@@ -38,6 +38,7 @@ namespace PhysioBoo.Presentation
             builder.Services.AddGrpc();
             builder.Services.AddGrpcReflection();
             builder.Services.AddOpenApi();
+            builder.Services.AddQueryHandlers();
             builder.Services.AddSettings<MailSettings>(builder.Configuration, "Email");
 
             if (builder.Environment.IsProduction())

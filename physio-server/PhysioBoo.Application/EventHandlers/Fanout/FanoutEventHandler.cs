@@ -1,8 +1,9 @@
 ﻿using MassTransit;
 using PhysioBoo.Domain.Interfaces;
+using PhysioBoo.Domain.Interfaces.EventHandlers;
 using PhysioBoo.Shared.Events;
 
-namespace PhysioBoo.Domain.EventHandler.Fanout
+namespace PhysioBoo.Application.EventHandlers.Fanout
 {
     public sealed class FanoutEventHandler : IFanoutEventHandler
     {

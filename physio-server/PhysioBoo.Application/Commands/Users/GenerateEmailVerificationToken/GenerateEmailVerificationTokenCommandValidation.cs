@@ -7,12 +7,7 @@ namespace PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken
     {
         public GenerateEmailVerificationTokenCommandValidation()
         {
-            RuleForEmail();
-        }
 
-        public void RuleForEmail()
-        {
-            RuleFor(cmd => cmd.Email).NotEmpty().WithErrorCode(DomainErrorCodes.User.EmptyEmail).WithMessage("Email may not be empty.");
         }
     }
 }

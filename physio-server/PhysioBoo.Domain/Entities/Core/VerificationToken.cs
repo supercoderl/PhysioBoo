@@ -26,6 +26,7 @@ namespace PhysioBoo.Domain.Entities.Core
             UserId = userId;
             Token = token;
             ExpiresAt = expiresAt;
+            IsUsed = false;
             Type = type;
         }
 

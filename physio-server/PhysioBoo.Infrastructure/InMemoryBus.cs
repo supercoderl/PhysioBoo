@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using PhysioBoo.Domain.DomainEvents;
-using PhysioBoo.Domain.EventHandler.Fanout;
 using PhysioBoo.Domain.Interfaces;
+using PhysioBoo.Domain.Interfaces.EventHandlers;
 using PhysioBoo.Shared.Events;
 using PhysioBoo.SharedKenel.Commands;
 

@@ -1,6 +1,6 @@
 ﻿using PhysioBoo.Shared.Events;
 
-namespace PhysioBoo.Domain.EventHandler.Fanout
+namespace PhysioBoo.Domain.Interfaces.EventHandlers
 {
     public interface IFanoutEventHandler
     {

@@ -1,0 +1,6 @@
+@PhysioBoo.Presentation_HostAddress = http://localhost:5047
+
+GET {{PhysioBoo.Presentation_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

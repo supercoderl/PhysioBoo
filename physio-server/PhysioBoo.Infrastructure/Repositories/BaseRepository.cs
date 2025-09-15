@@ -1,0 +1,274 @@
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.Caching.Memory;
+using PhysioBoo.Domain.Entities;
+using PhysioBoo.Domain.Interfaces.Repositories;
+using PhysioBoo.SharedKenel.Utils;
+using PhysioBoo.SharedKenel.ViewModels;
+using System.Linq.Expressions;
+using System.Reflection;
+
+namespace PhysioBoo.Infrastructure.Repositories
+{
+    public class BaseRepository<TEntity> : IRepository<TEntity> where TEntity : Entity
+    {
+        private readonly DbContext _dbContext;
+        protected readonly DbSet<TEntity> DbSet;
+
+        protected BaseRepository(DbContext context)
+        {
+            _dbContext = context;
+            DbSet = _dbContext.Set<TEntity>();
+        }
+
+        // OPTIMIZED QUERY METHODS WITH PAGINATION AND FILTERING
+        public virtual IQueryable<TEntity> GetAll(
+            Expression<Func<TEntity, bool>>? filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+            string includeProperties = "")
+        {
+            IQueryable<TEntity> query = DbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            foreach (var includeProperty in includeProperties.Split(
+                new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            if (orderBy != null)
+            {
+                return orderBy(query);
+            }
+
+            return query;
+        }
+
+        public virtual IQueryable<TEntity> GetAllNoTracking(
+            Expression<Func<TEntity, bool>>? filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+            string includeProperties = "")
+        {
+            return GetAll(filter, orderBy, includeProperties).AsNoTracking();
+        }
+
+        // PAGINATED QUERIES FOR BETTER PERFORMANCE
+        public virtual async Task<PagedResult<TEntity>> GetPagedAsync(
+            int pageNumber = 1,
+            int pageSize = 10,
+            Expression<Func<TEntity, bool>>? filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+            string includeProperties = "",
+            CancellationToken cancellationToken = default)
+        {
+            var query = GetAllNoTracking(filter, orderBy, includeProperties);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return new PagedResult<TEntity>(totalCount, items, pageNumber, pageSize);
+        }
+
+        // OPTIMIZED BULK OPERATIONS
+        public async Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        {
+            await DbSet.AddRangeAsync(entities, cancellationToken);
+        }
+
+        public async Task BulkInsertAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        {
+            // For large datasets, consider using EF Core bulk extensions
+            const int batchSize = 1000;
+            var batches = entities.Batch(batchSize);
+
+            foreach (var batch in batches)
+            {
+                await DbSet.AddRangeAsync(batch, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+                _dbContext.ChangeTracker.Clear(); // Clear tracking to save memory
+            }
+        }
+
+        // OPTIMIZED EXISTENCE CHECK
+        public virtual async Task<bool> ExistsAsync(
+            Expression<Func<TEntity, bool>> predicate,
+            CancellationToken cancellationToken = default)
+        {
+            return await DbSet.AsNoTracking().AnyAsync(predicate, cancellationToken);
+        }
+
+        public virtual async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            return await DbSet.AsNoTracking().AnyAsync(entity => entity.Id == id, cancellationToken);
+        }
+
+        // OPTIMIZED SINGLE ENTITY RETRIEVAL
+        public virtual async Task<TEntity?> GetByIdAsync(
+            Guid id,
+            string includeProperties = "",
+            CancellationToken cancellationToken = default)
+        {
+            IQueryable<TEntity> query = DbSet;
+
+            foreach (var includeProperty in includeProperties.Split(
+                new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            return await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        }
+
+        // COMPILED QUERIES FOR FREQUENTLY USED OPERATIONS
+        private static readonly Func<DbContext, Guid, Task<TEntity?>> GetByIdCompiledQuery =
+            EF.CompileAsyncQuery((DbContext context, Guid id) =>
+                context.Set<TEntity>().FirstOrDefault(e => e.Id == id));
+
+        public virtual async Task<TEntity?> GetByIdCompiledAsync(Guid id)
+        {
+            return await GetByIdCompiledQuery(_dbContext, id);
+        }
+
+        // RAW SQL QUERIES FOR COMPLEX OPERATIONS
+        public virtual async Task<IEnumerable<TEntity>> ExecuteRawSqlAsync(
+            string sql,
+            params object[] parameters)
+        {
+            return await DbSet.FromSqlRaw(sql, parameters).ToListAsync();
+        }
+
+        // STORED PROCEDURE EXECUTION
+        public virtual async Task<int> ExecuteStoredProcedureAsync(
+            string procedureName,
+            Dictionary<string, object> parameters,
+            CancellationToken cancellationToken = default)
+        {
+            var sqlParameters = parameters.Select(p =>
+                new SqlParameter($"@{p.Key}", p.Value ?? DBNull.Value)).ToArray();
+
+            var parameterNames = string.Join(", ", parameters.Keys.Select(k => $"@{k}"));
+            var sql = $"EXEC {procedureName} {parameterNames}";
+
+            return await _dbContext.Database.ExecuteSqlRawAsync(sql, sqlParameters, cancellationToken);
+        }
+
+        // OPTIMIZED SOFT DELETE WITH BULK OPERATIONS
+        public virtual async Task BulkSoftDeleteAsync(
+            Expression<Func<TEntity, bool>> predicate,
+            bool hardDelete = false,
+            CancellationToken cancellationToken = default)
+        {
+            var entities = await DbSet.Where(predicate).ToListAsync(cancellationToken);
+
+            if (hardDelete)
+            {
+                DbSet.RemoveRange(entities);
+            }
+
+            foreach (var entity in entities)
+            {
+                entity.Delete();
+            }
+        }
+
+        public virtual async Task<int> BatchDeleteAsync(
+            Expression<Func<TEntity, bool>> predicate,
+            CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Where(predicate)
+                .ExecuteDeleteAsync(cancellationToken);
+        }
+
+        public virtual async Task BatchUpdatePropertyAsync<TProperty>(
+                Expression<Func<TEntity, bool>> predicate,
+                Expression<Func<TEntity, TProperty>> propertySelector,
+                TProperty newValue,
+                CancellationToken cancellationToken = default)
+        {
+
+            var entities = await DbSet.Where(predicate).ToListAsync(cancellationToken);
+            var propertyInfo = GetPropertyInfo(propertySelector);
+        
+            foreach (var entity in entities)
+            {
+                propertyInfo.SetValue(entity, newValue);
+            }
+        }
+
+        // BATCH OPERATIONS
+        public virtual async Task<int> BatchUpdateMultipleAsync(
+            Expression<Func<TEntity, bool>> predicate,
+            Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setterExpression,
+            CancellationToken cancellationToken = default)
+        {
+            return await DbSet
+                .Where(predicate)
+                .ExecuteUpdateAsync(setterExpression, cancellationToken);
+        }
+
+
+        // CACHING SUPPORT
+        public virtual async Task<TEntity?> GetByIdWithCacheAsync(
+            Guid id,
+            IMemoryCache cache,
+            TimeSpan? expiration = null,
+            CancellationToken cancellationToken = default)
+        {
+            var cacheKey = $"{typeof(TEntity).Name}:{id}";
+
+            if (cache.TryGetValue(cacheKey, out TEntity? cachedEntity))
+            {
+                return cachedEntity;
+            }
+
+            var entity = await GetByIdAsync(id, cancellationToken: cancellationToken);
+
+            if (entity != null)
+            {
+                var options = new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = expiration ?? TimeSpan.FromMinutes(15)
+                };
+                cache.Set(cacheKey, entity, options);
+            }
+
+            return entity;
+        }
+
+        // HELPER METHODS
+        private static PropertyInfo GetPropertyInfo<TSource, TProperty>(
+            Expression<Func<TSource, TProperty>> propertyLambda)
+        {
+            if (propertyLambda.Body is not MemberExpression member)
+                throw new ArgumentException($"Expression '{propertyLambda}' refers to a method, not a property.");
+
+            if (member.Member is not PropertyInfo propInfo)
+                throw new ArgumentException($"Expression '{propertyLambda}' refers to a field, not a property.");
+
+            return propInfo;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _dbContext.Dispose();
+            }
+        }
+    }
+}

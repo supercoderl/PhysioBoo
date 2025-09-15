@@ -1,0 +1,242 @@
+<footer class="relative z-[1] bg-25 block">
+  <div class="pt-25 bg-white pb-10 relative overflow-hidden z-[1]">
+    <div class="container mx-auto">
+      <div class="grid grid-cols-3">
+        <div class="col-span-2">
+          <div class="grid grid-cols-4">
+            <div class="px-3" *ngFor="let menu of menus">
+              <div class="mb-5">
+                <h6
+                  class="text-primary text-lg font-semibold mb-6 capitalize"
+                >
+                  {{ menu.title }}
+                </h6>
+                <ul>
+                  <li
+                    class="mb-4 relative text-xs15"
+                    *ngFor="let menu_child of menu.children"
+                  >
+                    <a
+                      [href]="menu_child.href"
+                      class="text-brandDark transition-transform ease-in-out duration-500 text-xs15 relative inline-block hover:scale-x-110 origin-left transform-gpu"
+                    >
+                      {{ menu_child.title }}
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-3">
+          <div class="mb-5">
+            <h6
+              class="text-primary text-lg font-semibold mb-6 capitalize"
+            >
+              Newsletter
+            </h6>
+            <p class="mb-2 text-xs15">
+              Subscribe &amp; Stay Updated from the Doccure
+            </p>
+            <div class="relative mb-6">
+              <form action="#" class="relative bg-transparent">
+                <input
+                  class="w-full h-13.5 rounded-1.25 pr-25 border border-solid border-borderGray text-xs14 text-primary min-h-9.5 bg-white py-1.75 pl-3.75 transition-smooth block outline-none focus:bg-transparent"
+                  placeholder="Enter Email Address"
+                  type="email"
+                /><button
+                  type="submit"
+                  class="absolute right-4 top-1/2 -translate-y-1/2 rounded-11 text-white border-0 overflow-hidden z-[1] py-[0.315rem] px-3.4 text-[0.813rem] cursor-pointer transition-smooth inline-flex items-center"
+                >
+                  <i
+                    nz-icon
+                    nzType="send"
+                    nzTheme="outline"
+                    class="mr-1 w-3.25"
+                  ></i
+                  >Send
+                </button>
+              </form>
+            </div>
+            <div>
+              <h6 class="mb-3 text-lg font-semibold">Connect With Us</h6>
+              <ul class="flex items-center">
+                <li class="group mr-2 text-xs15">
+                  <a
+                    href="/react/template/index"
+                    class="flex-center-center bg-info w-8 h-8 rounded-full text-brandDark text-base transition-smooth group-hover:bg-black"
+                  >
+                    <lucide-angular
+                      [img]="Facebook"
+                      class="w-3.5 group-hover:animate-flip360 group-hover:stroke-white"
+                    />
+                  </a>
+                </li>
+                <li class="group mr-2 text-xs15">
+                  <a
+                    href="/react/template/index"
+                    class="flex-center-center bg-info w-8 h-8 rounded-full text-brandDark text-base transition-smooth group-hover:bg-black"
+                  >
+                    <lucide-angular
+                      [img]="Twitter"
+                      class="w-3.5 group-hover:animate-flip360 group-hover:stroke-white"
+                    />
+                  </a>
+                </li>
+                <li class="group mr-2 text-xs15">
+                  <a
+                    href="/react/template/index"
+                    class="flex-center-center bg-info w-8 h-8 rounded-full text-brandDark text-base transition-smooth group-hover:bg-black"
+                  >
+                    <lucide-angular
+                      [img]="Instagram"
+                      class="w-3.5 group-hover:animate-flip360 group-hover:stroke-white"
+                    />
+                  </a>
+                </li>
+                <li class="group mr-2 text-xs15">
+                  <a
+                    href="/react/template/index"
+                    class="flex-center-center bg-info w-8 h-8 rounded-full text-brandDark text-base transition-smooth group-hover:bg-black"
+                  >
+                    <lucide-angular
+                      [img]="Linkedin"
+                      class="w-3.5 group-hover:animate-flip360 group-hover:stroke-white"
+                    />
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <img
+        class="absolute top-[20%] left-0 z-[-1]"
+        alt="img"
+        src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/bg/footer-bg-01.png"
+      /><img
+        class="absolute top-0 right-0 h-full z-[-1]"
+        alt="img"
+        src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/bg/footer-bg-02.png"
+      /><img
+        class="absolute bottom-0 left-0 h-full z-[-1]"
+        alt="img"
+        src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/bg/footer-bg-03.png"
+      /><img
+        class="absolute bottom-0 left-[10%] h-full z-[-1]"
+        alt="img"
+        src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/bg/footer-bg-04.png"
+      /><img
+        class="absolute top-0 right-0 z-[-1]"
+        alt="img"
+        src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/bg/footer-bg-05.png"
+      />
+    </div>
+  </div>
+  <div class="bg-info border border-solid border-white">
+    <div class="container mx-auto">
+      <div class="pt-4 pb-1.5 flex-center-between flex-wrap">
+        <div class="mb-2.5">
+          <p class="text-base text-brandDark mb-0">
+            Copyright © 2025 Doccure. All Rights Reserved
+          </p>
+        </div>
+        <div>
+          <ul class="text-base mb-1.25">
+            <li
+              class="inline-flex mr-2 ml-1.25 pr-3.5 relative text-xs15 items-center"
+            >
+              <a
+                href="/react/template/index"
+                class="text-brandDark transition-smooth text-xs15 relative"
+                >Legal Notice</a
+              >
+              <div
+                class="bg-secondary w-1.5 h-1.5 absolute right-0 left-auto rounded-full top-1/2 -translate-y-1/2 content-[''] text-white"
+              ></div>
+            </li>
+            <li
+              class="inline-flex mr-2 ml-1.25 pr-3.5 relative text-xs15 items-center"
+            >
+              <a
+                href="/privacy"
+                class="text-brandDark transition-smooth text-xs15 relative"
+                >Privacy Policy</a
+              >
+              <div
+                class="bg-secondary w-1.5 h-1.5 absolute right-0 left-auto rounded-full top-1/2 -translate-y-1/2 content-[''] text-white"
+              ></div>
+            </li>
+            <li
+              class="inline-flex mr-2 ml-1.25 pr-3.5 relative text-xs15"
+            >
+              <a
+                href="/term"
+                class="text-brandDark transition-smooth text-xs15 relative"
+                >Term & Condition</a
+              >
+            </li>
+          </ul>
+        </div>
+        <ul class="flex-center-end mb-2.5">
+          <li class="mr-2.5 text-xs15 inline-block">
+            <a
+              href="/react/template/index"
+              class="text-brandDark transition-smooth text-xs15 relative"
+              ><img
+                alt="Img"
+                src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/card-01.svg"
+            /></a>
+          </li>
+          <li class="mr-2.5 text-xs15">
+            <a
+              href="/react/template/index"
+              class="text-brandDark transition-smooth text-xs15 relative"
+              ><img
+                alt="Img"
+                src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/card-02.svg"
+            /></a>
+          </li>
+          <li class="mr-2.5 text-xs15">
+            <a
+              href="/react/template/index"
+              class="text-brandDark transition-smooth text-xs15 relative"
+              ><img
+                alt="Img"
+                src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/card-03.svg"
+            /></a>
+          </li>
+          <li class="mr-2.5 text-xs15">
+            <a
+              href="/react/template/index"
+              class="text-brandDark transition-smooth text-xs15 relative"
+              ><img
+                alt="Img"
+                src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/card-04.svg"
+            /></a>
+          </li>
+          <li class="mr-2.5 text-xs15">
+            <a
+              href="/react/template/index"
+              class="text-brandDark transition-smooth text-xs15 relative"
+              ><img
+                alt="Img"
+                src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/card-05.svg"
+            /></a>
+          </li>
+          <li class="mr-2.5 text-xs15">
+            <a
+              href="/react/template/index"
+              class="text-brandDark transition-smooth text-xs15 relative"
+              ><img
+                alt="Img"
+                src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/card-06.svg"
+            /></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>

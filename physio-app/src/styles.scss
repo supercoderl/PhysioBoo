@@ -1,0 +1,54 @@
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "aos/dist/aos.css";
+
+:root {
+  /* Light mode */
+  --twc-bg-header: 249 249 249; /* #f9f9f9 */
+  --twc-primary: 1 32 71; /* #012047 */
+  --twc-secondary: 14 130 253; /* #0e82fd */
+  --twc-neutral: 46 56 66; /* #2e3842 */
+  --twc-border: 230 232 238; /* #E6E8EE */
+  --twc-brand-dark: 70 93 124; /* #465d7c */
+  --twc-info: 226 237 255; /* #e2edff */
+  --twc-danger: 224 79 22; /* #e04f16 */
+  --twc-info2: 240 246 255; /* #f0f6ff */
+}
+
+/* Dark mode */
+:root.dark {
+  /* Dark mode */
+  --twc-bg-header: 15 20 26; /* #0f141a */
+  --twc-primary: 158 193 255; /* #9ec1ff */
+  --twc-secondary: 99 179 255; /* #63b3ff */
+  --twc-neutral: 199 209 220; /* #c7d1dc */
+  --twc-border: 43 52 64; /* #2b3440 */
+  --twc-brand-dark: 169 182 201; /* #a9b6c9 */
+  --twc-info: 226 237 255; /* #e2edff */
+  --twc-danger: 224 79 22; /* #e04f16 */
+  --twc-info2: 240 246 255; /* #f0f6ff */
+}
+
+@layer utilities {
+  .flex-center-between {
+    @apply flex items-center justify-between;
+  }
+
+  .inlineFlex-center-center {
+    @apply inline-flex items-center justify-center;
+  }
+
+  .flex-center-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-center-end {
+    @apply flex items-center justify-end;
+  }
+
+  .transition-smooth {
+    @apply transition-all duration-500 ease-in-out;
+  }
+}

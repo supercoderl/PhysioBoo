@@ -1,0 +1,106 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./src/**/*.{html,js,ts}"],
+  darkMode: ['class', '[data-theme="dark"]'],
+  theme: {
+    extend: {
+      colors: {
+        primary: 'rgb(var(--twc-primary) / <alpha-value>)',
+        secondary: 'rgb(var(--twc-secondary) / <alpha-value>)',
+        neutral: 'rgb(var(--twc-neutral) / <alpha-value>)',
+        borderGray: 'rgb(var(--twc-border) / <alpha-value>)',
+        brandDark: 'rgb(var(--twc-brand-dark) / <alpha-value>)',
+        headerBg: 'rgb(var(--twc-bg-header) / <alpha-value>)',
+        info: 'rgb(var(--twc-info) / <alpha-value>)',
+        info2: 'rgb(var(--twc-info2) / <alpha-value>)',
+        danger: 'rgb(var(--twc-danger) / <alpha-value>)'
+      },
+      fontSize: {
+        xs14: "14px",
+        xs15: "15px",
+        '2.5xl': ['32px', { lineHeight: '40px' }], 
+      },
+      spacing: {
+        0.75: "3px",
+        1.25: "5px",
+        1.5: "6px",
+        1.75: "7px",
+        2.25: "9px",
+        3.25: "13px",
+        3.4: "0.85rem",
+        3.5: "14px",
+        3.6: "14.4px",
+        3.75: "15px",
+        4.5: "18px",
+        5.5: "22px",
+        6.25: "25px",
+        7.5: "30px",
+        8.25: "33px",
+        8.5: "34px",
+        9.5: "38px",
+        10.5: "42px",
+        11: "44px",
+        11.25: "45px",
+        11.252: "2.813rem",
+        11.5: "46px",
+        11.75: "47px",
+        12.5: "50px",
+        13.5: "54px",
+        14: "56px",
+        15: "60px",
+        17: "68px",
+        17.5: "70px",
+        18.75: "75px",
+        21.5: "86px",
+        25: "100px",
+        27: "108px",
+        28.75: "115px",
+        30: "120px",
+        41.25: "165px",
+        47.25: "189px",
+        50: "200px",
+        52: "208px",
+        55: "220px",
+        55.5: "222px",
+        62.75: "251px",
+        70: "280px"
+      },
+      borderRadius: {
+        1.25: '5px',
+        1.5: '6px',
+        xs: '3px',
+        5: '20px',
+        2.5: '10px',
+        7.5: '30px',
+        11: '44px',
+        17.5: '70px'
+      },
+      keyframes: {
+        mover: {
+          '0%': { transform: 'translateY(0px)' },
+          '100%': { transform: 'translateY(-15px)' },
+        },
+        flip360: {
+          '0%': { transform: 'rotateY(0deg)' },
+          '100%': { transform: 'rotateY(360deg)' },
+        },
+        tuck: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(calc(-50% - 0.5rem))' }, // = translate(calc(-50% - .5rem))
+        },
+        blinker: {
+          '0%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+      },
+      animation: {
+        mover: 'mover 3s infinite alternate',
+        flip360: 'flip360 0.35s linear forwards',
+        tuck: 'tuck 60s linear infinite reverse forwards',
+        blinker: 'blinker 0.6s ease-in-out infinite alternate',
+      },
+    },
+  },
+  plugins: [],
+}
+

@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Newtonsoft.Json;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.EventHandlers;
 using PhysioBoo.Shared.Events;
@@ -21,8 +22,9 @@ namespace PhysioBoo.Application.EventHandlers.Fanout
             var fanoutDomainEvent =
                 new FanoutDomainEvent(
                     @event.AggregateId,
-                    @event,
-                    _user.GetUserId()
+                    @event.GetType().Name,
+                    _user.GetUserId(),
+                    JsonConvert.SerializeObject(@event)
                 );
 
             await _massTransit.Publish(fanoutDomainEvent);

@@ -1,7 +1,7 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Caching.Memory;
+using Npgsql;
 using PhysioBoo.Domain.Entities;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.SharedKenel.Utils;
@@ -14,12 +14,14 @@ namespace PhysioBoo.Infrastructure.Repositories
     public class BaseRepository<TEntity> : IRepository<TEntity> where TEntity : Entity
     {
         private readonly DbContext _dbContext;
+        private readonly string _connectionString;
         protected readonly DbSet<TEntity> DbSet;
 
         protected BaseRepository(DbContext context)
         {
             _dbContext = context;
             DbSet = _dbContext.Set<TEntity>();
+            _connectionString = _dbContext.Database.GetConnectionString() ?? throw new ArgumentException("Connection does not exists.");
         }
 
         // OPTIMIZED QUERY METHODS WITH PAGINATION AND FILTERING
@@ -146,18 +148,38 @@ namespace PhysioBoo.Infrastructure.Repositories
         }
 
         // STORED PROCEDURE EXECUTION
-        public virtual async Task<int> ExecuteStoredProcedureAsync(
-            string procedureName,
+        public virtual async Task<List<T>> ExecutePostgresFunctionAsync<T>(
+            string functionName,
             Dictionary<string, object> parameters,
+            Func<NpgsqlDataReader, T> mapFunction,
             CancellationToken cancellationToken = default)
+            where T : class
         {
-            var sqlParameters = parameters.Select(p =>
-                new SqlParameter($"@{p.Key}", p.Value ?? DBNull.Value)).ToArray();
+            var results = new List<T>();
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            await connection.OpenAsync(cancellationToken);
 
             var parameterNames = string.Join(", ", parameters.Keys.Select(k => $"@{k}"));
-            var sql = $"EXEC {procedureName} {parameterNames}";
+            var sql = $"SELECT * FROM {functionName}({parameterNames})";
 
-            return await _dbContext.Database.ExecuteSqlRawAsync(sql, sqlParameters, cancellationToken);
+            using var command = new NpgsqlCommand(sql, connection);
+
+            // Add parameters
+            foreach (var param in parameters)
+            {
+                command.Parameters.AddWithValue($"@{param.Key}", param.Value ?? DBNull.Value);
+            }
+
+            using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+            while (await reader.ReadAsync(cancellationToken))
+            {
+                var item = mapFunction(reader);
+                results.Add(item);
+            }
+
+            return results;
         }
 
         // OPTIMIZED SOFT DELETE WITH BULK OPERATIONS
@@ -197,7 +219,7 @@ namespace PhysioBoo.Infrastructure.Repositories
 
             var entities = await DbSet.Where(predicate).ToListAsync(cancellationToken);
             var propertyInfo = GetPropertyInfo(propertySelector);
-        
+
             foreach (var entity in entities)
             {
                 propertyInfo.SetValue(entity, newValue);

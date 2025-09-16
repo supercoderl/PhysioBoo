@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PhysioBoo.Application.Commands.Mails.SendMail;
 using PhysioBoo.Application.Commands.Users.CreateUser;
 using PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken;
+using PhysioBoo.Application.Commands.Users.ResendVerification;
 using PhysioBoo.Application.EventHandlers.Fanout;
 using PhysioBoo.Application.EventHandlers.User;
 using PhysioBoo.Application.Queries.Users.GetById;
@@ -40,6 +41,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<CreateUserCommand>, CreateUserCommandHandler>();
             services.AddScoped<IRequestHandler<GenerateEmailVerificationTokenCommand>, GenerateEmailVerificationTokenCommandHandler>();
             services.AddScoped<IRequestHandler<SendMailCommand>, SendMailCommandHandler>();
+            services.AddScoped<IRequestHandler<ResendVerificationCommand>, ResendVerificationCommandHandler>();
 
             return services;
         }
@@ -71,6 +73,15 @@ namespace PhysioBoo.Application.Extensions
 
                     // Automatically configure all endpoints
                     cfg.ConfigureEndpoints(context);
+
+                    cfg.ReceiveEndpoint("physio-boo-fanout-event_error", e =>
+                    {
+                        e.Handler<Fault>(async context =>
+                        {
+                            Console.WriteLine($"Error: {context.Message.Exceptions.FirstOrDefault()?.Message}");
+                            await Task.CompletedTask;
+                        });
+                    });
                 });
             });
 

@@ -3,6 +3,7 @@ using PhysioBoo.Domain.Entities;
 using PhysioBoo.SharedKenel.ViewModels;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query;
+using Npgsql;
 
 namespace PhysioBoo.Domain.Interfaces.Repositories
 {
@@ -95,11 +96,12 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
             params object[] parameters
         );
 
-        Task<int> ExecuteStoredProcedureAsync(
-            string procedureName,
+        Task<List<T>> ExecutePostgresFunctionAsync<T>(
+            string functionName,
             Dictionary<string, object> parameters,
+            Func<NpgsqlDataReader, T> mapFunction,
             CancellationToken cancellationToken = default
-        );
+        ) where T : class;
         #endregion
     }
 }

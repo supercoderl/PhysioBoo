@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using PhysioBoo.Application.Commands.Users.CreateUser;
+using PhysioBoo.Application.Commands.Users.ResendVerification;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Notifications;
@@ -53,6 +54,42 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new user")
             .Produces<ResponseMessage<List<Guid>>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<List<Guid>>>(StatusCodes.Status400BadRequest);
+
+            // Resend verification
+            group.MapPost("/resend-verification", async (
+                ResendVerificationViewModel request,
+                IMediatorHandler bus,
+                INotificationHandler<DomainNotification> handler,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                var notifications = (DomainNotificationHandler)handler;
+
+                await bus.SendCommandAsync(new ResendVerificationCommand(request.UserId));
+
+                if (notifications.HasNotifications())
+                {
+                    return Results.BadRequest(new ResponseMessage<Guid>
+                    {
+                        Success = false,
+                        Errors = notifications.GetNotifications().Select(n => n.Value),
+                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
+                        {
+                            Code = n.Code,
+                            Data = n.Data
+                        })
+                    });
+                }
+
+                return Results.Created($"/api/users/resend-verrification/{request.UserId}", new ResponseMessage<Guid>
+                {
+                    Success = true,
+                    Data = request.UserId
+                });
+            }).WithName("Resend Verification")
+            .WithSummary("Resend Email Verification Token For User")
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
         }
     }
 }

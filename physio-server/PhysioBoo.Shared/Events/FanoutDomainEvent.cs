@@ -1,14 +1,20 @@
-﻿namespace PhysioBoo.Shared.Events
+﻿using Newtonsoft.Json;
+
+namespace PhysioBoo.Shared.Events
 {
     public class FanoutDomainEvent : DomainEvent
     {
-        public DomainEvent DomainEvent { get; }
+        public string EventType { get; }
         public Guid? UserId { get; }
+        public string Payload { get; }
 
-        public FanoutDomainEvent(Guid aggregateId, DomainEvent domainEvent, Guid? userId) : base(aggregateId)
+        [JsonConstructor]
+        public FanoutDomainEvent(Guid aggregateId, string eventType, Guid? userId, string payload)
+            : base(aggregateId)
         {
-            DomainEvent = domainEvent;
+            EventType = eventType;
             UserId = userId;
+            Payload = payload;
         }
     }
 }

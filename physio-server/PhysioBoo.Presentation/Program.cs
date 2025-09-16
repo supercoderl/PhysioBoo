@@ -2,10 +2,8 @@
 using Aikido.Zen.DotNetCore;
 using HealthChecks.ApplicationStatus.DependencyInjection;
 using HealthChecks.UI.Client;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using PhysioBoo.Application.Consumers;
+using Microsoft.Extensions.Caching.Memory;
 using PhysioBoo.Application.Extensions;
 using PhysioBoo.Application.gRPC;
 using PhysioBoo.Domain.Extensions;
@@ -14,8 +12,10 @@ using PhysioBoo.Infrastructure.Database;
 using PhysioBoo.Infrastructure.Extensions;
 using PhysioBoo.Presentation.Endpoints;
 using PhysioBoo.Presentation.Extensions;
+using PhysioBoo.Presentation.Warmup;
 using PhysioBoo.ServiceDefaults;
 using RabbitMQ.Client;
+using StackExchange.Profiling.Storage;
 
 namespace PhysioBoo.Presentation
 {
@@ -24,6 +24,14 @@ namespace PhysioBoo.Presentation
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            var isAspire = builder.Configuration["ASPIRE_ENABLED"] == "true";
+            var redisConnectionString =
+                isAspire ? builder.Configuration["ConnectionStrings:Redis"] : builder.Configuration["RedisHostName"];
+            var rabbitConfiguration = builder.Configuration.GetRabbitMqConfiguration();
+            var dbConnectionString = isAspire
+                ? builder.Configuration["ConnectionStrings:Database"]
+                : builder.Configuration["ConnectionStrings:DefaultConnection"];
 
             // Add services to the container.
 
@@ -39,7 +47,10 @@ namespace PhysioBoo.Presentation
             builder.Services.AddGrpcReflection();
             builder.Services.AddOpenApi();
             builder.Services.AddQueryHandlers();
+            builder.Services.AddPhysioBooConsumers(rabbitConfiguration.Host, rabbitConfiguration.Username, rabbitConfiguration.Password);
             builder.Services.AddSettings<MailSettings>(builder.Configuration, "Email");
+            builder.Services.AddSettings<ServerSettings>(builder.Configuration, "Server");
+            builder.Services.AddHostedService<WarmupConnection>();
 
             if (builder.Environment.IsProduction())
             {
@@ -52,14 +63,6 @@ namespace PhysioBoo.Presentation
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
             #endregion
-
-            var isAspire = builder.Configuration["ASPIRE_ENABLED"] == "true";
-            var redisConnectionString =
-                isAspire ? builder.Configuration["ConnectionStrings:Redis"] : builder.Configuration["RedisHostName"];
-            var rabbitConfiguration = builder.Configuration.GetRabbitMqConfiguration();
-            var dbConnectionString = isAspire
-                ? builder.Configuration["ConnectionStrings:Database"]
-                : builder.Configuration["ConnectionStrings:DefaultConnection"];
 
             #region Rabbit MQ Config
             if (builder.Environment.IsProduction())
@@ -120,45 +123,6 @@ namespace PhysioBoo.Presentation
             }
             #endregion
 
-            #region Consumers
-            builder.Services.AddMassTransit(x =>
-            {
-                x.AddConsumer<FanoutEventConsumer>();
-
-                x.UsingRabbitMq((context, cfg) =>
-                {
-                    cfg.ConfigureNewtonsoftJsonSerializer(settings =>
-                    {
-                        settings.TypeNameHandling = TypeNameHandling.Objects;
-                        settings.NullValueHandling = NullValueHandling.Ignore;
-                        return settings;
-                    });
-                    cfg.UseNewtonsoftJsonSerializer();
-                    cfg.ConfigureNewtonsoftJsonDeserializer(settings =>
-                    {
-                        settings.TypeNameHandling = TypeNameHandling.Objects;
-                        settings.NullValueHandling = NullValueHandling.Ignore;
-                        return settings;
-                    });
-
-                    cfg.Host(rabbitConfiguration.Host, (ushort)rabbitConfiguration.Port, "/", h => {
-                        h.Username(rabbitConfiguration.Username);
-                        h.Password(rabbitConfiguration.Password);
-                    });
-
-                    // Every instance of the service will receive the message
-                    cfg.ReceiveEndpoint("physio-boo-fanout-event-" + Guid.NewGuid(), e =>
-                    {
-                        e.Durable = false;
-                        e.AutoDelete = true;
-                        e.ConfigureConsumer<FanoutEventConsumer>(context);
-                        e.DiscardSkippedMessages();
-                    });
-                    cfg.ConfigureEndpoints(context);
-                });
-            });
-            #endregion
-
             #region MediatR
             builder.Services.AddMediatR(cfg =>
             {
@@ -172,6 +136,19 @@ namespace PhysioBoo.Presentation
                 console.TimestampFormat = "[yyyy-MM-ddTHH:mm:ss.fff]";
                 console.IncludeScopes = true;
             }));
+            #endregion
+
+            #region Mini Profiler
+            builder.Services.AddMemoryCache();
+            builder.Services.AddMiniProfiler(options =>
+            {
+                options.RouteBasePath = "/profiler";
+                options.Storage = new MemoryCacheStorage(
+                    new MemoryCache(new MemoryCacheOptions()), // IMemoryCache
+                    TimeSpan.FromMinutes(60)
+                );
+                options.TrackConnectionOpenClose = true;
+            }).AddEntityFramework();
             #endregion
 
             var app = builder.Build();
@@ -197,6 +174,7 @@ namespace PhysioBoo.Presentation
                 app.UseSwagger();
                 app.UseSwaggerUI();
                 app.MapGrpcReflectionService();
+                app.UseMiniProfiler();
             }
 
             app.UseHttpsRedirection();
@@ -214,7 +192,7 @@ namespace PhysioBoo.Presentation
             // Map endpoints
             app.MapUserEndpoints();
 
-            app.MapHealthChecks("/heathz", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+            app.MapHealthChecks("/healthz", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
             {
                 ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
             });

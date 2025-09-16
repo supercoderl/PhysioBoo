@@ -25,7 +25,7 @@ namespace PhysioBoo.Infrastructure
             catch (DbUpdateException dbUpdateException)
             {
                 _logger.LogError(dbUpdateException, "An error occured during commiting changes");
-                return false;
+                throw;
             }
         }
 

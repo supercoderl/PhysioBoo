@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Notifications;
@@ -29,18 +31,37 @@ namespace PhysioBoo.Application.Commands
                 return false;
             }
 
-            if (await _unitOfWork.CommitAsync())
+            try
             {
-                return true;
+                return await _unitOfWork.CommitAsync();
             }
+            catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx)
+            {
+                var parts = pgEx.ConstraintName?.Split('_');
+                var lastPart = parts?.LastOrDefault();
 
-            await Bus.RaiseEventAsync(
-                new DomainNotification(
+                string field = lastPart ?? "Unknown";
+                string code = $"DUPLICATE_{field.ToUpper()}";
+                string message = $"{field} already exists.";
+
+                await Bus.RaiseEventAsync(new DomainNotification(
                     "Commit",
-                    "Problem occured while saving the data. Please try again.",
-                    ErrorCodes.CommitFailed));
+                    message,
+                    code,
+                    new { pgEx.ConstraintName }));
 
-            return false;
+                return false;
+            }
+            catch (Exception)
+            {
+                await Bus.RaiseEventAsync(new DomainNotification(
+                    "Commit",
+                    "Unexpected error while saving the data.",
+                    ErrorCodes.CommitFailed)
+                );
+
+                return false;
+            }
         }
 
         protected async Task NotifyAsync(string key, string message, string code)

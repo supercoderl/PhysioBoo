@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using MassTransit;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PhysioBoo.Application.Commands.Mails.SendMail;
 using PhysioBoo.Application.Queries.Users.GetById;
@@ -6,29 +7,37 @@ using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Settings;
 using PhysioBoo.Shared.Events.Users;
 
-namespace PhysioBoo.Application.EventHandlers.User
+namespace PhysioBoo.Application.Consumers.Users
 {
-    public sealed class EmailVerificationTokenEmailHandler : INotificationHandler<EmailVerificationTokenGeneratedEvent>
+    public sealed class EmailVerificationTokenGeneratedEventConsumer : IConsumer<EmailVerificationTokenGeneratedEvent>
     {
+        private readonly ILogger<EmailVerificationTokenGeneratedEventConsumer> _logger;
         private readonly IMediatorHandler _bus;
         private readonly ServerSettings _server;
 
-        public EmailVerificationTokenEmailHandler(
+        public EmailVerificationTokenGeneratedEventConsumer(
+            ILogger<EmailVerificationTokenGeneratedEventConsumer> logger,
             IMediatorHandler bus,
             IOptions<ServerSettings> options
         )
         {
+            _logger = logger;
             _bus = bus;
             _server = options.Value;
         }
 
-        public async Task Handle(EmailVerificationTokenGeneratedEvent notification, CancellationToken cancellationToken)
+        public async Task Consume(ConsumeContext<EmailVerificationTokenGeneratedEvent> context)
         {
-            var user = await _bus.QueryAsync(new GetUserByIdQuery(notification.UserId));
+            _logger.LogInformation(
+                "EmailVerificationTokenGeneratedEventConsumer handled for User {UserId}, CorrelationId {CorrelationId}",
+                context.Message.UserId, context.CorrelationId
+            );
+
+            var user = await _bus.QueryAsync(new GetUserByIdQuery(context.Message.UserId));
 
             if (user != null)
             {
-                var verificationUrl = $"{_server.BaseUrl}/verify-email?token={notification.Token}";
+                var verificationUrl = $"{_server.BaseUrl}/verify-email?token={context.Message.Token}";
 
                 var subject = "Verify Your Email Address - Action Required";
 

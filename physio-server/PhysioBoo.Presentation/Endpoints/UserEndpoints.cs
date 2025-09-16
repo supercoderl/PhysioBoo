@@ -1,6 +1,8 @@
-﻿using PhysioBoo.Application.Commands.Users.CreateUser;
+﻿using MediatR;
+using PhysioBoo.Application.Commands.Users.CreateUser;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Interfaces;
+using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Presentation.Models;
 
 namespace PhysioBoo.Presentation.Endpoints
@@ -17,15 +19,36 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/", async (
                 CreateUserViewModel newUser,
                 IMediatorHandler bus,
+                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
+                var notifications = (DomainNotificationHandler)handler;
+
                 await bus.SendCommandAsync(new CreateUserCommand(new List<CreateUserViewModel>
                 {
                     newUser
                 }));
 
-                return newUser.Id;
+                if (notifications.HasNotifications())
+                {
+                    return Results.BadRequest(new ResponseMessage<List<Guid>>
+                    {
+                        Success = false,
+                        Errors = notifications.GetNotifications().Select(n => n.Value),
+                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
+                        {
+                            Code = n.Code,
+                            Data = n.Data
+                        })
+                    });
+                }
+
+                return Results.Created($"/api/users/{newUser.Id}", new ResponseMessage<List<Guid>>
+                {
+                    Success = true,
+                    Data = new List<Guid> { newUser.Id }
+                });
             }).WithName("CreateUser")
             .WithSummary("Create new user")
             .Produces<ResponseMessage<List<Guid>>>(StatusCodes.Status201Created)

@@ -1,5 +1,7 @@
-﻿using MediatR;
+﻿using MassTransit;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using PhysioBoo.Application.Commands.Mails.SendMail;
 using PhysioBoo.Application.Commands.Users.CreateUser;
 using PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken;
 using PhysioBoo.Application.EventHandlers.Fanout;
@@ -8,7 +10,6 @@ using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Interfaces.EventHandlers;
 using PhysioBoo.Shared.Events.Users;
-using PhysioBoo.SharedKenel.ViewModels;
 
 namespace PhysioBoo.Application.Extensions
 {
@@ -21,9 +22,6 @@ namespace PhysioBoo.Application.Extensions
 
             // User
             services.AddScoped<INotificationHandler<UsersCreatedEvent>, UserCacheEventHandler>();
-            services.AddScoped<INotificationHandler<UsersCreatedEvent>, UserEmailVerificationEventHandler>();
-            services.AddScoped<INotificationHandler<EmailVerificationRequiredEvent>, EmailVerificationRequiredEventHandler>();
-            services.AddScoped<INotificationHandler<EmailVerificationTokenGeneratedEvent>, EmailVerificationTokenEmailHandler>();
 
             return services;
         }
@@ -41,6 +39,40 @@ namespace PhysioBoo.Application.Extensions
             // User
             services.AddScoped<IRequestHandler<CreateUserCommand>, CreateUserCommandHandler>();
             services.AddScoped<IRequestHandler<GenerateEmailVerificationTokenCommand>, GenerateEmailVerificationTokenCommandHandler>();
+            services.AddScoped<IRequestHandler<SendMailCommand>, SendMailCommandHandler>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddPhysioBooConsumers(
+            this IServiceCollection services,
+            string rabbitMqHost,
+            string username = "guest",
+            string password = "guest"
+        )
+        {
+            services.AddMassTransit(x =>
+            {
+                // Auto scan all consumers in current assembly
+                x.AddConsumers(typeof(ServiceCollectionExtensions).Assembly);
+
+                // Set queue name format to kebab-case standard, prefix "phyo-boo"
+                x.SetEndpointNameFormatter(
+                    new KebabCaseEndpointNameFormatter("physio-boo", false)
+                );
+
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(rabbitMqHost, "/", h =>
+                    {
+                        h.Username(username);
+                        h.Password(password);
+                    });
+
+                    // Automatically configure all endpoints
+                    cfg.ConfigureEndpoints(context);
+                });
+            });
 
             return services;
         }

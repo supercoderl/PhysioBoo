@@ -12,6 +12,7 @@
     <PackageReference Include="MassTransit.Newtonsoft" Version="8.5.2" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
+    <PackageReference Include="Npgsql" Version="9.0.3" />
   </ItemGroup>
 
   <ItemGroup>

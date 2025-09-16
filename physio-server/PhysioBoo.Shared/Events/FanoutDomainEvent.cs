@@ -2,8 +2,8 @@
 {
     public class FanoutDomainEvent : DomainEvent
     {
-        public DomainEvent DomainEvent;
-        public Guid? UserId;
+        public DomainEvent DomainEvent { get; }
+        public Guid? UserId { get; }
 
         public FanoutDomainEvent(Guid aggregateId, DomainEvent domainEvent, Guid? userId) : base(aggregateId)
         {

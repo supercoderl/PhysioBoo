@@ -1,4 +1,4 @@
-﻿namespace PhysioBoo.SharedKenel.ViewModels
+﻿namespace PhysioBoo.SharedKernel.ViewModels
 {
     // SUPPORTING CLASSES
     public class PagedResult<T>

@@ -5,7 +5,7 @@ VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysioBoo.Domain", "PhysioBoo.Domain\PhysioBoo.Domain.csproj", "{2C0E3E22-A728-4B84-8A18-8C66FA93AE57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysioBoo.SharedKenel", "PhysioBoo.SharedKenel\PhysioBoo.SharedKenel.csproj", "{4C1FB89D-7D76-4A10-A0B5-2EF159485DCE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysioBoo.SharedKernel", "PhysioBoo.SharedKenel\PhysioBoo.SharedKernel.csproj", "{4C1FB89D-7D76-4A10-A0B5-2EF159485DCE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysioBoo.Infrastructure", "PhysioBoo.Infrastructure\PhysioBoo.Infrastructure.csproj", "{CF8D14FF-DBDB-471F-AE15-4B664BF23CD0}"
 EndProject

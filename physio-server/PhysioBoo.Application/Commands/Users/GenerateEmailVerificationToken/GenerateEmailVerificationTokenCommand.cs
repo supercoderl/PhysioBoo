@@ -1,6 +1,6 @@
 ﻿using MediatR;
-using PhysioBoo.Application.ViewModels.Users;
-using PhysioBoo.SharedKenel.Commands;
+using PhysioBoo.Application.ViewModels.VerificationTokens;
+using PhysioBoo.SharedKernel.Commands;
 
 namespace PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken
 {
@@ -8,10 +8,10 @@ namespace PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken
     {
         private static readonly GenerateEmailVerificationTokenCommandValidation s_validation = new();
 
-        public List<VerificationTokenViewModel> NewListVerificationTokens { get; }
+        public List<CreateVerificationTokenViewModel> NewListVerificationTokens { get; }
 
         public GenerateEmailVerificationTokenCommand(
-            List<VerificationTokenViewModel> newListVerificationTokens
+            List<CreateVerificationTokenViewModel> newListVerificationTokens
         ) : base(Guid.NewGuid())
         {
             NewListVerificationTokens = newListVerificationTokens;

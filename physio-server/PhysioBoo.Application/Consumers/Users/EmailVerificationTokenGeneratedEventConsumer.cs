@@ -37,7 +37,7 @@ namespace PhysioBoo.Application.Consumers.Users
 
             if (user != null)
             {
-                var verificationUrl = $"{_server.BaseUrl}/verify-email?token={context.Message.Token}";
+                var verificationUrl = $"{_server.BaseUrl}/api/users/verify-email?token={context.Message.Token}";
 
                 var subject = "Verify Your Email Address - Action Required";
 

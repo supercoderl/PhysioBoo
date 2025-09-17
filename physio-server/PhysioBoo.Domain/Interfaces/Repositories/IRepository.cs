@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using PhysioBoo.Domain.Entities;
-using PhysioBoo.SharedKenel.ViewModels;
+using PhysioBoo.SharedKernel.ViewModels;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.Query;
 using Npgsql;
@@ -54,11 +54,10 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
         #endregion
 
         #region Update Methods
-        Task BatchUpdatePropertyAsync<TProperty>(
-                Expression<Func<TEntity, bool>> predicate,
-                Expression<Func<TEntity, TProperty>> propertySelector,
-                TProperty newValue,
-                CancellationToken cancellationToken = default
+        Task<int> BatchUpdateAsync<TUpdateDto>(
+            Expression<Func<TEntity, bool>> predicate,
+            TUpdateDto updateDto,
+            CancellationToken cancellationToken = default
         );
 
         Task<int> BatchUpdateMultipleAsync(

@@ -1,9 +1,9 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
 using PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken;
+using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Shared.Events.Users;
-using PhysioBoo.SharedKenel.Utils;
 using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Application.Consumers.Users
@@ -29,9 +29,9 @@ namespace PhysioBoo.Application.Consumers.Users
                 );
 
                 await _bus.SendCommandAsync(new GenerateEmailVerificationTokenCommand(
-                    new List<ViewModels.Users.VerificationTokenViewModel>
+                    new List<CreateVerificationTokenViewModel>
                     {
-                        new ViewModels.Users.VerificationTokenViewModel(
+                        new CreateVerificationTokenViewModel(
                             Guid.NewGuid(),
                             userId,
                             TokenHelper.GenerateTimestampedToken(24),

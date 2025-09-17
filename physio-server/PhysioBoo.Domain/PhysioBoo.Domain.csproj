@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PhysioBoo.SharedKenel\PhysioBoo.SharedKenel.csproj" />
+    <ProjectReference Include="..\PhysioBoo.SharedKenel\PhysioBoo.SharedKernel.csproj" />
     <ProjectReference Include="..\PhysioBoo.Shared\PhysioBoo.Shared.csproj" />
   </ItemGroup>
 

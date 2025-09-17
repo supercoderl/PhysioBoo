@@ -2,7 +2,7 @@
 using MediatR;
 using PhysioBoo.SharedKernel.Utils;
 
-namespace PhysioBoo.SharedKenel.Commands
+namespace PhysioBoo.SharedKernel.Commands
 {
     public abstract class CommandBase : IRequest
     {

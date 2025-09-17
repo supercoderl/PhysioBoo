@@ -1,37 +1,37 @@
 ﻿using MediatR;
+using PhysioBoo.Application.Queries.VerificationTokens.GetById;
+using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Enums;
+using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
-using PhysioBoo.Shared.Events.Users;
 using PhysioBoo.SharedKernel.Utils;
 using System.Data;
 using System.Text;
 
-namespace PhysioBoo.Application.Commands.Users.ResendVerification
+namespace PhysioBoo.Application.Queries.VerificationTokens.GetByToken
 {
-    public sealed class ResendVerificationCommandHandler : CommandHandlerBase, IRequestHandler<ResendVerificationCommand>
+    public sealed class GetVerificationTokenByTokenQueryHandler : IRequestHandler<GetVerificationTokenByTokenQuery, VerificationTokenViewModel?>
     {
         private readonly IVerificationTokenRepository _verificationTokenRepository;
+        private readonly IMediatorHandler _bus;
 
-        public ResendVerificationCommandHandler(
-            IMediatorHandler bus,
-            IUnitOfWork unitOfWork,
-            INotificationHandler<DomainNotification> notifications,
-            IVerificationTokenRepository verificationTokenRepository
-        ) : base(bus, unitOfWork, notifications)
+        public GetVerificationTokenByTokenQueryHandler(
+            IVerificationTokenRepository verificationTokenRepository,
+            IMediatorHandler bus
+        )
         {
             _verificationTokenRepository = verificationTokenRepository;
+            _bus = bus;
         }
 
-        public async Task Handle(ResendVerificationCommand request, CancellationToken cancellationToken)
+        public async Task<VerificationTokenViewModel?> Handle(GetVerificationTokenByTokenQuery request, CancellationToken cancellationToken)
         {
-            if (!await TestValidityAsync(request)) return;
-
             var parameters = new Dictionary<string, object>
             {
-                { "p_user_id", request.UserId }
+                ["p_token"] = request.Token
             };
 
             var result = await _verificationTokenRepository.ExecutePostgresFunctionAsync<VerificationToken>(
@@ -50,21 +50,21 @@ namespace PhysioBoo.Application.Commands.Users.ResendVerification
                     token.SetIsUsed(reader.GetBoolean("IsUsed"));
 
                     return token;
-                },
-                cancellationToken
+                }
             );
 
-            if(result.Any())
+            if (!result.Any())
             {
-                var verificationToken = result.First();
-                await Bus.RaiseEventAsync(new EmailVerificationTokenGeneratedEvent(request.UserId, verificationToken.Token, verificationToken.ExpiresAt));
-            } else
-            {
-                await Bus.RaiseEventAsync(new UsersCreatedEvent(new List<Guid>
-                {
-                    request.UserId,
-                }));
+                await _bus.RaiseEventAsync(new DomainNotification(
+                    nameof(GetVerificationTokenByIdQuery),
+                    $"Token does not exists. Please check again your url.",
+                    ErrorCodes.ObjectNotFound
+                ));
+
+                return null;
             }
+
+            return VerificationTokenViewModel.FromVerificationToken(result.First());
         }
     }
 }

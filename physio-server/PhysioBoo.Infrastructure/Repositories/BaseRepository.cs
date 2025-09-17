@@ -4,8 +4,8 @@ using Microsoft.Extensions.Caching.Memory;
 using Npgsql;
 using PhysioBoo.Domain.Entities;
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.SharedKenel.Utils;
-using PhysioBoo.SharedKenel.ViewModels;
+using PhysioBoo.SharedKernel.Utils;
+using PhysioBoo.SharedKernel.ViewModels;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -156,29 +156,30 @@ namespace PhysioBoo.Infrastructure.Repositories
             where T : class
         {
             var results = new List<T>();
-
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
 
-            var parameterNames = string.Join(", ", parameters.Keys.Select(k => $"@{k}"));
-            var sql = $"SELECT * FROM {functionName}({parameterNames})";
+            // Build parameter list with proper PostgreSQL named parameter syntax
+            var parameterList = string.Join(", ", parameters.Keys.Select((k, i) => $"{k} => ${i + 1}"));
+            var sql = $"SELECT * FROM {functionName}({parameterList})";
 
             using var command = new NpgsqlCommand(sql, connection);
 
-            // Add parameters
-            foreach (var param in parameters)
+            // Add parameters correctly - don't use $ in parameter name, only in SQL
+            int paramIndex = 1;
+            foreach (var param in parameters.Values)
             {
-                command.Parameters.AddWithValue($"@{param.Key}", param.Value ?? DBNull.Value);
+                // Parameter name should NOT include the $, only the SQL should
+                command.Parameters.Add(new NpgsqlParameter { Value = param ?? DBNull.Value });
+                paramIndex++;
             }
 
             using var reader = await command.ExecuteReaderAsync(cancellationToken);
-
             while (await reader.ReadAsync(cancellationToken))
             {
                 var item = mapFunction(reader);
                 results.Add(item);
             }
-
             return results;
         }
 
@@ -210,20 +211,17 @@ namespace PhysioBoo.Infrastructure.Repositories
                 .ExecuteDeleteAsync(cancellationToken);
         }
 
-        public virtual async Task BatchUpdatePropertyAsync<TProperty>(
-                Expression<Func<TEntity, bool>> predicate,
-                Expression<Func<TEntity, TProperty>> propertySelector,
-                TProperty newValue,
-                CancellationToken cancellationToken = default)
+        public virtual async Task<int> BatchUpdateAsync<TUpdateDto>(
+            Expression<Func<TEntity, bool>> predicate,
+            TUpdateDto updateDto,
+            CancellationToken cancellationToken = default)
         {
+            var setPropertiesExpression = EFCoreUpdateHelper
+                .BuildSetPropertiesExpression<TEntity, TUpdateDto>(updateDto);
 
-            var entities = await DbSet.Where(predicate).ToListAsync(cancellationToken);
-            var propertyInfo = GetPropertyInfo(propertySelector);
-
-            foreach (var entity in entities)
-            {
-                propertyInfo.SetValue(entity, newValue);
-            }
+            return await DbSet
+                .Where(predicate)
+                .ExecuteUpdateAsync(setPropertiesExpression, cancellationToken);
         }
 
         // BATCH OPERATIONS

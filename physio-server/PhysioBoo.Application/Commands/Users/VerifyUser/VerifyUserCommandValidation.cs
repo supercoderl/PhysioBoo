@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FluentValidation;
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.Users.VerifyUser
 {
-    class VerifyUserCommandValidation
+    public sealed class VerifyUserCommandValidation : AbstractValidator<VerifyUserCommand>
     {
+        public VerifyUserCommandValidation()
+        {
+            RuleForToken();
+        }
+
+        private void RuleForToken()
+        {
+            RuleFor(cmd => cmd.Token).NotEmpty().WithErrorCode(DomainErrorCodes.VerificationToken.EmptyToken).WithMessage("Token may not be empty.");
+        }
     }
 }

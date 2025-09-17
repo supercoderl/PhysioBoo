@@ -3,7 +3,7 @@ using PhysioBoo.Domain.DomainEvents;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.EventHandlers;
 using PhysioBoo.Shared.Events;
-using PhysioBoo.SharedKenel.Commands;
+using PhysioBoo.SharedKernel.Commands;
 
 namespace PhysioBoo.Infrastructure
 {

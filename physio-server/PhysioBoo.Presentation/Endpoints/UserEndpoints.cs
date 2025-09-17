@@ -1,6 +1,8 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.Users.CreateUser;
 using PhysioBoo.Application.Commands.Users.ResendVerification;
+using PhysioBoo.Application.Commands.Users.VerifyUser;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Notifications;
@@ -90,6 +92,42 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Resend Email Verification Token For User")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+
+            // Verify email
+            group.MapGet("/verify-email", async (
+                [FromQuery] string token,
+                IMediatorHandler bus,
+                INotificationHandler<DomainNotification> handler,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                var notifications = (DomainNotificationHandler)handler;
+
+                await bus.SendCommandAsync(new VerifyUserCommand(token));
+
+                if (notifications.HasNotifications())
+                {
+                    return Results.BadRequest(new ResponseMessage<string>
+                    {
+                        Success = false,
+                        Errors = notifications.GetNotifications().Select(n => n.Value),
+                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
+                        {
+                            Code = n.Code,
+                            Data = n.Data
+                        })
+                    });
+                }
+
+                return Results.Created($"/api/users/verify-email?token={token}", new ResponseMessage<string>
+                {
+                    Success = true,
+                    Data = token
+                });
+            }).WithName("Verify email")
+            .WithSummary("Verify email")
+            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
         }
     }
 }

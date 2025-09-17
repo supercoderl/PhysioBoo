@@ -1,4 +1,4 @@
-﻿namespace PhysioBoo.SharedKenel.Utils
+﻿namespace PhysioBoo.SharedKernel.Utils
 {
     // EXTENSION METHOD FOR BATCHING
     public static class EnumerableExtensions

@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using PhysioBoo.Application.ViewModels.Users;
-using PhysioBoo.SharedKenel.Commands;
+using PhysioBoo.SharedKernel.Commands;
 
 namespace PhysioBoo.Application.Commands.Users.CreateUser
 {

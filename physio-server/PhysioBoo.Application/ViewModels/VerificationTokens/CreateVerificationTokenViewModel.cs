@@ -1,8 +1,8 @@
 ﻿using PhysioBoo.Domain.Enums;
 
-namespace PhysioBoo.Application.ViewModels.Users
+namespace PhysioBoo.Application.ViewModels.VerificationTokens
 {
-    public sealed record VerificationTokenViewModel
+    public sealed record CreateVerificationTokenViewModel
     (
         Guid Id,
         Guid UserId,

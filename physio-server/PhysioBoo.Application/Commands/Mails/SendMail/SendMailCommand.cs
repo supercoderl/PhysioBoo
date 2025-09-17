@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using PhysioBoo.SharedKenel.Commands;
+using PhysioBoo.SharedKernel.Commands;
 
 namespace PhysioBoo.Application.Commands.Mails.SendMail
 {

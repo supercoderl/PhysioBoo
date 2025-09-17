@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using PhysioBoo.Shared.Events;
-using PhysioBoo.SharedKenel.Commands;
+using PhysioBoo.SharedKernel.Commands;
 
 namespace PhysioBoo.Domain.Interfaces
 {

@@ -29,5 +29,11 @@
             public const string AlreadyExists = "USER_ALREADY_EXISTS";
             public const string PasswordIncorrect = "USER_PASSWORD_INCORRECT";
         }
+
+        public static class VerificationToken
+        {
+            // Token Validation
+            public const string EmptyToken = "VERIFICATION_TOKEN_EMPTY_TOKEN";
+        }
     }
 }

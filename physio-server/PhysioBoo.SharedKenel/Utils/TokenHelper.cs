@@ -1,8 +1,7 @@
-﻿using PhysioBoo.SharedKernel.Utils;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace PhysioBoo.SharedKenel.Utils
+namespace PhysioBoo.SharedKernel.Utils
 {
     public static class TokenHelper
     {

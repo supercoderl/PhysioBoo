@@ -5,10 +5,15 @@ using PhysioBoo.Application.Commands.Mails.SendMail;
 using PhysioBoo.Application.Commands.Users.CreateUser;
 using PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken;
 using PhysioBoo.Application.Commands.Users.ResendVerification;
+using PhysioBoo.Application.Commands.Users.UpdateUser;
+using PhysioBoo.Application.Commands.Users.VerifyUser;
 using PhysioBoo.Application.EventHandlers.Fanout;
 using PhysioBoo.Application.EventHandlers.User;
 using PhysioBoo.Application.Queries.Users.GetById;
+using PhysioBoo.Application.Queries.VerificationTokens.GetById;
+using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
 using PhysioBoo.Application.ViewModels.Users;
+using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Interfaces.EventHandlers;
 using PhysioBoo.Shared.Events.Users;
 
@@ -32,6 +37,10 @@ namespace PhysioBoo.Application.Extensions
             // User
             services.AddScoped<IRequestHandler<GetUserByIdQuery, UserViewModel?>, GetUserByIdQueryHandler>();
 
+            // Verification Token
+            services.AddScoped<IRequestHandler<GetVerificationTokenByIdQuery, VerificationTokenViewModel?>, GetVerificationTokenByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<GetVerificationTokenByTokenQuery, VerificationTokenViewModel?>, GetVerificationTokenByTokenQueryHandler>();
+
             return services;
         }
 
@@ -42,7 +51,8 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<GenerateEmailVerificationTokenCommand>, GenerateEmailVerificationTokenCommandHandler>();
             services.AddScoped<IRequestHandler<SendMailCommand>, SendMailCommandHandler>();
             services.AddScoped<IRequestHandler<ResendVerificationCommand>, ResendVerificationCommandHandler>();
-
+            services.AddScoped<IRequestHandler<VerifyUserCommand>, VerifyUserCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateUserCommand>, UpdateUserCommandHandler>();
             return services;
         }
 

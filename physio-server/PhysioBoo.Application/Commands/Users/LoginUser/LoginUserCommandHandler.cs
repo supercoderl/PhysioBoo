@@ -45,7 +45,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
                 return;
             }
 
-            //if (!await ValidatePassword(user, request)) return;
+            if (!await ValidatePassword(user, request)) return;
 
             if(!await CheckUserStatus(user, request)) return;
 

@@ -2,6 +2,8 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using PhysioBoo.Application.Commands.Mails.SendMail;
+using PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken;
+using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
 using PhysioBoo.Application.Commands.Users.CreateUser;
 using PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken;
 using PhysioBoo.Application.Commands.Users.LoginUser;
@@ -11,11 +13,11 @@ using PhysioBoo.Application.Commands.Users.UpdateUser;
 using PhysioBoo.Application.Commands.Users.VerifyUser;
 using PhysioBoo.Application.EventHandlers.Fanout;
 using PhysioBoo.Application.EventHandlers.User;
+using PhysioBoo.Application.Queries.RefreshTokens.GetByUserId;
 using PhysioBoo.Application.Queries.Users.GetByEmail;
 using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
-using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Interfaces.EventHandlers;
@@ -41,12 +43,15 @@ namespace PhysioBoo.Application.Extensions
         public static IServiceCollection AddQueryHandlers(this IServiceCollection services)
         {
             // User
-            services.AddScoped<IRequestHandler<GetUserByIdQuery, UserViewModel?>, GetUserByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<GetUserByIdQuery, User?>, GetUserByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetUserByEmailQuery, User?>, GetUserByEmailQueryHandler>();
 
             // Verification Token
             services.AddScoped<IRequestHandler<GetVerificationTokenByIdQuery, VerificationTokenViewModel?>, GetVerificationTokenByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetVerificationTokenByTokenQuery, VerificationTokenViewModel?>, GetVerificationTokenByTokenQueryHandler>();
+
+            // Refresh Token
+            services.AddScoped<IRequestHandler<GetRefreshTokensByUserIdQuery, List<RefreshToken>>, GetRefreshTokensByUserIdQueryHandler>();
 
             return services;
         }
@@ -62,6 +67,11 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<UpdateUserCommand>, UpdateUserCommandHandler>();
             services.AddScoped<IRequestHandler<LoginUserCommand>, LoginUserCommandHandler>();
             services.AddScoped<IRequestHandler<LogoutUserCommand>, LogoutUserCommandHandler>();
+            services.AddScoped<IRequestHandler<ChangePasswordUserCommand>, ChangePasswordUserCommandHandler>();
+
+            // Refresh Token
+            services.AddScoped<IRequestHandler<CreateRefreshTokenCommand>, CreateRefreshTokenCommandHandler>();
+
             return services;
         }
 

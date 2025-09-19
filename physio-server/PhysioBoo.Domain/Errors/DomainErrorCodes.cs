@@ -35,5 +35,12 @@
             // Token Validation
             public const string EmptyToken = "VERIFICATION_TOKEN_EMPTY_TOKEN";
         }
+
+        public static class RefreshToken
+        {
+            // Token Refreshing
+            public const string EmptyUserId = "REFRESH_TOKEN_EMPTY_USER_ID";
+            public const string EmptyToken = "REFRESH_TOKEN_EMPTY_TOKEN";
+        }
     }
 }

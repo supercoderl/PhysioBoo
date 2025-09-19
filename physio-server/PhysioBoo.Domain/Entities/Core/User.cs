@@ -123,6 +123,9 @@ namespace PhysioBoo.Domain.Entities.Core
         [InverseProperty("User")]
         public virtual ICollection<VerificationToken> VerificationTokens { get; private set; } = new List<VerificationToken>();
 
+        [InverseProperty("User")]
+        public virtual ICollection<RefreshToken> RefreshTokens { get; private set; } = new List<RefreshToken>();
+
         #endregion
 
         #region Constructor (21)

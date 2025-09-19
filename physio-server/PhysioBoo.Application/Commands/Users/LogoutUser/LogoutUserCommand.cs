@@ -7,11 +7,11 @@ namespace PhysioBoo.Application.Commands.Users.LogoutUser
     {
         private static readonly LogoutUserCommandValidation s_validation = new();
 
-        public string RefreshToken { get; }
+        public Guid UserId { get; }
 
-        public LogoutUserCommand(string refreshToken) : base(Guid.NewGuid())
+        public LogoutUserCommand(Guid userId) : base(Guid.NewGuid())
         {
-            RefreshToken = refreshToken;
+            UserId = userId;
         }
 
         public override bool IsValid()

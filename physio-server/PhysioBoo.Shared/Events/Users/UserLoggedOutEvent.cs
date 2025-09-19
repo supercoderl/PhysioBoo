@@ -2,7 +2,7 @@
 {
     public sealed class UserLoggedOutEvent : DomainEvent
     {
-        public UserLoggedOutEvent() : base(Guid.NewGuid())
+        public UserLoggedOutEvent(Guid UserId) : base(UserId)
         {
 
         }

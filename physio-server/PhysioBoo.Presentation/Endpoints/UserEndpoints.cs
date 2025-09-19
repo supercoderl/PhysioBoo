@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
 using PhysioBoo.Application.Commands.Users.CreateUser;
 using PhysioBoo.Application.Commands.Users.LoginUser;
 using PhysioBoo.Application.Commands.Users.LogoutUser;
@@ -172,21 +173,13 @@ namespace PhysioBoo.Presentation.Endpoints
                 HttpRequest request,
                 IMediatorHandler bus,
                 INotificationHandler<DomainNotification> handler,
+                IUser user,
                 CancellationToken cancellationToken
             ) =>
             {
                 var notifications = (DomainNotificationHandler)handler;
 
-                if (!request.Cookies.TryGetValue("refresh_token", out var rt) || string.IsNullOrWhiteSpace(rt))
-                {
-                    return Results.BadRequest(new ResponseMessage<string>
-                    {
-                        Success = false,
-                        Errors = new[] { "Missing refresh token." }
-                    });
-                }
-
-                await bus.SendCommandAsync(new LogoutUserCommand(rt));
+                await bus.SendCommandAsync(new LogoutUserCommand(user.GetUserId()));
 
                 if (notifications.HasNotifications())
                 {
@@ -210,7 +203,46 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("Logout")
             .WithSummary("Logout current user")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
+
+            // Change password
+            group.MapPost("/change-password", async (
+                [FromBody] ChangePasswordViewModel request,
+                IMediatorHandler bus,
+                INotificationHandler<DomainNotification> handler,
+                IUser user,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                var notifications = (DomainNotificationHandler)handler;
+
+                await bus.SendCommandAsync(new ChangePasswordUserCommand(user.GetUserId(), request.OldPassword, request.NewPassword));
+
+                if (notifications.HasNotifications())
+                {
+                    return Results.BadRequest(new ResponseMessage<string>
+                    {
+                        Success = false,
+                        Errors = notifications.GetNotifications().Select(n => n.Value),
+                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
+                        {
+                            Code = n.Code,
+                            Data = n.Data
+                        })
+                    });
+                }
+
+                return Results.Ok(new ResponseMessage<string>
+                {
+                    Success = true,
+                    Data = "Change password successfully. Please login again"
+                });
+            }).WithName("Change password")
+            .WithSummary("Change old password to new password")
+            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
         }
     }
 }

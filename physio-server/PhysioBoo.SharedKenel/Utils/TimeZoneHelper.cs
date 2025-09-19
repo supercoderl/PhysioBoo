@@ -26,7 +26,8 @@ namespace PhysioBoo.SharedKernel.Utils
         /// </summary>
         public static DateTime GetLocalTimeNow()
         {
-            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.Local);
+            var local = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.Local);
+            return DateTime.SpecifyKind(local, DateTimeKind.Unspecified);
         }
 
         /// <summary>

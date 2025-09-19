@@ -43,6 +43,7 @@ namespace PhysioBoo.Infrastructure.Extensions
             // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IVerificationTokenRepository, VerificationTokenRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
             return services;
         }

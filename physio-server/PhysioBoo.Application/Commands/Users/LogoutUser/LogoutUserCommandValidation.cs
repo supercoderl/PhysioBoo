@@ -6,12 +6,12 @@ namespace PhysioBoo.Application.Commands.Users.LogoutUser
     {
         public LogoutUserCommandValidation()
         {
-            RuleForRefreshToken();
+            RuleForUserId();
         }
 
-        private void RuleForRefreshToken()
+        private void RuleForUserId()
         {
-            RuleFor(cmd => cmd.RefreshToken).NotEmpty().WithErrorCode("LOGOUT_EMPTY_REFRESH_TOKEN").WithMessage("Refresh token may not be emtpy.");
+            RuleFor(cmd => cmd.UserId).NotEmpty().WithErrorCode("LOGOUT_EMPTY_USER_ID").WithMessage("User id may not be emtpy.");
         }
     }
 }

@@ -100,6 +100,9 @@ namespace PhysioBoo.Presentation
                 options.UseNpgsql(dbConnectionString,
                     b => b.MigrationsAssembly("PhysioBoo.Infrastructure")
                 );
+                options.EnableSensitiveDataLogging();
+                options.EnableDetailedErrors();
+                options.LogTo(Console.WriteLine, LogLevel.Information);
             });
             #endregion
 
@@ -158,6 +161,8 @@ namespace PhysioBoo.Presentation
                 options.TrackConnectionOpenClose = true;
             }).AddEntityFramework();
             #endregion
+
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
             var app = builder.Build();
 

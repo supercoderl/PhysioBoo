@@ -1,4 +1,7 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace PhysioBoo.SharedKernel.Utils
@@ -123,6 +126,43 @@ namespace PhysioBoo.SharedKernel.Utils
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Generate access token
+        /// </summary>
+        /// <param name="data">The dictionary with some datas</param>
+        public static string BuildToken(
+            Dictionary<string, string> claimDatas,
+            string secret,
+            string issuer,
+            string audience,
+            int expiryDurationMinutes = 15
+        )
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Email, claimDatas["Email"]),
+                new Claim(ClaimTypes.Role, claimDatas["Role"]),
+                new Claim(ClaimTypes.NameIdentifier, claimDatas["Id"]),
+                new Claim(ClaimTypes.Name, claimDatas["Name"])
+            };
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+
+            var credentials = new SigningCredentials(
+                securityKey,
+                SecurityAlgorithms.HmacSha256Signature
+            );
+
+            var tokenDescriptor = new JwtSecurityToken(
+                issuer,
+                audience,
+                claims,
+                expires: TimeZoneHelper.GetLocalTimeNow().AddMinutes(expiryDurationMinutes),
+                signingCredentials: credentials);
+
+            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
     }
 }

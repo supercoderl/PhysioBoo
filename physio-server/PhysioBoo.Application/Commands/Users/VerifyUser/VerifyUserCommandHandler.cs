@@ -44,10 +44,7 @@ namespace PhysioBoo.Application.Commands.Users.VerifyUser
                 return;
             }
 
-            if (await CommitAsync())
-            {
-                await Bus.RaiseEventAsync(new UserVerifiedEvent(request.Token));
-            }
+            await Bus.RaiseEventAsync(new UserVerifiedEvent(request.Token));
         }
     }
 }

@@ -3,6 +3,7 @@ using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Shared.Events.Users;
+using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Application.Commands.Users.CreateUser
 {
@@ -32,13 +33,13 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
                     userDTO.Id,
                     userDTO.Email,
                     userDTO.Phone,
-                    userDTO.Password,
+                    AuthHelper.HashPassword(userDTO.Password),
                     userDTO.Role,
                     _user.GetUserId() == Guid.Empty ? userDTO.Id : _user.GetUserId()
                 ))
             );
 
-            if(await CommitAsync())
+            if (await CommitAsync())
             {
                 var userIds = request.NewListUsers.Select(u => u.Id).ToList();
                 await Bus.RaiseEventAsync(new UsersCreatedEvent(userIds));

@@ -4,16 +4,20 @@ using Microsoft.Extensions.DependencyInjection;
 using PhysioBoo.Application.Commands.Mails.SendMail;
 using PhysioBoo.Application.Commands.Users.CreateUser;
 using PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken;
+using PhysioBoo.Application.Commands.Users.LoginUser;
+using PhysioBoo.Application.Commands.Users.LogoutUser;
 using PhysioBoo.Application.Commands.Users.ResendVerification;
 using PhysioBoo.Application.Commands.Users.UpdateUser;
 using PhysioBoo.Application.Commands.Users.VerifyUser;
 using PhysioBoo.Application.EventHandlers.Fanout;
 using PhysioBoo.Application.EventHandlers.User;
+using PhysioBoo.Application.Queries.Users.GetByEmail;
 using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Application.ViewModels.VerificationTokens;
+using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Interfaces.EventHandlers;
 using PhysioBoo.Shared.Events.Users;
 
@@ -28,6 +32,8 @@ namespace PhysioBoo.Application.Extensions
 
             // User
             services.AddScoped<INotificationHandler<UsersCreatedEvent>, UserCacheEventHandler>();
+            services.AddScoped<INotificationHandler<UserLoggedEvent>, UserCacheEventHandler>();
+            services.AddScoped<INotificationHandler<UserLoggedOutEvent>, UserCacheEventHandler>();
 
             return services;
         }
@@ -36,6 +42,7 @@ namespace PhysioBoo.Application.Extensions
         {
             // User
             services.AddScoped<IRequestHandler<GetUserByIdQuery, UserViewModel?>, GetUserByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<GetUserByEmailQuery, User?>, GetUserByEmailQueryHandler>();
 
             // Verification Token
             services.AddScoped<IRequestHandler<GetVerificationTokenByIdQuery, VerificationTokenViewModel?>, GetVerificationTokenByIdQueryHandler>();
@@ -53,6 +60,8 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<ResendVerificationCommand>, ResendVerificationCommandHandler>();
             services.AddScoped<IRequestHandler<VerifyUserCommand>, VerifyUserCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateUserCommand>, UpdateUserCommandHandler>();
+            services.AddScoped<IRequestHandler<LoginUserCommand>, LoginUserCommandHandler>();
+            services.AddScoped<IRequestHandler<LogoutUserCommand>, LogoutUserCommandHandler>();
             return services;
         }
 

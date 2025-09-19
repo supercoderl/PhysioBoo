@@ -224,6 +224,15 @@ namespace PhysioBoo.Infrastructure.Repositories
                 .ExecuteUpdateAsync(setPropertiesExpression, cancellationToken);
         }
 
+        // Overload for direct entity updates
+        public virtual async Task<int> UpdateTrackedAsync(
+            TEntity entity,
+            CancellationToken cancellationToken = default)
+        {
+            DbSet.Update(entity);
+            return await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
         // BATCH OPERATIONS
         public virtual async Task<int> BatchUpdateMultipleAsync(
             Expression<Func<TEntity, bool>> predicate,
@@ -234,7 +243,6 @@ namespace PhysioBoo.Infrastructure.Repositories
                 .Where(predicate)
                 .ExecuteUpdateAsync(setterExpression, cancellationToken);
         }
-
 
         // CACHING SUPPORT
         public virtual async Task<TEntity?> GetByIdWithCacheAsync(

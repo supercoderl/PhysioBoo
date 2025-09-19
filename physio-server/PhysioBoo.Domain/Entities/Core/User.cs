@@ -1,5 +1,4 @@
-﻿using Isopoh.Cryptography.Argon2;
-using PhysioBoo.Domain.Entities.Clinical;
+﻿using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
@@ -139,7 +138,7 @@ namespace PhysioBoo.Domain.Entities.Core
             Email = email;
             Phone = phone;
             AlternatePhone = null;
-            PasswordHash = Argon2.Hash(passwordHash);
+            PasswordHash = passwordHash;
             Role = role;
             IsActive = true;
             IsVerified = false;
@@ -164,7 +163,7 @@ namespace PhysioBoo.Domain.Entities.Core
         public void SetEmail(string email) { Email = email; }
         public void SetPhone(string phone) { Phone = phone; }
         public void SetAlternatePhone(string? alternatePhone) { AlternatePhone = alternatePhone; }
-        public void SetPassword(string newOriginPassword) { PasswordHash = Argon2.Hash(newOriginPassword); }
+        public void SetPassword(string passwordHash) { PasswordHash = passwordHash; }
         public void SetRole(Role role) { Role = role; }
         public void SetIsActive(bool isActive) { IsActive = isActive; }
         public void SetIsVerified(bool isVerified) { IsVerified = isVerified; }
@@ -176,12 +175,26 @@ namespace PhysioBoo.Domain.Entities.Core
         public void SetTwoFactorEnabled(bool twoFactorEnabled) { TwoFactorEnabled = twoFactorEnabled; }
         public void SetTwoFactorSecret(string? twoFactorSecret) { TwoFactorSecret = twoFactorSecret; }
         public void SetProfilePicture(string? profilePicture) { ProfilePicture = profilePicture; }
-        public void SetPreferredLanguage(string preferredLanguage) {  PreferredLanguage = preferredLanguage; }
+        public void SetPreferredLanguage(string preferredLanguage) { PreferredLanguage = preferredLanguage; }
         public void SetTimeZone(string timezone) { TimeZone = timezone; }
         public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         public void SetCreatedBy(Guid? createdBy) { CreatedBy = createdBy; }
         public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         public void SetUpdatedBy(Guid? updatedBy) { UpdatedBy = updatedBy; }
+        public void RegisterFailedLogin(int maxFailedAttempts, int lockoutMinutes)
+        {
+            if (FailedLoginAttempts >= maxFailedAttempts)
+            {
+                // Reset counter and lock account
+                FailedLoginAttempts = 0;
+                AccountLockedUntil = TimeZoneHelper.GetLocalTimeNow().AddMinutes(lockoutMinutes);
+            }
+            else
+            {
+                // Increase the number of mistakes
+                FailedLoginAttempts++;
+            }
+        }
         #endregion
     }
 }

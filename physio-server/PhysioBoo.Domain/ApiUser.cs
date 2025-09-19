@@ -11,6 +11,7 @@ namespace PhysioBoo.Domain
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<ApiUser> _logger;
         private string? _name;
+        private string? _timeZoneId;
         private Guid _userId = Guid.Empty;
 
         public ApiUser(IHttpContextAccessor httpContextAccessor, ILogger<ApiUser> logger)
@@ -79,6 +80,21 @@ namespace PhysioBoo.Domain
                     .Value;
                 _name = claim ?? string.Empty;
                 return _name;
+            }
+        }
+
+        public string? TimeZoneId
+        {
+            get
+            {
+                if (_timeZoneId is not null)
+                {
+                    return _timeZoneId;
+                }
+
+                _timeZoneId = _httpContextAccessor.HttpContext?.User.FindFirst("tz")?.Value ?? "UTC";
+
+                return _timeZoneId;
             }
         }
 

@@ -60,6 +60,11 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
             CancellationToken cancellationToken = default
         );
 
+        Task<int> UpdateTrackedAsync(
+            TEntity entity,
+            CancellationToken cancellationToken = default
+        );
+
         Task<int> BatchUpdateMultipleAsync(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setterExpression,

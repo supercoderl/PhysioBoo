@@ -57,6 +57,23 @@ namespace PhysioBoo.Presentation.Extensions
             return services;
         }
 
+        // CSRF Protection
+        public static IServiceCollection AddCSRFProtection(this IServiceCollection services, IWebHostEnvironment env)
+        {
+            services.AddAntiforgery(options =>
+            {
+                options.HeaderName = "X-XSRF-TOKEN";
+                options.Cookie.Name = "XSRF-TOKEN";
+
+                options.Cookie.HttpOnly = true;
+
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.None;
+            });
+
+            return services;
+        }
+
         public static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddHttpContextAccessor();
@@ -67,6 +84,7 @@ namespace PhysioBoo.Presentation.Extensions
                     jwtOptions =>
                     {
                         jwtOptions.TokenValidationParameters = CreateTokenValidationParameters(configuration);
+                        jwtOptions.Events = CreateBearerEvents(configuration);
                     });
 
             services
@@ -91,6 +109,24 @@ namespace PhysioBoo.Presentation.Extensions
                     Encoding.UTF8.GetBytes(
                         configuration["Auth:Secret"]!)),
                 RequireSignedTokens = false
+            };
+
+            return result;
+        }
+
+        public static JwtBearerEvents CreateBearerEvents(IConfiguration configuration)
+        {
+            var result = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    // Try to get token from cookie first
+                    if (context.Request.Cookies.ContainsKey("access_token"))
+                    {
+                        context.Token = context.Request.Cookies["access_token"];
+                    }
+                    return Task.CompletedTask;
+                }
             };
 
             return result;

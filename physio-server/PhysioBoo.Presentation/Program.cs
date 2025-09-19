@@ -51,10 +51,18 @@ namespace PhysioBoo.Presentation
             builder.Services.AddSettings<MailSettings>(builder.Configuration, "Email");
             builder.Services.AddSettings<ServerSettings>(builder.Configuration, "Server");
             builder.Services.AddHostedService<WarmupConnection>();
+            builder.Services.AddCSRFProtection(builder.Environment);
 
             if (builder.Environment.IsProduction())
             {
                 builder.Services.AddZenFirewall();
+
+                builder.Services.ConfigureApplicationCookie(options =>
+                {
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SameSite = SameSiteMode.None;
+                });
             }
 
             #region Handle Reference Loop - Avoid Errors When Using EF Core Navigation Properties
@@ -175,6 +183,9 @@ namespace PhysioBoo.Presentation
                 app.UseSwaggerUI();
                 app.MapGrpcReflectionService();
                 app.UseMiniProfiler();
+
+                // Map endpoints 
+                app.MapDevEndpoints();
             }
 
             app.UseHttpsRedirection();

@@ -31,6 +31,11 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .IsRequired()
                    .HasMaxLength(255);
 
+            builder.Property(u => u.EmailNormalized)
+                    .HasMaxLength(255)
+                    .ValueGeneratedOnAddOrUpdate()
+                    .Metadata.SetAfterSaveBehavior(Microsoft.EntityFrameworkCore.Metadata.PropertySaveBehavior.Ignore);
+
             builder.Property(u => u.Phone)
                    .IsRequired()
                    .HasMaxLength(20);

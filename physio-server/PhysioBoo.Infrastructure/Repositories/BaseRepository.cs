@@ -139,6 +139,12 @@ namespace PhysioBoo.Infrastructure.Repositories
             return await GetByIdCompiledQuery(_dbContext, id);
         }
 
+        // RAW SQL COMMANDS FOR COMPLEX OPERATIONS
+        public virtual async Task<int> ExecuteNonQueryAsync(string sql, NpgsqlParameter[] parameters)
+        {
+            return await _dbContext.Database.ExecuteSqlRawAsync(sql, parameters);
+        }
+
         // RAW SQL QUERIES FOR COMPLEX OPERATIONS
         public virtual async Task<IEnumerable<TEntity>> ExecuteRawSqlAsync(
             string sql,

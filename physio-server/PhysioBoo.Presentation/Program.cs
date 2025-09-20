@@ -98,12 +98,16 @@ namespace PhysioBoo.Presentation
             {
                 options.UseLazyLoadingProxies();
                 options.UseNpgsql(dbConnectionString,
-                    b => b.MigrationsAssembly("PhysioBoo.Infrastructure")
+                    npgsqlOptions => npgsqlOptions
+                            .MigrationsAssembly("PhysioBoo.Infrastructure")
+                            .CommandTimeout(30)
+                            // Enable connection pooling
+                            .EnableRetryOnFailure(3)
                 );
                 options.EnableSensitiveDataLogging();
                 options.EnableDetailedErrors();
                 options.LogTo(Console.WriteLine, LogLevel.Information);
-            });
+            }, ServiceLifetime.Scoped);
             #endregion
 
             #region Cors

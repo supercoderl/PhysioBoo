@@ -106,6 +106,8 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
             Func<NpgsqlDataReader, T> mapFunction,
             CancellationToken cancellationToken = default
         ) where T : class;
+
+        Task<int> ExecuteNonQueryAsync(string sql, NpgsqlParameter[] parameters);
         #endregion
     }
 }

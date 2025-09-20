@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PhysioBoo.Infrastructure.Database;
@@ -11,9 +12,11 @@ using PhysioBoo.Infrastructure.Database;
 namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250920025929_Add-Email-Normalized-User")]
+    partial class AddEmailNormalizedUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,7 +161,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("RecordNumber")
                         .IsUnique();
 
-                    b.ToTable("MedicalRecords", (string)null);
+                    b.ToTable("MedicalRecords");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Clinical.Medicine", b =>
@@ -353,7 +356,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("QrCode");
 
-                    b.ToTable("Medicines", (string)null);
+                    b.ToTable("Medicines");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Clinical.MedicineCategory", b =>
@@ -400,7 +403,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("ParentCategoryId");
 
-                    b.ToTable("MedicinesCategories", (string)null);
+                    b.ToTable("MedicinesCategories");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Clinical.MedicineInventory", b =>
@@ -490,7 +493,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("MedicineId", "HospitalId", "BatchNumber");
 
-                    b.ToTable("MedicinesInventories", (string)null);
+                    b.ToTable("MedicinesInventories");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Clinical.Prescription", b =>
@@ -578,7 +581,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("PrescriptionNumber")
                         .IsUnique();
 
-                    b.ToTable("Prescriptions", (string)null);
+                    b.ToTable("Prescriptions");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Clinical.PrescriptionItem", b =>
@@ -659,7 +662,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("PrescriptionId");
 
-                    b.ToTable("PrescriptionItems", (string)null);
+                    b.ToTable("PrescriptionItems");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Address", b =>
@@ -725,7 +728,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Addresses", (string)null);
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Profile", b =>
@@ -814,7 +817,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("FirstName", "LastName");
 
-                    b.ToTable("Profiles", (string)null);
+                    b.ToTable("Profiles");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.RefreshToken", b =>
@@ -843,7 +846,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.User", b =>
@@ -953,7 +956,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.VerificationToken", b =>
@@ -987,7 +990,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("VerificationTokens", (string)null);
+                    b.ToTable("VerificationTokens");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.ImagingModality", b =>
@@ -1042,7 +1045,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("Name");
 
-                    b.ToTable("ImagingModalities", (string)null);
+                    b.ToTable("ImagingModalities");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.ImagingOrder", b =>
@@ -1181,7 +1184,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("TechnicianId");
 
-                    b.ToTable("ImagingOrders", (string)null);
+                    b.ToTable("ImagingOrders");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.ImagingReport", b =>
@@ -1291,7 +1294,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("ReportNumber")
                         .IsUnique();
 
-                    b.ToTable("ImagingReports", (string)null);
+                    b.ToTable("ImagingReports");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.LabOrder", b =>
@@ -1403,7 +1406,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("LabOrders", (string)null);
+                    b.ToTable("LabOrders");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.LabOrderItem", b =>
@@ -1490,7 +1493,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("VerifiedBy");
 
-                    b.ToTable("LabOrdersItem", (string)null);
+                    b.ToTable("LabOrdersItem");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.LabReport", b =>
@@ -1585,7 +1588,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("ReportNumber")
                         .IsUnique();
 
-                    b.ToTable("LabReports", (string)null);
+                    b.ToTable("LabReports");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.LabTest", b =>
@@ -1693,7 +1696,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("TestName");
 
-                    b.ToTable("LabTests", (string)null);
+                    b.ToTable("LabTests");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.LabTestCategory", b =>
@@ -1733,7 +1736,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("Name");
 
-                    b.ToTable("LabTestCategories", (string)null);
+                    b.ToTable("LabTestCategories");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", b =>
@@ -1904,7 +1907,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("VerifiedBy");
 
-                    b.ToTable("Doctors", (string)null);
+                    b.ToTable("Doctors");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorAward", b =>
@@ -1964,7 +1967,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("DoctorId");
 
-                    b.ToTable("DoctorAwards", (string)null);
+                    b.ToTable("DoctorAwards");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorCertification", b =>
@@ -2026,7 +2029,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("DoctorId");
 
-                    b.ToTable("DoctorCertifications", (string)null);
+                    b.ToTable("DoctorCertifications");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorEducation", b =>
@@ -2112,7 +2115,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("DoctorId");
 
-                    b.ToTable("DoctorEducations", (string)null);
+                    b.ToTable("DoctorEducations");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorLeave", b =>
@@ -2186,7 +2189,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("SubstituteDoctorId");
 
-                    b.ToTable("DoctorLeaves", (string)null);
+                    b.ToTable("DoctorLeaves");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorPublication", b =>
@@ -2287,7 +2290,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("Pmid");
 
-                    b.ToTable("DoctorPublications", (string)null);
+                    b.ToTable("DoctorPublications");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorSchedule", b =>
@@ -2365,7 +2368,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("HospitalId");
 
-                    b.ToTable("DoctorSchedules", (string)null);
+                    b.ToTable("DoctorSchedules");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorSpecialty", b =>
@@ -2413,7 +2416,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("SpecialtyId");
 
-                    b.ToTable("DoctorSpecialtys", (string)null);
+                    b.ToTable("DoctorSpecialtys");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorWorkExperience", b =>
@@ -2496,7 +2499,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("DoctorId");
 
-                    b.ToTable("DoctorWorkExperiences", (string)null);
+                    b.ToTable("DoctorWorkExperiences");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.HospitalStaff", b =>
@@ -2610,7 +2613,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("ReportingManger");
 
-                    b.ToTable("HospitalStaffs", (string)null);
+                    b.ToTable("HospitalStaffs");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.MedicalSpecialty", b =>
@@ -2668,7 +2671,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("ParentSpecialtyId");
 
-                    b.ToTable("MedicalSpecialties", (string)null);
+                    b.ToTable("MedicalSpecialties");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.Appointment", b =>
@@ -2855,7 +2858,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("RescheduledFromAppointmentId");
 
-                    b.ToTable("Appointments", (string)null);
+                    b.ToTable("Appointments");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.AppointmentType", b =>
@@ -2918,7 +2921,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("Name");
 
-                    b.ToTable("AppointmentTypes", (string)null);
+                    b.ToTable("AppointmentTypes");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.Bill", b =>
@@ -3052,7 +3055,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("Bills", (string)null);
+                    b.ToTable("Bills");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.BillItem", b =>
@@ -3128,7 +3131,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("PerformedBy");
 
-                    b.ToTable("BillItems", (string)null);
+                    b.ToTable("BillItems");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.Department", b =>
@@ -3214,7 +3217,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("HospitalId");
 
-                    b.ToTable("Departments", (string)null);
+                    b.ToTable("Departments");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.Hospital", b =>
@@ -3376,7 +3379,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("Name");
 
-                    b.ToTable("Hospitals", (string)null);
+                    b.ToTable("Hospitals");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.HospitalGroup", b =>
@@ -3438,7 +3441,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("Name");
 
-                    b.ToTable("HospitalGroups", (string)null);
+                    b.ToTable("HospitalGroups");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.Payment", b =>
@@ -3541,7 +3544,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("ProcessedBy");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.PatientInformation.Patient", b =>
@@ -3690,7 +3693,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("ReferredBy");
 
-                    b.ToTable("Patients", (string)null);
+                    b.ToTable("Patients");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.PatientInformation.PatientAllergy", b =>
@@ -3748,7 +3751,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("PatientAllergies", (string)null);
+                    b.ToTable("PatientAllergies");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.PatientInformation.PatientMedicalHistory", b =>
@@ -3828,7 +3831,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("PatientMedicalHistories", (string)null);
+                    b.ToTable("PatientMedicalHistories");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Support.InsuranceCompany", b =>
@@ -3910,7 +3913,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("Name");
 
-                    b.ToTable("InsuranceCompanies", (string)null);
+                    b.ToTable("InsuranceCompanies");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Support.Manufacturer", b =>
@@ -3990,7 +3993,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("Name");
 
-                    b.ToTable("Manufacturers", (string)null);
+                    b.ToTable("Manufacturers");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Support.Review", b =>
@@ -4121,7 +4124,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("ReviewerId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Support.Supplier", b =>
@@ -4278,7 +4281,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("SupplierName");
 
-                    b.ToTable("Supplier", (string)null);
+                    b.ToTable("Supplier");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Clinical.MedicalRecord", b =>

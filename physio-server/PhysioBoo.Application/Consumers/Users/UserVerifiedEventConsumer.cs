@@ -5,6 +5,7 @@ using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Shared.Events.Users;
+using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Application.Consumers.Users
 {
@@ -36,7 +37,7 @@ namespace PhysioBoo.Application.Consumers.Users
                     token.UserId, context.CorrelationId
                 );
 
-                await _bus.SendCommandAsync(new UpdateUserCommand(token.UserId, new { IsVerified = true }));
+                await _bus.SendCommandAsync(new UpdateUserCommand(token.UserId, new { IsVerified = true, EmailVerifiedAt = (DateTime?)TimeZoneHelper.GetLocalTimeNow() }));
             }
         }
     }

@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Options;
-using PhysioBoo.Application.Queries.Users.GetByEmail;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
@@ -32,7 +31,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
         {
             if (!await TestValidityAsync(request)) return;
 
-            var user = await Bus.QueryAsync(new GetUserByEmailQuery(request.Email));
+            var user = await _userRepository.GetByEmailAsync(request.Email);
 
             if (user == null)
             {
@@ -45,15 +44,25 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
                 return;
             }
 
-            if (!await ValidatePassword(user, request)) return;
+            if (!await CheckIsLockedUser(user, request)) return;
 
-            if(!await CheckUserStatus(user, request)) return;
+            var validationResult = await ValidateUser(user, request);
 
-            user.SetLastLoginAt(TimeZoneHelper.GetLocalTimeNow());
+            if (!validationResult.IsValid)
+            {
+                // Only update if there was a failed login attempt
+                if (validationResult.UpdateUser)
+                {
+                    await _userRepository.UpdateUserFailedLoginAsync(user.Id, user.FailedLoginAttempts, user.AccountLockedUntil);
+                }
+                return;
+            }
 
-            var result = await _userRepository.UpdateTrackedAsync(user);
+            var (accessToken, refreshToken) = GenerateTokens(user);
 
-            if (result <= 0)
+            var updateResult = await _userRepository.UpdateLastLoginAsync(user.Id, TimeZoneHelper.GetLocalTimeNow());
+
+            if (!updateResult)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
@@ -64,7 +73,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
                 return;
             }
 
-            await GenerateTokens(user);
+            _ = Task.Run(() => Bus.RaiseEventAsync(new UserLoggedEvent(user.Id, accessToken, refreshToken)), cancellationToken);
         }
 
         /// <summary>
@@ -75,45 +84,17 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
         /// <param name="user">The user being validated.</param>
         /// <param name="request">The login request containing the raw password.</param>
         /// <returns><c>true</c> if the password is valid; otherwise, <c>false</c>.</returns>
-        private async Task<bool> ValidatePassword(Domain.Entities.Core.User user, LoginUserCommand request)
+        private async Task<(bool IsValid, bool UpdateUser)> ValidateUser(Domain.Entities.Core.User user, LoginUserCommand request)
         {
-             
-            if (!AuthHelper.VerifyPassword(request.Password, user.PasswordHash))
+            if (!user.IsActive)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    "Password does not correct!",
-                    "WRONG_PASSWORD"
-                ));
-
-                user.RegisterFailedLogin(Domain.Constants.MaxCounts.User.FailedLoginAttempts, 15);
-
-                await _userRepository.UpdateTrackedAsync(user);
-
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Checks if the user is active, not locked, and verified.
-        /// Publishes appropriate domain notifications if the account is banned or not verified.
-        /// </summary>
-        /// <param name="user">The user to check.</param>
-        /// <param name="request">The login request for context.</param>
-        /// <returns><c>true</c> if the user is active and verified; otherwise, <c>false</c>.</returns>
-        private async Task<bool> CheckUserStatus(Domain.Entities.Core.User user, LoginUserCommand request)
-        {
-            if (!user.IsActive || user.AccountLockedUntil.HasValue)
-            {
-                await NotifyAsync(new DomainNotification(
-                    request.MessageType,
-                    $"Your account has been banned{(user.AccountLockedUntil.HasValue ? $" until {user.AccountLockedUntil.Value.ToString("yyyy-MM-dd HH:mm:ss")}" : ".")}",
+                    $"Your account has been banned.",
                     "USER_HAS_BEEN_BANNED_BY_SYSTEM"
                 ));
 
-                return false;
+                return (false, false);
             }
 
             if (!user.IsVerified || !user.EmailVerifiedAt.HasValue)
@@ -126,6 +107,42 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
 
                 await Bus.RaiseEventAsync(new UsersCreatedEvent(new List<Guid> { user.Id }));
 
+                return (false, false);
+            }
+
+            if (!AuthHelper.VerifyPassword(request.Password, user.PasswordHash))
+            {
+                await NotifyAsync(new DomainNotification(
+                    request.MessageType,
+                    "Password does not correct!",
+                    "WRONG_PASSWORD"
+                ));
+
+                user.RegisterFailedLogin(Domain.Constants.MaxCounts.User.FailedLoginAttempts, 15);
+
+                return (false, true);
+            }
+
+            return (true, false);
+        }
+
+        /// <summary>
+        /// Checks if the user is locked or not.
+        /// Publishes appropriate domain notifications if the account is locked.
+        /// </summary>
+        /// <param name="user">The user to check.</param>
+        /// <param name="request">The login request for context.</param>
+        /// <returns><c>true</c> if the user is not locked; otherwise, <c>false</c>.</returns>
+        private async Task<bool> CheckIsLockedUser(Domain.Entities.Core.User user, LoginUserCommand request)
+        {
+            if (user.AccountLockedUntil.HasValue && user.AccountLockedUntil.Value > TimeZoneHelper.GetLocalTimeNow())
+            {
+                await NotifyAsync(new DomainNotification(
+                    request.MessageType,
+                    $"Your account is locked until {user.AccountLockedUntil.Value:yyyy-MM-dd HH:mm:ss}",
+                    "USER_HAS_BEEN_LOCKED"
+                ));
+
                 return false;
             }
 
@@ -133,12 +150,11 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
         }
 
         /// <summary>
-        /// Generates an access token and refresh token for the specified user
-        /// and publishes a <see cref="UserLoggedEvent"/> containing both tokens.
+        /// Generates an access token and refresh token for the specified user.
         /// </summary>
         /// <param name="user">The authenticated user.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        private async Task GenerateTokens(Domain.Entities.Core.User user)
+        /// <returns>A function return access token and refresh token.</returns>
+        private (string AccessToken, string RefreshToken) GenerateTokens(Domain.Entities.Core.User user)
         {
             var accessToken = TokenHelper.BuildToken(new Dictionary<string, string>
             {
@@ -150,7 +166,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
 
             var refreshToken = TokenHelper.GenerateSecureToken(32);
 
-            await Bus.RaiseEventAsync(new UserLoggedEvent(user.Id, accessToken, refreshToken));
+            return (accessToken, refreshToken);
         }
     }
 }

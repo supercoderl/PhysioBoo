@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Enums;
+using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
@@ -9,29 +10,37 @@ using PhysioBoo.SharedKernel.Utils;
 using System.Data;
 using System.Text;
 
-namespace PhysioBoo.Application.Commands.Users.ResendVerification
+namespace PhysioBoo.Application.Commands.Users.ForgotPassword
 {
-    public sealed class ResendVerificationCommandHandler : CommandHandlerBase, IRequestHandler<ResendVerificationCommand>
+    public sealed class ForgotPasswordCommandHandler : CommandHandlerBase, IRequestHandler<ForgotPasswordCommand>
     {
+        private readonly IUserRepository _userRepository;
         private readonly IVerificationTokenRepository _verificationTokenRepository;
 
-        public ResendVerificationCommandHandler(
+        public ForgotPasswordCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
+            IUserRepository userRepository,
             IVerificationTokenRepository verificationTokenRepository
         ) : base(bus, unitOfWork, notifications)
         {
+            _userRepository = userRepository;
             _verificationTokenRepository = verificationTokenRepository;
         }
 
-        public async Task Handle(ResendVerificationCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
+            var user = await RetriveUserData(request);
+
+            if (user == null) return;
+
             var parameters = new Dictionary<string, object>
             {
-                { "p_user_id", request.UserId }
+                { "p_user_id", user.Id },
+                { "p_type", VerificationType.PasswordReset.ToString() }
             };
 
             var result = await _verificationTokenRepository.ExecutePostgresFunctionAsync<VerificationToken>(
@@ -54,23 +63,42 @@ namespace PhysioBoo.Application.Commands.Users.ResendVerification
                 cancellationToken
             );
 
-            if(result.Any())
+            if (result.Any())
             {
                 var verificationToken = result.First();
                 await Bus.RaiseEventAsync(new EmailVerificationTokenGeneratedEvent(
-                    request.UserId, 
                     null,
-                    verificationToken.Token, 
+                    request.Email,
+                    verificationToken.Token,
                     verificationToken.ExpiresAt,
-                    VerificationType.Email.ToString()
+                    VerificationType.PasswordReset.ToString()
                 ));
-            } else
+            }
+            else
             {
                 await Bus.RaiseEventAsync(new UsersCreatedEvent(new List<Guid>
                 {
-                    request.UserId
-                }, VerificationType.Email.ToString()));
+                    user.Id
+                }, VerificationType.PasswordReset.ToString()));
             }
+        }
+
+        private async Task<User?> RetriveUserData(ForgotPasswordCommand request)
+        {
+            var user = await _userRepository.GetByEmailAsync(request.Email);
+
+            if (user == null)
+            {
+                await NotifyAsync(new DomainNotification(
+                    request.MessageType,
+                    $"User with email {request.Email} does not exists.",
+                    ErrorCodes.ObjectNotFound
+                ));
+
+                return null;
+            }
+
+            return user;
         }
     }
 }

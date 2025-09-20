@@ -7,6 +7,7 @@ using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Infrastructure.Database;
+using PhysioBoo.Infrastructure.Email;
 using PhysioBoo.Infrastructure.EventSourcing;
 using PhysioBoo.Infrastructure.Repositories;
 
@@ -44,6 +45,15 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IVerificationTokenRepository, VerificationTokenRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddEmail(this IServiceCollection services)
+        {
+            services.AddScoped<IEmailSender, SmtpEmailSender>();
+            services.AddScoped<IEmailTemplateProvider, FileEmailTemplateProvider>();
+            services.AddScoped<IEmailTemplateRenderer, ScribanEmailTemplateRenderer>();
 
             return services;
         }

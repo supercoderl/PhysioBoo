@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -132,7 +133,7 @@ namespace PhysioBoo.SharedKernel.Utils
         /// Generate access token
         /// </summary>
         /// <param name="data">The dictionary with some datas</param>
-        public static string BuildToken(
+        public static (string AccessToken, string RefreshToken) BuildAuthToken(
             Dictionary<string, string> claimDatas,
             string secret,
             string issuer,
@@ -162,7 +163,10 @@ namespace PhysioBoo.SharedKernel.Utils
                 expires: TimeZoneHelper.GetLocalTimeNow().AddMinutes(expiryDurationMinutes),
                 signingCredentials: credentials);
 
-            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+            var refreshToken = GenerateSecureToken(32);
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+
+            return (accessToken, refreshToken);
         }
     }
 }

@@ -52,6 +52,7 @@ namespace PhysioBoo.Presentation
             builder.Services.AddSettings<ServerSettings>(builder.Configuration, "Server");
             builder.Services.AddHostedService<WarmupConnection>();
             builder.Services.AddCSRFProtection(builder.Environment);
+            builder.Services.AddEmail();
 
             if (builder.Environment.IsProduction())
             {

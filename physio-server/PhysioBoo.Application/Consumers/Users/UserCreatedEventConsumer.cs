@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken;
 using PhysioBoo.Application.ViewModels.VerificationTokens;
+using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Shared.Events.Users;
 using PhysioBoo.SharedKernel.Utils;
@@ -36,7 +37,7 @@ namespace PhysioBoo.Application.Consumers.Users
                             userId,
                             TokenHelper.GenerateTimestampedToken(24),
                             TimeZoneHelper.GetLocalTimeNow().AddHours(24),
-                            Domain.Enums.VerificationType.Email
+                            Enum.Parse<VerificationType>(context.Message.Type)
                         )
                     }
                 ));

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
@@ -42,7 +43,7 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
             if (await CommitAsync())
             {
                 var userIds = request.NewListUsers.Select(u => u.Id).ToList();
-                await Bus.RaiseEventAsync(new UsersCreatedEvent(userIds));
+                await Bus.RaiseEventAsync(new UsersCreatedEvent(userIds, VerificationType.Email.ToString()));
             }
         }
     }

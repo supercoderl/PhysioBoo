@@ -35,5 +35,6 @@ namespace PhysioBoo.Domain.Entities.Core
         public void SetExpiresAt(DateTime expiresAt) { ExpiresAt = expiresAt; }
         public void SetVerificationType(VerificationType type) { Type = type; }
         public void SetIsUsed(bool isUsed) { IsUsed = isUsed; }
+        public void SetUser(User? user) { User = user; }
     }
 }

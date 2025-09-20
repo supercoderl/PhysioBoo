@@ -8,10 +8,12 @@ namespace PhysioBoo.Application.Commands.Users.VerifyUser
         private static readonly VerifyUserCommandValidation s_validation = new();
 
         public string Token { get; }
+        public string Type { get; }
 
-        public VerifyUserCommand(string token) : base(Guid.NewGuid())
+        public VerifyUserCommand(string token, string type) : base(Guid.NewGuid())
         {
             Token = token;
+            Type = type;
         }
 
         public override bool IsValid()

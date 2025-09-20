@@ -45,8 +45,10 @@ namespace PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken
                 {
                     await Bus.RaiseEventAsync(new EmailVerificationTokenGeneratedEvent(
                         tokenRequest.UserId,
+                        null,
                         tokenRequest.Token,
-                        tokenRequest.ExpiresAt
+                        tokenRequest.ExpiresAt,
+                        tokenRequest.Type.ToString()
                     ));
                 }
             }

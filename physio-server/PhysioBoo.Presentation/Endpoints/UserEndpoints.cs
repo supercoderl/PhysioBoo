@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
 using PhysioBoo.Application.Commands.Users.CreateUser;
+using PhysioBoo.Application.Commands.Users.ForgotPassword;
 using PhysioBoo.Application.Commands.Users.LoginUser;
 using PhysioBoo.Application.Commands.Users.LogoutUser;
 using PhysioBoo.Application.Commands.Users.ResendVerification;
+using PhysioBoo.Application.Commands.Users.ResetPassword;
 using PhysioBoo.Application.Commands.Users.VerifyUser;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Interfaces;
@@ -99,6 +101,7 @@ namespace PhysioBoo.Presentation.Endpoints
             // Verify email
             group.MapGet("/verify-email", async (
                 [FromQuery] string token,
+                [FromQuery] string type,
                 IMediatorHandler bus,
                 INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
@@ -106,7 +109,7 @@ namespace PhysioBoo.Presentation.Endpoints
             {
                 var notifications = (DomainNotificationHandler)handler;
 
-                await bus.SendCommandAsync(new VerifyUserCommand(token));
+                await bus.SendCommandAsync(new VerifyUserCommand(token, type));
 
                 if (notifications.HasNotifications())
                 {
@@ -239,6 +242,80 @@ namespace PhysioBoo.Presentation.Endpoints
                     Data = "Change password successfully. Please login again"
                 });
             }).WithName("Change password")
+            .WithSummary("Change old password to new password")
+            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
+
+            // Forgot password
+            group.MapPost("/forgot-password", async (
+                [FromBody] ForgotPasswordViewModel request,
+                IMediatorHandler bus,
+                INotificationHandler<DomainNotification> handler,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                var notifications = (DomainNotificationHandler)handler;
+
+                await bus.SendCommandAsync(new ForgotPasswordCommand(request.Email));
+
+                if (notifications.HasNotifications())
+                {
+                    return Results.BadRequest(new ResponseMessage<string>
+                    {
+                        Success = false,
+                        Errors = notifications.GetNotifications().Select(n => n.Value),
+                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
+                        {
+                            Code = n.Code,
+                            Data = n.Data
+                        })
+                    });
+                }
+
+                return Results.Ok(new ResponseMessage<string>
+                {
+                    Success = true,
+                    Data = "An url has been sent to your email, please check."
+                });
+            }).WithName("Forgot password")
+            .WithSummary("Send an url with token to user for resetting password")
+            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+
+            // Reset password
+            group.MapPost("/reset-password", async (
+                [FromBody] ResetPasswordViewModel request,
+                IMediatorHandler bus,
+                INotificationHandler<DomainNotification> handler,
+                IUser user,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                var notifications = (DomainNotificationHandler)handler;
+
+                await bus.SendCommandAsync(new ResetPasswordCommand(user.GetUserId(), user.GetUserEmail(), request.NewPassword));
+
+                if (notifications.HasNotifications())
+                {
+                    return Results.BadRequest(new ResponseMessage<string>
+                    {
+                        Success = false,
+                        Errors = notifications.GetNotifications().Select(n => n.Value),
+                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
+                        {
+                            Code = n.Code,
+                            Data = n.Data
+                        })
+                    });
+                }
+
+                return Results.Ok(new ResponseMessage<string>
+                {
+                    Success = true,
+                    Data = "Reset password successfully. Please login again"
+                });
+            }).WithName("Reset password")
             .WithSummary("Change old password to new password")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)

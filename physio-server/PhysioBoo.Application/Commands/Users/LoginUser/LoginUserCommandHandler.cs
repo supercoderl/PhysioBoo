@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Options;
+using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
@@ -58,7 +59,15 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
                 return;
             }
 
-            var (accessToken, refreshToken) = GenerateTokens(user);
+            var (accessToken, refreshToken) = TokenHelper.BuildAuthToken(
+                new Dictionary<string, string>
+                {
+                    ["Email"] = user.Email,
+                    ["Role"] = user.Role.ToString(),
+                    ["Id"] = user.Id.ToString(),
+                    ["Name"] = user.Email.Split("@")[0]
+                }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes
+            );
 
             var updateResult = await _userRepository.UpdateLastLoginAsync(user.Id, TimeZoneHelper.GetLocalTimeNow());
 
@@ -105,7 +114,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
                     "USER_IS_NOT_VERIFIED_YET"
                 ));
 
-                await Bus.RaiseEventAsync(new UsersCreatedEvent(new List<Guid> { user.Id }));
+                await Bus.RaiseEventAsync(new UsersCreatedEvent(new List<Guid> { user.Id }, VerificationType.Email.ToString()));
 
                 return (false, false);
             }
@@ -147,26 +156,6 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Generates an access token and refresh token for the specified user.
-        /// </summary>
-        /// <param name="user">The authenticated user.</param>
-        /// <returns>A function return access token and refresh token.</returns>
-        private (string AccessToken, string RefreshToken) GenerateTokens(Domain.Entities.Core.User user)
-        {
-            var accessToken = TokenHelper.BuildToken(new Dictionary<string, string>
-            {
-                ["Email"] = user.Email,
-                ["Role"] = user.Role.ToString(),
-                ["Id"] = user.Id.ToString(),
-                ["Name"] = user.Email.Split("@")[0]
-            }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes);
-
-            var refreshToken = TokenHelper.GenerateSecureToken(32);
-
-            return (accessToken, refreshToken);
         }
     }
 }

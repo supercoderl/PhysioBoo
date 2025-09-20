@@ -48,6 +48,14 @@ namespace PhysioBoo.Application.Queries.VerificationTokens.GetByToken
                     );
 
                     token.SetIsUsed(reader.GetBoolean("IsUsed"));
+                    token.SetUser(new User(
+                        token.UserId,
+                        !reader.IsDBNull("UserEmail") ? reader.GetString("UserEmail") : string.Empty,
+                        string.Empty,
+                        string.Empty,
+                        !reader.IsDBNull("UserRole") ? Enum.Parse<Role>(reader.GetString("UserRole")) : Role.Patient,
+                        null
+                    ));
 
                     return token;
                 }

@@ -1,5 +1,4 @@
-﻿using Aikido.Zen.Core;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
 using PhysioBoo.Application.Commands.Users.CreateUser;
@@ -69,16 +68,17 @@ namespace PhysioBoo.Presentation.Endpoints
                 ResendVerificationViewModel request,
                 IMediatorHandler bus,
                 INotificationHandler<DomainNotification> handler,
+                IUser user,
                 CancellationToken cancellationToken
             ) =>
             {
                 var notifications = (DomainNotificationHandler)handler;
 
-                await bus.SendCommandAsync(new ResendVerificationCommand(request.UserId));
+                await bus.SendCommandAsync(new ResendVerificationCommand(user.GetUserId(), request.VerificationType));
 
                 if (notifications.HasNotifications())
                 {
-                    return Results.BadRequest(new ResponseMessage<Guid>
+                    return Results.BadRequest(new ResponseMessage<string>
                     {
                         Success = false,
                         Errors = notifications.GetNotifications().Select(n => n.Value),
@@ -90,15 +90,16 @@ namespace PhysioBoo.Presentation.Endpoints
                     });
                 }
 
-                return Results.Ok(new ResponseMessage<Guid>
+                return Results.Ok(new ResponseMessage<string>
                 {
                     Success = true,
-                    Data = request.UserId
+                    Data = "Resend verification url successfully."
                 });
             }).WithName("Resend Verification")
             .WithSummary("Resend Email Verification Token For User")
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
 
             // Verify email
             group.MapGet("/verify-email", async (

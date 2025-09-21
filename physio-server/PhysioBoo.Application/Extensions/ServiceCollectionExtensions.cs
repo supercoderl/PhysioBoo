@@ -15,11 +15,13 @@ using PhysioBoo.Application.Commands.Users.UpdateUser;
 using PhysioBoo.Application.Commands.Users.VerifyUser;
 using PhysioBoo.Application.EventHandlers.Fanout;
 using PhysioBoo.Application.EventHandlers.User;
+using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Application.Queries.RefreshTokens.GetByUserId;
 using PhysioBoo.Application.Queries.Users.GetByEmail;
 using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
+using PhysioBoo.Application.Services;
 using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Interfaces.EventHandlers;
@@ -39,6 +41,14 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<INotificationHandler<UserLoggedEvent>, UserCacheEventHandler>();
             services.AddScoped<INotificationHandler<UserLoggedOutEvent>, UserCacheEventHandler>();
             services.AddScoped<INotificationHandler<UserVerifiedEvent>, UserCacheEventHandler>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddServices(this IServiceCollection services)
+        {
+            // User
+            services.AddScoped<IVerificationService, VerificationService>();
 
             return services;
         }

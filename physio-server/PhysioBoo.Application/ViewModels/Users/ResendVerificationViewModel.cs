@@ -1,4 +1,6 @@
-﻿namespace PhysioBoo.Application.ViewModels.Users
+﻿using PhysioBoo.Domain.Enums;
+
+namespace PhysioBoo.Application.ViewModels.Users
 {
-    public sealed record ResendVerificationViewModel(Guid UserId);
+    public sealed record ResendVerificationViewModel(VerificationType VerificationType);
 }

@@ -1,76 +1,29 @@
 ﻿using MediatR;
-using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Enums;
+using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
-using PhysioBoo.Shared.Events.Users;
-using PhysioBoo.SharedKernel.Utils;
-using System.Data;
-using System.Text;
 
 namespace PhysioBoo.Application.Commands.Users.ResendVerification
 {
     public sealed class ResendVerificationCommandHandler : CommandHandlerBase, IRequestHandler<ResendVerificationCommand>
     {
-        private readonly IVerificationTokenRepository _verificationTokenRepository;
+        private readonly IVerificationService _verificationService;
 
         public ResendVerificationCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IVerificationTokenRepository verificationTokenRepository
+            IVerificationService verificationService
         ) : base(bus, unitOfWork, notifications)
         {
-            _verificationTokenRepository = verificationTokenRepository;
+            _verificationService = verificationService;
         }
 
         public async Task Handle(ResendVerificationCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var parameters = new Dictionary<string, object>
-            {
-                { "p_user_id", request.UserId }
-            };
-
-            var result = await _verificationTokenRepository.ExecutePostgresFunctionAsync<VerificationToken>(
-                "get_tokens_dynamic",
-                parameters,
-                reader =>
-                {
-                    var token = new Domain.Entities.Core.VerificationToken(
-                        reader.GetFieldValue<Guid>("Id"),
-                        reader.GetFieldValue<Guid>("UserId"),
-                        reader.GetString("Token"),
-                        !reader.IsDBNull("ExpiresAt") ? reader.GetDateTime("ExpiresAt") : TimeZoneHelper.GetLocalTimeNow(),
-                        Enum.Parse<VerificationType>(reader.GetString("Type"))
-                    );
-
-                    token.SetIsUsed(reader.GetBoolean("IsUsed"));
-
-                    return token;
-                },
-                cancellationToken
-            );
-
-            if(result.Any())
-            {
-                var verificationToken = result.First();
-                await Bus.RaiseEventAsync(new EmailVerificationTokenGeneratedEvent(
-                    request.UserId, 
-                    null,
-                    verificationToken.Token, 
-                    verificationToken.ExpiresAt,
-                    VerificationType.Email.ToString()
-                ));
-            } else
-            {
-                await Bus.RaiseEventAsync(new UsersCreatedEvent(new List<Guid>
-                {
-                    request.UserId
-                }, VerificationType.Email.ToString()));
-            }
+            await _verificationService.SendAsync(request.UserId, null, request.VerificationType, cancellationToken);
         }
     }
 }

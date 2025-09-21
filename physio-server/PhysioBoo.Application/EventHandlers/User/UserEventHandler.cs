@@ -101,6 +101,15 @@ namespace PhysioBoo.Application.EventHandlers.User
 
                     await _bus.RaiseEventAsync(new UserLoggedEvent(token.UserId, accessToken, refreshToken));
                     break;
+                case VerificationType.Phone:
+                    await _bus.SendCommandAsync(new UpdateUserCommand(
+                        token.UserId,
+                        new
+                        {
+                            PhoneVerifiedAt = (DateTime?)TimeZoneHelper.GetLocalTimeNow()
+                        })
+                    );
+                    break;
             }
         }
     }

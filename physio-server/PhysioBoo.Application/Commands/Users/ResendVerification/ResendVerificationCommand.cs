@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Commands;
 
 namespace PhysioBoo.Application.Commands.Users.ResendVerification
@@ -8,10 +9,12 @@ namespace PhysioBoo.Application.Commands.Users.ResendVerification
         private static readonly ResendVerificationCommandValidation s_validation = new();
 
         public Guid UserId { get; }
+        public VerificationType VerificationType { get; }
 
-        public ResendVerificationCommand(Guid userId) : base(Guid.NewGuid())
+        public ResendVerificationCommand(Guid userId, VerificationType verificationType) : base(Guid.NewGuid())
         {
             UserId = userId;
+            VerificationType = verificationType;
         }
 
         public override bool IsValid()

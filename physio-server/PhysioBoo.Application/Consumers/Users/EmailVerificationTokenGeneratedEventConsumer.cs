@@ -3,9 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Domain.Enums;
-using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Domain.Settings;
 using PhysioBoo.Shared.Events.Users;
 using PhysioBoo.SharedKernel.Utils;
@@ -42,36 +40,42 @@ namespace PhysioBoo.Application.Consumers.Users
             string userName = string.Empty, subject = string.Empty, email = string.Empty, verificationUrl = string.Empty;
             object model = new { };
 
-            if (context.Message.UserId.HasValue)
+            if (string.IsNullOrEmpty(context.Message.Email))
             {
-                var user = await _bus.QueryAsync(new GetUserByIdQuery(context.Message.UserId.Value));
-
-                if (user != null)
+                if (context.Message.UserId.HasValue)
                 {
-                    email = user.Email;
-                    userName = user.Email.Split('@')[0];
-                    subject = "Verify Your Email Address - Action Required";
-                    verificationUrl = $"{_server.BaseUrl}/api/users/verify-email?type={VerificationType.Email.ToString()}token={context.Message.Token}";
-                    model = new { UserName = userName, VerificationUrl = verificationUrl };
+                    var user = await _bus.QueryAsync(new GetUserByIdQuery(context.Message.UserId.Value));
+
+                    if (user != null)
+                    {
+                        email = user.Email;
+                        userName = user.Email.Split('@')[0];
+                    }
                 }
-            }
-            else if (!string.IsNullOrEmpty(context.Message.Email))
-            {
-                email = context.Message.Email;
-                userName = context.Message.Email.Split('@')[0];
-                subject = "Forgot password";
-                verificationUrl = $"{_server.BaseUrl}/api/users/verify-email?type={VerificationType.PasswordReset.ToString()}token={context.Message.Token}";
-                model = new { UserName = userName, ResetLink = verificationUrl, Year = TimeZoneHelper.GetLocalTimeNow().Year };
             }
             else
             {
-                await _bus.RaiseEventAsync(new DomainNotification(
-                    typeof(EmailVerificationTokenGeneratedEventConsumer).Name,
-                    $"Cannot send mail because email or user id do not exists.",
-                    ErrorCodes.ObjectNotFound
-                ));
+                email = context.Message.Email;
+                userName = context.Message.Email.Split('@')[0];
+            }
 
-                return;
+            verificationUrl = $"{_server.BaseUrl}/api/users/verify-email?type={context.Message.Type}&token={context.Message.Token}";
+
+            switch (context.Message.Type)
+            {
+                case nameof(VerificationType.Email):
+                    subject = "Verify Your Email Address - Action Required";
+                    model = new { UserName = userName, VerificationUrl = verificationUrl };
+                    break;
+
+                case nameof(VerificationType.PasswordReset):
+                    subject = "Forgot password";
+                    model = new { UserName = userName, ResetLink = verificationUrl, Year = TimeZoneHelper.GetLocalTimeNow().Year };
+                    break;
+                case nameof(VerificationType.Phone):
+                    subject = "Verify Your Phone Number";
+                    model = new { UserName = userName, VerificationUrl = verificationUrl, Year = TimeZoneHelper.GetLocalTimeNow().Year };
+                    break;
             }
 
             await _emailSender.SendTemplateAsync(

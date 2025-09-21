@@ -108,7 +108,8 @@ namespace PhysioBoo.Presentation.Extensions
                 IssuerSigningKey = new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(
                         configuration["Auth:Secret"]!)),
-                RequireSignedTokens = false
+                RequireSignedTokens = true,
+                ClockSkew = TimeSpan.Zero
             };
 
             return result;

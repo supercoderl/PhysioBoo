@@ -34,8 +34,9 @@ namespace PhysioBoo.Domain.Entities.Core
         #region Setter Methods (4)
         public void SetUserId(Guid userId) { UserId = userId; }
         public void SetToken(string token) { Token = token; }
-        public void SetExpiresAt(DateTime expiresAt) { ExpiresAt = expiresAt; }
+        public void Revoke() { ExpiresAt = TimeZoneHelper.GetLocalTimeNow(); }
         public void SetCreatedAt(DateTime createdAt) { ExpiresAt = createdAt; }
+        public void SetUser(User? user) { User = user; }
         #endregion
     }
 }

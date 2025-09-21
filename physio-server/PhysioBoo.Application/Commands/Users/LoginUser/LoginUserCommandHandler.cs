@@ -82,7 +82,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
                 return;
             }
 
-            _ = Task.Run(() => Bus.RaiseEventAsync(new UserLoggedEvent(user.Id, accessToken, refreshToken)), cancellationToken);
+            await Bus.RaiseEventAsync(new UserLoggedEvent(user.Id, accessToken, refreshToken));
         }
 
         /// <summary>

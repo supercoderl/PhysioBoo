@@ -1,10 +1,12 @@
-﻿using MediatR;
+﻿using Aikido.Zen.Core;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
 using PhysioBoo.Application.Commands.Users.CreateUser;
 using PhysioBoo.Application.Commands.Users.ForgotPassword;
 using PhysioBoo.Application.Commands.Users.LoginUser;
 using PhysioBoo.Application.Commands.Users.LogoutUser;
+using PhysioBoo.Application.Commands.Users.RefreshToken;
 using PhysioBoo.Application.Commands.Users.ResendVerification;
 using PhysioBoo.Application.Commands.Users.ResetPassword;
 using PhysioBoo.Application.Commands.Users.VerifyUser;
@@ -320,6 +322,49 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
             .RequireAuthorization();
+
+            // Refresh token
+            group.MapPost("/refresh/refresh-token", async (
+                [FromBody] ResetPasswordViewModel request,
+                HttpContext context,
+                IMediatorHandler bus,
+                INotificationHandler<DomainNotification> handler,
+                IUser user,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                if (!context.Request.Cookies.TryGetValue("refresh_token", out var refreshToken) || string.IsNullOrEmpty(refreshToken))
+                {
+                    return Results.Unauthorized();
+                }
+
+                var notifications = (DomainNotificationHandler)handler;
+
+                await bus.SendCommandAsync(new RefreshTokenCommand(refreshToken));
+
+                if (notifications.HasNotifications())
+                {
+                    return Results.BadRequest(new ResponseMessage<string>
+                    {
+                        Success = false,
+                        Errors = notifications.GetNotifications().Select(n => n.Value),
+                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
+                        {
+                            Code = n.Code,
+                            Data = n.Data
+                        })
+                    });
+                }
+
+                return Results.Ok(new ResponseMessage<string>
+                {
+                    Success = true,
+                    Data = "Refresh token successfully"
+                });
+            }).WithName("Refresh Token")
+            .WithSummary("Refresh new token")
+            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
         }
     }
 }

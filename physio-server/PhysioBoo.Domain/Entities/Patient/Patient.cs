@@ -35,7 +35,10 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         public Guid? PreferredHospitalId { get; private set; }
         public Guid? PreferredDoctorId { get; private set; }
         public string? PreferredAppointmentTime { get; private set; }
+
+        [Column(TypeName = "jsonb")]
         public string? CommunicationPreferences { get; private set; } // JSONB
+
         public bool ConsentForResearch { get; private set; }
         public bool ConsentForMarketing { get; private set; }
         public bool DataSharingConsent { get; private set; }

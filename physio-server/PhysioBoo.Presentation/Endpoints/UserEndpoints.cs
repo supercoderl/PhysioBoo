@@ -25,7 +25,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 .WithOpenApi();
 
             // Create user
-            group.MapPost("/", async (
+            group.MapPost("/register", async (
                 CreateUserViewModel newUser,
                 IMediatorHandler bus,
                 INotificationHandler<DomainNotification> handler,
@@ -34,10 +34,7 @@ namespace PhysioBoo.Presentation.Endpoints
             {
                 var notifications = (DomainNotificationHandler)handler;
 
-                await bus.SendCommandAsync(new CreateUserCommand(new List<CreateUserViewModel>
-                {
-                    newUser
-                }));
+                await bus.SendCommandAsync(new CreateUserCommand(newUser));
 
                 if (notifications.HasNotifications())
                 {

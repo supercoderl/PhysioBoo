@@ -2,12 +2,12 @@
 {
     public sealed class UsersCreatedEvent : DomainEvent
     {
-        public List<Guid> UserIds { get; }
+        public Guid Id { get; }
         public string Type { get; }
 
-        public UsersCreatedEvent(List<Guid> userIds, string type) : base(Guid.NewGuid())
+        public UsersCreatedEvent(Guid id, string type) : base(id)
         {
-            UserIds = userIds;
+            Id = id;
             Type = type;
         }
     }

@@ -8,13 +8,11 @@ namespace PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken
     {
         private static readonly CreateRefreshTokenCommandValidation s_validation = new();
 
-        public List<CreateRefreshTokenViewModel> NewRefreshTokens { get; }
+        public CreateRefreshTokenViewModel NewRefreshToken { get; }
 
-        public CreateRefreshTokenCommand(
-            List<CreateRefreshTokenViewModel> newRefreshTokens
-        ) : base(Guid.NewGuid())
+        public CreateRefreshTokenCommand(CreateRefreshTokenViewModel newRefreshToken) : base(newRefreshToken.Id)
         {
-            NewRefreshTokens = newRefreshTokens;
+            NewRefreshToken = newRefreshToken;
         }
 
         public override bool IsValid()

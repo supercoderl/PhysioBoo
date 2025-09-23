@@ -88,7 +88,7 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         [InverseProperty("SubstituteDoctor")]
         public virtual ICollection<DoctorLeave> SubstitutedLeaves { get; private set; } = new List<DoctorLeave>();
 
-        [InverseProperty("Doctor")] 
+        [InverseProperty("Doctor")]
         public virtual ICollection<DoctorPublication> Publications { get; private set; } = new List<DoctorPublication>();
 
         [InverseProperty("Doctor")]
@@ -162,7 +162,7 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
             EmergencyConsultationFee = 0; // Default to 0, can be updated later
             HomeVisitFee = 0; // Default to 0, can be updated later
             VideoConsultationFee = 0; // Default to 0, can be updated later
-            LanguagesSpoken = Array.Empty<string>();
+            LanguagesSpoken = new string[] { "English" };
             SuccessRate = 0; // Default to 0, can be updated later
             PatientSatisfactionScore = 0; // Default to 0, can be updated later
             AverageRating = 0; // Default to 0, can be updated later
@@ -182,7 +182,7 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
             BufferTime = 10; // Default to 0, can be updated later
             AdvanceBookingDays = 30; // Default to 30 days, can be updated later
             CancellationPolicy = cancellationPolicy;
-            PaymentMethods = Array.Empty<string>();
+            PaymentMethods = new string[] { "Card" };
             BankAccountDetails = bankAccountDetails;
             PanNumber = panNumber;
             Gstin = gstin;

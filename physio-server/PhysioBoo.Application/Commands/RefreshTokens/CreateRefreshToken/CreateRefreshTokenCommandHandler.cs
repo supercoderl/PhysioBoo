@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
@@ -24,20 +26,25 @@ namespace PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken
         {
             if (!await TestValidityAsync(request)) return;
 
-            await _refreshTokenRepository.AddRangeAsync(request.NewRefreshTokens.Select(
-                refreshTokenDto => new Domain.Entities.Core.RefreshToken(
-                    refreshTokenDto.Id,
-                    refreshTokenDto.UserId,
-                    refreshTokenDto.Token,
-                    refreshTokenDto.ExpiresAt
-                ))
-            );
+            var result = await _refreshTokenRepository.InsertAsync<RefreshToken, Guid>(new RefreshToken(
+                request.NewRefreshToken.Id,
+                request.NewRefreshToken.UserId,
+                request.NewRefreshToken.Token,
+                request.NewRefreshToken.ExpiresAt
+            ));
 
-            if (await CommitAsync())
+            if (!result.Success)
             {
-                var userIds = request.NewRefreshTokens.Select(rt => rt.Id).ToList();
-                await Bus.RaiseEventAsync(new RefreshTokenCreatedEvent(userIds));
+                await NotifyAsync(new DomainNotification(
+                    request.MessageType,
+                    $"Insert failed, please try again. Error: {result.Error}",
+                    ErrorCodes.CommitFailed
+                ));
+
+                return;
             }
+
+            await Bus.RaiseEventAsync(new RefreshTokenCreatedEvent(result.Id));
         }
     }
 }

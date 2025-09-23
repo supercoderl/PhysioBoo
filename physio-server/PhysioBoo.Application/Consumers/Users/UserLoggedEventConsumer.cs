@@ -34,15 +34,12 @@ namespace PhysioBoo.Application.Consumers.Users
                    context.Message.RefreshToken, context.CorrelationId
             );
 
-            await _bus.SendCommandAsync(new CreateRefreshTokenCommand(new List<ViewModels.RefreshTokens.CreateRefreshTokenViewModel>
-            {
-                new CreateRefreshTokenViewModel(
-                    Guid.NewGuid(),
-                    context.Message.AggregateId,
-                    context.Message.RefreshToken,
-                    TimeZoneHelper.GetLocalTimeNow().AddDays(_token.ExpiryDurationMinutes >= 15 ? _token.ExpiryDurationMinutes : 15)
-                )
-            }));
+            await _bus.SendCommandAsync(new CreateRefreshTokenCommand(new CreateRefreshTokenViewModel(
+                Guid.NewGuid(),
+                context.Message.AggregateId,
+                context.Message.RefreshToken,
+                TimeZoneHelper.GetLocalTimeNow().AddDays(_token.ExpiryDurationMinutes >= 15 ? _token.ExpiryDurationMinutes : 15)
+            )));
         }
     }
 }

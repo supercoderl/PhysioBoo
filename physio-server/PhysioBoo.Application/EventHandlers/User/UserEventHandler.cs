@@ -42,13 +42,10 @@ namespace PhysioBoo.Application.EventHandlers.User
 
         public async Task Handle(UsersCreatedEvent notification, CancellationToken cancellationToken)
         {
-            foreach (var userId in notification.UserIds)
-            {
-                await _distributedCache.RemoveAsync(
-                    CacheKeyGenerator.GetEntityCacheKey<Domain.Entities.Core.User>(userId),
-                    cancellationToken
-                );
-            }
+            await _distributedCache.RemoveAsync(
+                CacheKeyGenerator.GetEntityCacheKey<Domain.Entities.Core.User>(notification.AggregateId),
+                cancellationToken
+            );
         }
 
         public async Task Handle(UserLoggedEvent notification, CancellationToken cancellationToken)

@@ -13,7 +13,10 @@ namespace PhysioBoo.Domain.Entities.Core
     {
         #region Core User Table (21)
         public string Email { get; private set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public string? EmailNormalized { get; private set; }
+
         public string Phone { get; private set; }
         public string? AlternatePhone { get; private set; }
         public string PasswordHash { get; private set; }

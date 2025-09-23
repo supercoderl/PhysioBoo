@@ -1,18 +1,23 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.Caching.Memory;
+using Npgsql;
 using PhysioBoo.Domain.Entities;
+using PhysioBoo.SharedKernel.Results;
 using PhysioBoo.SharedKernel.ViewModels;
 using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Query;
-using Npgsql;
 
 namespace PhysioBoo.Domain.Interfaces.Repositories
 {
     public interface IRepository<TEntity> : IDisposable where TEntity : Entity
     {
         #region Insert Methods
-        Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
+        Task<int> BulkInsertAsync<T>(IEnumerable<T> entities) where T : class;
 
-        Task BulkInsertAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
+        Task<int> InsertBatchAsync<T>(IEnumerable<T> entities) where T : class;
+
+        Task<DbResult<TKey>> InsertAsync<T, TKey>(T entity) where T : class;
+
+        Task InsertAsync<T>(T entity) where T : class;
         #endregion
 
         #region Get Methods

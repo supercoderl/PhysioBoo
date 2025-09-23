@@ -8,13 +8,11 @@ namespace PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken
     {
         private static readonly GenerateEmailVerificationTokenCommandValidation s_validation = new();
 
-        public List<CreateVerificationTokenViewModel> NewListVerificationTokens { get; }
+        public CreateVerificationTokenViewModel NewVerificationToken { get; }
 
-        public GenerateEmailVerificationTokenCommand(
-            List<CreateVerificationTokenViewModel> newListVerificationTokens
-        ) : base(Guid.NewGuid())
+        public GenerateEmailVerificationTokenCommand(CreateVerificationTokenViewModel newVerificationToken) : base(newVerificationToken.Id)
         {
-            NewListVerificationTokens = newListVerificationTokens;
+            NewVerificationToken = newVerificationToken;
         }
 
         public override bool IsValid()

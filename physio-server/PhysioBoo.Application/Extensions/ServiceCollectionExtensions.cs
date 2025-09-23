@@ -1,6 +1,8 @@
 ﻿using MassTransit;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using PhysioBoo.Application.Commands.Doctors.CreateDoctor;
+using PhysioBoo.Application.Commands.Patients.CreatePatient;
 using PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
 using PhysioBoo.Application.Commands.Users.CreateUser;
@@ -86,6 +88,12 @@ namespace PhysioBoo.Application.Extensions
 
             // Refresh Token
             services.AddScoped<IRequestHandler<CreateRefreshTokenCommand>, CreateRefreshTokenCommandHandler>();
+
+            // Patient
+            services.AddScoped<IRequestHandler<CreatePatientCommand>, CreatePatientCommandHandler>();
+
+            // Doctor
+            services.AddScoped<IRequestHandler<CreateDoctorCommand>, CreateDoctorCommandHandler>();
 
             return services;
         }

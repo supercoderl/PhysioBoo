@@ -22,26 +22,20 @@ namespace PhysioBoo.Application.Consumers.Users
 
         public async Task Consume(ConsumeContext<UsersCreatedEvent> context)
         {
-            foreach (var userId in context.Message.UserIds)
-            {
-                _logger.LogInformation(
+            _logger.LogInformation(
                     "UserCreatedEventConsumer handled for User {UserId}, CorrelationId {CorrelationId}",
-                    userId, context.CorrelationId
+                    context.Message.AggregateId, context.CorrelationId
                 );
 
-                await _bus.SendCommandAsync(new GenerateEmailVerificationTokenCommand(
-                    new List<CreateVerificationTokenViewModel>
-                    {
-                        new CreateVerificationTokenViewModel(
-                            Guid.NewGuid(),
-                            userId,
-                            TokenHelper.GenerateTimestampedToken(24),
-                            TimeZoneHelper.GetLocalTimeNow().AddHours(24),
-                            Enum.Parse<VerificationType>(context.Message.Type)
-                        )
-                    }
-                ));
-            }
+            await _bus.SendCommandAsync(new GenerateEmailVerificationTokenCommand(
+                new CreateVerificationTokenViewModel(
+                    Guid.NewGuid(),
+                    context.Message.AggregateId,
+                    TokenHelper.GenerateTimestampedToken(24),
+                    TimeZoneHelper.GetLocalTimeNow().AddHours(24),
+                    Enum.Parse<VerificationType>(context.Message.Type)
+                )
+            ));
         }
     }
 }

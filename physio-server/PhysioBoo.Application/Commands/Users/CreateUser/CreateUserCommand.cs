@@ -8,13 +8,11 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
     {
         private static readonly CreateUserCommandValidation s_validation = new();
 
-        public List<CreateUserViewModel> NewListUsers { get; }
+        public CreateUserViewModel NewUser { get; }
 
-        public CreateUserCommand(
-            List<CreateUserViewModel> newListUsers
-        ) : base(Guid.NewGuid())
+        public CreateUserCommand(CreateUserViewModel newUser) : base(newUser.Id)
         {
-            NewListUsers = newListUsers;
+            NewUser = newUser;
         }
 
         public override bool IsValid()

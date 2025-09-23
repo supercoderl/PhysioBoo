@@ -50,7 +50,7 @@ namespace PhysioBoo.Application.Services
             }
             else
             {
-                await _bus.RaiseEventAsync(new UsersCreatedEvent(new List<Guid> { userId }, type?.ToString() ?? VerificationType.Email.ToString()));
+                await _bus.RaiseEventAsync(new UsersCreatedEvent(userId, type?.ToString() ?? VerificationType.Email.ToString()));
             }
         }
 

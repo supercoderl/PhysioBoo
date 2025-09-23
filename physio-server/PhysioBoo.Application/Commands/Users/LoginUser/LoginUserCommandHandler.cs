@@ -114,7 +114,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
                     "USER_IS_NOT_VERIFIED_YET"
                 ));
 
-                await Bus.RaiseEventAsync(new UsersCreatedEvent(new List<Guid> { user.Id }, VerificationType.Email.ToString()));
+                await Bus.RaiseEventAsync(new UsersCreatedEvent(user.Id, VerificationType.Email.ToString()));
 
                 return (false, false);
             }

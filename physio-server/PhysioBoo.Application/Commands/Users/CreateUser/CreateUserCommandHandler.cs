@@ -1,5 +1,7 @@
 ﻿using MediatR;
+using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Enums;
+using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
@@ -29,22 +31,27 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
         {
             if (!await TestValidityAsync(request)) return;
 
-            await _userRepository.AddRangeAsync(request.NewListUsers.Select(
-                userDTO => new Domain.Entities.Core.User(
-                    userDTO.Id,
-                    userDTO.Email,
-                    userDTO.Phone,
-                    AuthHelper.HashPassword(userDTO.Password),
-                    userDTO.Role,
-                    _user.GetUserId() == Guid.Empty ? userDTO.Id : _user.GetUserId()
-                ))
-            );
+            var result = await _userRepository.InsertAsync<User, Guid>(new User(
+                request.NewUser.Id,
+                request.NewUser.Email,
+                request.NewUser.Phone,
+                AuthHelper.HashPassword(request.NewUser.Password),
+                request.NewUser.Role,
+                _user.GetUserId() == Guid.Empty ? request.NewUser.Id : _user.GetUserId()
+            ));
 
-            if (await CommitAsync())
+            if (!result.Success)
             {
-                var userIds = request.NewListUsers.Select(u => u.Id).ToList();
-                await Bus.RaiseEventAsync(new UsersCreatedEvent(userIds, VerificationType.Email.ToString()));
+                await NotifyAsync(new DomainNotification(
+                    request.MessageType,
+                    $"Insert failed, please try again. Error: {result.Error}",
+                    ErrorCodes.CommitFailed
+                ));
+
+                return;
             }
+
+            await Bus.RaiseEventAsync(new UsersCreatedEvent(result.Id, VerificationType.Email.ToString()));
         }
     }
 }

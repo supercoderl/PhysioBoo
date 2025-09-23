@@ -2,11 +2,11 @@
 {
     public sealed class RefreshTokenCreatedEvent : DomainEvent
     {
-        public List<Guid> Ids;
+        public Guid Id { get; }
 
-        public RefreshTokenCreatedEvent(List<Guid> ids) : base(Guid.NewGuid())
+        public RefreshTokenCreatedEvent(Guid id) : base(id)
         {
-            Ids = ids;
+            Id = id;
         }
     }
 }

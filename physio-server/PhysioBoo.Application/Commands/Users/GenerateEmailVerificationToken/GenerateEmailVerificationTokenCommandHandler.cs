@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
@@ -27,31 +29,32 @@ namespace PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken
 
             var newToken = TokenHelper.GenerateTimestampedToken(24);
 
-            await _verificationTokenRepository.AddRangeAsync(
-                request.NewListVerificationTokens.Select(
-                    newToken => new Domain.Entities.Core.VerificationToken(
-                        newToken.Id, 
-                        newToken.UserId, 
-                        newToken.Token,
-                        newToken.ExpiresAt, 
-                        newToken.Type
-                    )
-                )
-            );
+            var result = await _verificationTokenRepository.InsertAsync<VerificationToken, Guid>(new VerificationToken(
+                request.NewVerificationToken.Id,
+                request.NewVerificationToken.UserId,
+                request.NewVerificationToken.Token,
+                request.NewVerificationToken.ExpiresAt,
+                request.NewVerificationToken.Type
+            ));
 
-            if (await CommitAsync())
+            if (!result.Success)
             {
-                foreach (var tokenRequest in request.NewListVerificationTokens)
-                {
-                    await Bus.RaiseEventAsync(new EmailVerificationTokenGeneratedEvent(
-                        tokenRequest.UserId,
-                        null,
-                        tokenRequest.Token,
-                        tokenRequest.ExpiresAt,
-                        tokenRequest.Type.ToString()
-                    ));
-                }
+                await NotifyAsync(new DomainNotification(
+                    request.MessageType,
+                    $"Insert failed, please try again. Error: {result.Error}",
+                    ErrorCodes.CommitFailed
+                ));
+
+                return;
             }
+
+            await Bus.RaiseEventAsync(new EmailVerificationTokenGeneratedEvent(
+                request.NewVerificationToken.UserId,
+                null,
+                request.NewVerificationToken.Token,
+                request.NewVerificationToken.ExpiresAt,
+                request.NewVerificationToken.Type.ToString()
+            ));
         }
     }
 }

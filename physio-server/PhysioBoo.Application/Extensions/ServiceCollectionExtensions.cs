@@ -1,7 +1,10 @@
 ﻿using MassTransit;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using PhysioBoo.Application.Commands.Addresses.CreateAddress;
 using PhysioBoo.Application.Commands.Doctors.CreateDoctor;
+using PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup;
+using PhysioBoo.Application.Commands.Hospitals.CreateHospital;
 using PhysioBoo.Application.Commands.Patients.CreatePatient;
 using PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
@@ -94,6 +97,15 @@ namespace PhysioBoo.Application.Extensions
 
             // Doctor
             services.AddScoped<IRequestHandler<CreateDoctorCommand>, CreateDoctorCommandHandler>();
+
+            // Hospital
+            services.AddScoped<IRequestHandler<CreateHospitalCommand>, CreateHospitalCommandHandler>();
+
+            // Hospital Group
+            services.AddScoped<IRequestHandler<CreateHospitalGroupCommand>, CreateHospitalGroupCommandHandler>();
+
+            // Address
+            services.AddScoped<IRequestHandler<CreateAddressCommand>, CreateAddressCommandHandler>();   
 
             return services;
         }

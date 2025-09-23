@@ -48,6 +48,8 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IHospitalRepository, HospitalRepository>();
             services.AddScoped<IPatientRepository, PatientRepository>();
             services.AddScoped<IDoctorRepository, DoctorRepository>();
+            services.AddScoped<IHospitalGroupRepository, HospitalGroupRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
 
             return services;
         }

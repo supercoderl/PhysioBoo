@@ -422,7 +422,7 @@ namespace PhysioBoo.Infrastructure.Repositories
                 return cachedMetadata;
 
             var tableAttribute = type.GetCustomAttribute<TableAttribute>();
-            var tableName = tableAttribute?.Name ?? type.Name + "s";
+            var tableName = tableAttribute?.Name ?? TextHelper.Pluralize(type.Name);
 
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => SqlHelper.ShouldIncludeProperty(p))

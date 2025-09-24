@@ -5,6 +5,8 @@ using PhysioBoo.Application.Commands.Addresses.CreateAddress;
 using PhysioBoo.Application.Commands.Doctors.CreateDoctor;
 using PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup;
 using PhysioBoo.Application.Commands.Hospitals.CreateHospital;
+using PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy;
+using PhysioBoo.Application.Commands.PatientMedicalHistories.CreatePatientMedicalHistory;
 using PhysioBoo.Application.Commands.Patients.CreatePatient;
 using PhysioBoo.Application.Commands.Profiles.CreateProfile;
 using PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken;
@@ -110,6 +112,12 @@ namespace PhysioBoo.Application.Extensions
 
             // Profile
             services.AddScoped<IRequestHandler<CreateProfileCommand>, CreateProfileCommandHandler>();
+
+            // Patient Allergy
+            services.AddScoped<IRequestHandler<CreatePatientAllergyCommand>, CreatePatientAllergyCommandHandler>();
+
+            // Patient Medical History
+            services.AddScoped<IRequestHandler<CreatePatientMedicalHistoryCommand>, CreatePatientMedicalHistoryCommandHandler>();
 
             return services;
         }

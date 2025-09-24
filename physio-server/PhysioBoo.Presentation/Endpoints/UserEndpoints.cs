@@ -38,7 +38,7 @@ namespace PhysioBoo.Presentation.Endpoints
 
                 if (notifications.HasNotifications())
                 {
-                    return Results.BadRequest(new ResponseMessage<List<Guid>>
+                    return Results.BadRequest(new ResponseMessage<Guid>
                     {
                         Success = false,
                         Errors = notifications.GetNotifications().Select(n => n.Value),
@@ -50,15 +50,15 @@ namespace PhysioBoo.Presentation.Endpoints
                     });
                 }
 
-                return Results.Created($"/api/users/{newUser.Id}", new ResponseMessage<List<Guid>>
+                return Results.Created($"/api/users/{newUser.Id}", new ResponseMessage<Guid>
                 {
                     Success = true,
-                    Data = new List<Guid> { newUser.Id }
+                    Data = newUser.Id
                 });
             }).WithName("CreateUser")
             .WithSummary("Create new user")
-            .Produces<ResponseMessage<List<Guid>>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<List<Guid>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
 
             // Resend verification
             group.MapPost("/resend-verification", async (

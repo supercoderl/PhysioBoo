@@ -23,6 +23,8 @@ namespace PhysioBoo.Domain.Entities.Core
         public PreferredCommunication PreferredCommunication { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
+
+        public virtual User? User { get; private set; }
         #endregion
 
         #region Constructor (17)

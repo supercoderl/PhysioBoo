@@ -1,4 +1,5 @@
 ﻿using PhysioBoo.Domain.Entities.Clinical;
+using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
@@ -104,6 +105,8 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
 
         [InverseProperty("Patient")]
         public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();    
+
+        public virtual User? User { get; private set; }
         #endregion
 
         #region Constructor (37)

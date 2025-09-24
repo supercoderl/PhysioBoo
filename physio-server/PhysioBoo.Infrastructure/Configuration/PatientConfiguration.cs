@@ -41,6 +41,10 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(d => d.PreferredPatients)
                    .HasForeignKey(p => p.PreferredDoctorId);
 
+            builder.HasOne(p => p.User)
+                .WithOne(u => u.Patient)
+                .HasForeignKey<Patient>(p => p.Id);
+
             // Properties
             builder.Property(p => p.PatientNumber)
                    .IsRequired()

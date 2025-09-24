@@ -11,6 +11,11 @@ namespace PhysioBoo.Infrastructure.Configuration
             // PK
             builder.HasKey(p => p.Id);
 
+            // Self-relationships
+            builder.HasOne(p => p.User)
+                .WithOne(u => u.Profile)
+                .HasForeignKey<Profile>(p => p.Id);
+
             // Indexes
             builder.HasIndex(p => new { p.FirstName, p.LastName });
             builder.HasIndex(p => p.IdentificationNumber).IsUnique(false);

@@ -126,6 +126,8 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
 
         [InverseProperty("Doctor")]
         public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();
+
+        public virtual User? User { get; private set; }
         #endregion
 
         #region Constructor (46)

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Npgsql;
 using NpgsqlTypes;
 using PhysioBoo.Domain.Entities;
-using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.SharedKernel.Metadata;
 using PhysioBoo.SharedKernel.Results;

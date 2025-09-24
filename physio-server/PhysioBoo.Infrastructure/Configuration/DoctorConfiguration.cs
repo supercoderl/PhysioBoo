@@ -24,6 +24,10 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(u => u.VerifiedDoctors)
                    .HasForeignKey(d => d.VerifiedBy);
 
+            builder.HasOne(d => d.User)
+                .WithOne(u => u.Doctor)
+                .HasForeignKey<Doctor>(d => d.Id);
+
             // Properties
             builder.Property(d => d.EmployeeId)
                    .HasMaxLength(50);

@@ -2,6 +2,7 @@
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
+using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
@@ -129,6 +130,12 @@ namespace PhysioBoo.Domain.Entities.Core
 
         [InverseProperty("User")]
         public virtual ICollection<RefreshToken> RefreshTokens { get; private set; } = new List<RefreshToken>();
+
+        public virtual Profile? Profile { get; private set; }
+
+        public virtual Doctor? Doctor { get; private set; }
+
+        public virtual Patient? Patient { get; private set; }
 
         #endregion
 

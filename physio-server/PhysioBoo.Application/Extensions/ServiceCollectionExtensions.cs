@@ -2,12 +2,18 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using PhysioBoo.Application.Commands.Addresses.CreateAddress;
+using PhysioBoo.Application.Commands.Appointments.CreateAppointment;
+using PhysioBoo.Application.Commands.AppointmentTypes.CreateAppointmentType;
+using PhysioBoo.Application.Commands.BillItems.CreateBillItem;
+using PhysioBoo.Application.Commands.Bills.CreateBill;
+using PhysioBoo.Application.Commands.Departments.CreateDepartment;
 using PhysioBoo.Application.Commands.Doctors.CreateDoctor;
 using PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup;
 using PhysioBoo.Application.Commands.Hospitals.CreateHospital;
 using PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy;
 using PhysioBoo.Application.Commands.PatientMedicalHistories.CreatePatientMedicalHistory;
 using PhysioBoo.Application.Commands.Patients.CreatePatient;
+using PhysioBoo.Application.Commands.Payments.CreatePayment;
 using PhysioBoo.Application.Commands.Profiles.CreateProfile;
 using PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
@@ -118,6 +124,24 @@ namespace PhysioBoo.Application.Extensions
 
             // Patient Medical History
             services.AddScoped<IRequestHandler<CreatePatientMedicalHistoryCommand>, CreatePatientMedicalHistoryCommandHandler>();
+
+            // Department
+            services.AddScoped<IRequestHandler<CreateDepartmentCommand>, CreateDepartmentCommandHandler>();
+
+            // Appointment Type
+            services.AddScoped<IRequestHandler<CreateAppointmentTypeCommand>, CreateAppointmentTypeCommandHandler>();
+
+            // Appointment
+            services.AddScoped<IRequestHandler<CreateAppointmentCommand>, CreateAppointmentCommandHandler>();
+
+            // Bill
+            services.AddScoped<IRequestHandler<CreateBillCommand>, CreateBillCommandHandler>();
+
+            // Bill Item
+            services.AddScoped<IRequestHandler<CreateBillItemCommand>, CreateBillItemCommandHandler>();
+
+            // Payment
+            services.AddScoped<IRequestHandler<CreatePaymentCommand>, CreatePaymentCommandHandler>();
 
             return services;
         }

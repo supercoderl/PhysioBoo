@@ -98,6 +98,8 @@ namespace PhysioBoo.Domain
             }
         }
 
+        public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
+
         public string GetUserEmail()
         {
             var claim = _httpContextAccessor.HttpContext?.User.Claims

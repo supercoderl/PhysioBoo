@@ -9,5 +9,6 @@ namespace PhysioBoo.Domain.Interfaces
         Guid GetUserId();
         Role GetUserRole();
         string GetUserEmail();
+        bool IsAuthenticated { get; }
     }
 }

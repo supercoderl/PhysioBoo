@@ -221,6 +221,12 @@ namespace PhysioBoo.Presentation
             app.MapProfileEndpoints();
             app.MapPatientAllergyEndpoints();
             app.MapPatientMedicalHistoryEndpoints();
+            app.MapAppointmentTypeEndpoints();
+            app.MapAppointmentEndpoints();
+            app.MapBillItemEndpoints();
+            app.MapBillEndpoints();
+            app.MapDepartmentEndpoints();
+            app.MapPaymentEndpoints();
 
             app.MapHealthChecks("/healthz", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
             {

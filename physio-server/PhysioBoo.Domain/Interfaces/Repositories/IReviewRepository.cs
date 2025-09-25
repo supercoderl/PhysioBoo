@@ -2,7 +2,7 @@
 
 namespace PhysioBoo.Domain.Interfaces.Repositories
 {
-    public interface IInsuranceCompanyRepository : IRepository<InsuranceCompany>
+    public interface IReviewRepository : IRepository<Review>
     {
     }
 }

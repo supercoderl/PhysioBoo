@@ -10,12 +10,16 @@ using PhysioBoo.Application.Commands.Departments.CreateDepartment;
 using PhysioBoo.Application.Commands.Doctors.CreateDoctor;
 using PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup;
 using PhysioBoo.Application.Commands.Hospitals.CreateHospital;
+using PhysioBoo.Application.Commands.InsuranceCompanies.CreateInsuranceCompany;
+using PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer;
 using PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy;
 using PhysioBoo.Application.Commands.PatientMedicalHistories.CreatePatientMedicalHistory;
 using PhysioBoo.Application.Commands.Patients.CreatePatient;
 using PhysioBoo.Application.Commands.Payments.CreatePayment;
 using PhysioBoo.Application.Commands.Profiles.CreateProfile;
 using PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken;
+using PhysioBoo.Application.Commands.Reviews;
+using PhysioBoo.Application.Commands.Suppliers.CreateSupplier;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
 using PhysioBoo.Application.Commands.Users.CreateUser;
 using PhysioBoo.Application.Commands.Users.ForgotPassword;
@@ -142,6 +146,18 @@ namespace PhysioBoo.Application.Extensions
 
             // Payment
             services.AddScoped<IRequestHandler<CreatePaymentCommand>, CreatePaymentCommandHandler>();
+
+            // Insurance Company
+            services.AddScoped<IRequestHandler<CreateInsuranceCompanyCommand>, CreateInsuranceCompanyCommandHandler>();
+
+            // Manufacturer
+            services.AddScoped<IRequestHandler<CreateManufacturerCommand>, CreateManufacturerCommandHandler>();
+
+            // Supplier
+            services.AddScoped<IRequestHandler<CreateSupplierCommand>, CreateSupplierCommandHandler>();
+
+            // Review
+            services.AddScoped<IRequestHandler<CreateReviewCommand>, CreateReviewCommandHandler>();
 
             return services;
         }

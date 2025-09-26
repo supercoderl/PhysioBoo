@@ -12,10 +12,16 @@ using PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup;
 using PhysioBoo.Application.Commands.Hospitals.CreateHospital;
 using PhysioBoo.Application.Commands.InsuranceCompanies.CreateInsuranceCompany;
 using PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer;
+using PhysioBoo.Application.Commands.MedicalRecords.CreateMedicalRecord;
+using PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCategory;
+using PhysioBoo.Application.Commands.MedicineInventories.CreateMedicineInventory;
+using PhysioBoo.Application.Commands.Medicines.CreateMedicine;
 using PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy;
 using PhysioBoo.Application.Commands.PatientMedicalHistories.CreatePatientMedicalHistory;
 using PhysioBoo.Application.Commands.Patients.CreatePatient;
 using PhysioBoo.Application.Commands.Payments.CreatePayment;
+using PhysioBoo.Application.Commands.PrescriptionItems.CreatePrescriptionItem;
+using PhysioBoo.Application.Commands.Prescriptions.CreatePrescription;
 using PhysioBoo.Application.Commands.Profiles.CreateProfile;
 using PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken;
 using PhysioBoo.Application.Commands.Reviews;
@@ -158,6 +164,24 @@ namespace PhysioBoo.Application.Extensions
 
             // Review
             services.AddScoped<IRequestHandler<CreateReviewCommand>, CreateReviewCommandHandler>();
+
+            // Medicine Category
+            services.AddScoped<IRequestHandler<CreateMedicineCategoryCommand>, CreateMedicineCategoryCommandHandler>();
+
+            // Medicine
+            services.AddScoped<IRequestHandler<CreateMedicineCommand>, CreateMedicineCommandHandler>();
+
+            // Medicine Inventory
+            services.AddScoped<IRequestHandler<CreateMedicineInventoryCommand>, CreateMedicineInventoryCommandHandler>();
+
+            // Medical Record
+            services.AddScoped<IRequestHandler<CreateMedicalRecordCommand>, CreateMedicalRecordCommandHandler>();
+
+            // Prescription
+            services.AddScoped<IRequestHandler<CreatePrescriptionCommand>, CreatePrescriptionCommandHandler>();
+
+            // Prescription Item
+            services.AddScoped<IRequestHandler<CreatePrescriptionItemCommand>, CreatePrescriptionItemCommandHandler>();
 
             return services;
         }

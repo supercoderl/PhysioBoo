@@ -63,6 +63,12 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IManufacturerRepository, ManufacturerRepository>();
             services.AddScoped<ISupplierRepository, SupplierRepository>();
             services.AddScoped<IReviewRepository, ReviewRepository>();
+            services.AddScoped<IMedicineCategoryRepository, MedicineCategoryRepository>();
+            services.AddScoped<IMedicineRepository, MedicineRepository>();
+            services.AddScoped<IMedicineInventoryRepository, MedicineInventoryRepository>();
+            services.AddScoped<IMedicalRecordRepository, MedicalRecordRepository>();
+            services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
+            services.AddScoped<IPrescriptionItemRepository, PrescriptionItemRepository>();
 
             return services;
         }

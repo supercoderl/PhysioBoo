@@ -2,9 +2,9 @@
 
 namespace PhysioBoo.Application.Commands.Doctors.CreateDoctor
 {
-    public sealed class CreateDoctorValidation : AbstractValidator<CreateDoctorCommand>
+    public sealed class CreateDoctorCommandValidation : AbstractValidator<CreateDoctorCommand>
     {
-        public CreateDoctorValidation()
+        public CreateDoctorCommandValidation()
         {
 
         }

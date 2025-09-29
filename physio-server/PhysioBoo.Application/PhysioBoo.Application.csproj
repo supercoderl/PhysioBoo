@@ -20,4 +20,8 @@
     <ProjectReference Include="..\PhysioBoo.Proto\PhysioBoo.Proto.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Commands\DoctorSchedules\CreateDoctorSchedule\" />
+  </ItemGroup>
+
 </Project>

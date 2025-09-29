@@ -15,7 +15,7 @@ namespace PhysioBoo.gRPC.Extensions
         IConfiguration configuration,
         string configSectionKey = "gRPC")
         {
-            var settings = new GRPCSettings();
+            GRPCSettings settings = new GRPCSettings();
             configuration.Bind(configSectionKey, settings);
 
             return AddGrpcClient(services, settings);
@@ -40,9 +40,9 @@ namespace PhysioBoo.gRPC.Extensions
                 return services;
             }
 
-            var channel = GrpcChannel.ForAddress(gRPCUrl);
+            GrpcChannel channel = GrpcChannel.ForAddress(gRPCUrl);
 
-            var usersClient = new UsersApi.UsersApiClient(channel);
+            UsersApi.UsersApiClient usersClient = new UsersApi.UsersApiClient(channel);
             services.AddSingleton(usersClient);
 
             services.AddSingleton<IUsersContext, UsersContext>();

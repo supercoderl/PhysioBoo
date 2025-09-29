@@ -69,6 +69,24 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IMedicalRecordRepository, MedicalRecordRepository>();
             services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
             services.AddScoped<IPrescriptionItemRepository, PrescriptionItemRepository>();
+            services.AddScoped<IImagingModalityRepository, ImagingModalityRepository>();
+            services.AddScoped<IImagingOrderRepository, ImagingOrderRepository>();
+            services.AddScoped<IImagingReportRepository, ImagingReportRepository>();
+            services.AddScoped<ILabOrderRepository, LabOrderRepository>();
+            services.AddScoped<ILabOrderItemRepository, LabOrderItemRepository>();
+            services.AddScoped<ILabReportRepository, LabReportRepository>();
+            services.AddScoped<ILabTestRepository, LabTestRepository>();
+            services.AddScoped<ILabTestCategoryRepository, LabTestCategoryRepository>();
+            services.AddScoped<IDoctorAwardRepository, DoctorAwardRepository>();
+            services.AddScoped<IDoctorCertificationRepository, DoctorCertificationRepository>();
+            services.AddScoped<IDoctorEducationRepository, DoctorEducationRepository>();
+            services.AddScoped<IDoctorLeaveRepository, DoctorLeaveRepository>();
+            services.AddScoped<IDoctorPublicationRepository, DoctorPublicationRepository>();
+            services.AddScoped<IDoctorScheduleRepository, DoctorScheduleRepository>();
+            services.AddScoped<IDoctorSpecialtyRepository, DoctorSpecialtyRepository>();
+            services.AddScoped<IDoctorWorkExperienceRepository, DoctorWorkExperienceRepository>();
+            services.AddScoped<IHospitalStaffRepository, HospitalStaffRepository>();
+            services.AddScoped<IMedicalSpecialtyRepository, MedicalSpecialtyRepository>();
 
             return services;
         }

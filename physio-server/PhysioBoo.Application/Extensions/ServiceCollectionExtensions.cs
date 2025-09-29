@@ -7,12 +7,30 @@ using PhysioBoo.Application.Commands.AppointmentTypes.CreateAppointmentType;
 using PhysioBoo.Application.Commands.BillItems.CreateBillItem;
 using PhysioBoo.Application.Commands.Bills.CreateBill;
 using PhysioBoo.Application.Commands.Departments.CreateDepartment;
+using PhysioBoo.Application.Commands.DoctorAwards.CreateDoctorAward;
+using PhysioBoo.Application.Commands.DoctorCertifications.CreateDoctorCertification;
+using PhysioBoo.Application.Commands.DoctorEducations.CreateDoctorEducation;
+using PhysioBoo.Application.Commands.DoctorLeaves.CreateDoctorLeave;
+using PhysioBoo.Application.Commands.DoctorPublications.CreateDoctorPublication;
 using PhysioBoo.Application.Commands.Doctors.CreateDoctor;
+using PhysioBoo.Application.Commands.DoctorSchedules.CreateDoctorSchedule;
+using PhysioBoo.Application.Commands.DoctorSpecialties.CreateDoctorSpecialty;
+using PhysioBoo.Application.Commands.DoctorWorkExperiences.CreateDoctorWorkExperience;
 using PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup;
 using PhysioBoo.Application.Commands.Hospitals.CreateHospital;
+using PhysioBoo.Application.Commands.HospitalStaffs.CreateHospitalStaff;
+using PhysioBoo.Application.Commands.ImagingModalities.CreateImagingModality;
+using PhysioBoo.Application.Commands.ImagingOrders.CreateImagingOrder;
+using PhysioBoo.Application.Commands.ImagingReports.CreateImagingReport;
 using PhysioBoo.Application.Commands.InsuranceCompanies.CreateInsuranceCompany;
+using PhysioBoo.Application.Commands.LabOrderItems.CreateLabOrderItem;
+using PhysioBoo.Application.Commands.LabOrders.CreateLabOrder;
+using PhysioBoo.Application.Commands.LabReports.CreateLabReport;
+using PhysioBoo.Application.Commands.LabTestCategories.CreateLabTestCategory;
+using PhysioBoo.Application.Commands.LabTests.CreateLabTest;
 using PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer;
 using PhysioBoo.Application.Commands.MedicalRecords.CreateMedicalRecord;
+using PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecialty;
 using PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCategory;
 using PhysioBoo.Application.Commands.MedicineInventories.CreateMedicineInventory;
 using PhysioBoo.Application.Commands.Medicines.CreateMedicine;
@@ -95,6 +113,36 @@ namespace PhysioBoo.Application.Extensions
 
         public static IServiceCollection AddCommandHandlers(this IServiceCollection services)
         {
+            #region Medical Staff Flow
+            services.AddScoped<IRequestHandler<CreateDoctorCommand>, CreateDoctorCommandHandler>();
+
+            services.AddScoped<IRequestHandler<CreateDoctorAwardCommand>, CreateDoctorAwardCommandHandler>();
+
+            services.AddScoped<IRequestHandler<CreateDoctorCertificationCommand>, CreateDoctorCertificationCommandHandler>();
+
+            services.AddScoped<IRequestHandler<CreateDoctorEducationCommand>, CreateDoctorEducationCommandHandler>();
+
+            services.AddScoped<IRequestHandler<CreateDoctorLeaveCommand>, CreateDoctorLeaveCommandHandler>();
+
+            services.AddScoped<IRequestHandler<CreateDoctorPublicationCommand>, CreateDoctorPublicationCommandHandler>();
+
+            services.AddScoped<IRequestHandler<CreateDoctorScheduleCommand>, CreateDoctorScheduleCommandHandler>();
+
+            services.AddScoped<IRequestHandler<CreateDoctorSpecialtyCommand>, CreateDoctorSpecialtyCommandHandler>();
+
+            services.AddScoped<IRequestHandler<CreateDoctorWorkExperienceCommand>, CreateDoctorWorkExperienceCommandHandler>();
+
+            services.AddScoped<IRequestHandler<CreateHospitalStaffCommand>, CreateHospitalStaffCommandHandler>();
+
+            services.AddScoped<IRequestHandler<CreateMedicalSpecialtyCommand>, CreateMedicalSpecialtyCommandHandler>();
+            #endregion
+
+            #region Core Flow
+            services.AddScoped<IRequestHandler<CreateAddressCommand>, CreateAddressCommandHandler>();
+
+            // Profile
+            services.AddScoped<IRequestHandler<CreateProfileCommand>, CreateProfileCommandHandler>();
+
             // User
             services.AddScoped<IRequestHandler<CreateUserCommand>, CreateUserCommandHandler>();
             services.AddScoped<IRequestHandler<GenerateEmailVerificationTokenCommand>, GenerateEmailVerificationTokenCommandHandler>();
@@ -110,30 +158,25 @@ namespace PhysioBoo.Application.Extensions
 
             // Refresh Token
             services.AddScoped<IRequestHandler<CreateRefreshTokenCommand>, CreateRefreshTokenCommandHandler>();
+            #endregion
 
+            #region Patient Flow
             // Patient
             services.AddScoped<IRequestHandler<CreatePatientCommand>, CreatePatientCommandHandler>();
-
-            // Doctor
-            services.AddScoped<IRequestHandler<CreateDoctorCommand>, CreateDoctorCommandHandler>();
-
-            // Hospital
-            services.AddScoped<IRequestHandler<CreateHospitalCommand>, CreateHospitalCommandHandler>();
-
-            // Hospital Group
-            services.AddScoped<IRequestHandler<CreateHospitalGroupCommand>, CreateHospitalGroupCommandHandler>();
-
-            // Address
-            services.AddScoped<IRequestHandler<CreateAddressCommand>, CreateAddressCommandHandler>();
-
-            // Profile
-            services.AddScoped<IRequestHandler<CreateProfileCommand>, CreateProfileCommandHandler>();
 
             // Patient Allergy
             services.AddScoped<IRequestHandler<CreatePatientAllergyCommand>, CreatePatientAllergyCommandHandler>();
 
             // Patient Medical History
             services.AddScoped<IRequestHandler<CreatePatientMedicalHistoryCommand>, CreatePatientMedicalHistoryCommandHandler>();
+            #endregion
+
+            #region Operation Flow
+            // Hospital
+            services.AddScoped<IRequestHandler<CreateHospitalCommand>, CreateHospitalCommandHandler>();
+
+            // Hospital Group
+            services.AddScoped<IRequestHandler<CreateHospitalGroupCommand>, CreateHospitalGroupCommandHandler>();
 
             // Department
             services.AddScoped<IRequestHandler<CreateDepartmentCommand>, CreateDepartmentCommandHandler>();
@@ -152,7 +195,9 @@ namespace PhysioBoo.Application.Extensions
 
             // Payment
             services.AddScoped<IRequestHandler<CreatePaymentCommand>, CreatePaymentCommandHandler>();
+            #endregion
 
+            #region Support Flow
             // Insurance Company
             services.AddScoped<IRequestHandler<CreateInsuranceCompanyCommand>, CreateInsuranceCompanyCommandHandler>();
 
@@ -164,24 +209,47 @@ namespace PhysioBoo.Application.Extensions
 
             // Review
             services.AddScoped<IRequestHandler<CreateReviewCommand>, CreateReviewCommandHandler>();
+            #endregion
 
-            // Medicine Category
-            services.AddScoped<IRequestHandler<CreateMedicineCategoryCommand>, CreateMedicineCategoryCommandHandler>();
-
-            // Medicine
-            services.AddScoped<IRequestHandler<CreateMedicineCommand>, CreateMedicineCommandHandler>();
-
-            // Medicine Inventory
-            services.AddScoped<IRequestHandler<CreateMedicineInventoryCommand>, CreateMedicineInventoryCommandHandler>();
-
-            // Medical Record
+            #region Clinical Flow
             services.AddScoped<IRequestHandler<CreateMedicalRecordCommand>, CreateMedicalRecordCommandHandler>();
 
-            // Prescription
             services.AddScoped<IRequestHandler<CreatePrescriptionCommand>, CreatePrescriptionCommandHandler>();
 
-            // Prescription Item
             services.AddScoped<IRequestHandler<CreatePrescriptionItemCommand>, CreatePrescriptionItemCommandHandler>();
+
+            services.AddScoped<IRequestHandler<CreateMedicineCategoryCommand>, CreateMedicineCategoryCommandHandler>();
+
+            services.AddScoped<IRequestHandler<CreateMedicineCommand>, CreateMedicineCommandHandler>();
+
+            services.AddScoped<IRequestHandler<CreateMedicineInventoryCommand>, CreateMedicineInventoryCommandHandler>();
+            #endregion
+
+            #region Laboratory Imaging Flow
+            // Imaging Modality
+            services.AddScoped<IRequestHandler<CreateImagingModalityCommand>, CreateImagingModalityCommandHandler>();
+
+            // Imaging Order
+            services.AddScoped<IRequestHandler<CreateImagingOrderCommand>, CreateImagingOrderCommandHandler>();
+
+            // Imaging Report
+            services.AddScoped<IRequestHandler<CreateImagingReportCommand>, CreateImagingReportCommandHandler>();
+
+            // Lab Order
+            services.AddScoped<IRequestHandler<CreateLabOrderCommand>, CreateLabOrderCommandHandler>();
+
+            // Lab Order Item
+            services.AddScoped<IRequestHandler<CreateLabOrderItemCommand>, CreateLabOrderItemCommandHandler>();
+
+            // Lab Report
+            services.AddScoped<IRequestHandler<CreateLabReportCommand>, CreateLabReportCommandHandler>();
+
+            // Lab Test
+            services.AddScoped<IRequestHandler<CreateLabTestCommand>, CreateLabTestCommandHandler>();
+
+            // Lab Test Category
+            services.AddScoped<IRequestHandler<CreateLabTestCategoryCommand>, CreateLabTestCategoryCommandHandler>();
+            #endregion
 
             return services;
         }

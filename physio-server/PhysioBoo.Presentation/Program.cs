@@ -23,13 +23,13 @@ namespace PhysioBoo.Presentation
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-            var isAspire = builder.Configuration["ASPIRE_ENABLED"] == "true";
-            var redisConnectionString =
+            bool isAspire = builder.Configuration["ASPIRE_ENABLED"] == "true";
+            string? redisConnectionString =
                 isAspire ? builder.Configuration["ConnectionStrings:Redis"] : builder.Configuration["RedisHostName"];
-            var rabbitConfiguration = builder.Configuration.GetRabbitMqConfiguration();
-            var dbConnectionString = isAspire
+            RabbitMqConfiguration rabbitConfiguration = builder.Configuration.GetRabbitMqConfiguration();
+            string? dbConnectionString = isAspire
                 ? builder.Configuration["ConnectionStrings:Database"]
                 : builder.Configuration["ConnectionStrings:DefaultConnection"];
 
@@ -85,7 +85,7 @@ namespace PhysioBoo.Presentation
                     .AddRedis(redisConnectionString!, "Redis")
                     .AddRabbitMQ(async _ =>
                     {
-                        var factory = new ConnectionFactory
+                        ConnectionFactory factory = new ConnectionFactory
                         {
                             Uri = new Uri(rabbitConfiguration.ConnectionString)
                         };
@@ -170,17 +170,17 @@ namespace PhysioBoo.Presentation
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-            var app = builder.Build();
+            WebApplication app = builder.Build();
 
             app.MapDefaultEndpoints();
 
             // Sync with newest migration
-            using (var scope = app.Services.CreateScope())
+            using (IServiceScope scope = app.Services.CreateScope())
             {
-                var services = scope.ServiceProvider;
-                var appDbContext = services.GetRequiredService<ApplicationDbContext>();
-                var storeDbContext = services.GetRequiredService<EventStoreDbContext>();
-                var domainStoreDbContext = services.GetRequiredService<DomainNotificationStoreDbContext>();
+                IServiceProvider services = scope.ServiceProvider;
+                ApplicationDbContext appDbContext = services.GetRequiredService<ApplicationDbContext>();
+                EventStoreDbContext storeDbContext = services.GetRequiredService<EventStoreDbContext>();
+                DomainNotificationStoreDbContext domainStoreDbContext = services.GetRequiredService<DomainNotificationStoreDbContext>();
 
                 appDbContext.EnsureMigrationsApplied();
                 storeDbContext.EnsureMigrationsApplied();
@@ -211,7 +211,7 @@ namespace PhysioBoo.Presentation
                 app.UseZenFirewall();
             }
 
-            // Map endpoints
+            #region Map endpoints
             app.MapUserEndpoints();
             app.MapPatientEndpoints();
             app.MapDoctorEndpoints();
@@ -237,6 +237,25 @@ namespace PhysioBoo.Presentation
             app.MapMedicalRecordEndpoints();
             app.MapPrescriptionEndpoints();
             app.MapPrescriptionItemEndpoints();
+            app.MapImagingModalityEndpoints();
+            app.MapImagingOrderEndpoints();
+            app.MapImagingReportEndpoints();
+            app.MapLabOrderEndpoints();
+            app.MapLabOrderItemEndpoints();
+            app.MapLabReportEndpoints();
+            app.MapLabTestEndpoints();
+            app.MapLabTestCategoryEndpoints();
+            app.MapDoctorAwardEndpoints();
+            app.MapDoctorCertificationEndpoints();
+            app.MapDoctorEducationEndpoints();
+            app.MapDoctorLeaveEndpoints();
+            app.MapDoctorPublicationEndpoints();
+            app.MapDoctorScheduleEndpoints();
+            app.MapDoctorSpecialtyEndpoints();
+            app.MapDoctorWorkExperienceEndpoints();
+            app.MapHospitalStaffEndpoints();
+            app.MapMedicalSpecialtyEndpoints();
+            #endregion
 
             app.MapHealthChecks("/healthz", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
             {

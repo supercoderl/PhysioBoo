@@ -26,5 +26,17 @@
             //Default just need +s
             return name + "s";
         }
+
+        /// <summary>
+        /// Generate entity number based on current time.
+        /// Format: APP-YYYYMMDD-HHMMSS
+        /// Ví dụ: APP-20250923-182530
+        /// </summary>
+        public static string GenerateEntityNumber(string prefix)
+        {
+            var now = TimeZoneHelper.GetLocalTimeNow();
+
+            return $"{prefix}-{now:yyyyMMdd-HHmmss}";
+        }
     }
 }

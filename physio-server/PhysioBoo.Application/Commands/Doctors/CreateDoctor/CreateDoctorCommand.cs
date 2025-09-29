@@ -6,7 +6,7 @@ namespace PhysioBoo.Application.Commands.Doctors.CreateDoctor
 {
     public sealed class CreateDoctorCommand : CommandBase, IRequest
     {
-        private static readonly CreateDoctorValidation s_validation = new();
+        private static readonly CreateDoctorCommandValidation s_validation = new();
 
         public Guid Id { get; }
         public CreateDoctorViewModel NewDoctor { get; }

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.Reviews
 {
@@ -6,7 +7,15 @@ namespace PhysioBoo.Application.Commands.Reviews
     {
         public CreateReviewCommandValidation()
         {
+            RuleForEntityId();
+        }
 
+        public void RuleForEntityId()
+        {
+            RuleFor(cmd => cmd.NewReview.EntityId)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.Review.EmptyEntityId)
+                .WithMessage("EntityId may not be empty.");
         }
     }
 }

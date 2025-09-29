@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.AppointmentTypes.CreateAppointmentType
 {
@@ -6,7 +7,12 @@ namespace PhysioBoo.Application.Commands.AppointmentTypes.CreateAppointmentType
     {
         public CreateAppointmentTypeCommandValidation()
         {
+            RuleForName();
+        }
 
+        public void RuleForName()
+        {
+            RuleFor(cmd => cmd.NewAppointmentType.Name).NotEmpty().WithErrorCode(DomainErrorCodes.AppointmentType.EmptyName).WithMessage("Name may not be empty.");
         }
     }
 }

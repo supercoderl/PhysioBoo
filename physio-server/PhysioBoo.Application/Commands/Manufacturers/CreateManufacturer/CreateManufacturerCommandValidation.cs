@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer
 {
@@ -6,7 +7,15 @@ namespace PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer
     {
         public CreateManufacturerCommandValidation()
         {
+            RuleForName();
+        }
 
+        public void RuleForName()
+        {
+            RuleFor(cmd => cmd.NewManufacturer.Name)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.Manufacturer.EmptyName)
+                .WithMessage("Name may not be empty.");
         }
     }
 }

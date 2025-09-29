@@ -22,7 +22,7 @@ namespace PhysioBoo.Application.Extensions.Validation
             int minLength = 8,
             int maxLength = 50)
         {
-            var options = ruleBuilder
+            IRuleBuilderOptions<T, string> options = ruleBuilder
                 .NotEmpty().WithErrorCode(DomainErrorCodes.User.EmptyPassword)
                 .MinimumLength(minLength).WithErrorCode(DomainErrorCodes.User.ShortPassword)
                 .MaximumLength(maxLength).WithErrorCode(DomainErrorCodes.User.LongPassword)
@@ -31,6 +31,18 @@ namespace PhysioBoo.Application.Extensions.Validation
                 .Matches("[0-9]").WithErrorCode(DomainErrorCodes.User.NumberPassword)
                 .Matches("[^a-zA-Z0-9]").WithErrorCode(DomainErrorCodes.User.SpecialCharPassword);
             return options;
+        }
+
+        public static IRuleBuilder<T, decimal> GeographicCoordinate<T>(
+            this IRuleBuilder<T, decimal> ruleBuilder,
+            decimal min, decimal max
+        )
+        {
+            return ruleBuilder
+                .InclusiveBetween(-90, 90)
+                .WithMessage($"Coordinate must be between {min} and {max} degrees.")
+                .WithErrorCode(DomainErrorCodes.Address.InvalidGeographicCoordinate
+            );
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecialty
 {
@@ -6,7 +7,15 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecial
     {
         public CreateMedicalSpecialtyCommandValidation()
         {
-            // TODO: Add your validation rules here
+            RuleForName();
+        }
+
+        public void RuleForName()
+        {
+            RuleFor(cmd => cmd.NewMedicalSpecialty.Name)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.MedicalSpecialty.EmptyName)
+                .WithMessage("Name may not be empty.");
         }
     }
 }

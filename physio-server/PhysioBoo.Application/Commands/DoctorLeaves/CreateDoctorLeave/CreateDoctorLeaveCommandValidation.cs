@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.DoctorLeaves.CreateDoctorLeave
 {
@@ -6,7 +7,15 @@ namespace PhysioBoo.Application.Commands.DoctorLeaves.CreateDoctorLeave
     {
         public CreateDoctorLeaveCommandValidation()
         {
-            // TODO: Add your validation rules here
+            RuleForDoctorId();
+        }
+
+        public void RuleForDoctorId()
+        {
+            RuleFor(cmd => cmd.NewDoctorLeave.DoctorId)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.DoctorLeave.EmptyDoctorId)
+                .WithMessage("Doctor Id may not be empty.");
         }
     }
 }

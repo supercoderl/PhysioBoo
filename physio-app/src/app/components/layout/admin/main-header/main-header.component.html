@@ -1,0 +1,222 @@
+<header
+  class="relative z-20 flex sticky top-0 flex-col w-full bg-[#f6f7f8]"
+  id="physio-toolbar"
+>
+  <div class="min-h-12 p-0 md:min-h-16 relative flex items-center">
+    <div class="flex flex-1 items-center gap-3 px-2 md:px-4">
+      <button
+        class="h-7 w-7 border border-divider inlineFlex-center-center relative rounded-2 cursor-pointer transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
+        tabindex="0"
+        type="button"
+        (click)="collapseEvent.emit()"
+      >
+        <lucide-icon name="panelLeft" class="w-4 h-4"></lucide-icon>
+      </button>
+      <div
+        class="m-0 shrink-0 border-r border-solid border-[#E5E7EB] my-2 self-stretch h-auto"
+        role="separator"
+      ></div>
+      <div class="hidden md:flex shrink">
+        <div class="flex flex-1 items-center max-h-9">
+          <a role="button" href="/apps/calendar" data-discover="true">
+            <button
+              class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
+              tabindex="0"
+              type="button"
+              aria-label="Calendar"
+            >
+              <lucide-icon
+                name="calendar"
+                class="w-4 h-4 stroke-black"
+              ></lucide-icon>
+            </button>
+          </a>
+          <a
+            role="button"
+            href="/apps/mailbox/folders/inbox"
+            data-discover="true"
+            ><button
+              class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
+              tabindex="0"
+              type="button"
+              aria-label="Mail"
+            >
+              <lucide-icon
+                name="mail"
+                class="w-4 h-4 stroke-black"
+              ></lucide-icon></button></a
+          ><a role="button" href="/apps/contacts" data-discover="true"
+            ><button
+              class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
+              tabindex="0"
+              type="button"
+              aria-label="Contacts"
+            >
+              <lucide-icon
+                name="users"
+                class="w-4 h-4 stroke-black"
+              ></lucide-icon>
+            </button>
+          </a>
+          <button
+            class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
+            tabindex="0"
+            type="button"
+            aria-haspopup="true"
+            aria-label="Click to add/remove shortcut"
+          >
+            <lucide-icon
+              name="star"
+              class="w-4 h-4 stroke-yellow-400"
+            ></lucide-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center overflow-x-auto p-2 md:px-4">
+      <button
+        class="gap-1 inlineFlex-center-center rounded-2 relative h-8 px-3 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
+        tabindex="0"
+        type="button"
+        (click)="openPopover($event, 'LANGUAGE')"
+      >
+        <img
+          class="min-w-5"
+          alt="English"
+          src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/flags/US.svg"
+        />
+        <p class="text-[11px] font-medium uppercase m-0 leading-none">en</p>
+      </button>
+      <div>
+        <button
+          class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
+          tabindex="0"
+          type="button"
+          (click)="openPopover($event, 'SIZE')"
+        >
+          <lucide-icon
+            name="aLargeSmall"
+            class="w-4 h-4 stroke-black"
+          ></lucide-icon>
+        </button>
+      </div>
+      <div>
+        <button
+          class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
+          tabindex="0"
+          type="button"
+          (click)="fs.toggleFullScreen()"
+        >
+          <lucide-icon
+            [name]="fs.isFullScreen ? 'minimize' : 'maximize'"
+            class="w-4 h-4 stroke-black"
+          ></lucide-icon>
+        </button>
+      </div>
+      <button
+        class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
+        tabindex="0"
+        type="button"
+        (click)="themeSrv.toggleTheme()"
+      >
+        <lucide-icon
+          [name]="themeSrv.isDark() ? 'moon' : 'sun'"
+          class="w-4 h-4 stroke-black"
+        ></lucide-icon>
+      </button>
+      <div class="flex muiltr-eqgs9o">
+        <div role="button" tabindex="0" class="">
+          <button
+            class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
+            tabindex="0"
+            type="button"
+            (click)="toggleSearch()"
+          >
+            <lucide-icon
+              name="search"
+              class="w-4 h-4 stroke-black"
+            ></lucide-icon>
+          </button>
+        </div>
+        <div
+          class="h-full z-[999] top-0 inset-x-0 absolute bg-white text-[#1F232B] shadow-[0_1px_3px_0_rgba(0,_0,_0,_0.1),0_1px_2px_-1px_rgba(0,_0,_0,_0.1)] transition-[box-shadow_300ms_cubic-bezier(0.4,_0,_0.2,_1)]"
+          *ngIf="isSearching"
+        >
+          <div class="flex h-full w-full items-center">
+            <div role="combobox" class="flex flex-1 w-full">
+              <div class="relative w-full">
+                <div
+                  class="inline-flex flex-col relative min-w-0 p-0 m-0 border-0 align-top w-full"
+                >
+                  <div
+                    class="text-[13px] leading-[1.4375em] inline-flex items-center w-full relative"
+                  >
+                    <input
+                      autocomplete="off"
+                      id="«r17r»"
+                      placeholder="Search"
+                      class="py-0 px-4 h-9 outline-none transition-[background-color_250ms_cubic-bezier(0.4,_0,_0.2,_1)] block min-w-0 w-full"
+                      type="text"
+                      value=""
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              class="mx-2 inlineFlex-center-center relative bg-transparent cursor-pointer align-middle text-center text-[#4B5563] text-[26px] w-9 h-9 max-h-9 m-0 flex-0 transition-[background-color_150ms_cubic-bezier(0.4,_0,_0.2,_1)] p-3 rounded-[8px] hover:bg-gray-100 focus:bg-gray-100"
+              type="button"
+              #closeBtn
+              (click)="toggleSearch()"
+            >
+              <lucide-icon
+                name="x"
+                class="w-4 h-4 stroke-[rgb(75,_85,_99)]"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+      <button
+        class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
+        tabindex="0"
+        type="button"
+        (click)="
+          drawerEvent.emit({
+            type: 'CLOUD',
+            data: null
+          })
+        "
+      >
+        <lucide-icon
+          name="bookmark"
+          class="w-4 h-4 stroke-black"
+        ></lucide-icon>
+      </button>
+      <button
+        class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
+        tabindex="0"
+        type="button"
+        (click)="
+          drawerEvent.emit({
+            type: 'NOTIFICATION',
+            data: null
+          })
+        "
+      >
+        <span class="relative inline-flex shrink-0 rounded-[6px]">
+          <div style="transform: none">
+            <lucide-icon
+              name="bell"
+              class="w-4 h-4 stroke-black"
+            ></lucide-icon>
+          </div>
+          <span
+            class="flex-center-center flex-wrap absolute font-medium text-[11px] bg-secondary h-2 w-2 top-0 right-0 -translate-y-1/2 translate-x-1/2 rounded-[4px] origin-top"
+          ></span
+        ></span>
+      </button>
+    </div>
+  </div>
+  <ng-content></ng-content>
+</header>

@@ -8,10 +8,10 @@ import { SharedModule } from "../../../shared/shared-imports";
         SharedModule
     ],
     template: `
-    <section class="bg-white py-15 block">
+    <section class="bg-white py-10 md:py-15 block">
         <div class="container mx-auto">
-            <div class="grid grid-cols-2 items-center">
-                <div class="px-3">
+            <div class="grid md:grid-cols-2 items-center">
+                <div class="px-3 hidden md:block">
                     <div class="pr-7.5">
                         <div class="grid grid-cols-2">
                             <div class="px-3">

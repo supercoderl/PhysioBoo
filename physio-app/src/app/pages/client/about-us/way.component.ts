@@ -8,10 +8,10 @@ import { SharedModule } from "../../../shared/shared-imports";
         SharedModule
     ],
     template: `
-    <section class="bg-white pb-15 block">
-        <div class="container mx-auto">
-            <div class="bg-secondary rounded-[25px] relative overflow-hidden">
-                <div class="relative">
+    <section class="bg-white pb-10 md:pb-15 block">
+        <div class="container mx-auto px-3">
+            <div class="bg-secondary rounded-2.5 md:rounded-[25px] relative overflow-hidden">
+                <div class="relative hidden md:block">
                     <div class="absolute top-15 right-50">
                         <img
                             alt=""
@@ -22,23 +22,23 @@ import { SharedModule } from "../../../shared/shared-imports";
                         <img alt="" src="https://doccure.dreamstechnologies.com/react/template/assets/shape-07-DE-LB4SH.png" />
                     </div>
                 </div>
-                <div class="grid grid-cols-12 items-end">
-                    <div class="col-span-7 px-3">
-                        <div class="m-0 p-20">
-                            <h2 class="text-white text-[32px] font-bold leading-[1.2]">Be on Your Way to Feeling Better with the Doccure</h2>
-                            <p class="font-medium text-base text-info mb-10">
+                <div class="grid md:grid-cols-12 items-end">
+                    <div class="md:col-span-7 md:px-3">
+                        <div class="m-0 p-5 md:p-20">
+                            <h2 class="text-white text-[24px] md:text-[32px] font-bold leading-[1.2]">Be on Your Way to Feeling Better with the Doccure</h2>
+                            <p class="font-medium text-base text-info mb-3.75 md:mb-10">
                                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                                 eiusmod tempor incididunt ut labore et dolore magna aliqua.
                             </p>
                             <a
-                                class="text-base py-2 px-4 bg-white border border-solid border-white rounded-[44px] text-white relative overflow-hidden z-[1]"
+                                class="text-[14px] md:text-base py-2.5 md:py-2 px-3.75 md:px-4 bg-white border border-solid border-white rounded-[44px] text-white relative overflow-hidden z-[1]"
                                 href="/react/template/contactus"
                             >
                                 Contact With Us
                             </a>
                         </div>
                     </div>
-                    <div class="col-span-5 px-3">
+                    <div class="md:col-span-5 hidden md:block px-3">
                         <div class="relative top-2.5">
                             <img
                                 alt=""

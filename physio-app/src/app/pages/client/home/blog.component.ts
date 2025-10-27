@@ -9,19 +9,17 @@ import { SharedModule } from "../../../shared/shared-imports";
         SharedModule
     ],
     template: `
-    <section class="py-15 block">
+    <section class="py-12.5 md:py-15 block">
         <div class="container mx-auto">
             <div
-                class="mb-10 text-center"
-                data-aos="fade-up"
-                data-aos-delay="100"
+                class="mb-6 md:mb-10 text-center"
             >
                 <span class="text-xs14 rounded-5 font-medium py-1.75 px-5 relative mb-3.75 text-white bg-secondary inline-block">Recent Blogs</span>
-                <h2 class="text-2.5xl font-bold m-0">Stay Updated With Our Latest Articles</h2>
+                <h2 class="text-[24px] md:text-2.5xl font-bold m-0">Stay Updated With Our Latest Articles</h2>
             </div>
-            <div class="grid grid-cols-2 gap-6">
+            <div class="grid md:grid-cols-2 gap-6">
                 <div class="mt-6 px-3" *ngFor="let index of arr">
-                    <div class="rounded-2.5 shadow-[0_4px_14px_#e2edff40] overflow-hidden flex items-center" data-aos="fade-up">
+                    <div class="rounded-2.5 shadow-[0_4px_14px_#e2edff40] overflow-hidden block md:flex items-center">
                         <div class="relative w-full h-full overflow-hidden rounded-2.5">
                             <a href="/react/template/blog/blog-details" class="overflow-hidden w-full h-full">
                                 <img
@@ -55,8 +53,6 @@ import { SharedModule } from "../../../shared/shared-imports";
             </div>
             <div
                 class="mt-10 text-center"
-                data-aos="fade-up"
-                data-aos-delay="100"
             >
                 <a
                     class="py-2.25 px-4 mx-auto bg-primary border border-solid border-primary text-white text-xs14 transition-smooth font-medium flex items-center w-fit rounded-full hover:text-white"

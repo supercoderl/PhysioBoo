@@ -1,18 +1,17 @@
-import { AfterViewInit, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { SharedModule } from '../../../shared/shared-imports';
 import { BannerHomeComponent } from "./banner.component";
-import { ListHomeComponent } from "./list.component";
-import { SpecialityHomeComponent } from "./speciality.component";
-import { DoctorHomeComponent } from "./doctor.component";
-import { ServicesHomeComponent } from "./services.component";
-import { ReasonHomeComponent } from "./reason.component";
-import { TestimonialHomeComponent } from "./testimonial.component";
-import { CompanyHomeComponent } from "./company.component";
-import { FaqHomeComponent } from "./faq.component";
-import { MobileAppHomeComponent } from './mobile-app.component';
 import { BlogHomeComponent } from './blog.component';
+import { CompanyHomeComponent } from "./company.component";
+import { DoctorHomeComponent } from "./doctor.component";
+import { FaqHomeComponent } from "./faq.component";
 import { InfoHomeComponent } from "./info.component";
-import { AOSService } from '../../../services/aos/aos.service';
+import { ListHomeComponent } from "./list.component";
+import { MobileAppHomeComponent } from './mobile-app.component';
+import { ReasonHomeComponent } from "./reason.component";
+import { ServicesHomeComponent } from "./services.component";
+import { SpecialityHomeComponent } from "./speciality.component";
+import { TestimonialHomeComponent } from "./testimonial.component";
 
 @Component({
   selector: 'app-home',
@@ -51,14 +50,6 @@ import { AOSService } from '../../../services/aos/aos.service';
     </div>
   `,
 })
-export class HomeComponent implements AfterViewInit {
-  constructor(private aosService: AOSService) { }
-
-  ngAfterViewInit(): void {
-    // Ensure AOS is initialized for this component
-    this.aosService.initialize().then(() => {
-      // Small delay to ensure DOM is stable
-      setTimeout(() => this.aosService.refresh(), 50);
-    });
-  }
+export class HomeComponent {
+  constructor() { }
 }

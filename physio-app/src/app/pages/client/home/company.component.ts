@@ -1,8 +1,8 @@
 import { Component } from "@angular/core";
-import { SharedModule } from "../../../shared/shared-imports";
-import { SlickCarouselModule } from "ngx-slick-carousel";
 import { Star } from "lucide-angular";
+import { SlickCarouselModule } from "ngx-slick-carousel";
 import { COMPANYLOGOS } from "../../../shared/data/dummy";
+import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
     selector: 'company-home',
@@ -13,9 +13,7 @@ import { COMPANYLOGOS } from "../../../shared/data/dummy";
     ],
     template: `
             <section
-                class="py-15 rounded-b-7.5 bg-[#000f28] border border-solid border-[#000f28] text-white block"
-                data-aos="fade-up"
-                data-aos-delay="100"
+                class="py-12.5 md:py-15 rounded-b-7.5 bg-[#000f28] border border-solid border-[#000f28] text-white block"
             >
                 <div class="container mx-auto">
                     <div class="mb-10 text-center">
@@ -36,11 +34,11 @@ import { COMPANYLOGOS } from "../../../shared/data/dummy";
                                 @for (slide of logos; track slide) {
                                     <div 
                                         ngxSlickItem
-                                        class="mr-6 w-full inline-block" 
+                                        class="px-3 w-full inline-block" 
                                     >
                                         <img
                                             alt="img"
-                                            class="w-auto block"
+                                            class="w-auto block mx-auto md:mx-0"
                                             [src]="slide"
                                             loading="lazy"
                                         />
@@ -63,7 +61,27 @@ export class CompanyHomeComponent {
         slidesToScroll: 1,
         touchThreshold: 20,
         swipeToSlide: true,
-        arrows: false
+        arrows: false,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 6
+                }
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 4
+                }
+            },
+            {
+                breakpoint: 767,
+                settings: {
+                    slidesToShow: 2
+                }
+            },
+        ]
     };
 
     addSlide() {

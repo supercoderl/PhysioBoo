@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
-import { SharedModule } from "../../../shared/shared-imports";
 import { SquareMinus, SquarePlus } from "lucide-angular";
+import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
     selector: 'faq-about-us',
@@ -9,19 +9,19 @@ import { SquareMinus, SquarePlus } from "lucide-angular";
         SharedModule
     ],
     template: `
-    <section class="py-15 bg-white relative overflow-hidden block">
+    <section class="py-10 md:py-15 bg-white relative overflow-hidden block">
         <div class="container mx-auto">
             <div class="flex justify-center">
                 <div class="px-3">
                     <div class="mb-10 text-center">
                         <h6 class="font-semibold text-base text-secondary m-0 leading-[1.2]">Get Your Answer</h6>
-                        <h2 class="text-[32px] mb-0 font-bold leading-[1.2] text-primary">Frequently Asked Questions</h2>
+                        <h2 class="text-[24px] md:text-[32px] mb-0 font-bold leading-[1.2] text-primary">Frequently Asked Questions</h2>
                     </div>
                 </div>
             </div>
-            <div class="grid grid-cols-2 items-center">
+            <div class="grid md:grid-cols-2 items-center">
                 <div class="px-3">
-                    <div class="relative mb-10">
+                    <div class="relative mb-15 md:mb-10">
                         <img
                             alt="img"
                             src="https://doccure.dreamstechnologies.com/react/template/assets/faq-img-B8p_djQ0.png"

@@ -1,0 +1,152 @@
+<div class="z-10 flex h-full flex-auto flex-col">
+  <div class="flex flex-1 z-[2] min-w-0 h-full bg-[#F6F7F8] absolute inset-0">
+    <div class="flex flex-col w-full flex-1 z-[9999] overflow-y-scroll">
+      <div class="bg-[#0F1115] text-white flex flex-0 bg-cover">
+        <div class="container">
+          <div
+            class="relative flex shrink-0 items-center justify-center overflow-hidden px-4 py-8 md:p-16"
+          >
+            <div
+              class="mx-auto flex w-full flex-col items-center justify-center"
+            >
+              <div class="opacity-100">
+                <admin-breadcrumb theme="dark"></admin-breadcrumb>
+              </div>
+              <div class="opacity-100">
+                <p
+                  class="sm:text-5xl text-2xl tracking-tight font-extrabold text-center mt-1 m-0"
+                >
+                  What do you want to learn today?
+                </p>
+              </div>
+              <div class="opacity-100">
+                <p
+                  class="sm:text-lg sm:mt-6 opacity-75 tracking-tight text-xs text-center max-w-xl mt-4 m-0"
+                >
+                  Our courses will step you through the process of a building
+                  small applications, or adding new features to existing
+                  applications.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="relative ps flex flex-col flex-1 min-h-0 overscroll-contain">
+        <div class="container">
+          <div class="mx-auto flex w-full flex-1 flex-col p-4">
+            <div
+              class="flex shrink-0 flex-col items-start justify-between gap-2 sm:flex-row sm:gap-0 md:items-center"
+            >
+              <div class="flex w-full items-center gap-2 sm:w-auto">
+                <div class="sm:w-34 w-full flex flex-col relative">
+                  <boo-select
+                    [options]="types"
+                  ></boo-select>
+                </div>
+                <div class="sm:w-34 w-full flex flex-col relative min-w-0">
+                  <boo-search></boo-search>
+                </div>
+              </div>
+              <div class="flex w-full items-center gap-2 sm:w-auto">
+                <label class="m-0 inline-flex items-center cursor-pointer align-middle">
+                  <switch></switch>
+                  <span
+                    class="m-0 text-[13px] leading-[1.5] cursor-pointer"
+                  >
+                    Hide completed
+                  </span>
+                </label>
+              </div>
+            </div>
+            <div
+              class="mt-3 grid grid-cols-2 gap-4 sm:mt-4 sm:grid-cols-3 lg:grid-cols-4"
+            >
+              <div
+                style="opacity: 1; transform: none"
+                *ngFor="let course of courses"
+              >
+                <div
+                  class="md:h-80 shadow-sm flex flex-col h-8 bg-white text-[#1F232B] overflow-hidden rounded-[12px]"
+                >
+                  <div class="flex flex-auto flex-col p-4">
+                    <div class="w-full">
+                      <div class="mb-4 flex items-center justify-between">
+                        <div
+                          class="font-semibold text-md max-w-full inlineFlex-center-center leading-[1.5] align-middle h-5.5 bg-[#d2eafc] whitespace-nowrap rounded-[6px] p-0.5"
+                          [style.background-color]="course.type | colorByType"
+                        >
+                          <span
+                            class="truncate px-2 font-semibold text-xs text-white"
+                            >{{ course.type }}</span
+                          >
+                        </div>
+                        <lucide-icon
+                          name="badge-check"
+                          class="shrink-0 stroke-current text-green-600 w-4 h-4"
+                        ></lucide-icon>
+                      </div>
+                      <p class="font-medium text-sm m-0">{{ course.name }}</p>
+                      <p class="text-xs line-clamp-2 mt-0.5 m-0 text-[#4B5563]">
+                        {{ course.description }}
+                      </p>
+                      <hr
+                        class="w-12 my-6 mx-0 opacity-60 border-b border-solid border-[#E5E7EB]"
+                      />
+                      <p
+                        class="text-xs gap-1.5 flex items-center leading-[1.5] text-[#4B5563]"
+                      >
+                        <lucide-icon
+                          name="clock"
+                          class="shrink-0 w-4 h-4 stroke-[#BFC4CC]"
+                        ></lucide-icon>
+                        <span class="leading-none whitespace-nowrap"
+                          >{{ course.durationMinutes }} minutes</span
+                        >
+                      </p>
+                      <p
+                        class="text-xs gap-1.5 flex items-center mt-2 m-0 text-[#4B5563]"
+                      >
+                        <lucide-icon
+                          name="graduation-cap"
+                          class="shrink-0 w-4 h-4 stroke-[#BFC4CC]"
+                        ></lucide-icon>
+                        <span class="leading-none whitespace-nowrap">{{
+                          course.timeCompleted | completionText
+                        }}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    class="w-full h-0.5 relative overflow-hidden block z-0 bg-[#a6c4e7]"
+                    role="progressbar"
+                    ><span
+                      class="w-full absolute left-0 top-0 bottom-0 origin-left-center bg-[#1565C0] transition-transform duration-400 linear"
+                      style="transform: translateX(-72.7273%)"
+                    ></span
+                  ></span>
+                  <div class="p-4 flex items-center justify-end bg-[#f9fafa]">
+                    <a
+                      class="px-3 inlineFlex-center-center relative cursor-pointer align-middle text-white text-[12px] font-medium leading-1 min-h-7 min-w-7 rounded-[8px] py-1.5 bg-[#1565C0]"
+                      tabindex="0"
+                      href="/apps/academy/courses/694e4e5f-f25f-470b-bd0e-26b1d4f64028/basics-of-angular"
+                      data-discover="true"
+                    >
+                      Continue
+                      <span class="ml-2 -mr-0.5 text-base">
+                        <lucide-icon
+                          name="arrow-right"
+                          class="shrink-0 w-4 h-4 stroke-white"
+                        ></lucide-icon>
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

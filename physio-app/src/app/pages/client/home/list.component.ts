@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { SharedModule } from '../../../shared/shared-imports';
 import { CATEGORIES } from '../../../shared/data/dummy';
+import { SharedModule } from '../../../shared/shared-imports';
 
 @Component({
     selector: 'list-home',
@@ -10,15 +10,13 @@ import { CATEGORIES } from '../../../shared/data/dummy';
     ],
     template: `
         <div class="relative -mt-10 z-[9]">
-            <div class="container mx-auto">
+            <div class="container mx-auto px-3">
                 <div class="border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] rounded-2.5 relative flex flex-col bg-white">
-                    <div class="p-10 flex-1">
+                    <div class="p-7.5 md:p-10 flex-1">
                         <div class="flex-center-center md:justify-between flex-wrap gap-6">
                             <a 
                                 *ngFor="let item of categories"
-                                class="group text-neutral cursor-pointer transition-smooth block text-center" 
-                                data-aos="fade-up"
-                                data-aos-delay="100"
+                                class="group text-neutral cursor-pointer transition-smooth block text-center w-full md:w-auto" 
                                 [href]="item.href"
                             >
                                 <div 

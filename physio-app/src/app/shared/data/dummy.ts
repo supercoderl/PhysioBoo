@@ -1,3 +1,5 @@
+import { AlignStartVertical, BadgeCheck, Banknote, Calculator, Calendar, ChartPie, CircleAlert, Clock, Cloud, DollarSign, FileCheck, GraduationCap, Grid2x2, Image, Info, Link2, Lock, Mail, MessageSquare, NotebookPen, Search, ShoppingCart, TriangleAlert, Users } from "lucide-angular"
+
 export const CATEGORIES = [
     {
         id: 1,
@@ -472,5 +474,403 @@ export const BLOGS = [
         postedAt: "22 Jun 2025",
         thumbnail: "https://doccure.dreamstechnologies.com/react/template/src/assets/img/blog/blog-36.jpg",
         category: "Technology"
+    }
+]
+
+export const MENUS = [
+    {
+        id: 1,
+        title: 'Dashboard',
+        subtitle: 'Unique dashboard designs',
+        children: [
+            {
+                id: 1,
+                title: 'Project',
+                icon: FileCheck,
+                href: ''
+            },
+            {
+                id: 2,
+                title: 'Analytics',
+                icon: ChartPie,
+                href: ''
+            },
+            {
+                id: 3,
+                title: 'Finance',
+                icon: Banknote,
+                href: ''
+            },
+            {
+                id: 4,
+                title: 'Crypto',
+                icon: DollarSign,
+                href: ''
+            }
+        ]
+    },
+    {
+        id: 2,
+        title: 'Applications',
+        subtitle: 'Custom made application designs',
+        children: [
+            {
+                id: 1,
+                title: 'AI Image Generator',
+                icon: Image,
+                href: '',
+                suffix: 'New'
+            },
+            {
+                id: 2,
+                title: 'Academy',
+                icon: GraduationCap,
+                href: ''
+            },
+            {
+                id: 3,
+                title: 'Calendar',
+                icon: Calendar,
+                href: ''
+            },
+            {
+                id: 4,
+                title: 'Messenger',
+                icon: MessageSquare,
+                href: ''
+            },
+            {
+                id: 5,
+                title: 'Contacts',
+                icon: Users,
+                href: ''
+            },
+            {
+                id: 6,
+                title: 'E-commerce',
+                icon: ShoppingCart,
+                href: 'javascript:void(0)',
+                children: [
+                    {
+                        id: 1,
+                        title: 'Product'
+                    },
+                    {
+                        id: 2,
+                        title: 'Product Detail'
+                    },
+                    {
+                        id: 3,
+                        title: 'New Product'
+                    },
+                    {
+                        id: 4,
+                        title: 'Orders'
+                    }
+                ]
+            },
+            {
+                id: 7,
+                title: 'File Manager',
+                icon: Cloud,
+                href: ''
+            },
+            {
+                id: 8,
+                title: 'Help Center',
+                icon: Info,
+                href: ''
+            },
+            {
+                id: 9,
+                title: 'Mail',
+                icon: Mail,
+                href: '',
+                suffix: '27'
+            },
+            {
+                id: 10,
+                title: 'Notes',
+                icon: NotebookPen,
+                href: ''
+            },
+            {
+                id: 11,
+                title: 'Scrumboard',
+                icon: Grid2x2,
+                href: ''
+            }
+            , {
+                id: 12,
+                title: 'Tasks',
+                icon: BadgeCheck,
+                href: ''
+            }
+        ]
+    },
+    {
+        id: 3,
+        title: 'Pages',
+        subtitle: 'Custom made page designs',
+        children: [
+            {
+                id: 1,
+                title: 'Activities',
+                icon: AlignStartVertical,
+                href: ''
+            },
+            {
+                id: 2,
+                title: 'Authentication',
+                icon: Lock,
+                href: ''
+            },
+            {
+                id: 3,
+                title: 'Coming Soon',
+                icon: Clock,
+                href: ''
+            },
+            {
+                id: 4,
+                title: 'Error',
+                icon: CircleAlert,
+                href: ''
+            },
+            {
+                id: 5,
+                title: 'Invoice',
+                icon: Calculator,
+                href: ''
+            },
+            {
+                id: 6,
+                title: 'Maintenance',
+                icon: TriangleAlert,
+                href: ''
+            },
+            {
+                id: 7,
+                title: 'Pricing',
+                icon: Banknote,
+                href: ''
+            },
+            {
+                id: 8,
+                title: 'Search',
+                icon: Search,
+                href: ''
+            },
+            {
+                id: 9,
+                title: 'physioboo.com',
+                icon: Link2,
+                href: ''
+            },
+        ]
+    }
+]
+
+export const COURSES = [
+    {
+        id: 1,
+        name: 'Basic of Angular',
+        description: 'Introductory course for Angular and framework basics',
+        type: 'Web',
+        durationMinutes: 30,
+        timeCompleted: 2
+    },
+    {
+        id: 2,
+        name: 'Basics of TypeScript',
+        description: 'Beginner course for Typescript and its basics',
+        type: 'Web',
+        durationMinutes: 60,
+        timeCompleted: 3
+    },
+    {
+        id: 3,
+        name: 'Android N: Quick Settings',
+        description: 'Step by step guide for Android N: Quick Settings',
+        type: 'Android',
+        durationMinutes: 120,
+        timeCompleted: 1
+    },
+    {
+        id: 4,
+        name: 'Build an App for the Google Assistant with Firebase',
+        description: 'Dive deep into Google Assistant apps using Firebase',
+        type: 'Firebase',
+        durationMinutes: 30,
+        timeCompleted: 3
+    },
+    {
+        id: 5,
+        name: 'Keep Sensitive Data Safe and Private',
+        description: 'Learn how to keep your important data safe and private',
+        type: 'Android',
+        durationMinutes: 45,
+        timeCompleted: 0
+    },
+    {
+        id: 6,
+        name: 'Manage Your Pivotal Cloud Foundry App\'s Using Apigee Edge',
+        description: 'Introductory course for Pivotal Cloud Foundry App',
+        type: 'Cloud',
+        durationMinutes: 90,
+        timeCompleted: 0
+    },
+    {
+        id: 7,
+        name: 'Build a PWA Using Workbox',
+        description: 'Step by step guide for building a PWA using Workbox',
+        type: 'Web',
+        durationMinutes: 120,
+        timeCompleted: 0
+    },
+    {
+        id: 8,
+        name: 'Cloud Functions for Firebase',
+        description: 'Beginners guide of Firebase Cloud Functions',
+        type: 'Firebase',
+        durationMinutes: 45,
+        timeCompleted: 1
+    },
+    {
+        id: 9,
+        name: 'Building a gRPC Service with Java',
+        description: 'Learn more about building a gRPC Service with Java',
+        type: 'Cloud',
+        durationMinutes: 30,
+        timeCompleted: 1
+    },
+    {
+        id: 10,
+        name: 'Looking at Campaign Finance with BigQuery',
+        description: 'Dive deep into BigQuery: Campaign Finance',
+        type: 'Cloud',
+        durationMinutes: 60,
+        timeCompleted: 0
+    },
+    {
+        id: 11,
+        name: 'Personalize Your iOS App with Firebase User Management',
+        description: 'Dive deep into User Management on iOS apps using Firebase',
+        type: 'Firebase',
+        durationMinutes: 90,
+        timeCompleted: 0
+    },
+    {
+        id: 12,
+        name: 'Customize Network Topology with Subnetworks',
+        description: 'Dive deep into Network Topology with Subnetworks',
+        type: 'Web',
+        durationMinutes: 45,
+        timeCompleted: 0
+    },
+    {
+        id: 13,
+        name: 'Launch Cloud Datalab',
+        description: 'From start to finish: Launch Cloud Datalab',
+        type: 'Cloud',
+        durationMinutes: 60,
+        timeCompleted: 0
+    },
+    {
+        id: 14,
+        name: 'Cloud Firestore',
+        description: 'Step by step guide for setting up Cloud Firestore',
+        type: 'Cloud',
+        durationMinutes: 90,
+        timeCompleted: 0
+    },
+]
+
+export const FOLDERS = [
+    {
+        id: 1,
+        name: 'Personal',
+        totalFiles: 57,
+        isFolder: true
+    },
+    {
+        id: 2,
+        name: 'Photos',
+        totalFiles: 907,
+        isFolder: true
+    },
+    {
+        id: 3,
+        name: 'Work',
+        totalFiles: 24,
+        isFolder: true
+    }
+]
+
+export const FILES = [
+    {
+        "id": 1,
+        "name": "Contract #123",
+        "type": "pdf"
+    },
+    {
+        "id": 2,
+        "name": "Estimated budget",
+        "type": "xls"
+    },
+    {
+        "id": 3,
+        "name": "DMCA notice",
+        "type": "doc"
+    },
+    {
+        "id": 4,
+        "name": "Invoices",
+        "type": "pdf"
+    },
+    {
+        "id": 5,
+        "name": "Crash logs",
+        "type": "txt"
+    },
+    {
+        "id": 6,
+        "name": "System logs",
+        "type": "txt"
+    },
+    {
+        "id": 7,
+        "name": "Personal project",
+        "type": "doc"
+    },
+    {
+        "id": 8,
+        "name": "Biometric portrait",
+        "type": "jpg"
+    },
+    {
+        "id": 9,
+        "name": "Scanned image 1",
+        "type": "jpg"
+    },
+    {
+        "id": 10,
+        "name": "Scanned image 2",
+        "type": "jpg"
+    },
+    {
+        "id": 11,
+        "name": "Prices",
+        "type": "doc"
+    },
+    {
+        "id": 12,
+        "name": "Shopping list",
+        "type": "doc"
+    },
+    {
+        "id": 13,
+        "name": "Summer budget",
+        "type": "xls"
     }
 ]

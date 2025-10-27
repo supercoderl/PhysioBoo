@@ -1,0 +1,35 @@
+<div
+  [ngClass]="{
+    'fixed w-full h-full inset-0 bg-white z-[99999] flex-center-center transition-all duration-500': true,
+    'opacity-0 invisible': !isLoading,
+    'opacity-100 visible': isLoading
+  }"
+  id="ic_preloader"
+>
+  <div class="w-11 h-11 relative animate-preloader" style="transform-style: preserve-3d;">
+    <div
+      class="bg-[rgba(99,_61,_254,_0.2)] h-full w-full absolute border-2 border-solid border-primary"
+      style="transform: translateZ(-22px) rotateY(180deg);"
+    ></div>
+    <div
+      class="bg-[rgba(99,_61,_254,_0.2)] h-full w-full absolute border-2 border-solid border-primary origin-top-right"
+      style="transform: rotateY(-270deg) translateX(50%);"
+    ></div>
+    <div
+      class="bg-[rgba(99,_61,_254,_0.2)] h-full w-full absolute border-2 border-solid border-primary origin-[center_left]"
+      style="transform: rotateY(270deg) translateX(-50%);"
+    ></div>
+    <div
+      class="bg-[rgba(99,_61,_254,_0.2)] h-full w-full absolute border-2 border-solid border-primary origin-[top_center]"
+      style="transform: rotateX(90deg) translateY(-50%);"
+    ></div>
+    <div
+      class="bg-[rgba(99,_61,_254,_0.2)] h-full w-full absolute border-2 border-solid border-primary origin-[bottom_center]"
+      style="transform: rotateX(-90deg) translateY(50%);"
+    ></div>
+    <div
+      class="bg-[rgba(99,_61,_254,_0.2)] h-full w-full absolute border-2 border-solid border-primary"
+      style="transform: translateZ(22px);"
+    ></div>
+  </div>
+</div>

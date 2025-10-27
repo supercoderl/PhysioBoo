@@ -1,25 +1,23 @@
 import { Component } from "@angular/core";
-import { SharedModule } from "../../../shared/shared-imports";
 import { AudioLines, BriefcaseMedical, SquareUser } from "lucide-angular";
+import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
     selector: 'reason-home',
     standalone: true,
     imports: [SharedModule],
     template: `
-        <section class="py-15 block">
+        <section class="py-12.5 md:py-15 block">
             <div class="container mx-auto">
                 <div
                     class="mb-10 text-center"
-                    data-aos="fade-up"
-                    data-aos-delay="100"
                 >
                     <span class="text-xs14 rounded-5 font-medium py-1.75 px-5 relative mb-3.75 text-white bg-secondary inline-block">Why Book With Us</span>
-                    <h2 class="text-2.5xl font-bold m-0 block">Compelling Reasons to Choose</h2>
+                    <h2 class="text-[24px] md:text-2.5xl font-bold m-0 block">Compelling Reasons to Choose</h2>
                 </div>
-                <div class="grid grid-cols-3 justify-center">
+                <div class="grid md:grid-cols-3 justify-center">
                     <div class="mx-3">
-                        <div class="p-5" data-aos="fade-up" data-aos-delay="100">
+                        <div class="p-5">
                             <h6 class="mb-2 text-lg font-semibold text-primary flex items-center">
                                 <lucide-angular [img]="SquareUser" class="mr-2 stoke-danger w-4.5" />
                                 Follow-Up Care
@@ -31,7 +29,7 @@ import { AudioLines, BriefcaseMedical, SquareUser } from "lucide-angular";
                         </div>
                     </div>
                     <div class="mx-3">
-                        <div class="p-5 border-l border-dashed border-[#E3E6EC]" data-aos="fade-up" data-aos-delay="100">
+                        <div class="p-5 border-l border-dashed border-[#E3E6EC]">
                             <h6 class="mb-2 text-lg font-semibold text-primary flex items-center">
                                 <lucide-angular [img]="AudioLines" class="mr-2 stroke-[#6938ef] w-4.5" />
                                 Patient-Centered Approach
@@ -43,7 +41,7 @@ import { AudioLines, BriefcaseMedical, SquareUser } from "lucide-angular";
                         </div>
                     </div>
                     <div class="mx-3">
-                        <div class="p-5 border-l border-dashed border-[#E3E6EC]" data-aos="fade-up" data-aos-delay="100">
+                        <div class="p-5 border-l border-dashed border-[#E3E6EC]">
                             <h6 class="mb-2 text-lg font-semibold text-primary flex items-center">
                                 <lucide-angular [img]="BriefcaseMedical" class="mr-2 stroke-[#06aed4] w-4.5" />
                                 Convenient Access

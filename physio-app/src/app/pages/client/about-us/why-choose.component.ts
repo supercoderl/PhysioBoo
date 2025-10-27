@@ -13,11 +13,11 @@ import { SharedModule } from "../../../shared/shared-imports";
             <div class="flex justify-center">
                 <div class="px-3">
                     <div class="mb-10 text-center">
-                        <h2 class="text-[32px] mb-0 font-bold text-primary leading-[1.2]">Why Choose Us</h2>
+                        <h2 class="text-[24px] md:text-[32px] mb-0 font-bold text-primary leading-[1.2]">Why Choose Us</h2>
                     </div>
                 </div>
             </div>
-            <div class="grid grid-cols-4">
+            <div class="grid md:grid-cols-4">
                 <div class="flex px-3">
                     <div class="rounded-[8px] transition-smooth border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 w-full relative flex">
                         <div class="p-6.25 flex-1">

@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
-import { SharedModule } from "../../../shared/shared-imports";
-import { SlickCarouselModule } from "ngx-slick-carousel";
 import { ChevronLeft, ChevronRight } from "lucide-angular";
+import { SlickCarouselModule } from "ngx-slick-carousel";
+import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
     selector: 'testimonial-about-us',
@@ -11,7 +11,7 @@ import { ChevronLeft, ChevronRight } from "lucide-angular";
         SlickCarouselModule
     ],
     template: `
-    <section class="bg-[#f6faff] py-15 relative overflow-hidden z-[1] block">
+    <section class="bg-[#f6faff] py-10 md:py-15 relative overflow-hidden z-[1] block">
         <div class="relative">
             <div class="absolute -top-7.5 -left-10 animate-blinker">
                 <img
@@ -50,18 +50,18 @@ import { ChevronLeft, ChevronRight } from "lucide-angular";
                                 <div
                                     class="w-full inline-block m-0 px-15"
                                 >
-                                    <div class="flex items-center">
-                                        <div class="rounded-full mr-6 w-55 flex-[0_0_220px]">
+                                    <div class="flex flex-col md:flex-row items-center">
+                                        <div class="rounded-full mb-7.5 md:mb-0 md:mr-6 w-55 flex-[0_0_220px]">
                                             <img
                                                 class="rounded-full w-full"
                                                 alt="client-image"
                                                 src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/clients/client-05.jpg"
                                             />
                                         </div>
-                                        <div>
+                                        <div class="text-center md:text-left">
                                             <div class="mb-4">
                                                 <h6 class="text-base font-semibold text-secondary mb-0 leading-[1.2]">Testimonials</h6>
-                                                <h2 class="text-[32px] mb-0 leading-[1.2] text-primary">What Our Client Says</h2>
+                                                <h2 class="text-base md:text-[32px] mb-0 leading-[1.2] text-primary">What Our Client Says</h2>
                                             </div>
                                             <div>
                                                 <p class="text-base mb-4 line-clamp-4 text-brandDark">
@@ -152,15 +152,6 @@ export class TestimonialAboutUsComponent {
         infinite: true,
         speed: 300,
         cssEase: 'ease-in-out',
-        responsive: [
-            {
-                breakpoint: 768,
-                settings: {
-                    arrows: false,
-                    dots: true
-                }
-            }
-        ]
     };
 
     addSlide() {

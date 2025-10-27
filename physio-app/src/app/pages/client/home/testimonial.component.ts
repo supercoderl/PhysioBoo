@@ -1,8 +1,8 @@
 import { Component } from "@angular/core";
-import { SharedModule } from "../../../shared/shared-imports";
-import { SlickCarouselModule } from "ngx-slick-carousel";
 import { Star } from "lucide-angular";
+import { SlickCarouselModule } from "ngx-slick-carousel";
 import { TESTIMONIAL_COUNTERS } from "../../../shared/data/dummy";
+import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
     selector: 'testimonial-home',
@@ -12,17 +12,15 @@ import { TESTIMONIAL_COUNTERS } from "../../../shared/data/dummy";
         SlickCarouselModule
     ],
     template: `
-            <section id="testimonial" class="py-15 !bg-cover">
+            <section id="testimonial" class="py-12.5 md:py-15 !bg-cover">
                 <div class="container mx-auto">
                     <div
                         class="mb-10 text-center"
-                        data-aos="fade-up"
-                        data-aos-delay="100"
                     >
                         <span class="text-xs14 rounded-5 font-medium py-[7px] px-5 relative mb-[15px] text-white bg-secondary inline-block">Testimonials</span>
-                        <h2 class="text-2.5xl font-bold m-0 block">15k Users Trust Doccure Worldwide</h2>
+                        <h2 class="text-[24px] text-2.5xl font-bold m-0 block">15k Users Trust Doccure Worldwide</h2>
                     </div>
-                    <div data-aos="fade-up" data-aos-delay="100">
+                    <div>
                         <div class="relative block">
                             <ngx-slick-carousel class="carousel" 
                                 #slickModal="slick-carousel" 
@@ -35,9 +33,9 @@ import { TESTIMONIAL_COUNTERS } from "../../../shared/data/dummy";
                                 @for (slide of slides; track slide.img) {
                                     <div
                                         ngxSlickItem
-                                        class="mr-6 w-full inline-block border border-solid border-borderGray bg-white rounded-2.5"
+                                        class="px-3"
                                     >
-                                        <div class="p-5">
+                                        <div class="p-5 bg-white w-full inline-block border border-solid border-borderGray rounded-2.5">
                                             <div class="flex items-center mb-6">
                                                 <div class="flex mb-2 w-full">
                                                     <lucide-angular [img]="Star" class="w-5 fill-[#ffca18] stroke-[#ffca18]" />
@@ -85,14 +83,12 @@ import { TESTIMONIAL_COUNTERS } from "../../../shared/data/dummy";
                             </ngx-slick-carousel>
                         </div>
                     </div>
-                    <div class="pt-15">
+                    <div class="pt-12.5 md:pt-15">
                         <div
-                            class="grid grid-cols-5"
+                            class="grid md:grid-cols-5"
                         >
                         <div
                             class="text-center mx-3"
-                            data-aos="fade-up"
-                            data-aos-delay="100"
                             *ngFor="let item of testimonials"
                         >
                             <h6
@@ -113,7 +109,6 @@ import { TESTIMONIAL_COUNTERS } from "../../../shared/data/dummy";
         #testimonial {
             background: url('https://doccure.dreamstechnologies.com/react/template/assets/testimonial-bg-TnWcQqJd.jpg');
         }
-
         
         #count::before {
             background-color: var(--before-bg);
@@ -142,7 +137,27 @@ export class TestimonialHomeComponent {
         slidesToScroll: 1,
         touchThreshold: 20,
         swipeToSlide: true,
-        arrows: false
+        arrows: false,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 6
+                }
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 4
+                }
+            },
+            {
+                breakpoint: 767,
+                settings: {
+                    slidesToShow: 2
+                }
+            },
+        ]
     };
 
     addSlide() {

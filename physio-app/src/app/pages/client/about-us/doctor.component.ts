@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { MapPin } from "lucide-angular";
-import { SharedModule } from "../../../shared/shared-imports";
 import { BEST_DOCTORS } from "../../../shared/data/dummy";
+import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
     selector: 'doctor-about-us',
@@ -10,7 +10,7 @@ import { BEST_DOCTORS } from "../../../shared/data/dummy";
         SharedModule
     ],
     template: `
-    <section class="pb-9 bg-white pt-15 relative overflow-hidden z-[1] block">
+    <section class="pb-4 md:pb-9 bg-white pt-10 md:pt-15 relative overflow-hidden z-[1] block">
         <div class="container mx-auto">
             <div class="flex justify-center">
                 <div class="px-3">
@@ -19,7 +19,7 @@ import { BEST_DOCTORS } from "../../../shared/data/dummy";
                     </div>
                 </div>
             </div>
-            <div class="grid grid-cols-4">
+            <div class="grid md:grid-cols-4">
                 <div 
                     class="flex px-3"
                     *ngFor="let doctor of bestDoctors"

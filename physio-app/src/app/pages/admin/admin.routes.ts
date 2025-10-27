@@ -1,0 +1,75 @@
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+    {
+        path: '',
+        loadComponent: () => import('./admin.component').then(m => m.AdminComponent),
+        data: { breadcrumb: ['admin'] },
+        children: [
+            {
+                path: 'doctor',
+                data: { breadcrumb: ['doctor'] },
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'list',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'list',
+                        loadComponent: () => import('./doctor/list/doctor-list.component').then(m => m.DoctorListComponent),
+                        data: { breadcrumb: ['list'] },
+                    }
+                ]
+            },
+            {
+                path: 'academy',
+                data: { breadcrumb: ['academy'] },
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'list',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'list',
+                        loadComponent: () => import('./academy/list/academy-list.component').then(m => m.AcademyListComponent),
+                        data: { breadcrumb: ['list'] },
+                    }
+                ]
+            },
+            {
+                path: 'system',
+                data: { breadcrumb: ['system'] },
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'file-manager',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'file-manager',
+                        loadComponent: () => import('./system/file-manager/file-manager.component').then(m => m.FileManagerComponent),
+                        data: { breadcrumb: ['file manager'] },
+                    },
+                    {
+                        path: 'note',
+                        data: { breadcrumb: ['note'] },
+                        children: [
+                            {
+                                path: '',
+                                redirectTo: 'all',
+                                pathMatch: 'full'
+                            },
+                            {
+                                path: 'all',
+                                data: { breadcrumb: ['all']},
+                                loadComponent: () => import('./system/note/all/all.component').then(m => m.AllNoteComponent),
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+    },
+];

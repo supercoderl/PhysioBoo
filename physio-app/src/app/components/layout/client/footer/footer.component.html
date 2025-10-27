@@ -1,19 +1,19 @@
 <footer class="relative z-[1] bg-25 block">
-  <div class="pt-25 bg-white pb-10 relative overflow-hidden z-[1]">
+  <div class="pt-20 md:pt-25 bg-white pb-10 relative overflow-hidden z-[1]">
     <div class="container mx-auto">
-      <div class="grid grid-cols-3">
-        <div class="col-span-2">
-          <div class="grid grid-cols-4">
+      <div class="grid md:grid-cols-3">
+        <div class="md:col-span-2">
+          <div class="grid md:grid-cols-4">
             <div class="px-3" *ngFor="let menu of menus">
-              <div class="mb-5">
+              <div class="mb-7.5 md:mb-5">
                 <h6
-                  class="text-primary text-lg font-semibold mb-6 capitalize"
+                  class="text-primary text-base md:text-lg font-semibold mb-3.75 md:mb-6 capitalize"
                 >
                   {{ menu.title }}
                 </h6>
                 <ul>
                   <li
-                    class="mb-4 relative text-xs15"
+                    class="mb-2.5 md:mb-4 relative text-xs15"
                     *ngFor="let menu_child of menu.children"
                   >
                     <a
@@ -31,7 +31,7 @@
         <div class="px-3">
           <div class="mb-5">
             <h6
-              class="text-primary text-lg font-semibold mb-6 capitalize"
+              class="text-primary text-base md:text-lg font-semibold mb-3.75 md:mb-6 capitalize"
             >
               Newsletter
             </h6>
@@ -44,6 +44,7 @@
                   class="w-full h-13.5 rounded-1.25 pr-25 border border-solid border-borderGray text-xs14 text-primary min-h-9.5 bg-white py-1.75 pl-3.75 transition-smooth block outline-none focus:bg-transparent"
                   placeholder="Enter Email Address"
                   type="email"
+                  autocomplete="off"
                 /><button
                   type="submit"
                   class="absolute right-4 top-1/2 -translate-y-1/2 rounded-11 text-white border-0 overflow-hidden z-[1] py-[0.315rem] px-3.4 text-[0.813rem] cursor-pointer transition-smooth inline-flex items-center"
@@ -136,17 +137,17 @@
     </div>
   </div>
   <div class="bg-info border border-solid border-white">
-    <div class="container mx-auto">
-      <div class="pt-4 pb-1.5 flex-center-between flex-wrap">
-        <div class="mb-2.5">
+    <div class="container mx-auto px-3 md:px-0">
+      <div class="py-2.5 flex-center-between flex-wrap">
+        <div>
           <p class="text-base text-brandDark mb-0">
             Copyright © 2025 Doccure. All Rights Reserved
           </p>
         </div>
         <div>
-          <ul class="text-base mb-1.25">
+          <ul class="text-base mb-0">
             <li
-              class="inline-flex mr-2 ml-1.25 pr-3.5 relative text-xs15 items-center"
+              class="inline-flex mr-2 pr-3.5 relative text-xs15 items-center"
             >
               <a
                 href="/react/template/index"
@@ -158,7 +159,7 @@
               ></div>
             </li>
             <li
-              class="inline-flex mr-2 ml-1.25 pr-3.5 relative text-xs15 items-center"
+              class="inline-flex mr-2 pr-3.5 relative text-xs15 items-center"
             >
               <a
                 href="/privacy"
@@ -170,7 +171,7 @@
               ></div>
             </li>
             <li
-              class="inline-flex mr-2 ml-1.25 pr-3.5 relative text-xs15"
+              class="inline-flex mr-2 pr-3.5 relative text-xs15"
             >
               <a
                 href="/term"
@@ -180,7 +181,7 @@
             </li>
           </ul>
         </div>
-        <ul class="flex-center-end mb-2.5">
+        <ul class="flex-center-end m-0">
           <li class="mr-2.5 text-xs15 inline-block">
             <a
               href="/react/template/index"

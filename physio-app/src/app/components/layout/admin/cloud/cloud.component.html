@@ -1,0 +1,67 @@
+<div id="" class="relative">
+  <div
+    class="font-medium text-[13px] px-4 sticky top-0 z-1 bg-white leading-[48px]"
+  >
+    Today
+  </div>
+  <div class="mb-0 px-6 py-4" id="cloud_clock">
+    <clock></clock>
+  </div>
+  <divider />
+  <ul class="m-0 relative py-1">
+    <div
+      class="font-medium text-[13px] px-4 sticky top-0 z-1 bg-white leading-[48px]"
+    >
+      Events
+    </div>
+  </ul>
+  <divider />
+  <ul class="m-0 relative py-1">
+    <div
+      class="font-medium text-[13px] px-4 sticky top-0 z-1 bg-white leading-[48px]"
+    >
+      Notes
+    </div>
+  </ul>
+  <divider />
+  <ul class="m-0 relative py-1">
+    <div
+      class="font-medium text-[13px] px-4 sticky top-0 z-1 bg-white leading-[48px]"
+    >
+      Quick Settings
+    </div>
+    <li class="flex items-center relative w-full text-left py-2 pr-12 pl-4">
+      <div class="min-w-9 text-[#4B5563] inline-flex shrink-0">
+        <lucide-icon [name]="bell" class="w-4 h-4" />
+      </div>
+      <div class="flex-1 min-w-0 my-1">
+        <span class="block m-0 text-[13px] leading-[1.5]">Notifications</span>
+      </div>
+      <div class="absolute right-4 top-1/2 -translate-y-1/2">
+        <switch [isOpen]="true"></switch>
+      </div>
+    </li>
+    <li class="flex items-center relative w-full text-left py-2 pr-12 pl-4">
+      <div class="min-w-9 text-[#4B5563] inline-flex shrink-0">
+        <lucide-icon [name]="cloud" class="w-4 h-4" />
+      </div>
+      <div class="flex-1 min-w-0 my-1">
+        <span class="block m-0 text-[13px] leading-[1.5]">Cloud Sync</span>
+      </div>
+      <div class="absolute right-4 top-1/2 -translate-y-1/2">
+        <switch [isOpen]="false"></switch>
+      </div>
+    </li>
+    <li class="flex items-center relative w-full text-left py-2 pr-12 pl-4">
+      <div class="min-w-9 text-[#4B5563] inline-flex shrink-0">
+        <lucide-icon [name]="sun" class="w-4 h-4" />
+      </div>
+      <div class="flex-1 min-w-0 my-1">
+        <span class="block m-0 text-[13px] leading-[1.5]">Retro Thrusters</span>
+      </div>
+      <div class="absolute right-4 top-1/2 -translate-y-1/2">
+        <switch [isOpen]="false"></switch>
+      </div>
+    </li>
+  </ul>
+</div>

@@ -1,3 +1,4 @@
+import { ALargeSmall, ArrowRight, ArrowUpDown, BadgeCheck, Bell, Bookmark, Calendar, ChevronRight, Clock, FileText, Flame, Folder, GraduationCap, Info, LucideIconData, Mail, Maximize, Menu, Minimize, Moon, PanelLeft, Plus, Search, Star, Sun, Triangle, Users, X } from 'lucide-angular';
 import { NzAffixModule } from 'ng-zorro-antd/affix';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzAnchorModule } from 'ng-zorro-antd/anchor';
@@ -12,11 +13,13 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzCarouselModule } from 'ng-zorro-antd/carousel';
 import { NzCascaderModule } from 'ng-zorro-antd/cascader';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { NzCodeEditorModule } from 'ng-zorro-antd/code-editor';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzCommentModule } from 'ng-zorro-antd/comment';
 import { NzNoAnimationModule } from 'ng-zorro-antd/core/no-animation';
 import { NzTransButtonModule } from 'ng-zorro-antd/core/trans-button';
 import { NzWaveModule } from 'ng-zorro-antd/core/wave';
+import { NzCronExpressionModule } from 'ng-zorro-antd/cron-expression';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
@@ -24,6 +27,7 @@ import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzGraphModule } from 'ng-zorro-antd/graph';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzI18nModule } from 'ng-zorro-antd/i18n';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -39,11 +43,14 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+import { NzPipesModule } from 'ng-zorro-antd/pipes';
 import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
+import { NzQRCodeModule } from 'ng-zorro-antd/qr-code';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzRateModule } from 'ng-zorro-antd/rate';
+import { NzResizableModule } from 'ng-zorro-antd/resizable';
 import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -62,17 +69,12 @@ import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzTransferModule } from 'ng-zorro-antd/transfer';
 import { NzTreeModule } from 'ng-zorro-antd/tree';
-import { NzTreeViewModule } from 'ng-zorro-antd/tree-view';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
+import { NzTreeViewModule } from 'ng-zorro-antd/tree-view';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzUploadModule } from 'ng-zorro-antd/upload';
-import { NzResizableModule } from 'ng-zorro-antd/resizable';
-import { NzPipesModule } from 'ng-zorro-antd/pipes';
-import { NzCodeEditorModule } from 'ng-zorro-antd/code-editor';
-import { NzGraphModule } from 'ng-zorro-antd/graph';
-import { NzCronExpressionModule } from 'ng-zorro-antd/cron-expression';
-import { NzQRCodeModule } from 'ng-zorro-antd/qr-code';
 import { NzWaterMarkModule } from 'ng-zorro-antd/water-mark';
+import { ColorByFileTypePipe, ColorByTypePipe } from './pipes/color.pipe';
 
 export const SHARED_ZORRO_MODULES = [
     NzAffixModule,
@@ -152,3 +154,38 @@ export const SHARED_ZORRO_MODULES = [
     NzWaterMarkModule,
     NzBreadCrumbModule
 ];
+
+export const SHARED_LUCIDE_ICONS: Record<string, LucideIconData> = {
+    PanelLeft,
+    Calendar,
+    Mail,
+    Users,
+    Star,
+    ALargeSmall,
+    Maximize,
+    Minimize,
+    Sun,
+    Moon,
+    Search,
+    Bookmark,
+    Bell,
+    X,
+    Flame,
+    BadgeCheck,
+    GraduationCap,
+    ArrowRight,
+    Clock,
+    Triangle,
+    ChevronRight,
+    Plus,
+    Info,
+    Folder,
+    FileText,
+    Menu,
+    ArrowUpDown
+}
+
+export const SHARED_PIPES = [
+    ColorByTypePipe,
+    ColorByFileTypePipe
+]

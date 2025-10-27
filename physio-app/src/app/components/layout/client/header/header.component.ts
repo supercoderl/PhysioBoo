@@ -1,8 +1,8 @@
 import { Component, HostListener, Input } from '@angular/core';
-import { MessageSquareText, LucideAngularModule, Phone, Sun, Facebook, Instagram, Linkedin, Twitter, LockKeyhole, UserRoundX, Search } from 'lucide-angular';
-import { SharedModule } from '../../../../shared/shared-imports';
-import { HEADERS } from '../../../../shared/data/dummy';
 import { RouterLink } from "@angular/router";
+import { Facebook, Instagram, Linkedin, LockKeyhole, LucideAngularModule, MessageSquareText, Phone, Search, Sun, Twitter, UserRoundX } from 'lucide-angular';
+import { HEADERS } from '../../../../shared/data/dummy';
+import { SharedModule } from '../../../../shared/shared-imports';
 
 @Component({
   selector: 'layout-header',
@@ -26,6 +26,7 @@ export class HeaderComponent {
   readonly UserRoundX = UserRoundX;
   readonly Search = Search;
   isSticky = false;
+  isOpen = false;
 
   readonly headers = HEADERS;
 
@@ -39,5 +40,9 @@ export class HeaderComponent {
     return this.headers.find(
       (x: { title: string }) => x.title.toLowerCase() === this.currentPath.toLowerCase()
     )?.id ?? 0;
+  }
+
+  onToggle() {
+    this.isOpen = !this.isOpen;
   }
 }

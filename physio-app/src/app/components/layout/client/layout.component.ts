@@ -1,7 +1,7 @@
-import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HeaderComponent } from "./client/header/header.component";
-import { FooterComponent } from "./client/footer/footer.component";
+import { Component, Input } from '@angular/core';
+import { FooterComponent } from "./footer/footer.component";
+import { HeaderComponent } from "./header/header.component";
 
 @Component({
   selector: 'app-layout',

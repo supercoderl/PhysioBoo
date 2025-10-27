@@ -6,7 +6,7 @@ import { SharedModule } from "../../../shared/shared-imports";
     standalone: true,
     imports: [SharedModule],
     template: `
-        <section class="py-3.25 block group" data-aos="fade-up" data-aos-delay="100">
+        <section class="py-3.25 block group">
             <div class="overflow-hidden flex">
                 <div class="flex gap-6 w-max nowrap animate-tuck group-hover:[animation-play-state:paused]">
                     <div 

@@ -1,0 +1,99 @@
+<div>
+  <div
+    [ngClass]="{
+      'fixed md:sticky top-0 z-20 h-screen flex-auto shrink-0 flex-col border-r border-solid border-[#E5E7EB] transition-all duration-500': true,
+      'min-w-0 w-0 max-w-0 md:min-w-[280px] md:w-[280px] md:max-w-[280px]': !isCollapsed,
+      'min-w-[280px] w-[280px] max-w-[280px] shadow-lg md:shadow-none md:min-w-0 md:w-0 md:max-w-0': isCollapsed
+    }"
+  >
+    <div
+      class="flex h-full flex-auto flex-col overflow-hidden text-[#1F232B] bg-[#E5E7EB]"
+    >
+      <div class="flex h-12 shrink-0 flex-row items-center px-5 md:h-16">
+        <div class="flex flex-shrink-0 flex-grow items-center gap-3">
+          <div class="flex flex-1 items-center gap-2">
+            <img
+              class="w-1/3 h-auto"
+              alt="logo"
+              src="../../../../assets/logo/logo.webp"
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        class="flex min-h-0 h-full flex-1 flex-col w-full"
+        style="
+          position: relative;
+          overscroll-behavior: contain;
+          background-repeat: no-repeat;
+          background-size: 100% 40px, 100% 10px;
+          background-attachment: local, scroll;
+        "
+      >
+        <div class="group h-full">
+          <div
+            id="menu"
+            class="px-3 flex-1 max-h-[calc(100%_-_80px)] overflow-y-auto"
+            custom-scrollbar
+          >
+            <div *ngFor="let menu of menus">
+              <!-- Section Header -->
+              <div
+                class="mb-1 flex w-full items-center justify-start gap-2 rounded-md p-2 items-start relative cursor-pointer text-[13px] font-medium min-h-8 min-w-8 outline-none"
+                tabindex="0"
+                role="button"
+              >
+                <div class="flex min-w-0 flex-auto flex-col items-start gap-1">
+                  <p
+                    class="leading-none truncate max-w-full m-0 font-medium m-0 text-[13px] text-[#1565C0]"
+                  >
+                    {{menu.title}}
+                  </p>
+                  <p
+                    class="text-[11px] leading-none truncate max-w-full m-0 m-0 text-[#4B5563]"
+                  >
+                    {{menu.subtitle}}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Section Items -->
+              <sidebar-item *ngFor="let child of menu.children" [item]="child"></sidebar-item>
+
+              <div class="h-3" *ngIf="menus.indexOf(menu) < menus.length - 1"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3 p-3 absolute bottom-0 w-full">
+          <button
+            class="flex items-center shrink-0 justify-start h-14 min-h-14 px-2 gap-3 w-full relative cursor-pointer text-[13px] rounded-1.5 transition-all duration-300 hover:bg-[rgba(0,_0,_0,_0.05)]"
+            tabindex="0"
+            type="button"
+          >
+            <div
+              class="rounded-lg h-10 w-10 relative flex-center-center overflow-hidden text-[13px] bg-[#E5E7EB] text-[#4B5563]"
+            >
+              <img alt="user photo" class="w-full h-full text-center object-cover transparent" src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/avatars/brian-hughes.jpg">
+            </div>
+            <div class="flex flex-auto flex-col gap-2">
+              <span
+                class="flex truncate leading-none font-semibold tracking-tight capitalize text-base m-0"
+                >Abbott Keitch</span
+              >
+              <p
+                class="flex leading-none font-medium tracking-tighter text-md m-0 text-[#4B5563]"
+              >
+                admin&#64;fusetheme.com
+              </p>
+            </div>
+            <div class="flex shrink-0 items-center gap-2">
+              <lucide-icon [name]="info" class="w-4 h-4"></lucide-icon>
+              <lucide-icon [name]="chevronUp" class="w-4 h-4"></lucide-icon>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

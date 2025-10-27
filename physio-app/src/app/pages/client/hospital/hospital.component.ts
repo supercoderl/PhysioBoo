@@ -1,8 +1,8 @@
 import { Component } from "@angular/core";
-import { SharedModule } from "../../../shared/shared-imports";
-import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.component";
 import { MapPin, ScanQrCode, Search } from "lucide-angular";
+import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.component";
 import { HOSPITALS } from "../../../shared/data/dummy";
+import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
     selector: 'app-hospital',
@@ -13,8 +13,8 @@ import { HOSPITALS } from "../../../shared/data/dummy";
 ],
     template: `
         <breadcrumb title="Hospital"></breadcrumb>
-        <div class="py-15 bg-white min-h-50">
-            <div class="container mx-auto">
+        <div class="py-12.5 md:py-15 bg-white min-h-50">
+            <div class="container mx-auto px-3">
                 <div class="border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 rounded-[10px] flex">
                     <div class="p-5 flex-1">
                         <div
@@ -181,7 +181,7 @@ import { HOSPITALS } from "../../../shared/data/dummy";
                     </div>
                 </div>
                 <div class="block">
-                    <div class="grid grid-cols-4 -mx-3">
+                    <div class="grid md:grid-cols-4 -mx-3">
                         <div *ngFor="let item of hospitals" class="px-3">
                             <div class="border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 rounded-[10px] relative flex flex-col">
                                 <div class="p-5 text-center flex-1">

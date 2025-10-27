@@ -1,0 +1,21 @@
+<p class="group flex w-full gap-x-2.5 mb-0">
+  <label
+    [for]="id || name"
+    class="flex text-[#1d3349] absolute items-center mb-0 h-12.5 px-5 z-[1] transition-all duration-300 group-focus-within:translate-x-5 group-focus-within:opacity-0 group-focus-within:visibility-hidden cursor-text"
+  >
+    {{ label }} <span *ngIf="required" class="ml-1">*</span>
+  </label>
+  <span class="inline-flex w-auto flex-col relative flex-auto">
+    <textarea
+      [id]="id || name"
+      [name]="name"
+      [(ngModel)]="model"
+      size="40"
+      maxlength="400"
+      class="bg-[#F0F5FF] w-full h-12.5 text-[16px] text-[#1D3349] min-h-[150px] px-5 block py-1.5 focus:outline-none mb-5"
+      [rows]="rows"
+      [cols]="cols"
+      [maxlength]="maxlength"
+    ></textarea>
+  </span>
+</p>

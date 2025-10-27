@@ -4,6 +4,9 @@ module.exports = {
   darkMode: ['class', '[data-theme="dark"]'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Geist', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+      },
       colors: {
         primary: 'rgb(var(--twc-primary) / <alpha-value>)',
         secondary: 'rgb(var(--twc-secondary) / <alpha-value>)',
@@ -56,6 +59,7 @@ module.exports = {
         27: "108px",
         28.75: "115px",
         30: "120px",
+        37.5: "150px",
         41.25: "165px",
         47.25: "189px",
         50: "200px",
@@ -63,12 +67,15 @@ module.exports = {
         55: "220px",
         55.5: "222px",
         62.75: "251px",
-        70: "280px"
+        70: "280px",
+        80: "320px"
       },
       borderRadius: {
         1.25: '5px',
         1.5: '6px',
         xs: '3px',
+        2: '8px',
+        4: '16px',
         5: '20px',
         2.5: '10px',
         7.5: '30px',
@@ -92,12 +99,34 @@ module.exports = {
           '0%': { opacity: '1' },
           '100%': { opacity: '0' },
         },
+        preloader: {
+          '0%': { transform: 'rotate(45deg) rotateX(-25deg) rotateY(25deg)' },
+          '50%': { transform: 'rotate(45deg) rotateX(-385deg) rotateY(25deg)' },
+          '100%': { transform: 'rotate(45deg) rotateX(-385deg) rotateY(385deg)' }
+        }
       },
       animation: {
         mover: 'mover 3s infinite alternate',
         flip360: 'flip360 0.35s linear forwards',
         tuck: 'tuck 60s linear infinite reverse forwards',
         blinker: 'blinker 0.6s ease-in-out infinite alternate',
+        preloader: 'preloader 2s infinite ease'
+      },
+      boxShadow: {
+        switch: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)',
+        select: '0 4px 7px -2px rgba(0,0,0,0.11),0 2px 5px -2px rgba(0,0,0,0.1)'
+      },
+      transitionProperty: {
+        switch: 'left, transform',
+      },
+      transitionDuration: {
+        150: '150ms',
+        252: '252ms',
+        168: '168ms',
+      },
+      transitionTimingFunction: {
+        switch: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        material: 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
     },
   },

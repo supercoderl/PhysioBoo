@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
-import { SharedModule } from "../../../shared/shared-imports";
-import { SlickCarouselModule } from "ngx-slick-carousel";
 import { ChevronLeft, ChevronRight, Circle, Heart, MapPin, Star } from "lucide-angular";
+import { SlickCarouselModule } from "ngx-slick-carousel";
+import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
     selector: 'doctor-home',
@@ -11,32 +11,28 @@ import { ChevronLeft, ChevronRight, Circle, Heart, MapPin, Star } from "lucide-a
         SlickCarouselModule
     ],
     template: `
-        <section class="bg-[#f9fbff] py-15 block">
+        <section class="bg-[#f9fbff] py-12.5 md:py-15 block">
             <div class="container mx-auto">
                 <div
                     class="mb-10 text-center"
-                    data-aos="fade-up"
-                    data-aos-delay="100"
                 >
                     <span class="inline-block text-xs14 rounded-5 font-medium py-1.75 px-5 relative mb-3.75 text-white bg-secondary">Featured Doctors</span>
-                    <h2 class="text-2.5xl font-bold m-0 text-primary block">Our Highlighted Doctors</h2>
+                    <h2 class="text-[24px] text-2.5xl font-bold m-0 text-primary block">Our Highlighted Doctors</h2>
                 </div>
                 <div
                     class=""
-                    data-aos="fade-up"
-                    data-aos-delay="100"
                 >
                     <div class="relative block" dir="ltr">
                         <div class="mb-4 text-center">
                             <button 
                                 type="button" 
-                                class="group left-[47%] w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth flex-center-center hover:bg-blue-500"
+                                class="group left-[45%] md:left-[48%] -translate-x-1/2 w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth flex-center-center hover:bg-blue-500"
                                   (click)="slickModal.slickPrev()"
                             >
                                 <lucide-angular [img]="ChevronLeft" class="font-black group-hover:stroke-white" />
                             </button>
                         </div>
-                        <div class="-mr-6 relative block overflow-hidden">
+                        <div class="relative block overflow-hidden">
                             <ngx-slick-carousel class="carousel" 
                                 #slickModal="slick-carousel" 
                                 [config]="slideConfig" 
@@ -46,7 +42,7 @@ import { ChevronLeft, ChevronRight, Circle, Heart, MapPin, Star } from "lucide-a
                                 (beforeChange)="beforeChange($event)"
                             >
                                 @for (slide of slides; track slide.img) {
-                                    <div ngxSlickItem class="mr-6">
+                                    <div ngxSlickItem class="px-3">
                                         <div
                                             class="w-full inline-block border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 rounded-2.5 relative"
                                         >
@@ -134,7 +130,7 @@ import { ChevronLeft, ChevronRight, Circle, Heart, MapPin, Star } from "lucide-a
                         <div class="mt-4 text-center">
                             <button 
                                 type="button" 
-                                class="group left-1/2 ml-3 w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary m-0 absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth flex-center-center hover:bg-blue-500"
+                                class="group left-[55%] md:left-[52%] -translate-x-1/2 ml-3 w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary m-0 absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth flex-center-center hover:bg-blue-500"
                                 (click)="slickModal.slickNext()"
                             >
                                 <lucide-angular [img]="ChevronRight" class="font-black group-hover:stroke-white" />
@@ -172,7 +168,27 @@ export class DoctorHomeComponent {
         slidesToShow: 4, 
         slidesToScroll: 1,
         touchThreshold: 20,
-        swipeToSlide: true
+        swipeToSlide: true,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 6
+                }
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 4
+                }
+            },
+            {
+                breakpoint: 767,
+                settings: {
+                    slidesToShow: 2
+                }
+            },
+        ]
     };
 
     addSlide() {

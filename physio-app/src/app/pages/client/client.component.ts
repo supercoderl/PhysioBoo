@@ -1,9 +1,8 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { SharedModule } from '../../shared/shared-imports';
-import { LayoutComponent } from "../../components/layout/layout.component";
-import { delay, filter, map, startWith, Subject, takeUntil } from 'rxjs';
-import { AOSService } from '../../services/aos/aos.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { filter, map, startWith, Subject, takeUntil } from 'rxjs';
+import { LayoutComponent } from "../../components/layout/client/layout.component";
+import { SharedModule } from '../../shared/shared-imports';
 
 @Component({
     selector: 'app-client',
@@ -18,35 +17,14 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
         </app-layout>
   `,
 })
-export class ClientComponent implements AfterViewInit, OnDestroy, OnInit {
+export class ClientComponent implements OnDestroy, OnInit {
     private destroy$ = new Subject<void>();
     pathname: string = "";
 
     constructor(
-        private aosService: AOSService,
         private router: Router,
         private activatedRoute: ActivatedRoute
     ) { }
-
-    ngAfterViewInit(): void {
-        // Initialize AOS when this lazy-loaded component loads
-        this.aosService.initialize();
-
-        // Refresh AOS on route changes within lazy module
-        this.router.events.pipe(
-            filter(event => event instanceof NavigationEnd),
-            delay(200), // Increased delay for lazy-loaded content
-            takeUntil(this.destroy$)
-        ).subscribe(() => {
-            // Use forceRefresh for route changes in lazy modules
-            this.aosService.forceRefresh();
-
-            // Additional refresh after a longer delay
-            setTimeout(() => {
-                this.aosService.refresh();
-            }, 300);
-        });
-    }
 
     ngOnDestroy(): void {
         this.destroy$.next();

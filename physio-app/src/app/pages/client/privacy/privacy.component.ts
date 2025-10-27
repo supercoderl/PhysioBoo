@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
-import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.component";
 import { CircleCheck } from "lucide-angular";
+import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.component";
 import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
@@ -8,7 +8,7 @@ import { SharedModule } from "../../../shared/shared-imports";
     standalone: true,
     template: `
         <breadcrumb title="Privacy Policy"></breadcrumb>
-        <section class="py-15 block">
+        <section class="py-10 md:py-15 block">
             <div class="container mx-auto">
                 <div class="flex">
                     <div class="px-3">
@@ -76,7 +76,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                     nesciunt.
                                 </p>
                             </div>
-                            <div class="pb-6 mb-4">
+                            <div class="md:pb-6 md:mb-4">
                                 <p class="text-base text-[#6b7280] mb-6">
                                     Sed ut perspiciatis unde omnis iste natus error sit voluptatem
                                     accusantium doloremque laudantium, totam rem aperiam, eaque ipsa

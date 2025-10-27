@@ -1,0 +1,316 @@
+<div class="flex flex-col bg-white overflow-hidden">
+  <div class="flex w-full flex-col border-b-1 px-3 py-1">
+    <div class="flex w-full flex-col items-center bg-white z-[1] relative">
+      <div
+        class="flex-center-center blur-[4px] border-2 border-dashed border-secondary absolute w-full z-[4]"
+        style="opacity: 0; visibility: hidden"
+      >
+        <p class="m-0 text-[13px] leading-[1.5] italic">Drop to group by</p>
+      </div>
+      <div class="flex w-full items-center">
+        <div class="flex flex-1"></div>
+        <div class="flex items-center gap-2 text-[#1F232B">
+          <div class="w-auto h-auto" style="min-width: 0px">
+            <div class="flex w-auto h-full">
+              <div class="w-auto h-full">
+                <div
+                  class="inlineFlex flex-col relative min-w-0 p-0 m-0 border-0"
+                >
+                  <div
+                    class="min-h-7 px-2 text-[13px] text-[#1F232B] inline-flex items-center rounded-2 relative bg-white"
+                  >
+                    <lucide-icon [name]="search" class="w-4 h-4"></lucide-icon>
+                    <input
+                      aria-invalid="false"
+                      autocomplete="off"
+                      id="«r1h4»"
+                      placeholder="Search"
+                      class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall MuiInputBase-inputAdornedStart MuiInputBase-inputAdornedEnd muiltr-o3po2i"
+                      type="text"
+                      value=""
+                    />
+                    <div
+                      class="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-outlined MuiInputAdornment-sizeSmall muiltr-1ds3qrg"
+                    >
+                      <span aria-label="Clear search" class=""
+                        ><button
+                          class="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-sizeSmall muiltr-tx537v"
+                          tabindex="-1"
+                          type="button"
+                          disabled=""
+                          aria-label="Clear search"
+                        >
+                          <svg
+                            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium muiltr-1wsjw6a"
+                            focusable="false"
+                            aria-hidden="true"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                            ></path>
+                          </svg></button
+                      ></span>
+                    </div>
+                    <fieldset
+                      aria-hidden="true"
+                      class="MuiOutlinedInput-notchedOutline muiltr-1bl9ma3"
+                    >
+                      <legend class="muiltr-w4cd9x">
+                        <span class="notranslate" aria-hidden="true"
+                          >&ZeroWidthSpace;</span
+                        >
+                      </legend>
+                    </fieldset>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center z-[3]">
+            <button
+              class="inlineFlex-center-center relative bg-transparent cursor-pointer text-center text-[#4B5563] w-8 h-8 max-h-8 m-0 flex-auto rounded-2"
+              tabindex="0"
+              type="button"
+              aria-label="Show/Hide filters"
+            >
+              <lucide-icon [name]="listFilter" class="w-4 h-4"></lucide-icon>
+            </button>
+            <button
+              class="inlineFlex-center-center relative bg-transparent cursor-pointer text-center text-[#4B5563] w-8 h-8 max-h-8 m-0 flex-auto rounded-2"
+              tabindex="0"
+              type="button"
+              aria-label="Show/Hide columns"
+            >
+              <lucide-icon [name]="columns3cog" class="w-4 h-4"></lucide-icon>
+            </button>
+            <button
+              class="inlineFlex-center-center relative bg-transparent cursor-pointer text-center text-[#4B5563] w-8 h-8 max-h-8 m-0 flex-auto rounded-2"
+              tabindex="0"
+              type="button"
+              aria-label="Toggle density"
+            >
+              <lucide-icon [name]="rows4" class="w-4 h-4"></lucide-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="h-0 invisible overflow-hidden" style="min-height: 0px">
+      <div class="MuiCollapse-wrapper MuiCollapse-vertical muiltr-15830to">
+        <div
+          class="MuiCollapse-wrapperInner MuiCollapse-vertical muiltr-9vd5ud"
+        >
+          <div
+            class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation0 MuiAlert-root MuiAlert-colorInfo MuiAlert-standardInfo MuiAlert-standard mt-1 flex justify-center rounded-md muiltr-1dopikp"
+            role="alert"
+            style="--Paper-shadow: var(--mui-shadows-0)"
+          >
+            <div class="MuiAlert-message muiltr-h62sc9">
+              <div class="MuiStack-root muiltr-1vu93id">
+                <div class="MuiBox-root muiltr-k008qs"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex-auto max-w-full overflow-auto relative" style="max-height: clamp(350px, -88px + 100vh, 9999px);">
+    <table class="table w-full border-separate">
+      <thead class="bg-gray-50 sticky top-0 z-10">
+        <tr
+          cdkDropList
+          cdkDropListOrientation="horizontal"
+          [cdkDropListData]="draggableColumns"
+          (cdkDropListDropped)="drop($event)"
+        >
+          <ng-container *ngFor="let column of columns; let i = index">
+            <th
+              [class]="
+                'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 ' +
+                (column.pinned ? 'sticky bg-gray-50 ' : '') +
+                (column.id === 'checkbox' ? 'left-0 w-12' : '') +
+                (column.id === 'actions' ? 'right-0 w-24' : '')
+              "
+              [attr.data-index]="i"
+              [attr.data-pinned]="column.pinned"
+              [attr.data-can-sort]="column.sortable"
+            >
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <!-- Checkbox column -->
+                  <span
+                    *ngIf="column.id === 'checkbox'"
+                    class="inline-flex items-center"
+                  >
+                    <input
+                      type="checkbox"
+                      [checked]="allSelected"
+                      (change)="toggleSelectAll()"
+                      class="w-4 h-4 rounded border-gray-300"
+                    />
+                  </span>
+
+                  <!-- Regular columns -->
+                  <ng-container *ngIf="column.id !== 'checkbox'">
+                    {{ column.label }}
+                    <button
+                      *ngIf="column.sortable"
+                      (click)="handleSort(column.id)"
+                      class="ml-1 hover:text-gray-700"
+                    >
+                      <lucide-icon [name]="arrowDownUp" class="w-4 h-4"></lucide-icon>
+                    </button>
+                  </ng-container>
+                </div>
+
+                <!-- Column actions -->
+                <div *ngIf="column.hasActions" class="flex items-center gap-1">
+                  <button
+                    *ngIf="column.draggable"
+                    cdkDrag
+                    class="cursor-move p-1 hover:bg-gray-200 rounded"
+                    aria-label="Move"
+                  >
+                    <lucide-icon [name]="gripVertical" class="w-4 h-4"></lucide-icon>
+                  </button>
+                  <button
+                    class="p-1 hover:bg-gray-200 rounded"
+                    aria-label="Column Actions"
+                  >
+                    <lucide-icon [name]="ellipsisVertical" class="w-4 h-4"></lucide-icon>
+                  </button>
+                </div>
+              </div>
+            </th>
+          </ng-container>
+        </tr>
+      </thead>
+
+      <tbody class="bg-white">
+        <tr
+          *ngFor="let row of sortedData"
+          class="hover:bg-gray-50 border-b border-gray-200"
+        >
+          <ng-container *ngFor="let column of columns">
+            <td
+              [class]="
+                'px-6 py-4 text-sm text-gray-900 ' +
+                (column.pinned ? 'sticky bg-white ' : '') +
+                (column.id === 'checkbox' ? 'left-0' : '') +
+                (column.id === 'actions' ? 'right-0' : '')
+              "
+              [attr.data-index]="column.id"
+            >
+              <!-- Checkbox -->
+              <span
+                *ngIf="column.id === 'checkbox'"
+                class="inline-flex items-center"
+              >
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(row.id)"
+                  (change)="toggleRowSelection(row.id)"
+                  class="w-4 h-4 rounded border-gray-300"
+                />
+              </span>
+
+              <!-- Image -->
+              <div
+                *ngIf="column.id === 'image'"
+                class="flex items-center justify-center"
+              >
+                <img
+                  [src]="row.image"
+                  [alt]="row.name"
+                  class="block max-h-9 w-full max-w-9 rounded-sm object-cover"
+                />
+              </div>
+
+              <!-- Name -->
+              <a
+                *ngIf="column.id === 'name'"
+                [href]="row.link"
+                class="text-blue-600 hover:text-blue-800 underline"
+              >
+                {{ row.name }}
+              </a>
+
+              <!-- Category -->
+              <div
+                *ngIf="column.id === 'category'"
+                class="flex flex-wrap gap-1"
+              >
+                <span
+                  *ngFor="let cat of row.category"
+                  class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800"
+                >
+                  {{ cat }}
+                </span>
+              </div>
+
+              <!-- Price -->
+              <span *ngIf="column.id === 'price'">
+                ${{ row.price.toFixed(2) }}
+              </span>
+
+              <!-- Quantity -->
+              <div
+                *ngIf="column.id === 'quantity'"
+                class="flex items-center gap-1"
+              >
+                <span>{{ row.quantity }}</span>
+                <i
+                  *ngIf="row.quantity < 10"
+                  class="inline-block h-2 w-2 rounded-sm bg-red-500"
+                ></i>
+              </div>
+
+              <!-- Active -->
+              <div *ngIf="column.id === 'active'" class="flex items-center">
+                <svg
+                  *ngIf="row.active"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  class="text-green-500"
+                >
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <div
+                  *ngIf="!row.active"
+                  class="w-5 h-5 rounded-full border-2 border-gray-300"
+                ></div>
+              </div>
+
+              <!-- Actions -->
+              <button
+                *ngIf="column.id === 'actions'"
+                class="p-1 hover:bg-gray-100 rounded"
+                aria-label="Row Actions"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="1"></circle>
+                  <circle cx="19" cy="12" r="1"></circle>
+                  <circle cx="5" cy="12" r="1"></circle>
+                </svg>
+              </button>
+            </td>
+          </ng-container>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

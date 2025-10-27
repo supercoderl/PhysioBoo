@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
-import { SharedModule } from "../../../shared/shared-imports";
 import { AlarmClock } from "lucide-angular";
 import { BLOGS } from "../../../shared/data/dummy";
+import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
     selector: 'grid-blog',
@@ -11,8 +11,8 @@ import { BLOGS } from "../../../shared/data/dummy";
     ],
     template: `
         <div class="px-3">
-            <div class="grid grid-cols-2">
-                <div class="px-3" *ngFor="let blog of blogs">
+            <div class="grid md:grid-cols-2">
+                <div class="md:px-3" *ngFor="let blog of blogs">
                     <div class="p-5 border border-solid border-borderGray bg-white relative rounded-[10px] mb-6">
                         <div class="mb-4 overflow-hidden rounded-[10px] relative block w-full">
                             <a href="/react/template/blog/blog-grid" class="block relative w-full text-neutral transition-smooth">
@@ -60,8 +60,8 @@ import { BLOGS } from "../../../shared/data/dummy";
                     </div>
                 </div>
             </div>
-            <div class="flex-center-center -mx-3">
-                <div class="p-3">
+            <div class="flex-center-center">
+                <div class="px-3 md:p-3">
                     <div class="flex-center-center mt-4 mb-6">
                         <ul class="flex-center-center flex-wrap gap-2.5 m-0">
                             <li class="text-xs15">

@@ -1,0 +1,32 @@
+<div
+  id="font-size-menu"
+  [ngClass]="{
+    'z-[9999] fixed inset-0': true,
+    'pointer-events-none': !isOpen,
+  }"
+>
+  <div
+    aria-hidden="true"
+    [ngClass]="{
+      'flex-center-center fixed inset-0 z-[-1] bg-transparent transition-opacity duration-[225ms] ease-in-out': true,
+      'opacity-0': !isOpen,
+      'opacity-100': isOpen
+    }"
+    (click)="onClose.emit()"
+  ></div>
+  <div
+    tabindex="-1"
+    #popoverRef
+    [ngClass]="{
+      'absolute bg-white w-fit rounded-[6px] transition-all': true,
+      'opacity-0 scale-75': !isOpen,
+      'opacity-100 scale-100': isOpen
+    }"
+    [ngStyle]="popoverStyles"
+  >
+    <ul class="m-0 relative py-1 gap-0.5 grid w-fit" role="menu" tabindex="-1">
+      <ng-content></ng-content>
+    </ul>
+  </div>
+  <div tabindex="0" data-testid="sentinelEnd"></div>
+</div>

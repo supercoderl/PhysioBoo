@@ -1,0 +1,24 @@
+<span class="inline-flex overflow-hidden relative align-middle p-0 m-2 w-7 h-4">
+  <span
+    [ngClass]="{
+        'p-0.5 inlineFlex-center-center bg-transparent cursor-pointer align-middle absolute top-0 left-0 z-1 text-white rounded-full transition-switch ease-switch': true,
+        'translate-x-3': isOpen
+    }"
+  >
+    <input
+      class="left-[-100%] w-[300%] cursor-[inherit] absolute opacity-0 h-full top-0 m-0 p-0 z-1"
+      type="checkbox"
+      (click)="handleSwitch()"
+    />
+    <span
+      [ngClass]="{
+        'w-3 h-3 shadow-switch rounded-full bg-white cursor-pointer': true,
+        'bg-white': !isOpen,
+        'bg-[rgb(31,_35,_43)]': isOpen
+      }"
+    ></span>
+  </span>
+  <span
+    class="bg-[#1F232B] opacity-50 rounded-[8px] w-full h-full z-[-1] transition-opacity duration-150"
+  ></span>
+</span>

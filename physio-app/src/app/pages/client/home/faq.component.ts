@@ -11,19 +11,17 @@ import { SharedModule } from "../../../shared/shared-imports";
         LucideAngularModule
     ],
     template: `
-        <section class="py-15 block">
+        <section class="py-12.5 md:py-15 block">
             <div class="container mx-auto">
                 <div
                     class="mb-10 text-center"
-                    data-aos="fade-up"
-                    data-aos-delay="100"
                 >
                     <span class="text-xs14 rounded-5 font-medium py-1.75 px-5 relative mb-3.75 text-white bg-secondary inline-block">FAQ’S</span>
-                    <h2 class="text-2.5xl font-bold m-0 block">Your Questions are Answered</h2>
+                    <h2 class="text-[24px] md:text-2.5xl font-bold m-0 block">Your Questions are Answered</h2>
                 </div>
                 <div class="flex">
-                    <div class="w-2/3 mx-auto px-3">
-                        <div data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-full md:w-2/3 mx-auto px-3">
+                        <div>
                             <div id="faq-details">
                                 <div 
                                     class="bg-white pb-6 border-b border-solid border-borderGray rounded-1.5 mb-6"

@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
-import { SharedModule } from "../../../shared/shared-imports";
 import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.component";
+import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
     selector: 'app-term',
@@ -11,7 +11,7 @@ import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.c
 ],
     template: `
         <breadcrumb title="Term & Condition"></breadcrumb>
-        <div class="py-15">
+        <div class="py-10 md:py-15">
             <div class="container mx-auto">
                 <div class="flex">
                     <div class="px-3">
@@ -93,7 +93,7 @@ import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.c
                                 </li>
                             </ul>
                         </div>
-                        <div class="mb-4">
+                        <div class="md:mb-4">
                             <h6 class="mb-4 text-lg font-semibold leading-[1.2] text-primary">Changes to Privacy Policy</h6>
                             <p class="m-0 text-xs15 text-brandDark">
                                 Doccure may update these Privacy Policy periodically. Any changes

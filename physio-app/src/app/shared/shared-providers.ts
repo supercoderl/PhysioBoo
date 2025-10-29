@@ -1,4 +1,4 @@
-import { ALargeSmall, ArrowRight, ArrowUpDown, BadgeCheck, Bell, Bookmark, Calendar, ChevronRight, CircleCheck, Clock, FileText, Flame, Folder, GraduationCap, Info, LucideIconData, Mail, Maximize, Menu, Minimize, Moon, PanelLeft, Plus, Search, Star, Sun, Triangle, Users, X } from 'lucide-angular';
+import { ALargeSmall, ArrowRight, ArrowUpDown, BadgeCheck, Bell, Blocks, Bookmark, Calendar, ChevronRight, CircleCheck, Clock, FileText, Flame, Folder, GraduationCap, House, Info, LucideIconData, Mail, Maximize, Menu, Minimize, Moon, PanelLeft, Plus, Search, Star, Sun, Triangle, Users, X } from 'lucide-angular';
 import { NzAffixModule } from 'ng-zorro-antd/affix';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzAnchorModule } from 'ng-zorro-antd/anchor';
@@ -183,7 +183,9 @@ export const SHARED_LUCIDE_ICONS: Record<string, LucideIconData> = {
     FileText,
     Menu,
     ArrowUpDown,
-    CircleCheck
+    CircleCheck,
+    Blocks,
+    House
 }
 
 export const SHARED_PIPES = [

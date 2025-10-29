@@ -67,6 +67,22 @@ export const routes: Routes = [
                                 loadComponent: () => import('./system/note/all/all.component').then(m => m.AllNoteComponent),
                             }
                         ]
+                    },
+                    {
+                        path: 'scrumboard',
+                        data: { breadcrumb: ['scrumboard'] },
+                        children: [
+                            {
+                                path: '',
+                                redirectTo: 'list',
+                                pathMatch: 'full'
+                            },
+                            {
+                                path: 'list',
+                                data: { breadcrumb: ['list']},
+                                loadComponent: () => import('./system/scrumboard/list/list.component').then(m => m.ListScrumboardComponent),
+                            }
+                        ]
                     }
                 ]
             }

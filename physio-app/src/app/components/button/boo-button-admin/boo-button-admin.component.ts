@@ -22,6 +22,6 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class BooButtonAdminComponent {
-    // #region Input, Output, Properties
+    // #region Inputs, Outputs, Properties
     @Input() icon?: { name: string, size: number,  };
 }

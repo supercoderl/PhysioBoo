@@ -63,7 +63,7 @@ export const routes: Routes = [
                             },
                             {
                                 path: 'all',
-                                data: { breadcrumb: ['all']},
+                                data: { breadcrumb: ['all'] },
                                 loadComponent: () => import('./system/note/all/all.component').then(m => m.AllNoteComponent),
                             }
                         ]
@@ -79,13 +79,29 @@ export const routes: Routes = [
                             },
                             {
                                 path: 'list',
-                                data: { breadcrumb: ['list']},
+                                data: { breadcrumb: ['list'] },
                                 loadComponent: () => import('./system/scrumboard/list/list.component').then(m => m.ListScrumboardComponent),
                             }
                         ]
                     }
                 ]
-            }
+            },
+            {
+                path: 'profile',
+                data: { breadcrumb: ['profile'] },
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'general',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'general',
+                        loadComponent: () => import('./user/profile/profile.component').then(m => m.ProfileComponent),
+                        data: { breadcrumb: ['general'] },
+                    }
+                ]
+            },
         ],
     },
 ];

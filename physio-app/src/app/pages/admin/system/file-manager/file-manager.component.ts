@@ -18,7 +18,7 @@ import { SharedModule } from '../../../../shared/shared-imports';
   styleUrl: './file-manager.component.scss'
 })
 export class FileManagerComponent {
-  // #region Input, Output, Properties
+  // #region Inputs, Outputs, Properties
   folders = FOLDERS;
   files = FILES;
   // #endregion

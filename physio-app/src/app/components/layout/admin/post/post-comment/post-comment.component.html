@@ -39,10 +39,10 @@
           </div>
         </li>
         <div class="mx-13 mb-2 flex items-center">
-          <button-icon>
+          <button-icon buttonClass="!gap-1 !border-0">
             Reply
-            <span class="-mr-1 ml-2 text-base">
-              <lucide-icon name="undo-2"></lucide-icon>
+            <span class="-mr-1 text-base">
+              <lucide-icon name="undo-2" [size]="16"></lucide-icon>
             </span>
           </button-icon>
         </div>
@@ -51,13 +51,13 @@
   </div>
   <div class="-mx-1 flex flex-auto">
     <div
-      class="mx-1 relative center-center shrink-0 rounded-full leading-none overflow-hidden text-[#F6F7F8] bg-[#9CA3AF] w-9 h-9 text-[13px]"
+      class="mx-1 relative inlineFlex-center-center shrink-0 rounded-full leading-none overflow-hidden text-[#F6F7F8] bg-[#9CA3AF] w-9 h-9 text-[13px]"
     >
-      <boo-icon name="user"></boo-icon>
+      <boo-icon name="user" [size]="22" classname="fill-white"></boo-icon>
     </div>
     <div class="mx-1 flex flex-1 flex-col items-end">
       <div
-        class="border border-solid overflow-hidden w-full mb-4 bg-white text-[#1F232B] rounded-[12px] border-[#E5E7EB]"
+        class="border border-solid overflow-hidden w-full mb-4 bg-white text-[#1F232B] rounded-[12px] border-[#E5E7EB] shadow-md"
       >
         <div
           class="text-[12px] p-3 w-full leading-[1.4375] text-[#1F232B] inline-flex items-center relative"
@@ -76,7 +76,7 @@
         </div>
       </div>
       <div>
-        <button-icon>Post comment</button-icon>
+        <button-icon buttonClass="!bg-[#1565C0] !py-1.5 !text-[12px] text-white leading-none !border-0 min-w-8 min-h-8">Post comment</button-icon>
       </div>
     </div>
   </div>

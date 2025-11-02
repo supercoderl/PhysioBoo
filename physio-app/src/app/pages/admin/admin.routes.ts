@@ -102,6 +102,11 @@ export const routes: Routes = [
                     }
                 ]
             },
+            {
+                path: 'setting',
+                data: { breadcrumb: ['setting'] },
+                loadChildren: () => import('./setting/setting.routes').then(r => r.routes)
+            }
         ],
     },
 ];

@@ -7,9 +7,9 @@ import { ProfileTimelineComponent } from "./timeline.component";
   standalone: true,
   imports: [ProfileTimelineComponent, ButtonIconComponent],
   template: `
-    <div class="z-10 flex h-full flex-auto flex-col">
-      <div class="flex flex-1 z-[2] min-w-0 h-full bg-[#F6F7F8]">
-        <div class="flex flex-col w-full overflow-hidden z-[9999]">
+    <div class="z-10 flex flex-auto flex-col">
+      <div class="flex flex-1 z-[2] min-w-0 bg-[#F6F7F8]">
+        <div class="flex flex-col w-full z-[9999]">
           <div class="bg-white border-b border-solid border-[#E5E7EB] flex flex-0 bg-cover">
             <div class="container">
               <div class="flex w-full flex-col">

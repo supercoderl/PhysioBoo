@@ -1,0 +1,495 @@
+<div
+  id=""
+  class="ps relative flex flex-col flex-1 min-h-0"
+>
+  <div class="container">
+    <div class="max-w-2xl flex-auto p-4 md:p-6">
+      <div class="flex flex-col mb-4">
+        <admin-breadcrumb></admin-breadcrumb>
+        <div class="flex items-center gap-2">
+          <p
+            class="lg:ml-0 tracking-tight font-bold leading-none text-[22px] m-0"
+          >
+            Account
+          </p>
+        </div>
+      </div>
+      <div class="w-full max-w-5xl">
+        <form class="flex w-full flex-col gap-12">
+          <div class="flex flex-col gap-4">
+            <div class="w-full">
+              <p
+                class="font-medium text-base m-0"
+              >
+                Profile
+              </p>
+              <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
+                Following information is publicly displayed, be careful!
+              </p>
+            </div>
+            <div class="grid w-full gap-4 sm:grid-cols-4">
+              <div class="sm:col-span-4">
+                <div class="w-full inline-flex flex-col relative min-w-0 p-0 m-0 border-0">
+                  <boo-input label="Name"></boo-input>
+                </div>
+              </div>
+              <div class="sm:col-span-4">
+                <div class="MuiFormControl-root w-full muiltr-uoofuc">
+                  <label
+                    class="MuiFormLabel-root MuiFormLabel-colorSecondary muiltr-16o1k2"
+                    for="username"
+                    >Username</label
+                  >
+                  <div
+                    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root muiltr-1787c4w"
+                  >
+                    <div
+                      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorSecondary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedStart muiltr-1xg8fgo"
+                    >
+                      <p
+                        class="MuiTypography-root MuiTypography-body1 italic muiltr-1fh5ce7"
+                      >
+                        fusetheme.com/
+                      </p>
+                      <input
+                        aria-invalid="false"
+                        id="username"
+                        placeholder="Username"
+                        required=""
+                        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputAdornedStart muiltr-1422abv"
+                        type="text"
+                        value=""
+                        name="username"
+                      />
+                      <fieldset
+                        aria-hidden="true"
+                        class="MuiOutlinedInput-notchedOutline muiltr-1bl9ma3"
+                      >
+                        <legend class="muiltr-w4cd9x">
+                          <span class="notranslate" aria-hidden="true"
+                            >&ZeroWidthSpace;</span
+                          >
+                        </legend>
+                      </fieldset>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="sm:col-span-2">
+                <div class="MuiFormControl-root w-full muiltr-uoofuc">
+                  <label
+                    class="MuiFormLabel-root MuiFormLabel-colorSecondary muiltr-16o1k2"
+                    for="title"
+                    >Title</label
+                  >
+                  <div
+                    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root muiltr-1787c4w"
+                  >
+                    <div
+                      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorSecondary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedStart muiltr-1xg8fgo"
+                    >
+                      <svg
+                        color="action"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        class="shrink-0 stroke-current muiltr-jal039"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <use
+                          xlink:href="/assets/icons/lucide.svg#briefcase"
+                        ></use></svg
+                      ><input
+                        aria-invalid="false"
+                        id="title"
+                        placeholder="Job title"
+                        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputAdornedStart muiltr-1422abv"
+                        type="text"
+                        value=""
+                        name="title"
+                      />
+                      <fieldset
+                        aria-hidden="true"
+                        class="MuiOutlinedInput-notchedOutline muiltr-1bl9ma3"
+                      >
+                        <legend class="muiltr-w4cd9x">
+                          <span class="notranslate" aria-hidden="true"
+                            >&ZeroWidthSpace;</span
+                          >
+                        </legend>
+                      </fieldset>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="sm:col-span-2">
+                <div class="MuiFormControl-root w-full muiltr-uoofuc">
+                  <label
+                    class="MuiFormLabel-root MuiFormLabel-colorSecondary muiltr-16o1k2"
+                    for="company"
+                    >Company</label
+                  >
+                  <div
+                    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root muiltr-1787c4w"
+                  >
+                    <div
+                      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorSecondary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedStart muiltr-1xg8fgo"
+                    >
+                      <svg
+                        color="action"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        class="shrink-0 stroke-current muiltr-jal039"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <use
+                          xlink:href="/assets/icons/lucide.svg#building-2"
+                        ></use></svg
+                      ><input
+                        aria-invalid="false"
+                        id="company"
+                        placeholder="Company"
+                        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputAdornedStart muiltr-1422abv"
+                        type="text"
+                        value=""
+                        name="company"
+                      />
+                      <fieldset
+                        aria-hidden="true"
+                        class="MuiOutlinedInput-notchedOutline muiltr-1bl9ma3"
+                      >
+                        <legend class="muiltr-w4cd9x">
+                          <span class="notranslate" aria-hidden="true"
+                            >&ZeroWidthSpace;</span
+                          >
+                        </legend>
+                      </fieldset>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="sm:col-span-4">
+                <div class="MuiFormControl-root w-full muiltr-uoofuc">
+                  <label
+                    class="MuiFormLabel-root MuiFormLabel-colorSecondary muiltr-16o1k2"
+                    for="about"
+                    >Notes</label
+                  >
+                  <div
+                    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root muiltr-1787c4w"
+                  >
+                    <div
+                      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorSecondary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedStart items-start gap-2 muiltr-ucjejy"
+                    >
+                      <svg
+                        class="shrink-0 stroke-current mt-1 muiltr-jal039"
+                        color="action"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <use
+                          xlink:href="/assets/icons/lucide.svg#align-left"
+                        ></use></svg
+                      ><textarea
+                        aria-invalid="false"
+                        aria-describedby="about-helper-text"
+                        id="about"
+                        name="about"
+                        placeholder="Notes"
+                        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedStart muiltr-9mu7rj"
+                        style="height: 95px"
+                      ></textarea
+                      ><textarea
+                        aria-hidden="true"
+                        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedStart muiltr-9mu7rj"
+                        readonly=""
+                        tabindex="-1"
+                        style="
+                          visibility: hidden;
+                          position: absolute;
+                          overflow: hidden;
+                          height: 0px;
+                          top: 0px;
+                          left: 0px;
+                          transform: translateZ(0px);
+                          padding-top: 0px;
+                          padding-bottom: 0px;
+                          width: 576px;
+                        "
+                      ></textarea>
+                      <fieldset
+                        aria-hidden="true"
+                        class="MuiOutlinedInput-notchedOutline muiltr-1bl9ma3"
+                      >
+                        <legend class="muiltr-w4cd9x">
+                          <span class="notranslate" aria-hidden="true"
+                            >&ZeroWidthSpace;</span
+                          >
+                        </legend>
+                      </fieldset>
+                    </div>
+                    <p
+                      class="MuiFormHelperText-root MuiFormHelperText-sizeMedium MuiFormHelperText-contained muiltr-1uggfa5"
+                      id="about-helper-text"
+                    >
+                      <span class="flex flex-col"
+                        ><span
+                          >Brief description for your profile. Basic HTML and
+                          Emoji are allowed.</span
+                        ><span></span
+                      ></span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex w-full flex-col gap-4">
+            <div class="w-full">
+              <p
+                class="font-medium text-base m-0"
+              >
+                Personal Information
+              </p>
+              <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
+                Communication details in case we want to connect with you. These
+                will be kept private.
+              </p>
+            </div>
+            <div class="grid w-full gap-4 sm:grid-cols-4">
+              <div class="sm:col-span-2">
+                <div class="MuiFormControl-root w-full muiltr-uoofuc">
+                  <label
+                    class="MuiFormLabel-root MuiFormLabel-colorSecondary muiltr-16o1k2"
+                    for="email"
+                    >Email</label
+                  >
+                  <div
+                    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root muiltr-1787c4w"
+                  >
+                    <div
+                      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorSecondary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedStart muiltr-1xg8fgo"
+                    >
+                      <svg
+                        color="action"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        class="shrink-0 stroke-current muiltr-jal039"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <use
+                          xlink:href="/assets/icons/lucide.svg#mail"
+                        ></use></svg
+                      ><input
+                        aria-invalid="false"
+                        id="email"
+                        placeholder="Email"
+                        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputAdornedStart muiltr-1422abv"
+                        type="text"
+                        value=""
+                        name="email"
+                      />
+                      <fieldset
+                        aria-hidden="true"
+                        class="MuiOutlinedInput-notchedOutline muiltr-1bl9ma3"
+                      >
+                        <legend class="muiltr-w4cd9x">
+                          <span class="notranslate" aria-hidden="true"
+                            >&ZeroWidthSpace;</span
+                          >
+                        </legend>
+                      </fieldset>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="sm:col-span-2">
+                <div class="MuiFormControl-root w-full muiltr-uoofuc">
+                  <label
+                    class="MuiFormLabel-root MuiFormLabel-colorSecondary muiltr-16o1k2"
+                    for="phone"
+                    >Phone Number</label
+                  >
+                  <div
+                    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root muiltr-1787c4w"
+                  >
+                    <div
+                      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorSecondary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedStart muiltr-1xg8fgo"
+                    >
+                      <svg
+                        color="action"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        class="shrink-0 stroke-current muiltr-jal039"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <use
+                          xlink:href="/assets/icons/lucide.svg#phone"
+                        ></use></svg
+                      ><input
+                        aria-invalid="false"
+                        id="phone"
+                        placeholder="Phone Number"
+                        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputAdornedStart muiltr-1422abv"
+                        type="text"
+                        value=""
+                        name="phone"
+                      />
+                      <fieldset
+                        aria-hidden="true"
+                        class="MuiOutlinedInput-notchedOutline muiltr-1bl9ma3"
+                      >
+                        <legend class="muiltr-w4cd9x">
+                          <span class="notranslate" aria-hidden="true"
+                            >&ZeroWidthSpace;</span
+                          >
+                        </legend>
+                      </fieldset>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="sm:col-span-2">
+                <div class="MuiFormControl-root w-full muiltr-uoofuc">
+                  <label
+                    class="MuiFormLabel-root MuiFormLabel-colorSecondary muiltr-16o1k2"
+                    for="country"
+                    >Country</label
+                  >
+                  <div
+                    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root muiltr-1787c4w"
+                  >
+                    <div
+                      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorSecondary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedStart muiltr-1xg8fgo"
+                    >
+                      <svg
+                        color="action"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        class="shrink-0 stroke-current muiltr-jal039"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <use
+                          xlink:href="/assets/icons/lucide.svg#flag"
+                        ></use></svg
+                      ><input
+                        aria-invalid="false"
+                        id="country"
+                        placeholder="County"
+                        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputAdornedStart muiltr-1422abv"
+                        type="text"
+                        value=""
+                        name="country"
+                      />
+                      <fieldset
+                        aria-hidden="true"
+                        class="MuiOutlinedInput-notchedOutline muiltr-1bl9ma3"
+                      >
+                        <legend class="muiltr-w4cd9x">
+                          <span class="notranslate" aria-hidden="true"
+                            >&ZeroWidthSpace;</span
+                          >
+                        </legend>
+                      </fieldset>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="sm:col-span-2">
+                <div class="MuiFormControl-root w-full muiltr-uoofuc">
+                  <label
+                    class="MuiFormLabel-root MuiFormLabel-colorSecondary muiltr-16o1k2"
+                    for="language"
+                    >Language</label
+                  >
+                  <div
+                    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root muiltr-1787c4w"
+                  >
+                    <div
+                      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorSecondary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedStart muiltr-1xg8fgo"
+                    >
+                      <svg
+                        color="action"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        class="shrink-0 stroke-current muiltr-jal039"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <use
+                          xlink:href="/assets/icons/lucide.svg#globe"
+                        ></use></svg
+                      ><input
+                        aria-invalid="false"
+                        id="language"
+                        placeholder="Language"
+                        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputAdornedStart muiltr-1422abv"
+                        type="text"
+                        value=""
+                        name="language"
+                      />
+                      <fieldset
+                        aria-hidden="true"
+                        class="MuiOutlinedInput-notchedOutline muiltr-1bl9ma3"
+                      >
+                        <legend class="muiltr-w4cd9x">
+                          <span class="notranslate" aria-hidden="true"
+                            >&ZeroWidthSpace;</span
+                          >
+                        </legend>
+                      </fieldset>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center justify-end gap-2">
+            <button
+              class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary Mui-disabled MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary muiltr-2zdja7"
+              tabindex="-1"
+              type="button"
+              disabled=""
+            >
+              Cancel</button
+            ><button
+              class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary muiltr-17sbvwj"
+              tabindex="-1"
+              type="submit"
+              disabled=""
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

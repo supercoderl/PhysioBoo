@@ -24,9 +24,9 @@ import { SharedModule } from '../../../shared/shared-imports';
         [size]="icon.size || 16"
         [class]="icon.class"
       ></lucide-icon>
-      <span #contentWrapper>
+      <ng-container #contentWrapper>
         <ng-content></ng-content>
-      </span>
+      </ng-container>
     </button>
   `
 })

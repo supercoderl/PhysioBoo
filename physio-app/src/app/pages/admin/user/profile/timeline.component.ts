@@ -19,7 +19,7 @@ import { PostareaComponent } from "../../../../components/textarea/postarea/post
                             Latest Activity
                         </p>
                         <button
-                            class="font-medium -mx-2 inlineFlex-center-center relative cursor-pointer align-middle min-h-7 min-w-7 rounded-[8px] py-1.5 px-3"
+                            class="font-medium -mx-2 inlineFlex-center-center relative cursor-pointer align-middle min-h-7 min-w-7 rounded-[8px] py-1.5 px-3 text-[12px]"
                             tabindex="0"
                             type="button"
                         >
@@ -39,7 +39,7 @@ import { PostareaComponent } from "../../../../components/textarea/postarea/post
                                     </div>
                                 </div>
                                 <div
-                                    class="flex-1 my-1.5"
+                                    class="flex-1 my-1.5 overflow-hidden"
                                 >
                                     <span class="block m-0 text-[13px] leading-[1.5]">
                                         <div class="flex">
@@ -49,7 +49,7 @@ import { PostareaComponent } from "../../../../components/textarea/postarea/post
                                                 Bernard Langley
                                             </p>
                                             <p
-                                                class="px-1 truncate m-0 text-[13px] leading-[1.5]"
+                                                class="px-1 m-0 truncate text-[13px] leading-[1.5]"
                                             >
                                                 started following you.
                                             </p>
@@ -68,8 +68,9 @@ import { PostareaComponent } from "../../../../components/textarea/postarea/post
             </div>
             <div class="flex flex-1 flex-col">
                 <postarea class="md:mb-8 mb-4"></postarea>
+
+                <admin-post-card class="md:mb-8 mb-4 shadow-md overflow-hidden rounded-[12px]"></admin-post-card>
             </div>
-            <admin-post-card class="md:mb-8 mb-4"></admin-post-card>
         </div>
     `
 })

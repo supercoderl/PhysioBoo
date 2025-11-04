@@ -37,7 +37,7 @@ import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.com
                                             aria-label="Account"
                                             aria-expanded="false"
                                             aria-current="page"
-                                            class="p-2 rounded-md gap-2 w-full flex mb-1 bg-[#0000000d] cursor-pointer relative align-middle text-[13px] font-medium leading-none min-h-8 min-w-8 "
+                                            class="p-2 rounded-md gap-2 w-full flex mb-1 bg-[#0000000d] cursor-pointer relative align-middle text-[13px] font-medium leading-none min-h-8 min-w-8 text-[#1F232B]"
                                             href="/apps/settings/account"
                                             data-discover="true"
                                         >
@@ -62,7 +62,7 @@ import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.com
                                             tabindex="0"
                                             aria-label="Security"
                                             aria-expanded="false"
-                                            class="p-2 rounded-md gap-2 w-full flex mb-1 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-w-8 min-h-8"
+                                            class="p-2 rounded-md gap-2 w-full flex mb-1 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-w-8 min-h-8 text-[#1F232B]"
                                             href="/apps/settings/security"
                                             data-discover="true"
                                         >
@@ -87,7 +87,7 @@ import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.com
                                             tabindex="0"
                                             aria-label="Plan &amp; Billing"
                                             aria-expanded="false"
-                                            class="p-2 rounded-md gap-2 w-full flex mb-1 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-w-8 min-h-8"
+                                            class="p-2 rounded-md gap-2 w-full flex mb-1 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-w-8 min-h-8 text-[#1F232B]"
                                             href="/apps/settings/plan-billing"
                                             data-discover="true"
                                         >
@@ -113,7 +113,7 @@ import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.com
                                             tabindex="0"
                                             aria-label="Notifications"
                                             aria-expanded="false"
-                                            class="p-2 rounded-md gap-2 w-full flex mb-1 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-w-8 min-h-8"
+                                            class="p-2 rounded-md gap-2 w-full flex mb-1 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-w-8 min-h-8 text-[#1F232B]"
                                             href="/apps/settings/notifications"
                                             data-discover="true"
                                         >
@@ -138,7 +138,7 @@ import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.com
                                             tabindex="0"
                                             aria-label="Team"
                                             aria-expanded="false"
-                                            class="p-2 rounded-md gap-2 w-full flex mb-1 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-w-8 min-h-8"
+                                            class="p-2 rounded-md gap-2 w-full flex mb-1 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-w-8 min-h-8 text-[#1F232B]"
                                             href="/apps/settings/team"
                                             data-discover="true"
                                         >
@@ -164,7 +164,7 @@ import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.com
                         </div>
                     </div>
                 </div>
-                <div class="pt-0.5 pl-0.5 flex flex-col w-full overflow-hidden z-[9999]">
+                <div class="pt-0.5 pl-0.5 flex flex-col w-full z-[9999]">
                     <router-outlet></router-outlet>
                 </div>
             </div>

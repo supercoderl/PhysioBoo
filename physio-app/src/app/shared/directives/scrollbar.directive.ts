@@ -72,7 +72,7 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
         this.track = this.renderer.createElement('div');
         this.renderer.setStyle(this.track, 'position', 'fixed');
         this.renderer.setStyle(this.track, 'width', '6px');
-        this.renderer.setStyle(this.track, 'right', '0px');
+        this.renderer.setStyle(this.track, 'transform', 'translateX(-100%)');
         this.renderer.setStyle(this.track, 'background', 'transparent');
         this.renderer.setStyle(this.track, 'transition', 'background-color 0.2s linear, opacity 0.2s linear, width 0.2s ease-in-out');
         this.renderer.setStyle(this.track, 'opacity', '0');
@@ -191,6 +191,7 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
         const rect = container.getBoundingClientRect();
 
         this.renderer.setStyle(this.track, 'top', `${rect.top}px`);
+        this.renderer.setStyle(this.track, 'left', `${rect.right}px`);
         this.renderer.setStyle(this.track, 'height', `${rect.height}px`);
     }
 

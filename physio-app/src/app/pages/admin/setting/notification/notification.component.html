@@ -1,0 +1,134 @@
+<div
+  class="ps bg-white shadow-md flex flex-col flex-1 min-h-0 h-screen"
+  style="border-top-left-radius: 12px"
+  custom-scrollbar
+>
+  <div class="container">
+    <div class="max-w-2xl flex-auto p-4 md:p-6">
+      <div class="flex flex-col mb-4">
+        <admin-breadcrumb></admin-breadcrumb>
+        <div class="flex items-center gap-2">
+          <p
+            class="lg:ml-0 tracking-tight font-bold leading-none text-[22px] m-0"
+          >
+            Notifications
+          </p>
+        </div>
+      </div>
+      <div class="w-full max-w-5xl">
+        <form class="flex w-full flex-col gap-12">
+          <div>
+            <p class="font-medium text-base w-full m-0">Alerts</p>
+            <div class="grid w-full grid-cols-1 gap-1.5">
+              <div class="flex items-center justify-between divide-y">
+                <div class="flex w-full flex-col">
+                  <label
+                    class="z-[99] m-0 inline-flex items-center cursor-pointer align-middle flex-row-reverse"
+                  >
+                    <switch></switch>
+                    <span class="flex-1 flex m-0 text-[13px] leading-[1.5]"
+                      >Communication
+                    </span>
+                  </label>
+                  <p class="text-[#4B5563] leading-[1.66] mt-0.75 text-[12px]">
+                    Get news, announcements, and product updates.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex w-full flex-col">
+                  <label
+                    class="z-[99] m-0 inline-flex items-center cursor-pointer align-middle flex-row-reverse"
+                  >
+                    <switch></switch>
+                    <span class="flex-1 flex m-0 text-[13px] leading-[1.5]"
+                      >Security
+                    </span>
+                  </label>
+                  <p class="text-[#4B5563] leading-[1.66] mt-0.75 text-[12px]">
+                    Get important notifications about your account security.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex w-full flex-col">
+                  <label
+                    class="z-[99] m-0 inline-flex items-center cursor-pointer align-middle flex-row-reverse"
+                  >
+                    <switch></switch>
+                    <span class="flex-1 flex m-0 text-[13px] leading-[1.5]">
+                      Meetups
+                    </span>
+                  </label>
+                  <p class="text-[#4B5563] leading-[1.66] mt-0.75 text-[12px]">
+                    Get an email when a Meetup is posted close to my location.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="font-medium text-base w-full m-0">Account Activity</p>
+            <p class="font-medium w-full mt-6 m-0 text-[13px] leading-[1.5]">
+              Email me when:
+            </p>
+            <div class="mt-3 grid w-full grid-cols-1 gap-1">
+              <div class="flex items-center justify-between">
+                <div class="flex w-full flex-col">
+                  <label
+                    class="z-[99] m-0 inline-flex items-center cursor-pointer align-middle flex-row-reverse"
+                  >
+                    <switch></switch>
+                    <span class="flex-1 flex m-0 text-[13px] leading-[1.5]">
+                      Someone comments on one of my items
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex w-full flex-col">
+                  <label
+                    class="z-[99] m-0 inline-flex items-center cursor-pointer align-middle flex-row-reverse"
+                  >
+                    <switch></switch>
+                    <span class="flex-1 flex m-0 text-[13px] leading-[1.5]">
+                      Someone mentions me
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex w-full flex-col">
+                  <label
+                    class="z-[99] m-0 inline-flex items-center cursor-pointer align-middle flex-row-reverse"
+                  >
+                    <switch></switch>
+                    <span class="flex-1 flex m-0 text-[13px] leading-[1.5]">
+                      Someone follows me
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex w-full flex-col">
+                  <label
+                    class="z-[99] m-0 inline-flex items-center cursor-pointer align-middle flex-row-reverse"
+                  >
+                    <switch></switch>
+                    <span class="flex-1 flex m-0 text-[13px] leading-[1.5]">
+                      Someone replies to my job posting
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center justify-end gap-2">
+            <boo-button-admin>Cancel</boo-button-admin>
+            <boo-button-admin>Save</boo-button-admin>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

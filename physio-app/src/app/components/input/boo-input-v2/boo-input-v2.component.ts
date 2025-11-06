@@ -21,6 +21,7 @@ import { SharedModule } from '../../../shared/shared-imports';
       >
         <div
           class="text-[13px] leading-[1.43] text-[#1F232B] inline-flex items-center w-full relative rounded-[8px] min-h-8 p-2 h-auto bg-white border border-solid border-[#0000003b]"
+          [ngClass]="wrapperClass"
         >
           <ng-content select="[prefix]"></ng-content>
           <input
@@ -32,6 +33,7 @@ import { SharedModule } from '../../../shared/shared-imports';
             value="Brian Hughes"
             name="name"
           />
+          <ng-content select="[endfix]"></ng-content>
         </div>
       </div>
     </div>
@@ -39,4 +41,5 @@ import { SharedModule } from '../../../shared/shared-imports';
 })
 export class BooInputV2Component {
   @Input() label?: { text: string, htmlFor?: string }
+  @Input() wrapperClass: string = ''
 }

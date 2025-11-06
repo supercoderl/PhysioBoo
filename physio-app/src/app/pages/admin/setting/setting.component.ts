@@ -13,7 +13,7 @@ import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.com
                     class="relative mx-0 border-0 w-[320px] max-w-[320px] overflow-hidden bg-transparent flex-0"
                 >
                     <div
-                        class="border-0 w-full relative bg-white text-[#1F232B] max-w-full h-full overflow-y-auto flex flex-col top-0 left-0 border-r border-solid border-[#E5E7EB]"
+                        class="w-full relative bg-[#F6F7F8] text-[#1F232B] min-w-full h-full overflow-y-auto flex flex-col top-0 left-0"
                     >
                         <div
                             id=""

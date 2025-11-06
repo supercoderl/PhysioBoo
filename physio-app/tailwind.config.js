@@ -118,7 +118,8 @@ module.exports = {
       },
       boxShadow: {
         switch: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)',
-        select: '0 4px 7px -2px rgba(0,0,0,0.11),0 2px 5px -2px rgba(0,0,0,0.1)'
+        select: '0 4px 7px -2px rgba(0,0,0,0.11),0 2px 5px -2px rgba(0,0,0,0.1)',
+        card: '0 1px 4px 0 rgba(0,0,0,0.1),0 1px 2px -1px rgba(0,0,0,0.1)'
       },
       transitionProperty: {
         switch: 'left, transform',

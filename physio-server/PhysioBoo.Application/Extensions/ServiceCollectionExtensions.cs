@@ -59,15 +59,18 @@ using PhysioBoo.Application.EventHandlers.Fanout;
 using PhysioBoo.Application.EventHandlers.User;
 using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Application.Queries.RefreshTokens.GetByUserId;
+using PhysioBoo.Application.Queries.Users.GetAll;
 using PhysioBoo.Application.Queries.Users.GetByEmail;
 using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
 using PhysioBoo.Application.Services;
+using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Interfaces.EventHandlers;
 using PhysioBoo.Shared.Events.Users;
+using PhysioBoo.SharedKernel.Common;
 
 namespace PhysioBoo.Application.Extensions
 {
@@ -100,6 +103,7 @@ namespace PhysioBoo.Application.Extensions
             // User
             services.AddScoped<IRequestHandler<GetUserByIdQuery, User?>, GetUserByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetUserByEmailQuery, User?>, GetUserByEmailQueryHandler>();
+            services.AddScoped<IRequestHandler<GetAllUsersQuery, PagedResult<UserViewModel>>, GetAllUsersQueryHandler>();
 
             // Verification Token
             services.AddScoped<IRequestHandler<GetVerificationTokenByIdQuery, VerificationTokenViewModel?>, GetVerificationTokenByIdQueryHandler>();
@@ -115,35 +119,21 @@ namespace PhysioBoo.Application.Extensions
         {
             #region Medical Staff Flow
             services.AddScoped<IRequestHandler<CreateDoctorCommand>, CreateDoctorCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreateDoctorAwardCommand>, CreateDoctorAwardCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreateDoctorCertificationCommand>, CreateDoctorCertificationCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreateDoctorEducationCommand>, CreateDoctorEducationCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreateDoctorLeaveCommand>, CreateDoctorLeaveCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreateDoctorPublicationCommand>, CreateDoctorPublicationCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreateDoctorScheduleCommand>, CreateDoctorScheduleCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreateDoctorSpecialtyCommand>, CreateDoctorSpecialtyCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreateDoctorWorkExperienceCommand>, CreateDoctorWorkExperienceCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreateHospitalStaffCommand>, CreateHospitalStaffCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreateMedicalSpecialtyCommand>, CreateMedicalSpecialtyCommandHandler>();
             #endregion
 
             #region Core Flow
             services.AddScoped<IRequestHandler<CreateAddressCommand>, CreateAddressCommandHandler>();
-
-            // Profile
             services.AddScoped<IRequestHandler<CreateProfileCommand>, CreateProfileCommandHandler>();
-
-            // User
             services.AddScoped<IRequestHandler<CreateUserCommand>, CreateUserCommandHandler>();
             services.AddScoped<IRequestHandler<GenerateEmailVerificationTokenCommand>, GenerateEmailVerificationTokenCommandHandler>();
             services.AddScoped<IRequestHandler<ResendVerificationCommand>, ResendVerificationCommandHandler>();
@@ -155,99 +145,50 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<ForgotPasswordCommand>, ForgotPasswordCommandHandler>();
             services.AddScoped<IRequestHandler<ResetPasswordCommand>, ResetPasswordCommandHandler>();
             services.AddScoped<IRequestHandler<RefreshTokenCommand>, RefreshTokenCommandHandler>();
-
-            // Refresh Token
             services.AddScoped<IRequestHandler<CreateRefreshTokenCommand>, CreateRefreshTokenCommandHandler>();
             #endregion
 
             #region Patient Flow
-            // Patient
             services.AddScoped<IRequestHandler<CreatePatientCommand>, CreatePatientCommandHandler>();
-
-            // Patient Allergy
             services.AddScoped<IRequestHandler<CreatePatientAllergyCommand>, CreatePatientAllergyCommandHandler>();
-
-            // Patient Medical History
             services.AddScoped<IRequestHandler<CreatePatientMedicalHistoryCommand>, CreatePatientMedicalHistoryCommandHandler>();
             #endregion
 
             #region Operation Flow
-            // Hospital
             services.AddScoped<IRequestHandler<CreateHospitalCommand>, CreateHospitalCommandHandler>();
-
-            // Hospital Group
             services.AddScoped<IRequestHandler<CreateHospitalGroupCommand>, CreateHospitalGroupCommandHandler>();
-
-            // Department
             services.AddScoped<IRequestHandler<CreateDepartmentCommand>, CreateDepartmentCommandHandler>();
-
-            // Appointment Type
             services.AddScoped<IRequestHandler<CreateAppointmentTypeCommand>, CreateAppointmentTypeCommandHandler>();
-
-            // Appointment
             services.AddScoped<IRequestHandler<CreateAppointmentCommand>, CreateAppointmentCommandHandler>();
-
-            // Bill
             services.AddScoped<IRequestHandler<CreateBillCommand>, CreateBillCommandHandler>();
-
-            // Bill Item
             services.AddScoped<IRequestHandler<CreateBillItemCommand>, CreateBillItemCommandHandler>();
-
-            // Payment
             services.AddScoped<IRequestHandler<CreatePaymentCommand>, CreatePaymentCommandHandler>();
             #endregion
 
             #region Support Flow
-            // Insurance Company
             services.AddScoped<IRequestHandler<CreateInsuranceCompanyCommand>, CreateInsuranceCompanyCommandHandler>();
-
-            // Manufacturer
             services.AddScoped<IRequestHandler<CreateManufacturerCommand>, CreateManufacturerCommandHandler>();
-
-            // Supplier
             services.AddScoped<IRequestHandler<CreateSupplierCommand>, CreateSupplierCommandHandler>();
-
-            // Review
             services.AddScoped<IRequestHandler<CreateReviewCommand>, CreateReviewCommandHandler>();
             #endregion
 
             #region Clinical Flow
             services.AddScoped<IRequestHandler<CreateMedicalRecordCommand>, CreateMedicalRecordCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreatePrescriptionCommand>, CreatePrescriptionCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreatePrescriptionItemCommand>, CreatePrescriptionItemCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreateMedicineCategoryCommand>, CreateMedicineCategoryCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreateMedicineCommand>, CreateMedicineCommandHandler>();
-
             services.AddScoped<IRequestHandler<CreateMedicineInventoryCommand>, CreateMedicineInventoryCommandHandler>();
             #endregion
 
             #region Laboratory Imaging Flow
-            // Imaging Modality
             services.AddScoped<IRequestHandler<CreateImagingModalityCommand>, CreateImagingModalityCommandHandler>();
-
-            // Imaging Order
             services.AddScoped<IRequestHandler<CreateImagingOrderCommand>, CreateImagingOrderCommandHandler>();
-
-            // Imaging Report
             services.AddScoped<IRequestHandler<CreateImagingReportCommand>, CreateImagingReportCommandHandler>();
-
-            // Lab Order
             services.AddScoped<IRequestHandler<CreateLabOrderCommand>, CreateLabOrderCommandHandler>();
-
-            // Lab Order Item
             services.AddScoped<IRequestHandler<CreateLabOrderItemCommand>, CreateLabOrderItemCommandHandler>();
-
-            // Lab Report
             services.AddScoped<IRequestHandler<CreateLabReportCommand>, CreateLabReportCommandHandler>();
-
-            // Lab Test
             services.AddScoped<IRequestHandler<CreateLabTestCommand>, CreateLabTestCommandHandler>();
-
-            // Lab Test Category
             services.AddScoped<IRequestHandler<CreateLabTestCategoryCommand>, CreateLabTestCategoryCommandHandler>();
             #endregion
 

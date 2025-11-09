@@ -9,10 +9,12 @@ using PhysioBoo.Application.Commands.Users.RefreshToken;
 using PhysioBoo.Application.Commands.Users.ResendVerification;
 using PhysioBoo.Application.Commands.Users.ResetPassword;
 using PhysioBoo.Application.Commands.Users.VerifyUser;
+using PhysioBoo.Application.Queries.Users.GetAll;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Presentation.Models;
+using PhysioBoo.SharedKernel.Common;
 
 namespace PhysioBoo.Presentation.Endpoints
 {
@@ -20,11 +22,11 @@ namespace PhysioBoo.Presentation.Endpoints
     {
         public static void MapUserEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("api/users")
+            RouteGroupBuilder group = app.MapGroup("api/users")
                 .WithTags("Users")
                 .WithOpenApi();
 
-            // Create user
+            #region Create user
             group.MapPost("/register", async (
                 CreateUserViewModel newUser,
                 IMediatorHandler bus,
@@ -32,7 +34,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                var notifications = (DomainNotificationHandler)handler;
+                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
 
                 await bus.SendCommandAsync(new CreateUserCommand(newUser));
 
@@ -59,8 +61,9 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new user")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            #endregion
 
-            // Resend verification
+            #region Resend verification
             group.MapPost("/resend-verification", async (
                 ResendVerificationViewModel request,
                 IMediatorHandler bus,
@@ -69,7 +72,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                var notifications = (DomainNotificationHandler)handler;
+                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
 
                 await bus.SendCommandAsync(new ResendVerificationCommand(user.GetUserId(), request.VerificationType));
 
@@ -97,8 +100,9 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
             .RequireAuthorization();
+            #endregion
 
-            // Verify email
+            #region Verify email
             group.MapGet("/verify-email", async (
                 [FromQuery] string token,
                 [FromQuery] string type,
@@ -107,7 +111,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                var notifications = (DomainNotificationHandler)handler;
+                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
 
                 await bus.SendCommandAsync(new VerifyUserCommand(token, type));
 
@@ -134,8 +138,9 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Verify email")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            #endregion
 
-            // Login
+            #region Login
             group.MapPost("/login", async (
                 [FromBody] LoginUserViewModel request,
                 IMediatorHandler bus,
@@ -143,7 +148,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                var notifications = (DomainNotificationHandler)handler;
+                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
 
                 await bus.SendCommandAsync(new LoginUserCommand(request.Email, request.Password));
 
@@ -170,8 +175,9 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Login user with email and password")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            #endregion
 
-            // Logout
+            #region Logout
             group.MapPost("/refresh/logout", async (
                 HttpRequest request,
                 IMediatorHandler bus,
@@ -180,7 +186,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                var notifications = (DomainNotificationHandler)handler;
+                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
 
                 await bus.SendCommandAsync(new LogoutUserCommand(user.GetUserId()));
 
@@ -208,8 +214,9 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
             .RequireAuthorization();
+            #endregion
 
-            // Change password
+            #region Change password
             group.MapPost("/change-password", async (
                 [FromBody] ChangePasswordViewModel request,
                 IMediatorHandler bus,
@@ -218,7 +225,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                var notifications = (DomainNotificationHandler)handler;
+                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
 
                 await bus.SendCommandAsync(new ChangePasswordUserCommand(user.GetUserId(), request.OldPassword, request.NewPassword));
 
@@ -246,8 +253,9 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
             .RequireAuthorization();
+            #endregion
 
-            // Forgot password
+            #region Forgot password
             group.MapPost("/forgot-password", async (
                 [FromBody] ForgotPasswordViewModel request,
                 IMediatorHandler bus,
@@ -255,7 +263,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                var notifications = (DomainNotificationHandler)handler;
+                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
 
                 await bus.SendCommandAsync(new ForgotPasswordCommand(request.Email));
 
@@ -282,8 +290,9 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Send an url with token to user for resetting password")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            #endregion
 
-            // Reset password
+            #region Reset password
             group.MapPost("/reset-password", async (
                 [FromBody] ResetPasswordViewModel request,
                 IMediatorHandler bus,
@@ -292,7 +301,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                var notifications = (DomainNotificationHandler)handler;
+                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
 
                 await bus.SendCommandAsync(new ResetPasswordCommand(user.GetUserId(), user.GetUserEmail(), request.NewPassword));
 
@@ -320,8 +329,9 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
             .RequireAuthorization();
+            #endregion
 
-            // Refresh token
+            #region Refresh token
             group.MapPost("/refresh/refresh-token", async (
                 [FromBody] ResetPasswordViewModel request,
                 HttpContext context,
@@ -331,12 +341,12 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                if (!context.Request.Cookies.TryGetValue("refresh_token", out var refreshToken) || string.IsNullOrEmpty(refreshToken))
+                if (!context.Request.Cookies.TryGetValue("refresh_token", out string? refreshToken) || string.IsNullOrEmpty(refreshToken))
                 {
                     return Results.Unauthorized();
                 }
 
-                var notifications = (DomainNotificationHandler)handler;
+                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
 
                 await bus.SendCommandAsync(new RefreshTokenCommand(refreshToken));
 
@@ -363,6 +373,45 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Refresh new token")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            #endregion
+
+
+            #region Get All Users
+            group.MapPost("/search", async (
+                [FromBody] PagedRequest<UserFilter> request,
+                IMediatorHandler bus,
+                INotificationHandler<DomainNotification> handler,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
+
+                PagedResult<UserViewModel> result = await bus.QueryAsync(new GetAllUsersQuery(request));
+
+                if (notifications.HasNotifications())
+                {
+                    return Results.BadRequest(new ResponseMessage<Guid>
+                    {
+                        Success = false,
+                        Errors = notifications.GetNotifications().Select(n => n.Value),
+                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
+                        {
+                            Code = n.Code,
+                            Data = n.Data
+                        })
+                    });
+                }
+
+                return Results.Ok(new ResponseMessage<PagedResult<UserViewModel>>
+                {
+                    Success = true,
+                    Data = result
+                });
+            }).WithName("SearchUsers")
+            .WithSummary("Retrieve a paginated list of users with filters and sorting.")
+            .Produces<ResponseMessage<PagedResult<UserViewModel>>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<PagedResult<UserViewModel>>>(StatusCodes.Status400BadRequest);
+            #endregion
         }
     }
 }

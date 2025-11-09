@@ -8,54 +8,62 @@ namespace PhysioBoo.Presentation.Warmup
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<WarmupConnection> _logger;
+        private readonly IHostApplicationLifetime _appLifetime;
 
-        public WarmupConnection(IServiceProvider serviceProvider, ILogger<WarmupConnection> logger)
+        public WarmupConnection(
+            IServiceProvider serviceProvider,
+            ILogger<WarmupConnection> logger,
+            IHostApplicationLifetime appLifetime
+        )
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
+            _appLifetime = appLifetime;
         }
 
         private async Task PrewarmEntityFramework()
         {
             try
             {
-                using var scope = _serviceProvider.CreateScope();
-                var dbContext = scope.ServiceProvider.GetService<ApplicationDbContext>();
-
-                if (dbContext == null)
+                using IServiceScope scope = _serviceProvider.CreateScope();
+                DbContext?[] dbContexts = new DbContext?[]
                 {
-                    _logger.LogWarning("DbContext not found for EF warmup");
-                    return;
-                }
+                    scope.ServiceProvider.GetService<ApplicationDbContext>(),
+                    scope.ServiceProvider.GetService<EventStoreDbContext>(),
+                    scope.ServiceProvider.GetService<DomainNotificationStoreDbContext>()
+                };
 
-                var sw = Stopwatch.StartNew();
-
-                // Force model building
-                _ = dbContext.Model;
-                _logger.LogInformation("EF Model built in {ElapsedMs}ms", sw.ElapsedMilliseconds);
-
-                // Ensure database exists and is accessible
-                var canConnect = await dbContext.Database.CanConnectAsync();
-                if (!canConnect)
+                foreach (DbContext? dbContext in dbContexts.Where(x => x != null))
                 {
-                    _logger.LogWarning("Cannot connect to database during warmup");
-                    return;
+                    Stopwatch sw = Stopwatch.StartNew();
+                    _ = dbContext!.Model;
+                    bool canConnect = await dbContext.Database.CanConnectAsync();
+                    if (canConnect)
+                    {
+                        await dbContext.Database.ExecuteSqlRawAsync("SELECT 1");
+                        _logger.LogInformation("{DbContext} warmed up in {Elapsed}ms",
+                            dbContext.GetType().Name, sw.ElapsedMilliseconds);
+                    }
                 }
-
-                // Execute a simple query to warm up the query pipeline
-                await dbContext.Database.ExecuteSqlRawAsync("SELECT 1");
-
-                _logger.LogInformation("Entity Framework prewarmed in {ElapsedMs}ms", sw.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Failed to prewarm Entity Framework");
+                _logger.LogWarning(ex, "Failed to prewarm Entity Framework contexts");
             }
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            await PrewarmEntityFramework();
+            _appLifetime.ApplicationStarted.Register(() =>
+            {
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(2000, cancellationToken);
+                    await PrewarmEntityFramework();
+                }, cancellationToken);
+            });
+
+            return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

@@ -1,4 +1,4 @@
-
+﻿
 using Aikido.Zen.DotNetCore;
 using HealthChecks.ApplicationStatus.DependencyInjection;
 using HealthChecks.UI.Client;
@@ -14,7 +14,6 @@ using PhysioBoo.Presentation.Endpoints;
 using PhysioBoo.Presentation.Extensions;
 using PhysioBoo.Presentation.Warmup;
 using PhysioBoo.ServiceDefaults;
-using RabbitMQ.Client;
 using StackExchange.Profiling.Storage;
 
 namespace PhysioBoo.Presentation
@@ -23,7 +22,11 @@ namespace PhysioBoo.Presentation
     {
         public static void Main(string[] args)
         {
+            System.Diagnostics.Stopwatch totalTimer = System.Diagnostics.Stopwatch.StartNew();
+            System.Diagnostics.Stopwatch stepTimer = System.Diagnostics.Stopwatch.StartNew();
+
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+            LogStep("Builder created", ref stepTimer);
 
             bool isAspire = builder.Configuration["ASPIRE_ENABLED"] == "true";
             string? redisConnectionString =
@@ -32,28 +35,43 @@ namespace PhysioBoo.Presentation
             string? dbConnectionString = isAspire
                 ? builder.Configuration["ConnectionStrings:Database"]
                 : builder.Configuration["ConnectionStrings:DefaultConnection"];
+            LogStep("Configuration loaded", ref stepTimer);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwagger();
+            LogStep("Controllers added", ref stepTimer);
+
             builder.Services.AddInfrastructure(builder.Configuration, "PhysioBoo.Infrastructure");
+            LogStep("Infrastructure added", ref stepTimer);
+
             builder.Services.AddNotificationHandlers();
             builder.Services.AddApiUser();
             builder.Services.AddCommandHandlers();
+            LogStep("Handlers added", ref stepTimer);
+
             builder.Services.AddAuth(builder.Configuration);
-            builder.Services.AddGrpc();
-            builder.Services.AddGrpcReflection();
-            builder.Services.AddOpenApi();
+            LogStep("Auth configured", ref stepTimer);
+
+            if (builder.Environment.IsDevelopment())
+            {
+                builder.Services.AddGrpc();
+                builder.Services.AddGrpcReflection();
+                builder.Services.AddSwagger();
+                builder.Services.AddOpenApi();
+                LogStep("gRPC configured", ref stepTimer);
+            }
+
             builder.Services.AddQueryHandlers();
-            builder.Services.AddPhysioBooConsumers(rabbitConfiguration.Host, rabbitConfiguration.Username, rabbitConfiguration.Password);
+            LogStep("Query handlers added", ref stepTimer);
+
             builder.Services.AddSettings<MailSettings>(builder.Configuration, "Email");
             builder.Services.AddSettings<ServerSettings>(builder.Configuration, "Server");
-            builder.Services.AddHostedService<WarmupConnection>();
             builder.Services.AddCSRFProtection(builder.Environment);
             builder.Services.AddEmail();
             builder.Services.AddServices();
+            builder.Services.AddPhysioBooConsumers(rabbitConfiguration.Host, rabbitConfiguration.Username, rabbitConfiguration.Password);
+            builder.Services.AddHostedService<WarmupConnection>();
 
             if (builder.Environment.IsProduction())
             {
@@ -74,41 +92,38 @@ namespace PhysioBoo.Presentation
             });
             #endregion
 
-            #region Rabbit MQ Config
+            #region Health Checks
             if (builder.Environment.IsProduction())
             {
-                builder.Services
-                    .AddHealthChecks()
-                    .AddDbContextCheck<ApplicationDbContext>()
-                    .AddApplicationStatus()
-                    .AddNpgSql(dbConnectionString!)
-                    .AddRedis(redisConnectionString!, "Redis")
-                    .AddRabbitMQ(async _ =>
-                    {
-                        ConnectionFactory factory = new ConnectionFactory
-                        {
-                            Uri = new Uri(rabbitConfiguration.ConnectionString)
-                        };
-
-                        return await factory.CreateConnectionAsync();
-                    }, name: "RabbitMQ");
+                builder.Services.AddHealthChecks()
+                    .AddNpgSql(dbConnectionString!, name: "Postgres", timeout: TimeSpan.FromSeconds(2))
+                    .AddApplicationStatus();
             }
             #endregion
 
             #region DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseLazyLoadingProxies();
                 options.UseNpgsql(dbConnectionString,
                     npgsqlOptions => npgsqlOptions
-                            .MigrationsAssembly("PhysioBoo.Infrastructure")
-                            .CommandTimeout(30)
-                            // Enable connection pooling
-                            .EnableRetryOnFailure(3)
+                        .MigrationsAssembly("PhysioBoo.Infrastructure")
+                        .CommandTimeout(30)
+                        .EnableRetryOnFailure(
+                            maxRetryCount: 3,
+                            maxRetryDelay: TimeSpan.FromSeconds(5),
+                            errorCodesToAdd: null)
+                        .MinBatchSize(1)
+                        .MaxBatchSize(100)
                 );
-                options.EnableSensitiveDataLogging();
-                options.EnableDetailedErrors();
-                options.LogTo(Console.WriteLine, LogLevel.Information);
+
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTrackingWithIdentityResolution);
+
+                if (builder.Environment.IsDevelopment())
+                {
+                    options.EnableSensitiveDataLogging();
+                    options.EnableDetailedErrors();
+                    options.LogTo(Console.WriteLine, LogLevel.Warning);
+                }
             }, ServiceLifetime.Scoped);
             #endregion
 
@@ -132,6 +147,13 @@ namespace PhysioBoo.Presentation
                 {
                     options.Configuration = builder.Configuration["RedisHostName"];
                     options.InstanceName = "PhysioBoo";
+                    options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions
+                    {
+                        ConnectTimeout = 3000,
+                        SyncTimeout = 3000,
+                        AbortOnConnectFail = false,
+                        ConnectRetry = 3
+                    };
                 });
             }
             else
@@ -143,49 +165,48 @@ namespace PhysioBoo.Presentation
             #region MediatR
             builder.Services.AddMediatR(cfg =>
             {
-                cfg.RegisterServicesFromAssemblies(typeof(Program).Assembly);
+                cfg.RegisterServicesFromAssemblies(
+                    typeof(Program).Assembly,
+                    typeof(ApplicationDbContext).Assembly,
+                    typeof(PhysioBoo.Application.AssemblyMarker).Assembly,
+                    typeof(PhysioBoo.Domain.AssemblyMarker).Assembly
+                );
             });
             #endregion
 
-            #region Logging
-            builder.Services.AddLogging(x => x.AddSimpleConsole(console =>
+            #region Mini Profiler & Logging 
+            if (builder.Environment.IsDevelopment())
             {
-                console.TimestampFormat = "[yyyy-MM-ddTHH:mm:ss.fff]";
-                console.IncludeScopes = true;
-            }));
-            #endregion
-
-            #region Mini Profiler
-            builder.Services.AddMemoryCache();
-            builder.Services.AddMiniProfiler(options =>
+                builder.Services.AddMemoryCache();
+                builder.Services.AddMiniProfiler(options =>
+                {
+                    options.RouteBasePath = "/profiler";
+                    options.Storage = new MemoryCacheStorage(
+                        new MemoryCache(new MemoryCacheOptions()), // IMemoryCache
+                        TimeSpan.FromMinutes(60)
+                    );
+                    options.TrackConnectionOpenClose = true;
+                }).AddEntityFramework(); // Mini Profiler
+                builder.Services.AddLogging(x => x.AddSimpleConsole(console =>
+                {
+                    console.TimestampFormat = "[yyyy-MM-ddTHH:mm:ss.fff]";
+                    console.IncludeScopes = true;
+                })); // Logging
+            }
+            else
             {
-                options.RouteBasePath = "/profiler";
-                options.Storage = new MemoryCacheStorage(
-                    new MemoryCache(new MemoryCacheOptions()), // IMemoryCache
-                    TimeSpan.FromMinutes(60)
-                );
-                options.TrackConnectionOpenClose = true;
-            }).AddEntityFramework();
+                builder.Services.AddLogging(x => x.AddJsonConsole()); // Logging
+            }
             #endregion
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+            System.Diagnostics.Stopwatch startupTimer = System.Diagnostics.Stopwatch.StartNew();
+
             WebApplication app = builder.Build();
+            LogStep("App built", ref stepTimer);
 
             app.MapDefaultEndpoints();
-
-            // Sync with newest migration
-            using (IServiceScope scope = app.Services.CreateScope())
-            {
-                IServiceProvider services = scope.ServiceProvider;
-                ApplicationDbContext appDbContext = services.GetRequiredService<ApplicationDbContext>();
-                EventStoreDbContext storeDbContext = services.GetRequiredService<EventStoreDbContext>();
-                DomainNotificationStoreDbContext domainStoreDbContext = services.GetRequiredService<DomainNotificationStoreDbContext>();
-
-                appDbContext.EnsureMigrationsApplied();
-                storeDbContext.EnsureMigrationsApplied();
-                domainStoreDbContext.EnsureMigrationsApplied();
-            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -212,49 +233,78 @@ namespace PhysioBoo.Presentation
             }
 
             #region Map endpoints
-            app.MapUserEndpoints();
-            app.MapPatientEndpoints();
-            app.MapDoctorEndpoints();
-            app.MapHospitalEndpoints();
-            app.MapHospitalGroupEndpoints();
-            app.MapAddressEndpoints();
-            app.MapProfileEndpoints();
-            app.MapPatientAllergyEndpoints();
-            app.MapPatientMedicalHistoryEndpoints();
-            app.MapAppointmentTypeEndpoints();
-            app.MapAppointmentEndpoints();
-            app.MapBillItemEndpoints();
-            app.MapBillEndpoints();
-            app.MapDepartmentEndpoints();
-            app.MapPaymentEndpoints();
-            app.MapInsuranceCompanyEndpoints();
-            app.MapManufacturerEndpoints();
-            app.MapSupplierEndpoints();
-            app.MapReviewEndpoints();
-            app.MapMedicineCategoryEndpoints();
-            app.MapMedicineEndpoints();
-            app.MapMedicineInventoryEndpoints();
-            app.MapMedicalRecordEndpoints();
-            app.MapPrescriptionEndpoints();
-            app.MapPrescriptionItemEndpoints();
-            app.MapImagingModalityEndpoints();
-            app.MapImagingOrderEndpoints();
-            app.MapImagingReportEndpoints();
-            app.MapLabOrderEndpoints();
-            app.MapLabOrderItemEndpoints();
-            app.MapLabReportEndpoints();
-            app.MapLabTestEndpoints();
-            app.MapLabTestCategoryEndpoints();
-            app.MapDoctorAwardEndpoints();
-            app.MapDoctorCertificationEndpoints();
-            app.MapDoctorEducationEndpoints();
-            app.MapDoctorLeaveEndpoints();
-            app.MapDoctorPublicationEndpoints();
-            app.MapDoctorScheduleEndpoints();
-            app.MapDoctorSpecialtyEndpoints();
-            app.MapDoctorWorkExperienceEndpoints();
-            app.MapHospitalStaffEndpoints();
-            app.MapMedicalSpecialtyEndpoints();
+            void MapHealthcareEndpoints(WebApplication app)
+            {
+                app.MapPatientEndpoints();
+                app.MapPatientAllergyEndpoints();
+                app.MapPatientMedicalHistoryEndpoints();
+                app.MapDoctorEndpoints();
+                app.MapDoctorAwardEndpoints();
+                app.MapDoctorCertificationEndpoints();
+                app.MapDoctorEducationEndpoints();
+                app.MapDoctorLeaveEndpoints();
+                app.MapDoctorPublicationEndpoints();
+                app.MapDoctorScheduleEndpoints();
+                app.MapDoctorSpecialtyEndpoints();
+                app.MapDoctorWorkExperienceEndpoints();
+            }
+            void MapFacilityEndpoints(WebApplication app)
+            {
+                app.MapHospitalEndpoints();
+                app.MapHospitalGroupEndpoints();
+                app.MapHospitalStaffEndpoints();
+                app.MapDepartmentEndpoints();
+            }
+            void MapClinicalEndpoints(WebApplication app)
+            {
+                app.MapAppointmentEndpoints();
+                app.MapAppointmentTypeEndpoints();
+                app.MapMedicalRecordEndpoints();
+                app.MapPrescriptionEndpoints();
+                app.MapPrescriptionItemEndpoints();
+            }
+            void MapDiagnosticEndpoints(WebApplication app)
+            {
+                app.MapImagingModalityEndpoints();
+                app.MapImagingOrderEndpoints();
+                app.MapImagingReportEndpoints();
+                app.MapLabOrderEndpoints();
+                app.MapLabOrderItemEndpoints();
+                app.MapLabReportEndpoints();
+                app.MapLabTestEndpoints();
+                app.MapLabTestCategoryEndpoints();
+            }
+            void MapPharmacyEndpoints(WebApplication app)
+            {
+                app.MapMedicineEndpoints();
+                app.MapMedicineCategoryEndpoints();
+                app.MapMedicineInventoryEndpoints();
+                app.MapManufacturerEndpoints();
+                app.MapSupplierEndpoints();
+            }
+            void MapFinancialEndpoints(WebApplication app)
+            {
+                app.MapBillEndpoints();
+                app.MapBillItemEndpoints();
+                app.MapPaymentEndpoints();
+                app.MapInsuranceCompanyEndpoints();
+            }
+            void MapCommonEndpoints(WebApplication app)
+            {
+                app.MapUserEndpoints();
+                app.MapAddressEndpoints();
+                app.MapProfileEndpoints();
+                app.MapReviewEndpoints();
+                app.MapMedicalSpecialtyEndpoints();
+            }
+
+            MapCommonEndpoints(app);
+            MapHealthcareEndpoints(app);
+            MapFacilityEndpoints(app);
+            MapClinicalEndpoints(app);
+            MapDiagnosticEndpoints(app);
+            MapPharmacyEndpoints(app);
+            MapFinancialEndpoints(app);
             #endregion
 
             app.MapHealthChecks("/healthz", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
@@ -265,7 +315,24 @@ namespace PhysioBoo.Presentation
             app.MapControllers();
             app.MapGrpcService<UsersApiImplementation>();
 
+            totalTimer.Stop();
+
+            app.Lifetime.ApplicationStarted.Register(() =>
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Application started successfully.");
+                Console.ResetColor();
+                Console.WriteLine($"Total startup time: {totalTimer.ElapsedMilliseconds} ms");
+                Console.WriteLine($"────────────────────────────────────────────");
+            });
+
             app.Run();
+        }
+
+        static void LogStep(string stepName, ref System.Diagnostics.Stopwatch timer)
+        {
+            Console.WriteLine($"[{timer.ElapsedMilliseconds,5}ms] {stepName}");
+            timer.Restart();
         }
     }
 }

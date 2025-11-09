@@ -6,10 +6,10 @@ using Npgsql;
 using NpgsqlTypes;
 using PhysioBoo.Domain.Entities;
 using PhysioBoo.Domain.Interfaces.Repositories;
+using PhysioBoo.SharedKernel.Common;
 using PhysioBoo.SharedKernel.Metadata;
 using PhysioBoo.SharedKernel.Results;
 using PhysioBoo.SharedKernel.Utils;
-using PhysioBoo.SharedKernel.ViewModels;
 using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -46,7 +46,7 @@ namespace PhysioBoo.Infrastructure.Repositories
                 query = query.Where(filter);
             }
 
-            foreach (var includeProperty in includeProperties.Split(
+            foreach (string includeProperty in includeProperties.Split(
                 new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(includeProperty);
@@ -77,10 +77,10 @@ namespace PhysioBoo.Infrastructure.Repositories
             string includeProperties = "",
             CancellationToken cancellationToken = default)
         {
-            var query = GetAllNoTracking(filter, orderBy, includeProperties);
+            IQueryable<TEntity> query = GetAllNoTracking(filter, orderBy, includeProperties);
 
-            var totalCount = await query.CountAsync(cancellationToken);
-            var items = await query
+            int totalCount = await query.CountAsync(cancellationToken);
+            List<TEntity> items = await query
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);
@@ -97,11 +97,11 @@ namespace PhysioBoo.Infrastructure.Repositories
         {
             try
             {
-                var metadata = GetTableMetadata<T>();
-                var sql = GenerateInsertSql<T>(metadata, returnsKey: true);
+                TableMetadata metadata = GetTableMetadata<T>();
+                string sql = GenerateInsertSql<T>(metadata, returnsKey: true);
 
-                using var connection = new NpgsqlConnection(_connectionString);
-                var parameters = BuildParameters(entity, metadata);
+                using NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+                DynamicParameters parameters = BuildParameters(entity, metadata);
 
                 TKey id = await connection.QuerySingleAsync<TKey>(sql, parameters);
 
@@ -118,11 +118,11 @@ namespace PhysioBoo.Infrastructure.Repositories
         /// </summary>
         public async Task InsertAsync<T>(T entity) where T : class
         {
-            var metadata = GetTableMetadata<T>();
-            var sql = GenerateInsertSql<T>(metadata, returnsKey: false);
+            TableMetadata metadata = GetTableMetadata<T>();
+            string sql = GenerateInsertSql<T>(metadata, returnsKey: false);
 
-            using var connection = new NpgsqlConnection(_connectionString);
-            var parameters = BuildParameters(entity, metadata);
+            using NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
+            DynamicParameters parameters = BuildParameters(entity, metadata);
 
             await connection.ExecuteAsync(sql, parameters);
         }
@@ -136,15 +136,15 @@ namespace PhysioBoo.Infrastructure.Repositories
         /// </summary>
         public async Task<int> InsertBatchAsync<T>(IEnumerable<T> entities) where T : class
         {
-            var entitiesList = entities.ToList();
+            List<T> entitiesList = entities.ToList();
             if (!entitiesList.Any()) return 0;
 
-            var metadata = GetTableMetadata<T>();
-            var sql = GenerateInsertSql<T>(metadata, returnsKey: false);
+            TableMetadata metadata = GetTableMetadata<T>();
+            string sql = GenerateInsertSql<T>(metadata, returnsKey: false);
 
-            using var connection = new NpgsqlConnection(_connectionString);
+            using NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
 
-            var parametersList = entitiesList.Select(entity => BuildParameters(entity, metadata));
+            IEnumerable<DynamicParameters> parametersList = entitiesList.Select(entity => BuildParameters(entity, metadata));
 
             return await connection.ExecuteAsync(sql, parametersList);
         }
@@ -158,36 +158,36 @@ namespace PhysioBoo.Infrastructure.Repositories
         /// </summary>
         public async Task<int> BulkInsertAsync<T>(IEnumerable<T> entities) where T : class
         {
-            var entitiesList = entities.ToList();
+            List<T> entitiesList = entities.ToList();
             if (!entitiesList.Any()) return 0;
 
-            var metadata = GetTableMetadata<T>();
+            TableMetadata metadata = GetTableMetadata<T>();
 
-            using var connection = new NpgsqlConnection(_connectionString);
+            using NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            using var transaction = await connection.BeginTransactionAsync();
+            using NpgsqlTransaction transaction = await connection.BeginTransactionAsync();
 
             try
             {
                 // Create staging table
-                var createStagingTableSql = GenerateCreateStagingTableSql(metadata);
+                string createStagingTableSql = GenerateCreateStagingTableSql(metadata);
                 await connection.ExecuteAsync(createStagingTableSql, transaction: transaction);
 
                 // COPY data to staging table using text format
-                var copyCommand = GenerateCopyCommand(metadata);
-                using (var writer = await connection.BeginTextImportAsync(copyCommand))
+                string copyCommand = GenerateCopyCommand(metadata);
+                using (TextWriter writer = await connection.BeginTextImportAsync(copyCommand))
                 {
-                    foreach (var entity in entitiesList)
+                    foreach (T? entity in entitiesList)
                     {
-                        var csvLine = GenerateCsvLine(entity, metadata);
+                        string csvLine = GenerateCsvLine(entity, metadata);
                         await writer.WriteLineAsync(csvLine);
                     }
                 } // TextWriter disposal completes the COPY operation
 
                 // Move from staging to main table
-                var moveSql = GenerateMoveStagingToMainSql(metadata);
-                var insertedCount = await connection.QuerySingleAsync<int>(moveSql, transaction: transaction);
+                string moveSql = GenerateMoveStagingToMainSql(metadata);
+                int insertedCount = await connection.QuerySingleAsync<int>(moveSql, transaction: transaction);
 
                 // Clean up staging table
                 await connection.ExecuteAsync($"DROP TABLE {metadata.StagingTableName}", transaction: transaction);
@@ -225,7 +225,7 @@ namespace PhysioBoo.Infrastructure.Repositories
         {
             IQueryable<TEntity> query = DbSet;
 
-            foreach (var includeProperty in includeProperties.Split(
+            foreach (string includeProperty in includeProperties.Split(
                 new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(includeProperty);
@@ -266,29 +266,29 @@ namespace PhysioBoo.Infrastructure.Repositories
             CancellationToken cancellationToken = default)
             where T : class
         {
-            var results = new List<T>();
-            using var connection = new NpgsqlConnection(_connectionString);
+            List<T> results = new List<T>();
+            using NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
 
             // Build parameter list with proper PostgreSQL named parameter syntax
-            var parameterList = string.Join(", ", parameters.Keys.Select((k, i) => $"{k} => ${i + 1}"));
-            var sql = $"SELECT * FROM {functionName}({parameterList})";
+            string parameterList = string.Join(", ", parameters.Keys.Select((k, i) => $"{k} => ${i + 1}"));
+            string sql = $"SELECT * FROM {functionName}({parameterList})";
 
-            using var command = new NpgsqlCommand(sql, connection);
+            using NpgsqlCommand command = new NpgsqlCommand(sql, connection);
 
             // Add parameters correctly - don't use $ in parameter name, only in SQL
             int paramIndex = 1;
-            foreach (var param in parameters.Values)
+            foreach (object param in parameters.Values)
             {
                 // Parameter name should NOT include the $, only the SQL should
                 command.Parameters.Add(new NpgsqlParameter { Value = param ?? DBNull.Value });
                 paramIndex++;
             }
 
-            using var reader = await command.ExecuteReaderAsync(cancellationToken);
+            using NpgsqlDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
             while (await reader.ReadAsync(cancellationToken))
             {
-                var item = mapFunction(reader);
+                T item = mapFunction(reader);
                 results.Add(item);
             }
             return results;
@@ -300,14 +300,14 @@ namespace PhysioBoo.Infrastructure.Repositories
             bool hardDelete = false,
             CancellationToken cancellationToken = default)
         {
-            var entities = await DbSet.Where(predicate).ToListAsync(cancellationToken);
+            List<TEntity> entities = await DbSet.Where(predicate).ToListAsync(cancellationToken);
 
             if (hardDelete)
             {
                 DbSet.RemoveRange(entities);
             }
 
-            foreach (var entity in entities)
+            foreach (TEntity? entity in entities)
             {
                 entity.Delete();
             }
@@ -327,7 +327,7 @@ namespace PhysioBoo.Infrastructure.Repositories
             TUpdateDto updateDto,
             CancellationToken cancellationToken = default)
         {
-            var setPropertiesExpression = EFCoreUpdateHelper
+            Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setPropertiesExpression = EFCoreUpdateHelper
                 .BuildSetPropertiesExpression<TEntity, TUpdateDto>(updateDto);
 
             return await DbSet
@@ -362,18 +362,18 @@ namespace PhysioBoo.Infrastructure.Repositories
             TimeSpan? expiration = null,
             CancellationToken cancellationToken = default)
         {
-            var cacheKey = $"{typeof(TEntity).Name}:{id}";
+            string cacheKey = $"{typeof(TEntity).Name}:{id}";
 
             if (cache.TryGetValue(cacheKey, out TEntity? cachedEntity))
             {
                 return cachedEntity;
             }
 
-            var entity = await GetByIdAsync(id, cancellationToken: cancellationToken);
+            TEntity? entity = await GetByIdAsync(id, cancellationToken: cancellationToken);
 
             if (entity != null)
             {
-                var options = new MemoryCacheEntryOptions
+                MemoryCacheEntryOptions options = new MemoryCacheEntryOptions
                 {
                     AbsoluteExpirationRelativeToNow = expiration ?? TimeSpan.FromMinutes(15)
                 };
@@ -415,19 +415,19 @@ namespace PhysioBoo.Infrastructure.Repositories
         #region Metadata and SQL Generation
         private TableMetadata GetTableMetadata<T>()
         {
-            var type = typeof(T);
+            Type type = typeof(T);
 
-            if (_metadataCache.TryGetValue(type, out var cachedMetadata))
+            if (_metadataCache.TryGetValue(type, out TableMetadata? cachedMetadata))
                 return cachedMetadata;
 
-            var tableAttribute = type.GetCustomAttribute<TableAttribute>();
-            var tableName = tableAttribute?.Name ?? TextHelper.Pluralize(type.Name);
+            TableAttribute? tableAttribute = type.GetCustomAttribute<TableAttribute>();
+            string tableName = tableAttribute?.Name ?? TextHelper.Pluralize(type.Name);
 
-            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            List<PropertyInfo> properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => SqlHelper.ShouldIncludeProperty(p))
                 .ToList();
 
-            var columns = properties.Select(p => new ColumnMetadata
+            List<ColumnMetadata> columns = properties.Select(p => new ColumnMetadata
             {
                 PropertyName = p.Name,
                 ColumnName = p.GetCustomAttribute<ColumnAttribute>()?.Name ?? p.Name,
@@ -438,7 +438,7 @@ namespace PhysioBoo.Infrastructure.Repositories
                 Property = p
             }).ToList();
 
-            var metadata = new TableMetadata
+            TableMetadata metadata = new TableMetadata
             {
                 TableName = tableName,
                 StagingTableName = $"{tableName}_staging_{Guid.NewGuid():N}",
@@ -453,10 +453,10 @@ namespace PhysioBoo.Infrastructure.Repositories
 
         private string GenerateInsertSql<T>(TableMetadata metadata, bool returnsKey)
         {
-            var columns = string.Join(", ", metadata.InsertableColumns.Select(c => QuoteIdentifier(c.ColumnName)));
-            var parameters = string.Join(", ", metadata.InsertableColumns.Select(c => $"@{c.PropertyName}"));
+            string columns = string.Join(", ", metadata.InsertableColumns.Select(c => QuoteIdentifier(c.ColumnName)));
+            string parameters = string.Join(", ", metadata.InsertableColumns.Select(c => $"@{c.PropertyName}"));
 
-            var sql = $"INSERT INTO {QuoteIdentifier(metadata.TableName)} ({columns}) VALUES ({parameters})";
+            string sql = $"INSERT INTO {QuoteIdentifier(metadata.TableName)} ({columns}) VALUES ({parameters})";
 
             if (returnsKey && metadata.KeyColumn != null)
             {
@@ -468,12 +468,12 @@ namespace PhysioBoo.Infrastructure.Repositories
 
         private DynamicParameters BuildParameters<T>(T entity, TableMetadata metadata)
         {
-            var parameters = new DynamicParameters();
+            DynamicParameters parameters = new DynamicParameters();
 
-            foreach (var column in metadata.InsertableColumns)
+            foreach (ColumnMetadata column in metadata.InsertableColumns)
             {
-                var value = column.Property?.GetValue(entity);
-                var columnName = column.ColumnName;
+                object? value = column.Property?.GetValue(entity);
+                string columnName = column.ColumnName;
 
                 // Handle null values first
                 if (value == null)
@@ -482,12 +482,12 @@ namespace PhysioBoo.Infrastructure.Repositories
                     continue;
                 }
 
-                var valueType = value.GetType();
+                Type valueType = value.GetType();
 
                 // Handle Jsonb types
                 if (SqlHelper.IsJsonbType(column))
                 {
-                    var jsonString = value is string s ? s : JsonSerializer.Serialize(value);
+                    string jsonString = value is string s ? s : JsonSerializer.Serialize(value);
                     parameters.Add($"@{columnName}", new NpgsqlParameter
                     {
                         ParameterName = $"@{columnName}",
@@ -516,13 +516,13 @@ namespace PhysioBoo.Infrastructure.Repositories
                 {
                     try
                     {
-                        var npgsqlDbType = SqlHelper.GetArrayNpgsqlDbType(valueType);
+                        NpgsqlDbType npgsqlDbType = SqlHelper.GetArrayNpgsqlDbType(valueType);
 
                         // For empty arrays, ensure we pass the correct empty array type
                         if (SqlHelper.IsEmptyArray(value))
                         {
-                            var elementType = SqlHelper.GetArrayElementType(valueType);
-                            var emptyArray = SqlHelper.CreateTypedEmptyArray(elementType);
+                            Type? elementType = SqlHelper.GetArrayElementType(valueType);
+                            object emptyArray = SqlHelper.CreateTypedEmptyArray(elementType);
                             parameters.AddNpgsql($"@{columnName}", emptyArray, npgsqlDbType);
                         }
                         else
@@ -533,14 +533,14 @@ namespace PhysioBoo.Infrastructure.Repositories
                     catch (Exception)
                     {
                         // Fallback: convert array to PostgreSQL text format
-                        var arrayText = SqlHelper.ConvertArrayToPostgreSqlFormat(value);
+                        string arrayText = SqlHelper.ConvertArrayToPostgreSqlFormat(value);
                         parameters.Add($"@{columnName}", arrayText, DbType.String);
                     }
                     continue;
                 }
 
                 // Handle regular types
-                var dbType = SqlHelper.GetDbTypeForValue(value);
+                DbType? dbType = SqlHelper.GetDbTypeForValue(value);
                 parameters.Add($"@{columnName}", value, dbType);
             }
 
@@ -557,7 +557,7 @@ namespace PhysioBoo.Infrastructure.Repositories
 
         private string GenerateMoveStagingToMainSql(TableMetadata metadata)
         {
-            var columns = string.Join(", ", metadata.InsertableColumns.Select(c => QuoteIdentifier(c.ColumnName)));
+            string columns = string.Join(", ", metadata.InsertableColumns.Select(c => QuoteIdentifier(c.ColumnName)));
             return $@"
             WITH moved AS (
                 INSERT INTO {QuoteIdentifier(metadata.TableName)} ({columns}) 
@@ -569,7 +569,7 @@ namespace PhysioBoo.Infrastructure.Repositories
 
         private string GenerateCopyCommand(TableMetadata metadata)
         {
-            var columns = string.Join(", ", metadata.InsertableColumns.Select(c => QuoteIdentifier(c.ColumnName)));
+            string columns = string.Join(", ", metadata.InsertableColumns.Select(c => QuoteIdentifier(c.ColumnName)));
             return $"COPY {QuoteIdentifier(metadata.StagingTableName)} ({columns}) FROM STDIN (FORMAT CSV, DELIMITER ',', NULL '')";
         }
 

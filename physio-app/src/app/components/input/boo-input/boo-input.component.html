@@ -1,6 +1,6 @@
 <p class="group flex w-full gap-x-2.5 mb-0">
   <label
-    [for]="id || name"
+    (click)="focusInput()"
     [ngClass]="{
       'flex absolute items-center mb-0 z-[1] transition-all duration-300 group-focus-within:translate-x-5 group-focus-within:opacity-0 group-focus-within:visibility-hidden cursor-text': true,
       'px-3 h-10': size === 'small',
@@ -8,11 +8,13 @@
       'px-7 h-14.5': size === 'large'
     }"
     [style.color]="placeholderColor"
+    *ngIf="model === ''"
   >
     {{ label }} <span *ngIf="required" class="ml-1">*</span>
   </label>
   <span class="inline-flex w-auto flex-col relative flex-auto">
     <input
+      #inputElement
       [id]="id || name"
       [name]="name"
       [type]="type"
@@ -30,5 +32,6 @@
       [style.border-width.px]="borderWidth"
       [style.border-color]="borderColor"
     />
+    <ng-content select="[endfix]"></ng-content>
   </span>
 </p>

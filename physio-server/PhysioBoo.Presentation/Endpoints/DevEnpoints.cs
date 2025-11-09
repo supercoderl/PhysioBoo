@@ -6,17 +6,17 @@ namespace PhysioBoo.Presentation.Endpoints
     {
         public static void MapDevEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("api/devs")
+            RouteGroupBuilder group = app.MapGroup("api")
                 .WithTags("Cookies")
                 .WithOpenApi();
 
-            // Get cookies
+            #region Get cookies
             group.MapPost("/cookies", (
                 HttpRequest request,
                 CancellationToken cancellationToken
             ) =>
             {
-                var cookies = request.Cookies;
+                IRequestCookieCollection cookies = request.Cookies;
                 return Results.Ok(new ResponseMessage<IRequestCookieCollection>
                 {
                     Success = true,
@@ -26,14 +26,15 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Get all cookies from request")
             .Produces<ResponseMessage<IRequestCookieCollection>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<IRequestCookieCollection>>(StatusCodes.Status400BadRequest);
+            #endregion
 
-            // Check is authenticated
+            #region Check is authenticated
             group.MapPost("/is-authenticated", (
                 HttpContext context,
                 CancellationToken cancellationToken
             ) =>
             {
-                var isAuthenticated = context.User.Identity?.IsAuthenticated;
+                bool? isAuthenticated = context.User.Identity?.IsAuthenticated;
 
                 return Results.Ok(new ResponseMessage<string>
                 {
@@ -44,6 +45,25 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Check user is authenticated or not")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            #endregion
+
+            #region Check
+            // Get cookies
+            group.MapPost("/check", (
+                HttpRequest request,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                return Results.Ok(new ResponseMessage<string>
+                {
+                    Success = true,
+                    Data = "Application started successfully!"
+                });
+            }).WithName("Check")
+            .WithSummary("Check Application Is Running")
+            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            #endregion
         }
     }
 }

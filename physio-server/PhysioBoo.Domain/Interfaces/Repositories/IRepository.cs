@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Caching.Memory;
 using Npgsql;
 using PhysioBoo.Domain.Entities;
+using PhysioBoo.SharedKernel.Common;
 using PhysioBoo.SharedKernel.Results;
-using PhysioBoo.SharedKernel.ViewModels;
 using System.Linq.Expressions;
 
 namespace PhysioBoo.Domain.Interfaces.Repositories
@@ -20,19 +20,23 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
         Task InsertAsync<T>(T entity) where T : class;
         #endregion
 
-        #region Get Methods
+        #region Get All
         IQueryable<TEntity> GetAll(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = ""
         );
+        #endregion
 
+        #region Get All No Tracking
         IQueryable<TEntity> GetAllNoTracking(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = ""
         );
+        #endregion
 
+        #region Get Paged Async
         Task<PagedResult<TEntity>> GetPagedAsync(
             int pageNumber = 1,
             int pageSize = 10,
@@ -41,7 +45,9 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
             string includeProperties = "",
             CancellationToken cancellationToken = default
         );
+        #endregion
 
+        #region Get By Id
         Task<TEntity?> GetByIdAsync(
             Guid id,
             string includeProperties = "",

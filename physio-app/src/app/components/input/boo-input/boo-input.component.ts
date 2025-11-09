@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { SharedModule } from '../../../shared/shared-imports';
 
 @Component({
@@ -10,6 +10,7 @@ import { SharedModule } from '../../../shared/shared-imports';
   templateUrl: './boo-input.component.html'
 })
 export class BooInputComponent {
+  // #region Inputs, Outputs, Properties
   @Input() label: string = '';
   @Input() required: boolean = false;
   @Input() id: string = '';
@@ -23,4 +24,12 @@ export class BooInputComponent {
   @Input() borderWidth: number = 0;
   @Input() borderColor: string = '#fff';
   @Input() placeholderColor: string = '#1d3349';
+  @ViewChild('inputElement') inputElement!: ElementRef;
+  // #endregion
+
+  // #region Events
+  focusInput(): void {
+    this.inputElement.nativeElement.focus();
+  }
+  // #endregion
 }

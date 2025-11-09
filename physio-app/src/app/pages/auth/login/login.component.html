@@ -80,9 +80,13 @@
                 <div class="mb-4">
                   <label
                     class="text-xs14 font-medium text-primary mb-1 inline-block"
-                  >{{state === 'phone' ? 'Phone number' : 'E-mail'}}</label>
+                    >{{ state === "phone" ? "Phone number" : "E-mail" }}</label
+                  >
                   <boo-input
-                    [label]="'Input your ' + (state === 'phone' ? 'phone number' : 'e-mail')"
+                    [label]="
+                      'Input your ' +
+                      (state === 'phone' ? 'phone number' : 'e-mail')
+                    "
                     [id]="state === 'phone' ? 'Phone number' : 'E-mail'"
                     [name]="state === 'phone' ? 'Phone number' : 'E-mail'"
                     [radius]="5"
@@ -91,6 +95,7 @@
                     borderColor="#e6e8ee"
                     size="small"
                     placeholderColor="rgba(0, 0, 0, 0.4)"
+                    model="admin@gmail.com"
                   />
                 </div>
                 <div class="mb-4">
@@ -107,14 +112,26 @@
                     </a>
                   </div>
                   <div class="relative">
-                    <input
-                      class="text-xs14 border border-solid border-borderGray text-primary min-h-9.5 bg-white leading-[1.6] rounded-[5px] py-1.75 px-3.75 transition-smooth block w-full"
-                      type="password"
-                    />
-                    <lucide-angular
-                      [img]="EyeOff"
-                      class="w-4 absolute top-1/2 -translate-y-1/2 right-2.5 stroke-brandDark cursor-pointer"
-                    />
+                    <boo-input
+                      label="Input your password"
+                      id="password"
+                      name="password"
+                      [radius]="5"
+                      backgroundColor="white"
+                      [borderWidth]="1"
+                      borderColor="#e6e8ee"
+                      size="small"
+                      placeholderColor="rgba(0, 0, 0, 0.4)"
+                      model="Password123!"
+                      [type]="type"
+                    >
+                      <boo-icon
+                        [name]="type === 'text' ? 'eye' : 'eye-off'"
+                        class="leading-none absolute top-1/2 -translate-y-1/2 right-2.5 stroke-brandDark cursor-pointer"
+                        endfix
+                        [onClick]="onChangeType"
+                      ></boo-icon>
+                    </boo-input>
                   </div>
                 </div>
                 <div class="mb-4">
@@ -143,12 +160,14 @@
                   </div>
                 </div>
                 <div class="mb-4">
-                  <button
-                    class="bg-[linear-gradient(90.08deg,#0e82fd_0.09%,#06aed4_70.28%)] text-white relative overflow-hidden z-[1] cursor-pointer rounded-[44px] py-2 px-3.4 font-medium w-full inline-block"
-                    type="submit"
+                  <boo-button
+                    label="Login"
+                    classname="!w-full"
+                    [radius]="44"
+                    [loading]="(loadingSrv.loading$ | async)"
+                    [onClick]="login"
                   >
-                    Log in
-                  </button>
+                  </boo-button>
                 </div>
                 <div class="text-base my-4 py-2.5 relative">
                   <span class="bg-borderGray h-[1px] block"></span>

@@ -1,7 +1,8 @@
 <button
   type="submit"
-  class="text-white border-0 overflow-hidden z-[1] cursor-pointer transition-smooth inline-flex items-center justify-center"
+  [class]="classname"
   [ngClass]="{
+    'relative text-white border-0 overflow-hidden z-[1] cursor-pointer transition-smooth inline-flex items-center justify-center': true,
     'py-[0.315rem] px-4 text-[0.75rem] w-32': size === 'small',
     'py-[0.425rem] px-6.25 text-[0.813rem] w-37.5': size === 'medium',
     'py-[0.6rem] px-8 text-[0.875rem] w-44': size === 'large'
@@ -10,7 +11,12 @@
   [disabled]="disabled"
   [style.borderRadius.px]="radius"
   [style.background]="background"
+  (click)="onClick($event)"
 >
   <ng-content *ngIf="label === ''"></ng-content>
   <span *ngIf="label !== ''">{{ label }}</span>
+  <loading-spinner
+    [size]="20"
+    *ngIf="loading && loading === true"
+  ></loading-spinner>
 </button>

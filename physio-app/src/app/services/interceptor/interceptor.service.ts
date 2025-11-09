@@ -1,13 +1,16 @@
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, catchError, filter, map, mergeMap, switchMap, take, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, filter, switchMap, take, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
 import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InterceptorService implements HttpInterceptor {
+  private readonly baseUrl = environment.API_URL;
+  
   constructor(
     private router: Router,
     private authService: AuthService
@@ -18,9 +21,17 @@ export class InterceptorService implements HttpInterceptor {
 
     }
 
-    return next.handle(request).pipe(catchError((err: HttpErrorResponse) => {
+    if (/^https?:\/\//i.test(request.url)) {
+      return next.handle(request);
+    }
+
+    const apiReq = request.clone({
+      url: `${this.baseUrl}${request.url.startsWith('/') ? '' : '/'}${request.url}`
+    });
+
+    return next.handle(apiReq).pipe(catchError((err: HttpErrorResponse) => {
       if (err.status === 401) {
-        return this.handle401Error(request, next);
+        return this.handle401Error(apiReq, next);
       }
       switch (err.status) {
         case 403:

@@ -2,7 +2,7 @@ import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { registerLocaleData } from '@angular/common';
-import { provideHttpClient } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import en from '@angular/common/locales/en';
 import { FormsModule } from '@angular/forms';
 import { provideClientHydration } from '@angular/platform-browser';
@@ -11,6 +11,8 @@ import { LucideAngularModule } from 'lucide-angular';
 import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
 import { routes } from './app.routes';
 import { provideIcons } from './icon.config';
+import { InterceptorService } from './services/interceptor/interceptor.service';
+import { HttpLoadingInterceptor } from './services/interceptor/loading-interceptor.service';
 import { SHARED_LUCIDE_ICONS } from './shared/shared-providers';
 
 registerLocaleData(en);
@@ -22,7 +24,9 @@ export const appConfig: ApplicationConfig = {
     provideNzI18n(en_US),
     importProvidersFrom([FormsModule, LucideAngularModule.pick(SHARED_LUCIDE_ICONS)]),
     provideAnimationsAsync(),
-    provideHttpClient(),
-    provideIcons()
+    provideHttpClient(withInterceptorsFromDi()),
+    provideIcons(),
+    { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: HttpLoadingInterceptor, multi: true }
   ]
 };

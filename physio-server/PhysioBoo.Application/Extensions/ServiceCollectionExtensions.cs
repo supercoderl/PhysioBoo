@@ -38,11 +38,14 @@ using PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy;
 using PhysioBoo.Application.Commands.PatientMedicalHistories.CreatePatientMedicalHistory;
 using PhysioBoo.Application.Commands.Patients.CreatePatient;
 using PhysioBoo.Application.Commands.Payments.CreatePayment;
+using PhysioBoo.Application.Commands.Permissions.CreatePermission;
 using PhysioBoo.Application.Commands.PrescriptionItems.CreatePrescriptionItem;
 using PhysioBoo.Application.Commands.Prescriptions.CreatePrescription;
 using PhysioBoo.Application.Commands.Profiles.CreateProfile;
 using PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken;
 using PhysioBoo.Application.Commands.Reviews;
+using PhysioBoo.Application.Commands.Roles.AssignPermissionToRole;
+using PhysioBoo.Application.Commands.Roles.CreateRole;
 using PhysioBoo.Application.Commands.Suppliers.CreateSupplier;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
 using PhysioBoo.Application.Commands.Users.CreateUser;
@@ -58,13 +61,17 @@ using PhysioBoo.Application.Commands.Users.VerifyUser;
 using PhysioBoo.Application.EventHandlers.Fanout;
 using PhysioBoo.Application.EventHandlers.User;
 using PhysioBoo.Application.Interfaces;
+using PhysioBoo.Application.Queries.Permissions.GetAll;
 using PhysioBoo.Application.Queries.RefreshTokens.GetByUserId;
+using PhysioBoo.Application.Queries.Roles.GetAll;
 using PhysioBoo.Application.Queries.Users.GetAll;
 using PhysioBoo.Application.Queries.Users.GetByEmail;
 using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
 using PhysioBoo.Application.Services;
+using PhysioBoo.Application.ViewModels.Permissions;
+using PhysioBoo.Application.ViewModels.Roles;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Entities.Core;
@@ -112,6 +119,12 @@ namespace PhysioBoo.Application.Extensions
             // Refresh Token
             services.AddScoped<IRequestHandler<GetRefreshTokensByUserIdQuery, List<RefreshToken>>, GetRefreshTokensByUserIdQueryHandler>();
 
+            // Role
+            services.AddScoped<IRequestHandler<GetAllRolesQuery, PagedResult<RoleViewModel>>, GetAllRolesQueryHandler>();
+
+            // Permission
+            services.AddScoped<IRequestHandler<GetAllPermissionsQuery, PagedResult<PermissionViewModel>>, GetAllPermissionsQueryHandler>();
+
             return services;
         }
 
@@ -146,6 +159,9 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<ResetPasswordCommand>, ResetPasswordCommandHandler>();
             services.AddScoped<IRequestHandler<RefreshTokenCommand>, RefreshTokenCommandHandler>();
             services.AddScoped<IRequestHandler<CreateRefreshTokenCommand>, CreateRefreshTokenCommandHandler>();
+            services.AddScoped<IRequestHandler<CreateRoleCommand>, CreateRoleCommandHandler>();
+            services.AddScoped<IRequestHandler<CreatePermissionCommand>, CreatePermissionCommandHandler>();
+            services.AddScoped<IRequestHandler<AssignPermissionToRoleCommand>, AssignPermissionToRoleCommandHandler>();
             #endregion
 
             #region Patient Flow

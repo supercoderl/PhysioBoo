@@ -32,7 +32,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
         {
             if (!await TestValidityAsync(request)) return;
 
-            var user = await _userRepository.GetByEmailAsync(request.Email);
+            Domain.Entities.Core.User? user = await _userRepository.GetByEmailAsync(request.Email);
 
             if (user == null)
             {
@@ -47,7 +47,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
 
             if (!await CheckIsLockedUser(user, request)) return;
 
-            var validationResult = await ValidateUser(user, request);
+            (bool IsValid, bool UpdateUser) validationResult = await ValidateUser(user, request);
 
             if (!validationResult.IsValid)
             {
@@ -59,17 +59,16 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
                 return;
             }
 
-            var (accessToken, refreshToken) = TokenHelper.BuildAuthToken(
+            (string accessToken, string refreshToken) = TokenHelper.BuildAuthToken(
                 new Dictionary<string, string>
                 {
                     ["Email"] = user.Email,
-                    ["Role"] = user.Role.ToString(),
                     ["Id"] = user.Id.ToString(),
                     ["Name"] = user.Email.Split("@")[0]
                 }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes
             );
 
-            var updateResult = await _userRepository.UpdateLastLoginAsync(user.Id, TimeZoneHelper.GetLocalTimeNow());
+            bool updateResult = await _userRepository.UpdateLastLoginAsync(user.Id, TimeZoneHelper.GetLocalTimeNow());
 
             if (!updateResult)
             {

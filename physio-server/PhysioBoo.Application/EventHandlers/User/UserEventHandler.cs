@@ -50,7 +50,7 @@ namespace PhysioBoo.Application.EventHandlers.User
 
         public async Task Handle(UserLoggedEvent notification, CancellationToken cancellationToken)
         {
-            var response = _httpContextAccessor.HttpContext?.Response;
+            HttpResponse? response = _httpContextAccessor.HttpContext?.Response;
             AuthHelper.SetTokenCookie(response, "access_token", notification.AccessToken, _user.TimeZoneId);
             AuthHelper.SetTokenCookie(response, "refresh_token", notification.RefreshToken, _user.TimeZoneId);
 
@@ -59,7 +59,7 @@ namespace PhysioBoo.Application.EventHandlers.User
 
         public async Task Handle(UserLoggedOutEvent notification, CancellationToken cancellationToken)
         {
-            var response = _httpContextAccessor.HttpContext?.Response;
+            HttpResponse? response = _httpContextAccessor.HttpContext?.Response;
             AuthHelper.RemoveTokenCookie(response, "access_token");
             AuthHelper.RemoveTokenCookie(response, "refresh_token");
 
@@ -68,10 +68,10 @@ namespace PhysioBoo.Application.EventHandlers.User
 
         public async Task Handle(UserVerifiedEvent notification, CancellationToken cancellationToken)
         {
-            var token = await _bus.QueryAsync(new GetVerificationTokenByTokenQuery(notification.Token));
+            ViewModels.VerificationTokens.VerificationTokenViewModel? token = await _bus.QueryAsync(new GetVerificationTokenByTokenQuery(notification.Token));
             if (token == null) return;
 
-            var type = Enum.Parse<VerificationType>(notification.Type);
+            VerificationType type = Enum.Parse<VerificationType>(notification.Type);
 
             switch (type)
             {
@@ -86,11 +86,10 @@ namespace PhysioBoo.Application.EventHandlers.User
                     );
                     break;
                 case VerificationType.PasswordReset:
-                    var (accessToken, refreshToken) = TokenHelper.BuildAuthToken(
+                    (string accessToken, string refreshToken) = TokenHelper.BuildAuthToken(
                         new Dictionary<string, string>
                         {
                             ["Email"] = token.UserEmail,
-                            ["Role"] = token.UserRole.ToString(),
                             ["Id"] = token.UserId.ToString(),
                             ["Name"] = token.UserEmail.Split("@")[0]
                         }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes

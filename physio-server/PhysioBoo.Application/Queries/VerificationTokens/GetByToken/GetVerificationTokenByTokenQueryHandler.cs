@@ -29,17 +29,17 @@ namespace PhysioBoo.Application.Queries.VerificationTokens.GetByToken
 
         public async Task<VerificationTokenViewModel?> Handle(GetVerificationTokenByTokenQuery request, CancellationToken cancellationToken)
         {
-            var parameters = new Dictionary<string, object>
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 ["p_token"] = request.Token
             };
 
-            var result = await _verificationTokenRepository.ExecutePostgresFunctionAsync<VerificationToken>(
+            List<VerificationToken> result = await _verificationTokenRepository.ExecutePostgresFunctionAsync<VerificationToken>(
                 "get_tokens_dynamic",
                 parameters,
                 reader =>
                 {
-                    var token = new Domain.Entities.Core.VerificationToken(
+                    VerificationToken token = new Domain.Entities.Core.VerificationToken(
                         reader.GetFieldValue<Guid>("Id"),
                         reader.GetFieldValue<Guid>("UserId"),
                         reader.GetString("Token"),
@@ -53,7 +53,6 @@ namespace PhysioBoo.Application.Queries.VerificationTokens.GetByToken
                         !reader.IsDBNull("UserEmail") ? reader.GetString("UserEmail") : string.Empty,
                         string.Empty,
                         string.Empty,
-                        !reader.IsDBNull("UserRole") ? Enum.Parse<Role>(reader.GetString("UserRole")) : Role.Patient,
                         null
                     ));
 

@@ -1,6 +1,5 @@
 ﻿using Npgsql;
 using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Infrastructure.Database;
 using System.Data;
@@ -16,12 +15,12 @@ namespace PhysioBoo.Infrastructure.Repositories
 
         public async Task<RefreshToken?> GetByTokenAsync(string token)
         {
-            var parameters = new Dictionary<string, object>
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 ["p_token"] = token
             };
 
-            var result = await ExecutePostgresFunctionAsync<RefreshToken>(
+            List<RefreshToken> result = await ExecutePostgresFunctionAsync<RefreshToken>(
                 "get_refresh_tokens_dynamic",
                 parameters,
                 reader => MapRefreshToken(reader)
@@ -32,7 +31,7 @@ namespace PhysioBoo.Infrastructure.Repositories
 
         private static RefreshToken MapRefreshToken(NpgsqlDataReader reader)
         {
-            var refreshToken = new RefreshToken(
+            RefreshToken refreshToken = new RefreshToken(
                 reader.GetFieldValue<Guid>("Id"),
                 reader.GetGuid("UserId"),
                 reader.GetString("Token"),
@@ -45,7 +44,6 @@ namespace PhysioBoo.Infrastructure.Repositories
                 reader.IsDBNull("UserEmail") ? string.Empty : reader.GetString("UserEmail"),
                 string.Empty,
                 string.Empty,
-                reader.IsDBNull("UserRole") ? Role.Patient : Enum.Parse<Role>(reader.GetString("UserRole")),
                 null
             ));
 

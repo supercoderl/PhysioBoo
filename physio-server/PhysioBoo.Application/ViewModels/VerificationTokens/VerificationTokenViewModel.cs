@@ -12,7 +12,6 @@ namespace PhysioBoo.Application.ViewModels.VerificationTokens
         public bool IsUsed { get; set; }
         public VerificationType Type { get; set; }
         public string UserEmail { get; set; } = string.Empty;
-        public Role UserRole { get; set; }
 
         public static VerificationTokenViewModel FromVerificationToken(VerificationToken verificationToken)
         {
@@ -24,8 +23,7 @@ namespace PhysioBoo.Application.ViewModels.VerificationTokens
                 ExpiresAt = verificationToken.ExpiresAt,
                 Type = verificationToken.Type,
                 IsUsed = verificationToken.IsUsed,
-                UserEmail = verificationToken.User?.Email ?? string.Empty,
-                UserRole = verificationToken.User?.Role ?? Role.Patient
+                UserEmail = verificationToken.User?.Email ?? string.Empty
             };
         }
     }

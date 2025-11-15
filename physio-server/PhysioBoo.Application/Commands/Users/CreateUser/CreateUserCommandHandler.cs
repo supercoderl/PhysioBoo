@@ -31,12 +31,11 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _userRepository.InsertAsync<User, Guid>(new User(
+            SharedKernel.Results.DbResult<Guid> result = await _userRepository.InsertAsync<User, Guid>(new User(
                 request.NewUser.Id,
                 request.NewUser.Email,
                 request.NewUser.Phone,
                 AuthHelper.HashPassword(request.NewUser.Password),
-                request.NewUser.Role,
                 _user.GetUserId() == Guid.Empty ? request.NewUser.Id : _user.GetUserId()
             ));
 

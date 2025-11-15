@@ -18,9 +18,6 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.9")
-                .HasAnnotation("Proxies:ChangeTracking", false)
-                .HasAnnotation("Proxies:CheckEquality", false)
-                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -728,6 +725,31 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Permission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Permission");
+                });
+
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Profile", b =>
                 {
                     b.Property<Guid>("Id")
@@ -845,6 +867,98 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Role", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Color")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsSystemRole")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.RolePermission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PermissionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RolePermission");
+                });
+
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -914,11 +1028,6 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
                     b.Property<string>("TimeZone")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -949,11 +1058,41 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("Phone")
                         .IsUnique();
 
-                    b.HasIndex("Role");
-
                     b.HasIndex("UpdatedBy");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.UserRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("AssignedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignedBy");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserRole");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.VerificationToken", b =>
@@ -4473,6 +4612,43 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Role", b =>
+                {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedRoles")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedRoles")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("Updater");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.RolePermission", b =>
+                {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.Permission", "Permission")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.Role", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.User", b =>
                 {
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
@@ -4488,6 +4664,32 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("Creator");
 
                     b.Navigation("Updater");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.UserRole", b =>
+                {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Assigner")
+                        .WithMany("AssignedUserRoles")
+                        .HasForeignKey("AssignedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Assigner");
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.VerificationToken", b =>
@@ -5256,6 +5458,18 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("PrescriptionItems");
                 });
 
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Permission", b =>
+                {
+                    b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Role", b =>
+                {
+                    b.Navigation("RolePermissions");
+
+                    b.Navigation("UserRoles");
+                });
+
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.User", b =>
                 {
                     b.Navigation("Addresses");
@@ -5263,6 +5477,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("ApprovedBills");
 
                     b.Navigation("ApprovedLeaves");
+
+                    b.Navigation("AssignedUserRoles");
 
                     b.Navigation("CancelledAppointments");
 
@@ -5277,6 +5493,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("CreatedLabOrders");
 
                     b.Navigation("CreatedMedicalRecords");
+
+                    b.Navigation("CreatedRoles");
 
                     b.Navigation("CreatedUsers");
 
@@ -5312,7 +5530,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Navigation("Reviews");
 
+                    b.Navigation("UpdatedRoles");
+
                     b.Navigation("UpdatedUsers");
+
+                    b.Navigation("UserRoles");
 
                     b.Navigation("VerificationTokens");
 

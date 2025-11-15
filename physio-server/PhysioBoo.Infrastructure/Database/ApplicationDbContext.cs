@@ -57,13 +57,14 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<VerificationToken> VerificationTokens { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+        public DbSet<Role> Roles { get; set; } = null!;
         #endregion
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            foreach (Microsoft.EntityFrameworkCore.Metadata.IMutableEntityType entity in modelBuilder.Model.GetEntityTypes())
             {
                 modelBuilder.Entity(entity.ClrType).HasQueryFilter(DbContextUtility.GetIsDeletedRestriction(entity.ClrType));
             }
@@ -72,7 +73,7 @@ namespace PhysioBoo.Infrastructure.Database
 
             ApplyConfigurations(modelBuilder);
 
-            foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(x => x.GetForeignKeys()))
+            foreach (Microsoft.EntityFrameworkCore.Metadata.IMutableForeignKey? relationship in modelBuilder.Model.GetEntityTypes().SelectMany(x => x.GetForeignKeys()))
             {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
             }
@@ -133,6 +134,7 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new SupplierConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
             builder.ApplyConfiguration(new VerificationTokenConfiguration());
+            builder.ApplyConfiguration(new RoleConfiguration());
         }
     }
 }

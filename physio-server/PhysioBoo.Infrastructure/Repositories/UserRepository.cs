@@ -1,6 +1,5 @@
 ﻿using Npgsql;
 using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Infrastructure.Database;
 using PhysioBoo.SharedKernel.Utils;
@@ -17,12 +16,12 @@ namespace PhysioBoo.Infrastructure.Repositories
 
         public async Task<User?> GetByEmailAsync(string email)
         {
-            var parameters = new Dictionary<string, object>
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 ["p_email"] = email
             };
 
-            var result = await ExecutePostgresFunctionAsync<User>(
+            List<User> result = await ExecutePostgresFunctionAsync<User>(
                 "get_user_for_login",
                 parameters,
                 reader => MapUserForLogin(reader)
@@ -33,12 +32,11 @@ namespace PhysioBoo.Infrastructure.Repositories
 
         private static User MapUserForLogin(NpgsqlDataReader reader)
         {
-            var user = new User(
+            User user = new User(
                 reader.GetFieldValue<Guid>("Id"),
                 reader.GetString("Email"),
                 reader.GetString("Phone"),
                 reader.GetString("PasswordHash"),
-                Enum.Parse<Role>(reader.GetString("Role")),
                 reader.IsDBNull("CreatedBy") ? null : reader.GetGuid("CreatedBy")
             );
 
@@ -83,7 +81,7 @@ namespace PhysioBoo.Infrastructure.Repositories
                 };
             }
 
-            var rowsAffected = await ExecuteNonQueryAsync(sql, parameters.ToArray());
+            int rowsAffected = await ExecuteNonQueryAsync(sql, parameters.ToArray());
             return rowsAffected > 0;
         }
 
@@ -93,7 +91,7 @@ namespace PhysioBoo.Infrastructure.Repositories
         /// </summary>
         public async Task<bool> UpdateLastLoginAsync(Guid id, DateTime? lastLoginAt)
         {
-            var rowsAffected = await ExecuteNonQueryAsync(
+            int rowsAffected = await ExecuteNonQueryAsync(
                 @"UPDATE ""Users"" SET ""LastLoginAt"" = @lastLoginAt, ""UpdatedAt"" = @updatedAt WHERE ""Id"" = @userId",
                 new List<NpgsqlParameter>
                 {

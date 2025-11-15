@@ -4,7 +4,6 @@ using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
-using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,7 +11,7 @@ namespace PhysioBoo.Domain.Entities.Core
 {
     public class User : Entity
     {
-        #region Core User Table (21)
+        #region Core User Table (20)
         public string Email { get; private set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
@@ -21,7 +20,6 @@ namespace PhysioBoo.Domain.Entities.Core
         public string Phone { get; private set; }
         public string? AlternatePhone { get; private set; }
         public string PasswordHash { get; private set; }
-        public Role Role { get; private set; }
         public bool IsActive { get; private set; }
         public bool IsVerified { get; private set; }
         public DateTime? EmailVerifiedAt { get; private set; }
@@ -131,6 +129,18 @@ namespace PhysioBoo.Domain.Entities.Core
         [InverseProperty("User")]
         public virtual ICollection<RefreshToken> RefreshTokens { get; private set; } = new List<RefreshToken>();
 
+        [InverseProperty("Creator")]
+        public virtual ICollection<Role> CreatedRoles { get; private set; } = new List<Role>();
+
+        [InverseProperty("Updater")]
+        public virtual ICollection<Role> UpdatedRoles { get; private set; } = new List<Role>();
+
+        [InverseProperty("User")]
+        public virtual ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
+
+        [InverseProperty("Assigner")]
+        public virtual ICollection<UserRole> AssignedUserRoles { get; private set; } = new List<UserRole>();
+
         public virtual Profile? Profile { get; private set; }
 
         public virtual Doctor? Doctor { get; private set; }
@@ -139,13 +149,12 @@ namespace PhysioBoo.Domain.Entities.Core
 
         #endregion
 
-        #region Constructor (21)
+        #region Constructor (20)
         public User(
             Guid id,
             string email,
             string phone,
             string passwordHash,
-            Role role,
             Guid? createdBy
         ) : base(id)
         {
@@ -153,7 +162,6 @@ namespace PhysioBoo.Domain.Entities.Core
             Phone = phone;
             AlternatePhone = null;
             PasswordHash = passwordHash;
-            Role = role;
             IsActive = true;
             IsVerified = false;
             EmailVerifiedAt = null;
@@ -173,12 +181,11 @@ namespace PhysioBoo.Domain.Entities.Core
         }
         #endregion
 
-        #region Setter Methods (21)
+        #region Setter Methods (20)
         public void SetEmail(string email) { Email = email; }
         public void SetPhone(string phone) { Phone = phone; }
         public void SetAlternatePhone(string? alternatePhone) { AlternatePhone = alternatePhone; }
         public void SetPassword(string passwordHash) { PasswordHash = passwordHash; }
-        public void SetRole(Role role) { Role = role; }
         public void SetIsActive(bool isActive) { IsActive = isActive; }
         public void SetIsVerified(bool isVerified) { IsVerified = isVerified; }
         public void SetEmailVerifiedAt(DateTime? emailVerifiedAt) { EmailVerifiedAt = emailVerifiedAt; }

@@ -1,5 +1,4 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Enums;
 
 namespace PhysioBoo.Application.ViewModels.Users
 {
@@ -9,7 +8,6 @@ namespace PhysioBoo.Application.ViewModels.Users
         public string Email { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public string? AlternatePhone { get; set; }
-        public Role Role { get; set; }
         public bool IsActive { get; set; }
         public bool IsVerified { get; set; }
         public DateTime? EmailVerifiedAt { get; set; }
@@ -35,7 +33,6 @@ namespace PhysioBoo.Application.ViewModels.Users
                 Email = user.Email,
                 Phone = user.Phone,
                 AlternatePhone = user.AlternatePhone,
-                Role = user.Role,
                 IsActive = user.IsActive,
                 IsVerified = user.IsVerified,
                 EmailVerifiedAt = user.EmailVerifiedAt,

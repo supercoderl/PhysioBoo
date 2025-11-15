@@ -296,6 +296,7 @@ namespace PhysioBoo.Presentation
                 app.MapProfileEndpoints();
                 app.MapReviewEndpoints();
                 app.MapMedicalSpecialtyEndpoints();
+                app.MapRoleEndpoints();
             }
 
             MapCommonEndpoints(app);

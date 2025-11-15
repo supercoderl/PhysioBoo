@@ -26,7 +26,6 @@ namespace PhysioBoo.Application.Queries.Users.GetAll
             if (req.Filter != null)
             {
                 predicate = u =>
-                    (req.Filter.Role.HasValue || u.Role == req.Filter.Role) &&
                     (!req.Filter.IsActive.HasValue || u.IsActive == req.Filter.IsActive.Value);
             }
 

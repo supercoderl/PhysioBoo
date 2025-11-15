@@ -14,7 +14,6 @@ namespace PhysioBoo.Infrastructure.Configuration
             // Indexes
             builder.HasIndex(u => u.Email).IsUnique();
             builder.HasIndex(u => u.Phone).IsUnique();
-            builder.HasIndex(u => u.Role);
             builder.HasIndex(u => u.IsActive);
 
             // Self-relationships
@@ -46,11 +45,6 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(u => u.PasswordHash)
                    .IsRequired()
                    .HasMaxLength(255);
-
-            builder.Property(u => u.Role)
-                   .HasConversion<string>()
-                   .HasMaxLength(20)
-                   .IsRequired();
 
             builder.Property(u => u.IsActive).IsRequired();
             builder.Property(u => u.IsVerified).IsRequired();

@@ -404,5 +404,21 @@
             public const string EmptyStateProvince = "SUPPLIER_EMPTY_STATE_PROVINCE";
             public const string EmptyCountry = "SUPPLIER_EMPTY_COUNTRY";
         }
+
+        public static class Role
+        {
+            // Role Validation
+            public const string EmptyId = "ROLE_EMPTY_ID";
+            public const string EmptyName = "ROLE_EMPTY_NAME";
+            public const string EmptyCode = "ROLE_EMPTY_CODE";
+        }
+
+        public static class Permission
+        {
+            // Permission Validation
+            public const string EmptyId = "PERMISSION_EMPTY_ID";
+            public const string EmptyName = "PERMISSION_EMPTY_NAME";
+            public const string EmptyCode = "PERMISSION_EMPTY_CODE";
+        }
     }
 }

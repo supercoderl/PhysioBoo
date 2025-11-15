@@ -28,7 +28,7 @@ namespace PhysioBoo.Presentation.Endpoints
 
             #region Create user
             group.MapPost("/register", async (
-                CreateUserViewModel newUser,
+                [FromBody] CreateUserViewModel newUser,
                 IMediatorHandler bus,
                 INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken

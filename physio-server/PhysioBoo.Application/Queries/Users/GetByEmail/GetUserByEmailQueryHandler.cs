@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using System.Data;
@@ -21,22 +20,21 @@ namespace PhysioBoo.Application.Queries.Users.GetByEmail
 
         public async Task<User?> Handle(GetUserByEmailQuery request, CancellationToken cancellationToken)
         {
-            var parameters = new Dictionary<string, object>
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 ["p_email"] = request.Email
             };
 
-            var result = await _userRepository.ExecutePostgresFunctionAsync<User>(
+            List<User> result = await _userRepository.ExecutePostgresFunctionAsync<User>(
                 "get_users_dynamic",
                 parameters,
                 reader =>
                 {
-                    var user = new Domain.Entities.Core.User(
+                    User user = new Domain.Entities.Core.User(
                         reader.GetFieldValue<Guid>("Id"),
                         reader.GetString("Email"),
                         reader.GetString("Phone"),
                         reader.GetString("PasswordHash"),
-                        Enum.Parse<Role>(reader.GetString("Role")),
                         !reader.IsDBNull(reader.GetOrdinal("CreatedBy")) ? reader.GetFieldValue<Guid>("CreatedBy") : (Guid?)null
                     );
 

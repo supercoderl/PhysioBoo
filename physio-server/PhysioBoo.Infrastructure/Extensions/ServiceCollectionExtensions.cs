@@ -87,6 +87,10 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IDoctorWorkExperienceRepository, DoctorWorkExperienceRepository>();
             services.AddScoped<IHospitalStaffRepository, HospitalStaffRepository>();
             services.AddScoped<IMedicalSpecialtyRepository, MedicalSpecialtyRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+            services.AddScoped<IPermissionRepository, PermissionRepository>();
+            services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
 
             return services;
         }

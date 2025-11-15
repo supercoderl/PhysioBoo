@@ -31,7 +31,7 @@ namespace PhysioBoo.Application.Commands.Users.RefreshToken
         {
             if (!await TestValidityAsync(request)) return;
 
-            var token = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken);
+            Domain.Entities.Core.RefreshToken? token = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken);
 
             if (token == null || token.ExpiresAt < TimeZoneHelper.GetLocalTimeNow())
             {
@@ -46,7 +46,7 @@ namespace PhysioBoo.Application.Commands.Users.RefreshToken
 
             token.Revoke();
 
-            var result = await _refreshTokenRepository.UpdateTrackedAsync(token);
+            int result = await _refreshTokenRepository.UpdateTrackedAsync(token);
 
             if (result <= 0)
             {
@@ -59,11 +59,10 @@ namespace PhysioBoo.Application.Commands.Users.RefreshToken
                 return;
             }
 
-            var (accessToken, refreshToken) = TokenHelper.BuildAuthToken(
+            (string accessToken, string refreshToken) = TokenHelper.BuildAuthToken(
                 new Dictionary<string, string>
                 {
                     ["Email"] = token.User?.Email ?? string.Empty,
-                    ["Role"] = token.User?.Role.ToString() ?? string.Empty,
                     ["Id"] = token.UserId.ToString(),
                     ["Name"] = (token.User?.Email ?? string.Empty).Split("@")[0]
                 }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes

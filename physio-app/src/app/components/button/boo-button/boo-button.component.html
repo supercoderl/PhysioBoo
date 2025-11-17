@@ -11,7 +11,7 @@
   [disabled]="disabled"
   [style.borderRadius.px]="radius"
   [style.background]="background"
-  (click)="onClick($event)"
+  (click)="clicked.emit()"
 >
   <ng-content *ngIf="label === ''"></ng-content>
   <span *ngIf="label !== ''">{{ label }}</span>

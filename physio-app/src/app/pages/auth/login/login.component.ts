@@ -5,7 +5,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { BooButtonComponent } from "../../../components/button/boo-button/boo-button.component";
 import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
-import { LoadingService } from '../../../services/common/loading.service';
+import { LocalLoadingService } from '../../../services/common/local-loading.service';
 import { SharedModule } from '../../../shared/shared-imports';
 import { PagedResponse } from '../../../shared/types/common';
 
@@ -34,7 +34,7 @@ export class LoginComponent {
   // #region Init (Lifecycle + Setup)
   constructor(
     private http: HttpClient,
-    protected loadingSrv: LoadingService,
+    protected loadingSrv: LocalLoadingService,
     private router: Router
   ) {}
   // #endregion

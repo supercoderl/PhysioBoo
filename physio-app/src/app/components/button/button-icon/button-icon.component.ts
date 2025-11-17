@@ -12,11 +12,12 @@ import { SharedModule } from '../../../shared/shared-imports';
       tabindex="0"
       type="button"
       [ngClass]="{
-        'border border-solid inlineFlex-center-center relative bg-transparent cursor-pointer align-middle text-center text-[#4B5563] outline-none rounded-[8px] transition-background duration-150 ease-in-out': true,
+        'border border-solid inlineFlex-center-center relative bg-transparent cursor-pointer align-middle text-center text-[#4B5563] outline-none rounded-[8px] transition-background duration-300 ease-in-out': true,
         'w-8 h-8 p-2': !hasContent,   
         'px-3 py-2 gap-2': hasContent      
       }"
       [class]="buttonClass"
+      [disabled]="disabled"
     >
       <lucide-icon 
         *ngIf="icon"
@@ -36,6 +37,8 @@ export class ButtonIconComponent implements AfterContentInit {
 
   private _icon?: { name: string; size?: number; class?: string };
   @Input() buttonClass: string = '';
+  @Input() loading?: boolean = false;
+  @Input() disabled?: boolean = false;
   @ViewChild('contentWrapper', { static: true }) content!: ElementRef;
   @Input()
   set icon(value: { name: string; size?: number; class?: string } | undefined) {
@@ -57,7 +60,6 @@ export class ButtonIconComponent implements AfterContentInit {
   // #region Init (Lifecycle + Setup)
   ngAfterContentInit() {
     const text = this.content?.nativeElement?.textContent?.trim();
-    console.log(text);
     this.hasContent = !!text;
   }
   // #endregion

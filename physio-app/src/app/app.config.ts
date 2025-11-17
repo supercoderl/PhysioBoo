@@ -1,4 +1,4 @@
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { registerLocaleData } from '@angular/common';
@@ -11,11 +11,16 @@ import { LucideAngularModule } from 'lucide-angular';
 import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
 import { routes } from './app.routes';
 import { provideIcons } from './icon.config';
+import { InitService } from './services/common/init.service';
 import { InterceptorService } from './services/interceptor/interceptor.service';
 import { HttpLoadingInterceptor } from './services/interceptor/loading-interceptor.service';
 import { SHARED_LUCIDE_ICONS } from './shared/shared-providers';
 
 registerLocaleData(en);
+
+function initializeApp(initService: InitService): () => Promise<void> {
+  return () => initService.load();
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,7 +31,13 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(withInterceptorsFromDi()),
     provideIcons(),
+    { provide: HTTP_INTERCEPTORS, useClass: HttpLoadingInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: HttpLoadingInterceptor, multi: true }
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeApp,
+      deps: [InitService],
+      multi: true
+    }
   ]
 };

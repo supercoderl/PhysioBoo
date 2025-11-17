@@ -32,7 +32,7 @@
     </div>
     <li class="flex items-center relative w-full text-left py-2 pr-12 pl-4">
       <div class="min-w-9 text-[#4B5563] inline-flex shrink-0">
-        <lucide-icon [name]="bell" class="w-4 h-4" />
+        <boo-icon name="bell" classname="leading-none" />
       </div>
       <div class="flex-1 min-w-0 my-1">
         <span class="block m-0 text-[13px] leading-[1.5]">Notifications</span>
@@ -43,7 +43,7 @@
     </li>
     <li class="flex items-center relative w-full text-left py-2 pr-12 pl-4">
       <div class="min-w-9 text-[#4B5563] inline-flex shrink-0">
-        <lucide-icon [name]="cloud" class="w-4 h-4" />
+        <boo-icon name="cloud" classname="leading-none" />
       </div>
       <div class="flex-1 min-w-0 my-1">
         <span class="block m-0 text-[13px] leading-[1.5]">Cloud Sync</span>
@@ -54,13 +54,35 @@
     </li>
     <li class="flex items-center relative w-full text-left py-2 pr-12 pl-4">
       <div class="min-w-9 text-[#4B5563] inline-flex shrink-0">
-        <lucide-icon [name]="sun" class="w-4 h-4" />
+        <boo-icon name="sun" classname="leading-none" />
       </div>
       <div class="flex-1 min-w-0 my-1">
         <span class="block m-0 text-[13px] leading-[1.5]">Retro Thrusters</span>
       </div>
       <div class="absolute right-4 top-1/2 -translate-y-1/2">
         <switch [isOpen]="false"></switch>
+      </div>
+    </li>
+    <li class="flex items-center relative w-full text-left py-2 pr-12 pl-4">
+      <div class="min-w-9 text-[#4B5563] inline-flex shrink-0">
+        <boo-icon name="database-backup" classname="leading-none" />
+      </div>
+      <div class="flex-1 min-w-0 my-1">
+        <span class="block m-0 text-[13px] leading-[1.5]">Hard Reload</span>
+      </div>
+      <div class="absolute right-4 top-1/2 -translate-y-1/2">
+        <button-icon 
+          [icon]="{
+            name: locLoadingSrv.isLoading('hard-reload') ? 'loader' : 'play',
+            size: 14,
+            class: locLoadingSrv.isLoading('hard-reload') 
+              ? 'fill-gray-600 animate-spin' 
+              : 'fill-gray-600'
+          }"
+          buttonClass="!border-0 mr-1 hover:bg-gray-200"
+          (click)="onReload()"
+          [disabled]="locLoadingSrv.isLoading('hard-reload')"
+        ></button-icon>
       </div>
     </li>
   </ul>

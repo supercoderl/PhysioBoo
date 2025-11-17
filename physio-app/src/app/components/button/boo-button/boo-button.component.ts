@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SharedModule } from '../../../shared/shared-imports';
 import { LoadingSpinnerComponent } from "../../loading/spinner/spinner.component";
 
@@ -20,5 +20,5 @@ export class BooButtonComponent {
   @Input() size: 'small' | 'medium' | 'large' = 'medium';
   @Input() classname: string = '';
   @Input() loading: boolean | null = false;
-  @Input() onClick: (event?: MouseEvent) => void = () => {};
+  @Output() clicked = new EventEmitter<MouseEvent>();
 }

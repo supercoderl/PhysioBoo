@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, EventEmitter, Output } from "@angular/core";
 import { BooButtonComponent } from "../../../components/button/boo-button/boo-button.component";
 import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
 import { SharedModule } from "../../../shared/shared-imports";
@@ -12,83 +12,71 @@ import { SharedModule } from "../../../shared/shared-imports";
     BooInputComponent
 ],
     template: `
-        <div class="tab-pane fade" id="step1">
+        <div class="min-w-full" id="step1">
             <div class="relative">
                 <h3
-                    class="text-[30px] text-black font-semibold mb-3.75"
+                    class="text-[24px] text-black font-semibold"
                 >
                     Create your account
                 </h3>
-                <p class="m-0 text-[#4B5563] text-base">
-                    👋 Let’s start your dream journry
-                </p>
-                <div class="relative mt-5">
-                    <div class="grid grid-cols-2">
+                <div class="relative">
+                    <div class="space-y-3">
                         <div>
-                            <div class="mt-5 relative">
-                                <div>
-                                    <label
-                                        class="text-xs14 font-medium text-primary mb-1 inline-block"
-                                    >
-                                        Email
-                                    </label>
-                                    <boo-input
-                                        label="Enter your email"
-                                        id="email"
-                                        name="email"
-                                        [radius]="5"
-                                        backgroundColor="white"
-                                        [borderWidth]="1"
-                                        borderColor="#e6e8ee"
-                                        size="small"
-                                        placeholderColor="rgba(0, 0, 0, 0.4)"
-                                    />
-                                </div>
-                            </div>
+                            <label
+                                class="text-xs14 font-medium text-primary mb-1 inline-block"
+                            >
+                                Email
+                            </label>
+                            <boo-input
+                                label="Enter your email"
+                                id="email"
+                                name="email"
+                                [radius]="5"
+                                backgroundColor="white"
+                                [borderWidth]="1"
+                                borderColor="#e6e8ee"
+                                size="small"
+                                placeholderColor="rgba(0, 0, 0, 0.4)"
+                                required
+                            />
                         </div>
                         <div>
-                            <div class="mt-5 relative">
-                                <div>
-                                    <label
-                                        class="text-xs14 font-medium text-primary mb-1 inline-block"
-                                    >
-                                        Phone number
-                                    </label>
-                                    <boo-input
-                                        label="Enter your phone number"
-                                        id="phone"
-                                        name="phone"
-                                        [radius]="5"
-                                        backgroundColor="white"
-                                        [borderWidth]="1"
-                                        borderColor="#e6e8ee"
-                                        size="small"
-                                        placeholderColor="rgba(0, 0, 0, 0.4)"
-                                    />
-                                </div>
-                            </div>
+                            <label
+                                class="text-xs14 font-medium text-primary mb-1 inline-block"
+                            >
+                                Phone number
+                            </label>
+                            <boo-input
+                                label="Enter your phone number"
+                                id="phone"
+                                name="phone"
+                                [radius]="5"
+                                backgroundColor="white"
+                                [borderWidth]="1"
+                                borderColor="#e6e8ee"
+                                size="small"
+                                placeholderColor="rgba(0, 0, 0, 0.4)"
+                                required
+                            />
                         </div>
-                        <div class="col-12">
-                            <div class="mt-5 relative">
-                                <div>
-                                    <label
-                                        class="text-xs14 font-medium text-primary mb-1 inline-block"
-                                    >
-                                        Password
-                                    </label>
-                                    <boo-input
-                                        label="Enter your password"
-                                        id="password"
-                                        name="password"
-                                        [radius]="5"
-                                        backgroundColor="white"
-                                        [borderWidth]="1"
-                                        borderColor="#e6e8ee"
-                                        size="small"
-                                        placeholderColor="rgba(0, 0, 0, 0.4)"
-                                    />
-                                </div>
-                            </div>
+                        <div>
+                            <label
+                                class="text-xs14 font-medium text-primary mb-1 inline-block"
+                            >
+                                Password
+                            </label>
+                            <boo-input
+                                label="Enter your password"
+                                id="password"
+                                name="password"
+                                [radius]="5"
+                                backgroundColor="white"
+                                [borderWidth]="1"
+                                borderColor="#e6e8ee"
+                                size="small"
+                                placeholderColor="rgba(0, 0, 0, 0.4)"
+                                required
+                            />
                         </div>
                     </div>
                     <div class="mt-10">
@@ -96,6 +84,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                             <boo-button
                                 label="Next"
                                 [radius]="5"
+                                (clicked)="onNext.emit()"
                             ></boo-button>
                         </div>
                     </div>
@@ -105,4 +94,8 @@ import { SharedModule } from "../../../shared/shared-imports";
     `
 })
 
-export class RegisterStepOneComponent {}
+export class RegisterStepOneComponent {
+    // #region Inputs, Outputs, Properties
+    @Output() onNext = new EventEmitter<MouseEvent>();
+    // #endregion
+}

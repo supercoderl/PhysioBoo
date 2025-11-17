@@ -12,7 +12,7 @@ import { SharedModule } from '../../../shared/shared-imports';
 export class BooInputComponent {
   // #region Inputs, Outputs, Properties
   @Input() label: string = '';
-  @Input() required: boolean = false;
+  @Input({ transform: (v: unknown) => v === '' || v === true || v === 'true' }) required: boolean = false;
   @Input() id: string = '';
   @Input() name: string = '';
   @Input() type: string = 'text';

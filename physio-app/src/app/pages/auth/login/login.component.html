@@ -164,8 +164,8 @@
                     label="Login"
                     classname="!w-full"
                     [radius]="44"
-                    [loading]="(loadingSrv.loading$ | async)"
-                    [onClick]="login"
+                    [loading]="loadingSrv.isLoading('login')"
+                    (clicked)="login()"
                   >
                   </boo-button>
                 </div>

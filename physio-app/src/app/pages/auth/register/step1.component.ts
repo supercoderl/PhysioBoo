@@ -1,5 +1,7 @@
-import { Component, EventEmitter, Output } from "@angular/core";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { FormGroup } from "@angular/forms";
 import { BooButtonComponent } from "../../../components/button/boo-button/boo-button.component";
+import { DividerComponent } from "../../../components/divider/divider.component";
 import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
 import { SharedModule } from "../../../shared/shared-imports";
 
@@ -9,17 +11,18 @@ import { SharedModule } from "../../../shared/shared-imports";
     imports: [
     SharedModule,
     BooButtonComponent,
-    BooInputComponent
+    BooInputComponent,
+    DividerComponent
 ],
     template: `
-        <div class="min-w-full" id="step1">
-            <div class="relative">
+        <div class="min-w-full p-4 h-full flex" id="step1">
+            <div class="relative flex flex-1 flex-col">
                 <h3
                     class="text-[24px] text-black font-semibold"
                 >
                     Create your account
                 </h3>
-                <div class="relative">
+                <div class="relative flex flex-1 flex-col" [formGroup]="formGroup">
                     <div class="space-y-3">
                         <div>
                             <label
@@ -32,6 +35,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 id="email"
                                 name="email"
                                 [radius]="5"
+                                formControlName="email"
                                 backgroundColor="white"
                                 [borderWidth]="1"
                                 borderColor="#e6e8ee"
@@ -50,6 +54,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 label="Enter your phone number"
                                 id="phone"
                                 name="phone"
+                                formControlName="phone"
                                 [radius]="5"
                                 backgroundColor="white"
                                 [borderWidth]="1"
@@ -69,6 +74,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 label="Enter your password"
                                 id="password"
                                 name="password"
+                                formControlName="password"
                                 [radius]="5"
                                 backgroundColor="white"
                                 [borderWidth]="1"
@@ -79,7 +85,10 @@ import { SharedModule } from "../../../shared/shared-imports";
                             />
                         </div>
                     </div>
-                    <div class="mt-10">
+
+                    <divider classname="py-4"></divider>
+
+                    <div class="mt-auto">
                         <div class="flex justify-between gap-5">
                             <boo-button
                                 label="Next"
@@ -97,5 +106,10 @@ import { SharedModule } from "../../../shared/shared-imports";
 export class RegisterStepOneComponent {
     // #region Inputs, Outputs, Properties
     @Output() onNext = new EventEmitter<MouseEvent>();
+    @Input() formGroup!: FormGroup;
+    // #endregion
+
+    // #region Init (Lifecycle + Setup)
+
     // #endregion
 }

@@ -1,15 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { catchError, firstValueFrom, of, throwError } from 'rxjs';
-import { PagedResponse } from '../../shared/types/common';
-import { Role } from '../../shared/types/role';
+import { AppConfig, PagedResponse } from '../../shared/types/common';
 import { LocalStorage } from '../../shared/utils/storage';
-
-export interface AppConfig {
-    version: string;
-    features: Record<string, boolean>;
-    registrationRoles: Role[];
-}
 
 @Injectable({ providedIn: 'root' })
 export class InitService {

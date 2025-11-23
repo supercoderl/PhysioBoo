@@ -60,10 +60,11 @@
               class="relative max-w-full"
             >
               <div>
-                <form
-                  id="multiStepForm"
+                <boo-form
+                  id="registrationMultiStepForm"
+                  [showActions]="false"
                 >
-                  <div class="relative">
+                  <div class="relative" [formGroup]="form">
                     <register-progress-bar
                       [stepCount]="stepCount"
                       [currentStep]="currentStep"
@@ -75,18 +76,21 @@
                         <div class="min-w-full">
                           <register-step-one
                             (onNext)="nextStep()"
+                            [formGroup]="form"
                           ></register-step-one>
                         </div>
-                        <div class="min-w-full">
+                        <div class="min-w-full p-2">
                           <register-step-two
-                            (onNext)="nextStep()"
+                            (onSubmit)="handleRegistration()"
                             (onPrev)="previousStep()"
+                            (onSelect)="onRoleSelected($event)"
+                            [value]="selectedRoleId"
                           ></register-step-two>
                         </div>
                       </div>
                     </div>
                   </div>
-                </form>
+                </boo-form>
               </div>
             </div>
           </div>

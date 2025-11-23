@@ -1,4 +1,4 @@
-import { ALargeSmall, ArrowRight, ArrowUpDown, BadgeCheck, Bell, Blocks, Bookmark, Brain, Briefcase, Building2, Calendar, ChevronDown, ChevronRight, CircleCheck, CirclePlus, CircleUser, Clock, Cloud, CreditCard, DatabaseBackup, EllipsisVertical, Eye, EyeOff, FileText, Flag, Flame, Folder, Globe, GraduationCap, Hash, Heart, House, Image, Info, Key, LandPlot, Loader, Lock, LucideIconData, Mail, MapPin, Maximize, Menu, Minimize, Moon, PanelLeft, Phone, Play, Plus, Search, Share, Star, Sun, Triangle, Undo2, User, UserRound, Users, X } from 'lucide-angular';
+import { ALargeSmall, ArrowRight, ArrowUpDown, BadgeCheck, Bell, Blocks, Bookmark, Brain, Briefcase, Building2, Calendar, ChevronDown, ChevronRight, CircleCheck, CirclePlus, CircleUser, Clock, Cloud, CreditCard, DatabaseBackup, EllipsisVertical, Eye, EyeOff, FileText, Flag, Flame, Folder, Globe, GraduationCap, Hash, Heart, House, Image, Info, Key, LandPlot, Loader, Lock, LucideIconData, Mail, MapPin, Maximize, Menu, Minimize, Moon, PanelLeft, Phone, Play, Plus, Search, Share, Star, Stethoscope, Sun, Triangle, Undo2, User, UserRound, Users, X } from 'lucide-angular';
 import { NzAffixModule } from 'ng-zorro-antd/affix';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzAnchorModule } from 'ng-zorro-antd/anchor';
@@ -213,7 +213,8 @@ export const SHARED_LUCIDE_ICONS: Record<string, LucideIconData> = {
     Play,
     DatabaseBackup,
     Cloud,
-    Loader
+    Loader,
+    Stethoscope
 }
 
 export const SHARED_PIPES = [

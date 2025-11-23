@@ -1,3 +1,5 @@
+import { Role } from "./role";
+
 export interface DrawerProperty {
     isOpen: boolean;
     type: string | null;
@@ -15,4 +17,10 @@ export interface PagedResponse<T> {
     detailedErrors: string[],
     errors: any;
     success: boolean;
+}
+
+export interface AppConfig {
+    version: string;
+    features: Record<string, boolean>;
+    registrationRoles: Role[];
 }

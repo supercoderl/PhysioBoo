@@ -8,6 +8,9 @@ namespace PhysioBoo.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<Profile> builder)
         {
+            // Naming
+            builder.ToTable("Profiles");
+
             // PK
             builder.HasKey(p => p.Id);
 

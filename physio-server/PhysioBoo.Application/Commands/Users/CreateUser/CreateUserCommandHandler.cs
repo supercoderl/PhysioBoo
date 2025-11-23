@@ -50,7 +50,11 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
                 return;
             }
 
-            await Bus.RaiseEventAsync(new UsersCreatedEvent(result.Id, VerificationType.Email.ToString()));
+            await Bus.RaiseEventAsync(new UsersCreatedEvent(
+                result.Id,
+                request.NewUser.RoleId,
+                VerificationType.Email.ToString()
+            ));
         }
     }
 }

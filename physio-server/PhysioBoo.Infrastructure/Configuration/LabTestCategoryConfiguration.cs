@@ -8,6 +8,9 @@ namespace PhysioBoo.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<LabTestCategory> builder)
         {
+            // Naming
+            builder.ToTable("LabTestCategories");
+
             // PK
             builder.HasKey(c => c.Id);
 

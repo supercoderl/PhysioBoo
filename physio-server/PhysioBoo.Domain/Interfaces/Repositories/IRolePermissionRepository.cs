@@ -4,6 +4,6 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
 {
     public interface IRolePermissionRepository : IRepository<RolePermission>
     {
-        Task<List<RolePermission>> GetPermissionIdsByRoleIdAsync(Guid roleId);
+        Task AssignPermissionsAsync(Guid roleId, string perJson);
     }
 }

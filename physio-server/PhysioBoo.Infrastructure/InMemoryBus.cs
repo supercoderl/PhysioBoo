@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using PhysioBoo.Domain.DomainEvents;
 using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Interfaces.EventHandlers;
+using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Shared.Events;
 using PhysioBoo.SharedKernel.Commands;
 
@@ -11,17 +11,17 @@ namespace PhysioBoo.Infrastructure
     {
         private readonly IMediator _mediator;
         private readonly IDomainEventStore _domainEventStore;
-        private readonly IFanoutEventHandler _fanoutEventHandler;
+        private readonly IOutboxRepository _outboxRepository;
 
         public InMemoryBus(
             IMediator mediator,
             IDomainEventStore domainEventStore,
-            IFanoutEventHandler fanoutEventHandler
+            IOutboxRepository outboxRepository
         )
         {
             _mediator = mediator;
             _domainEventStore = domainEventStore;
-            _fanoutEventHandler = fanoutEventHandler;
+            _outboxRepository = outboxRepository;
         }
 
         public Task<TResponse> QueryAsync<TResponse>(IRequest<TResponse> query) => _mediator.Send(query);
@@ -30,9 +30,7 @@ namespace PhysioBoo.Infrastructure
         {
             await _domainEventStore.SaveAsync(@event);
 
-            await _mediator.Publish(@event);
-
-            await _fanoutEventHandler.HandleDomainEventAsync(@event);
+            await _outboxRepository.SaveEventToOutboxAsync(@event);
         }
 
         public Task SendCommandAsync<T>(T command) where T : CommandBase => _mediator.Send(command);

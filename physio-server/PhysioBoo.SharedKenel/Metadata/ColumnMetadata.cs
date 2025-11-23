@@ -10,6 +10,6 @@ namespace PhysioBoo.SharedKernel.Metadata
         public bool IsKey { get; set; }
         public bool IsGenerated { get; set; }
         public bool IsComputed { get; set; }
-        public PropertyInfo Property { get; set; } 
+        public PropertyInfo Property { get; set; }
     }
 }

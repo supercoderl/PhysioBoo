@@ -47,6 +47,8 @@ using PhysioBoo.Application.Commands.Reviews;
 using PhysioBoo.Application.Commands.Roles.AssignPermissionToRole;
 using PhysioBoo.Application.Commands.Roles.CreateRole;
 using PhysioBoo.Application.Commands.Suppliers.CreateSupplier;
+using PhysioBoo.Application.Commands.Users.AssignRoleToUser;
+using PhysioBoo.Application.Commands.Users.AssignRoleToUserUsingRoleId;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
 using PhysioBoo.Application.Commands.Users.CreateUser;
 using PhysioBoo.Application.Commands.Users.ForgotPassword;
@@ -61,6 +63,7 @@ using PhysioBoo.Application.Commands.Users.VerifyUser;
 using PhysioBoo.Application.EventHandlers.Fanout;
 using PhysioBoo.Application.EventHandlers.User;
 using PhysioBoo.Application.Interfaces;
+using PhysioBoo.Application.Queries.Configurations.GetInitData;
 using PhysioBoo.Application.Queries.Permissions.GetAll;
 using PhysioBoo.Application.Queries.RefreshTokens.GetByUserId;
 using PhysioBoo.Application.Queries.Roles.GetAll;
@@ -70,6 +73,7 @@ using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
 using PhysioBoo.Application.Services;
+using PhysioBoo.Application.ViewModels.Configurations;
 using PhysioBoo.Application.ViewModels.Permissions;
 using PhysioBoo.Application.ViewModels.Roles;
 using PhysioBoo.Application.ViewModels.Users;
@@ -107,6 +111,8 @@ namespace PhysioBoo.Application.Extensions
 
         public static IServiceCollection AddQueryHandlers(this IServiceCollection services)
         {
+            // Init
+            services.AddScoped<IRequestHandler<GetInitDataQuery, InitDataViewModel>, GetInitDataQueryHandler>();
             // User
             services.AddScoped<IRequestHandler<GetUserByIdQuery, User?>, GetUserByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetUserByEmailQuery, User?>, GetUserByEmailQueryHandler>();
@@ -162,6 +168,8 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<CreateRoleCommand>, CreateRoleCommandHandler>();
             services.AddScoped<IRequestHandler<CreatePermissionCommand>, CreatePermissionCommandHandler>();
             services.AddScoped<IRequestHandler<AssignPermissionToRoleCommand>, AssignPermissionToRoleCommandHandler>();
+            services.AddScoped<IRequestHandler<AssignRoleToUserCommand>, AssignRoleToUserCommandHandler>();
+            services.AddScoped<IRequestHandler<AssignRoleToUserUsingRoleIdCommand>, AssignRoleToUserUsingRoleIdCommandHandler>();
             #endregion
 
             #region Patient Flow

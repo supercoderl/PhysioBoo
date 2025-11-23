@@ -8,6 +8,9 @@ namespace PhysioBoo.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<Hospital> builder)
         {
+            // Naming
+            builder.ToTable("Hospitals");
+
             // PK
             builder.HasKey(h => h.Id);
 

@@ -539,6 +539,12 @@ namespace PhysioBoo.Infrastructure.Repositories
                     continue;
                 }
 
+                if (valueType.IsEnum)
+                {
+                    parameters.Add($"@{columnName}", value.ToString(), DbType.String);
+                    continue;
+                }
+
                 // Handle regular types
                 DbType? dbType = SqlHelper.GetDbTypeForValue(value);
                 parameters.Add($"@{columnName}", value, dbType);

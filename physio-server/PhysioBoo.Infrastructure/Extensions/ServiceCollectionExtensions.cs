@@ -9,6 +9,7 @@ using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Infrastructure.Database;
 using PhysioBoo.Infrastructure.Email;
 using PhysioBoo.Infrastructure.EventSourcing;
+using PhysioBoo.Infrastructure.Outbox;
 using PhysioBoo.Infrastructure.Repositories;
 
 namespace PhysioBoo.Infrastructure.Extensions
@@ -91,6 +92,7 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             services.AddScoped<IPermissionRepository, PermissionRepository>();
             services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+            services.AddScoped<IOutboxRepository, OutboxRepository>();
 
             return services;
         }
@@ -100,6 +102,13 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IEmailSender, SmtpEmailSender>();
             services.AddScoped<IEmailTemplateProvider, FileEmailTemplateProvider>();
             services.AddScoped<IEmailTemplateRenderer, ScribanEmailTemplateRenderer>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddHostedInfrastructureService(this IServiceCollection services)
+        {
+            services.AddHostedService<OutboxProcessor>();
 
             return services;
         }

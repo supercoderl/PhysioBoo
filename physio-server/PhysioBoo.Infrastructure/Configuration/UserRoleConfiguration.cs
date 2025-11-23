@@ -8,6 +8,9 @@ namespace PhysioBoo.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<UserRole> builder)
         {
+            // Naming
+            builder.ToTable("UserRoles");
+
             // PK
             builder.HasKey(ur => ur.Id);
 

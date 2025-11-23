@@ -8,6 +8,9 @@ namespace PhysioBoo.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<Appointment> builder)
         {
+            // Naming
+            builder.ToTable("Appointments");
+
             // Key
             builder.HasKey(a => a.Id);
 

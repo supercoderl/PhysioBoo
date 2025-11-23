@@ -4,10 +4,13 @@ using PhysioBoo.Domain.Entities.MedicalStaff;
 
 namespace PhysioBoo.Infrastructure.Configuration
 {
-    public sealed class MedicalSpecialityConfiguration : IEntityTypeConfiguration<MedicalSpecialty>
+    public sealed class MedicalSpecialtyConfiguration : IEntityTypeConfiguration<MedicalSpecialty>
     {
         public void Configure(EntityTypeBuilder<MedicalSpecialty> builder)
         {
+            // Naming
+            builder.ToTable("MedicalSpecialties");
+
             // PK
             builder.HasKey(s => s.Id);
 

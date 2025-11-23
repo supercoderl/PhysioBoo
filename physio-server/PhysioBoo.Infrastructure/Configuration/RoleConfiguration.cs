@@ -8,6 +8,9 @@ namespace PhysioBoo.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<Role> builder)
         {
+            // Naming
+            builder.ToTable("Roles");
+
             // PK
             builder.HasKey(r => r.Id);
 
@@ -47,6 +50,9 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(r => r.IsActive)
                    .IsRequired();
+
+            builder.Property(r => r.IsPublicForRegistration)
+                    .IsRequired();
 
             builder.Property(r => r.CreatedAt)
                 .IsRequired()

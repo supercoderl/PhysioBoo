@@ -9,7 +9,7 @@ namespace PhysioBoo.Application.Commands.Roles.AssignPermissionToRole
         private static readonly AssignPermissionToRoleCommandValidation s_validation = new();
 
         public PermissionForAssigningViewModel PermissionForAssigning { get; }
-        public Guid UserId { get; }
+        public Guid RoleId { get; }
 
         public AssignPermissionToRoleCommand(PermissionForAssigningViewModel permissionForAssigning) : base(Guid.NewGuid())
         {

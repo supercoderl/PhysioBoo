@@ -8,6 +8,9 @@ namespace PhysioBoo.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<Review> builder)
         {
+            // Naming
+            builder.ToTable("Reviews");
+
             // PK
             builder.HasKey(r => r.Id);
 

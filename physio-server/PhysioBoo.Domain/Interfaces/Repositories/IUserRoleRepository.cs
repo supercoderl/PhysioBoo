@@ -4,5 +4,6 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
 {
     public interface IUserRoleRepository : IRepository<UserRole>
     {
+        Task AssignRolesAsync(Guid userId, string roleJson);
     }
 }

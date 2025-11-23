@@ -7,6 +7,7 @@ using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
 using PhysioBoo.Infrastructure.Configuration;
+using PhysioBoo.Infrastructure.Outbox;
 
 namespace PhysioBoo.Infrastructure.Database
 {
@@ -26,7 +27,7 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<DoctorLeave> DoctorLeaves { get; set; } = null!;
         public DbSet<DoctorPublication> DoctorPublications { get; set; } = null!;
         public DbSet<DoctorSchedule> DoctorSchedules { get; set; } = null!;
-        public DbSet<DoctorSpecialty> DoctorSpecialtys { get; set; } = null!;
+        public DbSet<DoctorSpecialty> DoctorSpecialties { get; set; } = null!;
         public DbSet<DoctorWorkExperience> DoctorWorkExperiences { get; set; } = null!;
         public DbSet<Hospital> Hospitals { get; set; } = null!;
         public DbSet<HospitalGroup> HospitalGroups { get; set; } = null!;
@@ -58,6 +59,10 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<VerificationToken> VerificationTokens { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
         public DbSet<Role> Roles { get; set; } = null!;
+        public DbSet<UserRole> UserRoles { get; set; } = null!;
+        public DbSet<Permission> Permissions { get; set; } = null!;
+        public DbSet<RolePermission> RolePermissions { get; set; } = null!;
+        public DbSet<OutboxMessage> OutboxMessages { get; set; } = null!;
         #endregion
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
@@ -66,6 +71,11 @@ namespace PhysioBoo.Infrastructure.Database
         {
             foreach (Microsoft.EntityFrameworkCore.Metadata.IMutableEntityType entity in modelBuilder.Model.GetEntityTypes())
             {
+                if (entity.ClrType == typeof(OutboxMessage))
+                {
+                    continue;
+                }
+
                 modelBuilder.Entity(entity.ClrType).HasQueryFilter(DbContextUtility.GetIsDeletedRestriction(entity.ClrType));
             }
 
@@ -103,7 +113,7 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new DoctorLeaveConfiguration());
             builder.ApplyConfiguration(new DoctorPublicationConfiguration());
             builder.ApplyConfiguration(new DoctorScheduleConfiguration());
-            builder.ApplyConfiguration(new DoctorSpecialityConfiguration());
+            builder.ApplyConfiguration(new DoctorSpecialtyConfiguration());
             builder.ApplyConfiguration(new DoctorWorkExperienceConfiguration());
             builder.ApplyConfiguration(new HospitalConfiguration());
             builder.ApplyConfiguration(new HospitalGroupConfiguration());
@@ -119,7 +129,7 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new LabTestCategoryConfiguration());
             builder.ApplyConfiguration(new ManufacturerConfiguration());
             builder.ApplyConfiguration(new MedicalRecordConfiguration());
-            builder.ApplyConfiguration(new MedicalSpecialityConfiguration());
+            builder.ApplyConfiguration(new MedicalSpecialtyConfiguration());
             builder.ApplyConfiguration(new MedicineCategoryConfiguration());
             builder.ApplyConfiguration(new MedicineConfiguration());
             builder.ApplyConfiguration(new MedicineInventoryConfiguration());
@@ -133,8 +143,12 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new ReviewConfiguration());
             builder.ApplyConfiguration(new SupplierConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
+            builder.ApplyConfiguration(new UserRoleConfiguration());
             builder.ApplyConfiguration(new VerificationTokenConfiguration());
             builder.ApplyConfiguration(new RoleConfiguration());
+            builder.ApplyConfiguration(new PermissionConfiguration());
+            builder.ApplyConfiguration(new RolePermissionConfiguration());
+            builder.ApplyConfiguration(new OutboxConfiguration());
         }
     }
 }

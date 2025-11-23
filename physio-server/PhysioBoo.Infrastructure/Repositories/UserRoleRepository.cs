@@ -10,5 +10,20 @@ namespace PhysioBoo.Infrastructure.Repositories
         {
 
         }
+
+        public async Task AssignRolesAsync(Guid userId, string roleJson)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>
+            {
+                ["p_user_id"] = userId,
+                ["p_roles_json"] = roleJson
+            };
+
+            await ExecutePostgresFunctionAsync(
+                "assign_roles",
+                parameters,
+                reader => reader
+            );
+        }
     }
 }

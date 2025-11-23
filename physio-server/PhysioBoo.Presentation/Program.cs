@@ -42,6 +42,32 @@ namespace PhysioBoo.Presentation
             builder.Services.AddEndpointsApiExplorer();
             LogStep("Controllers added", ref stepTimer);
 
+            #region DbContext
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseNpgsql(dbConnectionString,
+                    npgsqlOptions => npgsqlOptions
+                        .MigrationsAssembly("PhysioBoo.Infrastructure")
+                        .CommandTimeout(30)
+                        .EnableRetryOnFailure(
+                            maxRetryCount: 3,
+                            maxRetryDelay: TimeSpan.FromSeconds(5),
+                            errorCodesToAdd: null)
+                        .MinBatchSize(1)
+                        .MaxBatchSize(100)
+                );
+
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTrackingWithIdentityResolution);
+
+                if (builder.Environment.IsDevelopment())
+                {
+                    options.EnableSensitiveDataLogging();
+                    options.EnableDetailedErrors();
+                    options.LogTo(Console.WriteLine, LogLevel.Warning);
+                }
+            }, ServiceLifetime.Scoped);
+            #endregion
+
             builder.Services.AddInfrastructure(builder.Configuration, "PhysioBoo.Infrastructure");
             LogStep("Infrastructure added", ref stepTimer);
 
@@ -72,6 +98,7 @@ namespace PhysioBoo.Presentation
             builder.Services.AddServices();
             builder.Services.AddPhysioBooConsumers(rabbitConfiguration.Host, rabbitConfiguration.Username, rabbitConfiguration.Password);
             builder.Services.AddHostedService<WarmupConnection>();
+            builder.Services.AddHostedInfrastructureService();
 
             if (builder.Environment.IsProduction())
             {
@@ -99,32 +126,6 @@ namespace PhysioBoo.Presentation
                     .AddNpgSql(dbConnectionString!, name: "Postgres", timeout: TimeSpan.FromSeconds(2))
                     .AddApplicationStatus();
             }
-            #endregion
-
-            #region DbContext
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                options.UseNpgsql(dbConnectionString,
-                    npgsqlOptions => npgsqlOptions
-                        .MigrationsAssembly("PhysioBoo.Infrastructure")
-                        .CommandTimeout(30)
-                        .EnableRetryOnFailure(
-                            maxRetryCount: 3,
-                            maxRetryDelay: TimeSpan.FromSeconds(5),
-                            errorCodesToAdd: null)
-                        .MinBatchSize(1)
-                        .MaxBatchSize(100)
-                );
-
-                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTrackingWithIdentityResolution);
-
-                if (builder.Environment.IsDevelopment())
-                {
-                    options.EnableSensitiveDataLogging();
-                    options.EnableDetailedErrors();
-                    options.LogTo(Console.WriteLine, LogLevel.Warning);
-                }
-            }, ServiceLifetime.Scoped);
             #endregion
 
             #region Cors
@@ -297,6 +298,7 @@ namespace PhysioBoo.Presentation
                 app.MapReviewEndpoints();
                 app.MapMedicalSpecialtyEndpoints();
                 app.MapRoleEndpoints();
+                app.MapConfigEndpoints();
             }
 
             MapCommonEndpoints(app);

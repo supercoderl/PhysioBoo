@@ -26,7 +26,7 @@ namespace PhysioBoo.Application.Services
 
         public async Task SendAsync(Guid userId, string? email, VerificationType? type, CancellationToken cancellationToken)
         {
-            var parameters = new Dictionary<string, object>
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
                 { "p_user_id", userId }
             };
@@ -34,7 +34,7 @@ namespace PhysioBoo.Application.Services
             if (type.HasValue)
                 parameters.Add("p_type", type.Value.ToString());
 
-            var result = await _verificationTokenRepository.ExecutePostgresFunctionAsync<VerificationToken>(
+            List<VerificationToken> result = await _verificationTokenRepository.ExecutePostgresFunctionAsync<VerificationToken>(
                 "get_tokens_dynamic",
                 parameters,
                 reader => MapToken(reader),
@@ -43,20 +43,20 @@ namespace PhysioBoo.Application.Services
 
             if (result.Any())
             {
-                var token = result.First();
+                VerificationToken token = result.First();
                 await _bus.RaiseEventAsync(new EmailVerificationTokenGeneratedEvent(
                     userId, email, token.Token, token.ExpiresAt, type?.ToString() ?? VerificationType.Email.ToString()
                 ));
             }
             else
             {
-                await _bus.RaiseEventAsync(new UsersCreatedEvent(userId, type?.ToString() ?? VerificationType.Email.ToString()));
+                await _bus.RaiseEventAsync(new UsersCreatedEvent(userId, null, type?.ToString() ?? VerificationType.Email.ToString()));
             }
         }
 
         private VerificationToken MapToken(DbDataReader reader)
         {
-            var token = new VerificationToken(
+            VerificationToken token = new VerificationToken(
                 reader.GetFieldValue<Guid>("Id"),
                 reader.GetFieldValue<Guid>("UserId"),
                 reader.GetString("Token"),

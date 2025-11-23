@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using PhysioBoo.Application.Commands.Users.AssignRoleToUser;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
 using PhysioBoo.Application.Commands.Users.CreateUser;
 using PhysioBoo.Application.Commands.Users.ForgotPassword;
@@ -103,9 +104,8 @@ namespace PhysioBoo.Presentation.Endpoints
             #endregion
 
             #region Verify email
-            group.MapGet("/verify-email", async (
-                [FromQuery] string token,
-                [FromQuery] string type,
+            group.MapPost("/verify-email", async (
+                [FromBody] VerifyUserViewModel request,
                 IMediatorHandler bus,
                 INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
@@ -113,7 +113,7 @@ namespace PhysioBoo.Presentation.Endpoints
             {
                 DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
 
-                await bus.SendCommandAsync(new VerifyUserCommand(token, type));
+                await bus.SendCommandAsync(new VerifyUserCommand(request.Token, request.Type));
 
                 if (notifications.HasNotifications())
                 {
@@ -132,7 +132,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 return Results.Ok(new ResponseMessage<string>
                 {
                     Success = true,
-                    Data = token
+                    Data = request.Token
                 });
             }).WithName("Verify email")
             .WithSummary("Verify email")
@@ -375,7 +375,6 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
             #endregion
 
-
             #region Get All Users
             group.MapPost("/search", async (
                 [FromBody] PagedRequest<UserFilter> request,
@@ -411,6 +410,40 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a paginated list of users with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<UserViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<UserViewModel>>>(StatusCodes.Status400BadRequest);
+            #endregion
+
+            #region Assign Role To User
+            group.MapPost("/assign-role-to-user", async (
+                [FromBody] RoleForAssigningViewModel roleForAssigning,
+                IMediatorHandler bus,
+                INotificationHandler<DomainNotification> handler,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
+
+                await bus.SendCommandAsync(new AssignRoleToUserCommand(roleForAssigning));
+
+                if (notifications.HasNotifications())
+                {
+                    return Results.BadRequest(new ResponseMessage<Guid>
+                    {
+                        Success = false,
+                        Errors = notifications.GetNotifications().Select(n => n.Value),
+                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
+                        {
+                            Code = n.Code,
+                            Data = n.Data
+                        })
+                    });
+                }
+
+                return Results.Ok();
+            }).WithName("AssignRoleToUser")
+            .WithSummary("Assign Role To User")
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
         }
     }

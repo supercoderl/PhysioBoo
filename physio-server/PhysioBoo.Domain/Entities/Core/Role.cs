@@ -13,6 +13,7 @@ namespace PhysioBoo.Domain.Entities.Core
         public string? Icon { get; private set; }
         public bool IsSystemRole { get; private set; }
         public bool IsActive { get; private set; }
+        public bool IsPublicForRegistration { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public Guid CreatedBy { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
@@ -50,6 +51,7 @@ namespace PhysioBoo.Domain.Entities.Core
             Color = color;
             Icon = icon;
             IsActive = true;
+            IsPublicForRegistration = false;
             CreatedAt = TimeZoneHelper.GetLocalTimeNow();
             CreatedBy = createdBy;
             UpdatedAt = null;
@@ -64,6 +66,7 @@ namespace PhysioBoo.Domain.Entities.Core
         public void SetColor(string? color) { Color = color; }
         public void SetIcon(string? icon) { Icon = icon; }
         public void SetIsSystemRole(bool isSystemRole) { IsSystemRole = isSystemRole; }
+        public void SetIsPublicForRegistration(bool isPublicForRegistration) { IsPublicForRegistration = isPublicForRegistration; }
         public void SetIsActive(bool isActive) { IsActive = isActive; }
         public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         public void SetCreatedBy(Guid createdBy) { CreatedBy = createdBy; }

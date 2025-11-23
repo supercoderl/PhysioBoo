@@ -8,6 +8,9 @@ namespace PhysioBoo.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<RefreshToken> builder)
         {
+            // Naming
+            builder.ToTable("RefreshTokens");
+
             // PK
             builder.HasKey(rt => rt.Id);
 

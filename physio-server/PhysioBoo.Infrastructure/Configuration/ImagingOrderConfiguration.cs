@@ -8,6 +8,9 @@ namespace PhysioBoo.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<ImagingOrder> builder)
         {
+            // Naming
+            builder.ToTable("ImagingOrders");
+
             // PK
             builder.HasKey(o => o.Id);
 

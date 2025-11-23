@@ -8,6 +8,9 @@ namespace PhysioBoo.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<VerificationToken> builder)
         {
+            // Naming
+            builder.ToTable("VerificationTokens");
+
             // PK
             builder.HasKey(v => v.Id);
 

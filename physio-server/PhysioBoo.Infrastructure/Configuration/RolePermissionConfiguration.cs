@@ -8,6 +8,9 @@ namespace PhysioBoo.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<RolePermission> builder)
         {
+            // Naming
+            builder.ToTable("RolePermissions");
+
             // PK
             builder.HasKey(rp => rp.Id);
 

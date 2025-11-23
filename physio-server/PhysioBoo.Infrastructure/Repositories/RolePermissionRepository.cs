@@ -1,7 +1,6 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Infrastructure.Database;
-using System.Data;
 
 namespace PhysioBoo.Infrastructure.Repositories
 {
@@ -12,24 +11,19 @@ namespace PhysioBoo.Infrastructure.Repositories
 
         }
 
-        public async Task<List<RolePermission>> GetPermissionIdsByRoleIdAsync(Guid roleId)
+        public async Task AssignPermissionsAsync(Guid roleId, string perJson)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>
             {
-                ["p_role_id"] = roleId
+                ["p_role_id"] = roleId,
+                ["p_permissions_json"] = perJson
             };
 
-            List<RolePermission> result = await ExecutePostgresFunctionAsync<RolePermission>(
-                "get_permission_ids_by_role_id",
+            await ExecutePostgresFunctionAsync(
+                "assign_permissions",
                 parameters,
-                reader => new RolePermission(
-                    Guid.NewGuid(),
-                    roleId,
-                    reader.GetFieldValue<Guid>("PermissionId")
-                )
+                reader => reader
             );
-
-            return result;
         }
     }
 }

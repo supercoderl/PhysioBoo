@@ -106,7 +106,7 @@
                     >
                     <a
                       class="font-medium text-secondary mb-1 inline-block text-xs14 cursor-pointer"
-                      href="/react/template/forgot-password"
+                      routerLink="/auth/forgot"
                     >
                       Forgot password?
                     </a>
@@ -162,8 +162,8 @@
                 <div class="mb-4">
                   <boo-button
                     label="Login"
-                    classname="!w-full"
-                    [radius]="44"
+                    classname="!w-full !py-3 font-bold uppercase"
+                    [radius]="5"
                     [loading]="loadingSrv.isLoading('login')"
                     (clicked)="login()"
                   >

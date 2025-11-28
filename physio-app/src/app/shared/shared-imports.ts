@@ -8,6 +8,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { NzIconModule } from "ng-zorro-antd/icon";
 import { NzLayoutModule } from "ng-zorro-antd/layout";
 import { NzMenuModule } from "ng-zorro-antd/menu";
+import { LottieComponent } from "ngx-lottie";
 import { ParticlesDirective } from "./directives/particles.directive";
 import { CustomScrollbarDirective } from "./directives/scrollbar.directive";
 import { CompletionTextPipe } from "./pipes/completion.pipe";
@@ -31,5 +32,6 @@ export const SharedModule = [
     LucideAngularModule,
     ...SHARED_ZORRO_MODULES,
     CompletionTextPipe,
-    ...SHARED_PIPES
+    ...SHARED_PIPES,
+    LottieComponent
 ];

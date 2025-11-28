@@ -71,7 +71,7 @@ export class RegisterComponent {
     this.http.post<PagedResponse<string>>("/api/users/register", body).subscribe({
       next: (res) => {
         if(res.success) {
-          this.router.navigate(['/admin/verify-required']);
+          this.router.navigate(['/auth/verify-required']);
         }
       },
       error: (err) => {

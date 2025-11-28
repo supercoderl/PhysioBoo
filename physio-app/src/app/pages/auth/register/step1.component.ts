@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { FormGroup } from "@angular/forms";
 import { BooButtonComponent } from "../../../components/button/boo-button/boo-button.component";
-import { DividerComponent } from "../../../components/divider/divider.component";
 import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
 import { SharedModule } from "../../../shared/shared-imports";
 
@@ -11,8 +10,7 @@ import { SharedModule } from "../../../shared/shared-imports";
     imports: [
     SharedModule,
     BooButtonComponent,
-    BooInputComponent,
-    DividerComponent
+    BooInputComponent
 ],
     template: `
         <div class="min-w-full p-4 h-full flex" id="step1">
@@ -84,9 +82,27 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 required
                             />
                         </div>
+                        <div>
+                            <label
+                                class="text-xs14 font-medium text-primary mb-1 inline-block"
+                            >
+                                Confirm Password
+                            </label>
+                            <boo-input
+                                label="Enter your confirm password"
+                                id="confirm-password"
+                                name="password"
+                                formControlName="password"
+                                [radius]="5"
+                                backgroundColor="white"
+                                [borderWidth]="1"
+                                borderColor="#e6e8ee"
+                                size="small"
+                                placeholderColor="rgba(0, 0, 0, 0.4)"
+                                required
+                            />
+                        </div>
                     </div>
-
-                    <divider classname="py-4"></divider>
 
                     <div class="mt-auto">
                         <div class="flex justify-between gap-5">
@@ -94,6 +110,8 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 label="Next"
                                 [radius]="5"
                                 (clicked)="onNext.emit()"
+                                class="w-full"
+                                classname="w-full !py-3 uppercase text-md font-bold"
                             ></boo-button>
                         </div>
                     </div>

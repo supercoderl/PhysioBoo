@@ -1,6 +1,6 @@
 <div class="bg-white">
   <div
-    class="py-20 md:py-15 flex md:items-center h-screen overflow-y-auto flex-wrap relative"
+    class="py-20 md:py-15 flex md:items-center h-screen overflow-y-auto relative"
   >
     <div
       class="bg-center bg-cover absolute top-0 left-0 right-0 w-full h-[380px]"
@@ -79,7 +79,7 @@
                             [formGroup]="form"
                           ></register-step-one>
                         </div>
-                        <div class="min-w-full p-2">
+                        <div class="min-w-full">
                           <register-step-two
                             (onSubmit)="handleRegistration()"
                             (onPrev)="previousStep()"
@@ -92,6 +92,9 @@
                   </div>
                 </boo-form>
               </div>
+            </div>
+            <div>
+              <p class="m-0">Already have an account? <a routerLink="/auth/login">Login Now!</a></p>
             </div>
           </div>
         </div>

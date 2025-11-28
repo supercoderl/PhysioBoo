@@ -9,6 +9,7 @@ import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { LucideAngularModule } from 'lucide-angular';
 import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
+import { provideLottieOptions } from 'ngx-lottie';
 import { routes } from './app.routes';
 import { provideIcons } from './icon.config';
 import { InitService } from './services/common/init.service';
@@ -38,6 +39,9 @@ export const appConfig: ApplicationConfig = {
       useFactory: initializeApp,
       deps: [InitService],
       multi: true
-    }
+    },
+    provideLottieOptions({
+      player: () => import('lottie-web'),
+    }),
   ]
 };

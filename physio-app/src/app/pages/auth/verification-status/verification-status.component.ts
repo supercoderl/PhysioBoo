@@ -59,7 +59,7 @@ export class VerificationStatusComponent implements OnInit, OnDestroy, AfterView
   }
   // #endregion
 
-  // #region Events
+  // #region Methods
   updateMessage(status: string) {
     if (status === "fail") {
       this.message = "fail";

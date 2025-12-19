@@ -13,14 +13,14 @@ import { SharedModule } from "../../../shared/shared-imports";
     BooInputComponent
 ],
     template: `
-        <div class="min-w-full p-4 h-full flex" id="step1">
+        <div class="min-w-full px-1 pb-2 h-full flex" id="step1" [formGroup]="formGroup">
             <div class="relative flex flex-1 flex-col">
                 <h3
                     class="text-[24px] text-black font-semibold"
                 >
                     Create your account
                 </h3>
-                <div class="relative flex flex-1 flex-col" [formGroup]="formGroup">
+                <div class="relative flex flex-1 flex-col">
                     <div class="space-y-3">
                         <div>
                             <label
@@ -30,16 +30,8 @@ import { SharedModule } from "../../../shared/shared-imports";
                             </label>
                             <boo-input
                                 label="Enter your email"
-                                id="email"
-                                name="email"
-                                [radius]="5"
                                 formControlName="email"
-                                backgroundColor="white"
-                                [borderWidth]="1"
-                                borderColor="#e6e8ee"
-                                size="small"
-                                placeholderColor="rgba(0, 0, 0, 0.4)"
-                                required
+                                booError
                             />
                         </div>
                         <div>
@@ -50,16 +42,8 @@ import { SharedModule } from "../../../shared/shared-imports";
                             </label>
                             <boo-input
                                 label="Enter your phone number"
-                                id="phone"
-                                name="phone"
                                 formControlName="phone"
-                                [radius]="5"
-                                backgroundColor="white"
-                                [borderWidth]="1"
-                                borderColor="#e6e8ee"
-                                size="small"
-                                placeholderColor="rgba(0, 0, 0, 0.4)"
-                                required
+                                booError
                             />
                         </div>
                         <div>
@@ -70,49 +54,22 @@ import { SharedModule } from "../../../shared/shared-imports";
                             </label>
                             <boo-input
                                 label="Enter your password"
-                                id="password"
-                                name="password"
                                 formControlName="password"
-                                [radius]="5"
-                                backgroundColor="white"
-                                [borderWidth]="1"
-                                borderColor="#e6e8ee"
-                                size="small"
-                                placeholderColor="rgba(0, 0, 0, 0.4)"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label
-                                class="text-xs14 font-medium text-primary mb-1 inline-block"
-                            >
-                                Confirm Password
-                            </label>
-                            <boo-input
-                                label="Enter your confirm password"
-                                id="confirm-password"
-                                name="password"
-                                formControlName="password"
-                                [radius]="5"
-                                backgroundColor="white"
-                                [borderWidth]="1"
-                                borderColor="#e6e8ee"
-                                size="small"
-                                placeholderColor="rgba(0, 0, 0, 0.4)"
-                                required
+                                booError
                             />
                         </div>
                     </div>
 
                     <div class="mt-auto">
                         <div class="flex justify-between gap-5">
-                            <boo-button
+                            <button
+                                boo-button
                                 label="Next"
                                 [radius]="5"
-                                (clicked)="onNext.emit()"
+                                (click)="onNext.emit()"
                                 class="w-full"
                                 classname="w-full !py-3 uppercase text-md font-bold"
-                            ></boo-button>
+                            ></button>
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,6 @@
-import { AlignStartVertical, BadgeCheck, Banknote, Calculator, Calendar, ChartPie, CircleAlert, Clock, Cloud, DollarSign, FileCheck, GraduationCap, Grid2x2, Image, Info, Link2, Lock, Mail, MessageSquare, NotebookPen, Search, ShoppingCart, TriangleAlert, Users } from "lucide-angular"
+import { MenuItem } from "../types/menu"
 
+// #region Categories
 export const CATEGORIES = [
     {
         id: 1,
@@ -51,7 +52,9 @@ export const CATEGORIES = [
         color: "#0e9384"
     }
 ]
+// #endregion
 
+// #region Company Logos
 export const COMPANYLOGOS = [
     'https://doccure.dreamstechnologies.com/react/template/src/assets/img/company/company-01.svg',
     'https://doccure.dreamstechnologies.com/react/template/src/assets/img/company/company-02.svg',
@@ -62,7 +65,9 @@ export const COMPANYLOGOS = [
     'https://doccure.dreamstechnologies.com/react/template/src/assets/img/company/company-07.svg',
     'https://doccure.dreamstechnologies.com/react/template/src/assets/img/company/company-08.svg',
 ]
+// #endregion
 
+// #region Footer Menus
 export const FOOTER_MENUS = [
     {
         id: 1,
@@ -189,7 +194,9 @@ export const FOOTER_MENUS = [
         ]
     }
 ]
+// #endregion
 
+// #region Testimonial Counters
 export const TESTIMONIAL_COUNTERS = [
     {
         id: 1,
@@ -222,7 +229,9 @@ export const TESTIMONIAL_COUNTERS = [
         color: '#ffca18'
     }
 ]
+// #endregion
 
+// #region FAQs
 export const FAQs = [
     {
         id: 1,
@@ -250,7 +259,9 @@ export const FAQs = [
         description: 'Yes, in many cases, you can book appointments for family members or dependents. However, you may need to provide their personal information and consent to do so.'
     },
 ]
+// #endregion
 
+// #region Headers
 export const HEADERS = [
     {
         id: 1,
@@ -283,7 +294,9 @@ export const HEADERS = [
         href: '/blog'
     },
 ]
+// #endregion
 
+// #region Best Doctors
 export const BEST_DOCTORS = [
     {
         id: 1,
@@ -326,7 +339,9 @@ export const BEST_DOCTORS = [
         price: 570
     }
 ]
+// #endregion
 
+// #region Hospitals
 export const HOSPITALS = [
     {
         id: 1,
@@ -401,7 +416,9 @@ export const HOSPITALS = [
         img: "https://doccure.dreamstechnologies.com/react/template/src/assets/img/hospitals/hospital-12.svg"
     }
 ]
+// #endregion
 
+// #region Blogs
 export const BLOGS = [
     {
         id: 1,
@@ -476,201 +493,9 @@ export const BLOGS = [
         category: "Technology"
     }
 ]
+// #endregion
 
-export const MENUS = [
-    {
-        id: 1,
-        title: 'Dashboard',
-        subtitle: 'Unique dashboard designs',
-        children: [
-            {
-                id: 1,
-                title: 'Project',
-                icon: FileCheck,
-                href: ''
-            },
-            {
-                id: 2,
-                title: 'Analytics',
-                icon: ChartPie,
-                href: ''
-            },
-            {
-                id: 3,
-                title: 'Finance',
-                icon: Banknote,
-                href: ''
-            },
-            {
-                id: 4,
-                title: 'Crypto',
-                icon: DollarSign,
-                href: ''
-            }
-        ]
-    },
-    {
-        id: 2,
-        title: 'Applications',
-        subtitle: 'Custom made application designs',
-        children: [
-            {
-                id: 1,
-                title: 'AI Image Generator',
-                icon: Image,
-                href: '',
-                suffix: 'New'
-            },
-            {
-                id: 2,
-                title: 'Academy',
-                icon: GraduationCap,
-                href: ''
-            },
-            {
-                id: 3,
-                title: 'Calendar',
-                icon: Calendar,
-                href: ''
-            },
-            {
-                id: 4,
-                title: 'Messenger',
-                icon: MessageSquare,
-                href: ''
-            },
-            {
-                id: 5,
-                title: 'Contacts',
-                icon: Users,
-                href: ''
-            },
-            {
-                id: 6,
-                title: 'E-commerce',
-                icon: ShoppingCart,
-                href: 'javascript:void(0)',
-                children: [
-                    {
-                        id: 1,
-                        title: 'Product'
-                    },
-                    {
-                        id: 2,
-                        title: 'Product Detail'
-                    },
-                    {
-                        id: 3,
-                        title: 'New Product'
-                    },
-                    {
-                        id: 4,
-                        title: 'Orders'
-                    }
-                ]
-            },
-            {
-                id: 7,
-                title: 'File Manager',
-                icon: Cloud,
-                href: ''
-            },
-            {
-                id: 8,
-                title: 'Help Center',
-                icon: Info,
-                href: ''
-            },
-            {
-                id: 9,
-                title: 'Mail',
-                icon: Mail,
-                href: '',
-                suffix: '27'
-            },
-            {
-                id: 10,
-                title: 'Notes',
-                icon: NotebookPen,
-                href: ''
-            },
-            {
-                id: 11,
-                title: 'Scrumboard',
-                icon: Grid2x2,
-                href: ''
-            }
-            , {
-                id: 12,
-                title: 'Tasks',
-                icon: BadgeCheck,
-                href: ''
-            }
-        ]
-    },
-    {
-        id: 3,
-        title: 'Pages',
-        subtitle: 'Custom made page designs',
-        children: [
-            {
-                id: 1,
-                title: 'Activities',
-                icon: AlignStartVertical,
-                href: ''
-            },
-            {
-                id: 2,
-                title: 'Authentication',
-                icon: Lock,
-                href: ''
-            },
-            {
-                id: 3,
-                title: 'Coming Soon',
-                icon: Clock,
-                href: ''
-            },
-            {
-                id: 4,
-                title: 'Error',
-                icon: CircleAlert,
-                href: ''
-            },
-            {
-                id: 5,
-                title: 'Invoice',
-                icon: Calculator,
-                href: ''
-            },
-            {
-                id: 6,
-                title: 'Maintenance',
-                icon: TriangleAlert,
-                href: ''
-            },
-            {
-                id: 7,
-                title: 'Pricing',
-                icon: Banknote,
-                href: ''
-            },
-            {
-                id: 8,
-                title: 'Search',
-                icon: Search,
-                href: ''
-            },
-            {
-                id: 9,
-                title: 'physioboo.com',
-                icon: Link2,
-                href: ''
-            },
-        ]
-    }
-]
-
+// #region Courses
 export const COURSES = [
     {
         id: 1,
@@ -785,7 +610,9 @@ export const COURSES = [
         timeCompleted: 0
     },
 ]
+// #endregion
 
+// #region Folders
 export const FOLDERS = [
     {
         id: 1,
@@ -806,71 +633,407 @@ export const FOLDERS = [
         isFolder: true
     }
 ]
+// #endregion
 
+// #region Files
 export const FILES = [
     {
-        "id": 1,
+        id: 1,
         "name": "Contract #123",
         "type": "pdf"
     },
     {
-        "id": 2,
+        id: 2,
         "name": "Estimated budget",
         "type": "xls"
     },
     {
-        "id": 3,
+        id: 3,
         "name": "DMCA notice",
         "type": "doc"
     },
     {
-        "id": 4,
+        id: 4,
         "name": "Invoices",
         "type": "pdf"
     },
     {
-        "id": 5,
+        id: 5,
         "name": "Crash logs",
         "type": "txt"
     },
     {
-        "id": 6,
+        id: 6,
         "name": "System logs",
         "type": "txt"
     },
     {
-        "id": 7,
+        id: 7,
         "name": "Personal project",
         "type": "doc"
     },
     {
-        "id": 8,
+        id: 8,
         "name": "Biometric portrait",
         "type": "jpg"
     },
     {
-        "id": 9,
+        id: 9,
         "name": "Scanned image 1",
         "type": "jpg"
     },
     {
-        "id": 10,
+        id: 10,
         "name": "Scanned image 2",
         "type": "jpg"
     },
     {
-        "id": 11,
+        id: 11,
         "name": "Prices",
         "type": "doc"
     },
     {
-        "id": 12,
+        id: 12,
         "name": "Shopping list",
         "type": "doc"
     },
     {
-        "id": 13,
+        id: 13,
         "name": "Summer budget",
         "type": "xls"
     }
 ]
+// #endregion
+
+// #region Menus    
+export const MENUS: MenuItem[] = [
+    {
+        id: "overview",
+        label: "Overview",
+        icon: "layout-dashboard",
+        route: "overview",
+        roles: ["admin", "director", "doctor", "receptionist", "marketer"],
+        children: [
+            {
+                id: "dashboard",
+                label: "Dashboard",
+                route: "overview/dashboard",
+                icon: "gauge"
+            },
+        ]
+    },
+    {
+        id: "reception",
+        label: "Reception",
+        icon: "concierge-bell",
+        roles: ["admin", "receptionist"],
+        children: [
+            {
+                id: "booking",
+                label: "Booking",
+                route: "reception/booking",
+                icon: "calendar-days"
+            },
+            {
+                id: "registration",
+                label: "Registration",
+                route: "reception/register",
+                icon: "user-plus"
+            },
+            {
+                id: "queue",
+                label: "Queue",
+                route: "reception/queue",
+                icon: "users",
+                badge: 12
+            },
+            {
+                id: "patient-lookup",
+                label: "Patient Lookup",
+                route: "reception/patient-lookup",
+                icon: "search"
+            }
+        ]
+    },
+    {
+        id: "clinic",
+        label: "Clinic",
+        icon: "stethoscope",
+        roles: ["admin", "doctor"],
+        children: [
+            {
+                id: "doctor-desk",
+                label: "Doctor Desk",
+                route: "clinic/doctor-desk",
+                icon: "monitor-check"
+            },
+            {
+                id: "prescription",
+                label: "Prescription",
+                route: "clinic/prescription",
+                icon: "file-plus"
+            },
+            {
+                id: "medical-record",
+                label: "Medical Record",
+                route: "clinic/medical-record",
+                icon: "folder-open"
+            }
+        ]
+    },
+    {
+        id: "inpatient",
+        label: "Inpatient",
+        icon: "bed",
+        roles: ["admin", "nurse", "doctor"],
+        children: [
+            {
+                id: "bed-map",
+                label: "Bed Map",
+                route: "inpatient/bed-map",
+                icon: "layout-grid"
+            },
+            {
+                id: "admission",
+                label: "Admission",
+                route: "inpatient/admission",
+                icon: "log-in"
+            },
+            {
+                id: "treatment-sheet",
+                label: "Treatment Sheet",
+                route: "inpatient/treatment",
+                icon: "clipboard-list"
+            }
+        ]
+    },
+    {
+        id: "paraclinical",
+        label: "Paraclinical",
+        icon: "microscope",
+        roles: ["admin", "technician", "doctor"],
+        children: [
+            {
+                id: "lis",
+                label: "Laboratory",
+                route: "paraclinical/lis",
+                icon: "flask-conical"
+            },
+            {
+                id: "ris",
+                label: "Radiology",
+                route: "paraclinical/ris",
+                icon: "image"
+            },
+            {
+                id: "surgery",
+                label: "Surgery",
+                route: "paraclinical/surgery",
+                icon: "scissors"
+            }
+        ]
+    },
+    {
+        id: "pharmacy",
+        label: "Pharmacy",
+        icon: "pill",
+        roles: ["admin", "pharmacist"],
+        children: [
+            {
+                id: "retail",
+                label: "Retail",
+                route: "pharmacy/retail",
+                icon: "shopping-cart"
+            },
+            {
+                id: "prescription-dispense",
+                label: "Prescription Dispense",
+                route: "pharmacy/dispense",
+                icon: "file-check"
+            },
+            {
+                id: "inventory",
+                label: "Inventory Management",
+                route: "pharmacy/inventory",
+                icon: "warehouse"
+            },
+            {
+                id: "inventory-check",
+                label: "Stock Take",
+                route: "pharmacy/stock-take",
+                icon: "clipboard-check"
+            }
+        ]
+    },
+    {
+        id: "finance",
+        label: "Finance",
+        icon: "wallet",
+        roles: ["admin", "accountant", "cashier"],
+        children: [
+            {
+                id: "cashier",
+                label: "Cashier",
+                route: "finance/cashier",
+                icon: "banknote"
+            },
+            {
+                id: "insurance",
+                label: "Insurance",
+                route: "finance/insurance",
+                icon: "shield-check"
+            },
+            {
+                id: "revenue-report",
+                label: "Revenue Report",
+                route: "finance/reports",
+                icon: "bar-chart-3"
+            }
+        ]
+    },
+    {
+        id: "crm",
+        label: "CRM & CS",
+        icon: "users-round",
+        roles: ["admin", "marketer", "cskh"],
+        children: [
+            {
+                id: "customer-data",
+                label: "Customer 360",
+                route: "crm/customers",
+                icon: "database"
+            },
+            {
+                id: "marketing",
+                label: "Marketing Campaign",
+                route: "crm/marketing",
+                icon: "megaphone"
+            },
+            {
+                id: "leads",
+                label: "Lead Management",
+                route: "crm/leads",
+                icon: "list-filter"
+            },
+            {
+                id: "tickets",
+                label: "Support & Complaints",
+                route: "crm/tickets",
+                icon: "headphones",
+                badge: 5
+            },
+            {
+                id: "loyalty",
+                label: "Members & Points",
+                route: "crm/loyalty",
+                icon: "gift"
+            }
+        ]
+    },
+    {
+        id: "cms",
+        label: "CMS",
+        icon: "globe",
+        roles: ["admin", "marketer"],
+        children: [
+            {
+                id: "articles",
+                label: "Articles & News",
+                route: "cms/articles",
+                icon: "newspaper"
+            },
+            {
+                id: "services",
+                label: "Services",
+                route: "cms/services",
+                icon: "briefcase"
+            },
+            {
+                id: "doctors",
+                label: "Doctors",
+                route: "cms/doctors",
+                icon: "user-check"
+            },
+            {
+                id: "configuration",
+                label: "Home Configuration",
+                route: "cms/config",
+                icon: "layout-template"
+            }
+        ]
+    },
+    {
+        id: "system",
+        label: "System",
+        icon: "settings",
+        roles: ["admin"],
+        children: [
+            {
+                id: "users",
+                label: "Users & Permissions",
+                route: "system/users",
+                icon: "user-cog"
+            },
+            {
+                id: "categories",
+                label: "Common Categories",
+                route: "system/categories",
+                icon: "list"
+            },
+            {
+                id: "print-templates",
+                label: "Print Templates",
+                route: "system/templates",
+                icon: "printer"
+            }
+        ]
+    }
+]   
+// #endregion
+
+// #region Category Dashboard
+export const MEDICAL_CATEGORIES = [
+    {
+        id: 1,
+        name: "All Patient",
+        color: "#1F6DB2",
+        background: "#EBF2F9",
+        icon: "users"
+    },
+    {
+        id: 2,
+        name: "Doctors",
+        color: "#09800F",
+        background: "#EEF9F1",
+        icon: "briefcase-medical"
+    },
+    {
+        id: 3,
+        name: "Labs Results",
+        color: "#FDAF22",
+        background: "#FFF8EF",
+        icon: "test-tube"
+    },
+    {
+        id: 4,
+        name: "Prescriptions",
+        color: "#B71C1C",
+        background: "#FBECEA",
+        icon: "heart-pulse"
+    },
+    {
+        id: 5,
+        name: "Visits",
+        color: "#6A1B9A",
+        background: "#F1EBF7",
+        icon: "telescope"
+    },
+    {
+        id: 6,
+        name: "Medical Results",
+        color: "#00796B",
+        background: "#EBF2F1",
+        icon: "clipboard-plus"
+    }
+]
+// #endregion

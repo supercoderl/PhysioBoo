@@ -39,7 +39,7 @@ export class RegisterProgressBarComponent {
     @Input() currentStep = 1;
     // #endregion
 
-    // #region Events
+    // #region Methods
     getStepWidth(index: number): string {
         const base = 100 / this.stepCount; 
         const activeBoost = 1.4;   

@@ -1,4 +1,4 @@
-import { ALargeSmall, ArrowRight, ArrowUpDown, BadgeCheck, Bell, Blocks, Bookmark, Brain, Briefcase, Building2, Calendar, ChevronDown, ChevronRight, CircleCheck, CirclePlus, CircleUser, Clock, Cloud, CreditCard, DatabaseBackup, EllipsisVertical, Eye, EyeOff, FileText, Flag, Flame, Folder, Globe, GraduationCap, Hash, Heart, House, Image, Info, Key, LandPlot, Loader, Lock, LucideIconData, Mail, MapPin, Maximize, Menu, Minimize, Moon, MoveLeft, PanelLeft, Phone, Play, Plus, Search, Share, Star, Stethoscope, Sun, Triangle, Undo2, User, UserRound, Users, X } from 'lucide-angular';
+import { ALargeSmall, ArrowRight, ArrowUpDown, Badge, BadgeCheck, Banknote, BarChart3, Bell, Blocks, Bookmark, BoomBox, Brain, Briefcase, BriefcaseMedical, Building2, Calendar, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, CirclePlus, CircleUser, CircleX, ClipboardCheck, ClipboardList, ClipboardPlus, Clock, Cloud, CreditCard, Database, DatabaseBackup, Download, Droplet, EllipsisVertical, Eye, EyeOff, FileCheck, FilePlus, FileText, Flag, Flame, FlaskConical, Folder, FolderOpen, Funnel, Gauge, Gift, Globe, GraduationCap, Handbag, Hash, Headphones, Heart, HeartPulse, House, Image, Info, Key, LandPlot, LayoutGrid, LayoutTemplate, List, ListFilter, Loader, Lock, LogIn, LucideIconData, Mail, MapPin, Maximize, Megaphone, Meh, Menu, Minimize, MonitorCheck, Moon, MoveLeft, Newspaper, PanelLeft, Phone, Play, Plus, Printer, Rainbow, Scissors, Search, Share, ShieldCheck, ShoppingCart, Smile, Star, Stethoscope, Sun, Telescope, TestTube, Triangle, Undo2, User, UserCheck, UserCog, UserPlus, UserRound, Users, Warehouse, X } from 'lucide-angular';
 import { NzAffixModule } from 'ng-zorro-antd/affix';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzAnchorModule } from 'ng-zorro-antd/anchor';
@@ -215,7 +215,53 @@ export const SHARED_LUCIDE_ICONS: Record<string, LucideIconData> = {
     Cloud,
     Loader,
     Stethoscope,
-    MoveLeft
+    MoveLeft,
+    Smile,
+    CalendarDays,
+    UserPlus,
+    MonitorCheck,
+    FilePlus,
+    FolderOpen,
+    LayoutGrid,
+    LogIn,
+    ClipboardList,
+    FlaskConical,
+    Scissors,
+    ShoppingCart,
+    FileCheck,
+    Warehouse,
+    ClipboardCheck,
+    Banknote,
+    ShieldCheck,
+    BarChart3,
+    Database,
+    Megaphone,
+    Headphones,
+    Gift,
+    Newspaper,
+    UserCheck,
+    LayoutTemplate,
+    List,
+    Printer,
+    ListFilter,
+    UserCog,
+    Gauge,
+    Handbag,
+    CircleX,
+    Check,
+    ClipboardPlus,
+    Telescope,
+    HeartPulse,
+    TestTube,
+    BriefcaseMedical,
+    Download,
+    BoomBox,
+    Badge,
+    Rainbow,
+    Meh,
+    Droplet,
+    Funnel,
+    ChevronLeft
 }
 
 export const SHARED_PIPES = [

@@ -1,159 +1,81 @@
-import { Component, ContentChild, EventEmitter, Input, Output } from '@angular/core';
-import { FormGroupDirective, NgForm } from '@angular/forms';
+import { Component, EventEmitter, HostListener, Input, Optional, Output, Self } from '@angular/core';
+import { FormGroupDirective } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared-imports';
 
 @Component({
-  selector: 'boo-form',
+  selector: 'form[boo-form]',
   standalone: true,
   imports: [
     SharedModule
   ],
   template: `
-    <form 
-      [class]="formClass"
-      (ngSubmit)="onSubmit()"
-      #form="ngForm"
-    >
-      <ng-content></ng-content>
+    <ng-content></ng-content>
+    <div class="flex gap-3 mt-6 pt-5 border-t border-gray-200" *ngIf="showActions">   
+      <button 
+        type="submit"
+        [disabled]="disableSubmitWhenInvalid && (formDir ? formDir.invalid : false)"
+        [class]="submitButtonClass || 'px-6 py-2.5 bg-green-600 text-white font-medium rounded hover:bg-green-700 disabled:bg-gray-300 transition-all shadow-sm'"
+      >
+        {{ submitButtonText }}
+      </button>
       
-      <div class="form-actions" *ngIf="showActions">
-        <button 
-          type="submit" 
-          [disabled]="isSubmitDisabled()"
-          [class]="submitButtonClass"
-        >
-          {{ submitButtonText }}
-        </button>
-        
-        <button 
-          type="button" 
-          (click)="onReset()"
-          [class]="resetButtonClass"
-          *ngIf="showResetButton"
-        >
-          {{ resetButtonText }}
-        </button>
-      </div>
-    </form>
+      <button 
+        *ngIf="showResetButton"
+        type="button" 
+        (click)="onReset()"
+        [class]="resetButtonClass || 'px-6 py-2.5 bg-gray-100 text-gray-700 font-medium rounded hover:bg-gray-200 border border-gray-300 transition-all'"
+      >
+        {{ resetButtonText }}
+      </button>
+    </div>
   `,
-  styles: [`
-    form {
-      width: 100%;
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-      padding-top: 20px;
-      border-top: 1px solid #e0e0e0;
-    }
-
-    button {
-      padding: 10px 24px;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    button[type="submit"] {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    button[type="submit"]:hover:not(:disabled) {
-      background-color: #45a049;
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
-    }
-
-    button[type="submit"]:disabled {
-      background-color: #cccccc;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    button[type="button"] {
-      background-color: #f5f5f5;
-      color: #333;
-      border: 1px solid #ddd;
-    }
-
-    button[type="button"]:hover {
-      background-color: #e0e0e0;
-    }
-  `]
+  host: {
+    '[class]': 'formClass',
+    '[class.w-full]': 'true'
+  },
 })
 export class FormWrapperComponent {
-  @Input() submitButtonText: string = 'Submit';
-  @Input() resetButtonText: string = 'Reset';
-  @Input() showActions: boolean = true;
-  @Input() showResetButton: boolean = true;
-  @Input() disableSubmitWhenInvalid: boolean = true;
+  // #region Inputs, Outputs, Properties
   @Input() formClass: string = '';
+  @Input() showActions: boolean = false;
+  @Input() showResetButton: boolean = true;
+  @Input() disableSubmitWhenInvalid: boolean = false;
+  @Input() submitButtonText: string = 'Lưu lại';
+  @Input() resetButtonText: string = 'Nhập lại';
   @Input() submitButtonClass: string = '';
   @Input() resetButtonClass: string = '';
-  
-  @Output() formSubmit = new EventEmitter<any>();
-  @Output() formReset = new EventEmitter<void>();
-  
-  @ContentChild(NgForm) ngForm?: NgForm;
-  @ContentChild(FormGroupDirective) formGroupDirective?: FormGroupDirective;
 
-  onSubmit(): void {
-    const formValue = this.getFormValue();
-    
-    if (this.isFormValid()) {
-      this.formSubmit.emit(formValue);
-    } else {
-      this.markFormAsTouched();
+  @Output() validSubmit = new EventEmitter<any>();
+  @Output() formReset = new EventEmitter<void>();
+  // #endregion
+
+  // #region Init (Lifecycles + Setup)
+  constructor(
+    @Optional() @Self() public formDir: FormGroupDirective
+  ) { }
+  // #endregion
+
+  // #region Methods
+  @HostListener('submit', ['$event'])
+  onFormSubmit(event: Event) {
+    if (!this.formDir) return; // Safety check
+
+    const formGroup = this.formDir.form;
+
+    if (formGroup.invalid) {
+      event.preventDefault();
+      formGroup.markAllAsTouched();
+      return;
     }
+
+    this.validSubmit.emit(formGroup.value);
   }
 
-  onReset(): void {
-    if (this.ngForm) {
-      this.ngForm.resetForm();
-    } else if (this.formGroupDirective) {
-      this.formGroupDirective.form.reset();
+  onReset() {
+    if (this.formDir) {
+      this.formDir.resetForm();
     }
     this.formReset.emit();
   }
-
-  isSubmitDisabled(): boolean {
-    if (!this.disableSubmitWhenInvalid) {
-      return false;
-    }
-    return !this.isFormValid();
-  }
-
-  private isFormValid(): boolean {
-    if (this.ngForm) {
-      return this.ngForm.valid || false;
-    } else if (this.formGroupDirective) {
-      return this.formGroupDirective.form.valid;
-    }
-    return true;
-  }
-
-  private getFormValue(): any {
-    if (this.ngForm) {
-      return this.ngForm.value;
-    } else if (this.formGroupDirective) {
-      return this.formGroupDirective.form.value;
-    }
-    return null;
-  }
-
-  private markFormAsTouched(): void {
-    if (this.ngForm) {
-      Object.keys(this.ngForm.controls).forEach(key => {
-        this.ngForm?.controls[key].markAsTouched();
-      });
-    } else if (this.formGroupDirective) {
-      this.formGroupDirective.form.markAllAsTouched();
-    }
-  }
+  // #endregion
 }

@@ -119,9 +119,12 @@ import { SharedModule } from '../../../shared/shared-imports';
                         I understand and agree to the
                         <a href="#" target="_blank" class="font-medium">privacy policy</a>.
                       </boo-checkbox>
-                      <boo-button size="large">
+                      <button 
+                        boo-button
+                        size="large"
+                      >
                         Submit Request 
-                      </boo-button>
+                      </button>
                     </form>
                   </div>
                 </div>

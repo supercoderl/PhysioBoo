@@ -7,6 +7,111 @@ export const routes: Routes = [
         data: { breadcrumb: ['admin'] },
         children: [
             {
+                path: '',
+                redirectTo: 'overview',
+                pathMatch: 'full'
+            },
+            {
+                path: 'overview',
+                data: { breadcrumb: ['overview'] },
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'dashboard',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'dashboard',
+                        loadComponent: () => import('./overview/dashboard/dashboard.component').then(m => m.DashboardComponent),
+                        data: { breadcrumb: ['dashboard'] },
+                    }
+                ]
+            },
+            {
+                path: 'reception',
+                data: { breadcrumb: ['reception'] },
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'booking',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'booking',
+                        data: { breadcrumb: ['booking'] },
+                        children: [
+                            {
+                                path: '',
+                                redirectTo: 'list',
+                                pathMatch: 'full'
+                            },
+                            {
+                                path: 'list',
+                                loadComponent: () => import('./reception/booking/admin-booking-list/admin-booking-list.component').then(m => m.AdminBookingListComponent),
+                                data: { breadcrumb: ['list'] }
+                            }
+                        ]
+                    },
+                    {
+                        path: 'queue',
+                        data: { breadcrumb: ['queue'] },
+                        loadComponent: () => import('./reception/queue/queue.component').then(m => m.AdminQueueComponent),
+                    },
+                    {
+                        path: 'patient-lookup',
+                        data: { breadcrumb: ['patient-lookup'] },
+                        loadComponent: () => import('./reception/patient-lookup/patient-lookup.component').then(m => m.AdminPatientLookupComponent),
+                    }
+                ]
+            },
+            {
+                path: 'clinic',
+                data: { breadcrumb: ['clinic'] },
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'doctor-desk',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'doctor-desk',
+                        data: { breadcrumb: ['doctor-desk'] },
+                        loadComponent: () => import('./clinic/doctor-desk/doctor-desk.component').then(m => m.AdminDoctorDeskComponent)
+                    },
+                    {
+                        path: 'prescription',
+                        data: { breadcrumb: ['prescription'] },
+                        loadComponent: () => import('./clinic/prescription/prescription.component').then(m => m.AdminPrescriptionComponent)
+                    },
+                    {
+                        path: 'medical-record',
+                        data: { breadcrumb: ['medical record'] },
+                        loadComponent: () => import('./clinic/medical-record/medical-record.component').then(m => m.AdminMedicalRecordComponent)
+                    }
+                ]
+            },
+            {
+                path: 'inpatient',
+                data: { breadcrumb: ['inpatient'] },
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'bed-map',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'bed-map',
+                        data: { breadcrumb: ['bed-map'] },
+                        loadComponent: () => import('./inpatient/bed-map/bed-map.component').then(m => m.AdminBedMapComponent),
+                    },
+                    {
+                        path: 'admission',
+                        data: { breadcrumb: ['admission'] },
+                        loadComponent: () => import('./inpatient/admission/admission.component').then(m => m.AdminAdmissionComponent),
+                    }
+                ]
+            },
+            {
                 path: 'doctor',
                 data: { breadcrumb: ['doctor'] },
                 children: [

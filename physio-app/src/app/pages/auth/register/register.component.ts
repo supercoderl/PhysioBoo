@@ -44,7 +44,7 @@ export class RegisterComponent {
   }
   // #endregion
 
-  // #region Events
+  // #region Methods
   nextStep() {
     if (this.currentStep < this.stepCount) {
       this.currentStep++;

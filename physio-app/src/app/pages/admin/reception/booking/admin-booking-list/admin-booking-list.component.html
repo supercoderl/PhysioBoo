@@ -1,0 +1,160 @@
+<div class="min-h-full p-5">
+  <!-- Start Page Header -->
+  <div
+    class="flex items-center md:flex-column gap-2 pb-3 mb-2 border-1 border-bottom"
+  >
+    <div class="flex-1">
+      <h4 class="text-xl font-semibold mb-0">Appointment</h4>
+    </div>
+    <div class="text-right flex">
+      <!-- dropdown-->
+      <div class="relative me-1">
+        <boo-button-admin
+          background="white"
+          [border]="{ width: 1, color: '#e3e3e3' }"
+          [radius]="5"
+          [gap]="8"
+          buttonClass="h-full"
+          [fontSize]="15"
+          [dropdown]="menuExportRef"
+        >
+          <span>Export</span>
+          <boo-icon name="chevron-down" />
+        </boo-button-admin>
+        <ng-template #menuExportRef>
+          <ul
+            class="p-2 m-0 block min-w-50 bg-white rounded-[5px]"
+            @dropdownState
+          >
+            <li>
+              <a
+                class="block text-[14px] text-primary bg-transparent rounded-[4.8px] px-3.75 py-1.625"
+                href="#"
+                >Download as PDF</a
+              >
+            </li>
+            <li>
+              <a
+                class="block text-[14px] text-primary bg-transparent rounded-[4.8px] px-3.75 py-1.625"
+                href="#"
+                >Download as Excel</a
+              >
+            </li>
+          </ul>
+        </ng-template>
+      </div>
+      <div
+        class="bg-white border shadow-sm rounded px-1 pb-0 text-center flex-center-center"
+      >
+        <button-icon
+          [icon]="{ name: 'list' }"
+          buttonClass="!bg-borderGray border-0 !p-1"
+        />
+        <button-icon
+          [icon]="{ name: 'calendar' }"
+          buttonClass="!bg-white border-0 !p-1"
+        />
+      </div>
+      <button-icon
+        [icon]="{ name: 'plus' }"
+        buttonClass="!bg-primary ms-2 text-white"
+      >
+        New Appointment
+      </button-icon>
+    </div>
+  </div>
+  <!-- End Page Header -->
+
+  <!--  Start Filter -->
+  <div class="flex items-center justify-between flex-wrap">
+    <div class="flex items-center gap-2">
+      <div>
+        <div class="flex items-center flex-wrap gap-2">
+          <div class="table-search flex items-center mb-0">
+            <div class="search-input">
+              <boo-input label="Search..." size="small" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex right-content items-center flex-wrap">
+        <boo-button-admin
+          [icon]="{ name: 'calendar', size: 14, color: '#6C7688' }"
+          buttonClass="!bg-white h-full"
+          [border]="{ width: 1, color: '#e3e3e3' }"
+          [dropdown]="menuDateRangeRef"
+        >
+          9 Dec 25 - 9 Dec 25
+        </boo-button-admin>
+      </div>
+      <ng-template #menuDateRangeRef>
+        <ul
+          class="p-2 m-0 block min-w-50 bg-white rounded-[5px]"
+          @dropdownState
+        >
+          <li>
+            <a
+              class="block text-[14px] text-primary bg-transparent rounded-[4.8px] px-3.75 py-1.625"
+            >
+              Today
+            </a>
+          </li>
+          <li>
+            <a
+              class="block text-[14px] text-primary bg-transparent rounded-[4.8px] px-3.75 py-1.625"
+            >
+              Yesterday
+            </a>
+          </li>
+        </ul>
+      </ng-template>
+    </div>
+
+    <div
+      class="flex table-dropdown right-content items-center flex-wrap row-gap-3"
+    >
+      <div class="dropdown me-2">
+        <boo-button-admin
+          [icon]="{ name: 'funnel', size: 14, color: '#6C7688' }"
+          buttonClass="!bg-white h-full"
+          [border]="{ width: 1, color: '#e3e3e3' }"
+          >Filter</boo-button-admin
+        >
+      </div>
+      <div class="dropdown">
+        <boo-button-admin
+          buttonClass="!bg-white h-full"
+          [border]="{ width: 1, color: '#e3e3e3' }"
+          [dropdown]="menuSortRef"
+        >
+          <span class="me-1"> Sort By : </span> Recent
+        </boo-button-admin>
+      </div>
+      <ng-template #menuSortRef>
+        <ul
+          class="p-2 m-0 block min-w-50 bg-white rounded-[5px]"
+          @dropdownState
+        >
+          <li>
+            <a
+              class="block text-[14px] text-primary bg-transparent rounded-[4.8px] px-3.75 py-1.625"
+              >Recent</a
+            >
+          </li>
+          <li>
+            <a
+              class="block text-[14px] text-primary bg-transparent rounded-[4.8px] px-3.75 py-1.625"
+              >Oldest</a
+            >
+          </li>
+        </ul>
+      </ng-template>
+    </div>
+  </div>
+  <!--  End Filter -->
+
+  <div class="mt-2">
+    <admin-booking-table-card />
+  </div>
+</div>

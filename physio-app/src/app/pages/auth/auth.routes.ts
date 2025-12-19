@@ -29,6 +29,11 @@ export const routes: Routes = [
                 path: 'forgot', 
                 loadComponent: () => import('./forgot/forgot.component').then(m => m.ForgotComponent),
                 data: { breadcrumbs: ['forgot'] } 
+            },
+            { 
+                path: 'reset-password', 
+                loadComponent: () => import('./reset-password/reset-password.component').then(m => m.ResetPasswordComponent),
+                data: { breadcrumbs: ['reset-password'] } 
             }
         ],
     },

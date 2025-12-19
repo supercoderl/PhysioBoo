@@ -6,9 +6,9 @@ import { SharedModule } from "../../../shared/shared-imports";
     selector: 'app-term',
     standalone: true,
     imports: [
-    SharedModule,
-    BreadcrumbComponent
-],
+        SharedModule,
+        BreadcrumbComponent
+    ],
     template: `
         <breadcrumb title="Term & Condition"></breadcrumb>
         <div class="py-10 md:py-15">

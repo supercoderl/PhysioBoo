@@ -79,7 +79,7 @@ export class BooSelectComponent implements OnChanges {
   }
   // #endregion
 
-  // #region Events (User Interaction)
+  // #region Methods (User Interaction)
   get selectedItem() {
     return this.options.find((x) => x.value === this.selected) ?? { label: 'All', value: '0' };
   }

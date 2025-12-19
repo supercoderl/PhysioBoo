@@ -65,7 +65,7 @@
                   Log in to continue to Physio Boo.
                 </p>
               </div>
-              <form>
+              <form boo-form [formGroup]="form" (validSubmit)="login($event)">
                 <span class="text-primary inline-block mb-3">
                   Log in with
                   <a
@@ -87,15 +87,9 @@
                       'Input your ' +
                       (state === 'phone' ? 'phone number' : 'e-mail')
                     "
-                    [id]="state === 'phone' ? 'Phone number' : 'E-mail'"
-                    [name]="state === 'phone' ? 'Phone number' : 'E-mail'"
-                    [radius]="5"
-                    backgroundColor="white"
-                    [borderWidth]="1"
-                    borderColor="#e6e8ee"
-                    size="small"
-                    placeholderColor="rgba(0, 0, 0, 0.4)"
-                    model="admin@gmail.com"
+                    formControlName="email"
+                    [required]="true"
+                    booError
                   />
                 </div>
                 <div class="mb-4">
@@ -114,22 +108,16 @@
                   <div class="relative">
                     <boo-input
                       label="Input your password"
-                      id="password"
-                      name="password"
-                      [radius]="5"
-                      backgroundColor="white"
-                      [borderWidth]="1"
-                      borderColor="#e6e8ee"
-                      size="small"
-                      placeholderColor="rgba(0, 0, 0, 0.4)"
-                      model="Password123!"
+                      formControlName="password"
+                      [required]="true"
                       [type]="type"
+                      booError
                     >
                       <boo-icon
                         [name]="type === 'text' ? 'eye' : 'eye-off'"
                         class="leading-none absolute top-1/2 -translate-y-1/2 right-2.5 stroke-brandDark cursor-pointer"
                         endfix
-                        [onClick]="onChangeType"
+                        (click)="onChangeType()"
                       ></boo-icon>
                     </boo-input>
                   </div>
@@ -160,14 +148,13 @@
                   </div>
                 </div>
                 <div class="mb-4">
-                  <boo-button
+                  <button
+                    boo-button
                     label="Login"
                     classname="!w-full !py-3 font-bold uppercase"
                     [radius]="5"
                     [loading]="loadingSrv.isLoading('login')"
-                    (clicked)="login()"
-                  >
-                  </boo-button>
+                  ></button>
                 </div>
                 <div class="text-base my-4 py-2.5 relative">
                   <span class="bg-borderGray h-[1px] block"></span>
@@ -178,8 +165,10 @@
                 </div>
                 <div>
                   <a
-                    class="font-medium text-base text-brandDark bg-white border border-solid border-borderGray py-2.25 px-3.75 rounded-[44px] flex-center-center w-full text-center cursor-pointer"
-                    href="/react/template/pages/login-email"
+                    boo-button
+                    background="white"
+                    classname="!w-full !py-3 font-bold uppercase !border border-borderGray !text-primary"
+                    [radius]="5"
                   >
                     <img
                       alt="google-icon"
@@ -189,8 +178,10 @@
                     Log in With Google
                   </a>
                   <a
-                    class="font-medium mt-4 text-base text-brandDark bg-white border border-solid border-borderGray py-2.25 px-3.75 rounded-[44px] flex-center-center w-full text-center cursor-pointer"
-                    href="/react/template/pages/login-email"
+                    boo-button
+                    background="white"
+                    classname="!w-full !py-3 font-bold mt-3 uppercase !border border-borderGray !text-primary"
+                    [radius]="5"
                   >
                     <img
                       alt="fb-icon"

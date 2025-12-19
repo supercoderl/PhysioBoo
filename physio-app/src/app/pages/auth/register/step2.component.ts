@@ -10,19 +10,19 @@ import { LocalStorage } from "../../../shared/utils/storage";
     selector: 'register-step-two',
     standalone: true,
     imports: [
-    SharedModule,
-    BooIconComponent,
-    BooButtonComponent
-],
+        SharedModule,
+        BooIconComponent,
+        BooButtonComponent
+    ],
     template: `
-        <div class="min-w-full p-4 h-full flex" id="step2">
+        <div class="min-w-full p-1 h-full flex" id="step2">
             <div class="relative flex flex-1 flex-col">
                 <h3 class="text-[24px] text-black font-semibold mb-4">
                     Choose your role
                 </h3>
                 
-                <div class="relative flex flex-1 flex-col">
-                    <div class="space-y-4 mb-4"> 
+                <div class="relative flex flex-1 flex-col px-2">
+                    <div class="flex flex-col gap-8 mb-4"> 
                         <div
                             *ngFor="let role of roles"
                             (click)="handleSelect(role.id)"
@@ -37,7 +37,7 @@ import { LocalStorage } from "../../../shared/utils/storage";
                         >
                             <!-- Icon badge positioned on top-right border -->
                             <div 
-                                class="absolute -top-5 -right-5 py-2 px-1.5 rounded-full transition-all duration-300 shadow-md border-4 border-white"
+                                class="absolute flex-center-center -top-5 -right-2 p-2 rounded-full transition-all duration-300 shadow-md border-4 border-white"
                                 [style.backgroundColor]="value === role.id ? role.color : ''"
                                 [ngClass]="value !== role.id ? 'bg-gray-100 text-gray-500 group-hover:bg-gray-200' : 'text-white'"
                             >
@@ -78,14 +78,16 @@ import { LocalStorage } from "../../../shared/utils/storage";
                     <!-- Navigation buttons -->
                     <div class="mt-auto">
                         <div class="flex justify-between gap-5">
-                            <boo-button
+                            <button
+                                boo-button
                                 label="Previous"
                                 [radius]="5"
                                 classname="!py-3 w-full uppercase text-md font-bold bg-gray-100 text-gray-700 hover:bg-gray-200"
                                 class="w-full"
-                                (clicked)="onPrev.emit()"
-                            ></boo-button>
-                            <boo-button
+                                (click)="onPrev.emit()"
+                            ></button>
+                            <button
+                                boo-button
                                 label="Finish"
                                 type="submit"
                                 [radius]="5"
@@ -93,8 +95,8 @@ import { LocalStorage } from "../../../shared/utils/storage";
                                 [disabled]="loadingSrv.isLoading('register')"
                                 classname="w-full !py-3 uppercase text-md font-bold"
                                 class="w-full"
-                                (clicked)="onSubmit.emit()"
-                            ></boo-button>
+                                (click)="onSubmit.emit()"
+                            ></button>
                         </div>
                     </div>
                 </div>
@@ -106,7 +108,7 @@ import { LocalStorage } from "../../../shared/utils/storage";
 export class RegisterStepTwoComponent implements OnInit {
     // #region Inputs, Outputs
     @Input() value: string = '';
-    
+
     @Output() onSubmit = new EventEmitter<void>();
     @Output() onPrev = new EventEmitter<void>();
     @Output() onSelect = new EventEmitter<string>();
@@ -115,8 +117,8 @@ export class RegisterStepTwoComponent implements OnInit {
     // #endregion
 
     // #region Init (Lifecycle + Setup)
-    constructor(protected loadingSrv: LocalLoadingService) {}
-    
+    constructor(protected loadingSrv: LocalLoadingService) { }
+
     ngOnInit() {
         const cached = LocalStorage.load<AppConfig>("config_data");
         if (cached && cached.registrationRoles) {
@@ -127,7 +129,7 @@ export class RegisterStepTwoComponent implements OnInit {
     }
     // #endregion
 
-    // #region Events
+    // #region Methods
     handleSelect(id: string) {
         this.onSelect.emit(id);
     }

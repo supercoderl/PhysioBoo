@@ -1,0 +1,50 @@
+<div class="p-6 min-h-screen">
+  <!-- Page Header -->
+  <div class="flex items-center justify-between gap-2 mb-4 flex-wrap">
+    <div>
+      <h4 class="mb-1 text-2xl font-semibold">Welcome, Admin</h4>
+      <p class="mb-0">
+        Today you have 10 visits,
+        <a href="visits.php" class="underline text-black">View Details</a>
+      </p>
+    </div>
+    <div
+      class="p-2 gap-2 rounded-[5px] border border-solid border-[#E2E8F0] text-[#0F172A] bg-white flex items-center"
+    >
+      <boo-icon name="calendar-days"></boo-icon>
+      <span>3 Dec 25 - 3 Dec 25</span>
+    </div>
+  </div>
+  <!-- End Page Header -->
+
+  <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4">
+    <ng-container *ngFor="let title of analyticTitles">
+      <admin-analytic-card
+        [title]="title"
+        [analyticItem]="analyticsProperties(title)"
+      />
+    </ng-container>
+  </div>
+
+  <div class="grid xl:grid-cols-2 gap-4 mt-4">
+    <admin-appointment-table-card class="h-full block" />
+    <admin-statistic-card class="h-full block" />
+  </div>
+
+  <div class="grid xl:grid-cols-6 md:grid-cols-3 gap-4 mt-4">
+    <ng-container *ngFor="let category of medicalCategories">
+      <admin-category-card 
+        [backgroundColor]="category.background"
+        [title]="category.name"
+      >
+        <boo-icon [name]="category.icon" [size]="24" [color]="category.color"></boo-icon>
+      </admin-category-card>
+    </ng-container>
+  </div>
+
+  <div class="grid xl:grid-cols-3 md:grid-cols-2 gap-4 mt-4">
+    <admin-patient-report-table-card />
+    <admin-patient-visit-card />
+    <admin-doctor-table-card />
+  </div>
+</div>

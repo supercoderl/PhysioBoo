@@ -5,18 +5,36 @@ import { SharedModule } from '../../../shared/shared-imports';
   selector: 'boo-icon',
   standalone: true,
   imports: [SharedModule],
+  styles: [`
+    :host {
+      display: inline-flex; 
+      align-items: center;     
+      justify-content: center;   
+      line-height: 0;  
+    }
+  `],
   template: `
     <lucide-icon 
       [name]="name" 
-      [class]="['inlineFlex-center-center mx-1 transition-all duration-300 ease-in-out hover:scale-110 hover:opacity-80 active:scale-95', classname].join(' ')"
       [size]="size"
-      (click)="onClick($event)"
+      [color]="color"
+      [strokeWidth]="strokeWidth"
     ></lucide-icon>
-  `
+  `,
+  host: {
+    'class': 'align-middle transition-all duration-300 ease-in-out',
+    '[class.hover:scale-110]': 'interactive',
+    '[class.hover:opacity-80]': 'interactive',
+    '[class.active:scale-95]': 'interactive',
+    '[class.cursor-pointer]': 'interactive',
+  }
 })
 export class BooIconComponent {
-  @Input() name!: string;
-  @Input() classname?: string;
+  // #region Inputs, Outputs, Properties
+  @Input({ required: true }) name!: string;
   @Input() size: number = 16;
-  @Input() onClick: (e?: Event) => void = () => {};
+  @Input() strokeWidth: number = 2;
+  @Input() color: string = "black";
+  @Input() interactive: boolean = false;
+  // #endregion
 }

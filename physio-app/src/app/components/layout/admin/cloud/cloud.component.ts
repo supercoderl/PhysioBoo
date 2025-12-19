@@ -22,7 +22,7 @@ export class AdminCloudComponent {
   }
   // #endregion
 
-  // #region Events
+  // #region Methods
   async onReload() {
     this.locLoadingSrv.setLoading('hard-reload', true);
 

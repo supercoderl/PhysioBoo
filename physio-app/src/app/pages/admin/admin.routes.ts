@@ -108,6 +108,79 @@ export const routes: Routes = [
                         path: 'admission',
                         data: { breadcrumb: ['admission'] },
                         loadComponent: () => import('./inpatient/admission/admission.component').then(m => m.AdminAdmissionComponent),
+                    },
+                    {
+                        path: 'treatment-sheet',
+                        data: { breadcrumb: ['treatment-sheet'] },
+                        loadComponent: () => import('./inpatient/treatment-sheet/treatment-sheet.component').then(m => m.AdminTreatmentSheetComponent),
+                    }
+                ]
+            },
+            {
+                path: 'paraclinical',
+                data: { breadcrumb: ['paraclinical'] },
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'laboratory',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'laboratory',
+                        data: { breadcrumb: ['laboratory'] },
+                        loadComponent: () => import('./paraclinical/laboratory/laboratory.component').then(m => m.AdminLaboratoryComponent),
+                    },
+                    {
+                        path: 'radiology',
+                        data: { breadcrumb: ['radiology'] },
+                        loadComponent: () => import('./paraclinical/radiology/radiology.component').then(m => m.AdminRadiologyComponent),
+                    },
+                    {
+                        path: 'surgery',
+                        data: { breadcrumb: ['surgery'] },
+                        loadComponent: () => import('./paraclinical/surgery/surgery.component').then(m => m.AdminSurgeryComponent),
+                    }
+                ]
+            },
+            {
+                path: 'pharmacy',
+                data: { breadcrumb: ['pharmacy'] },
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'retail',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'retail',
+                        data: { breadcrumb: ['retail'] },
+                        loadComponent: () => import('./pharmacy/retail/retail.component').then(m => m.AdminRetailComponent),
+                    }
+                ]
+            },
+            {
+                path: 'finance',
+                data: { breadcrumb: ['finance'] },
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'cashier',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'cashier',
+                        data: { breadcrumb: ['cashier'] },
+                        loadComponent: () => import('./finance/cashier/cashier.component').then(m => m.AdminCashierComponent),
+                    },
+                    {
+                        path: 'insurance',
+                        data: { breadcrumb: ['insurance'] },
+                        loadComponent: () => import('./finance/insurance/insurance.component').then(m => m.AdminInsuranceComponent),
+                    },
+                    {
+                        path: 'reports',
+                        data: { breadcrumb: ['reports'] },
+                        loadComponent: () => import('./finance/report/revenue-report.component').then(m => m.AdminRevenueReportComponent),
                     }
                 ]
             },

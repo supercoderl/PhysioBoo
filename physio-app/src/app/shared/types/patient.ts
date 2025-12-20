@@ -14,3 +14,10 @@ export interface Patient {
   emergencyPhone: string;
   chronicConditions: string[];
 }
+
+export interface PaymentSummary {
+  method: string;
+  amount: number;
+  count: number;
+  percentage: number;
+}

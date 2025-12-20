@@ -802,7 +802,7 @@ export const MENUS: MenuItem[] = [
             {
                 id: "treatment-sheet",
                 label: "Treatment Sheet",
-                route: "inpatient/treatment",
+                route: "inpatient/treatment-sheet",
                 icon: "clipboard-list"
             }
         ]
@@ -816,13 +816,13 @@ export const MENUS: MenuItem[] = [
             {
                 id: "lis",
                 label: "Laboratory",
-                route: "paraclinical/lis",
+                route: "paraclinical/laboratory",
                 icon: "flask-conical"
             },
             {
                 id: "ris",
                 label: "Radiology",
-                route: "paraclinical/ris",
+                route: "paraclinical/radiology",
                 icon: "image"
             },
             {

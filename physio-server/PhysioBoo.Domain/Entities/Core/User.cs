@@ -36,6 +36,7 @@ namespace PhysioBoo.Domain.Entities.Core
         public Guid? CreatedBy { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
         public Guid? UpdatedBy { get; private set; }
+        public string Roles { get; private set; }
 
         [ForeignKey("CreatedBy")]
         [InverseProperty("CreatedUsers")]
@@ -141,6 +142,12 @@ namespace PhysioBoo.Domain.Entities.Core
         [InverseProperty("Assigner")]
         public virtual ICollection<UserRole> AssignedUserRoles { get; private set; } = new List<UserRole>();
 
+        [InverseProperty("Creator")]
+        public virtual ICollection<AdminMenu> CreatedMenus { get; private set; } = new List<AdminMenu>();
+
+        [InverseProperty("Updater")]
+        public virtual ICollection<AdminMenu> UpdatedMenus { get; private set; } = new List<AdminMenu>();
+
         public virtual Profile? Profile { get; private set; }
 
         public virtual Doctor? Doctor { get; private set; }
@@ -216,6 +223,7 @@ namespace PhysioBoo.Domain.Entities.Core
                 FailedLoginAttempts++;
             }
         }
+        public void SetRoles(string roles) { Roles = roles; }
         #endregion
     }
 }

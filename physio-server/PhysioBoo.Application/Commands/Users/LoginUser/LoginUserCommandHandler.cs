@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Options;
+using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
@@ -64,7 +65,8 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
                 {
                     ["Email"] = user.Email,
                     ["Id"] = user.Id.ToString(),
-                    ["Name"] = user.Email.Split("@")[0]
+                    ["Name"] = user.Email.Split("@")[0],
+                    ["Roles"] = user.Roles
                 }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes
             );
 
@@ -80,6 +82,8 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
 
                 return;
             }
+
+            request.Result = new AuthResult(accessToken, refreshToken);
 
             await Bus.RaiseEventAsync(new UserLoggedEvent(user.Id, accessToken, refreshToken));
         }

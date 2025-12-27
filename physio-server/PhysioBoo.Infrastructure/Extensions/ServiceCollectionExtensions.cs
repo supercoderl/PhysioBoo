@@ -93,6 +93,8 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IPermissionRepository, PermissionRepository>();
             services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
             services.AddScoped<IOutboxRepository, OutboxRepository>();
+            services.AddScoped<IAdminMenuRepository, AdminMenuRepository>();
+            services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
 
             return services;
         }

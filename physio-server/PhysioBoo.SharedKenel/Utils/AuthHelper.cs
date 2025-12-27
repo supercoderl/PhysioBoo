@@ -17,13 +17,13 @@ namespace PhysioBoo.SharedKernel.Utils
         private static readonly ThreadLocal<RandomNumberGenerator> RandomGeneratorCache =
             new ThreadLocal<RandomNumberGenerator>(() => RandomNumberGenerator.Create(), true);
 
-        public static void SetTokenCookie(HttpResponse? response, string key, string value, string? tzId)
+        public static void SetTokenCookie(HttpResponse? response, string key, string value, string? tzId, bool isDev = false)
         {
-            var cookieOptions = new CookieOptions
+            CookieOptions cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
+                Secure = isDev ? false : true,
+                SameSite = isDev ? SameSiteMode.Lax : SameSiteMode.None,
                 Expires = key == "access_token" ? TimeZoneHelper.GetLocalTimeNow().AddMinutes(15) : TimeZoneHelper.GetLocalTimeNow().AddDays(45), // Short expiration for token
                 Path = key == "access_token" ? "/" : "/api",
                 Domain = null
@@ -55,7 +55,7 @@ namespace PhysioBoo.SharedKernel.Utils
             byte[] hash = HashPasswordInternal(password, salt);
 
             // Pre-allocate combined array
-            var combinedBytes = new byte[SaltSize + HashSize];
+            byte[] combinedBytes = new byte[SaltSize + HashSize];
             Buffer.BlockCopy(salt, 0, combinedBytes, 0, SaltSize);
             Buffer.BlockCopy(hash, 0, combinedBytes, SaltSize, HashSize);
 
@@ -66,7 +66,7 @@ namespace PhysioBoo.SharedKernel.Utils
         private static byte[] HashPasswordInternal(string password, byte[] salt)
         {
             // Use using statement for proper disposal
-            using var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password))
+            using Argon2id argon2 = new Argon2id(Encoding.UTF8.GetBytes(password))
             {
                 Salt = salt,
                 DegreeOfParallelism = DegreeOfParallelism,

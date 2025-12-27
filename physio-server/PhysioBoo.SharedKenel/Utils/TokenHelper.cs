@@ -1,5 +1,4 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -23,8 +22,8 @@ namespace PhysioBoo.SharedKernel.Utils
         /// <param name="length">Token length in bytes (will be base64 encoded, so actual string will be longer)</param>
         public static string GenerateSecureToken(int length = 32)
         {
-            using var rng = RandomNumberGenerator.Create();
-            var bytes = new byte[length];
+            using RandomNumberGenerator rng = RandomNumberGenerator.Create();
+            byte[] bytes = new byte[length];
             rng.GetBytes(bytes);
             return Convert.ToBase64String(bytes).Replace("/", "_").Replace("+", "-").TrimEnd('=');
         }
@@ -36,11 +35,11 @@ namespace PhysioBoo.SharedKernel.Utils
         public static string GenerateUrlSafeToken(int length = 32)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            using var rng = RandomNumberGenerator.Create();
-            var bytes = new byte[length];
+            using RandomNumberGenerator rng = RandomNumberGenerator.Create();
+            byte[] bytes = new byte[length];
             rng.GetBytes(bytes);
 
-            var result = new StringBuilder(length);
+            StringBuilder result = new StringBuilder(length);
             foreach (byte b in bytes)
             {
                 result.Append(chars[b % chars.Length]);
@@ -55,11 +54,11 @@ namespace PhysioBoo.SharedKernel.Utils
         /// <param name="length">Token length (default 6 digits)</param>
         public static string GenerateNumericToken(int length = 6)
         {
-            using var rng = RandomNumberGenerator.Create();
-            var bytes = new byte[length];
+            using RandomNumberGenerator rng = RandomNumberGenerator.Create();
+            byte[] bytes = new byte[length];
             rng.GetBytes(bytes);
 
-            var result = new StringBuilder(length);
+            StringBuilder result = new StringBuilder(length);
             for (int i = 0; i < length; i++)
             {
                 result.Append(bytes[i] % 10);
@@ -74,8 +73,8 @@ namespace PhysioBoo.SharedKernel.Utils
         /// <param name="expirationHours">Token expiration in hours</param>
         public static (string Token, DateTime ExpiresAt) GenerateTokenWithExpiration(int expirationHours = 24)
         {
-            var token = GenerateSecureToken();
-            var expiresAt = TimeZoneHelper.GetLocalTimeNow().AddHours(expirationHours);
+            string token = GenerateSecureToken();
+            DateTime expiresAt = TimeZoneHelper.GetLocalTimeNow().AddHours(expirationHours);
 
             return (token, expiresAt);
         }
@@ -87,12 +86,12 @@ namespace PhysioBoo.SharedKernel.Utils
         /// <param name="expirationHours">Token expiration in hours</param>
         public static string GenerateTimestampedToken(int expirationHours = 24)
         {
-            var expiresAt = new DateTimeOffset(TimeZoneHelper.GetLocalTimeNow().AddHours(expirationHours));
-            var timestamp = expiresAt.ToUnixTimeSeconds();
-            var randomPart = GenerateSecureToken(16);
+            DateTimeOffset expiresAt = new DateTimeOffset(TimeZoneHelper.GetLocalTimeNow().AddHours(expirationHours));
+            long timestamp = expiresAt.ToUnixTimeSeconds();
+            string randomPart = GenerateSecureToken(16);
 
-            var tokenData = $"{timestamp}:{randomPart}";
-            var tokenBytes = Encoding.UTF8.GetBytes(tokenData);
+            string tokenData = $"{timestamp}:{randomPart}";
+            byte[] tokenBytes = Encoding.UTF8.GetBytes(tokenData);
 
             return Convert.ToBase64String(tokenBytes).Replace("/", "_").Replace("+", "-").TrimEnd('=');
         }
@@ -106,21 +105,21 @@ namespace PhysioBoo.SharedKernel.Utils
             try
             {
                 // Restore base64 padding and convert back
-                var paddedToken = token.Replace("_", "/").Replace("-", "+");
+                string paddedToken = token.Replace("_", "/").Replace("-", "+");
                 while (paddedToken.Length % 4 != 0)
                     paddedToken += "=";
 
-                var tokenBytes = Convert.FromBase64String(paddedToken);
-                var tokenData = Encoding.UTF8.GetString(tokenBytes);
+                byte[] tokenBytes = Convert.FromBase64String(paddedToken);
+                string tokenData = Encoding.UTF8.GetString(tokenBytes);
 
-                var parts = tokenData.Split(':');
+                string[] parts = tokenData.Split(':');
                 if (parts.Length != 2)
                     return false;
 
-                if (!long.TryParse(parts[0], out var timestamp))
+                if (!long.TryParse(parts[0], out long timestamp))
                     return false;
 
-                var expiresAt = DateTimeOffset.FromUnixTimeSeconds(timestamp);
+                DateTimeOffset expiresAt = DateTimeOffset.FromUnixTimeSeconds(timestamp);
                 return new DateTimeOffset(TimeZoneHelper.GetLocalTimeNow()) < expiresAt;
             }
             catch
@@ -141,30 +140,30 @@ namespace PhysioBoo.SharedKernel.Utils
             int expiryDurationMinutes = 15
         )
         {
-            var claims = new[]
+            Claim[] claims = new[]
             {
                 new Claim(ClaimTypes.Email, claimDatas["Email"]),
-                new Claim(ClaimTypes.Role, claimDatas["Role"]),
+                new Claim(ClaimTypes.Role, claimDatas["Roles"]),
                 new Claim(ClaimTypes.NameIdentifier, claimDatas["Id"]),
                 new Claim(ClaimTypes.Name, claimDatas["Name"])
             };
 
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+            SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
 
-            var credentials = new SigningCredentials(
+            SigningCredentials credentials = new SigningCredentials(
                 securityKey,
                 SecurityAlgorithms.HmacSha256Signature
             );
 
-            var tokenDescriptor = new JwtSecurityToken(
+            JwtSecurityToken tokenDescriptor = new JwtSecurityToken(
                 issuer,
                 audience,
                 claims,
                 expires: TimeZoneHelper.GetLocalTimeNow().AddMinutes(expiryDurationMinutes),
                 signingCredentials: credentials);
 
-            var refreshToken = GenerateSecureToken(32);
-            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+            string refreshToken = GenerateSecureToken(32);
+            string accessToken = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
 
             return (accessToken, refreshToken);
         }

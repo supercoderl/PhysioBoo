@@ -1,5 +1,7 @@
 ﻿using MediatR;
+using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.SharedKernel.Commands;
+using System.Text.Json.Serialization;
 
 namespace PhysioBoo.Application.Commands.Users.LoginUser
 {
@@ -9,6 +11,9 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
 
         public string Email { get; }
         public string Password { get; }
+
+        [JsonIgnore]
+        public AuthResult? Result { get; set; }
 
         public LoginUserCommand(
            string email,

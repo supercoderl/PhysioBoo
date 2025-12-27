@@ -25,31 +25,38 @@ namespace PhysioBoo.Infrastructure.Email
 
         public async Task SendTemplateAsync(string to, string templateKey, object model, string subject)
         {
-            var templateContent = _provider.GetTemplate(templateKey);
-            var html = _renderer.Render(templateContent, model);
+            string templateContent = _provider.GetTemplate(templateKey);
+            string html = _renderer.Render(templateContent, model);
 
             await SendAsync(to, subject, html, true);
         }
 
         private async Task SendAsync(string to, string subject, string body, bool isHtml)
         {
-            var client = new SmtpClient("smtp.gmail.com")
+            try
             {
-                Port = _mail.Port,
-                Credentials = new NetworkCredential(_mail.Username, _mail.Password),
-                EnableSsl = _mail.EnableSSL
-            };
+                SmtpClient client = new SmtpClient("smtp.gmail.com")
+                {
+                    Port = _mail.Port,
+                    Credentials = new NetworkCredential(_mail.Username, _mail.Password),
+                    EnableSsl = _mail.EnableSSL
+                };
 
-            var mail = new MailMessage
+                MailMessage mail = new MailMessage
+                {
+                    From = new MailAddress(_mail.Username, _mail.DisplayName),
+                    Subject = subject,
+                    Body = body,
+                    IsBodyHtml = isHtml
+                };
+                mail.To.Add(to);
+
+                await client.SendMailAsync(mail);
+            }
+            catch (Exception)
             {
-                From = new MailAddress(_mail.Username, _mail.DisplayName),
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = isHtml
-            };
-            mail.To.Add(to);
-
-            await client.SendMailAsync(mail);
+                throw;
+            }
         }
     }
 }

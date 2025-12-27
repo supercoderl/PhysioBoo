@@ -139,6 +139,18 @@ namespace PhysioBoo.Infrastructure.Outbox
                     e.Type
                 ),
 
+                EmailVerificationTokenGeneratedEvent e => new EmailVerificationTokenGeneratedEvent(
+                    e.UserId,
+                    e.Email,
+                    e.Token,
+                    e.ExpiresAt,
+                    e.Type
+                ),
+
+                UserVerifiedEvent e => new UserVerifiedEvent(e.Token, e.Type),
+
+                UserLoggedEvent e => new UserLoggedEvent(e.UserId, e.AccessToken, e.RefreshToken),
+
                 _ => null
             };
         }

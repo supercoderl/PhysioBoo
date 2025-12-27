@@ -63,6 +63,8 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<Permission> Permissions { get; set; } = null!;
         public DbSet<RolePermission> RolePermissions { get; set; } = null!;
         public DbSet<OutboxMessage> OutboxMessages { get; set; } = null!;
+        public DbSet<AdminMenu> AdminMenus { get; set; } = null!;
+        public DbSet<SystemSetting> SystemSettings { get; set; } = null!;
         #endregion
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
@@ -149,6 +151,8 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new PermissionConfiguration());
             builder.ApplyConfiguration(new RolePermissionConfiguration());
             builder.ApplyConfiguration(new OutboxConfiguration());
+            builder.ApplyConfiguration(new AdminMenuConfiguration());
+            builder.ApplyConfiguration(new SystemSettingConfiguration());
         }
     }
 }

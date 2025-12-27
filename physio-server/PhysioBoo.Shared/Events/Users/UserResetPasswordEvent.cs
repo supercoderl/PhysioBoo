@@ -3,12 +3,12 @@
     public sealed class UserResetPasswordEvent : DomainEvent
     {
         public Guid UserId { get; }
-        public string Email { get; }
+        public string Token { get; }
 
-        public UserResetPasswordEvent(Guid userId, string email) : base(userId)
+        public UserResetPasswordEvent(Guid userId, string token) : base(userId)
         {
             UserId = userId;
-            Email = email;
+            Token = token;
         }
     }
 }

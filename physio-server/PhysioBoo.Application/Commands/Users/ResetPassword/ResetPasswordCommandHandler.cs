@@ -10,15 +10,18 @@ namespace PhysioBoo.Application.Commands.Users.ResetPassword
 {
     public sealed class ResetPasswordCommandHandler : CommandHandlerBase, IRequestHandler<ResetPasswordCommand>
     {
+        private readonly IVerificationTokenRepository _verificationTokenRepository;
         private readonly IUserRepository _userRepository;
 
         public ResetPasswordCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
+            IVerificationTokenRepository verificationTokenRepository,
             IUserRepository userRepository
         ) : base(bus, unitOfWork, notifications)
         {
+            _verificationTokenRepository = verificationTokenRepository;
             _userRepository = userRepository;
         }
 
@@ -26,8 +29,21 @@ namespace PhysioBoo.Application.Commands.Users.ResetPassword
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _userRepository.BatchUpdateAsync(
-                predicate: u => u.Id == request.Id,
+            Guid userId = await _verificationTokenRepository.GetUserIdByTokenAsync(request.Token);
+
+            if (userId == Guid.Empty)
+            {
+                await NotifyAsync(new DomainNotification(
+                    request.MessageType,
+                    $"Token does not exist",
+                    ErrorCodes.ObjectNotFound
+                ));
+
+                return;
+            }
+
+            int result = await _userRepository.BatchUpdateAsync(
+                predicate: u => u.Id == userId,
                 updateDto: new { PasswordHash = AuthHelper.HashPassword(request.NewPassword) },
                 cancellationToken
             );
@@ -43,7 +59,7 @@ namespace PhysioBoo.Application.Commands.Users.ResetPassword
                 return;
             }
 
-            await Bus.RaiseEventAsync(new UserResetPasswordEvent(request.Id, request.Email));
+            await Bus.RaiseEventAsync(new UserResetPasswordEvent(userId, request.Token));
         }
     }
 }

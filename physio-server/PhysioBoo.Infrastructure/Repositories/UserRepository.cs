@@ -46,6 +46,7 @@ namespace PhysioBoo.Infrastructure.Repositories
             user.SetEmailVerifiedAt(reader.IsDBNull("EmailVerifiedAt") ? null : reader.GetDateTime("EmailVerifiedAt"));
             user.SetFailedLoginAttempts(reader.GetInt32("FailedLoginAttempts"));
             user.SetAccountLockedUntil(reader.IsDBNull("AccountLockedUntil") ? null : reader.GetDateTime("AccountLockedUntil"));
+            user.SetRoles(reader.GetString("Roles"));
 
             return user;
         }

@@ -1,4 +1,6 @@
-﻿using PhysioBoo.Presentation.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using PhysioBoo.Domain.Interfaces;
+using PhysioBoo.Presentation.Models;
 
 namespace PhysioBoo.Presentation.Endpoints
 {
@@ -61,6 +63,28 @@ namespace PhysioBoo.Presentation.Endpoints
                 });
             }).WithName("Check")
             .WithSummary("Check Application Is Running")
+            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            #endregion
+
+            #region Send mail
+            // Get cookies
+            group.MapPost("/test-mail", async (
+                HttpRequest request,
+                [FromBody] string To,
+                IEmailSender emailSender,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                await emailSender.SendTemplateAsync(To, "Email", new { UserName = "test", VerificationUrl = "test" }, "Test mail");
+
+                return Results.Ok(new ResponseMessage<string>
+                {
+                    Success = true,
+                    Data = "Mail was sent successfully!"
+                });
+            }).WithName("Send maill")
+            .WithSummary("Send mail")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
             #endregion

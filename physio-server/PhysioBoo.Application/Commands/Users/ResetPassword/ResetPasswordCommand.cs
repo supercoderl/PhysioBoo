@@ -7,15 +7,13 @@ namespace PhysioBoo.Application.Commands.Users.ResetPassword
     {
         private static readonly ResetPasswordCommandValidation s_validation = new();
 
-        public Guid Id { get; }
-        public string Email { get; }
+        public string Token { get; }
         public string NewPassword { get; }
 
-        public ResetPasswordCommand(Guid id, string email, string newPassword) : base(Guid.NewGuid())
+        public ResetPasswordCommand(string token, string newPassword) : base(Guid.NewGuid())
         {
-            Id = id;
             NewPassword = newPassword;
-            Email = email;
+            Token = token;
         }
 
         public override bool IsValid()

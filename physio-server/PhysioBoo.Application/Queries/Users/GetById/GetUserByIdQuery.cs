@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Application.ViewModels.Users;
 
 namespace PhysioBoo.Application.Queries.Users.GetById
 {
-    public sealed record GetUserByIdQuery(Guid Id) : IRequest<User?>;
+    public sealed record GetUserByIdQuery(Guid Id) : IRequest<UserViewModel?>;
 }

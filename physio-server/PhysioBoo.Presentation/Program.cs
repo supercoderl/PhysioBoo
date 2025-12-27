@@ -299,6 +299,7 @@ namespace PhysioBoo.Presentation
                 app.MapMedicalSpecialtyEndpoints();
                 app.MapRoleEndpoints();
                 app.MapConfigEndpoints();
+                app.MapAdminMenuEndpoints();
             }
 
             MapCommonEndpoints(app);

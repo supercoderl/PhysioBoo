@@ -32,7 +32,7 @@ namespace PhysioBoo.Application.Consumers.Users
                     Guid.NewGuid(),
                     context.Message.AggregateId,
                     TokenHelper.GenerateTimestampedToken(24),
-                    TimeZoneHelper.GetLocalTimeNow().AddHours(24),
+                    TimeZoneHelper.GetLocalTimeNow().AddMinutes(15),
                     Enum.Parse<VerificationType>(context.Message.Type)
                 )
             ));

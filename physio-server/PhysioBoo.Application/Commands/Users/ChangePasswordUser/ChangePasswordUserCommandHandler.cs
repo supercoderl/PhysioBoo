@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using PhysioBoo.Application.Commands.Users.LogoutUser;
-using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
@@ -27,7 +26,7 @@ namespace PhysioBoo.Application.Commands.Users.ChangePasswordUser
         {
             if (!await TestValidityAsync(request)) return;
 
-            var user = await Bus.QueryAsync(new GetUserByIdQuery(request.Id));
+            Domain.Entities.Core.User? user = await _userRepository.GetByIdAsync(request.Id);
 
             if (user == null)
             {
@@ -44,7 +43,7 @@ namespace PhysioBoo.Application.Commands.Users.ChangePasswordUser
 
             user.SetPassword(AuthHelper.HashPassword(request.NewPassword));
 
-            var result = await _userRepository.UpdateTrackedAsync(user);
+            int result = await _userRepository.UpdateTrackedAsync(user);
 
             if (!await CheckStatus(result, request)) return;
 

@@ -8,14 +8,8 @@ namespace PhysioBoo.Application.Commands.Users.ResetPassword
     {
         public ResetPasswordCommandValidation()
         {
-            RuleForId();
             RuleForPassword();
-            RuleForEmail();
-        }
-
-        private void RuleForId()
-        {
-            RuleFor(cmd => cmd.Id).NotEmpty().WithErrorCode(DomainErrorCodes.User.EmptyId).WithMessage("User id may not be empty.");
+            RuleForToken();
         }
 
         private void RuleForPassword()
@@ -23,9 +17,9 @@ namespace PhysioBoo.Application.Commands.Users.ResetPassword
             RuleFor(cmd => cmd.NewPassword).Password();
         }
 
-        private void RuleForEmail()
+        private void RuleForToken()
         {
-            RuleFor(cmd => cmd.Email).NotEmpty().WithErrorCode(DomainErrorCodes.User.EmptyEmail).WithMessage("Email may not be empty.");
+            RuleFor(cmd => cmd.Token).NotEmpty().WithErrorCode(DomainErrorCodes.VerificationToken.EmptyToken).WithMessage("Token may not be empty.");
         }
     }
 }

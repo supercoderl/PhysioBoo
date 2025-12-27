@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
@@ -27,11 +26,22 @@ namespace PhysioBoo.Application.Commands.Users.VerifyUser
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _verificationTokenRepository.BatchUpdateAsync(
-                predicate: p => p.Token == request.Token && !p.IsUsed && p.ExpiresAt > TimeZoneHelper.GetLocalTimeNow(),
-                updateDto: new { IsUsed = true },
-                cancellationToken
-            );
+            int result = 0;
+
+            if (request.AllowModify)
+            {
+                result = await _verificationTokenRepository.BatchUpdateAsync(
+                    predicate: p => p.Token == request.Token && !p.IsUsed && p.ExpiresAt > TimeZoneHelper.GetLocalTimeNow(),
+                    updateDto: new { IsUsed = true },
+                    cancellationToken
+                );
+            }
+
+            else
+            {
+                Guid userId = await _verificationTokenRepository.GetUserIdByTokenAsync(request.Token);
+                result = userId == Guid.Empty ? 0 : 1;
+            }
 
             if (result <= 0)
             {

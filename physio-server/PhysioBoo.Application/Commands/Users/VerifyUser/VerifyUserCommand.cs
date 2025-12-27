@@ -9,11 +9,13 @@ namespace PhysioBoo.Application.Commands.Users.VerifyUser
 
         public string Token { get; }
         public string Type { get; }
+        public bool AllowModify { get; }
 
-        public VerifyUserCommand(string token, string type) : base(Guid.NewGuid())
+        public VerifyUserCommand(string token, string type, bool allowModify) : base(Guid.NewGuid())
         {
             Token = token;
             Type = type;
+            AllowModify = allowModify;
         }
 
         public override bool IsValid()

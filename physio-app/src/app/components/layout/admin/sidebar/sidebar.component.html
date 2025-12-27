@@ -2,8 +2,10 @@
   <div
     [ngClass]="{
       'fixed md:sticky top-0 z-20 h-screen flex-auto shrink-0 flex-col border-r border-solid border-[#E5E7EB] transition-all duration-500': true,
-      'min-w-0 w-0 max-w-0 md:min-w-[280px] md:w-[280px] md:max-w-[280px]': !isCollapsed,
-      'min-w-[280px] w-[280px] max-w-[280px] shadow-lg md:shadow-none md:min-w-0 md:w-0 md:max-w-0': isCollapsed
+      'min-w-0 w-0 max-w-0 md:min-w-[280px] md:w-[280px] md:max-w-[280px]':
+        !isCollapsed,
+      'min-w-[280px] w-[280px] max-w-[280px] shadow-lg md:shadow-none md:min-w-0 md:w-0 md:max-w-0':
+        isCollapsed
     }"
   >
     <div
@@ -47,15 +49,23 @@
                   <p
                     class="leading-none truncate max-w-full m-0 font-medium m-0 text-[13px] text-[#1565C0]"
                   >
-                    {{menu.label}}
+                    {{ menu.label }}
                   </p>
                 </div>
               </div>
 
               <!-- Section Items -->
-              <sidebar-item *ngFor="let child of menu.children" [item]="child"></sidebar-item>
+              <ng-container *ngIf="menu.children">
+                <sidebar-item
+                *ngFor="let child of menu.children"
+                [item]="child"
+              ></sidebar-item>
+              </ng-container>
 
-              <div class="h-3" *ngIf="menus.indexOf(menu) < menus.length - 1"></div>
+              <div
+                class="h-3"
+                *ngIf="menus.indexOf(menu) < menus.length - 1"
+              ></div>
             </div>
           </div>
         </div>
@@ -69,7 +79,11 @@
             <div
               class="rounded-lg h-10 w-10 relative flex-center-center overflow-hidden text-[13px] bg-[#E5E7EB] text-[#4B5563]"
             >
-              <img alt="user photo" class="w-full h-full text-center object-cover transparent" src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/avatars/brian-hughes.jpg">
+              <img
+                alt="user photo"
+                class="w-full h-full text-center object-cover transparent"
+                src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/avatars/brian-hughes.jpg"
+              />
             </div>
             <div class="flex flex-auto flex-col gap-2">
               <span

@@ -24,3 +24,13 @@ export interface AppConfig {
     features: Record<string, boolean>;
     registrationRoles: Role[];
 }
+
+export interface PaginationData<T> {
+    hasNext: boolean;
+    hasPrevious: boolean;
+    items: T[];
+    pageNumber: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
+}

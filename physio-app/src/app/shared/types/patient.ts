@@ -21,3 +21,28 @@ export interface PaymentSummary {
   count: number;
   percentage: number;
 }
+
+export interface PatientInfo {
+  id: string;
+  name: string;
+  age: number;
+  gender: string;
+  bloodType: string;
+  phone: string;
+  address: string;
+}
+
+export interface PatientProfile {
+  id: string;
+  name: string;
+  age: number;
+  gender: string;
+  bloodType: string;
+  phone: string;
+  email: string;
+  address: string;
+  emergencyContact: string;
+  emergencyPhone: string;
+  photo: string;
+  registrationDate: string;
+}

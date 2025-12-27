@@ -1,4 +1,5 @@
-import { Component, ElementRef, HostListener, Input, OnChanges } from '@angular/core';
+import { Component, ElementRef, forwardRef, HostListener, Input } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared-imports';
 import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
 
@@ -6,97 +7,191 @@ import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
   selector: 'boo-select',
   standalone: true,
   imports: [
-    BooIconComponent,
-    SharedModule
+    SharedModule,
+    BooIconComponent
+],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => BooSelectComponent),
+      multi: true
+    }
   ],
   template: `
-    <div
-      class="min-h-7 w-full text-[13px] leading-[1.4375em] text-[#1F232B] inline-flex items-center relative rounded-[8px] h-auto bg-white border border-solid border-[#0000003b]"
-    >
-      <div
-        tabindex="0"
-        role="combobox"
-        id="category-select"
-        class="pr-8 min-h-0 h-auto truncate appearance-none cursor-pointer rounded-[8px] block min-w-0 w-full py-1 pl-3"
-        (click)="toggleSelect()"
+    <div class="flex w-full relative items-center group" #container>
+      
+      <label
+        [class]="labelClasses"
+        [style.color]="placeholderColor"
+        *ngIf="!model" 
       >
-        <span>{{selectedItem.label}}</span>
-      </div>
-      <input
-        class="bottom-0 left-0 absolute opacity-0 pointer-events-none w-full"
-        value="all"
-      />
-      <boo-icon 
-        name="triangle" 
-        classname="absolute top-1/2 -translate-y-1/2 pointer-events-none fill-[#4B5563] right-1.75 rotate-180"
-        [size]="6"
-      ></boo-icon>
-    </div>
-    <div 
-      class="[transition:opacity_272ms_cubic-bezier(0.4,0,0.2,1),transform_181ms_cubic-bezier(0.4,0,0.2,1)] 
-          absolute bg-white text-[#1F232B] shadow-select min-h-4 min-w-4 w-full px-1 rounded-[6px] z-[9999]"
-      [ngClass]="{
-        'opacity-100 scale-100 translate-y-0 pointer-events-auto': isOpen,
-        'opacity-0 scale-95 translate-y-1 pointer-events-none': !isOpen
-      }"
-      style="transform-origin: 68px 0px;"
-    >
-      <ul class="m-0 relative py-1 outline-none gap-0.5 grid" role="listbox" tabindex="-1">
-        <li 
-          *ngFor="let option of options; let i = index; trackBy: trackByValue"
-          class="cursor-pointer min-h-auto m-0 align-middle text-[13px] flex items-center relative whitespace-nowrap rounded-[4px] py-1.5 px-2 transition-colors duration-150 ease-in-out" 
-          [ngClass]="{
-            'bg-[#1f232b14]': option.value === selected,
-            'hover:bg-[#1f232b1f]': true
-          }"
-          role="option" 
-          [attr.aria-selected]="option.value === selected" 
+        {{ label }} <span *ngIf="required" class="text-red-500 ml-0.5">*</span>
+      </label>
+
+      <div class="flex-auto relative w-full">
+        <div
+          (click)="toggleDropdown()"
+          [class]="inputClasses"
+          [style.border-radius.px]="radius"
+          [style.background-color]="backgroundColor"
+          [style.border-width.px]="borderWidth"
+          [style.border-color]="isOpen ? '#60A5FA' : borderColor" 
+          tabindex="0"
+          (blur)="onTouched()"
         >
-          <span> {{option.label}} </span>
-        </li>
-      </ul>
+          <span *ngIf="model" class="truncate block w-[90%]">
+            {{ getDisplayLabel(model) }}
+          </span>
+          <span *ngIf="!model">&nbsp;</span>
+        </div>
+
+        <div 
+            *ngIf="isOpen"
+            class="absolute top-[calc(100%+4px)] left-0 w-full bg-white shadow-xl border border-slate-100 overflow-hidden z-50 animate-fade-in-down"
+            [style.border-radius.px]="radius"
+        >
+            <ul class="max-h-60 overflow-y-auto py-1 custom-scrollbar">
+                <li 
+                    *ngFor="let opt of options"
+                    (click)="selectOption(opt)"
+                    class="px-4 py-2.5 text-sm cursor-pointer transition-colors flex items-center justify-between group/item hover:bg-slate-50 hover:text-slate-900"
+                    [class.bg-blue-50]="opt[bindValue] === model"
+                    [class.text-blue-600]="opt[bindValue] === model"
+                    [class.font-medium]="opt[bindValue] === model"
+                    [class.text-slate-600]="opt[bindValue] !== model"
+                >
+                    <span>{{ opt[bindLabel] }}</span>
+                    
+                    <span *ngIf="opt[bindValue] === model" class="text-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </span>
+                </li>
+
+                <li *ngIf="options.length === 0" class="px-4 py-3 text-sm text-slate-400 text-center italic">
+                    Empty data
+                </li>
+            </ul>
+        </div>
+
+        <div 
+            class="absolute right-0 top-0 h-full flex items-center pr-3 pointer-events-none text-slate-400 transition-transform duration-200"
+        >
+            <boo-icon [name]="isOpen ? 'chevron-up' : 'chevron-down'" />
+        </div>
+      </div>
     </div>
-  `
-})
-export class BooSelectComponent implements OnChanges {
-  // #region Inputs / Outputs / Properties
-  @Input() options: { label: string, value: string }[] = [];
-
-  selected: string = '0';
-  isOpen: boolean = false;
-  // #endregion
-
-  // #region Init (Lifecycle + Setup)
-  constructor(private elementRef: ElementRef) { }
-
-  ngOnChanges(): void {
-    if (this.options) {
-      const hasAll = this.options.some(o => o.value === '0');
-      if (!hasAll) {
-        this.options = [{ label: 'All', value: '0' }, ...this.options];
-      }
+  `,
+  styles: [`
+    .animate-fade-in-down {
+        animation: fadeInDown 0.2s ease-out forwards;
     }
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+  `],
+  host: {
+    'class': 'block w-full relative mb-0',
   }
-  // #endregion
+})
+export class BooSelectComponent implements ControlValueAccessor {
+  // #region Inputs
+  @Input() label: string = '';
+  @Input({ transform: (v: unknown) => v === '' || v === true || v === 'true' }) required: boolean = false;
+  @Input() size: "small" | "medium" | "large" = "medium";
+  @Input() radius: number = 6; 
+  @Input() backgroundColor: string = 'white';
+  @Input() borderWidth: number = 1;
+  @Input() borderColor: string = '#e6e8ee';
+  @Input() placeholderColor: string = '#64748B';
 
-  // #region Methods (User Interaction)
-  get selectedItem() {
-    return this.options.find((x) => x.value === this.selected) ?? { label: 'All', value: '0' };
-  }
+  @Input() options: any[] = [];
+  @Input() bindLabel: string = 'label'; 
+  @Input() bindValue: string = 'value';
+  
+  model: any = null;
+  isOpen: boolean = false;
+  disabled: boolean = false;
 
-  toggleSelect() {
-    this.isOpen = !this.isOpen;
-  }
+  constructor(private _elementRef: ElementRef) {}
 
   @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    if (!this.elementRef.nativeElement.contains(event.target)) {
+  clickOutside(event: Event) {
+    if (!this._elementRef.nativeElement.contains(event.target)) {
       this.isOpen = false;
     }
   }
 
-  trackByValue(index: number, option: { label: string, value: string }) {
-    return option.value;
+  get labelClasses(): string {
+    const base = 'absolute left-0 z-[1] flex items-center transition-all duration-300 pointer-events-none truncate';
+    const focusEffect = 'group-focus-within:translate-x-4 group-focus-within:opacity-0 group-focus-within:invisible';
+    
+    let sizeClass = '';
+    switch (this.size) {
+      case 'small':  sizeClass = 'px-3 text-xs'; break;
+      case 'large':  sizeClass = 'px-5 text-base'; break;
+      default:       sizeClass = 'px-4 text-sm'; break;
+    }
+
+    return `${base} ${focusEffect} ${sizeClass}`;
   }
-  // #region
+
+  get inputClasses(): string {
+    const base = 'flex items-center w-full text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer border-solid';
+    
+    let sizeClass = '';
+    switch (this.size) {
+      case 'small':  sizeClass = 'px-3 h-8.5 text-xs'; break;
+      case 'large':  sizeClass = 'px-5 h-12 text-base'; break;
+      default:       sizeClass = 'px-4 h-11 text-sm'; break;
+    }
+
+    const disabledClass = this.disabled ? 'bg-gray-100 cursor-not-allowed opacity-70' : '';
+
+    return `${base} ${sizeClass} ${disabledClass}`;
+  }
+  // #endregion
+
+  // #region Methods
+  toggleDropdown() {
+    if (this.disabled) return;
+    this.isOpen = !this.isOpen;
+  }
+
+  selectOption(opt: any) {
+    const value = opt[this.bindValue];
+    this.model = value;
+    this.onChange(value);
+    this.isOpen = false;
+  }
+
+  getDisplayLabel(currentValue: any): string {
+    const found = this.options.find(o => o[this.bindValue] === currentValue);
+    return found ? found[this.bindLabel] : '';
+  }
+
+  // #region ControlValueAccessor boilerplate
+  onChange: (value: any) => void = () => {};
+  onTouched: () => void = () => {};
+
+  writeValue(obj: any): void {
+    this.model = obj;
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled = isDisabled;
+  }
+  // #endregion
 }

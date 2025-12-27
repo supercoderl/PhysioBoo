@@ -712,281 +712,440 @@ export const MENUS: MenuItem[] = [
         label: "Overview",
         icon: "layout-dashboard",
         route: "overview",
-        roles: ["admin", "director", "doctor", "receptionist", "marketer"],
+        permissionCode: ["admin", "director", "doctor", "receptionist", "marketer"],
         children: [
             {
                 id: "dashboard",
                 label: "Dashboard",
                 route: "overview/dashboard",
-                icon: "gauge"
+                icon: "gauge",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
-        ]
+        ],
+        isActive: false,
+        order: 0
     },
     {
         id: "reception",
         label: "Reception",
         icon: "concierge-bell",
-        roles: ["admin", "receptionist"],
+        permissionCode: ["admin", "receptionist"],
         children: [
             {
                 id: "booking",
                 label: "Booking",
                 route: "reception/booking",
-                icon: "calendar-days"
+                icon: "calendar-days",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "registration",
                 label: "Registration",
-                route: "reception/register",
-                icon: "user-plus"
+                route: "reception/registration",
+                icon: "user-plus",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "queue",
                 label: "Queue",
                 route: "reception/queue",
                 icon: "users",
-                badge: 12
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "patient-lookup",
                 label: "Patient Lookup",
                 route: "reception/patient-lookup",
-                icon: "search"
+                icon: "search",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             }
-        ]
+        ],
+        route: "",
+        isActive: false,
+        order: 0
     },
     {
         id: "clinic",
         label: "Clinic",
         icon: "stethoscope",
-        roles: ["admin", "doctor"],
+        permissionCode: ["admin", "doctor"],
         children: [
             {
                 id: "doctor-desk",
                 label: "Doctor Desk",
                 route: "clinic/doctor-desk",
-                icon: "monitor-check"
+                icon: "monitor-check",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "prescription",
                 label: "Prescription",
                 route: "clinic/prescription",
-                icon: "file-plus"
+                icon: "file-plus",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "medical-record",
                 label: "Medical Record",
                 route: "clinic/medical-record",
-                icon: "folder-open"
+                icon: "folder-open",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             }
-        ]
+        ],
+        route: "",
+        isActive: false,
+        order: 0
     },
     {
         id: "inpatient",
         label: "Inpatient",
         icon: "bed",
-        roles: ["admin", "nurse", "doctor"],
+        permissionCode: ["admin", "nurse", "doctor"],
         children: [
             {
                 id: "bed-map",
                 label: "Bed Map",
                 route: "inpatient/bed-map",
-                icon: "layout-grid"
+                icon: "layout-grid",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "admission",
                 label: "Admission",
                 route: "inpatient/admission",
-                icon: "log-in"
+                icon: "log-in",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "treatment-sheet",
                 label: "Treatment Sheet",
                 route: "inpatient/treatment-sheet",
-                icon: "clipboard-list"
+                icon: "clipboard-list",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             }
-        ]
+        ],
+        route: "",
+        isActive: false,
+        order: 0
     },
     {
         id: "paraclinical",
         label: "Paraclinical",
         icon: "microscope",
-        roles: ["admin", "technician", "doctor"],
+        permissionCode: ["admin", "technician", "doctor"],
         children: [
             {
                 id: "lis",
                 label: "Laboratory",
                 route: "paraclinical/laboratory",
-                icon: "flask-conical"
+                icon: "flask-conical",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "ris",
                 label: "Radiology",
                 route: "paraclinical/radiology",
-                icon: "image"
+                icon: "image",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "surgery",
                 label: "Surgery",
                 route: "paraclinical/surgery",
-                icon: "scissors"
+                icon: "scissors",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             }
-        ]
+        ],
+        route: "",
+        isActive: false,
+        order: 0
     },
     {
         id: "pharmacy",
         label: "Pharmacy",
         icon: "pill",
-        roles: ["admin", "pharmacist"],
+        permissionCode: ["admin", "pharmacist"],
         children: [
             {
                 id: "retail",
                 label: "Retail",
                 route: "pharmacy/retail",
-                icon: "shopping-cart"
+                icon: "shopping-cart",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "prescription-dispense",
                 label: "Prescription Dispense",
-                route: "pharmacy/dispense",
-                icon: "file-check"
+                route: "pharmacy/prescription-dispense",
+                icon: "file-check",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "inventory",
                 label: "Inventory Management",
-                route: "pharmacy/inventory",
-                icon: "warehouse"
+                route: "pharmacy/inventory-management",
+                icon: "warehouse",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "inventory-check",
                 label: "Stock Take",
                 route: "pharmacy/stock-take",
-                icon: "clipboard-check"
+                icon: "clipboard-check",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             }
-        ]
+        ],
+        route: "",
+        isActive: false,
+        order: 0
     },
     {
         id: "finance",
         label: "Finance",
         icon: "wallet",
-        roles: ["admin", "accountant", "cashier"],
+        permissionCode: ["admin", "accountant", "cashier"],
         children: [
             {
                 id: "cashier",
                 label: "Cashier",
                 route: "finance/cashier",
-                icon: "banknote"
+                icon: "banknote",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "insurance",
                 label: "Insurance",
                 route: "finance/insurance",
-                icon: "shield-check"
+                icon: "shield-check",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "revenue-report",
                 label: "Revenue Report",
                 route: "finance/reports",
-                icon: "bar-chart-3"
+                icon: "bar-chart-3",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             }
-        ]
+        ],
+        route: "",
+        isActive: false,
+        order: 0
     },
     {
         id: "crm",
         label: "CRM & CS",
         icon: "users-round",
-        roles: ["admin", "marketer", "cskh"],
+        permissionCode: ["admin", "marketer", "cskh"],
         children: [
             {
                 id: "customer-data",
                 label: "Customer 360",
-                route: "crm/customers",
-                icon: "database"
+                route: "crm/customer",
+                icon: "database",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "marketing",
                 label: "Marketing Campaign",
-                route: "crm/marketing",
-                icon: "megaphone"
+                route: "crm/marketing-campaign",
+                icon: "megaphone",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "leads",
                 label: "Lead Management",
-                route: "crm/leads",
-                icon: "list-filter"
+                route: "crm/lead-management",
+                icon: "list-filter",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "tickets",
                 label: "Support & Complaints",
-                route: "crm/tickets",
+                route: "crm/support-complaint",
                 icon: "headphones",
-                badge: 5
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "loyalty",
                 label: "Members & Points",
-                route: "crm/loyalty",
-                icon: "gift"
+                route: "crm/member-point",
+                icon: "gift",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             }
-        ]
+        ],
+        route: "",
+        isActive: false,
+        order: 0
     },
     {
         id: "cms",
         label: "CMS",
         icon: "globe",
-        roles: ["admin", "marketer"],
+        permissionCode: ["admin", "marketer"],
         children: [
             {
                 id: "articles",
                 label: "Articles & News",
-                route: "cms/articles",
-                icon: "newspaper"
+                route: "cms/article-news",
+                icon: "newspaper",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "services",
                 label: "Services",
-                route: "cms/services",
-                icon: "briefcase"
+                route: "cms/service",
+                icon: "briefcase",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "doctors",
                 label: "Doctors",
-                route: "cms/doctors",
-                icon: "user-check"
+                route: "cms/doctor",
+                icon: "user-check",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "configuration",
                 label: "Home Configuration",
-                route: "cms/config",
-                icon: "layout-template"
+                route: "cms/home-configuration",
+                icon: "layout-template",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             }
-        ]
+        ],
+        route: "",
+        isActive: false,
+        order: 0
     },
     {
         id: "system",
         label: "System",
         icon: "settings",
-        roles: ["admin"],
+        permissionCode: ["admin"],
         children: [
             {
                 id: "users",
                 label: "Users & Permissions",
-                route: "system/users",
-                icon: "user-cog"
+                route: "system/user-permission",
+                icon: "user-cog",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "categories",
                 label: "Common Categories",
-                route: "system/categories",
-                icon: "list"
+                route: "system/common-category",
+                icon: "list",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             },
             {
                 id: "print-templates",
                 label: "Print Templates",
-                route: "system/templates",
-                icon: "printer"
+                route: "system/print-template",
+                icon: "printer",
+                isActive: false,
+                order: 0,
+                permissionCode: [],
+                children: []
             }
-        ]
+        ],
+        route: "",
+        isActive: false,
+        order: 0
     }
 ]   
 // #endregion

@@ -61,6 +61,11 @@ export const routes: Routes = [
                         path: 'patient-lookup',
                         data: { breadcrumb: ['patient-lookup'] },
                         loadComponent: () => import('./reception/patient-lookup/patient-lookup.component').then(m => m.AdminPatientLookupComponent),
+                    },
+                    {
+                        path: 'registration',
+                        data: { breadcrumb: ['registration'] },
+                        loadComponent: () => import('./reception/registration/registration.component').then(m => m.AdminRegistrationComponent),
                     }
                 ]
             },
@@ -155,6 +160,21 @@ export const routes: Routes = [
                         path: 'retail',
                         data: { breadcrumb: ['retail'] },
                         loadComponent: () => import('./pharmacy/retail/retail.component').then(m => m.AdminRetailComponent),
+                    },
+                    {
+                        path: 'prescription-dispense',
+                        data: { breadcrumb: ['prescription-dispense'] },
+                        loadComponent: () => import('./pharmacy/prescription-dispense/prescription-dispense.component').then(m => m.AdminPrescriptionDispenseComponent),
+                    },
+                    {
+                        path: 'inventory-management',
+                        data: { breadcrumb: ['inventory-management'] },
+                        loadComponent: () => import('./pharmacy/inventory-management/inventory-management.component').then(m => m.AdminInventoryManagementComponent),
+                    },
+                    {
+                        path: 'stock-take',
+                        data: { breadcrumb: ['stock-take'] },
+                        loadComponent: () => import('./pharmacy/stock-take/stock-take.component').then(m => m.AdminStockTakeComponent),
                     }
                 ]
             },
@@ -185,19 +205,81 @@ export const routes: Routes = [
                 ]
             },
             {
-                path: 'doctor',
-                data: { breadcrumb: ['doctor'] },
+                path: 'crm',
+                data: { breadcrumb: ['crm'] },
                 children: [
                     {
                         path: '',
-                        redirectTo: 'list',
+                        redirectTo: 'customer',
                         pathMatch: 'full'
                     },
                     {
-                        path: 'list',
-                        loadComponent: () => import('./doctor/list/doctor-list.component').then(m => m.DoctorListComponent),
-                        data: { breadcrumb: ['list'] },
+                        path: 'customer',
+                        loadComponent: () => import('./crm/customer/customer.component').then(m => m.AdminCustomer360Component),
+                        data: { breadcrumb: ['customer'] },
+                    },
+                    {
+                        path: 'marketing-campaign',
+                        data: { breadcrumb: ['marketing-campaign'] },
+                        loadComponent: () => import('./crm/marketing-campaign/marketing-campaign.component').then(m => m.AdminMarketingCampaignComponent),
+                    },
+                    {
+                        path: 'lead-management',
+                        data: { breadcrumb: ['lead-management'] },
+                        loadComponent: () => import('./crm/lead-management/lead-management.component').then(m => m.AdminLeadManagementComponent),
+                    },
+                    {
+                        path: 'support-complaint',
+                        data: { breadcrumb: ['support-complaint'] },
+                        loadComponent: () => import('./crm/support-complaint/support-complaint.component').then(m => m.AdminSupportComplaintComponent),
+                    },
+                    {
+                        path: 'member-point',
+                        data: { breadcrumb: ['member-point'] },
+                        loadComponent: () => import('./crm/member-point/member-point.component').then(m => m.AdminMemberPointComponent),
                     }
+                ]
+            },
+            {
+                path: 'cms',
+                data: { breadcrumb: ['cms'] },
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'article-news',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'article-news',
+                        data: { breadcrumb: ['article-news'] },
+                        loadComponent: () => import('./cms/article-news/article-news.component').then(m => m.AdminArticleNewsComponent),
+                    },
+                    {
+                        path: 'service',
+                        data: { breadcrumb: ['service'] },
+                        loadComponent: () => import('./cms/service/service.component').then(m => m.AdminServiceComponent),
+                    },
+                    {
+                        path: 'home-configuration',
+                        data: { breadcrumb: ['home-configuration'] },
+                        loadComponent: () => import('./cms/home-configuration/home-configuration.component').then(m => m.AdminHomeConfigurationComponent),
+                    },
+                    {
+                        path: 'doctor',
+                        data: { breadcrumb: ['doctor'] },
+                        children: [
+                            {
+                                path: '',
+                                redirectTo: 'list',
+                                pathMatch: 'full'
+                            },
+                            {
+                                path: 'list',
+                                loadComponent: () => import('./cms/doctor/list/doctor-list.component').then(m => m.DoctorListComponent),
+                                data: { breadcrumb: ['list'] },
+                            }
+                        ]
+                    },
                 ]
             },
             {
@@ -261,6 +343,26 @@ export const routes: Routes = [
                                 loadComponent: () => import('./system/scrumboard/list/list.component').then(m => m.ListScrumboardComponent),
                             }
                         ]
+                    },
+                    {
+                        path: 'user-permission',
+                        data: { breadcrumb: ['user-permission'] },
+                        loadComponent: () => import('./system/user-permission/user-permission.component').then(m => m.AdminUserPermissionComponent),
+                    },
+                    {
+                        path: 'common-category',
+                        data: { breadcrumb: ['common-category'] },
+                        loadComponent: () => import('./system/common-category/common-category.component').then(m => m.AdminCommonCategoryComponent),
+                    },
+                    {
+                        path: 'print-template',
+                        data: { breadcrumb: ['print-template'] },
+                        loadComponent: () => import('./system/print-template/print-template.component').then(m => m.AdminPrintTemplateComponent),
+                    },
+                    {
+                        path: 'setting',
+                        data: { breadcrumb: ['setting'] },
+                        loadChildren: () => import('./system/setting/setting.routes').then(r => r.routes)
                     }
                 ]
             },

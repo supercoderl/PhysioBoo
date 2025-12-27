@@ -6,6 +6,7 @@ import { BooInputComponent } from "../../../../../components/input/boo-input/boo
 import { AdminBookingTableCardComponent } from "../../../../../components/layout/admin/booking/booking-table-card.component";
 import { dropdownAnimations } from '../../../../../shared/animations/dropdown.animation';
 import { SharedModule } from '../../../../../shared/shared-imports';
+import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
 
 @Component({
   selector: 'admin-booking-list',
@@ -16,8 +17,9 @@ import { SharedModule } from '../../../../../shared/shared-imports';
     BooIconComponent,
     BooInputComponent,
     AdminBookingTableCardComponent,
-    SharedModule
-  ],
+    SharedModule,
+    AdminContentHeaderComponent
+],
   templateUrl: './admin-booking-list.component.html',
   animations: [dropdownAnimations]
 })

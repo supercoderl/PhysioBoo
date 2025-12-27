@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { LucideAngularModule, Plus } from "lucide-angular";
-import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
-import { BooTableComponent } from "../../../../components/table/boo-table/boo-table.component";
+import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
+import { BooTableComponent } from "../../../../../components/table/boo-table/boo-table.component";
 
 @Component({
     selector: 'doctor-list',

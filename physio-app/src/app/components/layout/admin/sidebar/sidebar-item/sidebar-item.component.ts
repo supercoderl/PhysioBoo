@@ -12,7 +12,7 @@ import { MenuItem } from '../../../../../shared/types/menu';
   template: `
     <a
       class="mb-1 flex w-full items-center justify-start gap-2 rounded-md px-2 py-1 relative cursor-pointer text-[13px] text-[#1F232B] transition-all duration-300 hover:bg-[rgba(0,_0,_0,_0.07)] hover:text-inherit"
-      [routerLink]="item.children ? null : (['/admin'].concat(item.route?.split('/') || []))"
+      [routerLink]="item.children ? null : (['/admin'].concat(item.route.split('/') || []))"
     >
       <lucide-icon
         *ngIf="item.icon"

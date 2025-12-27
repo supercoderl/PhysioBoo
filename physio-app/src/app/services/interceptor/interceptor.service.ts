@@ -26,7 +26,8 @@ export class InterceptorService implements HttpInterceptor {
     }
 
     const apiReq = request.clone({
-      url: `${this.baseUrl}${request.url.startsWith('/') ? '' : '/'}${request.url}`
+      url: `${this.baseUrl}${request.url.startsWith('/') ? '' : '/'}${request.url}`,
+      withCredentials: true
     });
 
     return next.handle(apiReq).pipe(catchError((err: HttpErrorResponse) => {

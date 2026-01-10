@@ -16,6 +16,11 @@ export const routes: Routes = [
                 data: { breadcrumbs: ['register'] } 
             },
             { 
+                path: 'register-employee', 
+                loadComponent: () => import('./register-employee/register-employee.component').then(m => m.RegisterEmployeeComponent),
+                data: { breadcrumbs: ['register-employee'] } 
+            },
+            { 
                 path: 'verify-required', 
                 loadComponent: () => import('./verify-required/verify-required.component').then(m => m.VerifyRequiredComponent),
                 data: { breadcrumbs: ['verify-required'] } 

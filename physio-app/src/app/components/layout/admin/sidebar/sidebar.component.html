@@ -57,9 +57,9 @@
               <!-- Section Items -->
               <ng-container *ngIf="menu.children">
                 <sidebar-item
-                *ngFor="let child of menu.children"
-                [item]="child"
-              ></sidebar-item>
+                  *ngFor="let child of menu.children"
+                  [item]="child"
+                ></sidebar-item>
               </ng-container>
 
               <div
@@ -71,36 +71,57 @@
         </div>
 
         <div class="flex flex-col gap-3 p-3 absolute bottom-0 w-full">
-          <button
-            class="flex items-center shrink-0 justify-start h-14 min-h-14 px-2 gap-3 w-full relative cursor-pointer text-[13px] rounded-1.5 transition-all duration-300 hover:bg-[rgba(0,_0,_0,_0.05)]"
-            tabindex="0"
-            type="button"
-          >
-            <div
-              class="rounded-lg h-10 w-10 relative flex-center-center overflow-hidden text-[13px] bg-[#E5E7EB] text-[#4B5563]"
+          <popup [(isOpen)]="isOpen" position="top-right">
+            <button
+              trigger
+              class="flex items-center shrink-0 justify-start h-14 min-h-14 px-2 gap-3 w-full relative cursor-pointer text-[13px] rounded-1.5 transition-all duration-300 hover:bg-[rgba(0,_0,_0,_0.05)]"
+              tabindex="0"
+              type="button"
             >
-              <img
-                alt="user photo"
-                class="w-full h-full text-center object-cover transparent"
-                src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/avatars/brian-hughes.jpg"
+              <boo-avatar
+                [src]="(userInfo$ | async)?.profilePicture"
+                [allowBorder]="true"
               />
-            </div>
-            <div class="flex flex-auto flex-col gap-2">
-              <span
-                class="flex truncate leading-none font-semibold tracking-tight capitalize text-base m-0"
-                >Abbott Keitch</span
+              <div class="flex flex-auto flex-col gap-2">
+                <span class="flex truncate leading-none font-semibold tracking-tight capitalize text-base m-0">
+                  asdasdsa
+                </span
+                >
+                <p
+                  class="flex leading-none font-medium tracking-tighter text-md m-0 text-[#4B5563]"
+                >
+                  {{ (userInfo$ | async)?.email }}
+                </p>
+              </div>
+              <div class="flex shrink-0 items-center gap-2">
+                <lucide-icon [name]="info" class="w-4 h-4"></lucide-icon>
+                <lucide-icon [name]="chevronUp" class="w-4 h-4"></lucide-icon>
+              </div>
+            </button>
+            <div content class="min-w-32 max-w-32 bg-white rounded-[8px]">
+              <button-icon
+                [icon]="{ name: 'circle-user' }"
+                buttonClass="border-0 w-full !justify-start"
+                routerLink="/admin/profile"
               >
-              <p
-                class="flex leading-none font-medium tracking-tighter text-md m-0 text-[#4B5563]"
+                My Profile
+              </button-icon>
+              <button-icon
+                [icon]="{ name: 'mail' }"
+                buttonClass="border-0 w-full !justify-start"
               >
-                admin&#64;fusetheme.com
-              </p>
+                Inbox
+              </button-icon>
+              <button-icon
+                [icon]="{ name: 'circle-power', color: '#a2b223' }"
+                buttonClass="border-0 w-full text-[#a2b223] !justify-start"
+                (onClick)="logout()"
+                [loading]="loadingSrv.isLoading('logout')"
+              >
+                Logout
+              </button-icon>
             </div>
-            <div class="flex shrink-0 items-center gap-2">
-              <lucide-icon [name]="info" class="w-4 h-4"></lucide-icon>
-              <lucide-icon [name]="chevronUp" class="w-4 h-4"></lucide-icon>
-            </div>
-          </button>
+          </popup>
         </div>
       </div>
     </div>

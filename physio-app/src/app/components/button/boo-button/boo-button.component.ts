@@ -20,7 +20,7 @@ import { LoadingSpinnerComponent } from "../../loading/spinner/spinner.component
   `,
   host: {
     '[type]': 'type',
-    '[disabled]': 'disabled || loading',
+    '[attr.disabled]': '(disabled || loading) ? true : null',
     '[style.border-radius.px]': 'radius',
     '[style.background]': 'background',
     '[class]': 'combinedClasses'

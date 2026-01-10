@@ -1,14 +1,16 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { catchError, firstValueFrom, of, throwError } from 'rxjs';
+import { catchError, firstValueFrom, lastValueFrom, of, throwError } from 'rxjs';
 import { AppConfig, PagedResponse } from '../../shared/types/common';
 import { LocalStorage } from '../../shared/utils/storage';
 import { MenuCache, MenuItem } from '../../shared/types/menu';
 import { BASE_API } from '../../shared/api/base';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class InitService {
     private http = inject(HttpClient);
+    private authSrv = inject(AuthService);
 
     private config: AppConfig | null = null;
     private menus: MenuItem[] = [];
@@ -23,7 +25,8 @@ export class InitService {
     async load(): Promise<void> {
         await Promise.all([
             this.loadConfig(),
-            this.loadMenu()
+            this.loadMenu(),
+            this.loadCurrentUser(),
         ]);
     }
 
@@ -44,7 +47,7 @@ export class InitService {
                 }).pipe(
                     catchError(err => {
                         if (err.status === 304) {
-                            return of(err); 
+                            return of(err);
                         }
                         return throwError(() => err);
                     })
@@ -62,7 +65,7 @@ export class InitService {
                 })
             );
 
-            if(res?.success) {
+            if (res?.success) {
                 const newConfig = res.data;
                 this.config = newConfig;
                 LocalStorage.save(this.CACHE_KEY, newConfig);
@@ -99,11 +102,11 @@ export class InitService {
 
             const res = await firstValueFrom(request$);
             if (res.success) {
-                const newMenuData = res.data; 
-                this.menus = newMenuData.items; 
+                const newMenuData = res.data;
+                this.menus = newMenuData.items;
                 LocalStorage.save(this.MENU_CACHE_KEY, newMenuData);
             } else {
-                this.menus = []; 
+                this.menus = [];
             }
 
         } catch (err) {
@@ -114,6 +117,14 @@ export class InitService {
             } else {
                 this.menus = [];
             }
+        }
+    }
+
+    private async loadCurrentUser() {
+        try {
+            await lastValueFrom(this.authSrv.getProfile());
+        } catch (error) {
+            console.log('Người dùng chưa đăng nhập hoặc phiên đã hết hạn.');
         }
     }
 

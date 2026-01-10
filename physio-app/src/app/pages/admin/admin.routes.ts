@@ -360,8 +360,8 @@ export const routes: Routes = [
                         loadComponent: () => import('./system/print-template/print-template.component').then(m => m.AdminPrintTemplateComponent),
                     },
                     {
-                        path: 'setting',
-                        data: { breadcrumb: ['setting'] },
+                        path: 'settings',
+                        data: { breadcrumb: ['settings'] },
                         loadChildren: () => import('./system/setting/setting.routes').then(r => r.routes)
                     }
                 ]
@@ -382,11 +382,6 @@ export const routes: Routes = [
                     }
                 ]
             },
-            {
-                path: 'setting',
-                data: { breadcrumb: ['setting'] },
-                loadChildren: () => import('./setting/setting.routes').then(r => r.routes)
-            }
         ],
     },
 ];

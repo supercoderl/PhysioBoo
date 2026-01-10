@@ -17,6 +17,8 @@ import { ParticlesDirective } from "./directives/particles.directive";
 import { CustomScrollbarDirective } from "./directives/scrollbar.directive";
 import { CompletionTextPipe } from "./pipes/completion.pipe";
 import { SHARED_PIPES, SHARED_ZORRO_MODULES } from "./shared-providers";
+import { DefaultUserPipe } from "./pipes/default-user.pipe";
+import { ImageFallbackDirective } from "./directives/image-fallback.directive";
 
 export const SharedModule = [
     FormsModule,
@@ -38,8 +40,10 @@ export const SharedModule = [
     OverlayModule,
     ...SHARED_ZORRO_MODULES,
     CompletionTextPipe,
+    DefaultUserPipe,
     ...SHARED_PIPES,
     LottieComponent,
     BooErrorDirective,
-    DropdownDirective
+    DropdownDirective,
+    ImageFallbackDirective
 ];

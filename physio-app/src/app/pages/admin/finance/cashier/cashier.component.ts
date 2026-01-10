@@ -2,14 +2,15 @@ import { Component, OnInit } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { BillItem } from "../../../../shared/types/bill";
 import { Patient } from "../../../../shared/types/patient";
+import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 
 @Component({
-    selector: 'admin-cashier',
-    standalone: true,
-    imports: [
-        SharedModule
-    ],
-    template: `
+  selector: 'admin-cashier',
+  standalone: true,
+  imports: [
+    SharedModule
+  ],
+  template: `
     <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
         <!-- Search Patient Section -->
@@ -30,7 +31,6 @@ import { Patient } from "../../../../shared/types/patient";
               <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
               <input
                 type="text"
-                [(ngModel)]="selectedPatient.phone"
                 placeholder="Phone number"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
@@ -231,138 +231,122 @@ import { Patient } from "../../../../shared/types/patient";
 })
 
 export class AdminCashierComponent implements OnInit {
-    // #region Inputs, Outputs, Properties
-    searchQuery = '';
-    selectedPatient: Patient = {
-        id: 0, name: '', phone: '',
-        age: 0,
-        gender: "",
-        allergies: [],
-        dateOfBirth: "",
-        bloodType: "",
-        email: "",
-        address: "",
-        emergencyContact: "",
-        emergencyPhone: "",
-        chronicConditions: []
-    };
-    billNumber = '';
+  // #region Inputs, Outputs, Properties
+  searchQuery = '';
+  selectedPatient: Patient = {
+    id: "",
+    patientNumber: "",
+    patientType: PatientType.Outpatient,
+    primaryDoctorId: "",
+    totalVisits: 0,
+    totalAmountSpent: 0,
+    loyaltyPoints: 0,
+    riskLevel: RiskLevel.Low
+  };
+  billNumber = '';
 
-    newItem = { service: '', quantity: 1, price: 0, total: 0 };
-    billItems: BillItem[] = [];
-    nextItemId = 1;
+  newItem = { service: '', quantity: 1, price: 0, total: 0 };
+  billItems: BillItem[] = [];
+  nextItemId = 1;
 
-    subtotal = 0;
-    discount = 0;
-    tax = 5;
-    totalAmount = 0;
-    amountReceived = 0;
-    change = 0;
-    paymentMethod: 'cash' | 'card' | 'insurance' | 'upi' = 'cash';
-    // #endregion
+  subtotal = 0;
+  discount = 0;
+  tax = 5;
+  totalAmount = 0;
+  amountReceived = 0;
+  change = 0;
+  paymentMethod: 'cash' | 'card' | 'insurance' | 'upi' = 'cash';
+  // #endregion
 
-    // #region Init (Lifecycle + Setup)
-    ngOnInit() {
-        this.generateBillNumber();
+  // #region Init (Lifecycle + Setup)
+  ngOnInit() {
+    this.generateBillNumber();
+  }
+  // #endregion
+
+  // #region Methods
+  generateBillNumber() {
+    const now = new Date();
+    this.billNumber = `BILL${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+  }
+
+  searchPatient() {
+    // Implement patient search logic here
+    console.log('Searching for:', this.searchQuery);
+  }
+
+  addNewItem() {
+    if (this.newItem.service && this.newItem.quantity > 0 && this.newItem.price > 0) {
+      this.billItems.push({
+        id: this.nextItemId++,
+        service: this.newItem.service,
+        quantity: this.newItem.quantity,
+        price: this.newItem.price,
+        total: this.newItem.quantity * this.newItem.price
+      });
+
+      this.newItem = { service: '', quantity: 1, price: 0, total: 0 };
+      this.calculateTotal();
     }
-    // #endregion
+  }
 
-    // #region Methods
-    generateBillNumber() {
-        const now = new Date();
-        this.billNumber = `BILL${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
-    }
+  calculateItemTotal() {
+    this.newItem.total = this.newItem.quantity * this.newItem.price;
+  }
 
-    searchPatient() {
-        // Implement patient search logic here
-        console.log('Searching for:', this.searchQuery);
-    }
+  removeItem(id: number) {
+    this.billItems = this.billItems.filter(item => item.id !== id);
+    this.calculateTotal();
+  }
 
-    addNewItem() {
-        if (this.newItem.service && this.newItem.quantity > 0 && this.newItem.price > 0) {
-            this.billItems.push({
-                id: this.nextItemId++,
-                service: this.newItem.service,
-                quantity: this.newItem.quantity,
-                price: this.newItem.price,
-                total: this.newItem.quantity * this.newItem.price
-            });
+  calculateTotal() {
+    this.subtotal = this.billItems.reduce((sum, item) => sum + item.total, 0);
+    const discountAmount = (this.subtotal * this.discount) / 100;
+    const afterDiscount = this.subtotal - discountAmount;
+    const taxAmount = (afterDiscount * this.tax) / 100;
+    this.totalAmount = afterDiscount + taxAmount;
+    this.calculateChange();
+  }
 
-            this.newItem = { service: '', quantity: 1, price: 0, total: 0 };
-            this.calculateTotal();
-        }
-    }
+  calculateChange() {
+    this.change = Math.max(0, this.amountReceived - this.totalAmount);
+  }
 
-    calculateItemTotal() {
-        this.newItem.total = this.newItem.quantity * this.newItem.price;
-    }
-
-    removeItem(id: number) {
-        this.billItems = this.billItems.filter(item => item.id !== id);
-        this.calculateTotal();
-    }
-
-    calculateTotal() {
-        this.subtotal = this.billItems.reduce((sum, item) => sum + item.total, 0);
-        const discountAmount = (this.subtotal * this.discount) / 100;
-        const afterDiscount = this.subtotal - discountAmount;
-        const taxAmount = (afterDiscount * this.tax) / 100;
-        this.totalAmount = afterDiscount + taxAmount;
-        this.calculateChange();
-    }
-
-    calculateChange() {
-        this.change = Math.max(0, this.amountReceived - this.totalAmount);
-    }
-
-    processPayment() {
-        if (this.billItems.length === 0) {
-            alert('Please add items to the bill');
-            return;
-        }
-
-        if (this.amountReceived < this.totalAmount) {
-            alert('Insufficient payment amount');
-            return;
-        }
-
-        alert(`Payment processed successfully!\nBill Number: ${this.billNumber}\nTotal: ₹${this.totalAmount.toFixed(2)}\nReceived: ₹${this.amountReceived.toFixed(2)}\nChange: ₹${this.change.toFixed(2)}`);
-
-        // Here you would typically save to backend
-        this.printBill();
+  processPayment() {
+    if (this.billItems.length === 0) {
+      alert('Please add items to the bill');
+      return;
     }
 
-    printBill() {
-        console.log('Printing bill...');
-        window.print();
+    if (this.amountReceived < this.totalAmount) {
+      alert('Insufficient payment amount');
+      return;
     }
 
-    clearBill() {
-        if (confirm('Are you sure you want to clear the current bill?')) {
-            this.billItems = [];
-            this.newItem = { service: '', quantity: 1, price: 0, total: 0 };
-            this.subtotal = 0;
-            this.discount = 0;
-            this.tax = 5;
-            this.totalAmount = 0;
-            this.amountReceived = 0;
-            this.change = 0;
-            this.selectedPatient = {
-                id: 0, name: '', phone: '',
-                age: 0,
-                gender: "",
-                allergies: [],
-                dateOfBirth: "",
-                bloodType: "",
-                email: "",
-                address: "",
-                emergencyContact: "",
-                emergencyPhone: "",
-                chronicConditions: []
-            };
-            this.searchQuery = '';
-            this.generateBillNumber();
-        }
+    alert(`Payment processed successfully!\nBill Number: ${this.billNumber}\nTotal: ₹${this.totalAmount.toFixed(2)}\nReceived: ₹${this.amountReceived.toFixed(2)}\nChange: ₹${this.change.toFixed(2)}`);
+
+    // Here you would typically save to backend
+    this.printBill();
+  }
+
+  printBill() {
+    console.log('Printing bill...');
+    window.print();
+  }
+
+  clearBill() {
+    if (confirm('Are you sure you want to clear the current bill?')) {
+      this.billItems = [];
+      this.newItem = { service: '', quantity: 1, price: 0, total: 0 };
+      this.subtotal = 0;
+      this.discount = 0;
+      this.tax = 5;
+      this.totalAmount = 0;
+      this.amountReceived = 0;
+      this.change = 0;
+      this.searchQuery = '';
+      this.generateBillNumber();
     }
-    // #endregion
+  }
+  // #endregion
 }

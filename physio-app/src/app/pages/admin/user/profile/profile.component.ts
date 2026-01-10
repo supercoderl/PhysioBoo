@@ -1,11 +1,17 @@
 import { Component } from '@angular/core';
 import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
 import { ProfileTimelineComponent } from "./timeline.component";
+import { AuthService } from '../../../../services/auth/auth.service';
+import { SharedModule } from '../../../../shared/shared-imports';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [ProfileTimelineComponent, ButtonIconComponent],
+  imports: [
+    ProfileTimelineComponent,
+    ButtonIconComponent,
+    SharedModule
+  ],
   template: `
     <div class="z-10 flex flex-auto flex-col">
       <div class="flex flex-1 z-[2] min-w-0 bg-[#F6F7F8]">
@@ -24,13 +30,9 @@ import { ProfileTimelineComponent } from "./timeline.component";
                   <div class="-mt-24 rounded-full lg:-mt-22">
                     <div style="transform: none">
                       <div
-                        class="border-4 border-solid w-32 h-32 relative flex-center-center leading-none rounded-full overflow-hidden text-[13px] border-white"
+                        class="border-4 border-solid w-32 h-32 relative flex-center-center leading-none rounded-full overflow-hidden text-[13px] border-[#c4c4c4]"
                       >
-                        <img
-                          alt="User avatar"
-                          class="w-full h-full text-center object-cover"
-                          src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/avatars/male-04.jpg"
-                        />
+                        
                       </div>
                     </div>
                   </div>
@@ -40,7 +42,7 @@ import { ProfileTimelineComponent } from "./timeline.component";
                     <p
                       class="font-bold leading-none text-[14px] m-0"
                     >
-                      Brian Hughes
+                      asdasdasd
                     </p>
                     <p
                       class="m-0 text-[13px] leading-[1.5] text-[#4B5563]"
@@ -54,24 +56,36 @@ import { ProfileTimelineComponent } from "./timeline.component";
                       <p
                         class="font-bold m-0 leading-[1.5] text-[13px]"
                       >
-                        200k
+                        DR-001
                       </p>
                       <p
                         class="font-medium m-0 text-[11px] text-[#4B5563]"
                       >
-                        FOLLOWERS
+                        EMP ID
                       </p>
                     </div>
                     <div class="flex flex-col items-center">
                       <p
                         class="font-bold m-0 leading-[1.5] text-[13px]"
                       >
-                        1.2k
+                        10 years
                       </p>
                       <p
                         class="font-medium m-0 text-[11px] text-[#4B5563]"
                       >
-                        FOLLOWING
+                        EXP
+                      </p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                      <p
+                        class="font-bold m-0 leading-[1.5] text-[13px]"
+                      >
+                        4.8 ⭐
+                      </p>
+                      <p
+                        class="font-medium m-0 text-[11px] text-[#4B5563]"
+                      >
+                        Rating
                       </p>
                     </div>
                   </div>
@@ -88,19 +102,19 @@ import { ProfileTimelineComponent } from "./timeline.component";
                             class="z-[1]"
                             buttonClass="text-[13px] !border-0"
                           >
-                            Timeline
+                            Schedule
                           </button-icon>
                           <button-icon
                             class="z-[1]"
                             buttonClass="text-[13px] !border-0"
                           >
-                            About
+                            Qualifications
                           </button-icon>
                           <button-icon
                             class="z-[1]"
                             buttonClass="text-[13px] !border-0"
                           >
-                            Photos &amp; Videos
+                            My Patients
                           </button-icon>
                         </div>
                         <span
@@ -128,5 +142,13 @@ import { ProfileTimelineComponent } from "./timeline.component";
   `
 })
 export class ProfileComponent {
+  // #region Inputs, Outputs, Properties
+  userInfo$ = this.authSrv.userInfo$;
+  // #endregion
 
+  // #region Init (Lifecycle + Setup)
+  constructor(
+    private authSrv: AuthService
+  ) { }
+  // #endregion
 }

@@ -1,4 +1,6 @@
 import { MenuItem } from "../types/menu"
+import { User } from "../types/user"
+import { generateUUID } from "../utils/common"
 
 // #region Categories
 export const CATEGORIES = [
@@ -1147,7 +1149,7 @@ export const MENUS: MenuItem[] = [
         isActive: false,
         order: 0
     }
-]   
+]
 // #endregion
 
 // #region Category Dashboard
@@ -1195,4 +1197,31 @@ export const MEDICAL_CATEGORIES = [
         icon: "clipboard-plus"
     }
 ]
+// #endregion
+
+// #region Default Values
+export const AVATAR = 'assets/images/default/avatar.png';
+
+export const USER: User = {
+    id: generateUUID(),
+    email: "user@example.com",
+    phone: "+1898754115",
+    alternatePhone: null,
+    isActive: true,
+    isVerified: true,
+    emailVerifiedAt: new Date(2025, 8, 11),
+    phoneVerifiedAt: null,
+    lastLoginAt: new Date(2025, 12, 28),
+    failedLoginAttempts: 0,
+    accountLockedUntil: null,
+    twoFactorEnabled: false,
+    twoFactorSecret: null,
+    profilePicture: AVATAR,
+    preferredLanguage: "en",
+    timeZone: "Asia/Ho_Chi_Minh",
+    createdAt: new Date(2025, 11, 10),
+    createdBy: generateUUID(),
+    updatedAt: null,
+    updatedBy: null,
+}
 // #endregion

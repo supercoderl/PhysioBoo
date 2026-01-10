@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuardFn } from './services/auth/auth-guard.guard';
 
 export const routes: Routes = [
     {
@@ -11,7 +12,8 @@ export const routes: Routes = [
     },
     {
         path: 'admin',
-        loadChildren: () => import('./pages/admin/admin.routes').then(m => m.routes)
+        loadChildren: () => import('./pages/admin/admin.routes').then(m => m.routes),
+        canActivate: [authGuardFn]
     },
     {
         path: 'exception',

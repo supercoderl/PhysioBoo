@@ -4,14 +4,15 @@ import { LabResult } from "../../../../shared/types/lab-result";
 import { Visit } from "../../../../shared/types/visit";
 import { Patient } from "../../../../shared/types/patient";
 import { Document } from "../../../../shared/types/document";
+import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 
 @Component({
-    selector: 'admin-medical-record',
-    standalone: true,
-    imports: [
-        SharedModule
-    ],
-    template: `
+  selector: 'admin-medical-record',
+  standalone: true,
+  imports: [
+    SharedModule
+  ],
+  template: `
     <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
         <!-- Header with Patient Search -->
@@ -40,10 +41,10 @@ import { Document } from "../../../../shared/types/document";
           <div class="flex items-start justify-between mb-6">
             <div class="flex items-start gap-6">
               <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center">
-                <span class="text-3xl font-bold text-blue-600">{{ getInitials(patient.name) }}</span>
+                <span class="text-3xl font-bold text-blue-600">asd</span>
               </div>
               <div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ patient.name }}</h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">asd</h2>
                 <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
                   <div>
                     <span class="text-gray-600">Patient ID:</span>
@@ -51,23 +52,23 @@ import { Document } from "../../../../shared/types/document";
                   </div>
                   <div>
                     <span class="text-gray-600">Blood Type:</span>
-                    <span class="font-semibold text-gray-800 ml-2">{{ patient.bloodType }}</span>
+                    <span class="font-semibold text-gray-800 ml-2">asd</span>
                   </div>
                   <div>
                     <span class="text-gray-600">Date of Birth:</span>
-                    <span class="font-semibold text-gray-800 ml-2">{{ patient.dateOfBirth }} ({{ patient.age }}y)</span>
+                    <span class="font-semibold text-gray-800 ml-2">asdas</span>
                   </div>
                   <div>
                     <span class="text-gray-600">Gender:</span>
-                    <span class="font-semibold text-gray-800 ml-2">{{ patient.gender }}</span>
+                    <span class="font-semibold text-gray-800 ml-2">asd</span>
                   </div>
                   <div>
                     <span class="text-gray-600">Phone:</span>
-                    <span class="font-semibold text-gray-800 ml-2">{{ patient.phone }}</span>
+                    <span class="font-semibold text-gray-800 ml-2">asd</span>
                   </div>
                   <div>
                     <span class="text-gray-600">Email:</span>
-                    <span class="font-semibold text-gray-800 ml-2">{{ patient.email }}</span>
+                    <span class="font-semibold text-gray-800 ml-2">asd</span>
                   </div>
                 </div>
               </div>
@@ -79,36 +80,7 @@ import { Document } from "../../../../shared/types/document";
 
           <!-- Allergies & Chronic Conditions -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div *ngIf="patient.allergies.length > 0" 
-                 class="bg-red-50 border-2 border-red-200 rounded-lg p-4">
-              <h3 class="font-bold text-red-800 mb-2 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                Allergies
-              </h3>
-              <div class="flex flex-wrap gap-2">
-                <span *ngFor="let allergy of patient.allergies" 
-                      class="bg-red-200 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                  {{ allergy }}
-                </span>
-              </div>
-            </div>
-            <div *ngIf="patient.chronicConditions.length > 0" 
-                 class="bg-orange-50 border-2 border-orange-200 rounded-lg p-4">
-              <h3 class="font-bold text-orange-800 mb-2 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Chronic Conditions
-              </h3>
-              <div class="flex flex-wrap gap-2">
-                <span *ngFor="let condition of patient.chronicConditions" 
-                      class="bg-orange-200 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">
-                  {{ condition }}
-                </span>
-              </div>
-            </div>
+            
           </div>
         </div>
 
@@ -314,116 +286,111 @@ import { Document } from "../../../../shared/types/document";
 })
 
 export class AdminMedicalRecordComponent implements OnInit {
-    // #region Inputs, Outputs, Properties
-    searchQuery: string = '';
-    activeTab: string = 'visits';
+  // #region Inputs, Outputs, Properties
+  searchQuery: string = '';
+  activeTab: string = 'visits';
 
-    tabs = [
-        { label: 'Visit History', value: 'visits' },
-        { label: 'Lab Results', value: 'labs' },
-        { label: 'Documents', value: 'documents' },
-        { label: 'Medications', value: 'medications' }
-    ];
+  tabs = [
+    { label: 'Visit History', value: 'visits' },
+    { label: 'Lab Results', value: 'labs' },
+    { label: 'Documents', value: 'documents' },
+    { label: 'Medications', value: 'medications' }
+  ];
 
-    patient: Patient = {
-        id: 12345,
-        name: 'John Smith',
-        dateOfBirth: 'March 15, 1978',
-        age: 45,
-        gender: 'Male',
-        bloodType: 'O+',
-        phone: '+1 (555) 123-4567',
-        email: 'john.smith@email.com',
-        address: '123 Main Street, New York, NY 10001',
-        emergencyContact: 'Jane Smith (Wife)',
-        emergencyPhone: '+1 (555) 987-6543',
-        allergies: ['Penicillin', 'Aspirin', 'Shellfish'],
-        chronicConditions: ['Hypertension', 'Type 2 Diabetes']
+  patient: Patient = {
+    id: "",
+    patientNumber: "",
+    patientType: PatientType.Outpatient,
+    primaryDoctorId: "",
+    totalVisits: 0,
+    totalAmountSpent: 0,
+    loyaltyPoints: 0,
+    riskLevel: RiskLevel.Low
+  };
+
+  visits: Visit[] = [
+    {
+      id: 1,
+      date: 'December 15, 2024',
+      doctor: 'Dr. Sarah Johnson',
+      department: 'Cardiology',
+      chiefComplaint: 'Chest pain and shortness of breath',
+      diagnosis: ['Angina pectoris, unspecified', 'Hypertension'],
+      prescriptions: [
+        { medication: 'Nitroglycerin', dosage: '0.4mg', frequency: 'As needed', duration: '30 days' },
+        { medication: 'Aspirin', dosage: '81mg', frequency: 'Once daily', duration: 'Ongoing' }
+      ],
+      vitals: {
+        bloodPressure: '145/92',
+        heartRate: 88,
+        temperature: 36.8,
+        weight: 82,
+        height: 175,
+        bmi: 26.8
+      },
+      notes: 'Patient reports chest discomfort during physical activity. ECG shows minor irregularities. Recommended stress test and follow-up in 2 weeks.'
+    },
+    {
+      id: 2,
+      date: 'November 10, 2024',
+      doctor: 'Dr. Michael Chen',
+      department: 'General Practice',
+      chiefComplaint: 'Regular checkup and diabetes monitoring',
+      diagnosis: ['Type 2 Diabetes, controlled'],
+      prescriptions: [
+        { medication: 'Metformin', dosage: '500mg', frequency: 'Twice daily', duration: 'Ongoing' }
+      ],
+      vitals: {
+        bloodPressure: '138/85',
+        heartRate: 76,
+        temperature: 36.6,
+        weight: 83,
+        height: 175,
+        bmi: 27.1
+      },
+      notes: 'Blood glucose levels well controlled. HbA1c at 6.5%. Continue current medication regimen.'
+    }
+  ];
+
+  labResults: LabResult[] = [
+    { id: 1, date: '2024-12-15', testName: 'Complete Blood Count', result: 'Normal', normalRange: 'Various', status: 'normal', orderedBy: 'Dr. Sarah Johnson' },
+    { id: 2, date: '2024-12-15', testName: 'Lipid Panel - Cholesterol', result: '245 mg/dL', normalRange: '<200 mg/dL', status: 'abnormal', orderedBy: 'Dr. Sarah Johnson' },
+    { id: 3, date: '2024-11-10', testName: 'HbA1c', result: '6.5%', normalRange: '<5.7%', status: 'abnormal', orderedBy: 'Dr. Michael Chen' },
+    { id: 4, date: '2024-11-10', testName: 'Fasting Blood Glucose', result: '110 mg/dL', normalRange: '70-100 mg/dL', status: 'abnormal', orderedBy: 'Dr. Michael Chen' },
+    { id: 5, date: '2024-10-05', testName: 'Kidney Function Test', result: 'Normal', normalRange: 'Various', status: 'normal', orderedBy: 'Dr. Michael Chen' }
+  ];
+
+  documents: Document[] = [
+    { id: 1, name: 'ECG Report', type: 'PDF Document', date: 'Dec 15, 2024', uploadedBy: 'Dr. Sarah Johnson', size: '2.4 MB' },
+    { id: 2, name: 'Chest X-Ray', type: 'DICOM Image', date: 'Dec 15, 2024', uploadedBy: 'Radiology Dept', size: '8.1 MB' },
+    { id: 3, name: 'Lab Results - Blood Work', type: 'PDF Document', date: 'Nov 10, 2024', uploadedBy: 'Laboratory', size: '1.2 MB' },
+    { id: 4, name: 'Insurance Card', type: 'Image', date: 'Jan 5, 2024', uploadedBy: 'Patient', size: '0.8 MB' },
+    { id: 5, name: 'Prescription History', type: 'PDF Document', date: 'Oct 20, 2024', uploadedBy: 'Pharmacy', size: '1.5 MB' }
+  ];
+  // #endregion
+
+  // #region Init (Lifecycle + Setup)
+  ngOnInit() {
+    // Load patient data
+  }
+  // #endregion
+
+  // #region Methods
+  getInitials(name: string): string {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase();
+  }
+
+  getLabStatusClass(status: string): string {
+    const classes = {
+      'normal': 'bg-green-100 text-green-800',
+      'abnormal': 'bg-yellow-100 text-yellow-800',
+      'critical': 'bg-red-100 text-red-800'
     };
-
-    visits: Visit[] = [
-        {
-            id: 1,
-            date: 'December 15, 2024',
-            doctor: 'Dr. Sarah Johnson',
-            department: 'Cardiology',
-            chiefComplaint: 'Chest pain and shortness of breath',
-            diagnosis: ['Angina pectoris, unspecified', 'Hypertension'],
-            prescriptions: [
-                { medication: 'Nitroglycerin', dosage: '0.4mg', frequency: 'As needed', duration: '30 days' },
-                { medication: 'Aspirin', dosage: '81mg', frequency: 'Once daily', duration: 'Ongoing' }
-            ],
-            vitals: {
-                bloodPressure: '145/92',
-                heartRate: 88,
-                temperature: 36.8,
-                weight: 82,
-                height: 175,
-                bmi: 26.8
-            },
-            notes: 'Patient reports chest discomfort during physical activity. ECG shows minor irregularities. Recommended stress test and follow-up in 2 weeks.'
-        },
-        {
-            id: 2,
-            date: 'November 10, 2024',
-            doctor: 'Dr. Michael Chen',
-            department: 'General Practice',
-            chiefComplaint: 'Regular checkup and diabetes monitoring',
-            diagnosis: ['Type 2 Diabetes, controlled'],
-            prescriptions: [
-                { medication: 'Metformin', dosage: '500mg', frequency: 'Twice daily', duration: 'Ongoing' }
-            ],
-            vitals: {
-                bloodPressure: '138/85',
-                heartRate: 76,
-                temperature: 36.6,
-                weight: 83,
-                height: 175,
-                bmi: 27.1
-            },
-            notes: 'Blood glucose levels well controlled. HbA1c at 6.5%. Continue current medication regimen.'
-        }
-    ];
-
-    labResults: LabResult[] = [
-        { id: 1, date: '2024-12-15', testName: 'Complete Blood Count', result: 'Normal', normalRange: 'Various', status: 'normal', orderedBy: 'Dr. Sarah Johnson' },
-        { id: 2, date: '2024-12-15', testName: 'Lipid Panel - Cholesterol', result: '245 mg/dL', normalRange: '<200 mg/dL', status: 'abnormal', orderedBy: 'Dr. Sarah Johnson' },
-        { id: 3, date: '2024-11-10', testName: 'HbA1c', result: '6.5%', normalRange: '<5.7%', status: 'abnormal', orderedBy: 'Dr. Michael Chen' },
-        { id: 4, date: '2024-11-10', testName: 'Fasting Blood Glucose', result: '110 mg/dL', normalRange: '70-100 mg/dL', status: 'abnormal', orderedBy: 'Dr. Michael Chen' },
-        { id: 5, date: '2024-10-05', testName: 'Kidney Function Test', result: 'Normal', normalRange: 'Various', status: 'normal', orderedBy: 'Dr. Michael Chen' }
-    ];
-
-    documents: Document[] = [
-        { id: 1, name: 'ECG Report', type: 'PDF Document', date: 'Dec 15, 2024', uploadedBy: 'Dr. Sarah Johnson', size: '2.4 MB' },
-        { id: 2, name: 'Chest X-Ray', type: 'DICOM Image', date: 'Dec 15, 2024', uploadedBy: 'Radiology Dept', size: '8.1 MB' },
-        { id: 3, name: 'Lab Results - Blood Work', type: 'PDF Document', date: 'Nov 10, 2024', uploadedBy: 'Laboratory', size: '1.2 MB' },
-        { id: 4, name: 'Insurance Card', type: 'Image', date: 'Jan 5, 2024', uploadedBy: 'Patient', size: '0.8 MB' },
-        { id: 5, name: 'Prescription History', type: 'PDF Document', date: 'Oct 20, 2024', uploadedBy: 'Pharmacy', size: '1.5 MB' }
-    ];
-    // #endregion
-
-    // #region Init (Lifecycle + Setup)
-    ngOnInit() {
-        // Load patient data
-    }
-    // #endregion
-
-    // #region Methods
-    getInitials(name: string): string {
-        return name
-            .split(' ')
-            .map(n => n[0])
-            .join('')
-            .toUpperCase();
-    }
-
-    getLabStatusClass(status: string): string {
-        const classes = {
-            'normal': 'bg-green-100 text-green-800',
-            'abnormal': 'bg-yellow-100 text-yellow-800',
-            'critical': 'bg-red-100 text-red-800'
-        };
-        return classes[status as keyof typeof classes] || '';
-    }
-    // #endregion
+    return classes[status as keyof typeof classes] || '';
+  }
+  // #endregion
 }

@@ -6,14 +6,15 @@ import { Medication } from "../../../../shared/types/medication";
 import { Procedure } from "../../../../shared/types/procedure";
 import { Note } from "../../../../shared/types/note";
 import { FluidBalance } from "../../../../shared/types/fluid-balance";
+import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 
 @Component({
-    selector: 'admin-treatment-sheet',
-    standalone: true,
-    imports: [
-        SharedModule
-    ],
-    template: `
+  selector: 'admin-treatment-sheet',
+  standalone: true,
+  imports: [
+    SharedModule
+  ],
+  template: `
     <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
         <!-- Header -->
@@ -37,11 +38,11 @@ import { FluidBalance } from "../../../../shared/types/fluid-balance";
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <p class="text-sm text-gray-600">Patient Name</p>
-              <p class="text-lg font-bold text-gray-800">{{ patient.name }}</p>
+              <p class="text-lg font-bold text-gray-800">asd</p>
             </div>
             <div>
               <p class="text-sm text-gray-600">Age / Gender</p>
-              <p class="text-lg font-semibold text-gray-800">{{ patient.age }}y / {{ patient.gender }}</p>
+              <p class="text-lg font-semibold text-gray-800">asdy / asd</p>
             </div>
             <div>
               <p class="text-sm text-gray-600">Admission Date</p>
@@ -50,15 +51,6 @@ import { FluidBalance } from "../../../../shared/types/fluid-balance";
             <div>
               <p class="text-sm text-gray-600">Diagnosis</p>
               <p class="text-lg font-semibold text-gray-800"></p>
-            </div>
-          </div>
-          <div *ngIf="patient.allergies.length > 0" class="mt-4 bg-red-50 border-2 border-red-200 rounded-lg p-3">
-            <p class="text-sm font-semibold text-red-800 mb-2">⚠️ Allergies</p>
-            <div class="flex flex-wrap gap-2">
-              <span *ngFor="let allergy of patient.allergies" 
-                    class="bg-red-200 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                {{ allergy }}
-              </span>
             </div>
           </div>
         </div>
@@ -389,252 +381,247 @@ import { FluidBalance } from "../../../../shared/types/fluid-balance";
 })
 
 export class AdminTreatmentSheetComponent implements OnInit, OnDestroy {
-    // #region Inputs, Outputs, Properties
-    ward: string = 'Ward A - General Medicine';
-    currentDate: string = '';
-    currentTime: string = '';
-    activeTab: string = 'vitals';
+  // #region Inputs, Outputs, Properties
+  ward: string = 'Ward A - General Medicine';
+  currentDate: string = '';
+  currentTime: string = '';
+  activeTab: string = 'vitals';
 
-    patient: Patient = {
-        id: 12345,
-        name: 'John Smith',
-        dateOfBirth: 'March 15, 1978',
-        age: 45,
-        gender: 'Male',
-        bloodType: 'O+',
-        phone: '+1 (555) 123-4567',
-        email: 'john.smith@email.com',
-        address: '123 Main Street, New York, NY 10001',
-        emergencyContact: 'Jane Smith (Wife)',
-        emergencyPhone: '+1 (555) 987-6543',
-        allergies: ['Penicillin', 'Aspirin', 'Shellfish'],
-        chronicConditions: ['Hypertension', 'Type 2 Diabetes']
+  patient: Patient = {
+    id: "",
+    patientNumber: "",
+    patientType: PatientType.Outpatient,
+    primaryDoctorId: "",
+    totalVisits: 0,
+    totalAmountSpent: 0,
+    loyaltyPoints: 0,
+    riskLevel: RiskLevel.Low
+  };
+
+  vitalSigns: Vitals[] = [
+    {
+      temperature: 37.2, bloodPressure: '120/80', heartRate: 78,
+      weight: 0,
+      height: 0,
+      bmi: 0
+    },
+    {
+      temperature: 37.5, bloodPressure: '125/82', heartRate: 82,
+      weight: 0,
+      height: 0,
+      bmi: 0
+    },
+    {
+      temperature: 37.8, bloodPressure: '130/85', heartRate: 85,
+      weight: 0,
+      height: 0,
+      bmi: 0
+    }
+  ];
+
+  newVital: any = {
+    temperature: null,
+    bloodPressure: '',
+    heartRate: null,
+    respiratoryRate: null,
+    oxygenSaturation: null,
+    painScore: null,
+    recordedBy: ''
+  };
+
+  medications: Medication[] = [
+    {
+      id: '1',
+      name: 'Amoxicillin',
+      dosage: '500mg',
+      frequency: '3 times daily',
+      duration: "",
+      instructions: "",
+      quantity: 0
+    },
+    {
+      id: '2',
+      name: 'Paracetamol',
+      dosage: '500mg',
+      frequency: "",
+      duration: "",
+      instructions: "",
+      quantity: 0
+    }
+  ];
+
+  procedures: Procedure[] = [
+    { id: '1', time: '09:00', name: 'Wound Dressing Change', performedBy: 'Nurse Sarah', notes: 'Wound healing well, no signs of infection', status: 'completed' },
+    { id: '2', time: '15:30', name: 'Blood Sample Collection', performedBy: 'Lab Tech Mike', notes: 'Sample sent to laboratory for analysis', status: 'completed' }
+  ];
+
+  newProcedure: any = {
+    name: '',
+    performedBy: '',
+    notes: ''
+  };
+
+  notes: Note[] = [
+    { id: '1', time: '08:30', type: 'nursing', content: 'Patient alert and oriented. Complaining of mild chest discomfort. Vital signs stable.', writtenBy: 'Nurse Mary Johnson' },
+    { id: '2', time: '10:00', type: 'doctor', content: 'Chest X-ray shows improvement. Continue current antibiotic regimen. Patient responding well to treatment.', writtenBy: 'Dr. Sarah Wilson' },
+    { id: '3', time: '14:00', type: 'nursing', content: 'Patient had lunch, appetite improving. Ambulated to bathroom without assistance.', writtenBy: 'Nurse John Davis' }
+  ];
+
+  newNote: any = {
+    type: 'nursing',
+    content: '',
+    writtenBy: ''
+  };
+
+  fluidBalance: FluidBalance[] = [
+    { time: '08:00', intake: { oral: 200, iv: 500, total: 700 }, output: { urine: 300, drain: 0, total: 300 }, balance: 400 },
+    { time: '12:00', intake: { oral: 300, iv: 500, total: 800 }, output: { urine: 400, drain: 0, total: 400 }, balance: 400 },
+    { time: '16:00', intake: { oral: 250, iv: 500, total: 750 }, output: { urine: 350, drain: 0, total: 350 }, balance: 400 }
+  ];
+
+  private timeInterval: any;
+  // #endregion
+
+  // #region Init (Lifecycle + Setup)
+  ngOnInit() {
+    this.updateTime();
+    this.timeInterval = setInterval(() => {
+      this.updateTime();
+    }, 1000);
+  }
+
+  ngOnDestroy() {
+    if (this.timeInterval) {
+      clearInterval(this.timeInterval);
+    }
+  }
+  // #endregion
+
+  // #region Methods
+  updateTime() {
+    const now = new Date();
+    this.currentTime = now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    this.currentDate = now.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  addVitalSigns() {
+    if (!this.newVital.temperature || !this.newVital.bloodPressure || !this.newVital.heartRate) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    const now = new Date();
+    const vital: Vitals = {
+      temperature: this.newVital.temperature,
+      bloodPressure: this.newVital.bloodPressure,
+      heartRate: this.newVital.heartRate,
+      weight: 0,
+      height: 0,
+      bmi: 0
     };
 
-    vitalSigns: Vitals[] = [
-        {
-            temperature: 37.2, bloodPressure: '120/80', heartRate: 78,
-            weight: 0,
-            height: 0,
-            bmi: 0
-        },
-        {
-            temperature: 37.5, bloodPressure: '125/82', heartRate: 82,
-            weight: 0,
-            height: 0,
-            bmi: 0
-        },
-        {
-            temperature: 37.8, bloodPressure: '130/85', heartRate: 85,
-            weight: 0,
-            height: 0,
-            bmi: 0
-        }
-    ];
+    this.vitalSigns.push(vital);
+    this.newVital = {
+      temperature: null,
+      bloodPressure: '',
+      heartRate: null,
+      respiratoryRate: null,
+      oxygenSaturation: null,
+      painScore: null,
+      recordedBy: ''
+    };
+    alert('Vital signs recorded successfully!');
+  }
 
-    newVital: any = {
-        temperature: null,
-        bloodPressure: '',
-        heartRate: null,
-        respiratoryRate: null,
-        oxygenSaturation: null,
-        painScore: null,
-        recordedBy: ''
+  giveMedication(medId: string, scheduledTime: string) {
+    const med = this.medications.find(m => m.id === medId);
+    if (med) {
+
+    }
+  }
+
+  missedMedication(medId: string, scheduledTime: string) {
+    const med = this.medications.find(m => m.id === medId);
+    if (med) {
+
+    }
+  }
+
+  addProcedure() {
+    if (!this.newProcedure.name || !this.newProcedure.performedBy) {
+      alert('Please fill in required fields');
+      return;
+    }
+
+    const now = new Date();
+    const procedure: Procedure = {
+      id: Date.now().toString(),
+      time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+      name: this.newProcedure.name,
+      performedBy: this.newProcedure.performedBy,
+      notes: this.newProcedure.notes,
+      status: 'completed'
     };
 
-    medications: Medication[] = [
-        {
-            id: '1',
-            name: 'Amoxicillin',
-            dosage: '500mg',
-            frequency: '3 times daily',
-            duration: "",
-            instructions: "",
-            quantity: 0
-        },
-        {
-            id: '2',
-            name: 'Paracetamol',
-            dosage: '500mg',
-            frequency: "",
-            duration: "",
-            instructions: "",
-            quantity: 0
-        }
-    ];
+    this.procedures.push(procedure);
+    this.newProcedure = { name: '', performedBy: '', notes: '' };
+    alert('Procedure recorded successfully!');
+  }
 
-    procedures: Procedure[] = [
-        { id: '1', time: '09:00', name: 'Wound Dressing Change', performedBy: 'Nurse Sarah', notes: 'Wound healing well, no signs of infection', status: 'completed' },
-        { id: '2', time: '15:30', name: 'Blood Sample Collection', performedBy: 'Lab Tech Mike', notes: 'Sample sent to laboratory for analysis', status: 'completed' }
-    ];
+  addNote() {
+    if (!this.newNote.content || !this.newNote.writtenBy) {
+      alert('Please fill in all fields');
+      return;
+    }
 
-    newProcedure: any = {
-        name: '',
-        performedBy: '',
-        notes: ''
+    const now = new Date();
+    const note: Note = {
+      id: Date.now().toString(),
+      time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+      type: this.newNote.type,
+      content: this.newNote.content,
+      writtenBy: this.newNote.writtenBy
     };
 
-    notes: Note[] = [
-        { id: '1', time: '08:30', type: 'nursing', content: 'Patient alert and oriented. Complaining of mild chest discomfort. Vital signs stable.', writtenBy: 'Nurse Mary Johnson' },
-        { id: '2', time: '10:00', type: 'doctor', content: 'Chest X-ray shows improvement. Continue current antibiotic regimen. Patient responding well to treatment.', writtenBy: 'Dr. Sarah Wilson' },
-        { id: '3', time: '14:00', type: 'nursing', content: 'Patient had lunch, appetite improving. Ambulated to bathroom without assistance.', writtenBy: 'Nurse John Davis' }
-    ];
+    this.notes.unshift(note);
+    this.newNote = { type: 'nursing', content: '', writtenBy: '' };
+    alert('Note added successfully!');
+  }
 
-    newNote: any = {
-        type: 'nursing',
-        content: '',
-        writtenBy: ''
+  getMedicationStatusClass(status: string): string {
+    const classes = {
+      'pending': 'bg-yellow-100 text-yellow-800',
+      'given': 'bg-green-100 text-green-800',
+      'missed': 'bg-red-100 text-red-800',
+      'refused': 'bg-orange-100 text-orange-800'
     };
+    return classes[status as keyof typeof classes] || '';
+  }
 
-    fluidBalance: FluidBalance[] = [
-        { time: '08:00', intake: { oral: 200, iv: 500, total: 700 }, output: { urine: 300, drain: 0, total: 300 }, balance: 400 },
-        { time: '12:00', intake: { oral: 300, iv: 500, total: 800 }, output: { urine: 400, drain: 0, total: 400 }, balance: 400 },
-        { time: '16:00', intake: { oral: 250, iv: 500, total: 750 }, output: { urine: 350, drain: 0, total: 350 }, balance: 400 }
-    ];
+  getProcedureStatusClass(status: string): string {
+    const classes = {
+      'completed': 'bg-green-100 text-green-800',
+      'scheduled': 'bg-blue-100 text-blue-800',
+      'cancelled': 'bg-red-100 text-red-800'
+    };
+    return classes[status as keyof typeof classes] || '';
+  }
 
-    private timeInterval: any;
-    // #endregion
-
-    // #region Init (Lifecycle + Setup)
-    ngOnInit() {
-        this.updateTime();
-        this.timeInterval = setInterval(() => {
-            this.updateTime();
-        }, 1000);
-    }
-
-    ngOnDestroy() {
-        if (this.timeInterval) {
-            clearInterval(this.timeInterval);
-        }
-    }
-    // #endregion
-
-    // #region Methods
-    updateTime() {
-        const now = new Date();
-        this.currentTime = now.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-        this.currentDate = now.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    }
-
-    addVitalSigns() {
-        if (!this.newVital.temperature || !this.newVital.bloodPressure || !this.newVital.heartRate) {
-            alert('Please fill in all required fields');
-            return;
-        }
-
-        const now = new Date();
-        const vital: Vitals = {
-            temperature: this.newVital.temperature,
-            bloodPressure: this.newVital.bloodPressure,
-            heartRate: this.newVital.heartRate,
-            weight: 0,
-            height: 0,
-            bmi: 0
-        };
-
-        this.vitalSigns.push(vital);
-        this.newVital = {
-            temperature: null,
-            bloodPressure: '',
-            heartRate: null,
-            respiratoryRate: null,
-            oxygenSaturation: null,
-            painScore: null,
-            recordedBy: ''
-        };
-        alert('Vital signs recorded successfully!');
-    }
-
-    giveMedication(medId: string, scheduledTime: string) {
-        const med = this.medications.find(m => m.id === medId);
-        if (med) {
-
-        }
-    }
-
-    missedMedication(medId: string, scheduledTime: string) {
-        const med = this.medications.find(m => m.id === medId);
-        if (med) {
-
-        }
-    }
-
-    addProcedure() {
-        if (!this.newProcedure.name || !this.newProcedure.performedBy) {
-            alert('Please fill in required fields');
-            return;
-        }
-
-        const now = new Date();
-        const procedure: Procedure = {
-            id: Date.now().toString(),
-            time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
-            name: this.newProcedure.name,
-            performedBy: this.newProcedure.performedBy,
-            notes: this.newProcedure.notes,
-            status: 'completed'
-        };
-
-        this.procedures.push(procedure);
-        this.newProcedure = { name: '', performedBy: '', notes: '' };
-        alert('Procedure recorded successfully!');
-    }
-
-    addNote() {
-        if (!this.newNote.content || !this.newNote.writtenBy) {
-            alert('Please fill in all fields');
-            return;
-        }
-
-        const now = new Date();
-        const note: Note = {
-            id: Date.now().toString(),
-            time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
-            type: this.newNote.type,
-            content: this.newNote.content,
-            writtenBy: this.newNote.writtenBy
-        };
-
-        this.notes.unshift(note);
-        this.newNote = { type: 'nursing', content: '', writtenBy: '' };
-        alert('Note added successfully!');
-    }
-
-    getMedicationStatusClass(status: string): string {
-        const classes = {
-            'pending': 'bg-yellow-100 text-yellow-800',
-            'given': 'bg-green-100 text-green-800',
-            'missed': 'bg-red-100 text-red-800',
-            'refused': 'bg-orange-100 text-orange-800'
-        };
-        return classes[status as keyof typeof classes] || '';
-    }
-
-    getProcedureStatusClass(status: string): string {
-        const classes = {
-            'completed': 'bg-green-100 text-green-800',
-            'scheduled': 'bg-blue-100 text-blue-800',
-            'cancelled': 'bg-red-100 text-red-800'
-        };
-        return classes[status as keyof typeof classes] || '';
-    }
-
-    getNoteTypeClass(type: string): string {
-        const classes = {
-            'nursing': 'bg-blue-100 text-blue-800',
-            'doctor': 'bg-green-100 text-green-800',
-            'general': 'bg-gray-100 text-gray-800'
-        };
-        return classes[type as keyof typeof classes] || '';
-    }
-    // #endregion
+  getNoteTypeClass(type: string): string {
+    const classes = {
+      'nursing': 'bg-blue-100 text-blue-800',
+      'doctor': 'bg-green-100 text-green-800',
+      'general': 'bg-gray-100 text-gray-800'
+    };
+    return classes[type as keyof typeof classes] || '';
+  }
+  // #endregion
 }

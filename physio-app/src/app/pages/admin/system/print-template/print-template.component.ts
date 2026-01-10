@@ -6,12 +6,12 @@ import { Medication } from "../../../../shared/types/medication";
 import { LabTest } from "../../../../shared/types/lab-test";
 
 @Component({
-    selector: 'admin-print-template',
-    standalone: true,
-    imports: [
-        SharedModule
-    ],
-    template: `
+  selector: 'admin-print-template',
+  standalone: true,
+  imports: [
+    SharedModule
+  ],
+  template: `
     <div class="print-container bg-white p-8 max-w-4xl mx-auto">
   <!-- Print Button - Hidden during print -->
   <div class="no-print mb-6 flex justify-end">
@@ -181,7 +181,7 @@ import { LabTest } from "../../../../shared/types/lab-test";
       <div class="mb-6">
         <h2 class="text-lg font-bold text-gray-800 mb-3">Follow-up Instructions</h2>
         <p class="text-gray-700 leading-relaxed">
-          Patient should follow up with {{ doctor.name }} in 7-10 days. 
+          Patient should follow up with asd in 7-10 days. 
           Maintain prescribed medications and contact hospital immediately if symptoms worsen.
         </p>
       </div>
@@ -206,10 +206,10 @@ import { LabTest } from "../../../../shared/types/lab-test";
       <div class="mb-6">
         <h2 class="text-lg font-bold text-gray-800 mb-3">Doctor Information</h2>
         <p class="text-sm text-gray-700 mb-1">
-          <span class="font-semibold">Name:</span> {{ doctor.name }}
+          <span class="font-semibold">Name:</span> asd
         </p>
         <p class="text-sm text-gray-700">
-          <span class="font-semibold">Specialization:</span> {{ doctor.specialization }}
+          <span class="font-semibold">Specialization:</span> asd
         </p>
       </div>
 
@@ -231,9 +231,9 @@ import { LabTest } from "../../../../shared/types/lab-test";
       <div class="flex justify-between items-end">
         <div>
           <p class="text-sm text-gray-600 mb-1">Prepared by:</p>
-          <p class="font-bold text-gray-800">{{ doctor.name }}</p>
-          <p class="text-sm text-gray-600">{{ doctor.specialization }}</p>
-          <p class="text-xs text-gray-500">License: {{ doctor.license }}</p>
+          <p class="font-bold text-gray-800">asd</p>
+          <p class="text-sm text-gray-600">asd</p>
+          <p class="text-xs text-gray-500">License: asd</p>
         </div>
         <div class="text-right">
           <div class="border-t-2 border-gray-400 w-48 mb-2"></div>
@@ -244,7 +244,7 @@ import { LabTest } from "../../../../shared/types/lab-test";
   </div>
 </div>
     `,
-    styles: [`
+  styles: [`
         @media print {
             .no-print {
                 display: none !important;
@@ -270,39 +270,44 @@ import { LabTest } from "../../../../shared/types/lab-test";
 })
 
 export class AdminPrintTemplateComponent {
-    // #region Inputs, Outputs, Properties
-    @Input() templateType: 'prescription' | 'lab-report' | 'discharge-summary' | 'appointment' = 'prescription';
-    @Input() patient: PatientInfo = {
-        id: 'P-2024-001',
-        name: 'John Doe',
-        age: 45,
-        gender: 'Male',
-        bloodType: 'O+',
-        phone: '+1 234 567 8900',
-        address: '123 Main Street, City, State 12345'
-    };
-    @Input() doctor: Doctor = {
-        name: 'Dr. Sarah Johnson',
-        specialization: 'General Physician',
-        license: 'MD-12345'
-    };
-    @Input() date: string = new Date().toLocaleDateString();
-    @Input() medications: Medication[] = [
+  // #region Inputs, Outputs, Properties
+  @Input() templateType: 'prescription' | 'lab-report' | 'discharge-summary' | 'appointment' = 'prescription';
+  @Input() patient: PatientInfo = {
+    id: 'P-2024-001',
+    name: 'John Doe',
+    age: 45,
+    gender: 'Male',
+    bloodType: 'O+',
+    phone: '+1 234 567 8900',
+    address: '123 Main Street, City, State 12345'
+  };
+  @Input() doctor: Doctor = {
+    id: "",
+    medicalLicenseNumber: "",
+    medicalLicenseExpiry: new Date(2025, 10, 10),
+    yearsOfExperience: 0,
+    averageRating: 0,
+    totalReviews: 0,
+    bio: null,
+    about: null
+  };
+  @Input() date: string = new Date().toLocaleDateString();
+  @Input() medications: Medication[] = [
 
-    ];
-    @Input() labTests: LabTest[] = [
+  ];
+  @Input() labTests: LabTest[] = [
 
-    ];
-    @Input() diagnosis: string = 'Upper Respiratory Tract Infection';
-    @Input() symptoms: string[] = ['Fever', 'Cough', 'Sore throat'];
-    @Input() notes: string = 'Patient advised to take complete rest and maintain hydration. Follow-up visit recommended after 7 days.';
-    @Input() appointmentDate: string = '';
-    @Input() appointmentTime: string = '';
-    // #endregion
+  ];
+  @Input() diagnosis: string = 'Upper Respiratory Tract Infection';
+  @Input() symptoms: string[] = ['Fever', 'Cough', 'Sore throat'];
+  @Input() notes: string = 'Patient advised to take complete rest and maintain hydration. Follow-up visit recommended after 7 days.';
+  @Input() appointmentDate: string = '';
+  @Input() appointmentTime: string = '';
+  // #endregion
 
-    // #region Methods
-    print(): void {
-        window.print();
-    }
-    // #endregion
+  // #region Methods
+  print(): void {
+    window.print();
+  }
+  // #endregion
 }

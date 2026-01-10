@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -10,13 +9,13 @@ import { BooInputComponent } from "../../../components/input/boo-input/boo-input
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
 import { ToastService } from '../../../services/common/toast.service';
 import { SharedModule } from '../../../shared/shared-imports';
-import { PagedResponse } from '../../../shared/types/common';
+import { AuthService } from '../../../services/auth/auth.service';
+import { USER_ERROR_CODES } from '../../../shared/errors/code.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
-    LucideAngularModule,
     SharedModule,
     BooInputComponent,
     BooIconComponent,
@@ -34,29 +33,44 @@ export class LoginComponent {
 
   // #region Init (Lifecycle + Setup)
   constructor(
-    private fb: FormBuilder,
-    private http: HttpClient,
     protected loadingSrv: LocalLoadingService,
+    private fb: FormBuilder,
     private router: Router,
-    private toastSrv: ToastService
+    private toastSrv: ToastService,
+    private authSrv: AuthService
   ) {
-    this.form = fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]]
+    this.form = this.fb.group({
+      email: ['lixopo2881@idwager.com', [Validators.required, Validators.email]],
+      password: ['Password123!', [Validators.required]]
     })
   }
   // #endregion
 
   // #region Methods
   login = (data: { email: string, password: string }) => {
-    this.http.post<PagedResponse<string>>("/api/users/login", data).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.router.navigate(['/admin'])
-        }
+    this.authSrv.login(data).subscribe({
+      next: _ => {
+        this.router.navigate(['/admin']);
+        this.loadingSrv.clear('login');
+        // this.form.reset();
       },
-      error: (err) => {
-        this.toastSrv.error(err?.message ?? "An error occurred");
+      error: err => {
+        const apiError = err?.error;
+
+        if (apiError?.detailedErrors?.length) {
+          const isUnactiveUser = apiError.detailedErrors.some(
+            (x: { code: string }) => USER_ERROR_CODES.includes(x.code)
+          );
+
+          if (isUnactiveUser) {
+            this.router.navigate(['auth', 'verify-required']);
+            return;
+          }
+
+          this.toastSrv.error(apiError.message ?? 'Có lỗi xảy ra');
+          return;
+        }
+        this.toastSrv.error(err.message);
       }
     })
   }

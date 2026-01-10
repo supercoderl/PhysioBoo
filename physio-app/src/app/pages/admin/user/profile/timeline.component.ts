@@ -16,7 +16,7 @@ import { PostareaComponent } from "../../../../components/textarea/postarea/post
                         <p
                             class="font-semibold leading-[1.25 text-lg m-0"
                         >
-                            Latest Activity
+                            Upcoming Appointments
                         </p>
                         <button
                             class="font-medium -mx-2 inlineFlex-center-center relative cursor-pointer align-middle min-h-7 min-w-7 rounded-[8px] py-1.5 px-3 text-[12px]"

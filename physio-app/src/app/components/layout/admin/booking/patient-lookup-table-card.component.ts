@@ -102,23 +102,7 @@ export class AdminBookingTableCardComponent {
     // #region Inputs, Outputs, Properties
     currentPage: number = 1;
     pageSize: number = 5;
-    patients: Patient[] = [
-        {
-            id: 12345,
-            name: 'John Smith',
-            dateOfBirth: 'March 15, 1978',
-            age: 45,
-            gender: 'Male',
-            bloodType: 'O+',
-            phone: '+1 (555) 123-4567',
-            email: 'john.smith@email.com',
-            address: '123 Main Street, New York, NY 10001',
-            emergencyContact: 'Jane Smith (Wife)',
-            emergencyPhone: '+1 (555) 987-6543',
-            allergies: ['Penicillin', 'Aspirin', 'Shellfish'],
-            chronicConditions: ['Hypertension', 'Type 2 Diabetes']
-        },
-    ];
+    patients: Patient[] = [];
 
     getPaginatedData(): Patient[] {
         const startIndex = (this.currentPage - 1) * this.pageSize;

@@ -1,5 +1,11 @@
 export interface Doctor {
-  name: string;
-  specialization: string;
-  license: string;
+  id: string;
+  employeeId?: string | null;
+  medicalLicenseNumber: string;
+  medicalLicenseExpiry: Date;
+  yearsOfExperience: number;
+  averageRating: number;
+  totalReviews: number;
+  bio: string | null;
+  about: string | null;
 }

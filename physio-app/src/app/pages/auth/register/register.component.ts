@@ -6,35 +6,39 @@ import { FormWrapperComponent } from "../../../components/form/boo-form/boo-form
 import { SharedModule } from '../../../shared/shared-imports';
 import { PagedResponse } from '../../../shared/types/common';
 import { generateUUID } from '../../../shared/utils/common';
-import { RegisterProgressBarComponent } from "./progress-bar.component";
-import { RegisterStepOneComponent } from "./step1.component";
-import { RegisterStepTwoComponent } from "./step2.component";
+import { ToastService } from '../../../services/common/toast.service';
+import { Role } from '../../../shared/enums/role';
+import { BASE_API } from '../../../shared/api/base';
+import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
+import { LocalLoadingService } from '../../../services/common/local-loading.service';
+import { BooInputComponent } from '../../../components/input/boo-input/boo-input.component';
+import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [
     SharedModule,
-    RegisterProgressBarComponent,
-    RegisterStepTwoComponent,
-    RegisterStepOneComponent,
-    FormWrapperComponent
-],
+    FormWrapperComponent,
+    BooButtonComponent,
+    BooInputComponent,
+    BooIconComponent
+  ],
   templateUrl: './register.component.html'
 })
 export class RegisterComponent {
   // #region Inputs, Outputs, Properties
-  stepCount: number = 2;
-  currentStep: number = 1;
-  selectedRoleId: string = '';
   form!: FormGroup;
+  type: 'text' | 'password' = 'password';
   // #endregion
 
   // #region Init (Lifecycle + Setup)
   constructor(
     public fb: FormBuilder,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private toastSrv: ToastService,
+    protected loadingSrv: LocalLoadingService
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -45,32 +49,16 @@ export class RegisterComponent {
   // #endregion
 
   // #region Methods
-  nextStep() {
-    if (this.currentStep < this.stepCount) {
-      this.currentStep++;
-    }
-  }
-  
-  previousStep() {
-    if (this.currentStep > 1) {
-      this.currentStep--;
-    }
-  }
-
-  onRoleSelected(id: string) {
-    this.selectedRoleId = id;
-  }
-
-  handleRegistration(): void {
+  register(): void {
     const body = {
       id: generateUUID(),
-      ...this.form.value, 
-      roleId: this.selectedRoleId
+      ...this.form.value,
+      role: Role.Patient
     }
 
-    this.http.post<PagedResponse<string>>("/api/users/register", body).subscribe({
+    this.http.post<PagedResponse<string>>(BASE_API.REGISTER, body).subscribe({
       next: (res) => {
-        if(res.success) {
+        if (res.success) {
           this.router.navigate(['/auth/verify-required']);
         }
       },
@@ -78,6 +66,10 @@ export class RegisterComponent {
         console.log(err);
       }
     })
+  }
+
+  onChangeType = () => {
+    this.type = this.type === 'password' ? 'text' : 'password';
   }
   // #endregion
 }

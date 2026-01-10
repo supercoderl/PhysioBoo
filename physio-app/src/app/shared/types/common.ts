@@ -34,3 +34,5 @@ export interface PaginationData<T> {
     totalCount: number;
     totalPages: number;
 }
+
+export type PopupPosition = 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right' | 'bottom-center' | 'top-center';

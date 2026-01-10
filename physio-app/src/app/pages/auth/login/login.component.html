@@ -191,14 +191,24 @@
                     Log in With Facebook
                   </a>
                 </div>
-                <div class="text-center mt-10">
+                <div class="text-center mt-8 space-y-3">
                   <p class="m-0 text-xs15 text-brandDark">
-                    Don't have an account ?
+                    New to our clinic?
                     <a
-                      href="/auth/register"
-                      class="font-medium text-secondary cursor-pointer transition-smooth"
+                      routerLink="/auth/register"
+                      class="font-medium text-secondary cursor-pointer hover:underline transition-smooth"
                     >
-                      Register
+                      Create an account
+                    </a>
+                  </p>
+
+                  <p class="m-0 text-sm text-slate-500">
+                    Are you a medical staff?
+                    <a
+                      routerLink="/auth/register-employee"
+                      class="font-medium text-secondary cursor-pointer hover:underline transition-smooth"
+                    >
+                      Apply here
                     </a>
                   </p>
                 </div>

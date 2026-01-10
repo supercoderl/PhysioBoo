@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, catchError, filter, switchMap, take, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { AuthService } from '../auth/auth.service';
+import { BASE_API } from '../../shared/api/base';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,10 @@ export class InterceptorService implements HttpInterceptor {
 
     return next.handle(apiReq).pipe(catchError((err: HttpErrorResponse) => {
       if (err.status === 401) {
+        if (request.url.includes(BASE_API.PROFILE)) {
+             return throwError(() => err);
+        }
+
         return this.handle401Error(apiReq, next);
       }
       switch (err.status) {

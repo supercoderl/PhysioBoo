@@ -1,14 +1,11 @@
 import { Component } from "@angular/core";
-import { SharedModule } from "../../../../shared/shared-imports";
+import { RouterModule } from "@angular/router";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 
 @Component({
     selector: 'admin-system-setting',
     standalone: true,
-    imports: [
-        BooIconComponent, 
-        SharedModule
-    ],
+    imports: [BooIconComponent, RouterModule],
     template: `
         <div class="z-10 flex h-full flex-auto flex-col">
             <div class="flex flex-1 z-[2] min-w-0 h-full bg-[#F6F7F8] absolute inset-0 overflow-hidden">
@@ -19,8 +16,7 @@ import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.
                         class="w-full relative bg-[#F6F7F8] text-[#1F232B] min-w-full h-full overflow-y-auto flex flex-col top-0 left-0"
                     >
                         <div
-                            id=""
-                            class="ps relative"
+                            class="relative"
                         >
                             <div
                                 class="lg:min-w-0 flex flex-col max-h-full bg-[#F6F7F8]"
@@ -28,30 +24,129 @@ import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.
                                 <div>
                                     <div class="flex items-center justify-between p-4">
                                         <p
-                                            class="tracking-tight font-extrabold text-[24px] m-0"
+                                            class="tracking-tight font-extrabold leading-none text-[24px] m-0"
                                         >
                                             Settings
                                         </p>
                                     </div>
                                     <div class="navigation px-3">
                                         <a
-                                            role="button"
-                                            tabindex="0"
-                                            aria-label="Account"
-                                            aria-expanded="false"
-                                            aria-current="page"
                                             class="p-2 rounded-md gap-2 w-full flex mb-1 bg-[#0000000d] cursor-pointer relative align-middle text-[13px] font-medium leading-none min-h-8 min-w-8 text-[#1F232B]"
-                                            href="/apps/settings/account"
-                                            data-discover="true"
+                                            routerLink="/admin/system/settings/account"
                                         >
-                                            <boo-icon name="settings"></boo-icon>
+                                            <boo-icon name="circle-user"></boo-icon>
                                             <div
-                                                class="flex min-w-0 flex-auto flex-col items-start justify-center"
+                                                class="flex min-w-0 flex-auto flex-col items-start gap-1"
                                             >
                                                 <p
-                                                    class="max-w-full m-0 text-[13px]"
+                                                    class="leading-none truncate max-w-full m-0 text-[13px]"
                                                 >
-                                                    General
+                                                    Account
+                                                </p>
+                                                <p
+                                                    class="leading-none text-[11px] truncate max-w-full m-0 text-[#4B5563]"
+                                                >
+                                                    Manage your public profile and private information
+                                                </p>
+                                            </div>
+                                        </a>
+                                        <a
+                                            class="p-2 rounded-md gap-2 w-full flex mb-1 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-w-8 min-h-8 text-[#1F232B]"
+                                            routerLink="/admin/system/settings/security"
+                                        >
+                                            <boo-icon name="lock"></boo-icon>
+                                            <div
+                                                class="flex min-w-0 flex-auto flex-col items-start gap-1"
+                                            >
+                                                <p
+                                                    class="leading-none truncate max-w-full m-0 text-[13px]"
+                                                >
+                                                    Security
+                                                </p>
+                                                <p
+                                                    class="leading-none text-[11px] truncate max-w-full m-0 text-[#4B5563]"
+                                                >
+                                                    Manage your password and 2-step verification preferences
+                                                </p>
+                                            </div>
+                                        </a>
+                                        <a
+                                            class="p-2 rounded-md gap-2 w-full flex mb-1 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-w-8 min-h-8 text-[#1F232B]"
+                                            routerLink="/admin/system/settings/billing"
+                                        >
+                                            <boo-icon name="credit-card"></boo-icon>
+                                            <div
+                                                class="flex min-w-0 flex-auto flex-col items-start gap-1"
+                                            >
+                                                <p
+                                                    class="leading-none truncate max-w-full m-0 text-[13px]"
+                                                >
+                                                    Plan &amp; Billing
+                                                </p>
+                                                <p
+                                                    class="leading-none text-[11px] truncate max-w-full m-0 text-[#4B5563]"
+                                                >
+                                                    Manage your subscription plan, payment method and billing information
+                                                </p>
+                                            </div>
+                                        </a>
+                                        <a
+                                            class="p-2 rounded-md gap-2 w-full flex mb-1 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-w-8 min-h-8 text-[#1F232B]"
+                                            routerLink="/admin/system/settings/notification"
+                                        >
+                                            <boo-icon name="bell"></boo-icon>
+                                            <div
+                                                class="flex min-w-0 flex-auto flex-col items-start gap-1"
+                                            >
+                                                <p
+                                                    class="leading-none truncate max-w-full m-0 text-[13px]"
+                                                >
+                                                    Notifications
+                                                </p>
+                                                <p
+                                                    class="leading-none text-[11px] truncate max-w-full m-0 text-[#4B5563]"
+                                                >
+                                                    Manage when you'll be notified on which channels
+                                                </p>
+                                            </div>
+                                        </a>
+                                        <a
+                                            class="p-2 rounded-md gap-2 w-full flex mb-1 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-w-8 min-h-8 text-[#1F232B]"
+                                            routerLink="/admin/system/settings/team"
+                                        >
+                                            <boo-icon name="users"></boo-icon>
+                                            <div
+                                                class="flex min-w-0 flex-auto flex-col items-start gap-1"
+                                            >
+                                                <p
+                                                    class="leading-none truncate max-w-full m-0 text-[13px]"
+                                                >
+                                                    Team
+                                                </p>
+                                                <p
+                                                    class="leading-none text-[11px] truncate max-w-full m-0 text-[#4B5563]"
+                                                >
+                                                    Manage your existing team and change roles/permissions
+                                                </p>
+                                            </div>
+                                        </a>
+                                        <a
+                                            class="p-2 rounded-md gap-2 w-full flex mb-1 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-w-8 min-h-8 text-[#1F232B]"
+                                            routerLink="/admin/system/settings/theme"
+                                        >
+                                            <boo-icon name="palette"></boo-icon>
+                                            <div
+                                                class="flex min-w-0 flex-auto flex-col items-start gap-1"
+                                            >
+                                                <p
+                                                    class="leading-none truncate max-w-full m-0 text-[13px]"
+                                                >
+                                                    Theme
+                                                </p>
+                                                <p
+                                                    class="leading-none text-[11px] truncate max-w-full m-0 text-[#4B5563]"
+                                                >
+                                                    Manage your theme which is being applied on the page
                                                 </p>
                                             </div>
                                         </a>
@@ -69,4 +164,4 @@ import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.
     `
 })
 
-export class AdminSystemSettingComponent {}
+export class AdminSystemSettingComponent { }

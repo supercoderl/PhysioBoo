@@ -1,0 +1,3 @@
+export const USER_ERROR_CODES = [
+    'USER_IS_NOT_VERIFIED_YET'
+]

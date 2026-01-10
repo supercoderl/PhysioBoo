@@ -3,14 +3,15 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { Diagnosis } from "../../../../shared/types/diagnosis";
 import { Medication } from "../../../../shared/types/medication";
 import { Patient } from "../../../../shared/types/patient";
+import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 
 @Component({
-    selector: 'admin-prescription',
-    standalone: true,
-    imports: [
-        SharedModule
-    ],
-    template: `
+  selector: 'admin-prescription',
+  standalone: true,
+  imports: [
+    SharedModule
+  ],
+  template: `
 <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
         <!-- Header -->
@@ -36,34 +37,25 @@ import { Patient } from "../../../../shared/types/patient";
               <div class="space-y-3">
                 <div>
                   <p class="text-sm text-gray-600">Queue Number</p>
-                  <p class="text-2xl font-bold text-blue-600">{{ patient.queueNumber }}</p>
+                  <p class="text-2xl font-bold text-blue-600">asd</p>
                 </div>
                 <div>
                   <p class="text-sm text-gray-600">Name</p>
-                  <p class="text-lg font-semibold text-gray-800">{{ patient.name }}</p>
+                  <p class="text-lg font-semibold text-gray-800">asd</p>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                   <div>
                     <p class="text-sm text-gray-600">Age</p>
-                    <p class="font-semibold text-gray-800">{{ patient.age }} years</p>
+                    <p class="font-semibold text-gray-800">asd years</p>
                   </div>
                   <div>
                     <p class="text-sm text-gray-600">Gender</p>
-                    <p class="font-semibold text-gray-800">{{ patient.gender }}</p>
+                    <p class="font-semibold text-gray-800">asd</p>
                   </div>
                 </div>
                 <div>
                   <p class="text-sm text-gray-600">Phone</p>
-                  <p class="font-semibold text-gray-800">{{ patient.phone }}</p>
-                </div>
-                <div *ngIf="patient.allergies.length > 0" class="bg-red-50 border-2 border-red-200 rounded-lg p-3">
-                  <p class="text-sm font-semibold text-red-800 mb-2">⚠️ Allergies</p>
-                  <div class="flex flex-wrap gap-2">
-                    <span *ngFor="let allergy of patient.allergies" 
-                          class="bg-red-200 text-red-800 px-2 py-1 rounded text-sm font-medium">
-                      {{ allergy }}
-                    </span>
-                  </div>
+                  <p class="font-semibold text-gray-800">asd</p>
                 </div>
               </div>
             </div>
@@ -281,148 +273,143 @@ import { Patient } from "../../../../shared/types/patient";
 })
 
 export class AdminPrescriptionComponent implements OnInit {
-    // #region Inputs, Outputs, Properties
-    doctorName: string = 'Dr. Sarah Johnson';
-    department: string = 'General Practice';
-    currentDate: string = '';
+  // #region Inputs, Outputs, Properties
+  doctorName: string = 'Dr. Sarah Johnson';
+  department: string = 'General Practice';
+  currentDate: string = '';
 
-    patient: Patient = {
-        id: 12345,
-        name: 'John Smith',
-        dateOfBirth: 'March 15, 1978',
-        age: 45,
-        gender: 'Male',
-        bloodType: 'O+',
-        phone: '+1 (555) 123-4567',
-        email: 'john.smith@email.com',
-        address: '123 Main Street, New York, NY 10001',
-        emergencyContact: 'Jane Smith (Wife)',
-        emergencyPhone: '+1 (555) 987-6543',
-        allergies: ['Penicillin', 'Aspirin', 'Shellfish'],
-        chronicConditions: ['Hypertension', 'Type 2 Diabetes']
+  patient: Patient = {
+    id: "",
+    patientNumber: "",
+    patientType: PatientType.Outpatient,
+    primaryDoctorId: "",
+    totalVisits: 0,
+    totalAmountSpent: 0,
+    loyaltyPoints: 0,
+    riskLevel: RiskLevel.Low
+  };
+
+  chiefComplaint: string = 'Chest pain and shortness of breath';
+  additionalNotes: string = '';
+
+  diagnoses: Diagnosis[] = [
+    { code: 'I20.9', description: 'Angina pectoris, unspecified' }
+  ];
+
+  newDiagnosis: Diagnosis = { code: '', description: '' };
+
+  medications: Medication[] = [];
+
+  newMedication: Medication = {
+    id: '',
+    name: '',
+    dosage: '',
+    frequency: '',
+    duration: '',
+    instructions: '',
+    quantity: 0
+  };
+
+  showMedicationForm: boolean = false;
+  // #endregion
+
+  // #region Init (Lifecycle + Setup)
+  ngOnInit() {
+    this.updateDate();
+  }
+  // #endregion
+
+  // #region Methods
+  updateDate() {
+    const now = new Date();
+    this.currentDate = now.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  addDiagnosis() {
+    if (this.newDiagnosis.code && this.newDiagnosis.description) {
+      this.diagnoses.push({ ...this.newDiagnosis });
+      this.newDiagnosis = { code: '', description: '' };
+    }
+  }
+
+  removeDiagnosis(index: number) {
+    this.diagnoses.splice(index, 1);
+  }
+
+  addMedication() {
+    if (this.newMedication.name && this.newMedication.dosage &&
+      this.newMedication.frequency && this.newMedication.duration) {
+      this.medications.push({
+        ...this.newMedication,
+        id: Date.now().toString()
+      });
+      this.cancelMedication();
+    } else {
+      alert('Please fill in all required fields');
+    }
+  }
+
+  removeMedication(index: number) {
+    if (confirm('Remove this medication from prescription?')) {
+      this.medications.splice(index, 1);
+    }
+  }
+
+  cancelMedication() {
+    this.showMedicationForm = false;
+    this.newMedication = {
+      id: '',
+      name: '',
+      dosage: '',
+      frequency: '',
+      duration: '',
+      instructions: '',
+      quantity: 0
     };
+  }
 
-    chiefComplaint: string = 'Chest pain and shortness of breath';
-    additionalNotes: string = '';
+  saveDraft() {
+    console.log('Saving draft...', {
+      patient: this.patient,
+      diagnoses: this.diagnoses,
+      medications: this.medications,
+      chiefComplaint: this.chiefComplaint,
+      additionalNotes: this.additionalNotes
+    });
+    alert('Prescription saved as draft');
+    // In production: save to API
+  }
 
-    diagnoses: Diagnosis[] = [
-        { code: 'I20.9', description: 'Angina pectoris, unspecified' }
-    ];
+  previewPrescription() {
+    console.log('Preview prescription');
+    alert('Preview feature - will open prescription in print format');
+    // In production: open print preview modal or new window
+  }
 
-    newDiagnosis: Diagnosis = { code: '', description: '' };
-
-    medications: Medication[] = [];
-
-    newMedication: Medication = {
-        id: '',
-        name: '',
-        dosage: '',
-        frequency: '',
-        duration: '',
-        instructions: '',
-        quantity: 0
-    };
-
-    showMedicationForm: boolean = false;
-    // #endregion
-
-    // #region Init (Lifecycle + Setup)
-    ngOnInit() {
-        this.updateDate();
-    }
-    // #endregion
-
-    // #region Methods
-    updateDate() {
-        const now = new Date();
-        this.currentDate = now.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+  submitPrescription() {
+    if (this.medications.length === 0) {
+      alert('Please add at least one medication');
+      return;
     }
 
-    addDiagnosis() {
-        if (this.newDiagnosis.code && this.newDiagnosis.description) {
-            this.diagnoses.push({ ...this.newDiagnosis });
-            this.newDiagnosis = { code: '', description: '' };
-        }
+    if (confirm('Issue this prescription? This action cannot be undone.')) {
+      console.log('Submitting prescription...', {
+        patient: this.patient,
+        diagnoses: this.diagnoses,
+        medications: this.medications,
+        chiefComplaint: this.chiefComplaint,
+        additionalNotes: this.additionalNotes,
+        doctor: this.doctorName,
+        date: this.currentDate
+      });
+      alert('Prescription issued successfully!');
+      // In production: submit to API and generate PDF
+      // this.router.navigate(['/doctor-desk']);
     }
-
-    removeDiagnosis(index: number) {
-        this.diagnoses.splice(index, 1);
-    }
-
-    addMedication() {
-        if (this.newMedication.name && this.newMedication.dosage &&
-            this.newMedication.frequency && this.newMedication.duration) {
-            this.medications.push({
-                ...this.newMedication,
-                id: Date.now().toString()
-            });
-            this.cancelMedication();
-        } else {
-            alert('Please fill in all required fields');
-        }
-    }
-
-    removeMedication(index: number) {
-        if (confirm('Remove this medication from prescription?')) {
-            this.medications.splice(index, 1);
-        }
-    }
-
-    cancelMedication() {
-        this.showMedicationForm = false;
-        this.newMedication = {
-            id: '',
-            name: '',
-            dosage: '',
-            frequency: '',
-            duration: '',
-            instructions: '',
-            quantity: 0
-        };
-    }
-
-    saveDraft() {
-        console.log('Saving draft...', {
-            patient: this.patient,
-            diagnoses: this.diagnoses,
-            medications: this.medications,
-            chiefComplaint: this.chiefComplaint,
-            additionalNotes: this.additionalNotes
-        });
-        alert('Prescription saved as draft');
-        // In production: save to API
-    }
-
-    previewPrescription() {
-        console.log('Preview prescription');
-        alert('Preview feature - will open prescription in print format');
-        // In production: open print preview modal or new window
-    }
-
-    submitPrescription() {
-        if (this.medications.length === 0) {
-            alert('Please add at least one medication');
-            return;
-        }
-
-        if (confirm('Issue this prescription? This action cannot be undone.')) {
-            console.log('Submitting prescription...', {
-                patient: this.patient,
-                diagnoses: this.diagnoses,
-                medications: this.medications,
-                chiefComplaint: this.chiefComplaint,
-                additionalNotes: this.additionalNotes,
-                doctor: this.doctorName,
-                date: this.currentDate
-            });
-            alert('Prescription issued successfully!');
-            // In production: submit to API and generate PDF
-            // this.router.navigate(['/doctor-desk']);
-        }
-    }
-    // #endregion   
+  }
+  // #endregion   
 }

@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { User } from "../../../../shared/types/uset";
+import { User } from "../../../../shared/types/user";
 import { Permission } from "../../../../shared/types/permission";
 
 @Component({
@@ -101,35 +101,35 @@ import { Permission } from "../../../../shared/types/permission";
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="flex items-center">
                         <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span class="text-blue-600 font-medium">{{ getInitials(user.name) }}</span>
+                          <span class="text-blue-600 font-medium">asd</span>
                         </div>
                         <div class="ml-4">
-                          <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
-                          <div class="text-sm text-gray-500">{{ user.email }}</div>
+                          <div class="text-sm font-medium text-gray-900">asd</div>
+                          <div class="text-sm text-gray-500">asd</div>
                         </div>
                       </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="text-sm text-gray-900">{{ user.role }}</span>
+                      <span class="text-sm text-gray-900">asd</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="text-sm text-gray-900">{{ user.department }}</span>
+                      <span class="text-sm text-gray-900">asd</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span
-                        [class.bg-green-100]="user.status === 'active'"
-                        [class.text-green-800]="user.status === 'active'"
-                        [class.bg-red-100]="user.status === 'inactive'"
-                        [class.text-red-800]="user.status === 'inactive'"
+                        [class.bg-green-100]="user.isActive"
+                        [class.text-green-800]="user.isActive"
+                        [class.bg-red-100]="!user.isActive"
+                        [class.text-red-800]="!user.isActive"
                         class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
-                        {{ user.status | titlecase }}
+                        asd
                       </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <button
                         (click)="editUserPermissions(user)"
                         class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                        {{ user.permissions.length }} assigned
+                        asd assigned
                       </button>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -273,7 +273,7 @@ import { Permission } from "../../../../shared/types/permission";
         <div *ngIf="showPermissionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b border-gray-200">
-              <h2 class="text-2xl font-bold text-gray-900">Edit Permissions for {{ selectedUser?.name }}</h2>
+              <h2 class="text-2xl font-bold text-gray-900">Edit Permissions for asd</h2>
             </div>
             <div class="p-6">
               <div class="space-y-6">
@@ -329,11 +329,11 @@ export class AdminUserPermissionComponent {
     tempPermissions: string[] = [];
 
     users: User[] = [
-        { id: 1, name: 'Dr. Sarah Johnson', email: 'sarah.j@hospital.com', role: 'Doctor', department: 'Cardiology', status: 'active', permissions: ['view_patients', 'edit_patients', 'view_medical_records'] },
-        { id: 2, name: 'Michael Chen', email: 'michael.c@hospital.com', role: 'Nurse', department: 'Emergency', status: 'active', permissions: ['view_patients', 'update_vitals'] },
-        { id: 3, name: 'Emily Rodriguez', email: 'emily.r@hospital.com', role: 'Administrator', department: 'Administration', status: 'active', permissions: ['view_patients', 'manage_users', 'view_reports', 'manage_billing'] },
-        { id: 4, name: 'James Wilson', email: 'james.w@hospital.com', role: 'Receptionist', department: 'Front Desk', status: 'active', permissions: ['view_appointments', 'create_appointments'] },
-        { id: 5, name: 'Dr. Lisa Anderson', email: 'lisa.a@hospital.com', role: 'Doctor', department: 'Pediatrics', status: 'inactive', permissions: ['view_patients', 'edit_patients'] },
+        // { id: 1, name: 'Dr. Sarah Johnson', email: 'sarah.j@hospital.com', role: 'Doctor', department: 'Cardiology', status: 'active', permissions: ['view_patients', 'edit_patients', 'view_medical_records'] },
+        // { id: 2, name: 'Michael Chen', email: 'michael.c@hospital.com', role: 'Nurse', department: 'Emergency', status: 'active', permissions: ['view_patients', 'update_vitals'] },
+        // { id: 3, name: 'Emily Rodriguez', email: 'emily.r@hospital.com', role: 'Administrator', department: 'Administration', status: 'active', permissions: ['view_patients', 'manage_users', 'view_reports', 'manage_billing'] },
+        // { id: 4, name: 'James Wilson', email: 'james.w@hospital.com', role: 'Receptionist', department: 'Front Desk', status: 'active', permissions: ['view_appointments', 'create_appointments'] },
+        // { id: 5, name: 'Dr. Lisa Anderson', email: 'lisa.a@hospital.com', role: 'Doctor', department: 'Pediatrics', status: 'inactive', permissions: ['view_patients', 'edit_patients'] },
     ];
 
     permissions: Permission[] = [
@@ -360,13 +360,14 @@ export class AdminUserPermissionComponent {
 
     // #region Methods
     filteredUsers(): User[] {
-        return this.users.filter(user => {
-            const matchesSearch = user.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                user.email.toLowerCase().includes(this.searchTerm.toLowerCase());
-            const matchesRole = !this.filterRole || user.role === this.filterRole;
-            const matchesStatus = !this.filterStatus || user.status === this.filterStatus;
-            return matchesSearch && matchesRole && matchesStatus;
-        });
+        // return this.users.filter(user => {
+        //     const matchesSearch = user.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        //         user.email.toLowerCase().includes(this.searchTerm.toLowerCase());
+        //     const matchesRole = !this.filterRole || user.role === this.filterRole;
+        //     const matchesStatus = !this.filterStatus || user.status === this.filterStatus;
+        //     return matchesSearch && matchesRole && matchesStatus;
+        // });
+        return [];
     }
 
     getInitials(name: string): string {
@@ -387,14 +388,14 @@ export class AdminUserPermissionComponent {
     }
 
     deleteUser(user: User): void {
-        if (confirm(`Are you sure you want to delete ${user.name}?`)) {
+        if (confirm(`Are you sure you want to delete asd?`)) {
             this.users = this.users.filter(u => u.id !== user.id);
         }
     }
 
     editUserPermissions(user: User): void {
         this.selectedUser = user;
-        this.tempPermissions = [...user.permissions];
+        // this.tempPermissions = [...user.permissions];
         this.showPermissionModal = true;
     }
 
@@ -413,7 +414,7 @@ export class AdminUserPermissionComponent {
 
     savePermissions(): void {
         if (this.selectedUser) {
-            this.selectedUser.permissions = [...this.tempPermissions];
+            // this.selectedUser.permissions = [...this.tempPermissions];
         }
         this.showPermissionModal = false;
         this.selectedUser = null;

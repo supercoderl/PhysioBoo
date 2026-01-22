@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, finalize, map, switchMap, tap, throwError } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, finalize, from, map, of, switchMap, tap, throwError } from 'rxjs';
 import { PagedResponse } from '../../shared/types/common';
 import { User } from '../../shared/types/user';
 import { BASE_API } from '../../shared/api/base';
+import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
 
 @Injectable({
     providedIn: 'root'
@@ -12,6 +13,7 @@ export class AuthService {
     // #region Inputs, Outputs, Properties
     private permissionsSubject = new BehaviorSubject<string[]>([]);
     private userInfoSubject = new BehaviorSubject<User | null>(null);
+    private oauthService = inject(SocialAuthService);
 
     permissions$ = this.permissionsSubject.asObservable();
     public userInfo$ = this.userInfoSubject.asObservable();
@@ -25,8 +27,24 @@ export class AuthService {
         return this.userInfoSubject.value != null;
     }
 
-    login<T>(body: { email: string, password: string }): Observable<PagedResponse<T>> {
+    login<T>(body: { identifier: string, password: string, otp: string }): Observable<PagedResponse<T>> {
         return this.http.post<PagedResponse<T>>(BASE_API.LOGIN, body).pipe(
+            switchMap(res => {
+                if (!res.success) {
+                    return throwError(() => res);
+                }
+                return this.getProfile().pipe(
+                    map(() => res)
+                );
+            })
+        );
+    }
+
+    oauthLogin<T>(token: string, provider: string): Observable<PagedResponse<T>> {
+        return this.http.post<PagedResponse<T>>(BASE_API.OAUTHLOGIN, {
+            token,
+            provider
+        }).pipe(
             switchMap(res => {
                 if (!res.success) {
                     return throwError(() => res);

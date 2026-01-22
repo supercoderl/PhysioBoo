@@ -16,6 +16,7 @@ import { InitService } from './services/common/init.service';
 import { InterceptorService } from './services/interceptor/interceptor.service';
 import { HttpLoadingInterceptor } from './services/interceptor/loading-interceptor.service';
 import { SHARED_LUCIDE_ICONS } from './shared/shared-providers';
+import { provideOAuth } from './oauth.config';
 
 registerLocaleData(en);
 
@@ -32,6 +33,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(withInterceptorsFromDi()),
     provideIcons(),
+    provideOAuth(),
     { provide: HTTP_INTERCEPTORS, useClass: HttpLoadingInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
     {

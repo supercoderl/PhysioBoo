@@ -13,6 +13,7 @@ import { LocalLoadingService } from "../../../../services/common/local-loading.s
 import { ButtonIconComponent } from "../../../button/button-icon/button-icon.component";
 import { Router } from "@angular/router";
 import { ToastService } from "../../../../services/common/toast.service";
+import { SocialAuthService } from "@abacritt/angularx-social-login";
 
 @Component({
     selector: 'admin-layout-sidebar',
@@ -46,7 +47,8 @@ export class AdminLayoutSideBarComponent implements OnInit {
         private authSrv: AuthService,
         private router: Router,
         private toastSrv: ToastService,
-        protected loadingSrv: LocalLoadingService
+        protected loadingSrv: LocalLoadingService,
+        private oauthSrv: SocialAuthService
     ) {
 
     }
@@ -61,6 +63,7 @@ export class AdminLayoutSideBarComponent implements OnInit {
 
     // #region Events
     logout() {
+        this.oauthSrv.signOut();
         this.authSrv.logout().subscribe({
             next: _ => this.router.navigate(['/auth/login']),
             error: err => this.toastSrv.error(err.message)

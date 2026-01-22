@@ -42,8 +42,6 @@ export class ToastService {
     }
 
     remove(id: number) {
-        console.log('Đang xóa ID:', id); // <--- Thêm dòng này
         this.toasts.update(current => current.filter(t => t.id !== id));
-        console.log('Danh sách còn lại:', this.toasts());
     }
 }

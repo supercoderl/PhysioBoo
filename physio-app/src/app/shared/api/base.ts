@@ -4,6 +4,7 @@ export const BASE_API = {
   MENU: '/api/admin-menus/search',
   PROFILE: '/api/users/me',
   LOGIN: '/api/users/login',
+  OAUTHLOGIN: '/api/users/oauth-login',
   LOGOUT: '/api/users/refresh/logout',
   REGISTER: '/api/users/register'
 };

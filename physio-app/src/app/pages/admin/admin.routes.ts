@@ -351,8 +351,8 @@ export const routes: Routes = [
                     },
                     {
                         path: 'common-category',
-                        data: { breadcrumb: ['common-category'] },
-                        loadComponent: () => import('./system/common-category/common-category.component').then(m => m.AdminCommonCategoryComponent),
+                        data: { breadcrumb: ['common category'] },
+                        loadChildren: () => import('./system/common-category/common-category.routes').then(r => r.routes),
                     },
                     {
                         path: 'print-template',

@@ -5,20 +5,24 @@ import { BehaviorSubject, Observable, catchError, filter, switchMap, take, throw
 import { environment } from '../../../environments/environment.development';
 import { AuthService } from '../auth/auth.service';
 import { BASE_API } from '../../shared/api/base';
+import { USER_ERROR_CODES } from '../../shared/errors/code.component';
+import { ToastService } from '../common/toast.service';
+import { SKIP_ERROR_TOAST } from '../../shared/tokens/http-context.tokens';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InterceptorService implements HttpInterceptor {
   private readonly baseUrl = environment.API_URL;
-  
+
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authSrv: AuthService,
+    private toastSrv: ToastService
   ) { }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (this.authService.isAuthenticated() != null) {
+    if (this.authSrv.isAuthenticated() != null) {
 
     }
 
@@ -34,11 +38,18 @@ export class InterceptorService implements HttpInterceptor {
     return next.handle(apiReq).pipe(catchError((err: HttpErrorResponse) => {
       if (err.status === 401) {
         if (request.url.includes(BASE_API.PROFILE)) {
-             return throwError(() => err);
+          return throwError(() => err);
         }
 
         return this.handle401Error(apiReq, next);
       }
+
+      if (err.status === 304) {
+        return throwError(() => err);
+      }
+
+      this.handleUnactiveUser(err);
+
       switch (err.status) {
         case 403:
           this.router.navigate(['exception/403']);
@@ -47,6 +58,12 @@ export class InterceptorService implements HttpInterceptor {
           this.router.navigate(['exception/404']);
           break;
       }
+
+      const shouldSkipToast = request.context.get(SKIP_ERROR_TOAST);
+      if (!shouldSkipToast) {
+        this.handleGlobalErrorToast(err);
+      }
+
       return throwError(() => err);
     }));
   }
@@ -67,7 +84,7 @@ export class InterceptorService implements HttpInterceptor {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
 
-      return this.authService.refreshToken().pipe(
+      return this.authSrv.refreshToken().pipe(
         switchMap((res) => {
           this.isRefreshing = false;
           this.refreshTokenSubject.next(res.value.access_token);
@@ -86,5 +103,26 @@ export class InterceptorService implements HttpInterceptor {
           return next.handle(this.addToken(request, jwt));
         }));
     }
+  }
+
+  private handleUnactiveUser(err: HttpErrorResponse) {
+    const apiError = err.error;
+
+    if (apiError?.detailedErrors?.length) {
+      const isUnactiveUser = apiError.detailedErrors.some(
+        (x: { code: string }) => USER_ERROR_CODES.includes(x.code)
+      );
+
+      if (isUnactiveUser) {
+        this.router.navigate(['auth', 'verify-required']);
+      }
+    }
+  }
+
+  private handleGlobalErrorToast(err: HttpErrorResponse) {
+    if (err.status === 401 || err.status === 403) return;
+    const message = err.error?.message || err.message || 'An error occurred, please try again.';
+
+    this.toastSrv.error(message);
   }
 }

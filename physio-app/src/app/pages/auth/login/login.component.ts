@@ -1,16 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
 import { BooButtonComponent } from "../../../components/button/boo-button/boo-button.component";
 import { FormWrapperComponent } from '../../../components/form/boo-form/boo-form.component';
 import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
-import { ToastService } from '../../../services/common/toast.service';
 import { SharedModule } from '../../../shared/shared-imports';
 import { AuthService } from '../../../services/auth/auth.service';
-import { USER_ERROR_CODES } from '../../../shared/errors/code.component';
+import { GoogleSigninButtonDirective, SocialAuthService } from '@abacritt/angularx-social-login';
+import { AppValidators } from '../../../shared/validator/validator-config.validator';
+import { ToastService } from '../../../services/common/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -20,15 +20,19 @@ import { USER_ERROR_CODES } from '../../../shared/errors/code.component';
     BooInputComponent,
     BooIconComponent,
     BooButtonComponent,
-    FormWrapperComponent
+    FormWrapperComponent,
+    GoogleSigninButtonDirective
   ],
   templateUrl: './login.component.html'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit, OnDestroy {
   // #region Inputs, Outputs, Properties
   state: string = "email";
   form!: FormGroup;
   type: 'text' | 'password' = 'password';
+  isFirstTime: boolean = true;
+  countdown: number = 0;
+  private timer: any;
   // #endregion
 
   // #region Init (Lifecycle + Setup)
@@ -36,51 +40,90 @@ export class LoginComponent {
     protected loadingSrv: LocalLoadingService,
     private fb: FormBuilder,
     private router: Router,
-    private toastSrv: ToastService,
-    private authSrv: AuthService
+    private authSrv: AuthService,
+    private oauthSrc: SocialAuthService,
+    private toastSrv: ToastService
   ) {
     this.form = this.fb.group({
-      email: ['lixopo2881@idwager.com', [Validators.required, Validators.email]],
-      password: ['Password123!', [Validators.required]]
+      identifier: ['lixopo2881@idwager.com', [Validators.required, AppValidators.emailOrMobile]],
+      password: ['Password123!', [Validators.required]],
+      otp: ['']
     })
+  }
+
+  ngOnInit(): void {
+    this.oauthSrc.authState.subscribe((user) => {
+      if (user && user.idToken && user.provider) {
+        this.authSrv.oauthLogin(
+          user.idToken,
+          user.provider.toLocaleLowerCase()
+        ).subscribe({
+          next: _ => {
+            this.router.navigate(['/admin']);
+            this.loadingSrv.clear('login');
+          }
+        });
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.timer) clearInterval(this.timer);
   }
   // #endregion
 
   // #region Methods
-  login = (data: { email: string, password: string }) => {
+  login = (data: { identifier: string, password: string, otp: string }) => {
+    if(this.state == 'phone' && data.otp != '123456') {
+      this.toastSrv.error("OTP does not correct.");
+      return;
+    } 
+
     this.authSrv.login(data).subscribe({
       next: _ => {
         this.router.navigate(['/admin']);
         this.loadingSrv.clear('login');
         // this.form.reset();
       },
-      error: err => {
-        const apiError = err?.error;
-
-        if (apiError?.detailedErrors?.length) {
-          const isUnactiveUser = apiError.detailedErrors.some(
-            (x: { code: string }) => USER_ERROR_CODES.includes(x.code)
-          );
-
-          if (isUnactiveUser) {
-            this.router.navigate(['auth', 'verify-required']);
-            return;
-          }
-
-          this.toastSrv.error(apiError.message ?? 'Có lỗi xảy ra');
-          return;
-        }
-        this.toastSrv.error(err.message);
-      }
     })
   }
 
   onChangeState = (newState: string) => {
+    this.form.setValue({
+      ...this.form.value,
+      identifier: newState === "phone"
+        ? '+14897221980'
+        : 'lixopo2881@idwager.com'
+    });
     this.state = newState;
   }
 
   onChangeType = () => {
     this.type = this.type === 'password' ? 'text' : 'password';
+  }
+
+  onSendOtp() {
+    if (this.countdown > 0) return;
+
+    const phone = this.form.get('identifier')?.value;
+    if (!phone) {
+      this.toastSrv.error("Please input your phone number first.");
+      return;
+    }
+
+    this.toastSrv.success('An OTP has been sent.');
+    this.startCountdown();
+    this.isFirstTime = false;
+  }
+
+  startCountdown() {
+    this.countdown = 60;
+    this.timer = setInterval(() => {
+      this.countdown--;
+      if (this.countdown <= 0) {
+        clearInterval(this.timer);
+      }
+    }, 1000);
   }
   // #endregion
 }

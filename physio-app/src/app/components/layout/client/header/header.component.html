@@ -261,7 +261,7 @@
                     'text-white md:text-primary': getHeaderByCurrentPath() !== item.id,
                     'text-secondary': getHeaderByCurrentPath() === item.id
                   }"
-                  [href]="item.href"
+                  [routerLink]="item.href"
                 >
                   {{ item.title }}
                 </a>

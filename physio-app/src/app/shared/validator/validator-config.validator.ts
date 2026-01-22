@@ -38,6 +38,25 @@ export class AppValidators extends Validators {
     static confirm(fb: UntypedFormGroup, control: UntypedFormControl): { [s: string]: boolean } {
         return confirmValidator(fb, control);
     }
+
+    static emailOrMobile(control: AbstractControl): ValidationErrors | null {
+        const value = control.value;
+
+        if (isEmptyInputValue(value)) {
+            return null;
+        }
+
+        const valid = isMobile(value) || isEmail(value);
+
+        return valid
+            ? null
+            : {
+                emailOrMobile: {
+                    'zh-cn': '邮箱或手机号码格式不正确',
+                    'en-us': 'Invalid email or mobile phone number'
+                }
+            };
+    }
 }
 
 function isEmptyInputValue(value: NzSafeAny): boolean {
@@ -45,7 +64,11 @@ function isEmptyInputValue(value: NzSafeAny): boolean {
 }
 
 function isMobile(value: string): boolean {
-    return typeof value === 'string' && /(^1\d{10}$)/.test(value);
+    return typeof value === 'string' && /^[0-9+]{9,15}$/.test(value);
+}
+
+function isEmail(value: string): boolean {
+    return typeof value === 'string' && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value);
 }
 
 function confirmValidator(fb: UntypedFormGroup, control: UntypedFormControl): { [s: string]: boolean } {

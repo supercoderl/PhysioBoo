@@ -4,9 +4,7 @@
   >
     <div
       class="bg-center bg-cover absolute top-0 left-0 right-0 w-full h-[380px]"
-      style="
-        background-image: url(https://themesbrand.com/velzon/html/master/assets/images/auth-one-bg.jpg);
-      "
+      style="background-image: url(../../../../assets/images/background/login-background.webp)"
     >
       <div
         class="opacity-90 absolute inset-0 w-full h-full"
@@ -62,7 +60,7 @@
                   Welcome Back!
                 </h3>
                 <p class="mb-2.5 text-xs15 text-brandDark text-center">
-                  Log in to continue to Physio Boo.
+                  Log in to continue
                 </p>
               </div>
               <form boo-form [formGroup]="form" (validSubmit)="login($event)">
@@ -87,12 +85,12 @@
                       'Input your ' +
                       (state === 'phone' ? 'phone number' : 'e-mail')
                     "
-                    formControlName="email"
+                    formControlName="identifier"
                     [required]="true"
                     booError
                   />
                 </div>
-                <div class="mb-4">
+                <div class="mb-4" *ngIf="state === 'email'">
                   <div class="flex-center-between">
                     <label
                       class="text-xs14 font-medium text-primary mb-1 inline-block"
@@ -122,6 +120,42 @@
                     </boo-input>
                   </div>
                 </div>
+                <div class="mb-4" *ngIf="state === 'phone'">
+                  <div class="flex-center-between">
+                    <label
+                      class="text-xs14 font-medium text-primary mb-1 inline-block"
+                    >
+                      OTP Code
+                    </label>
+
+                    <div class="text-xs14 mb-1">
+                      <span *ngIf="countdown > 0" class="text-gray-400">
+                        Resend after {{ countdown }}s
+                      </span>
+
+                      <a
+                        *ngIf="countdown === 0"
+                        class="font-medium text-secondary cursor-pointer hover:underline"
+                        (click)="onSendOtp()"
+                      >
+                        {{ isFirstTime ? "Send" : "Resend" }}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div class="relative">
+                    <boo-input
+                      label="Input 6 characters number"
+                      formControlName="otp"
+                      [required]="true"
+                      type="text"
+                      inputMode="numeric"
+                      autocomplete="one-time-code"
+                      booError
+                    >
+                    </boo-input>
+                  </div>
+                </div>
                 <div class="mb-4">
                   <div class="flex-center-between">
                     <div class="block pl-6">
@@ -133,16 +167,6 @@
                       />
                       <label class="text-xs14 inline-block" for="remember">
                         Remember Me
-                      </label>
-                    </div>
-                    <div class="block pl-6">
-                      <input
-                        class="bg-secondary border-secondary border border-solid rounded-[0.25rem] float-left -ml-6 mt-1 w-3.6 h-3.6"
-                        id="remember1"
-                        type="checkbox"
-                      />
-                      <label class="text-xs14 inline-block" for="remember1">
-                        Login with OTP
                       </label>
                     </div>
                   </div>
@@ -164,19 +188,27 @@
                   >
                 </div>
                 <div>
-                  <a
-                    boo-button
-                    background="white"
-                    classname="!w-full !py-3 font-bold uppercase !border border-borderGray !text-primary"
-                    [radius]="5"
-                  >
-                    <img
-                      alt="google-icon"
-                      src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/google-icon.svg"
-                      class="mr-2"
-                    />
-                    Log in With Google
-                  </a>
+                  <div class="w-full relative inline-block">
+                    <a
+                      boo-button
+                      background="white"
+                      classname="!w-full !py-3 font-bold uppercase !border border-borderGray !text-primary"
+                      [radius]="5"
+                    >
+                      <img
+                        alt="google-icon"
+                        src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/google-icon.svg"
+                        class="mr-2"
+                      />
+                      Log in With Google
+                    </a>
+                    <div
+                      class="absolute top-0 left-0 w-full h-full opacity-[0.01] overflow-hidden z-10"
+                    >
+                      <asl-google-signin-button type="standard" size="large">
+                      </asl-google-signin-button>
+                    </div>
+                  </div>
                   <a
                     boo-button
                     background="white"

@@ -1225,3 +1225,14 @@ export const USER: User = {
     updatedBy: null,
 }
 // #endregion
+
+// #region Category Management
+export const CATEGORIES_MANAGEMENT = [
+    {
+        id: 1,
+        name: "Medical Specialties",
+        icon: "origami",
+        route: "/admin/system/common-category/medical-specialty"
+    },
+]
+// #endregion

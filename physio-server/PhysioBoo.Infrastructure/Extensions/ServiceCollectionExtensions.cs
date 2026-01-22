@@ -38,7 +38,8 @@ namespace PhysioBoo.Infrastructure.Extensions
             // Core Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork<ApplicationDbContext>>();
             services.AddScoped<IEventStoreContext, EventStoreContext>();
-            services.AddScoped<INotificationHandler<DomainNotification>, DomainNotificationHandler>();
+            services.AddScoped<DomainNotificationHandler>();
+            services.AddScoped<INotificationHandler<DomainNotification>>(provider => provider.GetRequiredService<DomainNotificationHandler>());
             services.AddScoped<IDomainEventStore, DomainEventStore>();
             services.AddScoped<IMediatorHandler, InMemoryBus>();
 
@@ -95,6 +96,7 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IOutboxRepository, OutboxRepository>();
             services.AddScoped<IAdminMenuRepository, AdminMenuRepository>();
             services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
+            services.AddScoped<IUserLoginRepository, UserLoginRepository>();
 
             return services;
         }

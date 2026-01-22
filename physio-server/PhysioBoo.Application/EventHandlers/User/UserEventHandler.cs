@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
-using PhysioBoo.Application.Commands.Users.AssignRoleToUserUsingRoleId;
 using PhysioBoo.Application.Commands.Users.UpdateUser;
 using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
 using PhysioBoo.Domain;
@@ -48,10 +47,10 @@ namespace PhysioBoo.Application.EventHandlers.User
                 cancellationToken
             );
 
-            if (notification.RoleId.HasValue)
-            {
-                await _bus.SendCommandAsync(new AssignRoleToUserUsingRoleIdCommand(notification.Id, notification.RoleId.Value));
-            }
+            //if (notification.RoleId.HasValue)
+            //{
+            //    await _bus.SendCommandAsync(new AssignRoleToUserUsingRoleIdCommand(notification.Id, notification.RoleId.Value));
+            //}
         }
 
         public async Task Handle(UserLoggedEvent notification, CancellationToken cancellationToken)

@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
-using PhysioBoo.Application.Commands.Users.AssignRoleToUserUsingRoleId;
+using PhysioBoo.Application.Commands.Users.AssignRoleToUser;
+using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Shared.Events.Users;
 
@@ -28,9 +29,18 @@ namespace PhysioBoo.Application.Consumers.Users
                 evt.AggregateId
             );
 
-            if (evt.RoleId.HasValue)
+            if (!string.IsNullOrEmpty(evt.Role))
             {
-                await _bus.SendCommandAsync(new AssignRoleToUserUsingRoleIdCommand(evt.AggregateId, evt.RoleId.Value));
+                await _bus.SendCommandAsync(new AssignRoleToUserCommand(
+                    new RoleForAssigningViewModel(
+                        evt.AggregateId,
+                        new Dictionary<string, bool>
+                        {
+                            { evt.Role, true }
+                        },
+                        evt.AggregateId
+                    )
+                ));
             }
         }
     }

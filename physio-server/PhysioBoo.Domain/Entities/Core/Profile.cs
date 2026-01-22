@@ -1,5 +1,6 @@
 ﻿using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Core
 {
@@ -24,6 +25,8 @@ namespace PhysioBoo.Domain.Entities.Core
         public DateTime CreatedAt { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
 
+        [ForeignKey("Id")]
+        [InverseProperty(nameof(Profile))]
         public virtual User? User { get; private set; }
         #endregion
 

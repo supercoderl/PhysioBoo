@@ -5,6 +5,7 @@ using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Shared.Events.Doctors;
+using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Application.Commands.Doctors.CreateDoctor
 {
@@ -26,9 +27,9 @@ namespace PhysioBoo.Application.Commands.Doctors.CreateDoctor
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _doctorRepository.InsertAsync<Doctor, Guid>(new Doctor(
+            SharedKernel.Results.DbResult<Guid> result = await _doctorRepository.InsertAsync<Doctor, Guid>(new Doctor(
                 request.Id,
-                request.NewDoctor.EmployeeId,
+                CodeGenerationHelper.GenerateDoctorCode(),
                 request.NewDoctor.MedicalLicenseNumber,
                 request.NewDoctor.MedicalLicenseExpiry,
                 request.NewDoctor.MedicalLicenseIssuingAuthority,

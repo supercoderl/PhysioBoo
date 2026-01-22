@@ -28,9 +28,10 @@ namespace PhysioBoo.Application.Commands.Patients.CreatePatient
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _patientRepository.InsertAsync<Patient, Guid>(new Patient(
+            SharedKernel.Results.DbResult<Guid> result = await _patientRepository.InsertAsync<Patient, Guid>(new Patient(
                 request.Id,
-                Generate(),
+                CodeGenerationHelper.GeneratePatientCode(),
+                request.NewPatient.UserId,
                 request.NewPatient.PrimaryDoctorId,
                 request.NewPatient.ReferredBy,
                 request.NewPatient.ReferralHospitalId,
@@ -66,13 +67,6 @@ namespace PhysioBoo.Application.Commands.Patients.CreatePatient
             }
 
             await Bus.RaiseEventAsync(new PatientCreatedEvent(result.Id));
-        }
-
-        private string Generate()
-        {
-            var timestamp = TimeZoneHelper.GetLocalTimeNow().ToString("yyyyMMddHHmmss");
-            var randomSuffix = _random.Next(100, 999);
-            return $"PAT-{timestamp}-{randomSuffix}";
         }
     }
 }

@@ -3,13 +3,13 @@
     public sealed class UsersCreatedEvent : DomainEvent
     {
         public Guid Id { get; }
-        public Guid? RoleId { get; }
+        public string Role { get; }
         public string Type { get; }
 
-        public UsersCreatedEvent(Guid id, Guid? roleId, string type) : base(id)
+        public UsersCreatedEvent(Guid id, string role, string type) : base(id)
         {
             Id = id;
-            RoleId = roleId;
+            Role = role;
             Type = type;
         }
     }

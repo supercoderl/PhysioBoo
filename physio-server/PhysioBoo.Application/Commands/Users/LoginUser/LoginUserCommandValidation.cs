@@ -6,13 +6,13 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
     {
         public LoginUserCommandValidation()
         {
-            RuleForEmail();
+            RuleForIdentifier();
             RuleForPassword();
         }
 
-        public void RuleForEmail()
+        public void RuleForIdentifier()
         {
-            RuleFor(cmd => cmd.Email).NotEmpty().WithErrorCode("LOGIN_EMPTY_EMAIL").WithMessage("Email may not be empty.");
+            RuleFor(cmd => cmd.Identifier).NotEmpty().WithErrorCode("LOGIN_EMPTY_IDENTIFIER").WithMessage("Identifier may not be empty.");
         }
 
         public void RuleForPassword()

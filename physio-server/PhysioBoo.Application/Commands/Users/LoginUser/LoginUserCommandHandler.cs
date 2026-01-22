@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Options;
 using PhysioBoo.Application.ViewModels.Users;
+using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
@@ -33,13 +34,13 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.Core.User? user = await _userRepository.GetByEmailAsync(request.Email);
+            User? user = await _userRepository.GetByIdentifierAsync(request.Identifier);
 
             if (user == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"User {request.Email} does not exists.",
+                    $"User with info {request.Identifier} does not exists.",
                     ErrorCodes.ObjectNotFound
                 ));
 
@@ -66,7 +67,6 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
                     ["Email"] = user.Email,
                     ["Id"] = user.Id.ToString(),
                     ["Name"] = user.Email.Split("@")[0],
-                    ["Roles"] = user.Roles
                 }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes
             );
 
@@ -88,6 +88,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
             await Bus.RaiseEventAsync(new UserLoggedEvent(user.Id, accessToken, refreshToken));
         }
 
+        #region Handle Validate User
         /// <summary>
         /// Validates the user's password. 
         /// If incorrect, a domain notification is published, the user is locked after too many attempts, 
@@ -117,7 +118,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
                     "USER_IS_NOT_VERIFIED_YET"
                 ));
 
-                await Bus.RaiseEventAsync(new UsersCreatedEvent(user.Id, null, VerificationType.Email.ToString()));
+                await Bus.RaiseEventAsync(new UsersCreatedEvent(user.Id, string.Empty, VerificationType.Email.ToString()));
 
                 return (false, false);
             }
@@ -137,7 +138,9 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
 
             return (true, false);
         }
+        #endregion
 
+        #region Handle Check Lock
         /// <summary>
         /// Checks if the user is locked or not.
         /// Publishes appropriate domain notifications if the account is locked.
@@ -160,5 +163,6 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
 
             return true;
         }
+        #endregion
     }
 }

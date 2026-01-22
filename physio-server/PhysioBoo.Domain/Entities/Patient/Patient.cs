@@ -13,6 +13,7 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
     {
         #region Core Patient Table (37)
         public string PatientNumber { get; private set; }
+        public Guid? UserId { get; private set; }
         public DateOnly? RegistrationDate { get; private set; }
         public PatientType PatientType { get; private set; }
         public Guid PrimaryDoctorId { get; private set; }
@@ -73,6 +74,10 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         [InverseProperty("PreferredPatients")]
         public virtual Doctor? PreferredDoctor { get; private set; }
 
+        [ForeignKey(nameof(UserId))]
+        [InverseProperty("Patient")]
+        public virtual User? User { get; private set; }
+
         [InverseProperty("Patient")]
         public virtual ICollection<Appointment> Appointments { get; private set; } = new List<Appointment>();
 
@@ -104,15 +109,14 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         public virtual ICollection<Payment> Payments { get; private set; } = new List<Payment>();
 
         [InverseProperty("Patient")]
-        public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();    
-
-        public virtual User? User { get; private set; }
+        public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();
         #endregion
 
         #region Constructor (37)
         public Patient(
             Guid id,
             string patientNumber,
+            Guid? userId,
             Guid primaryDoctorId,
             Guid? referredBy,
             Guid? referralHospitalId,
@@ -137,6 +141,7 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         ) : base(id)
         {
             PatientNumber = patientNumber;
+            UserId = userId;
             RegistrationDate = DateOnly.FromDateTime(TimeZoneHelper.GetLocalTimeNow());
             PatientType = PatientType.Outpatient;
             PrimaryDoctorId = primaryDoctorId;
@@ -178,6 +183,7 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
 
         #region Setter Methods (37)
         public void SetPatientNumber(string patientNumber) { PatientNumber = patientNumber; }
+        public void SetUserId(Guid? userId) { UserId = userId; }
         public void SetRegistrationDate(DateOnly? registrationDate) { RegistrationDate = registrationDate; }
         public void SetPatientType(PatientType patientType) { PatientType = patientType; }
         public void SetPrimaryDoctorId(Guid primaryDoctorId) { PrimaryDoctorId = primaryDoctorId; }

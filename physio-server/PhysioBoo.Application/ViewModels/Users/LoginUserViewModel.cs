@@ -2,7 +2,7 @@
 {
     public sealed record LoginUserViewModel
     (
-        string Email,
+        string Identifier,
         string Password
     );
 }

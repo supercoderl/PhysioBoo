@@ -3,6 +3,7 @@
     public sealed record RoleForAssigningViewModel
     (
         Guid UserId,
-        Dictionary<string, bool> Roles
+        Dictionary<string, bool> Roles,
+        Guid? AssignerId
     );
 }

@@ -1,4 +1,7 @@
-﻿using PhysioBoo.Domain.Entities.Core;
+﻿using PhysioBoo.Application.ViewModels.Doctors;
+using PhysioBoo.Application.ViewModels.Patients;
+using PhysioBoo.Application.ViewModels.Profiles;
+using PhysioBoo.Domain.Entities.Core;
 
 namespace PhysioBoo.Application.ViewModels.Users
 {
@@ -25,6 +28,10 @@ namespace PhysioBoo.Application.ViewModels.Users
         public DateTime? UpdatedAt { get; set; }
         public Guid? UpdatedBy { get; set; }
 
+        public DoctorViewModel? Doctor { get; set; }
+        public PatientViewModel? Patient { get; set; }
+        public ProfileViewModel? Profile { get; set; }
+
         public static UserViewModel FromUser(User user)
         {
             return new UserViewModel
@@ -48,7 +55,10 @@ namespace PhysioBoo.Application.ViewModels.Users
                 CreatedAt = user.CreatedAt,
                 CreatedBy = user.CreatedBy,
                 UpdatedAt = user.UpdatedAt,
-                UpdatedBy = user.UpdatedBy
+                UpdatedBy = user.UpdatedBy,
+                Doctor = user.Doctor != null ? DoctorViewModel.FromDoctor(user.Doctor) : null,
+                Patient = user.Patient != null ? PatientViewModel.FromPatient(user.Patient) : null,
+                Profile = user.Profile != null ? ProfileViewModel.FromProfile(user.Profile) : null
             };
         }
     }

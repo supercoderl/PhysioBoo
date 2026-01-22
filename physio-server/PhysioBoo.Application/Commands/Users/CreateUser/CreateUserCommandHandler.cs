@@ -52,7 +52,7 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
 
             await Bus.RaiseEventAsync(new UsersCreatedEvent(
                 result.Id,
-                request.NewUser.RoleId,
+                request.NewUser.Role.ToString(),
                 VerificationType.Email.ToString()
             ));
         }

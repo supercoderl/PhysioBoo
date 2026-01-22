@@ -30,6 +30,22 @@ namespace PhysioBoo.Infrastructure.Repositories
             return result.FirstOrDefault();
         }
 
+        public async Task<User?> GetByIdentifierAsync(string identifier)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>
+            {
+                ["p_identifier"] = identifier
+            };
+
+            List<User> result = await ExecutePostgresFunctionAsync<User>(
+                "get_identifier_for_login",
+                parameters,
+                reader => MapUserForLogin(reader)
+            );
+
+            return result.FirstOrDefault();
+        }
+
         private static User MapUserForLogin(NpgsqlDataReader reader)
         {
             User user = new User(
@@ -46,7 +62,6 @@ namespace PhysioBoo.Infrastructure.Repositories
             user.SetEmailVerifiedAt(reader.IsDBNull("EmailVerifiedAt") ? null : reader.GetDateTime("EmailVerifiedAt"));
             user.SetFailedLoginAttempts(reader.GetInt32("FailedLoginAttempts"));
             user.SetAccountLockedUntil(reader.IsDBNull("AccountLockedUntil") ? null : reader.GetDateTime("AccountLockedUntil"));
-            user.SetRoles(reader.GetString("Roles"));
 
             return user;
         }

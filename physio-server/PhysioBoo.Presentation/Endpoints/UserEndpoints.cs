@@ -1,11 +1,13 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using PhysioBoo.Application.Commands.Users.AssignRoleToUser;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
 using PhysioBoo.Application.Commands.Users.CreateUser;
 using PhysioBoo.Application.Commands.Users.ForgotPassword;
 using PhysioBoo.Application.Commands.Users.LoginUser;
 using PhysioBoo.Application.Commands.Users.LogoutUser;
+using PhysioBoo.Application.Commands.Users.OAuthLoginUser;
 using PhysioBoo.Application.Commands.Users.RefreshToken;
 using PhysioBoo.Application.Commands.Users.ResendVerification;
 using PhysioBoo.Application.Commands.Users.ResetPassword;
@@ -15,6 +17,7 @@ using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Notifications;
+using PhysioBoo.Domain.Settings;
 using PhysioBoo.Presentation.Models;
 using PhysioBoo.SharedKernel.Common;
 using PhysioBoo.SharedKernel.Utils;
@@ -26,6 +29,7 @@ namespace PhysioBoo.Presentation.Endpoints
         public static void MapUserEndpoints(this IEndpointRouteBuilder app)
         {
             string? env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            string timeZoneId = "UTC";
 
             RouteGroupBuilder group = app.MapGroup("api/users")
                 .WithTags("Users")
@@ -113,6 +117,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 string type,
                 IMediatorHandler bus,
                 INotificationHandler<DomainNotification> handler,
+                IOptions<ClientSettings> options,
                 CancellationToken cancellationToken
             ) =>
             {
@@ -136,11 +141,11 @@ namespace PhysioBoo.Presentation.Endpoints
 
                 string redirectUrl = type switch
                 {
-                    "Email" => "http://localhost:4200/admin",
-                    "PasswordReset" => $"http://localhost:4200/auth/reset-password?token={token}",
+                    "Email" => $"{options.Value.BaseUrl}/auth/verification-status?result=success",
+                    "PasswordReset" => $"{options.Value.BaseUrl}/auth/reset-password?token={token}",
 
                     // fallback
-                    _ => "http://localhost:4200/auth/login"
+                    _ => $"{options.Value.BaseUrl}/auth/login"
                 };
 
                 return Results.Redirect(redirectUrl);
@@ -161,7 +166,7 @@ namespace PhysioBoo.Presentation.Endpoints
             {
                 DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
 
-                LoginUserCommand requestCmd = new LoginUserCommand(request.Email, request.Password);
+                LoginUserCommand requestCmd = new LoginUserCommand(request.Identifier, request.Password);
 
                 await bus.SendCommandAsync(requestCmd);
 
@@ -181,7 +186,6 @@ namespace PhysioBoo.Presentation.Endpoints
 
                 if (requestCmd.Result != null)
                 {
-                    string timeZoneId = "UTC";
                     AuthHelper.SetTokenCookie(response, "access_token", requestCmd.Result.AccessToken, timeZoneId, env == "Development");
                     AuthHelper.SetTokenCookie(response, "refresh_token", requestCmd.Result.RefreshToken, timeZoneId, env == "Development");
 
@@ -192,9 +196,55 @@ namespace PhysioBoo.Presentation.Endpoints
                     });
                 }
 
-                return Results.StatusCode(500);
+                return Results.Unauthorized();
             }).WithName("Login")
             .WithSummary("Login user with email and password")
+            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+
+            group.MapPost("/oauth-login", async (
+                [FromBody] OAuthLoginUserViewModel request,
+                IMediatorHandler bus,
+                HttpResponse response,
+                INotificationHandler<DomainNotification> handler,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
+
+                OAuthLoginUserCommand requestCmd = new OAuthLoginUserCommand(request.Token, request.Provider);
+
+                await bus.SendCommandAsync(requestCmd);
+
+                if (notifications.HasNotifications())
+                {
+                    return Results.BadRequest(new ResponseMessage<string>
+                    {
+                        Success = false,
+                        Errors = notifications.GetNotifications().Select(n => n.Value),
+                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
+                        {
+                            Code = n.Code,
+                            Data = n.Data
+                        })
+                    });
+                }
+
+                if (requestCmd.Result != null)
+                {
+                    AuthHelper.SetTokenCookie(response, "access_token", requestCmd.Result.AccessToken, timeZoneId, env == "Development");
+                    AuthHelper.SetTokenCookie(response, "refresh_token", requestCmd.Result.RefreshToken, timeZoneId, env == "Development");
+
+                    return Results.Ok(new ResponseMessage<string>
+                    {
+                        Success = true,
+                        Data = "Login successfully."
+                    });
+                }
+
+                return Results.Unauthorized();
+            }).WithName("OAuthLogin")
+            .WithSummary("Login user with oauth")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
             #endregion
@@ -202,6 +252,7 @@ namespace PhysioBoo.Presentation.Endpoints
             #region Logout
             group.MapPost("/refresh/logout", async (
                 HttpRequest request,
+                HttpResponse response,
                 IMediatorHandler bus,
                 INotificationHandler<DomainNotification> handler,
                 IUser user,
@@ -225,6 +276,9 @@ namespace PhysioBoo.Presentation.Endpoints
                         })
                     });
                 }
+
+                AuthHelper.RemoveTokenCookie(response, "access_token");
+                AuthHelper.RemoveTokenCookie(response, "refresh_token");
 
                 return Results.Ok(new ResponseMessage<string>
                 {
@@ -500,6 +554,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 });
             }).WithName("Profile")
             .WithSummary("Retrieve user profile.")
+            .RequireAuthorization()
             .Produces<ResponseMessage<UserViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<UserViewModel?>>(StatusCodes.Status400BadRequest);
             #endregion

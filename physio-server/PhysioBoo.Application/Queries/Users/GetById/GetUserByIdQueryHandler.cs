@@ -22,7 +22,10 @@ namespace PhysioBoo.Application.Queries.Users.GetById
 
         public async Task<UserViewModel?> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
         {
-            User? user = await _userRepository.GetByIdCompiledAsync(request.Id);
+            User? user = await _userRepository.GetByIdAsync(
+                request.Id,
+                includeProperties: "Doctor,Patient,Profile"
+            );
 
             if (user is null) return null;
 

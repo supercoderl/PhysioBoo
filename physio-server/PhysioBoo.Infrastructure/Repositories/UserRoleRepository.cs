@@ -1,4 +1,6 @@
-﻿using PhysioBoo.Domain.Entities.Core;
+﻿using Npgsql;
+using NpgsqlTypes;
+using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Infrastructure.Database;
 
@@ -11,19 +13,17 @@ namespace PhysioBoo.Infrastructure.Repositories
 
         }
 
-        public async Task AssignRolesAsync(Guid userId, string roleJson)
+        public async Task AssignRolesAsync(Guid userId, string roleJson, Guid? assignerId)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>
+            NpgsqlParameter pUserId = new NpgsqlParameter("p_user_id", userId);
+            NpgsqlParameter pRolesJson = new NpgsqlParameter("p_roles_json", NpgsqlDbType.Jsonb)
             {
-                ["p_user_id"] = userId,
-                ["p_roles_json"] = roleJson
+                Value = roleJson
             };
+            NpgsqlParameter pAssigner = new NpgsqlParameter("p_assigner", assignerId ?? (object)DBNull.Value);
+            string sql = "SELECT public.assign_roles(@p_user_id, @p_roles_json, @p_assigner)";
 
-            await ExecutePostgresFunctionAsync(
-                "assign_roles",
-                parameters,
-                reader => reader
-            );
+            await ExecuteNonQueryAsync(sql, new[] { pUserId, pRolesJson, pAssigner });
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Interfaces;
 using System.Security.Claims;
 
@@ -27,10 +26,10 @@ namespace PhysioBoo.Domain
                 return _userId;
             }
 
-            var claim = _httpContextAccessor.HttpContext?.User.Claims
+            Claim? claim = _httpContextAccessor.HttpContext?.User.Claims
             .FirstOrDefault(x => string.Equals(x.Type, ClaimTypes.NameIdentifier));
 
-            if (Guid.TryParse(claim?.Value, out var userId))
+            if (Guid.TryParse(claim?.Value, out Guid userId))
             {
                 _userId = userId;
                 return userId;
@@ -40,14 +39,14 @@ namespace PhysioBoo.Domain
             return Guid.Empty;
         }
 
-        public Role GetUserRole()
+        public string GetUserRole()
         {
-            var claim = _httpContextAccessor.HttpContext?.User.Claims
+            Claim? claim = _httpContextAccessor.HttpContext?.User.Claims
                 .FirstOrDefault(x => string.Equals(x.Type, ClaimTypes.Role));
 
-            if (Enum.TryParse(claim?.Value, out Role userRole))
+            if (claim != null && !string.IsNullOrEmpty(claim.Value))
             {
-                return userRole;
+                return claim.Value;
             }
 
             throw new ArgumentException("Could not parse user role");
@@ -62,7 +61,7 @@ namespace PhysioBoo.Domain
                     return _name;
                 }
 
-                var identity = _httpContextAccessor.HttpContext?.User.Identity;
+                System.Security.Principal.IIdentity? identity = _httpContextAccessor.HttpContext?.User.Identity;
                 if (identity is null)
                 {
                     _name = string.Empty;
@@ -75,7 +74,7 @@ namespace PhysioBoo.Domain
                     return identity.Name;
                 }
 
-                var claim = _httpContextAccessor.HttpContext!.User.Claims
+                string? claim = _httpContextAccessor.HttpContext!.User.Claims
                     .FirstOrDefault(c => string.Equals(c.Type, ClaimTypes.Name, StringComparison.OrdinalIgnoreCase))?
                     .Value;
                 _name = claim ?? string.Empty;
@@ -102,7 +101,7 @@ namespace PhysioBoo.Domain
 
         public string GetUserEmail()
         {
-            var claim = _httpContextAccessor.HttpContext?.User.Claims
+            Claim? claim = _httpContextAccessor.HttpContext?.User.Claims
                 .FirstOrDefault(x => string.Equals(x.Type, ClaimTypes.Email));
 
             if (!string.IsNullOrWhiteSpace(claim?.Value))

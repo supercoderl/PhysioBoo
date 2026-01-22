@@ -15,11 +15,11 @@ namespace PhysioBoo.gRPC.Contexts
 
         public async Task<IEnumerable<UserViewModel>> GetUsersByIds(IEnumerable<Guid> ids)
         {
-            var request = new GetUsersByIdsRequest();
+            GetUsersByIdsRequest request = new GetUsersByIdsRequest();
 
             request.Ids.AddRange(ids.Select(id => id.ToString()));
 
-            var result = await _client.GetByIdsAsync(request);
+            GetUsersByIdsResult result = await _client.GetByIdsAsync(request);
 
             return result.Users.Select(user => new UserViewModel(
                 Guid.Parse(user.Id),

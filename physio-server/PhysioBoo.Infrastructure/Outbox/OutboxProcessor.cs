@@ -135,7 +135,7 @@ namespace PhysioBoo.Infrastructure.Outbox
                 // USER DOMAIN EVENT
                 UsersCreatedEvent e => new UsersCreatedEvent(
                     e.AggregateId,
-                    e.RoleId,
+                    e.Role,
                     e.Type
                 ),
 

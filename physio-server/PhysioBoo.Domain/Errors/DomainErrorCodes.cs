@@ -420,5 +420,13 @@
             public const string EmptyName = "PERMISSION_EMPTY_NAME";
             public const string EmptyCode = "PERMISSION_EMPTY_CODE";
         }
+
+        public static class UserLogin
+        {
+            // User Login Validation
+            public const string EmptyId = "USERLOGIN_EMPTY_ID";
+            public const string EmptyLoginProvider = "USERLOGIN_EMPTY_LOGIN_PROVIDER";
+            public const string EmptyProviderKey = "USERLOGIN_EMPTY_PROVIDER_KEY";
+        }
     }
 }

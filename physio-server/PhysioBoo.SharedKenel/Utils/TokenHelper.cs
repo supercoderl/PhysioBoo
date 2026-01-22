@@ -143,7 +143,6 @@ namespace PhysioBoo.SharedKernel.Utils
             Claim[] claims = new[]
             {
                 new Claim(ClaimTypes.Email, claimDatas["Email"]),
-                new Claim(ClaimTypes.Role, claimDatas["Roles"]),
                 new Claim(ClaimTypes.NameIdentifier, claimDatas["Id"]),
                 new Claim(ClaimTypes.Name, claimDatas["Name"])
             };

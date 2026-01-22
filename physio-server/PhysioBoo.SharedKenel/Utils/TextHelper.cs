@@ -1,4 +1,7 @@
-﻿namespace PhysioBoo.SharedKernel.Utils
+﻿using PhoneNumbers;
+using System.Net.Mail;
+
+namespace PhysioBoo.SharedKernel.Utils
 {
     public static class TextHelper
     {
@@ -30,13 +33,56 @@
         /// <summary>
         /// Generate entity number based on current time.
         /// Format: APP-YYYYMMDD-HHMMSS
-        /// Ví dụ: APP-20250923-182530
+        /// Example: APP-20250923-182530
         /// </summary>
         public static string GenerateEntityNumber(string prefix)
         {
-            var now = TimeZoneHelper.GetLocalTimeNow();
+            DateTime now = TimeZoneHelper.GetLocalTimeNow();
 
             return $"{prefix}-{now:yyyyMMdd-HHmmss}";
+        }
+
+        /// <summary>
+        /// Check the value is email or not
+        /// Format: first + @ + second
+        /// Example: myemail@email.com
+        /// </summary>
+        public static bool CheckIsEmail(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+
+            try
+            {
+                MailAddress addr = new MailAddress(value);
+                return addr.Address == value;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Check the value is email or not
+        /// Format: a string number with 10 - 15 characters
+        /// Example: +18789876371
+        /// </summary>
+        public static bool CheckIsPhone(string value, string region = "VN")
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+
+            try
+            {
+                PhoneNumberUtil phoneUtil = PhoneNumberUtil.GetInstance();
+                PhoneNumber number = phoneUtil.Parse(value, region);
+                return phoneUtil.IsValidNumber(number);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

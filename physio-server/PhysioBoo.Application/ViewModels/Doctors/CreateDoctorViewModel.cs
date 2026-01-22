@@ -2,7 +2,6 @@
 {
     public sealed record CreateDoctorViewModel
     (
-        string? EmployeeId,
         string MedicalLicenseNumber,
         DateOnly MedicalLicenseExpiry,
         string? MedicalLicenseIssuingAuthority,

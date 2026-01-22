@@ -7,7 +7,7 @@ message GrpcUser {
 	string email = 2;
 	string phone = 3;
 	optional string alternatePhone = 4;
-	optional string deletedAt = 6;
+	optional string deletedAt = 5;
 }
 
 message GetUsersByIdsResult {

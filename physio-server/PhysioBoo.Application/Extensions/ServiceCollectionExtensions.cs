@@ -55,6 +55,7 @@ using PhysioBoo.Application.Commands.Users.ForgotPassword;
 using PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken;
 using PhysioBoo.Application.Commands.Users.LoginUser;
 using PhysioBoo.Application.Commands.Users.LogoutUser;
+using PhysioBoo.Application.Commands.Users.OAuthLoginUser;
 using PhysioBoo.Application.Commands.Users.RefreshToken;
 using PhysioBoo.Application.Commands.Users.ResendVerification;
 using PhysioBoo.Application.Commands.Users.ResetPassword;
@@ -175,6 +176,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<AssignPermissionToRoleCommand>, AssignPermissionToRoleCommandHandler>();
             services.AddScoped<IRequestHandler<AssignRoleToUserCommand>, AssignRoleToUserCommandHandler>();
             services.AddScoped<IRequestHandler<AssignRoleToUserUsingRoleIdCommand>, AssignRoleToUserUsingRoleIdCommandHandler>();
+            services.AddScoped<IRequestHandler<OAuthLoginUserCommand>, OAuthLoginUserCommandHandler>();
             #endregion
 
             #region Patient Flow

@@ -28,6 +28,10 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasForeignKey(p => p.PrimaryDoctorId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasOne(p => p.User)
+                   .WithOne(u => u.Patient)
+                   .HasForeignKey<Patient>(p => p.UserId);
+
             builder.HasOne(p => p.ReferringDoctor)
                    .WithMany(d => d.ReferredPatients)
                    .HasForeignKey(p => p.ReferredBy);
@@ -44,14 +48,13 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(d => d.PreferredPatients)
                    .HasForeignKey(p => p.PreferredDoctorId);
 
-            builder.HasOne(p => p.User)
-                .WithOne(u => u.Patient)
-                .HasForeignKey<Patient>(p => p.Id);
-
             // Properties
             builder.Property(p => p.PatientNumber)
                    .IsRequired()
                    .HasMaxLength(50);
+
+            builder.Property(p => p.UserId)
+                   .HasColumnType("uuid");
 
             builder.Property(p => p.RegistrationDate);
 

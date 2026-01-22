@@ -15,7 +15,7 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.HasKey(ur => ur.Id);
 
             // Indexes
-            builder.HasIndex(ur => new { ur.UserId, ur.RoleId });
+            builder.HasIndex(ur => new { ur.UserId, ur.RoleId }).IsUnique();
 
             // Self-relationships
             builder.HasOne(u => u.User)

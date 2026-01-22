@@ -2,6 +2,7 @@
 using PhysioBoo.Domain.DomainEvents;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
+using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Shared.Events;
 using PhysioBoo.SharedKernel.Commands;
 
@@ -28,9 +29,18 @@ namespace PhysioBoo.Infrastructure
 
         public async Task RaiseEventAsync<T>(T @event) where T : DomainEvent
         {
-            await _domainEventStore.SaveAsync(@event);
+            if (@event is DomainNotification domainNotification)
+            {
+                await _mediator.Publish(domainNotification);
+                return;
+            }
 
-            await _outboxRepository.SaveEventToOutboxAsync(@event);
+            if (@event is DomainEvent domainEvent)
+            {
+                await _domainEventStore.SaveAsync(domainEvent);
+
+                await _outboxRepository.SaveEventToOutboxAsync(domainEvent);
+            }
         }
 
         public Task SendCommandAsync<T>(T command) where T : CommandBase => _mediator.Send(command);

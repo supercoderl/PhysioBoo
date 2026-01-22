@@ -68,9 +68,6 @@ namespace PhysioBoo.Presentation
             }, ServiceLifetime.Scoped);
             #endregion
 
-            builder.Services.AddInfrastructure(builder.Configuration, "PhysioBoo.Infrastructure");
-            LogStep("Infrastructure added", ref stepTimer);
-
             builder.Services.AddNotificationHandlers();
             builder.Services.AddApiUser();
             builder.Services.AddCommandHandlers();
@@ -93,6 +90,8 @@ namespace PhysioBoo.Presentation
 
             builder.Services.AddSettings<MailSettings>(builder.Configuration, "Email");
             builder.Services.AddSettings<ServerSettings>(builder.Configuration, "Server");
+            builder.Services.AddSettings<ClientSettings>(builder.Configuration, "Client");
+            builder.Services.AddSettings<GoogleSettings>(builder.Configuration, "Google");
             builder.Services.AddCSRFProtection(builder.Environment);
             builder.Services.AddEmail();
             builder.Services.AddServices();
@@ -175,6 +174,9 @@ namespace PhysioBoo.Presentation
             });
             #endregion
 
+            builder.Services.AddInfrastructure(builder.Configuration, "PhysioBoo.Infrastructure");
+            LogStep("Infrastructure added", ref stepTimer);
+
             #region Mini Profiler & Logging 
             if (builder.Environment.IsDevelopment())
             {
@@ -221,7 +223,7 @@ namespace PhysioBoo.Presentation
                 app.MapDevEndpoints();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection(); use HTTP for development
 
             app.UseCors("CorsPolicy");
 

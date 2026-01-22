@@ -26,11 +26,15 @@ namespace PhysioBoo.Application.Commands.Users.AssignRoleToUser
 
             string perJson = JsonSerializer.Serialize(request.RoleForAssigning.Roles.Select(x => new
             {
-                code = x.Key,
+                code = x.Key.ToUpper(),
                 isChecked = x.Value
             }));
 
-            await _userRoleRepository.AssignRolesAsync(request.RoleForAssigning.UserId, perJson);
+            await _userRoleRepository.AssignRolesAsync(
+                request.RoleForAssigning.UserId,
+                perJson,
+                request.RoleForAssigning.AssignerId
+            );
         }
     }
 }

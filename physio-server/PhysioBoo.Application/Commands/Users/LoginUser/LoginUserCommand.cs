@@ -9,18 +9,18 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
     {
         private static readonly LoginUserCommandValidation s_validation = new();
 
-        public string Email { get; }
+        public string Identifier { get; }
         public string Password { get; }
 
         [JsonIgnore]
         public AuthResult? Result { get; set; }
 
         public LoginUserCommand(
-           string email,
+           string identifier,
            string password
         ) : base(Guid.NewGuid())
         {
-            Email = email;
+            Identifier = identifier;
             Password = password;
         }
 

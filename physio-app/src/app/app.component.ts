@@ -5,11 +5,12 @@ import { ToastComponent } from "./components/toast/toast.component";
 import { GlobalLoadingService } from './services/common/global-loading.service';
 import { ThemeService } from './services/common/theme.service';
 import { SharedModule } from './shared/shared-imports';
+import { DialogComponent } from './components/dialog/dialog.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [SharedModule, PreloaderComponent, ToastComponent],
+  imports: [SharedModule, PreloaderComponent, ToastComponent, DialogComponent],
   templateUrl: './app.component.html',
   providers: [
     { provide: NZ_I18N, useValue: en_US },

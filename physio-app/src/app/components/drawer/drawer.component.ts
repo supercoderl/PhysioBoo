@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SharedModule } from '../../shared/shared-imports';
+import { DialogService } from '../../services/common/dialog.service';
 
 @Component({
   selector: 'drawer',
@@ -18,7 +19,7 @@ import { SharedModule } from '../../shared/shared-imports';
       <!-- overlay -->
       <div
         aria-hidden="true"
-        (click)="onClose.emit()"
+        (click)="onClose()"
         [ngClass]="{
           'transition-opacity duration-300 ease-in-out fixed fixed inset-0 bg-[rgba(0,_0,_0,_0.5)]': true,
           'opacity-100': isOpen,
@@ -29,9 +30,9 @@ import { SharedModule } from '../../shared/shared-imports';
       <div
         [ngClass]="{
           'transition-transform duration-300 ease-in-out w-[280px] bg-white text-black flex flex-col h-full fixed top-0 right-0': true,
-          'translate-x-0': isOpen,
-          'translate-x-[280px]': !isOpen
         }"
+        [style.width.px]="width"
+        [style.transform]="'translateX(' + (isOpen ? 0 : width) + 'px)'"
       >
         <div class="relative overscroll-contain min-h-full">
           <ng-content></ng-content>
@@ -41,6 +42,27 @@ import { SharedModule } from '../../shared/shared-imports';
   `
 })
 export class DrawerComponent {
-  @Output() onClose: EventEmitter<void> = new EventEmitter<void>();
+  // #region Inputs, Outputs, Properties
+  @Output() close: EventEmitter<void> = new EventEmitter<void>();
   @Input() isOpen: boolean = false;
+  @Input() isShowDialog: boolean = false;
+  @Input() width: number = 280;
+  // #endregion
+
+  // #region Init (Lifecycle + Setup)
+  constructor(private dialogSrv: DialogService) { }
+  // #endregion
+
+  // #region Methods 
+  onClose() {
+    if (this.isShowDialog) {
+      this.dialogSrv.confirmUnsavedChanges(
+        () => {
+          this.close.emit();
+        }
+      );
+    }
+    else this.close.emit();
+  }
+  // #endregion
 }

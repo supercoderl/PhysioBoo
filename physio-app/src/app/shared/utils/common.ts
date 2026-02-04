@@ -62,3 +62,4 @@ export function generateUUID(): string {
     hex.substring(20)
   );
 }
+

@@ -9,7 +9,7 @@ import { SharedModule } from "../../../shared/shared-imports";
     ],
     template: `
         <button
-            class="whitespace-nowrap inlineFlex-center-center relative cursor-pointer align-middle leading-1 min-h-8 min-w-8 m-0"
+            class="whitespace-nowrap inlineFlex-center-center relative cursor-pointer align-middle leading-1 min-h-8 min-w-8 m-0 transition-all duration-300"
             [ngClass]="buttonClass"
             tabindex="0"
             type="button"

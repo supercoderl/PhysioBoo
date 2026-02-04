@@ -16,7 +16,7 @@ import { ButtonIconComponent } from "../../button/button-icon/button-icon.compon
           class="bg-gray-50 text-xs uppercase text-gray-700 font-semibold border-b">
         
           <tr>
-            <th *ngFor="let col of columnDefs" class="px-6 py-3" [ngClass]="col.headerClass">
+            <th *ngFor="let col of columnDefs" class="px-4 py-3" [ngClass]="col.headerClass">
               {{ col.headerLabel }}
             </th>
           </tr>

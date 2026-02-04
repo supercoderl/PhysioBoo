@@ -50,7 +50,7 @@ import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
             class="absolute top-[calc(100%+4px)] left-0 w-full bg-white shadow-xl border border-slate-100 overflow-hidden z-50 animate-fade-in-down"
             [style.border-radius.px]="radius"
         >
-            <ul class="max-h-60 overflow-y-auto py-1 custom-scrollbar">
+            <ul class="max-h-60 overflow-y-auto py-1 m-0" custom-scrollbar>
                 <li 
                     *ngFor="let opt of options"
                     (click)="selectOption(opt)"

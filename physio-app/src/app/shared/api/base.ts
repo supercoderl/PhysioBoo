@@ -6,5 +6,10 @@ export const BASE_API = {
   LOGIN: '/api/users/login',
   OAUTHLOGIN: '/api/users/oauth-login',
   LOGOUT: '/api/users/refresh/logout',
-  REGISTER: '/api/users/register'
+  REGISTER: '/api/users/register',
+  MEDICALSPECIALTY: {
+    SEARCH: '/api/medical-specialties/search',
+    CREATE: '/api/medical-specialties/create',
+    DELETE: '/api/medical-specialties/delete'
+  }
 };

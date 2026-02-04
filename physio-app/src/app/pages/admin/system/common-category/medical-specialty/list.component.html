@@ -20,10 +20,7 @@
           <boo-icon name="chevron-down" />
         </boo-button-admin>
         <ng-template #menuExportRef>
-          <ul
-            class="p-2 m-0 block min-w-50 bg-white rounded-[5px]"
-            @dropdownState
-          >
+          <ul class="p-2 m-0 block min-w-50 bg-white rounded-[5px] shadow-md">
             <li>
               <a
                 class="block text-[14px] text-primary bg-transparent rounded-[4.8px] px-3.75 py-1.625"
@@ -44,6 +41,7 @@
       <button-icon
         [icon]="{ name: 'plus', color: 'white' }"
         buttonClass="!bg-primary ms-2 text-white"
+        (onClick)="onOpenDrawer(null)"
       >
         New Specialty
       </button-icon>
@@ -73,10 +71,7 @@
         </boo-button-admin>
       </div>
       <ng-template #menuDateRangeRef>
-        <ul
-          class="p-2 m-0 block min-w-50 bg-white rounded-[5px]"
-          @dropdownState
-        >
+        <ul class="p-2 m-0 block min-w-50 bg-white rounded-[5px]">
           <li>
             <a
               class="block text-[14px] text-primary bg-transparent rounded-[4.8px] px-3.75 py-1.625"
@@ -116,10 +111,7 @@
         </boo-button-admin>
       </div>
       <ng-template #menuSortRef>
-        <ul
-          class="p-2 m-0 block min-w-50 bg-white rounded-[5px]"
-          @dropdownState
-        >
+        <ul class="p-2 m-0 block min-w-50 bg-white rounded-[5px]">
           <li>
             <a
               class="block text-[14px] text-primary bg-transparent rounded-[4.8px] px-3.75 py-1.625"
@@ -138,6 +130,18 @@
   </div>
 
   <div class="mt-2">
-    <admin-booking-table-card />
+    <admin-medical-specialty-table-card
+      [data]="paginationData"
+      (pageChange)="onPageChanged($event)"
+      (editClick)="onOpenDrawer($event)"
+      (deleteClick)="onDelete($event)"
+    />
   </div>
+
+  <admin-medical-specialty-drawer
+    [isOpen]="isDrawerOpen"
+    [currentId]="selectedId"
+    (close)="onCloseDrawer()"
+    (saveSuccess)="onSaveSuccess()"
+  />
 </admin-content-header>

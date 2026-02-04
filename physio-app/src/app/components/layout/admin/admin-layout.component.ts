@@ -32,7 +32,7 @@ import { AdminSizeComponent } from "./size/size.component";
                 <admin-layout-sidebar [isCollapsed]="isCollapsed" />
                 <main 
                     id="physio-main" 
-                    class="relative z-10 flex min-h-svh min-w-0 flex-auto flex-col max-h-svh"
+                    class="relative z-[2000] flex min-h-svh min-w-0 flex-auto flex-col max-h-svh"
                 >
                     <admin-main-header 
                         (collapseEvent)="handleCollapse()"
@@ -48,7 +48,7 @@ import { AdminSizeComponent } from "./size/size.component";
                             <admin-language *ngIf="popover.type === 'LANGUAGE'" class="w-full"></admin-language>
                         </popover>
                     </admin-main-header>
-                    <div class="flex-1 flex flex-col min-h-0 relative z-10">
+                    <div class="flex-1 flex flex-col min-h-0 relative z-20">
                         <div class="flex-1 flex flex-col min-h-0 px-4 bg-[#F6F7F8] overflow-hidden">
                             <div 
                                 id="wrapper"

@@ -1,8 +1,7 @@
-﻿using MediatR;
-using PhysioBoo.Application.Commands.DoctorLeaves.CreateDoctorLeave;
+﻿using PhysioBoo.Application.Commands.DoctorLeaves.CreateDoctorLeave;
 using PhysioBoo.Application.ViewModels.DoctorLeaves;
 using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Notifications;
+using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
 
 namespace PhysioBoo.Presentation.Endpoints
@@ -13,33 +12,17 @@ namespace PhysioBoo.Presentation.Endpoints
         {
             RouteGroupBuilder group = app.MapGroup("api/doctor-leaves")
                 .WithTags("Doctor Leaves")
-                .WithOpenApi();
+                .WithOpenApi()
+                .AddEndpointFilter<NotificationResultFilter>();
 
             // Create doctor leave
             group.MapPost("/create", async (
                 CreateDoctorLeaveViewModel newDoctorLeave,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new CreateDoctorLeaveCommand(newDoctorLeave));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<Guid>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Created($"/api/doctor-leaves/{newDoctorLeave.Id}", new ResponseMessage<Guid>
                 {

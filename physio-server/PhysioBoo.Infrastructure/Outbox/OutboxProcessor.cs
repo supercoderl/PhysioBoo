@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PhysioBoo.Infrastructure.Database;
 using PhysioBoo.Shared.Events;
+using PhysioBoo.Shared.Events.MedicalSpecialties;
 using PhysioBoo.Shared.Events.Users;
 using PhysioBoo.SharedKernel.Utils;
 
@@ -133,12 +134,7 @@ namespace PhysioBoo.Infrastructure.Outbox
             return domainEvent switch
             {
                 // USER DOMAIN EVENT
-                UsersCreatedEvent e => new UsersCreatedEvent(
-                    e.AggregateId,
-                    e.Role,
-                    e.Type
-                ),
-
+                UsersCreatedEvent e => new UsersCreatedEvent(e.AggregateId, e.Role, e.Type),
                 EmailVerificationTokenGeneratedEvent e => new EmailVerificationTokenGeneratedEvent(
                     e.UserId,
                     e.Email,
@@ -146,10 +142,11 @@ namespace PhysioBoo.Infrastructure.Outbox
                     e.ExpiresAt,
                     e.Type
                 ),
-
                 UserVerifiedEvent e => new UserVerifiedEvent(e.Token, e.Type),
-
                 UserLoggedEvent e => new UserLoggedEvent(e.UserId, e.AccessToken, e.RefreshToken),
+
+                // MEDICAL SPECIALTY EVENT
+                MedicalSpecialtyCreatedEvent e => new MedicalSpecialtyCreatedEvent(e.AggregateId, e.IconPublicId, e.IconUrl),
 
                 _ => null
             };

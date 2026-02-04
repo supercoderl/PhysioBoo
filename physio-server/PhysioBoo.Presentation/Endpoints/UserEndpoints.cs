@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using PhysioBoo.Application.Commands.Users.AssignRoleToUser;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
@@ -16,8 +15,8 @@ using PhysioBoo.Application.Queries.Users.GetAll;
 using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Domain.Settings;
+using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
 using PhysioBoo.SharedKernel.Common;
 using PhysioBoo.SharedKernel.Utils;
@@ -33,33 +32,17 @@ namespace PhysioBoo.Presentation.Endpoints
 
             RouteGroupBuilder group = app.MapGroup("api/users")
                 .WithTags("Users")
-                .WithOpenApi();
+                .WithOpenApi()
+                .AddEndpointFilter<NotificationResultFilter>();
 
             #region Create user
             group.MapPost("/register", async (
                 [FromBody] CreateUserViewModel newUser,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new CreateUserCommand(newUser));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<Guid>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Created($"/api/users/{newUser.Id}", new ResponseMessage<Guid>
                 {
@@ -76,28 +59,11 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/resend-verification", async (
                 ResendVerificationViewModel request,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 IUser user,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new ResendVerificationCommand(user.GetUserId(), request.VerificationType));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<string>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Ok(new ResponseMessage<string>
                 {
@@ -116,28 +82,11 @@ namespace PhysioBoo.Presentation.Endpoints
                 string token,
                 string type,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 IOptions<ClientSettings> options,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new VerifyUserCommand(token, type, type != "PasswordReset"));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<string>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 string redirectUrl = type switch
                 {
@@ -160,29 +109,12 @@ namespace PhysioBoo.Presentation.Endpoints
                 [FromBody] LoginUserViewModel request,
                 IMediatorHandler bus,
                 HttpResponse response,
-                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 LoginUserCommand requestCmd = new LoginUserCommand(request.Identifier, request.Password);
 
                 await bus.SendCommandAsync(requestCmd);
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<string>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 if (requestCmd.Result != null)
                 {
@@ -206,29 +138,12 @@ namespace PhysioBoo.Presentation.Endpoints
                 [FromBody] OAuthLoginUserViewModel request,
                 IMediatorHandler bus,
                 HttpResponse response,
-                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 OAuthLoginUserCommand requestCmd = new OAuthLoginUserCommand(request.Token, request.Provider);
 
                 await bus.SendCommandAsync(requestCmd);
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<string>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 if (requestCmd.Result != null)
                 {
@@ -254,28 +169,11 @@ namespace PhysioBoo.Presentation.Endpoints
                 HttpRequest request,
                 HttpResponse response,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 IUser user,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new LogoutUserCommand(user.GetUserId()));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<string>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 AuthHelper.RemoveTokenCookie(response, "access_token");
                 AuthHelper.RemoveTokenCookie(response, "refresh_token");
@@ -296,28 +194,11 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/change-password", async (
                 [FromBody] ChangePasswordViewModel request,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 IUser user,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new ChangePasswordUserCommand(user.GetUserId(), request.OldPassword, request.NewPassword));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<string>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Ok(new ResponseMessage<string>
                 {
@@ -335,27 +216,10 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/forgot-password", async (
                 [FromBody] ForgotPasswordViewModel request,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new ForgotPasswordCommand(request.Email));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<string>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Ok(new ResponseMessage<string>
                 {
@@ -372,27 +236,10 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/reset-password", async (
                 [FromBody] ResetPasswordViewModel request,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new ResetPasswordCommand(request.Token, request.NewPassword));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<string>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Ok(new ResponseMessage<string>
                 {
@@ -411,7 +258,6 @@ namespace PhysioBoo.Presentation.Endpoints
                 [FromBody] ResetPasswordViewModel request,
                 HttpContext context,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 IUser user,
                 CancellationToken cancellationToken
             ) =>
@@ -421,23 +267,7 @@ namespace PhysioBoo.Presentation.Endpoints
                     return Results.Unauthorized();
                 }
 
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new RefreshTokenCommand(refreshToken));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<string>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Ok(new ResponseMessage<string>
                 {
@@ -454,27 +284,10 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/search", async (
                 [FromBody] PagedRequest<UserFilter> request,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 PagedResult<UserViewModel> result = await bus.QueryAsync(new GetAllUsersQuery(request));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<Guid>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Ok(new ResponseMessage<PagedResult<UserViewModel>>
                 {
@@ -491,27 +304,10 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/assign-role-to-user", async (
                 [FromBody] RoleForAssigningViewModel roleForAssigning,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new AssignRoleToUserCommand(roleForAssigning));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<Guid>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Ok();
             }).WithName("AssignRoleToUser")
@@ -525,27 +321,10 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/me", async (
                 IUser user,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 UserViewModel? result = await bus.QueryAsync(new GetUserByIdQuery(user.GetUserId()));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<Guid>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Ok(new ResponseMessage<UserViewModel?>
                 {

@@ -1,9 +1,11 @@
-﻿using MediatR;
+﻿using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecialty;
+using PhysioBoo.Application.Queries.MedicalSpecialties.GetAll;
 using PhysioBoo.Application.ViewModels.MedicalSpecialties;
 using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Notifications;
+using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
+using PhysioBoo.SharedKernel.Common;
 
 namespace PhysioBoo.Presentation.Endpoints
 {
@@ -13,33 +15,17 @@ namespace PhysioBoo.Presentation.Endpoints
         {
             RouteGroupBuilder group = app.MapGroup("api/medical-specialties")
                 .WithTags("Medical Specialties")
-                .WithOpenApi();
+                .WithOpenApi()
+                .AddEndpointFilter<NotificationResultFilter>();
 
-            // Create medical specialty
+            #region Create New Medical Specialty
             group.MapPost("/create", async (
                 CreateMedicalSpecialtyViewModel newMedicalSpecialty,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new CreateMedicalSpecialtyCommand(newMedicalSpecialty));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<Guid>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Created($"/api/medical-specialty/{newMedicalSpecialty.Id}", new ResponseMessage<Guid>
                 {
@@ -50,6 +36,27 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new medical specialty")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            #endregion
+
+            #region Get All Medical Specialties
+            group.MapPost("/search", async (
+                [FromBody] PagedRequest<MedicalSpecialtyFilter> request,
+                IMediatorHandler bus,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                PagedResult<MedicalSpecialtyViewModel> result = await bus.QueryAsync(new GetAllMedicalSpecialtiesQuery(request));
+
+                return Results.Ok(new ResponseMessage<PagedResult<MedicalSpecialtyViewModel>>
+                {
+                    Success = true,
+                    Data = result
+                });
+            }).WithName("SearchMedicalSpecialties")
+            .WithSummary("Retrieve a paginated list of medical specialties with filters and sorting.")
+            .Produces<ResponseMessage<PagedResult<MedicalSpecialtyViewModel>>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<PagedResult<MedicalSpecialtyViewModel>>>(StatusCodes.Status400BadRequest);
+            #endregion
         }
     }
 }

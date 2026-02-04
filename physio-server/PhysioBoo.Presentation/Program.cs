@@ -2,6 +2,7 @@
 using Aikido.Zen.DotNetCore;
 using HealthChecks.ApplicationStatus.DependencyInjection;
 using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using PhysioBoo.Application.Extensions;
@@ -12,6 +13,7 @@ using PhysioBoo.Infrastructure.Database;
 using PhysioBoo.Infrastructure.Extensions;
 using PhysioBoo.Presentation.Endpoints;
 using PhysioBoo.Presentation.Extensions;
+using PhysioBoo.Presentation.Middlewares;
 using PhysioBoo.Presentation.Warmup;
 using PhysioBoo.ServiceDefaults;
 using StackExchange.Profiling.Storage;
@@ -71,6 +73,7 @@ namespace PhysioBoo.Presentation
             builder.Services.AddNotificationHandlers();
             builder.Services.AddApiUser();
             builder.Services.AddCommandHandlers();
+            builder.Services.AddRegisterEPPlus();
             LogStep("Handlers added", ref stepTimer);
 
             builder.Services.AddAuth(builder.Configuration);
@@ -98,6 +101,8 @@ namespace PhysioBoo.Presentation
             builder.Services.AddPhysioBooConsumers(rabbitConfiguration.Host, rabbitConfiguration.Username, rabbitConfiguration.Password);
             builder.Services.AddHostedService<WarmupConnection>();
             builder.Services.AddHostedInfrastructureService();
+            builder.Services.AddRegisterThirdPartyService(builder.Configuration);
+            builder.Services.AddHttpClient();
 
             if (builder.Environment.IsProduction())
             {
@@ -235,6 +240,12 @@ namespace PhysioBoo.Presentation
                 app.UseZenFirewall();
             }
 
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+            app.UseMiddleware<SecurityGuardMiddleware>();
+
             #region Map endpoints
             void MapHealthcareEndpoints(WebApplication app)
             {
@@ -303,6 +314,11 @@ namespace PhysioBoo.Presentation
                 app.MapConfigEndpoints();
                 app.MapAdminMenuEndpoints();
             }
+            void MapSystemEndpoints(WebApplication app)
+            {
+                app.MapSys_ResourceEndpoints();
+                app.MapSystemEndpoints();
+            }
 
             MapCommonEndpoints(app);
             MapHealthcareEndpoints(app);
@@ -311,6 +327,7 @@ namespace PhysioBoo.Presentation
             MapDiagnosticEndpoints(app);
             MapPharmacyEndpoints(app);
             MapFinancialEndpoints(app);
+            MapSystemEndpoints(app);
             #endregion
 
             app.MapHealthChecks("/healthz", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions

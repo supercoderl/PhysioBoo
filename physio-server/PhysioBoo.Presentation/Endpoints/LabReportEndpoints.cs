@@ -1,8 +1,7 @@
-﻿using MediatR;
-using PhysioBoo.Application.Commands.LabReports.CreateLabReport;
+﻿using PhysioBoo.Application.Commands.LabReports.CreateLabReport;
 using PhysioBoo.Application.ViewModels.LabReports;
 using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Notifications;
+using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
 
 namespace PhysioBoo.Presentation.Endpoints
@@ -13,33 +12,17 @@ namespace PhysioBoo.Presentation.Endpoints
         {
             RouteGroupBuilder group = app.MapGroup("api/lab-reports")
                 .WithTags("Lab Reports")
-                .WithOpenApi();
+                .WithOpenApi()
+                .AddEndpointFilter<NotificationResultFilter>();
 
             // Create lab report
             group.MapPost("/create", async (
                 CreateLabReportViewModel newLabReport,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new CreateLabReportCommand(newLabReport));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<Guid>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Created($"/api/lab-reports/{newLabReport.Id}", new ResponseMessage<Guid>
                 {

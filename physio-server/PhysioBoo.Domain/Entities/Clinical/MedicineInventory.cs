@@ -31,16 +31,16 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public DateTime? LastUpdated { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey("MedicineId")]
-        [InverseProperty("MedicineInventories")]
+        [ForeignKey(nameof(MedicineId))]
+        [InverseProperty(nameof(Medicine.MedicineInventories))]
         public virtual Medicine? Medicine { get; private set; }
 
-        [ForeignKey("HospitalId")]
-        [InverseProperty("MedicineInventories")]
+        [ForeignKey(nameof(HospitalId))]
+        [InverseProperty(nameof(Hospital.MedicineInventories))]
         public virtual Hospital? Hospital { get; private set; }
 
-        [ForeignKey("SupplierId")]
-        [InverseProperty("MedicineInventories")]
+        [ForeignKey(nameof(SupplierId))]
+        [InverseProperty(nameof(Supplier.MedicineInventories))]
         public virtual Supplier? Supplier { get; private set; }
         #endregion
 

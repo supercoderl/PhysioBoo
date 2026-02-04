@@ -6,5 +6,6 @@
         public const string ObjectNotFound = "OBJECT_NOT_FOUND";
         public const string InsufficientPermissions = "UNAUTHORIZED";
         public const string DuplicateValue = "DUPLICATE_VALUE";
+        public const string InvalidValue = "INVALID_VALUE";
     }
 }

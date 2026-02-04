@@ -1,10 +1,9 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.Permissions.CreatePermission;
 using PhysioBoo.Application.Queries.Permissions.GetAll;
 using PhysioBoo.Application.ViewModels.Permissions;
 using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Notifications;
+using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
 using PhysioBoo.SharedKernel.Common;
 
@@ -16,33 +15,17 @@ namespace PhysioBoo.Presentation.Endpoints
         {
             RouteGroupBuilder group = app.MapGroup("api/Permissions")
                 .WithTags("Permission")
-                .WithOpenApi();
+                .WithOpenApi()
+                .AddEndpointFilter<NotificationResultFilter>();
 
             // Create Permission
             group.MapPost("/create", async (
                 [FromBody] CreatePermissionViewModel newPermission,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new CreatePermissionCommand(newPermission));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<Guid>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Created($"/api/Permissions/{newPermission.Id}", new ResponseMessage<Guid>
                 {
@@ -59,27 +42,10 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/search", async (
                 [FromBody] PagedRequest<PermissionFilter> request,
                 IMediatorHandler bus,
-                INotificationHandler<DomainNotification> handler,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 PagedResult<PermissionViewModel> result = await bus.QueryAsync(new GetAllPermissionsQuery(request));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<Guid>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Ok(new ResponseMessage<PagedResult<PermissionViewModel>>
                 {

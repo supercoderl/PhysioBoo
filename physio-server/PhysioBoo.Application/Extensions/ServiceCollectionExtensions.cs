@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using OfficeOpenXml;
 using PhysioBoo.Application.Commands.Addresses.CreateAddress;
 using PhysioBoo.Application.Commands.Appointments.CreateAppointment;
 using PhysioBoo.Application.Commands.AppointmentTypes.CreateAppointmentType;
@@ -31,6 +32,7 @@ using PhysioBoo.Application.Commands.LabTests.CreateLabTest;
 using PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer;
 using PhysioBoo.Application.Commands.MedicalRecords.CreateMedicalRecord;
 using PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecialty;
+using PhysioBoo.Application.Commands.MedicalSpecialties.DeleteMedicalSpecialty;
 using PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCategory;
 using PhysioBoo.Application.Commands.MedicineInventories.CreateMedicineInventory;
 using PhysioBoo.Application.Commands.Medicines.CreateMedicine;
@@ -47,6 +49,10 @@ using PhysioBoo.Application.Commands.Reviews;
 using PhysioBoo.Application.Commands.Roles.AssignPermissionToRole;
 using PhysioBoo.Application.Commands.Roles.CreateRole;
 using PhysioBoo.Application.Commands.Suppliers.CreateSupplier;
+using PhysioBoo.Application.Commands.Sys_Media.CreateMedia;
+using PhysioBoo.Application.Commands.Sys_Resources.ImportLocalResource;
+using PhysioBoo.Application.Commands.Sys_Resources.ImportRemoteResource;
+using PhysioBoo.Application.Commands.Systems.Ip;
 using PhysioBoo.Application.Commands.Users.AssignRoleToUser;
 using PhysioBoo.Application.Commands.Users.AssignRoleToUserUsingRoleId;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
@@ -66,9 +72,13 @@ using PhysioBoo.Application.EventHandlers.User;
 using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Application.Queries.AdminMenus.GetAll;
 using PhysioBoo.Application.Queries.Configurations.GetInitData;
+using PhysioBoo.Application.Queries.MedicalSpecialties.GetAll;
 using PhysioBoo.Application.Queries.Permissions.GetAll;
 using PhysioBoo.Application.Queries.RefreshTokens.GetByUserId;
 using PhysioBoo.Application.Queries.Roles.GetAll;
+using PhysioBoo.Application.Queries.Sys_Languages.GetAllLanguages;
+using PhysioBoo.Application.Queries.Sys_Resources.GetAllResources;
+using PhysioBoo.Application.Queries.Sys_Settings.GetAll;
 using PhysioBoo.Application.Queries.Users.GetAll;
 using PhysioBoo.Application.Queries.Users.GetByEmail;
 using PhysioBoo.Application.Queries.Users.GetById;
@@ -77,8 +87,11 @@ using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
 using PhysioBoo.Application.Services;
 using PhysioBoo.Application.ViewModels.AdminMenus;
 using PhysioBoo.Application.ViewModels.Configurations;
+using PhysioBoo.Application.ViewModels.MedicalSpecialties;
 using PhysioBoo.Application.ViewModels.Permissions;
 using PhysioBoo.Application.ViewModels.Roles;
+using PhysioBoo.Application.ViewModels.Sys_Languages;
+using PhysioBoo.Application.ViewModels.Sys_Settings;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Entities.Core;
@@ -109,6 +122,9 @@ namespace PhysioBoo.Application.Extensions
             // User
             services.AddScoped<IVerificationService, VerificationService>();
 
+            // Sys Resource
+            services.AddScoped<IResourceExcelProcessor, ResourceExcelProcessor>();
+
             return services;
         }
 
@@ -137,6 +153,18 @@ namespace PhysioBoo.Application.Extensions
             // Admin Menu
             services.AddScoped<IRequestHandler<GetAllAdminMenusQuery, PagedResult<AdminMenuViewModel>>, GetAllAdminMenusQueryHandler>();
 
+            // MedicalSpecialty
+            services.AddScoped<IRequestHandler<GetAllMedicalSpecialtiesQuery, PagedResult<MedicalSpecialtyViewModel>>, GetAllMedicalSpecialtiesQueryHandler>();
+
+            // System Language
+            services.AddScoped<IRequestHandler<GetAllLanguagesQuery, List<LanguageViewModel>>, GetAllLanguagesQueryHandler>();
+
+            // System Resource
+            services.AddScoped<IRequestHandler<GetAllResourceQuery, string>, GetAllResourceQueryHandler>();
+
+            // System Setting
+            services.AddScoped<IRequestHandler<GetAllSettingsQuery, PagedResult<SettingViewModel>>, GetAllSettingsQueryHandler>();
+
             return services;
         }
 
@@ -154,6 +182,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<CreateDoctorWorkExperienceCommand>, CreateDoctorWorkExperienceCommandHandler>();
             services.AddScoped<IRequestHandler<CreateHospitalStaffCommand>, CreateHospitalStaffCommandHandler>();
             services.AddScoped<IRequestHandler<CreateMedicalSpecialtyCommand>, CreateMedicalSpecialtyCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteMedicalSpecialtyCommand>, DeleteMedicalSpecialtyCommandHandler>();
             #endregion
 
             #region Core Flow
@@ -223,6 +252,14 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<CreateLabTestCategoryCommand>, CreateLabTestCategoryCommandHandler>();
             #endregion
 
+            #region System Flow
+            services.AddScoped<IRequestHandler<CreateMediaCommand>, CreateMediaCommandHandler>();
+            services.AddScoped<IRequestHandler<ImportLocalResourceCommand>, ImportLocalResourceCommandHandler>();
+            services.AddScoped<IRequestHandler<ImportRemoteResourceCommand>, ImportRemoteResourceCommandHandler>();
+            services.AddScoped<IRequestHandler<BlockIpCommand>, SecurityCommandHandler>();
+            services.AddScoped<IRequestHandler<UnblockIpCommand>, SecurityCommandHandler>();
+            #endregion
+
             return services;
         }
 
@@ -265,6 +302,12 @@ namespace PhysioBoo.Application.Extensions
                 });
             });
 
+            return services;
+        }
+
+        public static IServiceCollection AddRegisterEPPlus(this IServiceCollection services)
+        {
+            ExcelPackage.License.SetNonCommercialPersonal("PhysioBoo Application - NonCommercial Use");
             return services;
         }
     }

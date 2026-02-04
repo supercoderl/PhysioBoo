@@ -15,14 +15,14 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public string? StorageConditions { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey("ParentCategoryId")]
-        [InverseProperty("SubCategories")]
+        [ForeignKey(nameof(ParentCategoryId))]
+        [InverseProperty(nameof(ParentCategory.SubCategories))]
         public virtual MedicineCategory? ParentCategory { get; private set; }
 
-        [InverseProperty("Category")]
+        [InverseProperty(nameof(Medicine.Category))]
         public virtual ICollection<Medicine> Medicines { get; private set; } = new List<Medicine>();
 
-        [InverseProperty("ParentCategory")]
+        [InverseProperty(nameof(ParentCategory))]
         public virtual ICollection<MedicineCategory> SubCategories { get; private set; } = new List<MedicineCategory>();
         #endregion
 

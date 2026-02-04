@@ -3,6 +3,7 @@ using PhysioBoo.Application.Commands.DoctorWorkExperiences.CreateDoctorWorkExper
 using PhysioBoo.Application.ViewModels.DoctorWorkExperiences;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Notifications;
+using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
 
 namespace PhysioBoo.Presentation.Endpoints
@@ -13,7 +14,8 @@ namespace PhysioBoo.Presentation.Endpoints
         {
             RouteGroupBuilder group = app.MapGroup("api/doctor-work-experiences")
                 .WithTags("Doctor Work Experiences")
-                .WithOpenApi();
+                .WithOpenApi()
+                .AddEndpointFilter<NotificationResultFilter>();
 
             // Create doctor work experience
             group.MapPost("/create", async (
@@ -23,23 +25,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 await bus.SendCommandAsync(new CreateDoctorWorkExperienceCommand(newDoctorWorkExperience));
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<Guid>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Created($"/api/doctor-work-experiences/{newDoctorWorkExperience.Id}", new ResponseMessage<Guid>
                 {

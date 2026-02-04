@@ -57,18 +57,18 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public DateTime CreatedAt { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("CategoryId")]
-        [InverseProperty("Medicines")]
+        [ForeignKey(nameof(CategoryId))]
+        [InverseProperty(nameof(Category.Medicines))]
         public virtual MedicineCategory? Category { get; private set; }
 
-        [ForeignKey("ManufacturerId")]
-        [InverseProperty("Medicines")]
+        [ForeignKey(nameof(ManufacturerId))]
+        [InverseProperty(nameof(Manufacturer.Medicines))]
         public virtual Manufacturer? Manufacturer { get; private set; }
 
-        [InverseProperty("Medicine")]
+        [InverseProperty(nameof(Medicine))]
         public virtual ICollection<MedicineInventory> MedicineInventories { get; private set; } = new List<MedicineInventory>();
 
-        [InverseProperty("Medicine")]
+        [InverseProperty(nameof(Medicine))]
         public virtual ICollection<PrescriptionItem> PrescriptionItems { get; private set; } = new List<PrescriptionItem>();
         #endregion
 

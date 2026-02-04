@@ -1,8 +1,7 @@
-﻿using MediatR;
-using PhysioBoo.Application.Queries.Configurations.GetInitData;
+﻿using PhysioBoo.Application.Queries.Configurations.GetInitData;
 using PhysioBoo.Application.ViewModels.Configurations;
 using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Notifications;
+using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
 
 namespace PhysioBoo.Presentation.Endpoints
@@ -13,33 +12,17 @@ namespace PhysioBoo.Presentation.Endpoints
         {
             RouteGroupBuilder group = app.MapGroup("api")
                 .WithTags("Configuration")
-                .WithOpenApi();
+                .WithOpenApi()
+                .AddEndpointFilter<NotificationResultFilter>();
 
             #region Get configuration data
             group.MapPost("/config", async (
                 HttpRequest request,
-                INotificationHandler<DomainNotification> handler,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                DomainNotificationHandler notifications = (DomainNotificationHandler)handler;
-
                 InitDataViewModel result = await bus.QueryAsync(new GetInitDataQuery());
-
-                if (notifications.HasNotifications())
-                {
-                    return Results.BadRequest(new ResponseMessage<Guid>
-                    {
-                        Success = false,
-                        Errors = notifications.GetNotifications().Select(n => n.Value),
-                        DetailedErrors = notifications.GetNotifications().Select(n => new DetailedError
-                        {
-                            Code = n.Code,
-                            Data = n.Data
-                        })
-                    });
-                }
 
                 return Results.Ok(new ResponseMessage<InitDataViewModel>
                 {

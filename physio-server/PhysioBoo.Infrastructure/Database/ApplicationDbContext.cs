@@ -6,6 +6,7 @@ using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
+using PhysioBoo.Domain.Entities.System;
 using PhysioBoo.Infrastructure.Configuration;
 using PhysioBoo.Infrastructure.Outbox;
 
@@ -66,6 +67,12 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<AdminMenu> AdminMenus { get; set; } = null!;
         public DbSet<SystemSetting> SystemSettings { get; set; } = null!;
         public DbSet<UserLogin> UserLogins { get; set; } = null!;
+        public DbSet<Sys_MediaFile> Sys_MediaFiles { get; set; } = null!;
+        public DbSet<Sys_Language> Sys_Languages { get; set; } = null!;
+        public DbSet<Sys_Resource> Sys_Resources { get; set; } = null!;
+        public DbSet<Sys_Setting> Sys_Settings { get; set; } = null!;
+        public DbSet<Sys_Device> Sys_Devices { get; set; } = null!;
+        public DbSet<Sys_AppVersion> Sys_AppVersions { get; set; } = null!;
         #endregion
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
@@ -155,6 +162,12 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new AdminMenuConfiguration());
             builder.ApplyConfiguration(new SystemSettingConfiguration());
             builder.ApplyConfiguration(new UserLoginConfiguration());
+            builder.ApplyConfiguration(new Sys_MediaFileConfiguration());
+            builder.ApplyConfiguration(new Sys_LanguageConfiguration());
+            builder.ApplyConfiguration(new Sys_ResourceConfiguration());
+            builder.ApplyConfiguration(new Sys_SettingConfiguration());
+            builder.ApplyConfiguration(new Sys_DeviceConfiguration());
+            builder.ApplyConfiguration(new Sys_AppVersionConfiguration());
         }
     }
 }

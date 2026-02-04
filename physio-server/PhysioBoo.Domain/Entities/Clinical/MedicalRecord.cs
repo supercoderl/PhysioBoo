@@ -46,27 +46,27 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public DateTime CreatedAt { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("PatientId")]
-        [InverseProperty("MedicalRecords")]
+        [ForeignKey(nameof(PatientId))]
+        [InverseProperty(nameof(Patient.MedicalRecords))]
         public virtual Patient? Patient { get; private set; }
 
-        [ForeignKey("AppointmentId")]
-        [InverseProperty("MedicalRecords")]
+        [ForeignKey(nameof(AppointmentId))]
+        [InverseProperty(nameof(Appointment.MedicalRecords))]
         public virtual Appointment? Appointment { get; private set; }
 
-        [ForeignKey("DoctorId")]
-        [InverseProperty("MedicalRecords")]
+        [ForeignKey(nameof(DoctorId))]
+        [InverseProperty(nameof(Doctor.MedicalRecords))]
         public virtual Doctor? Doctor { get; private set; }
 
-        [ForeignKey("HospitalId")]
-        [InverseProperty("MedicalRecords")]
+        [ForeignKey(nameof(HospitalId))]
+        [InverseProperty(nameof(Hospital.MedicalRecords))]
         public virtual Hospital? Hospital { get; private set; }
 
-        [ForeignKey("CreatedBy")]
-        [InverseProperty("CreatedMedicalRecords")]
+        [ForeignKey(nameof(CreatedBy))]
+        [InverseProperty(nameof(Creator.CreatedMedicalRecords))]
         public virtual User? Creator { get; private set; }
 
-        [InverseProperty("MedicalRecord")]
+        [InverseProperty(nameof(MedicalRecord))]
         public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();
         #endregion
 

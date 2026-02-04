@@ -4,6 +4,7 @@ using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
+using PhysioBoo.Shared.Events.MedicalSpecialties;
 
 namespace PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecialty
 {
@@ -46,6 +47,8 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecial
 
                 return;
             }
+
+            await Bus.RaiseEventAsync(new MedicalSpecialtyCreatedEvent(result.Id, request.NewMedicalSpecialty.IconPublicId, request.NewMedicalSpecialty.IconUrl));
         }
     }
 }

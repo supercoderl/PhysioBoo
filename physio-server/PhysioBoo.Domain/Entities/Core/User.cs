@@ -4,6 +4,7 @@ using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
+using PhysioBoo.Domain.Entities.System;
 using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -155,6 +156,9 @@ namespace PhysioBoo.Domain.Entities.Core
 
         [InverseProperty("User")]
         public virtual ICollection<UserLogin> UserLogins { get; private set; } = new List<UserLogin>();
+
+        [InverseProperty(nameof(Sys_Device.User))]
+        public virtual ICollection<Sys_Device> Sys_Devices { get; private set; } = new List<Sys_Device>();
 
         [InverseProperty(nameof(User))]
         public virtual Profile? Profile { get; private set; }

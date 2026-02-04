@@ -9,6 +9,7 @@
         string? Description,
         string? RequiredQualifications,
         Guid? ParentSpecialtyId,
-        string? IconUrl
+        string? IconUrl,
+        string? IconPublicId
     );
 }

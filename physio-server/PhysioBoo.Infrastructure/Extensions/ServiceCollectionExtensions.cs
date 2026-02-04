@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using CloudinaryDotNet;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,6 +7,7 @@ using PhysioBoo.Domain.DomainEvents;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
+using PhysioBoo.Infrastructure.BackgroundJobs;
 using PhysioBoo.Infrastructure.Database;
 using PhysioBoo.Infrastructure.Email;
 using PhysioBoo.Infrastructure.EventSourcing;
@@ -97,6 +99,12 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IAdminMenuRepository, AdminMenuRepository>();
             services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
             services.AddScoped<IUserLoginRepository, UserLoginRepository>();
+            services.AddScoped<ISys_MediaFileRepository, Sys_MediaFileRepository>();
+            services.AddScoped<ISys_LanguageRepository, Sys_LanguageRepository>();
+            services.AddScoped<ISys_ResourceRepository, Sys_ResourceRepository>();
+            services.AddScoped<ISys_SettingRepository, Sys_SettingRepository>();
+            services.AddScoped<ISys_DeviceRepository, Sys_DeviceRepository>();
+            services.AddScoped<ISys_AppVersionRepository, Sys_AppVersionRepository>();
 
             return services;
         }
@@ -113,6 +121,28 @@ namespace PhysioBoo.Infrastructure.Extensions
         public static IServiceCollection AddHostedInfrastructureService(this IServiceCollection services)
         {
             services.AddHostedService<OutboxProcessor>();
+            services.AddHostedService<CloudinaryCleanupJob>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddRegisterThirdPartyService(this IServiceCollection services, IConfiguration configuration)
+        {
+            #region Cloudinary
+            IConfigurationSection cloudSection = configuration.GetSection("ThirdParty:Cloudinary");
+            if (!cloudSection.Exists())
+            {
+                throw new Exception("The 'ThirdParty:Cloudinary' configuration is missing from your appsettings.json!");
+            }
+
+            Account account = new Account(
+                cloudSection["CloudName"],
+                cloudSection["ApiKey"],
+                cloudSection["SecretKey"]
+            );
+
+            services.AddSingleton(new Cloudinary(account));
+            #endregion
 
             return services;
         }

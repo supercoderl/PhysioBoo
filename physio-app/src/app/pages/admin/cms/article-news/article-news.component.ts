@@ -19,7 +19,7 @@ import { Article } from "../../../../shared/types/article";
         </div>
 
         <!-- Search and Filter Bar -->
-        <div class="bg-white rounded-lg shadow-sm p-4 mb-8">
+        <div class="bg-surface rounded-lg shadow-sm p-4 mb-8">
           <div class="flex flex-col md:flex-row gap-4">
             <div class="flex-1">
               <input
@@ -48,7 +48,7 @@ import { Article } from "../../../../shared/types/article";
         <!-- Featured Article -->
         <div *ngIf="featuredArticle" class="mb-12">
           <h2 class="text-2xl font-bold text-gray-900 mb-4">Featured Article</h2>
-          <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          <div class="bg-surface rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
             <div class="md:flex">
               <div class="md:w-1/2">
                 <img
@@ -88,7 +88,7 @@ import { Article } from "../../../../shared/types/article";
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div
               *ngFor="let article of filteredArticles"
-              class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+              class="bg-surface rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
             >
               <img
                 [src]="article.imageUrl"
@@ -128,19 +128,19 @@ import { Article } from "../../../../shared/types/article";
         <!-- Pagination -->
         <div class="mt-12 flex justify-center">
           <nav class="inline-flex rounded-lg shadow-sm">
-            <button class="px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-l-lg hover:bg-gray-50">
+            <button class="px-4 py-2 border border-gray-300 bg-surface text-gray-700 rounded-l-lg hover:bg-gray-50">
               Previous
             </button>
             <button class="px-4 py-2 border-t border-b border-gray-300 bg-blue-600 text-white">
               1
             </button>
-            <button class="px-4 py-2 border-t border-b border-gray-300 bg-white text-gray-700 hover:bg-gray-50">
+            <button class="px-4 py-2 border-t border-b border-gray-300 bg-surface text-gray-700 hover:bg-gray-50">
               2
             </button>
-            <button class="px-4 py-2 border-t border-b border-gray-300 bg-white text-gray-700 hover:bg-gray-50">
+            <button class="px-4 py-2 border-t border-b border-gray-300 bg-surface text-gray-700 hover:bg-gray-50">
               3
             </button>
-            <button class="px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-r-lg hover:bg-gray-50">
+            <button class="px-4 py-2 border border-gray-300 bg-surface text-gray-700 rounded-r-lg hover:bg-gray-50">
               Next
             </button>
           </nav>

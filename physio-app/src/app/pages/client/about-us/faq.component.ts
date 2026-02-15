@@ -9,7 +9,7 @@ import { SharedModule } from "../../../shared/shared-imports";
         SharedModule
     ],
     template: `
-    <section class="py-10 md:py-15 bg-white relative overflow-hidden block">
+    <section class="py-10 md:py-15 bg-surface relative overflow-hidden block">
         <div class="container mx-auto">
             <div class="flex justify-center">
                 <div class="px-3">
@@ -26,7 +26,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                             alt="img"
                             src="https://doccure.dreamstechnologies.com/react/template/assets/faq-img-B8p_djQ0.png"
                         />
-                        <div id="faq-count" class="bg-white rounded-[10px] p-3.75 min-w-55.5 absolute -bottom-10 left-1/2 -translate-x-1/2 flex-center-between">
+                        <div id="faq-count" class="bg-surface rounded-[10px] p-3.75 min-w-55.5 absolute -bottom-10 left-1/2 -translate-x-1/2 flex-center-between">
                             <div class="mr-4">
                                 <img
                                     alt="icon"

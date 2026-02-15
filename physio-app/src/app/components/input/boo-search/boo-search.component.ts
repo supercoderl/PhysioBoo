@@ -11,7 +11,7 @@ import { SharedModule } from '../../../shared/shared-imports';
     <div class="sm:w-64 w-full flex flex-col relative">
       <div
         aria-label="Search"
-        class="text-[13px] leading-[1.4375em] text-[#1F232B] inline-flex items-center relative rounded-[8px] min-h-8 h-auto bg-white border border-solid border-[#0000003b]"
+        class="text-[13px] leading-[1.4375em] text-[#1F232B] inline-flex items-center relative rounded-[8px] min-h-8 h-auto bg-surface border border-solid border-[#0000003b]"
       >
         <input
           aria-invalid="false"

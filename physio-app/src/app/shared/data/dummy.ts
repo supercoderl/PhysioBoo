@@ -1201,6 +1201,7 @@ export const MEDICAL_CATEGORIES = [
 
 // #region Default Values
 export const AVATAR = 'assets/images/default/avatar.png';
+export const DEFAULT_IMAGE = 'assets/images/default/default.png';
 
 export const USER: User = {
     id: generateUUID(),
@@ -1231,6 +1232,7 @@ export const CATEGORIES_MANAGEMENT = [
     {
         id: 1,
         name: "Medical Specialties",
+        description: "Manage and organize medical specialties used across the system for accurate classification and administration.",
         icon: "origami",
         route: "/admin/system/common-category/medical-specialty"
     },

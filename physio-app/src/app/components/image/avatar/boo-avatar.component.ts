@@ -10,7 +10,7 @@ import { SharedModule } from "../../../shared/shared-imports";
     ],
     template: `
         <div
-            class="rounded-[6px] h-10 w-10 p-1 relative flex-center-center overflow-hidden text-[13px] bg-white text-[#4B5563]"
+            class="rounded-[6px] h-10 w-10 p-1 relative flex-center-center overflow-hidden text-[13px] bg-surface text-[#4B5563]"
         >
             <img
                 alt="user photo"

@@ -20,7 +20,7 @@ import { Banner } from "../../../../shared/types/banner";
         </div>
 
         <!-- Tab Navigation -->
-        <div class="bg-white rounded-lg shadow-sm mb-6">
+        <div class="bg-surface rounded-lg shadow-sm mb-6">
           <div class="border-b border-gray-200">
             <nav class="flex -mb-px">
               <button
@@ -40,7 +40,7 @@ import { Banner } from "../../../../shared/types/banner";
 
         <!-- Hero Banners Tab -->
         <div *ngIf="activeTab === 'banners'">
-          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
             <div class="flex justify-between items-center mb-6">
               <h2 class="text-xl font-semibold text-gray-900">Hero Banners</h2>
               <button
@@ -110,7 +110,7 @@ import { Banner } from "../../../../shared/types/banner";
 
         <!-- Features Tab -->
         <div *ngIf="activeTab === 'features'">
-          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
             <div class="flex justify-between items-center mb-6">
               <h2 class="text-xl font-semibold text-gray-900">Features</h2>
               <button
@@ -170,7 +170,7 @@ import { Banner } from "../../../../shared/types/banner";
 
         <!-- Testimonials Tab -->
         <div *ngIf="activeTab === 'testimonials'">
-          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
             <div class="flex justify-between items-center mb-6">
               <h2 class="text-xl font-semibold text-gray-900">Patient Testimonials</h2>
               <button
@@ -236,7 +236,7 @@ import { Banner } from "../../../../shared/types/banner";
 
         <!-- General Settings Tab -->
         <div *ngIf="activeTab === 'settings'">
-          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
             <h2 class="text-xl font-semibold text-gray-900 mb-6">General Settings</h2>
             
             <div class="space-y-6">
@@ -333,7 +333,7 @@ import { Banner } from "../../../../shared/types/banner";
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
         (click)="showBannerModal = false"
       >
-        <div class="bg-white rounded-lg max-w-2xl w-full p-6" (click)="$event.stopPropagation()">
+        <div class="bg-surface rounded-lg max-w-2xl w-full p-6" (click)="$event.stopPropagation()">
           <h2 class="text-2xl font-bold text-gray-900 mb-6">
             {{ editingBanner ? 'Edit Banner' : 'Add New Banner' }}
           </h2>

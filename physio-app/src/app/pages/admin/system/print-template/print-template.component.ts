@@ -12,7 +12,7 @@ import { LabTest } from "../../../../shared/types/lab-test";
     SharedModule
   ],
   template: `
-    <div class="print-container bg-white p-8 max-w-4xl mx-auto">
+    <div class="print-container bg-surface p-8 max-w-4xl mx-auto">
   <!-- Print Button - Hidden during print -->
   <div class="no-print mb-6 flex justify-end">
     <button 

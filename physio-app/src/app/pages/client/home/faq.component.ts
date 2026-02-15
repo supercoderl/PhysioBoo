@@ -24,7 +24,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                         <div>
                             <div id="faq-details">
                                 <div 
-                                    class="bg-white pb-6 border-b border-solid border-borderGray rounded-1.5 mb-6"
+                                    class="bg-surface pb-6 border-b border-solid border-borderGray rounded-1.5 mb-6"
                                     *ngFor="let item of faqs; let i = index"
                                 >
                                     <h2 class="relative m-0 text-2.5xl font-bold" [id]="'heading' + i">

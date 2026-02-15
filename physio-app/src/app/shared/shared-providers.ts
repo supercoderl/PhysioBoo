@@ -1,4 +1,4 @@
-import { ALargeSmall, Angry, Annoyed, ArrowRight, ArrowUpDown, Badge, BadgeCheck, Banknote, BarChart3, Bell, Blocks, Bookmark, BoomBox, Brain, Briefcase, BriefcaseMedical, Building2, Calendar, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, CircleCheck, CircleCheckBig, CirclePlus, CirclePower, CircleUser, CircleX, ClipboardCheck, ClipboardList, ClipboardPlus, Clock, Cloud, CreditCard, Database, DatabaseBackup, Download, Droplet, EllipsisVertical, Eye, EyeOff, FileCheck, FilePlus, FileText, Flag, Flame, FlaskConical, Folder, FolderOpen, Frown, Funnel, Gauge, Gift, Globe, GraduationCap, Handbag, Hash, Headphones, Heart, HeartPulse, House, Image, Info, Key, LandPlot, LayoutGrid, LayoutTemplate, List, ListFilter, Loader, Lock, LogIn, LucideIconData, Mail, MapPin, Maximize, Megaphone, Meh, Menu, MessageCircleQuestionMark, MessageCircleWarning, Minimize, MonitorCheck, Moon, MoveLeft, Newspaper, Origami, Palette, PanelLeft, Pencil, Phone, Play, Plus, Printer, Rainbow, Scissors, Search, Settings, Share, ShieldCheck, ShoppingCart, Smile, Star, Stethoscope, Sun, Telescope, TestTube, Trash2, Triangle, Undo2, Upload, User, UserCheck, UserCog, UserPlus, UserRound, Users, Warehouse, X } from 'lucide-angular';
+import { ALargeSmall, Angry, Annoyed, ArrowRight, ArrowUpDown, Badge, BadgeCheck, Banknote, BarChart3, Bell, Blocks, Bookmark, BoomBox, Brain, Briefcase, BriefcaseMedical, Building2, Calendar, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, CircleCheck, CircleCheckBig, CirclePlus, CirclePower, CircleUser, CircleX, ClipboardCheck, ClipboardList, ClipboardPlus, Clock, Cloud, CreditCard, Database, DatabaseBackup, Download, Droplet, Ellipsis, EllipsisVertical, Eye, EyeOff, FileCheck, FilePlus, FileText, Flag, Flame, FlaskConical, Folder, FolderOpen, Frown, Funnel, Gauge, Gift, Globe, GraduationCap, Handbag, Hash, Headphones, Heart, HeartPulse, House, Image, Info, Key, LandPlot, LayoutGrid, LayoutTemplate, List, ListFilter, Loader, LoaderCircle, Lock, LogIn, LucideIconData, Mail, MapPin, Maximize, Megaphone, Meh, Menu, MessageCircleQuestionMark, MessageCircleWarning, Minimize, MonitorCheck, Moon, MoveLeft, Newspaper, Origami, Palette, PanelLeft, Pencil, Phone, Play, Plus, Printer, Rainbow, RefreshCw, Scissors, Search, Settings, Share, ShieldCheck, ShoppingCart, Smile, Star, Stethoscope, Sun, Telescope, TestTube, Trash2, Triangle, Undo2, Upload, User, UserCheck, UserCog, UserPlus, UserRound, Users, Warehouse, X } from 'lucide-angular';
 import { NzAffixModule } from 'ng-zorro-antd/affix';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzAnchorModule } from 'ng-zorro-antd/anchor';
@@ -276,7 +276,10 @@ export const SHARED_LUCIDE_ICONS: Record<string, LucideIconData> = {
     CircleCheckBig,
     Upload,
     Pencil,
-    Trash2
+    Trash2,
+    RefreshCw,
+    Ellipsis,
+    LoaderCircle
 }
 
 export const SHARED_PIPES = [

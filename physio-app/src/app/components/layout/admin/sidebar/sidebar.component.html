@@ -1,7 +1,7 @@
 <div>
   <div
     [ngClass]="{
-      'fixed md:sticky top-0 z-20 h-screen flex-auto shrink-0 flex-col border-r border-solid border-[#E5E7EB] transition-all duration-500': true,
+      'fixed md:sticky top-0 z-20 h-screen flex-auto shrink-0 flex-col border-r border-solid border-borderGray transition-all duration-500': true,
       'min-w-0 w-0 max-w-0 md:min-w-[280px] md:w-[280px] md:max-w-[280px]':
         !isCollapsed,
       'min-w-[280px] w-[280px] max-w-[280px] shadow-lg md:shadow-none md:min-w-0 md:w-0 md:max-w-0':
@@ -9,7 +9,7 @@
     }"
   >
     <div
-      class="flex h-full flex-auto flex-col overflow-hidden text-[#1F232B] bg-[#E5E7EB]"
+      class="flex h-full flex-auto flex-col overflow-hidden text-[#1F232B] bg-menu transition-all duration-300"
     >
       <div class="flex h-12 shrink-0 flex-row items-center px-5 md:h-16">
         <div class="flex flex-shrink-0 flex-grow items-center gap-3">
@@ -47,7 +47,7 @@
               >
                 <div class="flex min-w-0 flex-auto flex-col items-start gap-1">
                   <p
-                    class="leading-none truncate max-w-full m-0 font-medium m-0 text-[13px] text-[#1565C0]"
+                    class="leading-none truncate max-w-full m-0 font-medium m-0 text-[13px] text-secondary"
                   >
                     {{ menu.label }}
                   </p>
@@ -83,22 +83,22 @@
                 [allowBorder]="true"
               />
               <div class="flex flex-auto flex-col gap-2">
-                <span class="flex truncate leading-none font-semibold tracking-tight capitalize text-base m-0">
+                <span class="flex truncate leading-none font-semibold tracking-tight capitalize text-base text-regular m-0">
                   asdasdsa
                 </span
                 >
                 <p
-                  class="flex leading-none font-medium tracking-tighter text-md m-0 text-[#4B5563]"
+                  class="flex leading-none font-medium tracking-tighter text-md m-0 text-regular"
                 >
                   {{ (userInfo$ | async)?.email }}
                 </p>
               </div>
               <div class="flex shrink-0 items-center gap-2">
-                <lucide-icon [name]="info" class="w-4 h-4"></lucide-icon>
-                <lucide-icon [name]="chevronUp" class="w-4 h-4"></lucide-icon>
+                <lucide-icon [name]="info" class="w-4 h-4 stroke-regular"></lucide-icon>
+                <lucide-icon [name]="chevronUp" class="w-4 h-4 stroke-regular"></lucide-icon>
               </div>
             </button>
-            <div content class="min-w-32 max-w-32 bg-white rounded-[8px]">
+            <div content class="min-w-32 max-w-32 bg-surface rounded-[8px]">
               <button-icon
                 [icon]="{ name: 'circle-user' }"
                 buttonClass="border-0 w-full !justify-start"

@@ -21,7 +21,7 @@
         </boo-button-admin>
         <ng-template #menuExportRef>
           <ul
-            class="p-2 m-0 block min-w-50 bg-white rounded-[5px]"
+            class="p-2 m-0 block min-w-50 bg-surface rounded-[5px]"
             @dropdownState
           >
             <li>
@@ -42,7 +42,7 @@
         </ng-template>
       </div>
       <div
-        class="bg-white border shadow-sm rounded px-1 pb-0 text-center flex-center-center"
+        class="bg-surface border shadow-sm rounded px-1 pb-0 text-center flex-center-center"
       >
         <button-icon
           [icon]="{ name: 'list' }"
@@ -50,7 +50,7 @@
         />
         <button-icon
           [icon]="{ name: 'calendar' }"
-          buttonClass="!bg-white border-0 !p-1"
+          buttonClass="!bg-surface border-0 !p-1"
         />
       </div>
       <button-icon
@@ -77,7 +77,7 @@
       <div class="flex right-content items-center flex-wrap">
         <boo-button-admin
           [icon]="{ name: 'calendar', size: 14, color: '#6C7688' }"
-          buttonClass="!bg-white h-full"
+          buttonClass="!bg-surface h-full"
           [border]="{ width: 1, color: '#e3e3e3' }"
           [dropdown]="menuDateRangeRef"
         >
@@ -86,7 +86,7 @@
       </div>
       <ng-template #menuDateRangeRef>
         <ul
-          class="p-2 m-0 block min-w-50 bg-white rounded-[5px]"
+          class="p-2 m-0 block min-w-50 bg-surface rounded-[5px]"
           @dropdownState
         >
           <li>
@@ -113,14 +113,14 @@
       <div class="dropdown me-2">
         <boo-button-admin
           [icon]="{ name: 'funnel', size: 14, color: '#6C7688' }"
-          buttonClass="!bg-white h-full"
+          buttonClass="!bg-surface h-full"
           [border]="{ width: 1, color: '#e3e3e3' }"
           >Filter</boo-button-admin
         >
       </div>
       <div class="dropdown">
         <boo-button-admin
-          buttonClass="!bg-white h-full"
+          buttonClass="!bg-surface h-full"
           [border]="{ width: 1, color: '#e3e3e3' }"
           [dropdown]="menuSortRef"
         >
@@ -129,7 +129,7 @@
       </div>
       <ng-template #menuSortRef>
         <ul
-          class="p-2 m-0 block min-w-50 bg-white rounded-[5px]"
+          class="p-2 m-0 block min-w-50 bg-surface rounded-[5px]"
           @dropdownState
         >
           <li>

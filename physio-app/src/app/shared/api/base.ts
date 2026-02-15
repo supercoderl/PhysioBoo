@@ -9,7 +9,9 @@ export const BASE_API = {
   REGISTER: '/api/users/register',
   MEDICALSPECIALTY: {
     SEARCH: '/api/medical-specialties/search',
+    SEARCH_BY_ID: '/api/medical-specialties/search-by-id',
     CREATE: '/api/medical-specialties/create',
-    DELETE: '/api/medical-specialties/delete'
+    DELETE: '/api/medical-specialties/delete',
+    UPDATE: '/api/medical-specialties/update'
   }
 };

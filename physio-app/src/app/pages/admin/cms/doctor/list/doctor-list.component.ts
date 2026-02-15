@@ -33,7 +33,7 @@ import { BooTableComponent } from "../../../../../components/table/boo-table/boo
             </div>
         </admin-content-header>
         <div class="relative z-10 container flex h-full flex-auto flex-col overflow-hidden">
-            <div class="flex flex-1 z-[2] max-w-full min-w-0 h-full bg-white rounded-t-3 rounded-r-3 mt-0.5 mx-0.5">
+            <div class="flex flex-1 z-[2] max-w-full min-w-0 h-full bg-surface rounded-t-3 rounded-r-3 mt-0.5 mx-0.5">
                 <div class="overflow-hidden flex flex-col flex-1">
                     <boo-table></boo-table>
                 </div>

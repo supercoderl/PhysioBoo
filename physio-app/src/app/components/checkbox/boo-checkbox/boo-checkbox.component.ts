@@ -79,7 +79,7 @@ export class BooCheckboxComponent implements ControlValueAccessor {
     `;
     const stateClass = this.model
       ? `bg-primary border-primary before:opacity-100` 
-      : `bg-white border-gray-300 before:opacity-0 hover:border-primary`;
+      : `bg-surface border-gray-300 before:opacity-0 hover:border-primary`;
     const disabledClass = this.disabled ? '!cursor-not-allowed !bg-gray-100 !border-gray-200' : '';
     return `${base} ${stateClass} ${disabledClass}`;
   }

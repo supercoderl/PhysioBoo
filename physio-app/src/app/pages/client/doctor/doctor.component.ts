@@ -21,13 +21,13 @@ import { MapDoctorComponent } from "./map.component";
     template: `
         <breadcrumb title="Doctors" [isHidden]="false">
             <div id="doctor-form" class="max-w-[816px] w-full mx-auto mt-5 -mb-20 p-0.5 text-white rounded-full">
-                <div class="p-2 min-w-[800px] w-full bg-white border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] m-0 table relative z-[1] rounded-full">
+                <div class="p-2 min-w-[800px] w-full bg-surface border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] m-0 table relative z-[1] rounded-full">
                     <form class="flex-center-between float-left w-full">
                         <div class="w-[35%] float-left table-cell align-middle relative before:absolute before:top-1/2 before:-translate-y-1/2 before:right-0 before:w-[1px] before:h-11 before:bg-[#e3e4e8] before:content-[''] before:z-[1]">
                             <lucide-angular [img]="Hospital" class="w-4.5 stroke-[#8894ae] absolute top-1/2 -translate-y-1/2" />
                             <div class="mb-0">
                                 <input 
-                                    class="h-10 pr-2.5 pl-6.25 outline-none border-0 text-primary min-h-9.5 bg-white text-xs14 rounded-1.25 transition-smooth block w-full" 
+                                    class="h-10 pr-2.5 pl-6.25 outline-none border-0 text-primary min-h-9.5 bg-surface text-xs14 rounded-1.25 transition-smooth block w-full" 
                                     placeholder="Search for Doctors, Hospitals, Clinics" 
                                     type="text"
                                 >
@@ -37,7 +37,7 @@ import { MapDoctorComponent } from "./map.component";
                             <lucide-angular [img]="MapPin" class="w-4.5 stroke-[#8894ae] absolute top-1/2 -translate-y-1/2" />
                             <div class="mb-0">
                                 <input 
-                                    class="h-10 px-9 outline-none border-0 text-primary min-h-9.5 bg-white text-xs14 rounded-1.25 transition-smooth block w-full" 
+                                    class="h-10 px-9 outline-none border-0 text-primary min-h-9.5 bg-surface text-xs14 rounded-1.25 transition-smooth block w-full" 
                                     placeholder="Location" 
                                     type="text"
                                 >

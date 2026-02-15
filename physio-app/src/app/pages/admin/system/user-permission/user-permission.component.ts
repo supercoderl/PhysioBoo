@@ -19,7 +19,7 @@ import { Permission } from "../../../../shared/types/permission";
         </div>
 
         <!-- Tabs -->
-        <div class="bg-white rounded-lg shadow-sm mb-6">
+        <div class="bg-surface rounded-lg shadow-sm mb-6">
           <div class="border-b border-gray-200">
             <nav class="flex -mb-px">
               <button
@@ -53,7 +53,7 @@ import { Permission } from "../../../../shared/types/permission";
         <!-- Users Tab -->
         <div *ngIf="activeTab === 'users'" class="space-y-6">
           <!-- Search and Filter Bar -->
-          <div class="bg-white p-4 rounded-lg shadow-sm">
+          <div class="bg-surface p-4 rounded-lg shadow-sm">
             <div class="flex flex-col md:flex-row gap-4">
               <div class="flex-1">
                 <input
@@ -83,7 +83,7 @@ import { Permission } from "../../../../shared/types/permission";
           </div>
 
           <!-- Users Table -->
-          <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div class="bg-surface rounded-lg shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
               <table class="w-full">
                 <thead class="bg-gray-50 border-b border-gray-200">
@@ -96,7 +96,7 @@ import { Permission } from "../../../../shared/types/permission";
                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-surface divide-y divide-gray-200">
                   <tr *ngFor="let user of filteredUsers()" class="hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="flex items-center">
@@ -145,7 +145,7 @@ import { Permission } from "../../../../shared/types/permission";
 
         <!-- Permissions Tab -->
         <div *ngIf="activeTab === 'permissions'" class="space-y-6">
-          <div class="bg-white p-4 rounded-lg shadow-sm">
+          <div class="bg-surface p-4 rounded-lg shadow-sm">
             <div class="flex justify-between items-center">
               <input
                 type="text"
@@ -162,7 +162,7 @@ import { Permission } from "../../../../shared/types/permission";
 
           <!-- Permission Categories -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div *ngFor="let category of getPermissionCategories()" class="bg-white rounded-lg shadow-sm p-6">
+            <div *ngFor="let category of getPermissionCategories()" class="bg-surface rounded-lg shadow-sm p-6">
               <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ category }}</h3>
               <div class="space-y-3">
                 <div *ngFor="let permission of getPermissionsByCategory(category)" class="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
@@ -183,7 +183,7 @@ import { Permission } from "../../../../shared/types/permission";
 
         <!-- Roles Tab -->
         <div *ngIf="activeTab === 'roles'" class="space-y-6">
-          <div class="bg-white p-4 rounded-lg shadow-sm">
+          <div class="bg-surface p-4 rounded-lg shadow-sm">
             <div class="flex justify-between items-center">
               <h2 class="text-xl font-semibold text-gray-900">Role Templates</h2>
               <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
@@ -193,7 +193,7 @@ import { Permission } from "../../../../shared/types/permission";
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div *ngFor="let role of roles" class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div *ngFor="let role of roles" class="bg-surface rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
               <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">{{ role.name }}</h3>
                 <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
@@ -211,7 +211,7 @@ import { Permission } from "../../../../shared/types/permission";
 
         <!-- Add/Edit User Modal -->
         <div *ngIf="showAddUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div class="bg-surface rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b border-gray-200">
               <h2 class="text-2xl font-bold text-gray-900">Add New User</h2>
             </div>
@@ -271,7 +271,7 @@ import { Permission } from "../../../../shared/types/permission";
 
         <!-- Permission Assignment Modal -->
         <div *ngIf="showPermissionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div class="bg-surface rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b border-gray-200">
               <h2 class="text-2xl font-bold text-gray-900">Edit Permissions for asd</h2>
             </div>

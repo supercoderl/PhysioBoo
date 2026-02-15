@@ -35,7 +35,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                         ngxSlickItem
                                         class="px-3"
                                     >
-                                        <div class="p-5 bg-white w-full inline-block border border-solid border-borderGray rounded-2.5">
+                                        <div class="p-5 bg-surface w-full inline-block border border-solid border-borderGray rounded-2.5">
                                             <div class="flex items-center mb-6">
                                                 <div class="flex mb-2 w-full">
                                                     <lucide-angular [img]="Star" class="w-5 fill-[#ffca18] stroke-[#ffca18]" />

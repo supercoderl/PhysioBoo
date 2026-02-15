@@ -11,7 +11,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
   imports: [CommonModule, NzResultModule, NzButtonModule, NzIconModule],
   template: `
     <div class="min-h-screen flex-center-center p-6 bg-gray-50">
-      <div class="bg-white rounded-lg shadow-lg border border-gray-200 w-full max-w-md overflow-hidden">
+      <div class="bg-surface rounded-lg shadow-lg border border-gray-200 w-full max-w-md overflow-hidden">
         
         <!-- Header -->
         <div class="px-8 pt-8 pb-6 border-b border-gray-100">

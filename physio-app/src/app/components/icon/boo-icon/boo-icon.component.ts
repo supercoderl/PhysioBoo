@@ -19,6 +19,7 @@ import { SharedModule } from '../../../shared/shared-imports';
       [size]="size"
       [color]="color"
       [strokeWidth]="strokeWidth"
+      [class]="iconClass"
     ></lucide-icon>
   `,
   host: {
@@ -36,5 +37,6 @@ export class BooIconComponent {
   @Input() strokeWidth: number = 2;
   @Input() color: string = "black";
   @Input() interactive: boolean = false;
+  @Input() iconClass: string = '';
   // #endregion
 }

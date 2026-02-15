@@ -17,10 +17,10 @@ import { MenuItem } from '../../../../../shared/types/menu';
       <lucide-icon
         *ngIf="item.icon"
         [name]="item.icon"
-        class="w-4 h-4"
+        class="w-4 h-4 stroke-regular"
       ></lucide-icon>
       <div class="flex min-w-0 flex-auto flex-col items-start gap-1">
-        <p class="truncate max-w-full m-0 text-[#1F232B] text-[13px]">
+        <p class="truncate max-w-full m-0 text-regular text-[13px]">
           {{ item.label }}
         </p>
       </div>

@@ -20,7 +20,7 @@ import { SharedModule } from '../../../shared/shared-imports';
         class="inline-flex flex-col relative min-w-0 p-0 m-0 border-0 w-full"
       >
         <div
-          class="text-[13px] leading-[1.43] text-[#1F232B] inline-flex items-center w-full relative rounded-[8px] min-h-8 p-2 h-auto bg-white border border-solid border-[#0000003b]"
+          class="text-[13px] leading-[1.43] text-[#1F232B] inline-flex items-center w-full relative rounded-[8px] min-h-8 p-2 h-auto bg-surface border border-solid border-[#0000003b]"
           [ngClass]="wrapperClass"
         >
           <ng-content select="[prefix]"></ng-content>

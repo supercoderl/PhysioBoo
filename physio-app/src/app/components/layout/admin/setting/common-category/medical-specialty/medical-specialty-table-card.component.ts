@@ -1,11 +1,12 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { Component, EventEmitter, Input, Output, signal } from "@angular/core";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo-table-admin.component";
 import { ColumnDefDirective } from "../../../../../../shared/directives/column-def.directive";
-import { ButtonIconComponent } from "../../../../../button/button-icon/button-icon.component";
 import { MedicalSpecialty } from "../../../../../../shared/types/medical-staff";
-import { PaginationData } from "../../../../../../shared/types/common";
+import { ActionItem, PaginationData } from "../../../../../../shared/types/common";
 import { ColorUtils } from "../../../../../../shared/utils/color.utils";
+import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
+import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/boo-action-admin.component";
 
 @Component({
   selector: 'admin-medical-specialty-table-card',
@@ -14,24 +15,29 @@ import { ColorUtils } from "../../../../../../shared/utils/color.utils";
     SharedModule,
     BooTableAdminComponent,
     ColumnDefDirective,
-    ButtonIconComponent
+    BooActionAdminComponent
   ],
   template: `
-    <div class="bg-white rounded-[6px] border border-gray-200 h-full">
+    <div class="bg-surface rounded-[6px] border border-gray-200 h-full overflow-hidden">
       <boo-table-admin 
         [data]="data?.items ?? []" 
         tdClass="px-4 py-3"
         [showFooter]="true" 
-        [currentPage]="data?.pageNumber ?? 1"
-        [pageSize]="data?.pageSize ?? 10"
+        [currentPage]="data?.pageNumber ?? filter.pageNumber"
+        [pageSize]="data?.pageSize ?? filter.pageSize"
         [totalItems]="data?.totalCount ?? 0"
         (pageChange)="onPageClick($event)"
+        [loading]="loadingSrv.isLoading('search')"
       >  
         <ng-template appColumnDef="name" headerLabel="Name" headerClass="text-left" let-item>
-          <div class="flex items-center gap-3" (click)="onEditClick(item.id)">
-            <img [src]="item.iconUrl" [alt]="item.name" class="w-8 h-8 object-cover">
-            <div>
-              <div class="text-sm font-semibold text-gray-900">{{ item.name }}</div>
+          <div class="flex items-center gap-3 overflow-hidden" (click)="onEditClick(item.id)">
+            <div class="">
+              <img [appSrc]="item.iconUrl" [alt]="item.name" class="w-8 h-8 object-cover flex-shrink-0 grayscale">
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="truncate text-sm font-semibold text-danger cursor-pointer" [title]="item.name">
+                {{ item.name }}
+              </div>
             </div>
           </div>
         </ng-template>
@@ -46,8 +52,8 @@ import { ColorUtils } from "../../../../../../shared/utils/color.utils";
 
         <ng-template appColumnDef="attributes" headerLabel="Attributes" headerClass="text-left" let-item>
           <span class="inline-block px-2 py-1 rounded-md text-xs font-medium text-white" 
-            [style.background-color]="ColorUtils.generateFromText(item.isSurgery ? 'Surgery' : 'Diagnostic')">
-            {{ item.isSurgery ? 'Surgery' : 'Diagnostic' }}
+            [style.background-color]="ColorUtils.generateFromText(item.isSurgical ? 'Surgery' : item.isDiagnostic ? 'Diagnostic' : 'Unknown')">
+            {{ item.isSurgical ? 'Surgery' : item.isDiagnostic ? 'Diagnostic' : 'Unknown' }}
           </span>
         </ng-template>
 
@@ -56,13 +62,11 @@ import { ColorUtils } from "../../../../../../shared/utils/color.utils";
         </ng-template>
 
         <ng-template appColumnDef="actions" let-item cellClass="text-right">
-          <div class="flex items-center justify-end gap-2">
-            <button-icon
-              [icon]="{ name: 'trash-2' }"
-              buttonClass="!bg-[#EEF2F7] !border-0 !px-2"
-              (click)="onDeleteClick(item.id)"
-            >
-            </button-icon>
+          <div class="relative">
+            <boo-action-admin
+              [items]="tableActions"
+              [data]="item"
+            />
           </div>
         </ng-template>
       </boo-table-admin>
@@ -78,15 +82,26 @@ import { ColorUtils } from "../../../../../../shared/utils/color.utils";
 })
 export class AdminMedicalSpecialtyTableCardComponent {
   // #region Inputs, Outputs, Properties
-  @Input() data: PaginationData<MedicalSpecialty[]> | null = null;
+  @Input() data: PaginationData<MedicalSpecialty> | null = null;
+  @Input() filter!: { pageNumber: number, pageSize: number };
   @Output() pageChange = new EventEmitter<number>();
   @Output() editClick = new EventEmitter<string>();
   @Output() deleteClick = new EventEmitter<string>();
   ColorUtils = ColorUtils;
+
+  readonly tableActions: ActionItem[] = [
+    {
+      label: 'Delete',
+      isDanger: true,
+      onClick: (item: any) => this.onDeleteClick(item.id)
+    }
+  ];
   // #endregion
 
   // #region Init (Lifecycle + Setup)
-  constructor() { }
+  constructor(
+    protected loadingSrv: LocalLoadingService
+  ) { }
   // #endregion
 
   // #region Methods

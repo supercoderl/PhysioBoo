@@ -21,7 +21,7 @@ interface QueueDisplay {
     <admin-content-header>
       <!-- Current Number Display -->
       <div class="mb-8">
-        <div class="bg-white rounded-3xl p-12 border-4 border-blue-500">
+        <div class="bg-surface rounded-3xl p-12 border-4 border-blue-500">
           <div class="text-center">
             <h2 class="text-4xl font-bold text-gray-700 mb-6">NOW SERVING</h2>
             <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl py-16 px-8 mb-6">
@@ -43,7 +43,7 @@ interface QueueDisplay {
       <!-- Next Numbers Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <!-- Next in Queue -->
-        <div class="bg-white rounded-2xl p-8">
+        <div class="bg-surface rounded-2xl p-8">
           <div class="flex items-center gap-3 mb-6">
             <div class="bg-green-100 rounded-full p-3">
               <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +66,7 @@ interface QueueDisplay {
         </div>
 
         <!-- Waiting List -->
-        <div class="bg-white rounded-2xl p-8">
+        <div class="bg-surface rounded-2xl p-8">
           <div class="flex items-center gap-3 mb-6">
             <div class="bg-yellow-100 rounded-full p-3">
               <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,7 +88,7 @@ interface QueueDisplay {
       </div>
 
       <!-- Bottom Info Bar -->
-      <div class="bg-white rounded-2xl p-6">
+      <div class="bg-surface rounded-2xl p-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
             <div class="bg-blue-100 rounded-full p-3">

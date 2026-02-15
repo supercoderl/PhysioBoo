@@ -21,7 +21,7 @@ import { Transaction } from "../../../../shared/types/transaction";
 
         <!-- Stats Overview -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="bg-surface rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600">Total Members</p>
@@ -36,7 +36,7 @@ import { Transaction } from "../../../../shared/types/transaction";
             <p class="mt-2 text-sm text-green-600">↑ 12% from last month</p>
           </div>
 
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="bg-surface rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600">Active Members</p>
@@ -51,7 +51,7 @@ import { Transaction } from "../../../../shared/types/transaction";
             <p class="mt-2 text-sm text-green-600">89.2% active rate</p>
           </div>
 
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="bg-surface rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600">Points Distributed</p>
@@ -66,7 +66,7 @@ import { Transaction } from "../../../../shared/types/transaction";
             <p class="mt-2 text-sm text-green-600">This month</p>
           </div>
 
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="bg-surface rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600">Rewards Redeemed</p>
@@ -127,7 +127,7 @@ import { Transaction } from "../../../../shared/types/transaction";
         <!-- Members Directory Tab -->
         <div *ngIf="activeTab === 'members'">
           <!-- Search and Filter -->
-          <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
               <input
                 type="text"
@@ -155,7 +155,7 @@ import { Transaction } from "../../../../shared/types/transaction";
           </div>
 
           <!-- Members Table -->
-          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <div class="bg-surface rounded-lg shadow-md overflow-hidden">
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -169,7 +169,7 @@ import { Transaction } from "../../../../shared/types/transaction";
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-surface divide-y divide-gray-200">
                   <tr *ngFor="let member of filteredMembers" class="hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{member.id}}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -222,7 +222,7 @@ import { Transaction } from "../../../../shared/types/transaction";
         <div *ngIf="activeTab === 'points'">
           <!-- Point Summary Card -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <div class="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+            <div class="lg:col-span-2 bg-surface rounded-lg shadow-md p-6">
               <h3 class="text-lg font-semibold text-gray-900 mb-4">Member Points Overview</h3>
               <div class="mb-4">
                 <input
@@ -238,7 +238,7 @@ import { Transaction } from "../../../../shared/types/transaction";
                     <p class="text-4xl font-bold mt-2">3,450</p>
                     <p class="text-sm mt-2 opacity-90">Member: John Doe (MEM-001)</p>
                   </div>
-                  <div class="bg-white bg-opacity-20 rounded-full p-3">
+                  <div class="bg-surface bg-opacity-20 rounded-full p-3">
                     <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                     </svg>
@@ -247,7 +247,7 @@ import { Transaction } from "../../../../shared/types/transaction";
               </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-surface rounded-lg shadow-md p-6">
               <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
               <div class="space-y-3">
                 <button (click)="showAddPointsModal = true" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition-colors">
@@ -264,7 +264,7 @@ import { Transaction } from "../../../../shared/types/transaction";
           </div>
 
           <!-- Transactions History -->
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="bg-surface rounded-lg shadow-md p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Transactions</h3>
             <div class="space-y-3">
               <div *ngFor="let transaction of transactions" class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
@@ -299,7 +299,7 @@ import { Transaction } from "../../../../shared/types/transaction";
         <!-- Rewards Catalog Tab -->
         <div *ngIf="activeTab === 'rewards'">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div *ngFor="let reward of rewards" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div *ngFor="let reward of rewards" class="bg-surface rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
               <div [ngClass]="{
                 'bg-blue-500': reward.category === 'discount',
                 'bg-green-500': reward.category === 'service',
@@ -335,7 +335,7 @@ import { Transaction } from "../../../../shared/types/transaction";
         </div>
 
         <!-- Register Member Tab -->
-        <div *ngIf="activeTab === 'register'" class="bg-white rounded-lg shadow-md p-6">
+        <div *ngIf="activeTab === 'register'" class="bg-surface rounded-lg shadow-md p-6">
           <h2 class="text-xl font-semibold text-gray-900 mb-6">Register New Member</h2>
           
           <form (ngSubmit)="registerMember()" #memberForm="ngForm">
@@ -459,7 +459,7 @@ import { Transaction } from "../../../../shared/types/transaction";
 
         <!-- Add Points Modal -->
         <div *ngIf="showAddPointsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+          <div class="bg-surface rounded-lg p-6 max-w-md w-full mx-4">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Add Points</h3>
             <div class="space-y-4">
               <div>
@@ -484,7 +484,7 @@ import { Transaction } from "../../../../shared/types/transaction";
 
         <!-- Redeem Points Modal -->
         <div *ngIf="showRedeemModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+          <div class="bg-surface rounded-lg p-6 max-w-md w-full mx-4">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Redeem Points</h3>
             <div class="space-y-4">
               <div>

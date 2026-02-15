@@ -11,7 +11,7 @@ import { StockItem, StockTakeSession } from "../../../../shared/types/stock";
     template: `
     <div class="min-h-screen bg-gray-50 p-6">
       <!-- Header Section -->
-      <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
         <div class="flex justify-between items-center mb-4">
           <div>
             <h2 class="text-2xl font-semibold text-gray-800">Stock Take</h2>
@@ -57,7 +57,7 @@ import { StockItem, StockTakeSession } from "../../../../shared/types/stock";
       </div>
 
       <!-- Filters Section -->
-      <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Filters</h3>
         
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -133,7 +133,7 @@ import { StockItem, StockTakeSession } from "../../../../shared/types/stock";
       </div>
 
       <!-- Stock Items Table -->
-      <div class="bg-white rounded-lg shadow-sm">
+      <div class="bg-surface rounded-lg shadow-sm">
         <div class="p-6 border-b border-gray-200 flex justify-between items-center">
           <h3 class="text-lg font-semibold text-gray-800">Stock Items</h3>
           <div class="flex gap-3">
@@ -268,19 +268,19 @@ import { StockItem, StockTakeSession } from "../../../../shared/types/stock";
 
       <!-- Summary Statistics -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-surface rounded-lg shadow-sm p-6">
           <p class="text-sm text-gray-600 mb-2">Total Items</p>
           <p class="text-3xl font-bold text-gray-900">{{ stockItems.length }}</p>
         </div>
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-surface rounded-lg shadow-sm p-6">
           <p class="text-sm text-gray-600 mb-2">Counted</p>
           <p class="text-3xl font-bold text-blue-600">{{ getCountedItems() }}</p>
         </div>
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-surface rounded-lg shadow-sm p-6">
           <p class="text-sm text-gray-600 mb-2">Discrepancies</p>
           <p class="text-3xl font-bold text-red-600">{{ getDiscrepancyItems() }}</p>
         </div>
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-surface rounded-lg shadow-sm p-6">
           <p class="text-sm text-gray-600 mb-2">Verified</p>
           <p class="text-3xl font-bold text-green-600">{{ getVerifiedItems() }}</p>
         </div>

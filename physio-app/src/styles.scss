@@ -14,6 +14,11 @@
   --twc-info: 226 237 255; /* #e2edff */
   --twc-danger: 224 79 22; /* #e04f16 */
   --twc-info2: 240 246 255; /* #f0f6ff */
+  --bg-surface: 255 255 255; /* #ffffff */
+  --twc-menu: 229 231 235; /* #E5E7EB */
+  --twc-regular: 71 85 105; /* #475569 */
+  --twc-body: 246 247 248; /* #f6f7f8 */
+  --twc-placeholder: 100 116 139 /* #64748B */
 }
 
 /* Dark mode */
@@ -28,6 +33,11 @@
   --twc-info: 226 237 255; /* #e2edff */
   --twc-danger: 224 79 22; /* #e04f16 */
   --twc-info2: 240 246 255; /* #f0f6ff */
+  --bg-surface: 24 24 27; /* Zinc-900 */
+  --twc-menu: 3 4 26; /* #03041A */
+  --twc-regular: 203 213 225; /* #cbd5e1 */
+  --twc-body: 9 9 11; /* #09090b */
+  --twc-placeholder: 100 116 139 /* #64748B */
 }
 
 @layer utilities {

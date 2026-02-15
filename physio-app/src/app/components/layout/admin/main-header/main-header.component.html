@@ -1,16 +1,16 @@
 <header
-  class="relative z-20 flex sticky top-0 flex-col w-full bg-[#f6f7f8]"
+  class="relative z-20 flex sticky top-0 flex-col w-full bg-body transition-all duration-300"
   id="physio-toolbar"
 >
-  <div class="min-h-12 p-0 md:min-h-16 relative flex items-center">
+  <div class="min-h-12 p-0 md:min-h-13.5 relative flex items-center">
     <div class="flex flex-1 items-center gap-3 px-2 md:px-4">
       <button
-        class="h-7 w-7 border border-divider inlineFlex-center-center relative rounded-2 cursor-pointer transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
+        class="h-7 w-7 border border-borderGray inlineFlex-center-center relative rounded-2 cursor-pointer transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
         tabindex="0"
         type="button"
         (click)="collapseEvent.emit()"
       >
-        <lucide-icon name="panelLeft" class="w-4 h-4"></lucide-icon>
+        <lucide-icon name="panelLeft" class="w-4 h-4 stroke-regular"></lucide-icon>
       </button>
       <div
         class="m-0 shrink-0 border-r border-solid border-[#E5E7EB] my-2 self-stretch h-auto"
@@ -27,7 +27,7 @@
             >
               <lucide-icon
                 name="calendar"
-                class="w-4 h-4 stroke-black"
+                class="w-4 h-4 stroke-regular"
               ></lucide-icon>
             </button>
           </a>
@@ -43,7 +43,7 @@
             >
               <lucide-icon
                 name="mail"
-                class="w-4 h-4 stroke-black"
+                class="w-4 h-4 stroke-regular"
               ></lucide-icon></button></a
           ><a role="button" href="/apps/contacts" data-discover="true"
             ><button
@@ -54,7 +54,7 @@
             >
               <lucide-icon
                 name="users"
-                class="w-4 h-4 stroke-black"
+                class="w-4 h-4 stroke-regular"
               ></lucide-icon>
             </button>
           </a>
@@ -85,7 +85,7 @@
           alt="English"
           src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/flags/US.svg"
         />
-        <p class="text-[11px] font-medium uppercase m-0 leading-none">en</p>
+        <p class="text-[11px] text-regular font-medium uppercase m-0 leading-none">en</p>
       </button>
       <div>
         <button
@@ -96,7 +96,7 @@
         >
           <lucide-icon
             name="aLargeSmall"
-            class="w-4 h-4 stroke-black"
+            class="w-4 h-4 stroke-regular"
           ></lucide-icon>
         </button>
       </div>
@@ -109,7 +109,7 @@
         >
           <lucide-icon
             [name]="fs.isFullScreen ? 'minimize' : 'maximize'"
-            class="w-4 h-4 stroke-black"
+            class="w-4 h-4 stroke-regular"
           ></lucide-icon>
         </button>
       </div>
@@ -121,7 +121,7 @@
       >
         <lucide-icon
           [name]="themeSrv.isDark() ? 'moon' : 'sun'"
-          class="w-4 h-4 stroke-black"
+          class="w-4 h-4 stroke-regular"
         ></lucide-icon>
       </button>
       <div class="flex muiltr-eqgs9o">
@@ -134,12 +134,12 @@
           >
             <lucide-icon
               name="search"
-              class="w-4 h-4 stroke-black"
+              class="w-4 h-4 stroke-regular"
             ></lucide-icon>
           </button>
         </div>
         <div
-          class="h-full z-[999] top-0 inset-x-0 absolute bg-white text-[#1F232B] shadow-[0_1px_3px_0_rgba(0,_0,_0,_0.1),0_1px_2px_-1px_rgba(0,_0,_0,_0.1)] transition-[box-shadow_300ms_cubic-bezier(0.4,_0,_0.2,_1)]"
+          class="h-full z-[999] top-0 inset-x-0 absolute bg-surface text-[#1F232B] shadow-[0_1px_3px_0_rgba(0,_0,_0,_0.1),0_1px_2px_-1px_rgba(0,_0,_0,_0.1)] transition-[box-shadow_300ms_cubic-bezier(0.4,_0,_0.2,_1)]"
           *ngIf="isSearching"
         >
           <div class="flex h-full w-full items-center">
@@ -171,7 +171,7 @@
             >
               <lucide-icon
                 name="x"
-                class="w-4 h-4 stroke-[rgb(75,_85,_99)]"
+                class="w-4 h-4 stroke-regular"
               />
             </button>
           </div>
@@ -190,7 +190,7 @@
       >
         <lucide-icon
           name="bookmark"
-          class="w-4 h-4 stroke-black"
+          class="w-4 h-4 stroke-regular"
         ></lucide-icon>
       </button>
       <button
@@ -208,7 +208,7 @@
           <div style="transform: none">
             <lucide-icon
               name="bell"
-              class="w-4 h-4 stroke-black"
+              class="w-4 h-4 stroke-regular"
             ></lucide-icon>
           </div>
           <span

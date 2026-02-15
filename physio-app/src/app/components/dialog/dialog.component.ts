@@ -40,7 +40,7 @@ import { DialogType } from '../../shared/types/dialog';
 
         <div 
           @modal
-          class="relative bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100"
+          class="relative bg-surface rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100"
         >
           <div class="px-6 py-5 border-b border-gray-100 flex items-start gap-4">
             <div [class]="getIconBg(data.type)" class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
@@ -58,7 +58,7 @@ import { DialogType } from '../../shared/types/dialog';
           <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3">
             <button 
               (click)="data.onCancel ? data.onCancel() : dialogService.close()"
-              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:ring-2 focus:ring-gray-200"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-surface border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:ring-2 focus:ring-gray-200"
             >
               {{ data.cancelText }}
             </button>

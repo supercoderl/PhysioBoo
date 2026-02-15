@@ -17,7 +17,7 @@ import { Search } from "lucide-angular";
                             <div class="border border-solid border-borderGray rounded-[10px] min-h-14 p-2 relative flex flex-wrap items-stretch w-full">
                                 <input
                                     placeholder="Search..."
-                                    class="pl-2 relative flex-1 w-[1%] text-primary min-h-9.5 bg-white text-xs14 leading-[1.6] rounded-[5px] py-1.75 px-3.75 transition-smooth block"
+                                    class="pl-2 relative flex-1 w-[1%] text-primary min-h-9.5 bg-surface text-xs14 leading-[1.6] rounded-[5px] py-1.75 px-3.75 transition-smooth block"
                                     type="text"
                                 />
                                 <button type="submit" class="w-10 h-10 text-base rounded-[5px] flex-center-center bg-[linear-gradient(90.08deg,#0e82fd_.09%,#06aed4_70.28%)] text-white relative overflow-hidden z-[1] bg-secondary border border-solid border-secondary cursor-pointer font-medium transition-smooth">

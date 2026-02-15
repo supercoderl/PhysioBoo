@@ -20,7 +20,7 @@ import { Ward } from "../../../../shared/types/ward";
 
         <!-- Statistics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="bg-surface rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600 mb-1">Total Beds</p>
@@ -34,7 +34,7 @@ import { Ward } from "../../../../shared/types/ward";
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="bg-surface rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600 mb-1">Available</p>
@@ -48,7 +48,7 @@ import { Ward } from "../../../../shared/types/ward";
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="bg-surface rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600 mb-1">Occupied</p>
@@ -62,7 +62,7 @@ import { Ward } from "../../../../shared/types/ward";
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="bg-surface rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600 mb-1">Occupancy Rate</p>
@@ -78,7 +78,7 @@ import { Ward } from "../../../../shared/types/ward";
         </div>
 
         <!-- Filters -->
-        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div class="bg-surface rounded-lg shadow-md p-4 mb-6">
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Ward</label>
@@ -115,7 +115,7 @@ import { Ward } from "../../../../shared/types/ward";
         </div>
 
         <!-- Legend -->
-        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div class="bg-surface rounded-lg shadow-md p-4 mb-6">
           <h3 class="text-sm font-semibold text-gray-700 mb-3">Bed Status Legend</h3>
           <div class="flex flex-wrap gap-4">
             <div class="flex items-center">
@@ -139,7 +139,7 @@ import { Ward } from "../../../../shared/types/ward";
 
         <!-- Ward Cards with Bed Maps -->
         <div class="space-y-6">
-          <div *ngFor="let ward of getFilteredWards()" class="bg-white rounded-lg shadow-md overflow-hidden">
+          <div *ngFor="let ward of getFilteredWards()" class="bg-surface rounded-lg shadow-md overflow-hidden">
             <div class="bg-gray-100 px-6 py-4 border-b border-gray-200">
               <div class="flex justify-between items-center">
                 <div>
@@ -185,7 +185,7 @@ import { Ward } from "../../../../shared/types/ward";
 
         <!-- Selected Bed Details Modal (appears when bed is clicked) -->
         <div *ngIf="selectedBedDetails" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+          <div class="bg-surface rounded-lg shadow-xl max-w-md w-full p-6">
             <div class="flex justify-between items-start mb-4">
               <h3 class="text-xl font-bold text-gray-800">Bed Details</h3>
               <button (click)="closeBedDetails()" class="text-gray-400 hover:text-gray-600">

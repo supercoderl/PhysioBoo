@@ -16,7 +16,7 @@ import { SharedModule } from '../../../../shared/shared-imports';
     <div class="z-10 flex flex-auto flex-col">
       <div class="flex flex-1 z-[2] min-w-0 bg-[#F6F7F8]">
         <div class="flex flex-col w-full z-[9999]">
-          <div class="bg-white border-b border-solid border-[#E5E7EB] flex flex-0 bg-cover">
+          <div class="bg-surface border-b border-solid border-[#E5E7EB] flex flex-0 bg-cover">
             <div class="container">
               <div class="flex w-full flex-col">
                 <img
@@ -118,7 +118,7 @@ import { SharedModule } from '../../../../shared/shared-imports';
                           </button-icon>
                         </div>
                         <span
-                          class="absolute h-0.5 min-h-full bottom-0 top-0 bg-white rounded-[6px] border border-solid border-[#E5E7EB] z-0"
+                          class="absolute h-0.5 min-h-full bottom-0 top-0 bg-surface rounded-[6px] border border-solid border-[#E5E7EB] z-0"
                           style="left: 0px; width: 76.2625px"
                         ></span>
                       </div>

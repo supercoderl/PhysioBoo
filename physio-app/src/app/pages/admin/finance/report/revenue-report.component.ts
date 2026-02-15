@@ -13,7 +13,7 @@ import { PaymentSummary } from "../../../../shared/types/patient";
     <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
         <!-- Header with Date Range -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
           <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 class="text-2xl font-bold text-gray-800">Revenue Report</h1>
@@ -108,7 +108,7 @@ import { PaymentSummary } from "../../../../shared/types/patient";
         <!-- Charts Row -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <!-- Revenue Trend Chart -->
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="bg-surface rounded-lg shadow-md p-6">
             <h2 class="text-lg font-semibold text-gray-800 mb-4">Revenue Trend (Last 7 Days)</h2>
             <div class="space-y-3">
               <div *ngFor="let data of revenueData" class="flex items-center">
@@ -130,7 +130,7 @@ import { PaymentSummary } from "../../../../shared/types/patient";
           </div>
 
           <!-- Payment Methods Distribution -->
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="bg-surface rounded-lg shadow-md p-6">
             <h2 class="text-lg font-semibold text-gray-800 mb-4">Payment Methods Distribution</h2>
             <div class="space-y-4">
               <div *ngFor="let payment of paymentSummary" class="border-b border-gray-100 pb-4 last:border-0">
@@ -168,7 +168,7 @@ import { PaymentSummary } from "../../../../shared/types/patient";
         </div>
 
         <!-- Department Revenue -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
           <h2 class="text-lg font-semibold text-gray-800 mb-4">Department-wise Revenue</h2>
           <div class="overflow-x-auto">
             <table class="w-full">
@@ -205,7 +205,7 @@ import { PaymentSummary } from "../../../../shared/types/patient";
         </div>
 
         <!-- Detailed Transactions -->
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="bg-surface rounded-lg shadow-md p-6">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
             <h2 class="text-lg font-semibold text-gray-800">Recent Transactions</h2>
             <div class="flex gap-3">

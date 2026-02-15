@@ -64,7 +64,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                                         <lucide-angular [img]="Star" class="mr-1 w-3.75 fill-white" />4.6
                                                     </span>
                                                     <a
-                                                        class="w-8 h-8 bg-white flex-center-center rounded-full text-neutral cursor-pointer transition-smooth"
+                                                        class="w-8 h-8 bg-surface flex-center-center rounded-full text-neutral cursor-pointer transition-smooth"
                                                         href="https://doccure.dreamstechnologies.com/react/template/index"
                                                     >
                                                         <lucide-angular [img]="Heart" class="w-5 text-[#e3e6ec] fill-[#e3e6ec]" />

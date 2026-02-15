@@ -25,7 +25,7 @@ import { Medicine } from "../../../../shared/types/medicine";
           <div class="lg:col-span-2 space-y-6">
             
             <!-- Search & Filter Card -->
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-surface rounded-lg shadow-md p-6">
               <div class="flex flex-col md:flex-row gap-4">
                 <div class="flex-1">
                   <input
@@ -52,7 +52,7 @@ import { Medicine } from "../../../../shared/types/medicine";
             </div>
 
             <!-- Medicine List Card -->
-            <div class="bg-white rounded-lg shadow-md">
+            <div class="bg-surface rounded-lg shadow-md">
               <div class="p-6 border-b border-gray-200">
                 <h2 class="text-xl font-semibold text-gray-800">Available Medicines</h2>
               </div>
@@ -67,7 +67,7 @@ import { Medicine } from "../../../../shared/types/medicine";
                       <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
                   </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
+                  <tbody class="bg-surface divide-y divide-gray-200">
                     <tr *ngFor="let medicine of filteredMedicines" class="hover:bg-gray-50 transition-colors">
                       <td class="px-6 py-4">
                         <div class="text-sm font-medium text-gray-900">{{medicine.name}}</div>
@@ -118,7 +118,7 @@ import { Medicine } from "../../../../shared/types/medicine";
           <div class="space-y-6">
             
             <!-- Patient Info Card -->
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-surface rounded-lg shadow-md p-6">
               <h2 class="text-lg font-semibold text-gray-800 mb-4">Patient Information</h2>
               <div class="space-y-3">
                 <div>
@@ -152,7 +152,7 @@ import { Medicine } from "../../../../shared/types/medicine";
             </div>
 
             <!-- Cart Card -->
-            <div class="bg-white rounded-lg shadow-md">
+            <div class="bg-surface rounded-lg shadow-md">
               <div class="p-6 border-b border-gray-200 flex justify-between items-center">
                 <h2 class="text-lg font-semibold text-gray-800">Cart Items ({{cart.length}})</h2>
                 <button

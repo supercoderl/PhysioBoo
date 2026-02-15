@@ -11,7 +11,7 @@ import { DialogService } from '../../services/common/dialog.service';
   template: `
     <div 
       [ngClass]="{
-        'fixed inset-0 z-[1000]': true,
+        'fixed inset-0 z-[10000]': true,
         'pointer-events-auto': isOpen,
         'pointer-events-none': !isOpen
       }"
@@ -29,7 +29,7 @@ import { DialogService } from '../../services/common/dialog.service';
 
       <div
         [ngClass]="{
-          'transition-transform duration-300 ease-in-out w-[280px] bg-white text-black flex flex-col h-full fixed top-0 right-0': true,
+          'transition-transform duration-300 ease-in-out w-[280px] bg-surface text-black flex flex-col h-full fixed top-0 right-0': true,
         }"
         [style.width.px]="width"
         [style.transform]="'translateX(' + (isOpen ? 0 : width) + 'px)'"

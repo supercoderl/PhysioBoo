@@ -23,7 +23,7 @@ interface Patient {
  <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
         <!-- Header Section -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
           <div class="flex items-center justify-between">
             <div>
               <h1 class="text-3xl font-bold text-gray-800">Dr. {{ doctorName }}</h1>
@@ -90,7 +90,7 @@ interface Patient {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <!-- Current Patient Panel -->
           <div class="lg:col-span-2">
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
               <h2 class="text-xl font-bold text-gray-800 mb-4">Current Patient</h2>
               <div *ngIf="currentPatient" class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 border-2 border-blue-300">
                 <div class="flex items-start justify-between mb-4">
@@ -110,7 +110,7 @@ interface Patient {
                     <p class="text-lg font-semibold text-gray-800">{{ currentPatient.arrivalTime }}</p>
                   </div>
                 </div>
-                <div class="bg-white rounded p-4 mb-4">
+                <div class="bg-surface rounded p-4 mb-4">
                   <p class="text-sm text-gray-600 mb-1">Chief Complaint</p>
                   <p class="text-gray-800 font-medium">{{ currentPatient.reason }}</p>
                 </div>
@@ -138,7 +138,7 @@ interface Patient {
             </div>
 
             <!-- Patient History (Optional) -->
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-surface rounded-lg shadow-md p-6">
               <h2 class="text-xl font-bold text-gray-800 mb-4">Today's Completed</h2>
               <div class="space-y-2 max-h-64 overflow-y-auto">
                 <div *ngFor="let patient of getCompletedPatients()" 
@@ -158,7 +158,7 @@ interface Patient {
 
           <!-- Queue List Panel -->
           <div class="lg:col-span-1">
-            <div class="bg-white rounded-lg shadow-md p-6 sticky top-6">
+            <div class="bg-surface rounded-lg shadow-md p-6 sticky top-6">
               <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-bold text-gray-800">Waiting Queue</h2>
                 <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">

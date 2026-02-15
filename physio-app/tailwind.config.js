@@ -16,7 +16,12 @@ module.exports = {
         headerBg: 'rgb(var(--twc-bg-header) / <alpha-value>)',
         info: 'rgb(var(--twc-info) / <alpha-value>)',
         info2: 'rgb(var(--twc-info2) / <alpha-value>)',
-        danger: 'rgb(var(--twc-danger) / <alpha-value>)'
+        danger: 'rgb(var(--twc-danger) / <alpha-value>)',
+        surface: 'rgb(var(--bg-surface) / <alpha-value>)',
+        menu: 'rgb(var(--twc-menu) / <alpha-value>)',
+        regular: 'rgb(var(--twc-regular) / <alpha-value>)',
+        body: 'rgb(var(--twc-body) / <alpha-value>)',
+        placeholder: 'rgb(var(--twc-placeholder) / <alpha-value>)',
       },
       fontSize: {
         xs14: "14px",
@@ -53,6 +58,7 @@ module.exports = {
         13.5: "54px",
         14: "56px",
         15: "60px",
+        15.5: "62px",
         17: "68px",
         17.5: "70px",
         18: "72px",

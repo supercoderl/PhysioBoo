@@ -19,6 +19,7 @@ import { CompletionTextPipe } from "./pipes/completion.pipe";
 import { SHARED_PIPES, SHARED_ZORRO_MODULES } from "./shared-providers";
 import { DefaultUserPipe } from "./pipes/default-user.pipe";
 import { ImageFallbackDirective } from "./directives/image-fallback.directive";
+import { AutoAnimateDirective } from "./directives/auto-animate.directive";
 
 export const SharedModule = [
     FormsModule,
@@ -30,10 +31,8 @@ export const SharedModule = [
     NzIconModule,
     NzLayoutModule,
     NzMenuModule,
-    LucideAngularModule, 
+    LucideAngularModule,
     GoogleMapsModule,
-    ParticlesDirective,
-    CustomScrollbarDirective,
     RouterModule,
     LucideAngularModule,
     NgxChartsModule,
@@ -43,7 +42,13 @@ export const SharedModule = [
     DefaultUserPipe,
     ...SHARED_PIPES,
     LottieComponent,
+
+    // #region Directives
+    ParticlesDirective,
+    CustomScrollbarDirective,
     BooErrorDirective,
     DropdownDirective,
-    ImageFallbackDirective
+    ImageFallbackDirective,
+    AutoAnimateDirective
+    // #endregion
 ];

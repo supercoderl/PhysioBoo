@@ -19,9 +19,9 @@ import { SharedModule } from "../../shared/shared-imports";
     >
       <ol class="list-none m-0 p-0 flex items-center flex-wrap">
         <li *ngFor="let crumb of breadcrumbs; let i = index; let last = last"
-            class="flex items-center text-inherit">
+            class="flex items-center text-secondary">
           <a
-            class="block max-w-32 truncate font-medium capitalize m-0 leading-[1.5] text-inherit"
+            class="block max-w-32 truncate font-medium capitalize m-0 leading-[1.5] text-secondary"
             [routerLink]="crumb.url"
           >
             {{ crumb.label }}

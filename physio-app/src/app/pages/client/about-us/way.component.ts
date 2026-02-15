@@ -8,7 +8,7 @@ import { SharedModule } from "../../../shared/shared-imports";
         SharedModule
     ],
     template: `
-    <section class="bg-white pb-10 md:pb-15 block">
+    <section class="bg-surface pb-10 md:pb-15 block">
         <div class="container mx-auto px-3">
             <div class="bg-secondary rounded-2.5 md:rounded-[25px] relative overflow-hidden">
                 <div class="relative hidden md:block">
@@ -31,7 +31,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 eiusmod tempor incididunt ut labore et dolore magna aliqua.
                             </p>
                             <a
-                                class="text-[14px] md:text-base py-2.5 md:py-2 px-3.75 md:px-4 bg-white border border-solid border-white rounded-[44px] text-white relative overflow-hidden z-[1]"
+                                class="text-[14px] md:text-base py-2.5 md:py-2 px-3.75 md:px-4 bg-surface border border-solid border-white rounded-[44px] text-white relative overflow-hidden z-[1]"
                                 href="/react/template/contactus"
                             >
                                 Contact With Us

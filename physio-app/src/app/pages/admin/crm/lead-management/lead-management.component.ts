@@ -20,7 +20,7 @@ import { Lead } from "../../../../shared/types/lead";
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white rounded-lg shadow p-6">
+      <div class="bg-surface rounded-lg shadow p-6">
         <div class="flex items-center">
           <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
             <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,7 +34,7 @@ import { Lead } from "../../../../shared/types/lead";
         </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow p-6">
+      <div class="bg-surface rounded-lg shadow p-6">
         <div class="flex items-center">
           <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
             <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,7 +48,7 @@ import { Lead } from "../../../../shared/types/lead";
         </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow p-6">
+      <div class="bg-surface rounded-lg shadow p-6">
         <div class="flex items-center">
           <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
             <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,7 +62,7 @@ import { Lead } from "../../../../shared/types/lead";
         </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow p-6">
+      <div class="bg-surface rounded-lg shadow p-6">
         <div class="flex items-center">
           <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
             <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,7 +78,7 @@ import { Lead } from "../../../../shared/types/lead";
     </div>
 
     <!-- Filters and Actions -->
-    <div class="bg-white rounded-lg shadow mb-6 p-4">
+    <div class="bg-surface rounded-lg shadow mb-6 p-4">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div class="flex-1 flex flex-col sm:flex-row gap-4">
           <!-- Search -->
@@ -133,7 +133,7 @@ import { Lead } from "../../../../shared/types/lead";
     </div>
 
     <!-- Leads Table -->
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-surface rounded-lg shadow overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
@@ -148,7 +148,7 @@ import { Lead } from "../../../../shared/types/lead";
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody class="bg-surface divide-y divide-gray-200">
             <tr *ngFor="let lead of filteredLeads" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-medium text-gray-900">{{lead.name}}</div>
@@ -208,7 +208,7 @@ import { Lead } from "../../../../shared/types/lead";
 
 <!-- Add Lead Modal -->
 <div *ngIf="showAddModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-  <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-lg bg-white">
+  <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-lg bg-surface">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-semibold text-gray-900">Add New Lead</h3>
       <button (click)="closeAddModal()" class="text-gray-400 hover:text-gray-600">
@@ -297,7 +297,7 @@ import { Lead } from "../../../../shared/types/lead";
 
 <!-- Edit Lead Modal -->
 <div *ngIf="showEditModal && selectedLead" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-  <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-lg bg-white">
+  <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-lg bg-surface">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-semibold text-gray-900">Edit Lead</h3>
       <button (click)="closeEditModal()" class="text-gray-400 hover:text-gray-600">

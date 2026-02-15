@@ -14,7 +14,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
     <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
         <!-- Search Patient Section -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
           <h2 class="text-xl font-semibold text-gray-800 mb-4">Patient Information</h2>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -49,7 +49,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <!-- Bill Items Section -->
-          <div class="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+          <div class="lg:col-span-2 bg-surface rounded-lg shadow-md p-6">
             <div class="flex justify-between items-center mb-4">
               <h2 class="text-xl font-semibold text-gray-800">Bill Items</h2>
               <button
@@ -132,7 +132,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
           </div>
 
           <!-- Payment Section -->
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="bg-surface rounded-lg shadow-md p-6">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">Payment Details</h2>
             
             <!-- Summary -->

@@ -45,7 +45,7 @@ import { AdminContentHeaderComponent } from "../../../../components/layout/admin
             </boo-button-admin>
             <ng-template #menuExportRef>
               <ul
-                class="p-2 m-0 block min-w-50 bg-white rounded-[5px]"
+                class="p-2 m-0 block min-w-50 bg-surface rounded-[5px]"
                 @dropdownState
               >
                 <li>
@@ -91,7 +91,7 @@ import { AdminContentHeaderComponent } from "../../../../components/layout/admin
           <div class="flex right-content items-center flex-wrap">
             <boo-button-admin
               [icon]="{ name: 'calendar', size: 14, color: '#6C7688' }"
-              buttonClass="!bg-white h-full"
+              buttonClass="!bg-surface h-full"
               [border]="{ width: 1, color: '#e3e3e3' }"
               [dropdown]="menuDateRangeRef"
             >
@@ -100,7 +100,7 @@ import { AdminContentHeaderComponent } from "../../../../components/layout/admin
           </div>
           <ng-template #menuDateRangeRef>
             <ul
-              class="p-2 m-0 block min-w-50 bg-white rounded-[5px]"
+              class="p-2 m-0 block min-w-50 bg-surface rounded-[5px]"
               @dropdownState
             >
               <li>
@@ -127,14 +127,14 @@ import { AdminContentHeaderComponent } from "../../../../components/layout/admin
           <div class="dropdown me-2">
             <boo-button-admin
               [icon]="{ name: 'funnel', size: 14, color: '#6C7688' }"
-              buttonClass="!bg-white h-full"
+              buttonClass="!bg-surface h-full"
               [border]="{ width: 1, color: '#e3e3e3' }"
               >Filter</boo-button-admin
             >
           </div>
           <div class="dropdown">
             <boo-button-admin
-              buttonClass="!bg-white h-full"
+              buttonClass="!bg-surface h-full"
               [border]="{ width: 1, color: '#e3e3e3' }"
               [dropdown]="menuSortRef"
             >
@@ -143,7 +143,7 @@ import { AdminContentHeaderComponent } from "../../../../components/layout/admin
           </div>
           <ng-template #menuSortRef>
             <ul
-              class="p-2 m-0 block min-w-50 bg-white rounded-[5px]"
+              class="p-2 m-0 block min-w-50 bg-surface rounded-[5px]"
               @dropdownState
             >
               <li>

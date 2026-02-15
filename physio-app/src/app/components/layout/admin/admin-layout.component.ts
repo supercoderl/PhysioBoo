@@ -38,18 +38,9 @@ import { AdminSizeComponent } from "./size/size.component";
                         (collapseEvent)="handleCollapse()"
                         (drawerEvent)="handleOpenDrawer($event)"
                         (popoverEvent)="handleOpenPopover($event)"
-                    >
-                        <popover
-                            (onClose)="handleClosePopover()"
-                            [isOpen]="popover.isOpen"
-                            [trigger]="popover.data"
-                        >
-                            <admin-size *ngIf="popover.type === 'SIZE'" class="w-80"></admin-size>
-                            <admin-language *ngIf="popover.type === 'LANGUAGE'" class="w-full"></admin-language>
-                        </popover>
-                    </admin-main-header>
+                    />
                     <div class="flex-1 flex flex-col min-h-0 relative z-20">
-                        <div class="flex-1 flex flex-col min-h-0 px-4 bg-[#F6F7F8] overflow-hidden">
+                        <div class="flex-1 flex flex-col min-h-0 px-4 bg-body overflow-hidden transition-all duration-300">
                             <div 
                                 id="wrapper"
                                 class="flex-1 min-h-0 overflow-auto"
@@ -67,8 +58,16 @@ import { AdminSizeComponent } from "./size/size.component";
                 }" (click)="handleCollapse()"></div>
             </div>
         </div>
+        <popover
+            (onClose)="handleClosePopover()"
+            [isOpen]="popover.isOpen"
+            [trigger]="popover.data"
+        >
+            <admin-size *ngIf="popover.type === 'SIZE'" class="w-80"></admin-size>
+            <admin-language *ngIf="popover.type === 'LANGUAGE'" class="w-full"></admin-language>
+        </popover>
         <drawer
-           (onClose)="handleCloseDrawer()"
+           (close)="handleCloseDrawer()"
            [isOpen]="drawer.isOpen"
         >
             <admin-cloud *ngIf="drawer.type === 'CLOUD'"></admin-cloud>

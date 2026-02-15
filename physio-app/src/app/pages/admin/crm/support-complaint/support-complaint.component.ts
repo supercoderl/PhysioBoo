@@ -51,7 +51,7 @@ import { Complaint } from "../../../../shared/types/complaint";
         </div>
 
         <!-- Submit Complaint Form -->
-        <div *ngIf="activeTab === 'submit'" class="bg-white rounded-lg shadow-md p-6">
+        <div *ngIf="activeTab === 'submit'" class="bg-surface rounded-lg shadow-md p-6">
           <h2 class="text-xl font-semibold text-gray-900 mb-6">Submit a New Complaint</h2>
           
           <form (ngSubmit)="submitComplaint()" #complaintForm="ngForm">
@@ -218,7 +218,7 @@ import { Complaint } from "../../../../shared/types/complaint";
         <!-- Track Complaints -->
         <div *ngIf="activeTab === 'track'">
           <!-- Search Bar -->
-          <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
             <div class="flex flex-col sm:flex-row gap-4">
               <input
                 type="text"
@@ -238,7 +238,7 @@ import { Complaint } from "../../../../shared/types/complaint";
           </div>
 
           <!-- Complaints List -->
-          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <div class="bg-surface rounded-lg shadow-md overflow-hidden">
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -252,7 +252,7 @@ import { Complaint } from "../../../../shared/types/complaint";
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-surface divide-y divide-gray-200">
                   <tr *ngFor="let complaint of filteredComplaints" class="hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{complaint.id}}</td>
                     <td class="px-6 py-4 text-sm text-gray-900">{{complaint.subject}}</td>
@@ -292,7 +292,7 @@ import { Complaint } from "../../../../shared/types/complaint";
 
         <!-- FAQ Section -->
         <div *ngIf="activeTab === 'faq'" class="space-y-4">
-          <div *ngFor="let faq of faqs; let i = index" class="bg-white rounded-lg shadow-md overflow-hidden">
+          <div *ngFor="let faq of faqs; let i = index" class="bg-surface rounded-lg shadow-md overflow-hidden">
             <button
               (click)="toggleFaq(i)"
               class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">

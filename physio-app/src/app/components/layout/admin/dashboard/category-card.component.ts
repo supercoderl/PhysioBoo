@@ -9,7 +9,7 @@ import { SharedModule } from "../../../../shared/shared-imports";
     ],
     template: `
         <div class="">
-            <a href="lab-results.php" class="mb-6 border border-solid border-[#E2E8F0] rounded-[5px] bg-white flex">
+            <a href="lab-results.php" class="mb-6 border border-solid border-[#E2E8F0] rounded-[5px] bg-surface flex">
                 <div class="p-5 text-center flex-1">
                     <span 
                         class="text-[32px] p-4 mb-2 inlineFlex-center-center w-full"

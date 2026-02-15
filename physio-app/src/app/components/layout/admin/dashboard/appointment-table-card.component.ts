@@ -28,7 +28,7 @@ interface Appointment {
     ButtonIconComponent
 ],
     template: `
-    <div class="bg-white rounded-lg border border-gray-200 h-full">
+    <div class="bg-surface rounded-lg border border-gray-200 h-full">
       <div class="flex items-center justify-between py-3 px-5 border-b border-gray-200">
         <h5 class="font-bold text-lg mb-0">Appointment Request</h5> 
         <boo-button-admin

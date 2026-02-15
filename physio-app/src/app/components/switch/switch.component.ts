@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SharedModule } from '../../shared/shared-imports';
 
 @Component({
@@ -10,9 +10,14 @@ import { SharedModule } from '../../shared/shared-imports';
   templateUrl: './switch.component.html'
 })
 export class SwitchComponent {
-  @Input() isOpen: boolean = false;
+  // #region Inputs, Outputs, Properties
+  @Input() isOpen: boolean | null | undefined = false;
+  @Output() change = new EventEmitter<void>();
+  // #endregion
 
+  // #region Methods
   handleSwitch() {
-    this.isOpen = !this.isOpen;
+    this.change.emit();
   }
+  // #endregion
 }

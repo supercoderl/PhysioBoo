@@ -15,7 +15,7 @@ import { SharedModule } from '../../../shared/shared-imports';
                     <div class="md:col-span-7 px-3">
                         <div class="py-12.5 md:py-30 text-center md:text-left z-[1] relative">
                             <div
-                                class="bg-white shadow-[0_4px_14px_#e2edff40] rounded-7.5 p-2 mb-4 gap-2 inline-flex items-center"
+                                class="bg-surface shadow-[0_4px_14px_#e2edff40] rounded-7.5 p-2 mb-4 gap-2 inline-flex items-center"
                             >
                                 <div class="p-0">
                                     <span class="w-11.252 h-11.252 -mr-3.5 border border-solid border-[rgba(0,_0,_0,_0.05)] align-middle transition-transform duration-200 ease rounded-full relative inline-block overflow-hidden hover:-translate-y-0.75 hover:z-[10]">
@@ -114,7 +114,7 @@ import { SharedModule } from '../../../shared/shared-imports';
                                 alt="patient-image"
                                 src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/banner/banner-doctor.svg"
                             />
-                            <div class="shadow-[0_4px_24px_#dddcff] p-4 rounded-2.5 text-center bg-white absolute right-0 top-1/2 translate-y-1/2 animate-mover">
+                            <div class="shadow-[0_4px_24px_#dddcff] p-4 rounded-2.5 text-center bg-surface absolute right-0 top-1/2 translate-y-1/2 animate-mover">
                                 <h6 class="text-lg font-semibold text-primary">1K</h6>
                                 <p class="text-xs m-0 text-brandDark">
                                     Appointments

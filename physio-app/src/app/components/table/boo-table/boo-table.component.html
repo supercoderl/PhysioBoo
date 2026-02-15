@@ -1,6 +1,6 @@
-<div class="flex flex-col bg-white overflow-hidden">
+<div class="flex flex-col bg-surface overflow-hidden">
   <div class="flex w-full flex-col border-b-1 px-3 py-1">
-    <div class="flex w-full flex-col items-center bg-white z-[1] relative">
+    <div class="flex w-full flex-col items-center bg-surface z-[1] relative">
       <div
         class="flex-center-center blur-[4px] border-2 border-dashed border-secondary absolute w-full z-[4]"
         style="opacity: 0; visibility: hidden"
@@ -17,7 +17,7 @@
                   class="inlineFlex flex-col relative min-w-0 p-0 m-0 border-0"
                 >
                   <div
-                    class="min-h-7 px-2 text-[13px] text-[#1F232B] inline-flex items-center rounded-2 relative bg-white"
+                    class="min-h-7 px-2 text-[13px] text-[#1F232B] inline-flex items-center rounded-2 relative bg-surface"
                   >
                     <lucide-icon [name]="search" class="w-4 h-4"></lucide-icon>
                     <input
@@ -188,7 +188,7 @@
         </tr>
       </thead>
 
-      <tbody class="bg-white">
+      <tbody class="bg-surface">
         <tr
           *ngFor="let row of sortedData"
           class="hover:bg-gray-50 border-b border-gray-200"
@@ -197,7 +197,7 @@
             <td
               [class]="
                 'px-6 py-4 text-sm text-gray-900 ' +
-                (column.pinned ? 'sticky bg-white ' : '') +
+                (column.pinned ? 'sticky bg-surface ' : '') +
                 (column.id === 'checkbox' ? 'left-0' : '') +
                 (column.id === 'actions' ? 'right-0' : '')
               "

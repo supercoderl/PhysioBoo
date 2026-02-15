@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, catchError, filter, switchMap, take, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, delay, filter, switchMap, take, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { AuthService } from '../auth/auth.service';
 import { BASE_API } from '../../shared/api/base';
@@ -35,7 +35,7 @@ export class InterceptorService implements HttpInterceptor {
       withCredentials: true
     });
 
-    return next.handle(apiReq).pipe(catchError((err: HttpErrorResponse) => {
+    return next.handle(apiReq).pipe(delay(environment.DELAY_TIMES), catchError((err: HttpErrorResponse) => {
       if (err.status === 401) {
         if (request.url.includes(BASE_API.PROFILE)) {
           return throwError(() => err);

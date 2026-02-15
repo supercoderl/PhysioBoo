@@ -50,7 +50,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                             alt="img"
                                             src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/specialities/speciality-02.jpg"
                                         />
-                                        <span class="w-15 h-15 rounded-full bg-white inlineFlex-center-center absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2">
+                                        <span class="w-15 h-15 rounded-full bg-surface inlineFlex-center-center absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2">
                                             <img
                                                 class="w-auto h-auto rounded-5 block group-hover:animate-flip360"
                                                 alt="img"

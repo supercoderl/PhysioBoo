@@ -12,7 +12,7 @@ import { AdmissionForm } from "../../../../shared/types/admission";
     <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div class="max-w-5xl mx-auto">
         <!-- Header -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
           <div class="flex items-center justify-between">
             <div>
               <h2 class="text-2xl font-bold text-gray-800">Patient Admission</h2>
@@ -26,7 +26,7 @@ import { AdmissionForm } from "../../../../shared/types/admission";
         </div>
 
         <!-- Progress Steps -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
           <div class="flex items-center justify-between">
             <div *ngFor="let step of steps; let i = index" class="flex items-center flex-1">
               <div class="flex flex-col items-center flex-1">
@@ -53,7 +53,7 @@ import { AdmissionForm } from "../../../../shared/types/admission";
 
         <form (ngSubmit)="submitAdmission()">
           <!-- Step 1: Patient Information -->
-          <div *ngIf="currentStep === 1" class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div *ngIf="currentStep === 1" class="bg-surface rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-xl font-semibold text-gray-800 mb-6 pb-3 border-b border-gray-200">
               Patient Information
             </h3>
@@ -203,7 +203,7 @@ import { AdmissionForm } from "../../../../shared/types/admission";
           </div>
 
           <!-- Step 2: Admission Details -->
-          <div *ngIf="currentStep === 2" class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div *ngIf="currentStep === 2" class="bg-surface rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-xl font-semibold text-gray-800 mb-6 pb-3 border-b border-gray-200">
               Admission Details
             </h3>
@@ -328,7 +328,7 @@ import { AdmissionForm } from "../../../../shared/types/admission";
           </div>
 
           <!-- Step 3: Medical Information -->
-          <div *ngIf="currentStep === 3" class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div *ngIf="currentStep === 3" class="bg-surface rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-xl font-semibold text-gray-800 mb-6 pb-3 border-b border-gray-200">
               Medical Information
             </h3>
@@ -387,7 +387,7 @@ import { AdmissionForm } from "../../../../shared/types/admission";
           </div>
 
           <!-- Step 4: Insurance Information -->
-          <div *ngIf="currentStep === 4" class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div *ngIf="currentStep === 4" class="bg-surface rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-xl font-semibold text-gray-800 mb-6 pb-3 border-b border-gray-200">
               Insurance Information
             </h3>
@@ -452,7 +452,7 @@ import { AdmissionForm } from "../../../../shared/types/admission";
           </div>
 
           <!-- Navigation Buttons -->
-          <div class="bg-white rounded-lg shadow-md p-6 flex justify-between">
+          <div class="bg-surface rounded-lg shadow-md p-6 flex justify-between">
             <button 
               *ngIf="currentStep > 1"
               type="button"

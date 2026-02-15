@@ -19,7 +19,7 @@ import { RadiologyExam } from "../../../../shared/types/radiology";
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-          <div class="bg-white rounded-lg shadow p-6">
+          <div class="bg-surface rounded-lg shadow p-6">
             <div class="flex items-center">
               <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
                 <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,7 +33,7 @@ import { RadiologyExam } from "../../../../shared/types/radiology";
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow p-6">
+          <div class="bg-surface rounded-lg shadow p-6">
             <div class="flex items-center">
               <div class="flex-shrink-0 bg-purple-100 rounded-md p-3">
                 <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,7 +47,7 @@ import { RadiologyExam } from "../../../../shared/types/radiology";
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow p-6">
+          <div class="bg-surface rounded-lg shadow p-6">
             <div class="flex items-center">
               <div class="flex-shrink-0 bg-yellow-100 rounded-md p-3">
                 <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,7 +61,7 @@ import { RadiologyExam } from "../../../../shared/types/radiology";
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow p-6">
+          <div class="bg-surface rounded-lg shadow p-6">
             <div class="flex items-center">
               <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
                 <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,7 +75,7 @@ import { RadiologyExam } from "../../../../shared/types/radiology";
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow p-6">
+          <div class="bg-surface rounded-lg shadow p-6">
             <div class="flex items-center">
               <div class="flex-shrink-0 bg-indigo-100 rounded-md p-3">
                 <svg class="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,7 +91,7 @@ import { RadiologyExam } from "../../../../shared/types/radiology";
         </div>
 
         <!-- Modality Quick Access -->
-        <div class="bg-white rounded-lg shadow mb-6 p-4">
+        <div class="bg-surface rounded-lg shadow mb-6 p-4">
           <h2 class="text-sm font-semibold text-gray-700 mb-3">Quick Access by Modality</h2>
           <div class="flex flex-wrap gap-2">
             <button
@@ -116,7 +116,7 @@ import { RadiologyExam } from "../../../../shared/types/radiology";
         </div>
 
         <!-- Filter and Action Bar -->
-        <div class="bg-white rounded-lg shadow mb-6 p-4">
+        <div class="bg-surface rounded-lg shadow mb-6 p-4">
           <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div class="flex flex-col sm:flex-row gap-3 flex-1">
               <input
@@ -168,7 +168,7 @@ import { RadiologyExam } from "../../../../shared/types/radiology";
         </div>
 
         <!-- Exams Table -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-surface rounded-lg shadow overflow-hidden">
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
@@ -183,7 +183,7 @@ import { RadiologyExam } from "../../../../shared/types/radiology";
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
+              <tbody class="bg-surface divide-y divide-gray-200">
                 <tr *ngFor="let exam of filteredExams" class="hover:bg-gray-50">
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="text-sm font-medium text-gray-900">{{exam.patientName}}</div>
@@ -295,12 +295,12 @@ import { RadiologyExam } from "../../../../shared/types/radiology";
         </div>
 
         <!-- Pagination -->
-        <div class="bg-white rounded-lg shadow mt-6 px-4 py-3 flex items-center justify-between">
+        <div class="bg-surface rounded-lg shadow mt-6 px-4 py-3 flex items-center justify-between">
           <div class="flex-1 flex justify-between sm:hidden">
-            <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-surface hover:bg-gray-50">
               Previous
             </button>
-            <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-surface hover:bg-gray-50">
               Next
             </button>
           </div>
@@ -313,13 +313,13 @@ import { RadiologyExam } from "../../../../shared/types/radiology";
             </div>
             <div>
               <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                <button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-surface text-sm font-medium text-gray-500 hover:bg-gray-50">
                   Previous
                 </button>
                 <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600">
                   1
                 </button>
-                <button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-surface text-sm font-medium text-gray-500 hover:bg-gray-50">
                   Next
                 </button>
               </nav>

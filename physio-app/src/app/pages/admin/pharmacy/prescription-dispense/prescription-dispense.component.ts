@@ -11,7 +11,7 @@ import { Prescription } from "../../../../shared/types/prescription";
     template: `
     <div class="min-h-screen bg-gray-50 p-6">
       <!-- Search Section -->
-      <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
         <h2 class="text-2xl font-semibold text-gray-800 mb-4">Prescription Dispense</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -47,7 +47,7 @@ import { Prescription } from "../../../../shared/types/prescription";
       </div>
 
       <!-- Prescription Details -->
-      <div *ngIf="currentPrescription" class="bg-white rounded-lg shadow-sm mb-6">
+      <div *ngIf="currentPrescription" class="bg-surface rounded-lg shadow-sm mb-6">
         <!-- Patient Info Header -->
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-lg">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -135,7 +135,7 @@ import { Prescription } from "../../../../shared/types/prescription";
       </div>
 
       <!-- Recent Dispenses -->
-      <div class="bg-white rounded-lg shadow-sm p-6">
+      <div class="bg-surface rounded-lg shadow-sm p-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Dispenses</h3>
         
         <div class="overflow-x-auto">

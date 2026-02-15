@@ -10,7 +10,7 @@ import { PostareaComponent } from "../../../../components/textarea/postarea/post
         <div class="gap-4 md:flex md:gap-6">
             <div class="flex w-full flex-col pb-4 md:w-80">
                 <div
-                    class="pt-6 px-8 flex flex-col w-full bg-white text-[#1F232B] shadow-xs overflow-hidden rounded-[12px]"
+                    class="pt-6 px-8 flex flex-col w-full bg-surface text-[#1F232B] shadow-xs overflow-hidden rounded-[12px]"
                 >
                     <div class="flex items-center justify-between pb-4">
                         <p

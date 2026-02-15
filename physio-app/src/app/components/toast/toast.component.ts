@@ -42,7 +42,7 @@ import { Toast, ToastType } from '../../shared/types/toast';
                 [@toastAnimation]
                 [@shakeAnimation]="toast.shakeTrigger"
                 class="
-                    relative pointer-events-auto w-80 shadow-lg rounded-lg border-l-4 p-4 bg-white 
+                    relative pointer-events-auto w-80 shadow-lg rounded-lg border-l-4 p-4 bg-surface 
                     flex items-start gap-3 transition-all hover:scale-[1.02]
                 "
                 [ngClass]="getClasses(toast.type)"
@@ -128,7 +128,7 @@ export class ToastComponent {
             return 'bg-blue-600 text-white border-transparent hover:bg-blue-700';
         }
         if (customClass === 'btn-cancel') {
-            return 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50';
+            return 'bg-surface text-gray-700 border-gray-300 hover:bg-gray-50';
         }
         return 'bg-gray-100 text-gray-800 hover:bg-gray-200 border-transparent';
     }

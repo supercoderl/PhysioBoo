@@ -10,7 +10,7 @@ import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-bu
         BooButtonAdminComponent,
     ],
     template: `
-    <div class="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
+    <div class="bg-surface rounded-lg border border-gray-200 h-full flex flex-col">
         <div class="flex items-center justify-between py-3 px-5 border-b border-gray-200">
             <h5 class="font-bold text-lg mb-0">Patients Statistics</h5> 
             <boo-button-admin

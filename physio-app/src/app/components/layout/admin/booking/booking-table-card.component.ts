@@ -24,7 +24,7 @@ interface Booking {
     ButtonIconComponent
   ],
   template: `
-    <div class="bg-white rounded-[6px] border border-gray-200 h-full">
+    <div class="bg-surface rounded-[6px] border border-gray-200 h-full">
       <boo-table-admin 
         [data]="getPaginatedData()" 
         tdClass="px-4 py-3"

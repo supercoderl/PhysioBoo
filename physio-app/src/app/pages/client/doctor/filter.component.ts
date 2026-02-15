@@ -21,7 +21,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                         </span>
                         Price (Low to High)
                     </a>
-                    <div class="p-3.75 border border-solid border-borderGray bg-white text-xs14 rounded-xs hidden">
+                    <div class="p-3.75 border border-solid border-borderGray bg-surface text-xs14 rounded-xs hidden">
                         <a class="dropdown-item" href="/react/template/patient/doctor-map-list-availability" data-discover="true">
                             Price (Low to High)
                         </a>

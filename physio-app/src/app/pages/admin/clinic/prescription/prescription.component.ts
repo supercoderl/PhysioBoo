@@ -15,7 +15,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
         <!-- Header -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
           <div class="flex items-center justify-between">
             <div>
               <h1 class="text-3xl font-bold text-gray-800">Prescription</h1>
@@ -32,7 +32,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
           <!-- Left Side - Patient Info & Diagnosis -->
           <div class="space-y-6">
             <!-- Patient Information -->
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-surface rounded-lg shadow-md p-6">
               <h2 class="text-xl font-bold text-gray-800 mb-4">Patient Information</h2>
               <div class="space-y-3">
                 <div>
@@ -61,7 +61,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
             </div>
 
             <!-- Diagnosis -->
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-surface rounded-lg shadow-md p-6">
               <h2 class="text-xl font-bold text-gray-800 mb-4">Diagnosis</h2>
               <div class="space-y-3">
                 <div *ngFor="let diag of diagnoses; let i = index" 
@@ -96,7 +96,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
             </div>
 
             <!-- Chief Complaint & Notes -->
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-surface rounded-lg shadow-md p-6">
               <h2 class="text-xl font-bold text-gray-800 mb-4">Clinical Notes</h2>
               <div class="space-y-3">
                 <div>
@@ -119,7 +119,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 
           <!-- Right Side - Medications -->
           <div class="lg:col-span-2">
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-surface rounded-lg shadow-md p-6">
               <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold text-gray-800">Medications</h2>
                 <button (click)="showMedicationForm = !showMedicationForm" 

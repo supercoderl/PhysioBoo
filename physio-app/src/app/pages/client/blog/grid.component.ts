@@ -13,7 +13,7 @@ import { SharedModule } from "../../../shared/shared-imports";
         <div class="px-3">
             <div class="grid md:grid-cols-2">
                 <div class="md:px-3" *ngFor="let blog of blogs">
-                    <div class="p-5 border border-solid border-borderGray bg-white relative rounded-[10px] mb-6">
+                    <div class="p-5 border border-solid border-borderGray bg-surface relative rounded-[10px] mb-6">
                         <div class="mb-4 overflow-hidden rounded-[10px] relative block w-full">
                             <a href="/react/template/blog/blog-grid" class="block relative w-full text-neutral transition-smooth">
                                 <img
@@ -66,7 +66,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                         <ul class="flex-center-center flex-wrap gap-2.5 m-0">
                             <li class="text-xs15">
                                 <a
-                                    class="w-auto leading-[21px] px-4 py-1.5 rounded-full bg-white border-borderGray h-7.5 text-primary inline-flex-center-center text-xs14 relative border border-solid cursor-pointer transition-smooth hover:bg-secondary hover:text-white"
+                                    class="w-auto leading-[21px] px-4 py-1.5 rounded-full bg-surface border-borderGray h-7.5 text-primary inline-flex-center-center text-xs14 relative border border-solid cursor-pointer transition-smooth hover:bg-secondary hover:text-white"
                                     href="/react/template/blog/blog-grid"
                                 >
                                     Prev
@@ -74,7 +74,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                             </li>
                             <li class="text-xs15">
                                 <a
-                                    class="w-7.5 px-3 py-1.5 rounded-full bg-white border-borderGray h-7.5 text-primary inline-flex-center-center text-xs14 relative border border-solid cursor-pointer transition-smooth hover:bg-secondary hover:text-white"
+                                    class="w-7.5 px-3 py-1.5 rounded-full bg-surface border-borderGray h-7.5 text-primary inline-flex-center-center text-xs14 relative border border-solid cursor-pointer transition-smooth hover:bg-secondary hover:text-white"
                                     href="/react/template/blog/blog-grid"
                                 >
                                     1
@@ -90,7 +90,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                             </li>
                             <li class="text-xs15">
                                 <a
-                                    class="w-7.5 px-3 py-1.5 rounded-full bg-white border-borderGray h-7.5 text-primary inline-flex-center-center text-xs14 relative border border-solid cursor-pointer transition-smooth hover:bg-secondary hover:text-white"
+                                    class="w-7.5 px-3 py-1.5 rounded-full bg-surface border-borderGray h-7.5 text-primary inline-flex-center-center text-xs14 relative border border-solid cursor-pointer transition-smooth hover:bg-secondary hover:text-white"
                                     href="/react/template/blog/blog-grid"
                                 >
                                     3
@@ -98,7 +98,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                             </li>
                             <li class="text-xs15">
                                 <a
-                                    class="w-7.5 px-3 py-1.5 rounded-full bg-white border-borderGray h-7.5 text-primary inline-flex-center-center text-xs14 relative border border-solid cursor-pointer transition-smooth hover:bg-secondary hover:text-white"
+                                    class="w-7.5 px-3 py-1.5 rounded-full bg-surface border-borderGray h-7.5 text-primary inline-flex-center-center text-xs14 relative border border-solid cursor-pointer transition-smooth hover:bg-secondary hover:text-white"
                                     href="/react/template/blog/blog-grid"
                                 >
                                     4
@@ -106,7 +106,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                             </li>
                             <li class="text-xs15">
                                 <a
-                                class="w-auto px-4 py-1.5 rounded-full bg-white border-borderGray h-7.5 text-primary inline-flex-center-center text-xs14 relative border border-solid cursor-pointer transition-smooth hover:bg-secondary hover:text-white"
+                                class="w-auto px-4 py-1.5 rounded-full bg-surface border-borderGray h-7.5 text-primary inline-flex-center-center text-xs14 relative border border-solid cursor-pointer transition-smooth hover:bg-secondary hover:text-white"
                                 href="/react/template/blog/blog-grid"
                                 >
                                     Next

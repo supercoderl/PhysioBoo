@@ -8,7 +8,7 @@ import { SharedModule } from "../../../shared/shared-imports";
         SharedModule
     ],
     template: `
-        <section class="relative bg-white block">
+        <section class="relative bg-surface block">
             <div class="container mx-auto px-3">
                 <div id="app-bg" class="rounded-7.5 p-7.5 md:pt-12.5 md:px-12.5 z-[1] bg-[right_top] relative">
                     <div class="flex items-center">

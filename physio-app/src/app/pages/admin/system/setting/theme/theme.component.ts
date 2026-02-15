@@ -31,7 +31,7 @@ interface AccentColor {
             <h1 class="text-2xl font-semibold text-gray-900 mb-8">Appearance</h1>
 
             <!-- Theme Mode Section -->
-            <div class="bg-white rounded-lg border border-gray-200 mb-6">
+            <div class="bg-surface rounded-lg border border-gray-200 mb-6">
               <div class="p-6 border-b border-gray-200">
                 <h2 class="text-base font-semibold text-gray-900 mb-1">Theme</h2>
                 <p class="text-sm text-gray-600">
@@ -76,7 +76,7 @@ interface AccentColor {
             </div>
 
             <!-- Accent Color Section -->
-            <div class="bg-white rounded-lg border border-gray-200 mb-6">
+            <div class="bg-surface rounded-lg border border-gray-200 mb-6">
               <div class="p-6 border-b border-gray-200">
                 <h2 class="text-base font-semibold text-gray-900 mb-1">Accent color</h2>
                 <p class="text-sm text-gray-600">
@@ -99,7 +99,7 @@ interface AccentColor {
                       *ngIf="accentColor === color.value"
                       class="absolute inset-0 flex items-center justify-center"
                     >
-                      <div class="w-3 h-3 bg-white rounded-full"></div>
+                      <div class="w-3 h-3 bg-surface rounded-full"></div>
                     </div>
                   </button>
                 </div>
@@ -107,7 +107,7 @@ interface AccentColor {
             </div>
 
             <!-- Font Size Section -->
-            <div class="bg-white rounded-lg border border-gray-200">
+            <div class="bg-surface rounded-lg border border-gray-200">
               <div class="p-6 border-b border-gray-200">
                 <h2 class="text-base font-semibold text-gray-900 mb-1">Font size</h2>
                 <p class="text-sm text-gray-600">

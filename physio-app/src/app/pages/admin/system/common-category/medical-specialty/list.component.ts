@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, signal } from "@angular/core";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
@@ -10,6 +10,18 @@ import { MedicalSpecialty } from "../../../../../shared/types/medical-staff";
 import { MedicalSpecialtyService } from "../../../../../services/admin/medical-specialty.service";
 import { AdminMedicalSpecialtyTableCardComponent } from "../../../../../components/layout/admin/setting/common-category/medical-specialty/medical-specialty-table-card.component";
 import { AdminMedicalSpecialtyDrawerComponent } from "../../../../../components/layout/admin/setting/common-category/medical-specialty/medical-specialty-drawer.component";
+import { DialogService } from "../../../../../services/common/dialog.service";
+import { catchError, of, tap } from "rxjs";
+import { ToastService } from "../../../../../services/common/toast.service";
+import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
+import { BooSortAdminComponent } from "../../../../../components/table/boo-table-admin/boo-sort-admin.component";
+import { SortOption } from "../../../../../shared/types/sort";
+import { BooFilterAdminComponent } from "../../../../../components/table/boo-table-admin/boo-filter-admin.component";
+import { FilterConfig } from "../../../../../shared/types/filter";
+import { BooDateAdminComponent } from "../../../../../components/table/boo-table-admin/boo-date-admin.component";
+import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
+import { DateRange } from "../../../../../shared/types/date";
+import { DateService } from "../../../../../services/common/date.service";
 
 @Component({
     selector: 'common-category-medical-specialty-list',
@@ -22,22 +34,58 @@ import { AdminMedicalSpecialtyDrawerComponent } from "../../../../../components/
         ButtonIconComponent,
         BooInputComponent,
         AdminMedicalSpecialtyTableCardComponent,
-        AdminMedicalSpecialtyDrawerComponent
+        AdminMedicalSpecialtyDrawerComponent,
+        BooSortAdminComponent,
+        BooFilterAdminComponent,
+        BooDateAdminComponent,
+        BooSelectComponent
     ],
     templateUrl: `./list.component.html`
 })
 
 export class CommonCategoryMedicalSpecialtyListComponent implements OnInit {
     // #region Inputs, Outputs, Properties
-    paginationData: PaginationData<MedicalSpecialty[]> | null = null;
-    filter = { pageNumber: 1, pageSize: 5 };
+    tableData = signal<PaginationData<MedicalSpecialty> | null>(null);
+    params = {
+        pageNumber: 1,
+        pageSize: 5,
+        search: '',
+        sort: 'createdAt:desc',
+        filter: {
+            start: null as Date | null,
+            end: null as Date | null
+        }
+    };
     isDrawerOpen: boolean = false;
     selectedId: string | null = null;
+    sort_options: SortOption[] = [
+        { label: 'Recent', value: '-createdAt' },
+        { label: 'Oldest', value: '+createdAt' },
+        { label: 'Name (A-Z)', value: '+name' },
+        { label: 'Name (Z-A)', value: '-name' },
+        { label: 'Code (A-Z)', value: '+code' },
+        { label: 'Code (Z-A)', value: '-code' },
+    ];
+
+    filter_configs: FilterConfig[] = [
+        {
+            key: 'isSurgical',
+            label: 'Classification',
+            type: 'boolean',
+            value: null,
+            trueLabel: 'Surgical',
+            falseLabel: 'Diagnostic'
+        },
+    ];
     // #endregion
 
     // #region Init (Lifecycle + Setup)
     constructor(
-        private medicalSpecialtySrv: MedicalSpecialtyService
+        private medicalSpecialtySrv: MedicalSpecialtyService,
+        private dialogSrv: DialogService,
+        private toastSrv: ToastService,
+        protected loadingSrv: LocalLoadingService,
+        private dateSrv: DateService
     ) { }
 
     ngOnInit(): void {
@@ -48,18 +96,25 @@ export class CommonCategoryMedicalSpecialtyListComponent implements OnInit {
     // #region Methods
     loadMedicalSpecialties() {
         this.medicalSpecialtySrv.search({
-            pageNumber: this.filter.pageNumber,
-            pageSize: this.filter.pageSize
+            pageNumber: this.params.pageNumber,
+            pageSize: this.params.pageSize,
+            search: this.params.search,
+            sort: this.params.sort,
+            filter: {
+                ...this.params.filter,
+                start: this.dateSrv.format(this.params.filter.start, "YYYY-MM-DD"),
+                end: this.dateSrv.format(this.params.filter.end, "YYYY-MM-DD")
+            }
         })
             .subscribe(_res => {
                 if (_res.success) {
-                    this.paginationData = _res.data;
+                    this.tableData.set(_res.data);
                 }
             });
     }
 
     onPageChanged(newPage: number) {
-        this.filter.pageNumber = newPage;
+        this.params.pageNumber = newPage;
         this.loadMedicalSpecialties();
     }
 
@@ -73,20 +128,126 @@ export class CommonCategoryMedicalSpecialtyListComponent implements OnInit {
         this.selectedId = null;
     }
 
-    onSaveSuccess() {
+    onSaveSuccess(result: MedicalSpecialty) {
         this.onCloseDrawer();
-        this.loadMedicalSpecialties();
+        this.tableData.update((currentData) => {
+            if (!currentData) {
+                return {
+                    items: [result],
+                    totalCount: 1,
+                    pageNumber: 1,
+                    pageSize: this.params.pageSize,
+                    totalPages: 1,
+                    hasNext: false,
+                    hasPrevious: false
+                }
+            }
+
+            const existingIndex = currentData.items.findIndex(x => x.id === result.id);
+            if (existingIndex > -1) {
+                const updatedItems = [...currentData.items];
+                updatedItems[existingIndex] = result;
+                return {
+                    ...currentData,
+                    items: updatedItems
+                };
+            }
+
+            return {
+                ...currentData,
+                totalCount: currentData.totalCount + 1,
+                items: [result, ...currentData.items],
+                totalPages: Math.ceil((currentData.totalCount + 1) / currentData.pageSize)
+            }
+        })
     }
 
     onDelete(id: string | null) {
-        if (id) {
-            this.medicalSpecialtySrv.delete(id)
-                .subscribe(_res => {
-                    if (_res.success) {
-               
-                    }
+        if (!id) return;
+
+        this.dialogSrv.confirmDelete(() => {
+            const currentData = this.tableData();
+            if (!currentData) return;
+
+            const isLastItemOnPage = currentData.items.length === 1;
+            const isNotFirstPage = currentData.pageNumber > 1;
+
+            if (isLastItemOnPage && isNotFirstPage) {
+                this.medicalSpecialtySrv.delete(id).subscribe({
+                    next: () => {
+                        this.toastSrv.success("Deleted 1 item.");
+                        this.params.pageNumber = currentData.pageNumber - 1;
+                        this.loadMedicalSpecialties();
+                    },
+                    error: () => this.toastSrv.error("System error occurred.")
                 });
+                this.isDrawerOpen && this.onCloseDrawer();
+                return;
+            }
+
+            const backupItems = [...currentData.items];
+            const backupCount = currentData.totalCount;
+
+            this.tableData.update(data => {
+                if (!data) return null;
+                return {
+                    ...data,
+                    items: data.items.filter(item => item.id !== id),
+                    totalCount: data.totalCount - 1
+                };
+            });
+
+            this.medicalSpecialtySrv.delete(id)
+                .pipe(
+                    tap(() => this.toastSrv.success("Deleted 1 item.")),
+                    catchError(_ => {
+                        this.toastSrv.error("System error occurred. Rolling back data...");
+                        this.tableData.update(data => {
+                            if (!data) return null;
+                            return { ...data, items: backupItems, totalCount: backupCount };
+                        });
+                        return of(null);
+                    })
+                )
+                .subscribe({ next: _ => this.isDrawerOpen && this.onCloseDrawer() });
+        })
+    }
+
+    onSearch(val: string) {
+        this.params = { ...this.params, pageNumber: 1, search: val };
+        this.loadMedicalSpecialties();
+    }
+
+    onSortChange(sort: SortOption) {
+        this.params = { ...this.params, pageNumber: 1, sort: sort.value };
+        this.loadMedicalSpecialties();
+    }
+
+    onFilterApply(event: any) {
+        console.log(event);
+        this.params = {
+            ...this.params,
+            pageNumber: 1,
+            filter: {
+                start: this.params.filter.start,
+                end: this.params.filter.end,
+                ...event
+            }
         }
+        this.loadMedicalSpecialties();
+    }
+
+    onDateChange(range: DateRange) {
+        this.params = {
+            ...this.params,
+            pageNumber: 1,
+            filter: {
+                ...this.params.filter,
+                start: range.start,
+                end: range.end
+            }
+        };
+        this.loadMedicalSpecialties();
     }
     // #endregion
 }

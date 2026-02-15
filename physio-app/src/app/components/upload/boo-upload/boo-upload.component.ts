@@ -4,6 +4,8 @@ import { SharedModule } from '../../../shared/shared-imports'; // Chứa CommonM
 import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
 import { CloudinaryService } from '../../../services/common/cloudinary.service';
 import { environment } from '../../../../environments/environment.development';
+import { LocalLoadingService } from '../../../services/common/local-loading.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'boo-upload',
@@ -36,10 +38,13 @@ import { environment } from '../../../../environments/environment.development';
         [style.height]="height"
         [style.border-radius.px]="radius"
       >
+        <div *ngIf="loadingSrv.isLoading('upload')" class="absolute inset-0 bg-surface/80 z-20 flex flex-col items-center justify-center backdrop-blur-[1px]">
+          <boo-icon name="loader" class="animate-spin text-primary" [size]="24"></boo-icon>
+        </div>
         <ng-container *ngIf="previewUrl; else emptyState">
           <img [src]="previewUrl" class="w-full h-full object-cover">
           
-          <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+          <div *ngIf="!loadingSrv.isLoading('upload')" class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity z-10">
             <div class="flex flex-col items-center text-white">
               <boo-icon name="pencil" [size]="20" color="white"></boo-icon>
               <span class="text-[10px] font-medium mt-1">Change</span>
@@ -84,13 +89,16 @@ export class BooUploadComponent implements ControlValueAccessor {
   disabled = false;
 
   get containerClass() {
-    return { 'opacity-50 cursor-not-allowed pointer-events-none': this.disabled };
+    return { 
+      'opacity-50 cursor-not-allowed pointer-events-none': this.disabled || this.loadingSrv.isLoading('upload') 
+    };
   }
   // #endregion
 
   // #region Init (Lifecycle + Setup)
   constructor(
-    private cloudinarySrv: CloudinaryService
+    private cloudinarySrv: CloudinaryService,
+    protected loadingSrv: LocalLoadingService
   ) { }
   // #endregion
 
@@ -99,21 +107,27 @@ export class BooUploadComponent implements ControlValueAccessor {
   onTouched: () => void = () => { };
 
   triggerUpload() {
-    if (!this.disabled) this.fileInput.nativeElement.click();
+    if (!this.disabled && !this.loadingSrv.isLoading('upload')) this.fileInput.nativeElement.click();
   }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-    this.cloudinarySrv.uploadImage(file, this.folder).subscribe({
-      next: (res) => {
-        this.previewUrl = res.secure_url;
-        this.onChange(res.secure_url);
-        this.uploadSuccess.emit({ url: res.secure_url, publicId: res.public_id });
-      },
-      error: (err) => console.error('Upload failed', err)
-    });
+    this.cloudinarySrv.uploadImage(file, this.folder)
+      .pipe(
+        finalize(() => {
+          input.value = '';
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          this.previewUrl = res.secure_url;
+          this.onChange(res.secure_url);
+          this.uploadSuccess.emit({ url: res.secure_url, publicId: res.public_id });
+        },
+        error: (err) => console.error('Upload failed', err)
+      });
   }
 
   writeValue(value: any): void {

@@ -1,6 +1,9 @@
-import { Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared-imports';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { environment } from '../../../../environments/environment.development';
+import { Size } from '../../../shared/types/common';
 
 @Component({
   selector: 'boo-input',
@@ -20,7 +23,6 @@ import { SharedModule } from '../../../shared/shared-imports';
       <label
         (click)="focusInput()"
         [class]="labelClasses"
-        [style.color]="placeholderColor"
         *ngIf="!model" 
       >
         {{ label }} <span *ngIf="required" class="text-red-500 ml-0.5">*</span>
@@ -40,10 +42,9 @@ import { SharedModule } from '../../../shared/shared-imports';
           (blur)="onTouched()"
           
           [class]="inputClasses"
+
           [style.border-radius.px]="radius"
-          [style.background-color]="backgroundColor"
           [style.border-width.px]="borderWidth"
-          [style.border-color]="borderColor"
           
           autocomplete="off"
         />
@@ -58,52 +59,69 @@ import { SharedModule } from '../../../shared/shared-imports';
     'class': 'block w-full relative group mb-0',
   },
 })
-export class BooInputComponent {
+export class BooInputComponent implements OnInit, OnDestroy {
   // #region Inputs, Outputs, Properties
   @Input() label: string = '';
   @Input({ transform: (v: unknown) => v === '' || v === true || v === 'true' }) required: boolean = false;
   @Input() id: string = '';
   @Input() name: string = '';
   @Input() type: string = 'text';
-  @Input() size: "small" | "medium" | "large" = "medium";
+  @Input() size: Size = "middle";
   @Input() maxlength: number = 400;
-  @Input() radius: number = 6; 
-  @Input() backgroundColor: string = 'white';
+  @Input() radius: number = 6;
   @Input() borderWidth: number = 1;
-  @Input() borderColor: string = '#e6e8ee';
-  @Input() placeholderColor: string = '#64748B'; // Slate-500
+  @Output() search = new EventEmitter<string>();
   @ViewChild('inputElement') inputElement!: ElementRef;
 
   model: string = '';
   disabled: boolean = false;
+  private destroy$ = new Subject<void>();
+  private searchSubject = new Subject<string>();
 
   get labelClasses(): string {
-    const base = 'absolute left-0 z-[1] flex items-center transition-all duration-300 cursor-text truncate pointer-events-none';
+    const base = 'absolute left-0 z-[1] text-placeholder flex items-center transition-all duration-300 cursor-text truncate pointer-events-none';
     const focusEffect = 'group-focus-within:translate-x-4 group-focus-within:opacity-0 group-focus-within:invisible';
-    
+
     let sizeClass = '';
     switch (this.size) {
-      case 'small':  sizeClass = 'px-3 text-xs'; break;
-      case 'large':  sizeClass = 'px-5 text-base'; break;
-      default:       sizeClass = 'px-4 text-sm'; break; // medium
+      case 'small': sizeClass = 'px-3 text-xs'; break;
+      case 'large': sizeClass = 'px-5 text-base'; break;
+      default: sizeClass = 'px-4 text-sm'; break; // middle
     }
 
     return `${base} ${focusEffect} ${sizeClass}`;
   }
 
   get inputClasses(): string {
-    const base = 'block w-full text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400';
-    
+    const base = 'block bg-surface border-border w-full text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400';
+
     let sizeClass = '';
     switch (this.size) {
-      case 'small':  sizeClass = 'px-3 h-8.5 text-xs'; break;
-      case 'large':  sizeClass = 'px-5 h-12 text-base'; break;
-      default:       sizeClass = 'px-4 h-11 text-sm'; break; // medium
+      case 'small': sizeClass = 'px-3 h-8.5 text-xs'; break;
+      case 'large': sizeClass = 'px-5 h-12 text-base'; break;
+      default: sizeClass = 'px-4 h-11 text-sm'; break; // middle
     }
 
-    const disabledClass = this.disabled ? 'bg-gray-100 cursor-not-allowed opacity-70' : '';
+    const disabledClass = this.disabled ? '!bg-gray-100 dark:!bg-zinc-800/50 cursor-not-allowed opacity-70' : '';
 
     return `${base} ${sizeClass} ${disabledClass}`;
+  }
+  // #endregion
+
+  // #region Init (Lifecycle + Setup)
+  ngOnInit(): void {
+    this.searchSubject.pipe(
+      debounceTime(environment.DEBOUNCE_TIMES),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(val => {
+      this.search.emit(val || '');
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
   // #endregion
 
@@ -114,8 +132,8 @@ export class BooInputComponent {
     }
   }
 
-  onChange: (value: any) => void = () => {};
-  onTouched: () => void = () => {};
+  onChange: (value: any) => void = () => { };
+  onTouched: () => void = () => { };
 
   writeValue(value: any): void {
     this.model = value || '';
@@ -136,6 +154,7 @@ export class BooInputComponent {
   onModelChange(val: string) {
     this.model = val;
     this.onChange(val);
+    this.searchSubject.next(val);
   }
   // #endregion
 }

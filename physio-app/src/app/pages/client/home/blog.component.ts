@@ -29,7 +29,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 />
                             </a>
                             <!-- Date Badge -->
-                            <div class="w-15 h-15 rounded-2.5 absolute top-3.75 left-3.75 bg-white text-center p-1.5">
+                            <div class="w-15 h-15 rounded-2.5 absolute top-3.75 left-3.75 bg-surface text-center p-1.5">
                                 <span class="text-lg font-semibold text-primary block">15</span>
                                 <span class="text-xs text-gray-600">May</span>
                             </div>

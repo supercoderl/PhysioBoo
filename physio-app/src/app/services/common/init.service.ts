@@ -6,6 +6,7 @@ import { LocalStorage } from '../../shared/utils/storage';
 import { MenuCache, MenuItem } from '../../shared/types/menu';
 import { BASE_API } from '../../shared/api/base';
 import { AuthService } from '../auth/auth.service';
+import { CONFIG_CACHE_KEY, MENU_CACHE_KEY } from '../../shared/data/cache';
 
 @Injectable({ providedIn: 'root' })
 export class InitService {
@@ -14,9 +15,6 @@ export class InitService {
 
     private config: AppConfig | null = null;
     private menus: MenuItem[] = [];
-
-    private readonly CACHE_KEY = "config_data";
-    private readonly MENU_CACHE_KEY = "menu_data";
 
     /**
      * This main function will be called at APP_INITIALIZER
@@ -32,7 +30,7 @@ export class InitService {
 
     private async loadConfig(): Promise<void> {
         try {
-            const cache = LocalStorage.load<AppConfig>(this.CACHE_KEY);
+            const cache = LocalStorage.load<AppConfig>(CONFIG_CACHE_KEY);
             const cachedVersion = cache?.version;
 
             let headers = new HttpHeaders();
@@ -68,7 +66,7 @@ export class InitService {
             if (res?.success) {
                 const newConfig = res.data;
                 this.config = newConfig;
-                LocalStorage.save(this.CACHE_KEY, newConfig);
+                LocalStorage.save(CONFIG_CACHE_KEY, newConfig);
             } else {
                 this.config = this.getDefaultConfig();
             }
@@ -80,7 +78,7 @@ export class InitService {
 
     private async loadMenu(): Promise<void> {
         try {
-            const cache = LocalStorage.load<MenuCache>(this.MENU_CACHE_KEY);
+            const cache = LocalStorage.load<MenuCache>(MENU_CACHE_KEY);
             const cachedVersion = cache?.version;
 
             let headers = new HttpHeaders();
@@ -104,14 +102,14 @@ export class InitService {
             if (res.success) {
                 const newMenuData = res.data;
                 this.menus = newMenuData.items;
-                LocalStorage.save(this.MENU_CACHE_KEY, newMenuData);
+                LocalStorage.save(MENU_CACHE_KEY, newMenuData);
             } else {
                 this.menus = [];
             }
 
         } catch (err) {
             console.error("Load Menu Error", err);
-            const cache = LocalStorage.load<MenuCache>(this.MENU_CACHE_KEY);
+            const cache = LocalStorage.load<MenuCache>(MENU_CACHE_KEY);
             if (cache) {
                 this.menus = cache.items;
             } else {
@@ -132,7 +130,8 @@ export class InitService {
         return {
             version: '1.0.0',
             features: {},
-            registrationRoles: []
+            registrationRoles: [],
+            languages: []
         };
     }
 

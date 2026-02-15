@@ -13,7 +13,7 @@ import { PolicyVerification } from "../../../../shared/types/policy";
      <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
         <!-- Tab Navigation -->
-        <div class="bg-white rounded-lg shadow-md mb-6">
+        <div class="bg-surface rounded-lg shadow-md mb-6">
           <div class="flex border-b border-gray-200">
             <button
               *ngFor="let tab of tabs"
@@ -31,7 +31,7 @@ import { PolicyVerification } from "../../../../shared/types/policy";
         <!-- Policy Verification Tab -->
         <div *ngIf="activeTab === 'verification'" class="space-y-6">
           <!-- Verification Form -->
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="bg-surface rounded-lg shadow-md p-6">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">Verify Insurance Policy</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -64,7 +64,7 @@ import { PolicyVerification } from "../../../../shared/types/policy";
           </div>
 
           <!-- Verification Result -->
-          <div *ngIf="verifiedPolicy" class="bg-white rounded-lg shadow-md p-6">
+          <div *ngIf="verifiedPolicy" class="bg-surface rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between mb-4">
               <h2 class="text-xl font-semibold text-gray-800">Policy Details</h2>
               <span
@@ -123,7 +123,7 @@ import { PolicyVerification } from "../../../../shared/types/policy";
         </div>
 
         <!-- New Claim Tab -->
-        <div *ngIf="activeTab === 'newClaim'" class="bg-white rounded-lg shadow-md p-6">
+        <div *ngIf="activeTab === 'newClaim'" class="bg-surface rounded-lg shadow-md p-6">
           <h2 class="text-xl font-semibold text-gray-800 mb-6">Submit New Insurance Claim</h2>
           
           <form class="space-y-6">
@@ -264,7 +264,7 @@ import { PolicyVerification } from "../../../../shared/types/policy";
         </div>
 
         <!-- Claims List Tab -->
-        <div *ngIf="activeTab === 'claimsList'" class="bg-white rounded-lg shadow-md p-6">
+        <div *ngIf="activeTab === 'claimsList'" class="bg-surface rounded-lg shadow-md p-6">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-semibold text-gray-800">Insurance Claims</h2>
             <div class="flex gap-3">
@@ -337,7 +337,7 @@ import { PolicyVerification } from "../../../../shared/types/policy";
         </div>
 
         <!-- Providers Tab -->
-        <div *ngIf="activeTab === 'providers'" class="bg-white rounded-lg shadow-md p-6">
+        <div *ngIf="activeTab === 'providers'" class="bg-surface rounded-lg shadow-md p-6">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-semibold text-gray-800">Insurance Providers</h2>
             <button

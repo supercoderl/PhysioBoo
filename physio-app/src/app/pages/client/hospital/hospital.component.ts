@@ -13,7 +13,7 @@ import { SharedModule } from "../../../shared/shared-imports";
 ],
     template: `
         <breadcrumb title="Hospital"></breadcrumb>
-        <div class="py-12.5 md:py-15 bg-white min-h-50">
+        <div class="py-12.5 md:py-15 bg-surface min-h-50">
             <div class="container mx-auto px-3">
                 <div class="border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 rounded-[10px] flex">
                     <div class="p-5 flex-1">
@@ -114,7 +114,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 </div> -->
                                 <div class="max-w-100 relative">
                                     <input
-                                        class="h-9.5 min-h-9.5 border border-solid border-borderGray rounded-[5px] pl-8.5 text-primary bg-white text-xs14 leading-[1.6] py-1.75 px-3.75 transition-smooth block w-full"
+                                        class="h-9.5 min-h-9.5 border border-solid border-borderGray rounded-[5px] pl-8.5 text-primary bg-surface text-xs14 leading-[1.6] py-1.75 px-3.75 transition-smooth block w-full"
                                         placeholder="Search Hospitals"
                                         type="text"
                                     />

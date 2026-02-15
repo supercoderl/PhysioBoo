@@ -21,7 +21,7 @@ import { Allergy } from "../../../../shared/types/allergy";
   <div class="max-w-7xl mx-auto">
     
     <!-- Header Section -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
       <div class="flex items-start justify-between">
         <div class="flex items-start space-x-6">
           <!-- Patient Photo -->
@@ -78,7 +78,7 @@ import { Allergy } from "../../../../shared/types/allergy";
     </div>
 
     <!-- Tabs Navigation -->
-    <div class="bg-white rounded-lg shadow-md mb-6">
+    <div class="bg-surface rounded-lg shadow-md mb-6">
       <div class="border-b border-gray-200">
         <nav class="flex -mb-px">
           <button 

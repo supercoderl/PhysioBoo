@@ -28,7 +28,7 @@ import { BloodGroup } from "../../../../../shared/enums/blood-group";
             <div class="grid w-full gap-4 sm:grid-cols-4">
               <div class="sm:col-span-1">
                 <div
-                  class="border-4 border-solid w-40 h-40 overflow-hidden relative flex-center-center leading-none rounded-full overflow-hidden text-[13px] border-[#c3c3c3] bg-white"
+                  class="border-4 border-solid w-40 h-40 overflow-hidden relative flex-center-center leading-none rounded-full overflow-hidden text-[13px] border-[#c3c3c3] bg-surface"
                 >
                   <img
                     alt="User avatar"

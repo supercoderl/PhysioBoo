@@ -12,7 +12,7 @@ import { AudienceSegment } from "../../../../shared/types/audience-segment";
     template: `
     <div class="min-h-screen bg-gray-50 p-6">
       <!-- Header Section -->
-      <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
         <div class="flex justify-between items-center">
           <div>
             <h2 class="text-2xl font-semibold text-gray-800">Marketing Campaigns</h2>
@@ -29,7 +29,7 @@ import { AudienceSegment } from "../../../../shared/types/audience-segment";
 
       <!-- Statistics Cards -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-surface rounded-lg shadow-sm p-6">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 mb-1">Total Campaigns</p>
@@ -43,7 +43,7 @@ import { AudienceSegment } from "../../../../shared/types/audience-segment";
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-surface rounded-lg shadow-sm p-6">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 mb-1">Active Campaigns</p>
@@ -57,7 +57,7 @@ import { AudienceSegment } from "../../../../shared/types/audience-segment";
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-surface rounded-lg shadow-sm p-6">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 mb-1">Total Reach</p>
@@ -71,7 +71,7 @@ import { AudienceSegment } from "../../../../shared/types/audience-segment";
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-surface rounded-lg shadow-sm p-6">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 mb-1">Conversions</p>
@@ -87,7 +87,7 @@ import { AudienceSegment } from "../../../../shared/types/audience-segment";
       </div>
 
       <!-- Filters Section -->
-      <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
@@ -172,7 +172,7 @@ import { AudienceSegment } from "../../../../shared/types/audience-segment";
         <!-- Grid View -->
         <div *ngIf="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div *ngFor="let campaign of filteredCampaigns" 
-               class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200">
+               class="bg-surface rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200">
             <div class="p-6">
               <div class="flex justify-between items-start mb-4">
                 <div class="flex-1">
@@ -252,7 +252,7 @@ import { AudienceSegment } from "../../../../shared/types/audience-segment";
         </div>
 
         <!-- List View -->
-        <div *ngIf="viewMode === 'list'" class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div *ngIf="viewMode === 'list'" class="bg-surface rounded-lg shadow-sm overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead>
@@ -332,7 +332,7 @@ import { AudienceSegment } from "../../../../shared/types/audience-segment";
 
       <!-- Create Campaign Modal -->
       <div *ngIf="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="bg-surface rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           <div class="p-6 border-b border-gray-200">
             <h3 class="text-xl font-semibold text-gray-900">Create New Campaign</h3>
           </div>

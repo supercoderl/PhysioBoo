@@ -16,7 +16,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
     <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
         <!-- Header with Patient Search -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
           <div class="flex items-center justify-between mb-4">
             <h1 class="text-3xl font-bold text-gray-800">Medical Records</h1>
             <div class="flex items-center gap-3">
@@ -37,7 +37,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
         </div>
 
         <!-- Patient Profile Card -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
           <div class="flex items-start justify-between mb-6">
             <div class="flex items-start gap-6">
               <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center">
@@ -85,7 +85,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
         </div>
 
         <!-- Tabs Navigation -->
-        <div class="bg-white rounded-lg shadow-md mb-6">
+        <div class="bg-surface rounded-lg shadow-md mb-6">
           <div class="border-b border-gray-200">
             <nav class="flex -mb-px">
               <button *ngFor="let tab of tabs"
@@ -104,7 +104,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
         <div [ngSwitch]="activeTab">
           <!-- Visit History Tab -->
           <div *ngSwitchCase="'visits'" class="space-y-4">
-            <div *ngFor="let visit of visits" class="bg-white rounded-lg shadow-md p-6">
+            <div *ngFor="let visit of visits" class="bg-surface rounded-lg shadow-md p-6">
               <div class="flex items-start justify-between mb-4">
                 <div>
                   <h3 class="text-xl font-bold text-gray-800">{{ visit.date }}</h3>
@@ -161,7 +161,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
               </div>
             </div>
 
-            <div *ngIf="visits.length === 0" class="bg-white rounded-lg shadow-md p-12 text-center">
+            <div *ngIf="visits.length === 0" class="bg-surface rounded-lg shadow-md p-12 text-center">
               <svg class="w-16 h-16 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
@@ -170,7 +170,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
           </div>
 
           <!-- Lab Results Tab -->
-          <div *ngSwitchCase="'labs'" class="bg-white rounded-lg shadow-md p-6">
+          <div *ngSwitchCase="'labs'" class="bg-surface rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-bold text-gray-800">Laboratory Results</h2>
               <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
@@ -191,7 +191,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-surface divide-y divide-gray-200">
                   <tr *ngFor="let lab of labResults" class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ lab.date }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{{ lab.testName }}</td>
@@ -214,7 +214,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
           </div>
 
           <!-- Documents Tab -->
-          <div *ngSwitchCase="'documents'" class="bg-white rounded-lg shadow-md p-6">
+          <div *ngSwitchCase="'documents'" class="bg-surface rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-bold text-gray-800">Medical Documents</h2>
               <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
@@ -252,7 +252,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
           </div>
 
           <!-- Medications Tab -->
-          <div *ngSwitchCase="'medications'" class="bg-white rounded-lg shadow-md p-6">
+          <div *ngSwitchCase="'medications'" class="bg-surface rounded-lg shadow-md p-6">
             <h2 class="text-xl font-bold text-gray-800 mb-6">Current Medications</h2>
             <div class="space-y-4">
               <div class="border-2 border-gray-200 rounded-lg p-4">

@@ -10,7 +10,7 @@ import { SharedModule } from "../../../shared/shared-imports";
         SharedModule
     ],
     template: `
-    <section class="pb-4 md:pb-9 bg-white pt-10 md:pt-15 relative overflow-hidden z-[1] block">
+    <section class="pb-4 md:pb-9 bg-surface pt-10 md:pt-15 relative overflow-hidden z-[1] block">
         <div class="container mx-auto">
             <div class="flex justify-center">
                 <div class="px-3">
@@ -25,7 +25,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                     *ngFor="let doctor of bestDoctors"
                 >
                     <div 
-                        class="mb-6 bg-white border border-solid border-borderGray rounded-[8px] relative overflow-hidden w-full"
+                        class="mb-6 bg-surface border border-solid border-borderGray rounded-[8px] relative overflow-hidden w-full"
                     >
                         <div class="relative">
                             <a
@@ -41,7 +41,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 </div>
                             </a>
                             <div class="absolute top-5 right-5">
-                                <span class="font-semibold text-xs14 text-primary py-1.5 px-3 bg-white rounded-[8px]">$ {{doctor.price}}</span>
+                                <span class="font-semibold text-xs14 text-primary py-1.5 px-3 bg-surface rounded-[8px]">$ {{doctor.price}}</span>
                             </div>
                         </div>
                         <div class="p-5">

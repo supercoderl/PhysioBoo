@@ -2,8 +2,6 @@ import { Component } from "@angular/core";
 import { ColumnDefDirective } from "../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
-import { ButtonIconComponent } from "../../../button/button-icon/button-icon.component";
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 import { BooTableAdminComponent } from "../../../table/boo-table-admin/boo-table-admin.component";
 import { BooTagComponent } from "../../../tag/boo-tag/boo-tag/boo-tag.component";
 
@@ -23,12 +21,10 @@ interface Doctor {
         BooButtonAdminComponent,
         BooTableAdminComponent,
         ColumnDefDirective,
-        BooIconComponent,
-        ButtonIconComponent,
         BooTagComponent
     ],
     template: `
-    <div class="bg-white rounded-lg border border-gray-200 h-full">
+    <div class="bg-surface rounded-lg border border-gray-200 h-full">
       <div class="flex items-center justify-between py-3 px-5 border-b border-gray-200">
         <h5 class="font-bold text-lg mb-0">Doctors</h5> 
         <boo-button-admin

@@ -15,7 +15,7 @@ import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
     ],
     encapsulation: ViewEncapsulation.None,
     template: `
-        <div class="flex border border-borderGray rounded-md bg-white">
+        <div class="flex border border-borderGray rounded-md bg-surface">
             <div class="pb-2 flex-1 w-full">
                 <div class="flex items-center justify-between gap-1 p-5 pb-0 mb-1">
                     <div class="flex items-center overflow-hidden">

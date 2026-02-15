@@ -19,7 +19,7 @@ import { InventoryItem } from "../../../../shared/types/inventory";
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <div class="bg-white rounded-lg shadow p-6">
+          <div class="bg-surface rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600">Total Items</p>
@@ -33,7 +33,7 @@ import { InventoryItem } from "../../../../shared/types/inventory";
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow p-6">
+          <div class="bg-surface rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600">Low Stock</p>
@@ -47,7 +47,7 @@ import { InventoryItem } from "../../../../shared/types/inventory";
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow p-6">
+          <div class="bg-surface rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600">Out of Stock</p>
@@ -61,7 +61,7 @@ import { InventoryItem } from "../../../../shared/types/inventory";
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow p-6">
+          <div class="bg-surface rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600">Categories</p>
@@ -77,7 +77,7 @@ import { InventoryItem } from "../../../../shared/types/inventory";
         </div>
 
         <!-- Filters and Actions -->
-        <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <div class="bg-surface rounded-lg shadow p-6 mb-6">
           <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
               <!-- Search -->
@@ -142,7 +142,7 @@ import { InventoryItem } from "../../../../shared/types/inventory";
         </div>
 
         <!-- Inventory Table -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-surface rounded-lg shadow overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead class="bg-gray-50 border-b border-gray-200">
@@ -156,7 +156,7 @@ import { InventoryItem } from "../../../../shared/types/inventory";
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
+              <tbody class="bg-surface divide-y divide-gray-200">
                 <tr *ngFor="let item of filteredItems" class="hover:bg-gray-50 transition">
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="text-sm font-medium text-gray-900">{{ item.name }}</div>

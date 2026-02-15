@@ -2,16 +2,18 @@
   <input
     type="checkbox"
     class="absolute w-full h-full opacity-0 cursor-pointer peer z-10"
-    (click)="handleSwitch()"
+    (change)="handleSwitch()"
     [checked]="isOpen"
   />
+
   <span
     class="absolute inset-0 bg-gray-600 rounded-full transition-colors duration-300 ease-in-out peer-checked:bg-blue-500"
   ></span>
+
   <span
     [ngClass]="{
-      'absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ease-in-out': true,
-      'translate-x-5': isOpen
+      'absolute left-0.5 top-0.5 w-4 h-4 bg-surface rounded-full shadow-md transition-transform duration-300 ease-in-out': true,
+      'translate-x-5': isOpen,
     }"
   ></span>
 </span>

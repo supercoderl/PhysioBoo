@@ -18,7 +18,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
     <div class="min-h-screen bg-gray-50 p-6">
       <div class="max-w-7xl mx-auto">
         <!-- Header -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
           <div class="flex items-center justify-between">
             <div>
               <h1 class="text-3xl font-bold text-gray-800">Treatment Sheet</h1>
@@ -34,7 +34,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
         </div>
 
         <!-- Patient Info Card -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <p class="text-sm text-gray-600">Patient Name</p>
@@ -91,7 +91,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
         <div [ngSwitch]="activeTab">
           <!-- Vital Signs Tab -->
           <div *ngSwitchCase="'vitals'">
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
               <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold text-gray-800">Record Vital Signs</h2>
                 <span class="text-sm text-gray-600">{{ currentTime }}</span>
@@ -160,7 +160,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
             </div>
 
             <!-- Vital Signs History -->
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-surface rounded-lg shadow-md p-6">
               <h2 class="text-xl font-bold text-gray-800 mb-4">Vital Signs History (Today)</h2>
               <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -176,7 +176,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
                       <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">By</th>
                     </tr>
                   </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
+                  <tbody class="bg-surface divide-y divide-gray-200">
                     <tr *ngFor="let vital of vitalSigns" class="hover:bg-gray-50">
                       <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">12:00</td>
                       <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ vital.temperature }}</td>
@@ -191,7 +191,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 
           <!-- Medications Tab -->
           <div *ngSwitchCase="'medications'" class="space-y-6">
-            <div *ngFor="let med of medications" class="bg-white rounded-lg shadow-md p-6">
+            <div *ngFor="let med of medications" class="bg-surface rounded-lg shadow-md p-6">
               <div class="flex items-start justify-between mb-4">
                 <div>
                   <h3 class="text-xl font-bold text-gray-800">{{ med.name }}</h3>
@@ -213,7 +213,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
                       <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
                     </tr>
                   </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
+                  <tbody class="bg-surface divide-y divide-gray-200">
                     
                   </tbody>
                 </table>
@@ -223,7 +223,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 
           <!-- Procedures Tab -->
           <div *ngSwitchCase="'procedures'">
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
               <h2 class="text-xl font-bold text-gray-800 mb-4">Add New Procedure</h2>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -256,7 +256,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
               </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-surface rounded-lg shadow-md p-6">
               <h2 class="text-xl font-bold text-gray-800 mb-4">Procedures Today</h2>
               <div class="space-y-3">
                 <div *ngFor="let proc of procedures" 
@@ -279,7 +279,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 
           <!-- Notes Tab -->
           <div *ngSwitchCase="'notes'">
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
               <h2 class="text-xl font-bold text-gray-800 mb-4">Add New Note</h2>
               <div class="space-y-4">
                 <div>
@@ -312,7 +312,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
               </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-surface rounded-lg shadow-md p-6">
               <h2 class="text-xl font-bold text-gray-800 mb-4">Progress Notes</h2>
               <div class="space-y-4">
                 <div *ngFor="let note of notes" 
@@ -338,7 +338,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 
           <!-- Fluid Balance Tab -->
           <div *ngSwitchCase="'fluid'">
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-surface rounded-lg shadow-md p-6">
               <h2 class="text-xl font-bold text-gray-800 mb-6">Fluid Balance Chart</h2>
               <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -354,7 +354,7 @@ import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
                       <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance</th>
                     </tr>
                   </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
+                  <tbody class="bg-surface divide-y divide-gray-200">
                     <tr *ngFor="let fluid of fluidBalance" class="hover:bg-gray-50">
                       <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">{{ fluid.time }}</td>
                       <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ fluid.intake.oral }}</td>

@@ -24,7 +24,7 @@ import { DateItem } from "../../../../shared/types/date";
                                             class="w-full h-full object-cover rounded-1.25"
                                         />
                                     </span>
-                                    <span class="w-6 h-6 bg-white rounded-full flex-center-center absolute left-1.25 top-1.25">
+                                    <span class="w-6 h-6 bg-surface rounded-full flex-center-center absolute left-1.25 top-1.25">
                                         <lucide-angular [img]="CircleCheck" class="w-4 fill-[#00cc52] stroke-white" />
                                     </span>
                                 </div>
@@ -60,7 +60,7 @@ import { DateItem } from "../../../../shared/types/date";
                         <div class="col-span-7 px-3">
                             <div class="pb-7.5">
                                 <ul class="text-center mb-6">
-                                    <div class="flex items-center bg-white rounded-xl p-2 gap-3">
+                                    <div class="flex items-center bg-surface rounded-xl p-2 gap-3">
                                         <button 
                                             type="button" 
                                             class="rounded-lg w-10 h-10 flex items-center justify-center cursor-pointer text-gray-500 transition-all duration-200 hover:text-gray-700 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
@@ -108,7 +108,7 @@ import { DateItem } from "../../../../shared/types/date";
                                 </ul>
                                 <div class="my-2 grid grid-cols-6">
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -118,7 +118,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -127,7 +127,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -136,7 +136,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -145,7 +145,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -154,7 +154,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -163,7 +163,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -172,7 +172,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -181,7 +181,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -190,7 +190,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -199,7 +199,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -208,7 +208,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -217,7 +217,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -226,7 +226,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -235,7 +235,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -244,7 +244,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -253,7 +253,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -262,7 +262,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -271,7 +271,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"
@@ -280,7 +280,7 @@ import { DateItem } from "../../../../shared/types/date";
                                         >
                                     </div>
                                     <div class="mr-3.5 inline-block">
-                                        <label class="text-primary bg-white w-[80%] mb-2.5 block cursor-pointer"
+                                        <label class="text-primary bg-surface w-[80%] mb-2.5 block cursor-pointer"
                                         ><input
                                             class="opacity-0 visibility-hidden ml-0 absolute top-0 left-0 bg-secondary border-secondary border border-solid rounded-[0.25rem] mt-1"
                                             type="checkbox"

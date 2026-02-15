@@ -16,7 +16,7 @@ import { PopupPosition } from '../../shared/types/common';
       <div 
         *ngIf="isOpen"
         [ngClass]="getPositionClasses()"
-        class="absolute z-50 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 min-w-max"
+        class="absolute z-50 mt-2 bg-surface rounded-lg shadow-lg border border-gray-200 min-w-max"
         #popupRef
       >
         <ng-content select="[content]"></ng-content>

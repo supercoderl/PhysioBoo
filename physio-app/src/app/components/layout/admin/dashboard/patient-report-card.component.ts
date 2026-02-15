@@ -28,7 +28,7 @@ interface PatientReport {
         ButtonIconComponent
     ],
     template: `
-    <div class="md:col-span-2 bg-white rounded-lg border border-gray-200 h-full">
+    <div class="md:col-span-2 bg-surface rounded-lg border border-gray-200 h-full">
       <div class="flex items-center justify-between py-3 px-5 border-b border-gray-200">
         <h5 class="font-bold text-lg mb-0">Patient Reports</h5> 
         <boo-button-admin

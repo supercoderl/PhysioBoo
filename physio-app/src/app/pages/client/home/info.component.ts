@@ -14,7 +14,7 @@ import { Headphones, LucideAngularModule, MessageSquare } from "lucide-angular";
                         </div>
                         <div class="flex justify-center md:justify-end items-start md:items-center flex-col md:flex-row gap-3 md:gap-6 w-full md:w-auto">
                             <div class="mb-0 items-center flex">
-                                <span class="w-11 h-11 rounded-full bg-white flex-center-center">
+                                <span class="w-11 h-11 rounded-full bg-surface flex-center-center">
                                     <lucide-angular [img]="HeadPhones" class="w-6 stroke-[#06aed4]" />
                                 </span>
                                 <div class="ml-2">
@@ -23,7 +23,7 @@ import { Headphones, LucideAngularModule, MessageSquare } from "lucide-angular";
                                 </div>
                             </div>
                             <div class="flex items-center">
-                                <span class="w-11 h-11 rounded-full bg-white flex-center-center">
+                                <span class="w-11 h-11 rounded-full bg-surface flex-center-center">
                                     <lucide-angular [img]="MessageSquare" class="w-6 stroke-[#06aed4]" />
                                 </span>
                                 <div class="ml-2">

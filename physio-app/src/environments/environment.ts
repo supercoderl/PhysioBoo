@@ -6,5 +6,7 @@ export const environment = {
         NAME: 'dcystvroz',
         PRESET: 'physio_boo',
         BASE_FOLDER: 'physio-boo'
-    }
+    },
+    DELAY_TIMES: 600, //seconds
+    DEBOUNCE_TIMES: 300
 };

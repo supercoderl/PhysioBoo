@@ -2,6 +2,7 @@ import { Component, ElementRef, forwardRef, HostListener, Input } from '@angular
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared-imports';
 import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
+import { Size } from '../../../shared/types/common';
 
 @Component({
   selector: 'boo-select',
@@ -18,66 +19,62 @@ import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
     }
   ],
   template: `
-    <div class="flex w-full relative items-center group" #container>
-      
-      <label
-        [class]="labelClasses"
-        [style.color]="placeholderColor"
-        *ngIf="!model" 
+    <div class="w-full relative group" #container>      
+      <div
+        (click)="toggleDropdown()"
+        [class]="inputClasses"
+        [style.border-radius.px]="radius"
+        [style.border-width.px]="borderWidth"
+        [style.border-color]="isOpen ? '#60A5FA' : borderColor" 
+        tabindex="0"
+        (blur)="onTouched()"
       >
-        {{ label }} <span *ngIf="required" class="text-red-500 ml-0.5">*</span>
-      </label>
-
-      <div class="flex-auto relative w-full">
-        <div
-          (click)="toggleDropdown()"
-          [class]="inputClasses"
-          [style.border-radius.px]="radius"
-          [style.background-color]="backgroundColor"
-          [style.border-width.px]="borderWidth"
-          [style.border-color]="isOpen ? '#60A5FA' : borderColor" 
-          tabindex="0"
-          (blur)="onTouched()"
-        >
-          <span *ngIf="model" class="truncate block w-[90%]">
-            {{ getDisplayLabel(model) }}
-          </span>
-          <span *ngIf="!model">&nbsp;</span>
+        <div class="flex-1 truncate mr-2 select-none">      
+            <span *ngIf="!fitLabel && model; else showLabel" class="text-regular">
+                {{ getDisplayLabel(model) }}
+            </span>
+            <ng-template #showLabel>
+              <span class="text-regular">
+                {{ label }}
+                <span *ngIf="required" class="text-red-500 ml-0.5">*</span>
+              </span>
+            </ng-template>
         </div>
 
         <div 
-            *ngIf="isOpen"
-            class="absolute top-[calc(100%+4px)] left-0 w-full bg-white shadow-xl border border-slate-100 overflow-hidden z-50 animate-fade-in-down"
-            [style.border-radius.px]="radius"
+          class="flex-none text-slate-400 flex items-center pointer-events-none transition-transform duration-200"
+          [class.rotate-180]="isOpen"
         >
-            <ul class="max-h-60 overflow-y-auto py-1 m-0" custom-scrollbar>
-                <li 
-                    *ngFor="let opt of options"
-                    (click)="selectOption(opt)"
-                    class="px-4 py-2.5 text-sm cursor-pointer transition-colors flex items-center justify-between group/item hover:bg-slate-50 hover:text-slate-900"
-                    [class.bg-blue-50]="opt[bindValue] === model"
-                    [class.text-blue-600]="opt[bindValue] === model"
-                    [class.font-medium]="opt[bindValue] === model"
-                    [class.text-slate-600]="opt[bindValue] !== model"
-                >
-                    <span>{{ opt[bindLabel] }}</span>
-                    
-                    <span *ngIf="opt[bindValue] === model" class="text-blue-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    </span>
-                </li>
-
-                <li *ngIf="options.length === 0" class="px-4 py-3 text-sm text-slate-400 text-center italic">
-                    Empty data
-                </li>
-            </ul>
+          <boo-icon name="chevron-down" iconClass="stroke-regular" [size]="16" />
         </div>
+      </div>
 
-        <div 
-            class="absolute right-0 top-0 h-full flex items-center pr-3 pointer-events-none text-slate-400 transition-transform duration-200"
-        >
-            <boo-icon [name]="isOpen ? 'chevron-up' : 'chevron-down'" />
-        </div>
+      <div 
+        *ngIf="isOpen"
+        class="absolute top-[calc(100%+4px)] left-0 w-full bg-surface shadow-xl border border-slate-100 overflow-hidden z-50 animate-fade-in-down"
+        [style.border-radius.px]="radius"
+      >
+        <ul class="max-h-60 overflow-y-auto py-1 m-0" custom-scrollbar>
+            <li 
+                *ngFor="let opt of options"
+                (click)="selectOption(opt)"
+                class="px-4 py-2.5 text-sm cursor-pointer transition-colors flex items-center justify-between group/item hover:bg-slate-50 hover:text-slate-900"
+                [class.bg-blue-50]="opt[bindValue] === model"
+                [class.text-blue-600]="opt[bindValue] === model"
+                [class.font-medium]="opt[bindValue] === model"
+                [class.text-slate-600]="opt[bindValue] !== model"
+            >
+                <span class="text-regular group-hover/item:text-surface">{{ opt[bindLabel] }}</span>
+                
+                <span *ngIf="opt[bindValue] === model" class="text-blue-500">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+            </li>
+
+            <li *ngIf="options.length === 0" class="px-4 py-3 text-sm text-slate-400 text-center italic">
+                Empty data
+            </li>
+        </ul>
       </div>
     </div>
   `,
@@ -102,13 +99,11 @@ export class BooSelectComponent implements ControlValueAccessor {
   // #region Inputs
   @Input() label: string = '';
   @Input({ transform: (v: unknown) => v === '' || v === true || v === 'true' }) required: boolean = false;
-  @Input() size: "small" | "medium" | "large" = "medium";
+  @Input() size: Size = "middle";
   @Input() radius: number = 6; 
-  @Input() backgroundColor: string = 'white';
   @Input() borderWidth: number = 1;
   @Input() borderColor: string = '#e6e8ee';
-  @Input() placeholderColor: string = '#64748B';
-
+  @Input() fitLabel: boolean = false;
   @Input() options: any[] = [];
   @Input() bindLabel: string = 'label'; 
   @Input() bindValue: string = 'value';
@@ -127,27 +122,27 @@ export class BooSelectComponent implements ControlValueAccessor {
   }
 
   get labelClasses(): string {
-    const base = 'absolute left-0 z-[1] flex items-center transition-all duration-300 pointer-events-none truncate';
+    const base = 'flex items-center justify-between w-full transition-all focus:outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer border-solid';
     const focusEffect = 'group-focus-within:translate-x-4 group-focus-within:opacity-0 group-focus-within:invisible';
     
     let sizeClass = '';
     switch (this.size) {
-      case 'small':  sizeClass = 'px-3 text-xs'; break;
-      case 'large':  sizeClass = 'px-5 text-base'; break;
-      default:       sizeClass = 'px-4 text-sm'; break;
+      case 'small':  sizeClass = 'px-3 text-[12px]'; break;
+      case 'large':  sizeClass = 'px-5 text-[14px]'; break;
+      default:       sizeClass = 'px-4 text-[13px]'; break;
     }
 
     return `${base} ${focusEffect} ${sizeClass}`;
   }
 
   get inputClasses(): string {
-    const base = 'flex items-center w-full text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer border-solid';
+    const base = 'bg-surface flex items-center w-full text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer border-solid';
     
     let sizeClass = '';
     switch (this.size) {
-      case 'small':  sizeClass = 'px-3 h-8.5 text-xs'; break;
-      case 'large':  sizeClass = 'px-5 h-12 text-base'; break;
-      default:       sizeClass = 'px-4 h-11 text-sm'; break;
+      case 'small':  sizeClass = 'px-3 h-8.5 text-[12px]'; break;
+      case 'large':  sizeClass = 'px-5 h-10 text-[14px]'; break;
+      default:       sizeClass = 'px-4 h-9 text-[13px]'; break;
     }
 
     const disabledClass = this.disabled ? 'bg-gray-100 cursor-not-allowed opacity-70' : '';

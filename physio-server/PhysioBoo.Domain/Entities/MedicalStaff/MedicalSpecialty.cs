@@ -1,4 +1,5 @@
-﻿using PhysioBoo.SharedKernel.Utils;
+﻿using NpgsqlTypes;
+using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
@@ -17,6 +18,9 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public Guid? ParentSpecialtyId { get; private set; }
         public string? IconUrl { get; private set; }
         public DateTime CreatedAt { get; private set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public NpgsqlTsVector? SearchVector { get; private set; }
 
         [ForeignKey("ParentSpecialtyId")]
         [InverseProperty("SubSpecialties")]

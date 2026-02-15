@@ -3,8 +3,10 @@
     /// <summary>
     /// Represents filter criteria when querying medical specialties.
     /// </summary>
-    public class MedicalSpecialtyFilter
-    {
-
-    }
+    public sealed record MedicalSpecialtyFilter
+    (
+        string Start,
+        string End,
+        bool? IsSurgical
+    );
 }

@@ -14,6 +14,24 @@ namespace PhysioBoo.Presentation.Endpoints
                 .WithOpenApi()
                 .AddEndpointFilter<NotificationResultFilter>();
 
+            #region Check
+            // Get cookies
+            group.MapGet("/check", (
+                HttpRequest request,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                return Results.Ok(new ResponseMessage<string>
+                {
+                    Success = true,
+                    Data = "Application started successfully!"
+                });
+            }).WithName("Check")
+            .WithSummary("Check Application Is Running")
+            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            #endregion
+
             #region Get cookies
             group.MapPost("/cookies", (
                 HttpRequest request,
@@ -49,25 +67,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Check user is authenticated or not")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
-            #endregion
-
-            #region Check
-            // Get cookies
-            group.MapPost("/check", (
-                HttpRequest request,
-                CancellationToken cancellationToken
-            ) =>
-            {
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "Application started successfully!"
-                });
-            }).WithName("Check")
-            .WithSummary("Check Application Is Running")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
-            #endregion
+            #endregion 
 
             #region Send mail
             // Get cookies

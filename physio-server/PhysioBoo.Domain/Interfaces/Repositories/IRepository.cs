@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
+﻿using Ardalis.Specification;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Npgsql;
 using PhysioBoo.Domain.Entities;
@@ -45,6 +46,23 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
             string includeProperties = "",
             CancellationToken cancellationToken = default
         );
+        #endregion
+
+        #region List Async
+        Task<PagedResult<TEntity>> ListAsync(
+            ISpecification<TEntity> spec,
+            int pageNumber,
+            int pageSize,
+            CancellationToken cancellationToken = default
+        );
+        #endregion
+
+        #region First or Default Async
+        Task<TEntity?> FirstOrDefaultAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default);
+        #endregion
+
+        #region Count Async
+        Task<int> CountAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default);
         #endregion
 
         #region Get By Id
@@ -95,6 +113,12 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
         #region Delete Methods
         Task BulkSoftDeleteAsync(
             Expression<Func<TEntity, bool>> predicate,
+            bool hardDelete = false,
+            CancellationToken cancellationToken = default
+        );
+
+        void SoftDeleteSingle(
+            TEntity entity,
             bool hardDelete = false,
             CancellationToken cancellationToken = default
         );

@@ -1,5 +1,7 @@
 ﻿using PhysioBoo.Application.ViewModels.Roles;
+using PhysioBoo.Application.ViewModels.Sys_Languages;
 using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.System;
 
 namespace PhysioBoo.Application.ViewModels.Configurations
 {
@@ -8,8 +10,9 @@ namespace PhysioBoo.Application.ViewModels.Configurations
         public string Version { get; set; } = "1.0.0";
         public Dictionary<string, bool> Features { get; set; } = new();
         public List<RoleViewModel> RegistrationRoles { get; set; } = new List<RoleViewModel>();
+        public List<LanguageViewModel> Languages { get; set; } = new();
 
-        public static InitDataViewModel FromConfig(List<Role> roles)
+        public static InitDataViewModel FromConfig(List<Role> roles, List<Sys_Language> languages)
         {
             return new InitDataViewModel
             {
@@ -29,6 +32,17 @@ namespace PhysioBoo.Application.ViewModels.Configurations
                     CreatedBy = r.CreatedBy,
                     UpdatedAt = r.UpdatedAt,
                     UpdatedBy = r.UpdatedBy
+                }).ToList(),
+                Languages = languages.Select(l => new LanguageViewModel
+                {
+                    Id = l.Id,
+                    Name = l.Name,
+                    Code = l.Code,
+                    IsActive = l.IsActive,
+                    FlagUrl = l.FlagUrl,
+                    IsDefault = l.IsDefault,
+                    NativeName = l.NativeName,
+                    Index = l.Index
                 }).ToList()
             };
         }

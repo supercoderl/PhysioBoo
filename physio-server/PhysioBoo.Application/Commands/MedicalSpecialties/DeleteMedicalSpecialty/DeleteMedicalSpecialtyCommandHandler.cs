@@ -1,7 +1,9 @@
 ﻿using MediatR;
+using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
+using PhysioBoo.Shared.Events.MedicalSpecialties;
 
 namespace PhysioBoo.Application.Commands.MedicalSpecialties.DeleteMedicalSpecialty
 {
@@ -23,11 +25,29 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.DeleteMedicalSpecial
         {
             if (!await TestValidityAsync(request)) return;
 
-            await _medicalSpecialtyRepository.BulkSoftDeleteAsync(
-                predicate: ms => ms.Id == request.Id,
+            Domain.Entities.MedicalStaff.MedicalSpecialty? medicalSpecialty = await _medicalSpecialtyRepository.GetByIdAsync(request.Id);
+
+            if (medicalSpecialty == null)
+            {
+                await NotifyAsync(new DomainNotification(
+                    request.MessageType,
+                    "Medical Specialty not found.",
+                    ErrorCodes.ObjectNotFound
+                ));
+
+                return;
+            }
+
+            _medicalSpecialtyRepository.SoftDeleteSingle(
+                medicalSpecialty,
                 request.IsHard,
                 cancellationToken
             );
+
+            if (await CommitAsync())
+            {
+                await Bus.RaiseEventAsync(new MedicalSpecialtyDeletedEvent(request.Id));
+            }
         }
     }
 }

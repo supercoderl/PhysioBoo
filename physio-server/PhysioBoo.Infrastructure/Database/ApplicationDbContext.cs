@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
@@ -7,13 +8,18 @@ using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
 using PhysioBoo.Domain.Entities.System;
+using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Infrastructure.Configuration;
+using PhysioBoo.Infrastructure.Entries;
 using PhysioBoo.Infrastructure.Outbox;
 
 namespace PhysioBoo.Infrastructure.Database
 {
     public partial class ApplicationDbContext : DbContext
     {
+        private readonly IUser _user;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         #region DbSet
         public DbSet<Address> Addresses { get; set; } = null!;
         public DbSet<Appointment> Appointments { get; set; } = null!;
@@ -73,9 +79,18 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<Sys_Setting> Sys_Settings { get; set; } = null!;
         public DbSet<Sys_Device> Sys_Devices { get; set; } = null!;
         public DbSet<Sys_AppVersion> Sys_AppVersions { get; set; } = null!;
+        public DbSet<Sys_AuditLog> Sys_AuditLogs { get; set; } = null!;
         #endregion
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+        public ApplicationDbContext(
+            DbContextOptions<ApplicationDbContext> options,
+            IUser user,
+            IHttpContextAccessor httpContextAccessor
+        ) : base(options)
+        {
+            _user = user;
+            _httpContextAccessor = httpContextAccessor;
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -91,6 +106,8 @@ namespace PhysioBoo.Infrastructure.Database
 
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.HasPostgresExtension("unaccent");
+
             ApplyConfigurations(modelBuilder);
 
             foreach (Microsoft.EntityFrameworkCore.Metadata.IMutableForeignKey? relationship in modelBuilder.Model.GetEntityTypes().SelectMany(x => x.GetForeignKeys()))
@@ -105,6 +122,19 @@ namespace PhysioBoo.Infrastructure.Database
             optionsBuilder.EnableServiceProviderCaching(true);
             optionsBuilder.EnableSensitiveDataLogging(true);
             base.OnConfiguring(optionsBuilder);
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            Guid userId = _user.GetUserId();
+
+            List<AuditEntry> auditEntries = OnBeforeSaveChanges(userId);
+
+            int result = await base.SaveChangesAsync(cancellationToken);
+
+            await OnAfterSaveChanges(auditEntries);
+
+            return result;
         }
 
         private static void ApplyConfigurations(ModelBuilder builder)
@@ -168,6 +198,150 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new Sys_SettingConfiguration());
             builder.ApplyConfiguration(new Sys_DeviceConfiguration());
             builder.ApplyConfiguration(new Sys_AppVersionConfiguration());
+            builder.ApplyConfiguration(new Sys_AuditLogConfiguration());
+        }
+
+        private List<AuditEntry> OnBeforeSaveChanges(Guid userId)
+        {
+            ChangeTracker.DetectChanges();
+            List<AuditEntry> auditEntries = new List<AuditEntry>();
+
+            HttpContext httpContext = _httpContextAccessor.HttpContext;
+
+            string ipAddress = "N/A";
+            string userAgent = "N/A";
+            string requestId = "N/A";
+
+            if (httpContext != null)
+            {
+                ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+                requestId = httpContext.TraceIdentifier;
+            }
+
+            foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entry in ChangeTracker.Entries())
+            {
+                if (
+                    entry.Entity is Sys_AuditLog ||
+                    entry.Entity is OutboxMessage ||
+                    entry.State == EntityState.Detached ||
+                    entry.State == EntityState.Unchanged
+                )
+                    continue;
+
+                AuditEntry auditEntry = new AuditEntry(entry);
+                auditEntry.TableName = entry.Metadata.GetTableName() ?? string.Empty;
+                auditEntry.IpAddress = ipAddress;
+                auditEntry.UserAgent = userAgent;
+                auditEntry.RequestId = requestId;
+
+                if (userId == Guid.Empty)
+                {
+                    Microsoft.EntityFrameworkCore.ChangeTracking.PropertyEntry? userIdProp = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "AggregateId");
+
+                    if (userIdProp != null && userIdProp.CurrentValue != null)
+                    {
+                        auditEntry.UserId = Guid.Parse(userIdProp.CurrentValue.ToString() ?? string.Empty);
+                    }
+                }
+                else
+                {
+                    auditEntry.UserId = userId;
+                }
+
+                if (entry.State == EntityState.Modified)
+                {
+                    Microsoft.EntityFrameworkCore.ChangeTracking.PropertyEntry? deleteProp = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "Deleted" || p.Metadata.Name == "DeletedAt");
+                    if (deleteProp != null)
+                    {
+                        bool wasDeleted = deleteProp.OriginalValue != null;
+                        bool isDeletedNow = deleteProp.CurrentValue != null;
+
+                        if (!wasDeleted && isDeletedNow)
+                        {
+                            auditEntry.IsSoftDelete = true;
+                        }
+                    }
+                }
+
+                foreach (Microsoft.EntityFrameworkCore.ChangeTracking.PropertyEntry property in entry.Properties)
+                {
+                    if (property.IsTemporary)
+                    {
+                        auditEntry.TemporaryProperties.Add(property);
+                        continue;
+                    }
+
+                    string propertyName = property.Metadata.Name;
+                    if (property.Metadata.IsPrimaryKey())
+                    {
+                        auditEntry.KeyValues[propertyName] = property.CurrentValue ?? string.Empty;
+                        continue;
+                    }
+
+                    switch (entry.State)
+                    {
+                        case EntityState.Added:
+                            auditEntry.NewValues[propertyName] = property.CurrentValue ?? string.Empty;
+                            break;
+                        case EntityState.Deleted:
+                            auditEntry.OldValues[propertyName] = property.OriginalValue ?? string.Empty;
+                            break;
+                        case EntityState.Modified:
+                            if (property.IsModified)
+                            {
+                                auditEntry.AffectedColumns.Add(propertyName);
+                                auditEntry.OldValues[propertyName] = property.OriginalValue ?? string.Empty;
+                                auditEntry.NewValues[propertyName] = property.CurrentValue ?? string.Empty;
+                            }
+                            break;
+                    }
+                }
+                auditEntries.Add(auditEntry);
+            }
+
+            foreach (AuditEntry auditEntry in auditEntries)
+            {
+                if (auditEntry.TemporaryProperties.Count == 0)
+                {
+                    Sys_AuditLogs.Add(auditEntry.ToAudit());
+                }
+            }
+
+            return auditEntries;
+        }
+
+        private async Task OnAfterSaveChanges(List<AuditEntry> auditEntries)
+        {
+            if (auditEntries == null || auditEntries.Count == 0) return;
+
+            bool hasNewAuditLogs = false;
+
+            foreach (AuditEntry auditEntry in auditEntries)
+            {
+                if (auditEntry.TemporaryProperties.Count == 0)
+                    continue;
+
+                foreach (Microsoft.EntityFrameworkCore.ChangeTracking.PropertyEntry prop in auditEntry.TemporaryProperties)
+                {
+                    if (prop.Metadata.IsPrimaryKey())
+                    {
+                        auditEntry.KeyValues[prop.Metadata.Name] = prop.CurrentValue ?? string.Empty;
+                    }
+                    else
+                    {
+                        auditEntry.NewValues[prop.Metadata.Name] = prop.CurrentValue ?? string.Empty;
+                    }
+                }
+
+                Sys_AuditLogs.Add(auditEntry.ToAudit());
+                hasNewAuditLogs = true;
+            }
+
+            if (hasNewAuditLogs)
+            {
+                await base.SaveChangesAsync();
+            }
         }
     }
 }

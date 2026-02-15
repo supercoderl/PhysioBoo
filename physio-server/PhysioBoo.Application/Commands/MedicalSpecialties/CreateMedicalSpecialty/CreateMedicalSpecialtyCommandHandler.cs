@@ -26,7 +26,7 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecial
         {
             if (!await TestValidityAsync(request)) return;
 
-            SharedKernel.Results.DbResult<Guid> result = await _medicalSpecialtyRepository.InsertAsync<MedicalSpecialty, Guid>(new MedicalSpecialty(
+            MedicalSpecialty medicalSpecialty = new MedicalSpecialty(
                 request.NewMedicalSpecialty.Id,
                 request.NewMedicalSpecialty.Name,
                 request.NewMedicalSpecialty.Code,
@@ -35,7 +35,13 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecial
                 request.NewMedicalSpecialty.RequiredQualifications,
                 request.NewMedicalSpecialty.ParentSpecialtyId,
                 request.NewMedicalSpecialty.IconUrl
-            ));
+            );
+
+            medicalSpecialty.SetIsSurgical(request.NewMedicalSpecialty.IsSurgical);
+            medicalSpecialty.SetIsDiagnostic(request.NewMedicalSpecialty.IsDiagnostic);
+            medicalSpecialty.SetAverageConsultationDuration(request.NewMedicalSpecialty.AverageConsultationDuration);
+
+            SharedKernel.Results.DbResult<Guid> result = await _medicalSpecialtyRepository.InsertAsync<MedicalSpecialty, Guid>(medicalSpecialty);
 
             if (!result.Success)
             {

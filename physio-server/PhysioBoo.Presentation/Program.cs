@@ -95,6 +95,7 @@ namespace PhysioBoo.Presentation
             builder.Services.AddSettings<ServerSettings>(builder.Configuration, "Server");
             builder.Services.AddSettings<ClientSettings>(builder.Configuration, "Client");
             builder.Services.AddSettings<GoogleSettings>(builder.Configuration, "Google");
+            builder.Services.AddSettings<CloudinarySettings>(builder.Configuration, "Cloudinary");
             builder.Services.AddCSRFProtection(builder.Environment);
             builder.Services.AddEmail();
             builder.Services.AddServices();
@@ -103,6 +104,7 @@ namespace PhysioBoo.Presentation
             builder.Services.AddHostedInfrastructureService();
             builder.Services.AddRegisterThirdPartyService(builder.Configuration);
             builder.Services.AddHttpClient();
+            builder.Services.AddSortProviders();
 
             if (builder.Environment.IsProduction())
             {

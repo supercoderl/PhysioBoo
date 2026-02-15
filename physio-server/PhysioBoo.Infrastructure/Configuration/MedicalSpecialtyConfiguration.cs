@@ -12,42 +12,47 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.ToTable("MedicalSpecialties");
 
             // PK
-            builder.HasKey(s => s.Id);
+            builder.HasKey(ms => ms.Id);
 
             // Indexes
-            builder.HasIndex(s => s.Name);
-            builder.HasIndex(s => s.Code).IsUnique(false);
+            builder.HasIndex(ms => ms.Name);
+            builder.HasIndex(ms => ms.Code).IsUnique(false);
+            builder.HasIndex(ms => ms.SearchVector).HasMethod("GIN");
 
             // Self-relationship
-            builder.HasOne(s => s.ParentSpecialty)
+            builder.HasOne(ms => ms.ParentSpecialty)
                    .WithMany(p => p.SubSpecialties)
-                   .HasForeignKey(s => s.ParentSpecialtyId);
+                   .HasForeignKey(ms => ms.ParentSpecialtyId);
 
             // Properties
-            builder.Property(s => s.Name)
+            builder.Property(ms => ms.Name)
                    .IsRequired()
                    .HasMaxLength(200);
 
-            builder.Property(s => s.Code)
+            builder.Property(ms => ms.Code)
                    .HasMaxLength(20);
 
-            builder.Property(s => s.Category)
+            builder.Property(ms => ms.Category)
                    .HasMaxLength(100);
 
-            builder.Property(s => s.Description);
+            builder.Property(ms => ms.Description);
 
-            builder.Property(s => s.RequiredQualifications);
+            builder.Property(ms => ms.RequiredQualifications);
 
-            builder.Property(s => s.AverageConsultationDuration)
+            builder.Property(ms => ms.AverageConsultationDuration)
                    .IsRequired();
 
-            builder.Property(s => s.IsSurgical).IsRequired();
-            builder.Property(s => s.IsDiagnostic).IsRequired();
+            builder.Property(ms => ms.IsSurgical).IsRequired();
+            builder.Property(ms => ms.IsDiagnostic).IsRequired();
 
-            builder.Property(s => s.IconUrl)
+            builder.Property(ms => ms.IconUrl)
                    .HasMaxLength(500);
 
-            builder.Property(s => s.CreatedAt).IsRequired();
+            builder.Property(ms => ms.CreatedAt).IsRequired();
+
+            builder.Property(ms => ms.SearchVector)
+                .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"Code\", '')))", stored: true)
+                .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

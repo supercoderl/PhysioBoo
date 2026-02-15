@@ -147,6 +147,7 @@ namespace PhysioBoo.Infrastructure.Outbox
 
                 // MEDICAL SPECIALTY EVENT
                 MedicalSpecialtyCreatedEvent e => new MedicalSpecialtyCreatedEvent(e.AggregateId, e.IconPublicId, e.IconUrl),
+                MedicalSpecialtyUpdatedEvent e => new MedicalSpecialtyUpdatedEvent(e.AggregateId, e.IconPublicId, e.NewIconUrl, e.OldIconUrl),
 
                 _ => null
             };

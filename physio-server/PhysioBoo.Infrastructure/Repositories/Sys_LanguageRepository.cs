@@ -34,7 +34,11 @@ namespace PhysioBoo.Infrastructure.Repositories
             Sys_Language language = new Sys_Language(
                 reader.GetFieldValue<Guid>("Id"),
                 reader.GetString("Code"),
-                reader.GetString("Name")
+                reader.GetString("Name"),
+                reader.IsDBNull("FlagUrl") ? null : reader.GetString("FlagUrl"),
+                reader.GetBoolean("IsDefault"),
+                reader.IsDBNull("NativeName") ? null : reader.GetString("NativeName"),
+                reader.GetInt32("Index")
             );
 
             return language;

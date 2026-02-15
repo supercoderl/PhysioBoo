@@ -28,6 +28,18 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(sl => sl.IsActive)
                     .IsRequired();
+
+            builder.Property(sl => sl.IsDefault)
+                    .IsRequired();
+
+            builder.Property(sl => sl.Index)
+                    .IsRequired();
+
+            builder.Property(sl => sl.FlagUrl)
+                   .HasMaxLength(2083); // Max URL length
+
+            builder.Property(sl => sl.NativeName)
+                   .HasMaxLength(100);
         }
     }
 }

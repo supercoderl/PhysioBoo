@@ -1,4 +1,6 @@
-﻿using Dapper;
+﻿using Ardalis.Specification;
+using Ardalis.Specification.EntityFrameworkCore;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Caching.Memory;
@@ -86,6 +88,34 @@ namespace PhysioBoo.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
 
             return new PagedResult<TEntity>(totalCount, items, pageNumber, pageSize);
+        }
+
+        public virtual async Task<PagedResult<TEntity>> ListAsync(
+            ISpecification<TEntity> spec,
+            int pageNumber,
+            int pageSize,
+            CancellationToken cancellationToken = default
+        )
+        {
+            IQueryable<TEntity> specificationResult = ApplySpecification(spec);
+            int totalCount = await specificationResult.CountAsync(cancellationToken);
+            List<TEntity> items = await specificationResult
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+            return new PagedResult<TEntity>(totalCount, items, pageNumber, pageSize);
+        }
+
+        public virtual async Task<int> CountAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default)
+        {
+            IQueryable<TEntity> specificationResult = ApplySpecification(spec);
+            return await specificationResult.CountAsync(cancellationToken);
+        }
+
+        public virtual async Task<TEntity?> FirstOrDefaultAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default)
+        {
+            IQueryable<TEntity> specificationResult = ApplySpecification(spec);
+            return await specificationResult.FirstOrDefaultAsync(cancellationToken);
         }
 
         #region Method: Generic Single Insert
@@ -306,10 +336,29 @@ namespace PhysioBoo.Infrastructure.Repositories
             {
                 DbSet.RemoveRange(entities);
             }
+            else
+            {
+                foreach (TEntity? entity in entities)
+                {
+                    entity.Delete();
+                }
+            }
+        }
 
-            foreach (TEntity? entity in entities)
+        public virtual void SoftDeleteSingle(
+            TEntity entity,
+            bool hardDelete = false,
+            CancellationToken cancellationToken = default
+        )
+        {
+            if (hardDelete)
+            {
+                DbSet.Remove(entity);
+            }
+            else
             {
                 entity.Delete();
+                DbSet.Update(entity);
             }
         }
 
@@ -599,6 +648,11 @@ namespace PhysioBoo.Infrastructure.Repositories
         private string QuoteIdentifier(string identifier)
         {
             return $"\"{identifier}\"";
+        }
+
+        private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec)
+        {
+            return SpecificationEvaluator.Default.GetQuery(DbSet.AsQueryable(), spec);
         }
         #endregion
     }

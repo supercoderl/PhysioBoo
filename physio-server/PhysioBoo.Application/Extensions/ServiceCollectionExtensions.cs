@@ -30,9 +30,11 @@ using PhysioBoo.Application.Commands.LabReports.CreateLabReport;
 using PhysioBoo.Application.Commands.LabTestCategories.CreateLabTestCategory;
 using PhysioBoo.Application.Commands.LabTests.CreateLabTest;
 using PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer;
+using PhysioBoo.Application.Commands.Media.DeleteFile;
 using PhysioBoo.Application.Commands.MedicalRecords.CreateMedicalRecord;
 using PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecialty;
 using PhysioBoo.Application.Commands.MedicalSpecialties.DeleteMedicalSpecialty;
+using PhysioBoo.Application.Commands.MedicalSpecialties.UpdateMedicalSpecialty;
 using PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCategory;
 using PhysioBoo.Application.Commands.MedicineInventories.CreateMedicineInventory;
 using PhysioBoo.Application.Commands.Medicines.CreateMedicine;
@@ -73,6 +75,7 @@ using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Application.Queries.AdminMenus.GetAll;
 using PhysioBoo.Application.Queries.Configurations.GetInitData;
 using PhysioBoo.Application.Queries.MedicalSpecialties.GetAll;
+using PhysioBoo.Application.Queries.MedicalSpecialties.GetById;
 using PhysioBoo.Application.Queries.Permissions.GetAll;
 using PhysioBoo.Application.Queries.RefreshTokens.GetByUserId;
 using PhysioBoo.Application.Queries.Roles.GetAll;
@@ -85,16 +88,19 @@ using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
 using PhysioBoo.Application.Services;
+using PhysioBoo.Application.SortProviders;
 using PhysioBoo.Application.ViewModels.AdminMenus;
 using PhysioBoo.Application.ViewModels.Configurations;
 using PhysioBoo.Application.ViewModels.MedicalSpecialties;
 using PhysioBoo.Application.ViewModels.Permissions;
 using PhysioBoo.Application.ViewModels.Roles;
+using PhysioBoo.Application.ViewModels.Sorting;
 using PhysioBoo.Application.ViewModels.Sys_Languages;
 using PhysioBoo.Application.ViewModels.Sys_Settings;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Interfaces.EventHandlers;
 using PhysioBoo.Shared.Events.Users;
 using PhysioBoo.SharedKernel.Common;
@@ -124,6 +130,9 @@ namespace PhysioBoo.Application.Extensions
 
             // Sys Resource
             services.AddScoped<IResourceExcelProcessor, ResourceExcelProcessor>();
+
+            // Cloudinary
+            services.AddScoped<ICloudinaryService, CloudinaryService>();
 
             return services;
         }
@@ -155,6 +164,7 @@ namespace PhysioBoo.Application.Extensions
 
             // MedicalSpecialty
             services.AddScoped<IRequestHandler<GetAllMedicalSpecialtiesQuery, PagedResult<MedicalSpecialtyViewModel>>, GetAllMedicalSpecialtiesQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMedicalSpecialtyByIdQuery, MedicalSpecialtyViewModel?>, GetMedicalSpecialtyByIdQueryHandler>();
 
             // System Language
             services.AddScoped<IRequestHandler<GetAllLanguagesQuery, List<LanguageViewModel>>, GetAllLanguagesQueryHandler>();
@@ -183,6 +193,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<CreateHospitalStaffCommand>, CreateHospitalStaffCommandHandler>();
             services.AddScoped<IRequestHandler<CreateMedicalSpecialtyCommand>, CreateMedicalSpecialtyCommandHandler>();
             services.AddScoped<IRequestHandler<DeleteMedicalSpecialtyCommand>, DeleteMedicalSpecialtyCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateMedicalSpecialtyCommand>, UpdateMedicalSpecialtyCommandHandler>();
             #endregion
 
             #region Core Flow
@@ -258,6 +269,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<ImportRemoteResourceCommand>, ImportRemoteResourceCommandHandler>();
             services.AddScoped<IRequestHandler<BlockIpCommand>, SecurityCommandHandler>();
             services.AddScoped<IRequestHandler<UnblockIpCommand>, SecurityCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteFileCommand>, DeleteFileCommandHandler>();
             #endregion
 
             return services;
@@ -308,6 +320,13 @@ namespace PhysioBoo.Application.Extensions
         public static IServiceCollection AddRegisterEPPlus(this IServiceCollection services)
         {
             ExcelPackage.License.SetNonCommercialPersonal("PhysioBoo Application - NonCommercial Use");
+            return services;
+        }
+
+        public static IServiceCollection AddSortProviders(this IServiceCollection services)
+        {
+            services.AddScoped<ISortingExpressionProvider<MedicalSpecialtyViewModel, MedicalSpecialty>, MedicalSpecialtyViewModelSortProvider>();
+
             return services;
         }
     }

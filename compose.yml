@@ -1,0 +1,25 @@
+services:
+ api:
+   container_name: physio_api
+   build:
+      context: ./physio-server
+      dockerfile: PhysioBoo.Presentation/Dockerfile
+   ports:
+      - "4010:8080"
+   environment:
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Port=5432;Database=${DB_NAME};User Id=${DB_USER};Password=${DB_PASSWORD};
+      - RabbitMQ__Host=host.docker.internal
+      - ASPNETCORE_ENVIRONMENT=Development
+
+ web:
+   container_name: physio_web
+   build:
+      context: ./physio-app
+      dockerfile: Dockerfile
+   ports:
+      - "4110:80"
+   depends_on:
+      - api
+
+volumes:
+ pg_data:

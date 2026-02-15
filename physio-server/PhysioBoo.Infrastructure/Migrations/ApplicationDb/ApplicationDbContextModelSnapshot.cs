@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using NpgsqlTypes;
 using PhysioBoo.Infrastructure.Database;
 
 #nullable disable
@@ -20,6 +21,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                 .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "unaccent");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Clinical.MedicalRecord", b =>
@@ -2947,6 +2949,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("RequiredQualifications")
                         .HasColumnType("text");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"Code\", '')))", true);
+
                     b.HasKey("Id");
 
                     b.HasIndex("Code");
@@ -2954,6 +2961,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("Name");
 
                     b.HasIndex("ParentSpecialtyId");
+
+                    b.HasIndex("SearchVector");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "GIN");
 
                     b.ToTable("MedicalSpecialties", (string)null);
                 });
@@ -4621,6 +4632,56 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.ToTable("Sys_AppVersions", (string)null);
                 });
 
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.System.Sys_AuditLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AffectedColumns")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset>("DateOccurred")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NewValues")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("OldValues")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("PrimaryKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RequestId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserAgent")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Sys_AuditLogs", (string)null);
+                });
+
             modelBuilder.Entity("PhysioBoo.Domain.Entities.System.Sys_Device", b =>
                 {
                     b.Property<Guid>("Id")
@@ -4669,12 +4730,26 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("FlagUrl")
+                        .HasMaxLength(2083)
+                        .HasColumnType("character varying(2083)");
+
+                    b.Property<int>("Index")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDefault")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("NativeName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 

@@ -43,7 +43,7 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .IsRequired();
 
             builder.Property(i => i.RadiationDose)
-                   .HasColumnType("numeric(8,4)")  // ví dụ: 1234.567 mSv
+                   .HasColumnType("numeric(8,4)")  // example: 1234.567 mSv
                    .IsRequired();
 
             builder.Property(i => i.IsActive)
@@ -51,6 +51,10 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(i => i.CreatedAt)
                    .IsRequired();
+
+            builder.Property(ms => ms.SearchVector)
+                   .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"Code\", '')))", stored: true)
+                   .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

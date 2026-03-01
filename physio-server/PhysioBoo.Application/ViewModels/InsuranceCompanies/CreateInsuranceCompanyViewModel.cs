@@ -13,6 +13,8 @@ namespace PhysioBoo.Application.ViewModels.InsuranceCompanies
         string? Email,
         string? Address,
         string? Website,
+        bool CashlessFacility,
+        bool ReimbursementFacility,
         string? NetworkHospitals,
         decimal? MaximumCoverageAmount,
         decimal? ClaimSettlementRatio,

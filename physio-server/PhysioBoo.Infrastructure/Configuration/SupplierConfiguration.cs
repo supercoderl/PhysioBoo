@@ -90,6 +90,10 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(s => s.LastOrderDate);
             builder.Property(s => s.CreatedAt).IsRequired();
             builder.Property(s => s.UpdatedAt);
+
+            builder.Property(s => s.SearchVector)
+                   .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"SupplierName\", '') || ' ' || coalesce(\"SupplierCode\", '')))", stored: true)
+                   .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

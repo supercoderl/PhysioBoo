@@ -1,4 +1,5 @@
-﻿using PhysioBoo.SharedKernel.Utils;
+﻿using NpgsqlTypes;
+using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.LaboratoryImaging
@@ -17,6 +18,9 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public decimal RadiationDose { get; private set; }
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public NpgsqlTsVector? SearchVector { get; private set; }
 
         [InverseProperty("Modality")]
         public virtual ICollection<ImagingOrder> ImagingOrders { get; private set; } = new List<ImagingOrder>();

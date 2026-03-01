@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Options;
+using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
@@ -44,9 +45,11 @@ namespace PhysioBoo.Application.Commands.Users.RefreshToken
                 return;
             }
 
-            token.Revoke();
-
-            int result = await _refreshTokenRepository.UpdateTrackedAsync(token);
+            int result = await _refreshTokenRepository.BatchUpdateMultipleAsync(
+                predicate: t => t.Id == token.Id,
+                setterExpression: s => s
+                    .SetProperty(p => p.ExpiresAt, TimeZoneHelper.GetLocalTimeNow())
+            );
 
             if (result <= 0)
             {
@@ -67,6 +70,8 @@ namespace PhysioBoo.Application.Commands.Users.RefreshToken
                     ["Name"] = (token.User?.Email ?? string.Empty).Split("@")[0]
                 }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes
             );
+
+            request.Result = new AuthResult(accessToken, refreshToken);
 
             await Bus.RaiseEventAsync(new UserLoggedEvent(token.UserId, accessToken, refreshToken));
         }

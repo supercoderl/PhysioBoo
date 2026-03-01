@@ -1,4 +1,5 @@
-﻿using PhysioBoo.Domain.Entities.Core;
+﻿using NpgsqlTypes;
+using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -28,6 +29,9 @@ namespace PhysioBoo.Domain.Entities.Operation
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public NpgsqlTsVector? SearchVector { get; private set; }
 
         [ForeignKey("HospitalId")]
         [InverseProperty("Departments")]

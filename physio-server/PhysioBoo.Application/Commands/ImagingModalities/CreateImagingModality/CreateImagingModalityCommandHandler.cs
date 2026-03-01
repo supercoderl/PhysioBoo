@@ -25,7 +25,7 @@ namespace PhysioBoo.Application.Commands.ImagingModalities.CreateImagingModality
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _imagingModalityRepository.InsertAsync<ImagingModality, Guid>(new ImagingModality(
+            ImagingModality newImagingModality = new ImagingModality(
                 request.NewImagingModality.Id,
                 request.NewImagingModality.Name,
                 request.NewImagingModality.Code,
@@ -33,7 +33,14 @@ namespace PhysioBoo.Application.Commands.ImagingModalities.CreateImagingModality
                 request.NewImagingModality.Category,
                 request.NewImagingModality.PreparationInstructions,
                 request.NewImagingModality.RadiationDose
-            ));
+            );
+
+            newImagingModality.SetRequiresContrast(request.NewImagingModality.RequiresContrast);
+            newImagingModality.SetPreparationRequired(request.NewImagingModality.PreparationRequired);
+            newImagingModality.SetAverageDurationMinutes(request.NewImagingModality.AverageDurationMinutes);
+            newImagingModality.SetRadiationDose(request.NewImagingModality.RadiationDose);
+
+            SharedKernel.Results.DbResult<Guid> result = await _imagingModalityRepository.InsertAsync<ImagingModality, Guid>(newImagingModality);
 
             if (!result.Success)
             {

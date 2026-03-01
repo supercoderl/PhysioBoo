@@ -66,6 +66,7 @@
         public static class AppointmentType
         {
             // Appointment Type Validation
+            public const string EmptyId = "APPOINTMENT_TYPE_EMPTY_ID";
             public const string EmptyName = "APPOINTMENT_TYPE_EMPTY_NAME";
         }
 

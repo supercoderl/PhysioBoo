@@ -1,4 +1,5 @@
-﻿using PhysioBoo.SharedKernel.Utils;
+﻿using NpgsqlTypes;
+using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Operation
@@ -19,6 +20,9 @@ namespace PhysioBoo.Domain.Entities.Operation
         public string? ColorCode { get; private set; }
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public NpgsqlTsVector? SearchVector { get; private set; }
 
         [InverseProperty("AppointmentType")]
         public virtual ICollection<Appointment> Appointments { get; private set; } = new List<Appointment>();

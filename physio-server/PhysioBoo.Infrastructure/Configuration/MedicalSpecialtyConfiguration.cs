@@ -45,8 +45,7 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(ms => ms.IsSurgical).IsRequired();
             builder.Property(ms => ms.IsDiagnostic).IsRequired();
 
-            builder.Property(ms => ms.IconUrl)
-                   .HasMaxLength(500);
+            builder.Property(ms => ms.IconUrl);
 
             builder.Property(ms => ms.CreatedAt).IsRequired();
 

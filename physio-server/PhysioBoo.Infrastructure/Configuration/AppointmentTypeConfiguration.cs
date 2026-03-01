@@ -14,6 +14,11 @@ namespace PhysioBoo.Infrastructure.Configuration
             // PK
             builder.HasKey(a => a.Id);
 
+            // Indexes
+            builder.HasIndex(a => a.Name);
+            builder.HasIndex(a => a.Code);
+            builder.HasIndex(a => a.IsActive);
+
             // Properties
             builder.Property(a => a.Name)
                    .IsRequired()
@@ -53,10 +58,9 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(a => a.CreatedAt)
                    .IsRequired();
 
-            // Optional: Indexes for searching/filtering
-            builder.HasIndex(a => a.Name);
-            builder.HasIndex(a => a.Code);
-            builder.HasIndex(a => a.IsActive);
+            builder.Property(ms => ms.SearchVector)
+                .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"Code\", '')))", stored: true)
+                .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

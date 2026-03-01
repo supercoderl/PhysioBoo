@@ -25,7 +25,7 @@ namespace PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _manufacturerRepository.InsertAsync<Manufacturer, Guid>(new Manufacturer(
+            Manufacturer newManufacturer = new Manufacturer(
                 request.NewManufacturer.Id,
                 request.NewManufacturer.Name,
                 request.NewManufacturer.CompanyCode,
@@ -39,7 +39,13 @@ namespace PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer
                 request.NewManufacturer.Website,
                 request.NewManufacturer.LicenseNumber,
                 request.NewManufacturer.EstablishedYear
-            ));
+            );
+
+            newManufacturer.SetGmpCertified(request.NewManufacturer.GmpCertified);
+            newManufacturer.SetIsoCertified(request.NewManufacturer.IsoCertified);
+            newManufacturer.SetFdaApproved(request.NewManufacturer.FdaApproved);
+
+            SharedKernel.Results.DbResult<Guid> result = await _manufacturerRepository.InsertAsync<Manufacturer, Guid>(newManufacturer);
 
             if (!result.Success)
             {

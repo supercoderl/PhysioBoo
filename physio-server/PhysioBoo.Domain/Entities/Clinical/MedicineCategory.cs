@@ -1,4 +1,5 @@
-﻿using PhysioBoo.SharedKernel.Utils;
+﻿using NpgsqlTypes;
+using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Clinical
@@ -14,6 +15,9 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public bool RequiresPrescription { get; private set; }
         public string? StorageConditions { get; private set; }
         public DateTime CreatedAt { get; private set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public NpgsqlTsVector? SearchVector { get; private set; }
 
         [ForeignKey(nameof(ParentCategoryId))]
         [InverseProperty(nameof(ParentCategory.SubCategories))]

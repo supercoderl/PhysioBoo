@@ -25,7 +25,7 @@ namespace PhysioBoo.Application.Commands.Suppliers.CreateSupplier
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _supplierRepository.InsertAsync<Supplier, Guid>(new Supplier(
+            Supplier newSupplier = new Supplier(
                 request.NewSupplier.Id,
                 request.NewSupplier.SupplierName,
                 request.NewSupplier.SupplierCode,
@@ -51,7 +51,19 @@ namespace PhysioBoo.Application.Commands.Suppliers.CreateSupplier
                 request.NewSupplier.PaymentTerms,
                 request.NewSupplier.BankAccountDetails,
                 request.NewSupplier.LastOrderDate
-            ));
+            );
+
+            newSupplier.SetGmpCertified(request.NewSupplier.GmpCertified);
+            newSupplier.SetCreditLimit(request.NewSupplier.CreditLimit);
+            newSupplier.SetLeadTimeDays(request.NewSupplier.LeadTimeDays);
+            newSupplier.SetMinimumOrderValue(request.NewSupplier.MinimumOrderValue);
+            newSupplier.SetDeliveryReliabilityScore(request.NewSupplier.DeliveryReliabilityScore);
+            newSupplier.SetQualityRating(request.NewSupplier.QualityRating);
+            newSupplier.SetServiceRating(request.NewSupplier.ServiceRating);
+            newSupplier.SetTotalOrders(request.NewSupplier.TotalOrders);
+            newSupplier.SetTotalPurchaseValue(request.NewSupplier.TotalPurchaseValue);
+
+            SharedKernel.Results.DbResult<Guid> result = await _supplierRepository.InsertAsync<Supplier, Guid>(newSupplier);
 
             if (!result.Success)
             {

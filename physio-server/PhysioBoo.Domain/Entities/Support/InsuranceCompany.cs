@@ -1,4 +1,5 @@
-﻿using PhysioBoo.Domain.Entities.Operation;
+﻿using NpgsqlTypes;
+using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -26,6 +27,9 @@ namespace PhysioBoo.Domain.Entities.Support
         public string? TermAndConditions { get; private set; }
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public NpgsqlTsVector? SearchVector { get; private set; }
 
         [InverseProperty("InsuranceCompany")]
         public virtual ICollection<Bill> Bills { get; private set; } = new List<Bill>();

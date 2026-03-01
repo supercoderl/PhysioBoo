@@ -133,7 +133,9 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Login user with email and password")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            #endregion
 
+            #region OAuth Login
             group.MapPost("/oauth-login", async (
                 [FromBody] OAuthLoginUserViewModel request,
                 IMediatorHandler bus,
@@ -255,10 +257,10 @@ namespace PhysioBoo.Presentation.Endpoints
 
             #region Refresh token
             group.MapPost("/refresh/refresh-token", async (
-                [FromBody] ResetPasswordViewModel request,
                 HttpContext context,
                 IMediatorHandler bus,
                 IUser user,
+                HttpResponse response,
                 CancellationToken cancellationToken
             ) =>
             {
@@ -267,13 +269,23 @@ namespace PhysioBoo.Presentation.Endpoints
                     return Results.Unauthorized();
                 }
 
-                await bus.SendCommandAsync(new RefreshTokenCommand(refreshToken));
+                RefreshTokenCommand requestCmd = new RefreshTokenCommand(refreshToken);
 
-                return Results.Ok(new ResponseMessage<string>
+                await bus.SendCommandAsync(requestCmd);
+
+                if (requestCmd.Result != null)
                 {
-                    Success = true,
-                    Data = "Refresh token successfully"
-                });
+                    AuthHelper.SetTokenCookie(response, "access_token", requestCmd.Result.AccessToken, timeZoneId, env == "Development");
+                    AuthHelper.SetTokenCookie(response, "refresh_token", requestCmd.Result.RefreshToken, timeZoneId, env == "Development");
+
+                    return Results.Ok(new ResponseMessage<string>
+                    {
+                        Success = true,
+                        Data = "Login successfully."
+                    });
+                }
+
+                return Results.Unauthorized();
             }).WithName("Refresh Token")
             .WithSummary("Refresh new token")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)

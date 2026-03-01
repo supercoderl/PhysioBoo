@@ -14,6 +14,9 @@
         string? Email,
         string? Website,
         string? LicenseNumber,
+        bool GmpCertified,
+        bool IsoCertified,
+        bool FdaApproved,
         int EstablishedYear
     );
 }

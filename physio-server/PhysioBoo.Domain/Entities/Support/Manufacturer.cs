@@ -1,4 +1,5 @@
-﻿using PhysioBoo.Domain.Entities.Clinical;
+﻿using NpgsqlTypes;
+using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -24,6 +25,9 @@ namespace PhysioBoo.Domain.Entities.Support
         public int EstablishedYear { get; private set; }
         public bool IsActive { get; private set; }
         public DateTime CreatedAt { get; private set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public NpgsqlTsVector? SearchVector { get; private set; }
 
         [InverseProperty("Manufacturer")]
         public virtual ICollection<Medicine> Medicines { get; private set; } = new List<Medicine>();

@@ -7,6 +7,8 @@
         string? Code,
         string? Description,
         Guid? ParentCategoryId,
+        bool IsControlled,
+        bool RequiresPrescription,
         string? StorageConditions
     );
 }

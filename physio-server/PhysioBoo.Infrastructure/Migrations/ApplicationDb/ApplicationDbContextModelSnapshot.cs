@@ -388,6 +388,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<bool>("RequiresPrescription")
                         .HasColumnType("boolean");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"Code\", '')))", true);
+
                     b.Property<string>("StorageConditions")
                         .HasColumnType("text");
 
@@ -1325,6 +1330,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<bool>("RequiresContrast")
                         .HasColumnType("boolean");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"Code\", '')))", true);
 
                     b.HasKey("Id");
 
@@ -2929,8 +2939,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("text");
 
                     b.Property<string>("IconUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDiagnostic")
                         .HasColumnType("boolean");
@@ -3207,6 +3216,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<bool>("RequiresPreparation")
                         .HasColumnType("boolean");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"Code\", '')))", true);
 
                     b.HasKey("Id");
 
@@ -3496,6 +3510,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"DepartmentCode\", '')))", true);
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -4196,6 +4215,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .IsRequired()
                         .HasColumnType("text[]");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"Code\", '')))", true);
+
                     b.Property<string>("TermAndConditions")
                         .HasColumnType("text");
 
@@ -4279,6 +4303,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("PostalCode")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"CompanyCode\", '')))", true);
 
                     b.Property<string>("State")
                         .HasMaxLength(100)
@@ -4532,6 +4561,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<decimal>("QualityRating")
                         .HasColumnType("numeric(3,2)");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"SupplierName\", '') || ' ' || coalesce(\"SupplierCode\", '')))", true);
 
                     b.Property<decimal>("ServiceRating")
                         .HasColumnType("numeric(3,2)");

@@ -25,14 +25,19 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCatego
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _medicineCategoryRepository.InsertAsync<MedicineCategory, Guid>(new MedicineCategory(
+            MedicineCategory newMedicineCategory = new MedicineCategory(
                 request.NewMedicineCategory.Id,
                 request.NewMedicineCategory.Name,
                 request.NewMedicineCategory.Code,
                 request.NewMedicineCategory.Description,
                 request.NewMedicineCategory.ParentCategoryId,
                 request.NewMedicineCategory.StorageConditions
-            ));
+            );
+
+            newMedicineCategory.SetIsControlled(request.NewMedicineCategory.IsControlled);
+            newMedicineCategory.SetRequiresPrescription(request.NewMedicineCategory.RequiresPrescription);
+
+            SharedKernel.Results.DbResult<Guid> result = await _medicineCategoryRepository.InsertAsync<MedicineCategory, Guid>(newMedicineCategory);
 
             if (!result.Success)
             {

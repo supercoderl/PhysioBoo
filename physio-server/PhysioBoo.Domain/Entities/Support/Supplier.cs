@@ -1,4 +1,5 @@
-﻿using PhysioBoo.Domain.Entities.Clinical;
+﻿using NpgsqlTypes;
+using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -44,6 +45,9 @@ namespace PhysioBoo.Domain.Entities.Support
         public DateOnly? LastOrderDate { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public NpgsqlTsVector? SearchVector { get; private set; }
 
         [InverseProperty("Supplier")]
         public virtual ICollection<MedicineInventory> MedicineInventories { get; private set; } = new List<MedicineInventory>();
@@ -120,7 +124,7 @@ namespace PhysioBoo.Domain.Entities.Support
         #region Setter Methods (36)
         public void SetSupplierName(string supplierName) { SupplierName = supplierName; }
         public void SetSupplierCode(string? supplierCode) { SupplierCode = supplierCode; }
-        public void SetSupplierType(SupplierType supplierType) { Type = supplierType; }
+        public void SetType(SupplierType supplierType) { Type = supplierType; }
         public void SetContactPerson(string? contactPerson) { ContactPerson = contactPerson; }
         public void SetPhone(string? phone) { Phone = phone; }
         public void SetAlternatePhone(string? alternatePhone) { AlternatePhone = alternatePhone; }
@@ -132,7 +136,7 @@ namespace PhysioBoo.Domain.Entities.Support
         public void SetPostalCode(string? postalCode) { PostalCode = postalCode; }
         public void SetCountry(string country) { Country = country; }
         public void SetBusinessRegistrationNumber(string? businessRegistrationNumber) { BusinessRegistrationNumber = businessRegistrationNumber; }
-        public void SetTaxIdentification(string? taxIdentificationNumber) { TaxIdentificationNumber = taxIdentificationNumber; }
+        public void SetTaxIdentificationNumber(string? taxIdentificationNumber) { TaxIdentificationNumber = taxIdentificationNumber; }
         public void SetGstNumber(string? gstNumber) { GstNumber = gstNumber; }
         public void SetPanNumber(string? panNumber) { PanNumber = panNumber; }
         public void SetDrugLicenseNumber(string? drugLicenseNumber) { DrugLicenseNumber = drugLicenseNumber; }
@@ -147,7 +151,7 @@ namespace PhysioBoo.Domain.Entities.Support
         public void SetLeadTimeDays(int leadTimeDays) { LeadTimeDays = leadTimeDays; }
         public void SetMinimumOrderValue(decimal minimumOrderValue) { MinimumOrderValue = minimumOrderValue; }
         public void SetDeliveryReliabilityScore(decimal deliveryReliabilityScore) { DeliveryReliabilityScore = deliveryReliabilityScore; }
-        public void SetQuantityRating(decimal quantityRating) { QualityRating = quantityRating; }
+        public void SetQualityRating(decimal qualityRating) { QualityRating = qualityRating; }
         public void SetServiceRating(decimal serviceRating) { ServiceRating = serviceRating; }
         public void SetTotalOrders(int totalOrders) { TotalOrders = totalOrders; }
         public void SetTotalPurchaseValue(decimal totalPurchaseValue) { TotalPurchaseValue = totalPurchaseValue; }

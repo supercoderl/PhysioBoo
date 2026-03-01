@@ -26,8 +26,17 @@ namespace PhysioBoo.Application.ViewModels.Suppliers
         DateOnly? DrugLicenseExpiry,
         string? FdaRegistrationNumber,
         string? IsoCertification,
+        bool GmpCertified,
         string? PaymentTerms,
+        decimal CreditLimit,
         string? BankAccountDetails,
+        int LeadTimeDays,
+        decimal MinimumOrderValue,
+        decimal DeliveryReliabilityScore,
+        decimal QualityRating,
+        decimal ServiceRating,
+        int TotalOrders,
+        decimal TotalPurchaseValue,
         DateOnly? LastOrderDate
     );
 }

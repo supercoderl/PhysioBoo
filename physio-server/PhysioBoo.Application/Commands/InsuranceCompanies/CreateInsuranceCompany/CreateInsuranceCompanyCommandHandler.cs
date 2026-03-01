@@ -4,11 +4,6 @@ using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhysioBoo.Application.Commands.InsuranceCompanies.CreateInsuranceCompany
 {
@@ -30,7 +25,7 @@ namespace PhysioBoo.Application.Commands.InsuranceCompanies.CreateInsuranceCompa
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _insuranceCompanyRepository.InsertAsync<InsuranceCompany, Guid>(new InsuranceCompany(
+            InsuranceCompany newInsuranceCompany = new InsuranceCompany(
                 request.NewInsuranceCompany.Id,
                 request.NewInsuranceCompany.Name,
                 request.NewInsuranceCompany.Code,
@@ -46,9 +41,14 @@ namespace PhysioBoo.Application.Commands.InsuranceCompanies.CreateInsuranceCompa
                 request.NewInsuranceCompany.AverageClaimSettlementTime,
                 request.NewInsuranceCompany.RequiredDocuments,
                 request.NewInsuranceCompany.TermAndConditions
-            ));
+            );
 
-            if(!result.Success)
+            newInsuranceCompany.SetCashlessFacility(request.NewInsuranceCompany.CashlessFacility);
+            newInsuranceCompany.SetReimbursementFacility(request.NewInsuranceCompany.ReimbursementFacility);
+
+            SharedKernel.Results.DbResult<Guid> result = await _insuranceCompanyRepository.InsertAsync<InsuranceCompany, Guid>(newInsuranceCompany);
+
+            if (!result.Success)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,

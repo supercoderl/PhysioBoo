@@ -6,6 +6,7 @@ import { CloudinaryService } from '../../../services/common/cloudinary.service';
 import { environment } from '../../../../environments/environment.development';
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
 import { finalize } from 'rxjs';
+import { ToastService } from '../../../services/common/toast.service';
 
 @Component({
   selector: 'boo-upload',
@@ -26,7 +27,6 @@ import { finalize } from 'rxjs';
 
       <div 
         (click)="triggerUpload()"
-        [class.border-red-500]="error"
         class="
           relative overflow-hidden group cursor-pointer transition-all duration-200
           border-2 border-dashed border-gray-300 bg-gray-50
@@ -42,7 +42,8 @@ import { finalize } from 'rxjs';
           <boo-icon name="loader" class="animate-spin text-primary" [size]="24"></boo-icon>
         </div>
         <ng-container *ngIf="previewUrl; else emptyState">
-          <img [src]="previewUrl" class="w-full h-full object-cover">
+          <img *ngIf="!isSvgString" [src]="previewUrl" class="w-full h-full object-cover">
+          <div *ngIf="isSvgString" [innerHtml]="previewUrl | safeHtml" class="w-full h-full object-cover"></div>
           
           <div *ngIf="!loadingSrv.isLoading('upload')" class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity z-10">
             <div class="flex flex-col items-center text-white">
@@ -67,8 +68,6 @@ import { finalize } from 'rxjs';
           (change)="onFileSelected($event)"
         >
       </div>
-
-      <span *ngIf="error" class="text-xs text-red-500">{{ error }}</span>
     </div>
   `
 })
@@ -78,19 +77,20 @@ export class BooUploadComponent implements ControlValueAccessor {
   @Input() required = false;
   @Input() width = '80px';
   @Input() height = '80px';
+  @Input() svgSize: number = 24;
   @Input() radius = 12;
   @Input() accept = 'image/*';
-  @Input() error = '';
   @Input() folder = `${environment.CLOUDINARY.BASE_FOLDER}/others`;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @Output() uploadSuccess = new EventEmitter<{ url: string; publicId: string }>();
 
   previewUrl: string | null = null;
+  isSvgString: boolean = false;
   disabled = false;
 
   get containerClass() {
-    return { 
-      'opacity-50 cursor-not-allowed pointer-events-none': this.disabled || this.loadingSrv.isLoading('upload') 
+    return {
+      'opacity-50 cursor-not-allowed pointer-events-none': this.disabled || this.loadingSrv.isLoading('upload')
     };
   }
   // #endregion
@@ -98,6 +98,7 @@ export class BooUploadComponent implements ControlValueAccessor {
   // #region Init (Lifecycle + Setup)
   constructor(
     private cloudinarySrv: CloudinaryService,
+    private toastSrv: ToastService,
     protected loadingSrv: LocalLoadingService
   ) { }
   // #endregion
@@ -114,19 +115,91 @@ export class BooUploadComponent implements ControlValueAccessor {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
+
+    const allowedTypes = this.accept.split(',').map(t => t.trim().toLowerCase());
+
+    const isExtensionAllowed = allowedTypes.some(type => file.name.toLowerCase().endsWith(type));
+    const isMimeTypeAllowed = allowedTypes.some(type => {
+      if (type.includes('/*')) {
+        return file.type.startsWith(type.replace('/*', ''));
+      }
+      return file.type === type;
+    });
+
+    if (!isExtensionAllowed && !isMimeTypeAllowed) {
+      this.toastSrv.error(`Invalid file format. Only the following formats are accepted: ${this.accept}`)
+      input.value = '';
+      return;
+    }
+
+    if (file.type === 'image/svg+xml' || file.name.endsWith('.svg')) {
+      this.handleSvgFile(file);
+    } else {
+      this.uploadToCloudinary(file, input);
+    }
+  }
+
+  private handleSvgFile(file: File) {
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const svgString = e.target.result as string;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(svgString, 'image/svg+xml');
+      const svgElement = doc.documentElement;
+
+      if (svgElement.tagName.toLowerCase() !== 'svg') {
+        this.toastSrv.error('Invalid svg type');
+        return;
+      }
+
+      if (!svgElement.hasAttribute('viewBox')) {
+        const width = svgElement.getAttribute('width')?.replace(/[^0-9.]/g, '') || this.svgSize;
+        const height = svgElement.getAttribute('height')?.replace(/[^0-9.]/g, '') || this.svgSize;
+        svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      }
+
+      svgElement.setAttribute('width', '100%');
+      svgElement.setAttribute('height', '100%');
+      svgElement.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+      const elements = svgElement.querySelectorAll('*');
+      elements.forEach(el => {
+        const fill = el.getAttribute('fill');
+        if (fill && fill !== 'none' && fill !== 'currentColor') {
+          el.setAttribute('fill', 'currentColor');
+        }
+        const stroke = el.getAttribute('stroke');
+        if (stroke && stroke !== 'none' && stroke !== 'currentColor') {
+          el.setAttribute('stroke', 'currentColor');
+        }
+        el.removeAttribute('style');
+      });
+
+      const serializer = new XMLSerializer();
+      const cleanSvg = serializer.serializeToString(svgElement);
+
+      this.isSvgString = true;
+      this.previewUrl = cleanSvg;
+
+      this.onChange(cleanSvg);
+      this.uploadSuccess.emit({ url: cleanSvg, publicId: `svg-raw-${file.name}` });
+    };
+    reader.readAsText(file);
+  }
+
+  private uploadToCloudinary(file: File, input: HTMLInputElement) {
     this.cloudinarySrv.uploadImage(file, this.folder)
-      .pipe(
-        finalize(() => {
-          input.value = '';
-        })
-      )
+      .pipe(finalize(() => input.value = ''))
       .subscribe({
         next: (res) => {
           this.previewUrl = res.secure_url;
           this.onChange(res.secure_url);
           this.uploadSuccess.emit({ url: res.secure_url, publicId: res.public_id });
         },
-        error: (err) => console.error('Upload failed', err)
+        error: (err) => {
+          this.toastSrv.error('Upload failed, please try again.')
+          console.error(err);
+        }
       });
   }
 

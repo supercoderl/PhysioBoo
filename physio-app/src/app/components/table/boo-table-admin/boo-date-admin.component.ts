@@ -17,7 +17,7 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
             <boo-button-admin
                 (click)="toggle()"
                 [icon]="{ name: 'calendar', size: 14, color: '#6C7688' }"
-                buttonClass="!bg-surface h-full min-w-[180px] justify-between"
+                buttonClass="!bg-surface h-full min-w-[180px] flex-row-reverse !justify-between"
                 [border]="{ width: 1, color: isOpen ? '#3b82f6' : '#e3e3e3' }"
             >
                 <span class="text-[13px] font-medium text-placeholder">{{ displayText }}</span>

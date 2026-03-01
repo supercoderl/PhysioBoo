@@ -83,10 +83,10 @@ export class AuthService {
     }
 
     refreshToken() {
-        return this.http.post<any>('/api/users/refresh-token', {});
+        return this.http.post<any>(BASE_API.REFRESHTOKEN, {});
     }
 
     forgotPassword(body: any): Observable<any> {
-        return this.http.post('api/users/forgot-password', body);
+        return this.http.post(BASE_API.FORGOTPASSWORD, body);
     }
 }

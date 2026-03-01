@@ -17,7 +17,7 @@ import { LocalLoadingService } from "../../../../../../services/common/local-loa
 import { MedicalSpecialty } from "../../../../../../shared/types/medical-staff";
 
 @Component({
-    selector: 'admin-medical-specialty-drawer',
+    selector: 'common-category-medical-specialty-drawer',
     standalone: true,
     imports: [
         SharedModule,
@@ -62,6 +62,8 @@ import { MedicalSpecialty } from "../../../../../../shared/types/medical-staff";
                                     width="5rem" 
                                     height="5rem"
                                     [radius]="12"
+                                    [accept]="'.svg'"
+                                    [svgSize]="126"
                                     (uploadSuccess)="onIconUploaded($event)"
                                 />
                             </div>
@@ -182,7 +184,7 @@ import { MedicalSpecialty } from "../../../../../../shared/types/medical-staff";
     `
 })
 
-export class AdminMedicalSpecialtyDrawerComponent implements OnChanges {
+export class CommonCategoryMedicalSpecialtyDrawerComponent implements OnChanges {
     // #region Inputs, Outputs, Properties
     @Input() isOpen = false;
     @Input() currentId: string | null = null;

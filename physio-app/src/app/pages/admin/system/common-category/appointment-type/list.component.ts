@@ -1,0 +1,257 @@
+import { Component, OnInit, signal } from "@angular/core";
+import { SharedModule } from "../../../../../shared/shared-imports";
+import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
+import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
+import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { PaginationData } from "../../../../../shared/types/common";
+import { DialogService } from "../../../../../services/common/dialog.service";
+import { catchError, of, tap } from "rxjs";
+import { ToastService } from "../../../../../services/common/toast.service";
+import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
+import { BooSortAdminComponent } from "../../../../../components/table/boo-table-admin/boo-sort-admin.component";
+import { SortOption } from "../../../../../shared/types/sort";
+import { BooFilterAdminComponent } from "../../../../../components/table/boo-table-admin/boo-filter-admin.component";
+import { FilterConfig } from "../../../../../shared/types/filter";
+import { BooDateAdminComponent } from "../../../../../components/table/boo-table-admin/boo-date-admin.component";
+import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
+import { DateRange } from "../../../../../shared/types/date";
+import { DateService } from "../../../../../services/common/date.service";
+import { AppointmentType } from "../../../../../shared/types/operation";
+import { AppointmentTypeService } from "../../../../../services/admin/appointment-type.service";
+import { CommonCategoryAppointmentTypeDrawerComponent } from "../../../../../components/layout/admin/setting/common-category/appointment-type/appointment-type-drawer.component";
+import { CommonCategoryAppointmentTypeTableCardComponent } from "../../../../../components/layout/admin/setting/common-category/appointment-type/appointment-type-table-card.component";
+
+@Component({
+    selector: 'common-category-appointment-type-list',
+    standalone: true,
+    imports: [
+        SharedModule,
+        AdminContentHeaderComponent,
+        BooButtonAdminComponent,
+        BooIconComponent,
+        ButtonIconComponent,
+        BooInputComponent,
+        BooSortAdminComponent,
+        BooFilterAdminComponent,
+        BooDateAdminComponent,
+        BooSelectComponent,
+        CommonCategoryAppointmentTypeTableCardComponent,
+        CommonCategoryAppointmentTypeDrawerComponent
+    ],
+    templateUrl: `./list.component.html`
+})
+
+export class CommonCategoryAppointmentTypeListComponent implements OnInit {
+    // #region Inputs, Outputs, Properties
+    tableData = signal<PaginationData<AppointmentType> | null>(null);
+    params = {
+        pageNumber: 1,
+        pageSize: 5,
+        search: '',
+        sort: 'createdAt:desc',
+        filter: {
+            start: null as Date | null,
+            end: null as Date | null,
+            isEmergency: null as boolean | null,
+            requiresPreparation: null as boolean | null,
+            isFollowUp: null as boolean | null,
+            isActive: null as boolean | null
+        }
+    };
+    isDrawerOpen: boolean = false;
+    selectedId: string | null = null;
+    sort_options: SortOption[] = [
+        { label: 'Recent', value: '-createdAt' },
+        { label: 'Oldest', value: '+createdAt' },
+        { label: 'Name (A-Z)', value: '+name' },
+        { label: 'Name (Z-A)', value: '-name' },
+        { label: 'Code (A-Z)', value: '+code' },
+        { label: 'Code (Z-A)', value: '-code' },
+    ];
+
+    filter_configs: FilterConfig[] = [
+        {
+            key: 'isSurgical',
+            label: 'Classification',
+            type: 'boolean',
+            value: null,
+            trueLabel: 'Surgical',
+            falseLabel: 'Diagnostic'
+        },
+    ];
+    // #endregion
+
+    // #region Init (Lifecycle + Setup)
+    constructor(
+        private appointmentTypeSrv: AppointmentTypeService,
+        private dialogSrv: DialogService,
+        private toastSrv: ToastService,
+        protected loadingSrv: LocalLoadingService,
+        private dateSrv: DateService
+    ) { }
+
+    ngOnInit(): void {
+        this.loadAppointmentTypes();
+    }
+    // #endregion
+
+    // #region Methods
+    loadAppointmentTypes() {
+        this.appointmentTypeSrv.search({
+            pageNumber: this.params.pageNumber,
+            pageSize: this.params.pageSize,
+            search: this.params.search,
+            sort: this.params.sort,
+            filter: {
+                ...this.params.filter,
+                start: this.dateSrv.format(this.params.filter.start, "YYYY-MM-DD"),
+                end: this.dateSrv.format(this.params.filter.end, "YYYY-MM-DD")
+            }
+        })
+            .subscribe(_res => {
+                if (_res.success) {
+                    this.tableData.set(_res.data);
+                }
+            });
+    }
+
+    onPageChanged(newPage: number) {
+        this.params.pageNumber = newPage;
+        this.loadAppointmentTypes();
+    }
+
+    onOpenDrawer(id: string | null) {
+        this.selectedId = id;
+        this.isDrawerOpen = true;
+    }
+
+    onCloseDrawer() {
+        this.isDrawerOpen = false;
+        this.selectedId = null;
+    }
+
+    onSaveSuccess(result: AppointmentType) {
+        this.onCloseDrawer();
+        this.tableData.update((currentData) => {
+            if (!currentData) {
+                return {
+                    items: [result],
+                    totalCount: 1,
+                    pageNumber: 1,
+                    pageSize: this.params.pageSize,
+                    totalPages: 1,
+                    hasNext: false,
+                    hasPrevious: false
+                }
+            }
+
+            const existingIndex = currentData.items.findIndex(x => x.id === result.id);
+            if (existingIndex > -1) {
+                const updatedItems = [...currentData.items];
+                updatedItems[existingIndex] = result;
+                return {
+                    ...currentData,
+                    items: updatedItems
+                };
+            }
+
+            return {
+                ...currentData,
+                totalCount: currentData.totalCount + 1,
+                items: [result, ...currentData.items],
+                totalPages: Math.ceil((currentData.totalCount + 1) / currentData.pageSize)
+            }
+        })
+    }
+
+    onDelete(id: string | null) {
+        if (!id) return;
+
+        this.dialogSrv.confirmDelete(() => {
+            const currentData = this.tableData();
+            if (!currentData) return;
+
+            const isLastItemOnPage = currentData.items.length === 1;
+            const isNotFirstPage = currentData.pageNumber > 1;
+
+            if (isLastItemOnPage && isNotFirstPage) {
+                this.appointmentTypeSrv.delete(id).subscribe({
+                    next: () => {
+                        this.toastSrv.success("Deleted 1 item.");
+                        this.params.pageNumber = currentData.pageNumber - 1;
+                        this.loadAppointmentTypes();
+                    },
+                    error: () => this.toastSrv.error("System error occurred.")
+                });
+                this.isDrawerOpen && this.onCloseDrawer();
+                return;
+            }
+
+            const backupItems = [...currentData.items];
+            const backupCount = currentData.totalCount;
+
+            this.tableData.update(data => {
+                if (!data) return null;
+                return {
+                    ...data,
+                    items: data.items.filter(item => item.id !== id),
+                    totalCount: data.totalCount - 1
+                };
+            });
+
+            this.appointmentTypeSrv.delete(id)
+                .pipe(
+                    tap(() => this.toastSrv.success("Deleted 1 item.")),
+                    catchError(_ => {
+                        this.toastSrv.error("System error occurred. Rolling back data...");
+                        this.tableData.update(data => {
+                            if (!data) return null;
+                            return { ...data, items: backupItems, totalCount: backupCount };
+                        });
+                        return of(null);
+                    })
+                )
+                .subscribe({ next: _ => this.isDrawerOpen && this.onCloseDrawer() });
+        })
+    }
+
+    onSearch(val: string) {
+        this.params = { ...this.params, pageNumber: 1, search: val };
+        this.loadAppointmentTypes();
+    }
+
+    onSortChange(sort: SortOption) {
+        this.params = { ...this.params, pageNumber: 1, sort: sort.value };
+        this.loadAppointmentTypes();
+    }
+
+    onFilterApply(event: any) {
+        console.log(event);
+        this.params = {
+            ...this.params,
+            pageNumber: 1,
+            filter: {
+                start: this.params.filter.start,
+                end: this.params.filter.end,
+                ...event
+            }
+        }
+        this.loadAppointmentTypes();
+    }
+
+    onDateChange(range: DateRange) {
+        this.params = {
+            ...this.params,
+            pageNumber: 1,
+            filter: {
+                ...this.params.filter,
+                start: range.start,
+                end: range.end
+            }
+        };
+        this.loadAppointmentTypes();
+    }
+    // #endregion
+}

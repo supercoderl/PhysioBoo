@@ -63,3 +63,9 @@ export function generateUUID(): string {
   );
 }
 
+export function convertEnumToSelection(enumVal: any): { label: string, value: any }[] {
+  return Object.keys(enumVal).filter(key => isNaN(Number(key))).map(key => ({
+    label: key.replace(/([A-Z])/g, ' $1').trim(),
+    value: enumVal[key]
+  }))
+}

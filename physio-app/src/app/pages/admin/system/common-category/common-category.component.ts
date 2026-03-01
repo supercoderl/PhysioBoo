@@ -1,8 +1,8 @@
 import { Component } from "@angular/core";
-import { SharedModule } from "../../../../shared/shared-imports";
-import { Category } from "../../../../shared/types/category";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { CATEGORIES_MANAGEMENT } from "../../../../shared/data/dummy";
+import { SharedModule } from "../../../../shared/shared-imports";
+import { Category } from "../../../../shared/types/category";
 
 @Component({
   selector: 'admin-common-category',
@@ -14,7 +14,7 @@ import { CATEGORIES_MANAGEMENT } from "../../../../shared/data/dummy";
   template: `
       <div class="z-10 flex h-full flex-auto flex-col">
         <div class="flex flex-1 z-[2] min-w-0 h-full bg-body absolute inset-0 overflow-hidden">
-          <div class="relative mx-0 border-0 w-[320px] max-w-[320px] overflow-hidden bg-transparent flex-0">
+          <div class="relative mx-0 border-0 w-[280px] max-w-[280px] shrink-0 overflow-hidden bg-transparent flex-0">
             <div class="w-full relative bg-body text-[#1F232B] min-w-full h-full overflow-y-auto flex flex-col top-0 left-0">
               <div class="relative">
                 <div class="lg:min-w-0 flex flex-col max-h-full bg-body">
@@ -25,16 +25,34 @@ import { CATEGORIES_MANAGEMENT } from "../../../../shared/data/dummy";
                   </div>
                   <div class="navigation px-3">
                     <a 
-                      class="p-2 rounded-md gap-2 w-full flex mb-1 bg-borderGray cursor-pointer relative align-middle text-[13px] font-medium leading-none min-h-8 min-w-8 text-[#1F232B]"
+                      class="p-2 rounded-md gap-2 w-full flex mb-3 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-h-8 min-w-8 text-[#1F232B] transition-all duration-300 hover:scale-105"
                       *ngFor="let category of categories"
                       [routerLink]="category.route"
+                      routerLinkActive="active" 
+                      #rla="routerLinkActive" 
+                      
+                      [class.bg-primary]="rla.isActive"
+                      [class.text-surface]="rla.isActive"
+                      [class.bg-borderGray]="!rla.isActive"
+                      [class.text-[#1F232B]]="!rla.isActive"
                     >
-                      <boo-icon [name]="category.icon" iconClass="stroke-primary"></boo-icon>
+                      <boo-icon 
+                        [name]="category.icon" 
+                        [iconClass]="rla.isActive ? 'stroke-surface' : 'stroke-primary'"
+                      ></boo-icon>
                       <div class="flex min-w-0 flex-auto flex-col items-start gap-1">
-                        <p class="leading-none truncate max-w-full m-0 text-[13px] text-primary">
+                        <p 
+                          class="leading-none truncate max-w-full m-0 text-[13px] text-primary"
+                          [class.text-surface]="rla.isActive"
+                          [class.text-primary]="!rla.isActive"
+                        >
                           {{ category.name }}
                         </p>
-                        <p class="leading-none text-[11px] truncate max-w-full m-0 text-regular">
+                        <p 
+                          class="leading-none text-[11px] truncate max-w-full m-0 text-regular"
+                          [class.text-surface]="rla.isActive"
+                          [class.text-primary]="!rla.isActive"
+                        >
                             {{ category.description }}
                         </p>
                       </div>
@@ -44,7 +62,7 @@ import { CATEGORIES_MANAGEMENT } from "../../../../shared/data/dummy";
               </div>
             </div>
           </div>
-          <div class="pt-0.5 pl-0.5 flex flex-col w-full z-[9999]">
+          <div class="pt-0.5 pl-0.5 flex flex-col flex-1 min-w-0 w-full z-[9999]">
             <div 
               class="ps bg-surface relative flex flex-col flex-1 min-h-0 overscroll-contain h-screen shadow-card"
               style="border-top-left-radius: 12px; scrollbar-width: none; position: relative; overflow-y: auto;"
@@ -85,6 +103,7 @@ export class AdminCommonCategoryComponent {
   // #region Methods
   toggleMenu(id: number): void {
     this.openMenuId = this.openMenuId === id ? null : id;
+    console.log(this.openMenuId);
   }
 
   openAddModal(): void {

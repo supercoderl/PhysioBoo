@@ -10,7 +10,7 @@ export class ColumnDefDirective {
     @Input() headerLabel: string = '';
     @Input() headerClass: string = '';
     @Input() cellClass: string = '';
-    @Input() width?: number = 40;
+    @Input() width: string | number = 'auto';
     // #endregion
 
     // #region Init (Lifecycle + Setup)

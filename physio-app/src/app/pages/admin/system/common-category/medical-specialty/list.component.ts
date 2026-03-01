@@ -8,8 +8,8 @@ import { BooInputComponent } from "../../../../../components/input/boo-input/boo
 import { PaginationData } from "../../../../../shared/types/common";
 import { MedicalSpecialty } from "../../../../../shared/types/medical-staff";
 import { MedicalSpecialtyService } from "../../../../../services/admin/medical-specialty.service";
-import { AdminMedicalSpecialtyTableCardComponent } from "../../../../../components/layout/admin/setting/common-category/medical-specialty/medical-specialty-table-card.component";
-import { AdminMedicalSpecialtyDrawerComponent } from "../../../../../components/layout/admin/setting/common-category/medical-specialty/medical-specialty-drawer.component";
+import { CommonCategoryMedicalSpecialtyTableCardComponent } from "../../../../../components/layout/admin/setting/common-category/medical-specialty/medical-specialty-table-card.component";
+import { CommonCategoryMedicalSpecialtyDrawerComponent } from "../../../../../components/layout/admin/setting/common-category/medical-specialty/medical-specialty-drawer.component";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { catchError, of, tap } from "rxjs";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -33,8 +33,8 @@ import { DateService } from "../../../../../services/common/date.service";
         BooIconComponent,
         ButtonIconComponent,
         BooInputComponent,
-        AdminMedicalSpecialtyTableCardComponent,
-        AdminMedicalSpecialtyDrawerComponent,
+        CommonCategoryMedicalSpecialtyTableCardComponent,
+        CommonCategoryMedicalSpecialtyDrawerComponent,
         BooSortAdminComponent,
         BooFilterAdminComponent,
         BooDateAdminComponent,

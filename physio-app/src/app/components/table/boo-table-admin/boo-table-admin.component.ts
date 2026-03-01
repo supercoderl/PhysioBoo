@@ -38,9 +38,9 @@ import { Size } from '../../../shared/types/common';
                     <td 
                       class="whitespace-nowrap text-regular" 
                       [class]="tdClass" 
-                      [ngClass]="[tdPaddingClass, col.cellClass]"
+                      [ngClass]="[tdPaddingClass]"
                     >
-                      <div class="flex items-center w-full" [ngClass]="contentLimitClass">
+                      <div class="flex items-center w-full" [ngClass]="[contentLimitClass, col.cellClass]">
                         <div class="h-3.5 bg-gray-200 rounded col-span-2 animate-pulse" [style.width.%]="getStableWidth($index)"></div>
                       </div>
                     </td>
@@ -53,16 +53,16 @@ import { Size } from '../../../shared/types/common';
               @for (row of data; track row.id; let isLast = $last) {
                 <tr 
                   [class.border-b]="!isLast && showBorder" 
-                  class="hover:bg-gray-50 h-14 group transition-colors"
+                  class="hover:bg-borderGray h-14 group transition-colors"
                   [ngClass]="rowHeightClass"
                 >
                   @for (col of columnDefs; track col) {
                     <td 
-                      class="whitespace-nowrap text-regular group-hover:text-surface" 
+                      class="whitespace-nowrap text-regular" 
                       [class]="tdClass" 
-                      [ngClass]="[tdPaddingClass, col.cellClass]"
+                      [ngClass]="[tdPaddingClass]"
                     >
-                      <div class="line-clamp-2 whitespace-normal break-words flex items-center" [ngClass]="contentLimitClass">
+                      <div class="line-clamp-2 whitespace-normal break-words flex items-center" [ngClass]="[contentLimitClass, col.cellClass]">
                         <ng-container *ngTemplateOutlet="col.template; context: { $implicit: row }"></ng-container>
                       </div>
                     </td>

@@ -1232,9 +1232,74 @@ export const CATEGORIES_MANAGEMENT = [
     {
         id: 1,
         name: "Medical Specialties",
-        description: "Manage and organize medical specialties used across the system for accurate classification and administration.",
-        icon: "origami",
+        description:
+            "Manage and organize medical specialties used across the system for accurate clinical classification and administration.",
+        icon: "stethoscope",
         route: "/admin/system/common-category/medical-specialty"
     },
-]
+    {
+        id: 2,
+        name: "Appointment Types",
+        description:
+            "Define different appointment types to standardize scheduling duration, service classification, and workflow management.",
+        icon: "calendar-check",
+        route: "/admin/system/common-category/appointment-type"
+    },
+    {
+        id: 3,
+        name: "Imaging Modalities",
+        description:
+            "Manage diagnostic imaging categories such as X-Ray, Ultrasound, MRI, and CT Scan for structured medical imaging services.",
+        icon: "scan",
+        route: "/admin/system/common-category/imaging-modality"
+    },
+    {
+        id: 4,
+        name: "Lab Test Categories",
+        description:
+            "Organize laboratory tests into structured categories to support medical diagnostics and reporting.",
+        icon: "flask-round",
+        route: "/admin/system/common-category/lab-test-category"
+    },
+    {
+        id: 5,
+        name: "Lab Tests",
+        description:
+            "Manage individual laboratory tests including test codes, reference ranges, and pricing.",
+        icon: "test-tube",
+        route: "/admin/system/common-category/lab-test"
+    },
+    {
+        id: 6,
+        name: "Medicine Categories",
+        description:
+            "Define medicine classification groups to support prescription and pharmacy management.",
+        icon: "pill",
+        route: "/admin/system/common-category/medicine-category"
+    },
+    {
+        id: 7,
+        name: "Insurance Companies",
+        description:
+            "Manage insurance providers to support billing, claim processing, and coverage validation.",
+        icon: "shield-check",
+        route: "/admin/system/common-category/insurance-company"
+    },
+    {
+        id: 8,
+        name: "Manufacturers",
+        description:
+            "Manage manufacturers of medicines, medical devices, and healthcare equipment.",
+        icon: "factory",
+        route: "/admin/system/common-category/manufacturer"
+    },
+    {
+        id: 9,
+        name: "Suppliers",
+        description:
+            "Manage suppliers responsible for distributing medicines, medical supplies, and equipment.",
+        icon: "truck",
+        route: "/admin/system/common-category/supplier"
+    }
+];
 // #endregion

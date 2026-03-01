@@ -15,9 +15,7 @@ import { DropdownDirective } from "./directives/dropdown.directive";
 import { BooErrorDirective } from "./directives/error.directive";
 import { ParticlesDirective } from "./directives/particles.directive";
 import { CustomScrollbarDirective } from "./directives/scrollbar.directive";
-import { CompletionTextPipe } from "./pipes/completion.pipe";
 import { SHARED_PIPES, SHARED_ZORRO_MODULES } from "./shared-providers";
-import { DefaultUserPipe } from "./pipes/default-user.pipe";
 import { ImageFallbackDirective } from "./directives/image-fallback.directive";
 import { AutoAnimateDirective } from "./directives/auto-animate.directive";
 
@@ -38,8 +36,6 @@ export const SharedModule = [
     NgxChartsModule,
     OverlayModule,
     ...SHARED_ZORRO_MODULES,
-    CompletionTextPipe,
-    DefaultUserPipe,
     ...SHARED_PIPES,
     LottieComponent,
 

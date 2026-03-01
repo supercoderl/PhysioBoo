@@ -16,11 +16,11 @@ import { SharedModule } from '../../../shared/shared-imports';
                 type="button"
                 #triggerBtn
                 (click)="toggle($event)"
-                class="flex items-center justify-center w-8 h-8 rounded-sm hover:bg-gray-100 focus:outline-none transition-colors duration-200"
+                class="flex items-center justify-center w-8 h-8 rounded-sm hover:bg-borderGray focus:outline-none transition-colors duration-200"
                 [class.bg-gray-100]="isOpen" 
             >
                 <div class="pointer-events-none flex items-center">
-                    <boo-icon name="ellipsis" iconClass="stroke-regular group-hover:stroke-surface" />
+                    <boo-icon name="ellipsis" iconClass="stroke-regular" />
                 </div>
             </button>
 

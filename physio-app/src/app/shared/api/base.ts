@@ -7,11 +7,55 @@ export const BASE_API = {
   OAUTHLOGIN: '/api/users/oauth-login',
   LOGOUT: '/api/users/refresh/logout',
   REGISTER: '/api/users/register',
+  REFRESHTOKEN: 'api/users/refresh/refresh-token',
+  FORGOTPASSWORD: '/api/users/forgot-password',
   MEDICALSPECIALTY: {
     SEARCH: '/api/medical-specialties/search',
     SEARCH_BY_ID: '/api/medical-specialties/search-by-id',
     CREATE: '/api/medical-specialties/create',
     DELETE: '/api/medical-specialties/delete',
     UPDATE: '/api/medical-specialties/update'
-  }
+  },
+  APPOINTMENTTYPE: {
+    SEARCH: '/api/appointment-types/search',
+    SEARCH_BY_ID: '/api/appointment-types/search-by-id',
+    CREATE: '/api/appointment-types/create',
+    DELETE: '/api/appointment-types/delete',
+    UPDATE: '/api/appointment-types/update'
+  },
+  IMAGINGMODALITY: {
+    SEARCH: '/api/imaging-modalities/search',
+    SEARCH_BY_ID: '/api/imaging-modalities/search-by-id',
+    CREATE: '/api/imaging-modalities/create',
+    DELETE: '/api/imaging-modalities/delete',
+    UPDATE: '/api/imaging-modalities/update'
+  },
+  INSURANCECOMPANY: {
+    SEARCH: '/api/insurance-companies/search',
+    SEARCH_BY_ID: '/api/insurance-companies/search-by-id',
+    CREATE: '/api/insurance-companies/create',
+    DELETE: '/api/insurance-companies/delete',
+    UPDATE: '/api/insurance-companies/update'
+  },
+  MANUFACTURER: {
+    SEARCH: '/api/manufacturers/search',
+    SEARCH_BY_ID: '/api/manufacturers/search-by-id',
+    CREATE: '/api/manufacturers/create',
+    DELETE: '/api/manufacturers/delete',
+    UPDATE: '/api/manufacturers/update'
+  },
+  MEDICINECATEGORY: {
+    SEARCH: '/api/medicine-categories/search',
+    SEARCH_BY_ID: '/api/medicine-categories/search-by-id',
+    CREATE: '/api/medicine-categories/create',
+    DELETE: '/api/medicine-categories/delete',
+    UPDATE: '/api/medicine-categories/update'
+  },
+  SUPPLIER: {
+    SEARCH: '/api/suppliers/search',
+    SEARCH_BY_ID: '/api/suppliers/search-by-id',
+    CREATE: '/api/suppliers/create',
+    DELETE: '/api/suppliers/delete',
+    UPDATE: '/api/suppliers/update'
+  },
 };

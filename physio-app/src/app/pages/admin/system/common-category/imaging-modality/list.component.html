@@ -1,0 +1,120 @@
+<admin-content-header>
+  <div
+    class="flex items-center md:flex-column gap-2 pb-3 mb-2 border-1 border-bottom"
+  >
+    <div class="flex-1">
+      <h4 class="text-[22px] text-primary font-semibold mb-0">Imaging Modality</h4>
+    </div>
+    <div class="text-right flex">
+      <div class="relative me-1">
+        <boo-select
+          label="Export"
+          [fitLabel]="true"
+          [height]="40"
+          [options]="[
+            { label: 'Xlsx', value: 'xlsx' },
+            { label: 'Pdf', value: 'pdf' },
+            { label: 'Csv', value: 'csv' }
+          ]"
+        />
+        <ng-template #menuExportRef>
+          <ul class="p-2 m-0 block min-w-50 bg-surface rounded-[5px] shadow-md">
+            <li>
+              <a
+                class="block text-[14px] text-primary bg-transparent rounded-[4.8px] px-3.75 py-1.625"
+                href="#"
+                >Download as PDF</a
+              >
+            </li>
+            <li>
+              <a
+                class="block text-[14px] text-primary bg-transparent rounded-[4.8px] px-3.75 py-1.625"
+                href="#"
+                >Download as Excel</a
+              >
+            </li>
+          </ul>
+        </ng-template>
+      </div>
+      <button-icon
+        buttonClass="!bg-primary ms-2 text-white"
+        (onClick)="onOpenDrawer(null)"
+      >
+        New Item
+      </button-icon>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between flex-wrap">
+    <div class="flex items-center gap-2">
+      <div>
+        <div class="flex items-center flex-wrap gap-2">
+          <div class="table-search flex items-center mb-0">
+            <div class="search-input">
+              <boo-input
+                label="Search..."
+                size="small"
+                (search)="onSearch($event)"
+              >
+                <boo-icon
+                  [class.animate-spin]="loadingSrv.isLoading('search')"
+                  [name]="
+                    loadingSrv.isLoading('search') ? 'loader-circle' : 'search'
+                  "
+                  color="#64748B"
+                  endfix
+                />
+              </boo-input>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <boo-date-admin
+        [startDate]="params.filter.start"
+        [endDate]="params.filter.end"
+        (rangeChange)="onDateChange($event)"
+      />
+    </div>
+
+    <div
+      class="flex table-dropdown right-content items-center flex-wrap gap-3"
+    >
+      <boo-button-admin
+        [icon]="{ name: 'refresh-cw', size: 14, color: '#6C7688' }"
+        buttonClass="!bg-surface h-full"
+        [border]="{ width: 1, color: '#e3e3e3' }"
+        (click)="loadImagingModalities()"
+      >
+        <span class="text-placeholder">Reload</span>
+      </boo-button-admin>
+      <boo-filter-admin
+        [filters]="filter_configs"
+        (apply)="onFilterApply($event)"
+      />
+      <boo-sort-admin 
+        [(value)]="params.sort" 
+        (change)="onSortChange($event)" 
+        [options]="sort_options"
+      />
+    </div>
+  </div>
+
+  <div class="mt-2">
+    <common-category-imaging-modality-table-card
+      [data]="tableData()"
+      (pageChange)="onPageChanged($event)"
+      (editClick)="onOpenDrawer($event)"
+      (deleteClick)="onDelete($event)"
+      [filter]="params"
+    />
+  </div>
+
+  <common-category-imaging-modality-drawer
+    [isOpen]="isDrawerOpen"
+    [currentId]="selectedId"
+    (close)="onCloseDrawer()"
+    (saveSuccess)="onSaveSuccess($event)"
+    (delete)="onDelete($event)"
+  />
+</admin-content-header>

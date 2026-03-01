@@ -9,7 +9,7 @@ import { LocalLoadingService } from "../../../../../../services/common/local-loa
 import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/boo-action-admin.component";
 
 @Component({
-  selector: 'admin-medical-specialty-table-card',
+  selector: 'common-category-medical-specialty-table-card',
   standalone: true,
   imports: [
     SharedModule,
@@ -31,8 +31,9 @@ import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/bo
       >  
         <ng-template appColumnDef="name" headerLabel="Name" headerClass="text-left" let-item>
           <div class="flex items-center gap-3 overflow-hidden" (click)="onEditClick(item.id)">
-            <div class="">
-              <img [appSrc]="item.iconUrl" [alt]="item.name" class="w-8 h-8 object-cover flex-shrink-0 grayscale">
+            <div 
+              class="w-8 h-8 object-cover transition-colors duration-300 stroke-primary"
+              [innerHTML]="item.iconUrl | safeHtml">
             </div>
             <div class="min-w-0 flex-1">
               <div class="truncate text-sm font-semibold text-danger cursor-pointer" [title]="item.name">
@@ -80,7 +81,7 @@ import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/bo
     }
   `]
 })
-export class AdminMedicalSpecialtyTableCardComponent {
+export class CommonCategoryMedicalSpecialtyTableCardComponent {
   // #region Inputs, Outputs, Properties
   @Input() data: PaginationData<MedicalSpecialty> | null = null;
   @Input() filter!: { pageNumber: number, pageSize: number };

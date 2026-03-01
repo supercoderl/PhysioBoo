@@ -1,8 +1,8 @@
 import { Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { SharedModule } from '../../../shared/shared-imports';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
+import { SharedModule } from '../../../shared/shared-imports';
 import { Size } from '../../../shared/types/common';
 
 @Component({
@@ -23,7 +23,7 @@ import { Size } from '../../../shared/types/common';
       <label
         (click)="focusInput()"
         [class]="labelClasses"
-        *ngIf="!model" 
+        *ngIf="!hasValue" 
       >
         {{ label }} <span *ngIf="required" class="text-red-500 ml-0.5">*</span>
       </label>
@@ -42,7 +42,7 @@ import { Size } from '../../../shared/types/common';
           (blur)="onTouched()"
           
           [class]="inputClasses"
-
+          [class.empty-date]="type === 'date' && !hasValue"
           [style.border-radius.px]="radius"
           [style.border-width.px]="borderWidth"
           
@@ -55,6 +55,11 @@ import { Size } from '../../../shared/types/common';
       </div>
     </div>
   `,
+  styles: [`
+    input[type="date"].empty-date:not(:focus)::-webkit-datetime-edit {
+      color: transparent;
+    }
+  `],
   host: {
     'class': 'block w-full relative group mb-0',
   },
@@ -73,10 +78,14 @@ export class BooInputComponent implements OnInit, OnDestroy {
   @Output() search = new EventEmitter<string>();
   @ViewChild('inputElement') inputElement!: ElementRef;
 
-  model: string = '';
+  model: any = '';
   disabled: boolean = false;
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
+
+  get hasValue(): boolean {
+    return this.model !== null && this.model !== undefined && this.model !== '';
+  }
 
   get labelClasses(): string {
     const base = 'absolute left-0 z-[1] text-placeholder flex items-center transition-all duration-300 cursor-text truncate pointer-events-none';
@@ -136,7 +145,11 @@ export class BooInputComponent implements OnInit, OnDestroy {
   onTouched: () => void = () => { };
 
   writeValue(value: any): void {
-    this.model = value || '';
+    if (value !== null && value !== undefined) {
+      this.model = value;
+    } else {
+      this.model = '';
+    }
   }
 
   registerOnChange(fn: any): void {

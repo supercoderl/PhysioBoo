@@ -37,7 +37,11 @@ export class InterceptorService implements HttpInterceptor {
 
     return next.handle(apiReq).pipe(delay(environment.DELAY_TIMES), catchError((err: HttpErrorResponse) => {
       if (err.status === 401) {
-        if (request.url.includes(BASE_API.PROFILE)) {
+        const isRefreshUrl = request.url.includes(BASE_API.REFRESHTOKEN);
+
+        if (isRefreshUrl) {
+          this.authSrv.logout();
+          this.router.navigate(['/auth/login']);
           return throwError(() => err);
         }
 
@@ -68,14 +72,6 @@ export class InterceptorService implements HttpInterceptor {
     }));
   }
 
-  private addToken(request: HttpRequest<any>, token: string) {
-    return request.clone({
-      setHeaders: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-  }
-
   private isRefreshing = false;
   private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
@@ -85,13 +81,15 @@ export class InterceptorService implements HttpInterceptor {
       this.refreshTokenSubject.next(null);
 
       return this.authSrv.refreshToken().pipe(
-        switchMap((res) => {
+        switchMap((res: any) => {
           this.isRefreshing = false;
-          this.refreshTokenSubject.next(res.value.access_token);
-          return next.handle(this.addToken(request, res.value.access_token));
+          this.refreshTokenSubject.next(res || true);
+          return next.handle(request);
         }),
         catchError((error) => {
           this.isRefreshing = false;
+          this.authSrv.logout();
+          this.router.navigate(['/auth/login']);
           return throwError(() => error);
         })
       );
@@ -99,9 +97,10 @@ export class InterceptorService implements HttpInterceptor {
       return this.refreshTokenSubject.pipe(
         filter(token => token != null),
         take(1),
-        switchMap(jwt => {
-          return next.handle(this.addToken(request, jwt));
-        }));
+        switchMap(() => {
+          return next.handle(request);
+        })
+      );
     }
   }
 

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { SharedModule } from '../../shared/shared-imports';
 import { DialogService } from '../../services/common/dialog.service';
+import { SharedModule } from '../../shared/shared-imports';
 
 @Component({
   selector: 'drawer',
@@ -12,27 +12,24 @@ import { DialogService } from '../../services/common/dialog.service';
     <div 
       [ngClass]="{
         'fixed inset-0 z-[10000]': true,
-        'pointer-events-auto': isOpen,
-        'pointer-events-none': !isOpen
       }"
+      [style.pointer-events]="isOpen ? 'auto' : 'none'"
     >
       <!-- overlay -->
       <div
         aria-hidden="true"
         (click)="onClose()"
-        [ngClass]="{
-          'transition-opacity duration-300 ease-in-out fixed fixed inset-0 bg-[rgba(0,_0,_0,_0.5)]': true,
-          'opacity-100': isOpen,
-          'opacity-0': !isOpen
-        }"
+        class="transition-opacity duration-300 ease-in-out fixed inset-0 bg-[rgba(0,_0,_0,_0.5)]"
+        style="opacity: 0;"
+        style="opacity: 0;"
+        [style.opacity]="isOpen ? '1' : '0'"
       ></div>
 
       <div
-        [ngClass]="{
-          'transition-transform duration-300 ease-in-out w-[280px] bg-surface text-black flex flex-col h-full fixed top-0 right-0': true,
-        }"
+        class="transition-transform duration-300 ease-in-out bg-surface text-black flex flex-col h-full fixed top-0 right-0"
+        style="transform: translateX(100%);"
+        [style.transform]="isOpen ? 'translateX(0)' : 'translateX(100%)'"
         [style.width.px]="width"
-        [style.transform]="'translateX(' + (isOpen ? 0 : width) + 'px)'"
       >
         <div class="relative overscroll-contain min-h-full">
           <ng-content></ng-content>

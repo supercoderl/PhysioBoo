@@ -1303,3 +1303,64 @@ export const CATEGORIES_MANAGEMENT = [
     }
 ];
 // #endregion
+
+// #region Setting Management
+export const SETTINGS_MANAGEMENT = [
+    {
+        id: 1,
+        name: "Account",
+        description:
+            "Manage your public profile and private information",
+        icon: "circle-user",
+        route: "/admin/system/settings/account"
+    },
+    {
+        id: 2,
+        name: "Security",
+        description:
+            "Manage your password and 2-step verification preferences",
+        icon: "lock",
+        route: "/admin/system/settings/security"
+    },
+    {
+        id: 3,
+        name: "Plan & Billing",
+        description:
+            "Manage your subscription plan, payment method and billing information",
+        icon: "credit-card",
+        route: "/admin/system/settings/billing"
+    },
+    {
+        id: 4,
+        name: "Notification",
+        description:
+            "Manage when you'll be notified on which channels",
+        icon: "bell",
+        route: "/admin/system/settings/notification"
+    },
+    {
+        id: 5,
+        name: "Team",
+        description:
+            "Manage your existing team and change roles/permissions",
+        icon: "users",
+        route: "/admin/system/settings/team"
+    },
+    {
+        id: 6,
+        name: "Theme",
+        description:
+            "Manage your theme which is being applied on the page",
+        icon: "palette",
+        route: "/admin/system/settings/theme"
+    },
+    {
+        id: 7,
+        name: "Sequence Tracker",
+        description:
+            "Track and manage the order of system records and processes.",
+        icon: "pi",
+        route: "/admin/system/settings/sequence-tracker"
+    },
+]
+// #endregion

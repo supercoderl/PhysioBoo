@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { LabTest } from "../../../../shared/types/lab-test";
+import { LabTest } from "../../../../shared/types/laboratory-imaging";
 
 @Component({
     selector: 'admin-laboratory',
@@ -139,37 +139,37 @@ import { LabTest } from "../../../../shared/types/lab-test";
               <tbody class="bg-surface divide-y divide-gray-200">
                 <tr *ngFor="let test of filteredTests" class="hover:bg-gray-50">
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900">{{test.patientName}}</div>
-                    <div class="text-sm text-gray-500">ID: {{test.patientId}}</div>
+                    <div class="text-sm font-medium text-gray-900">{{test.testName}}</div>
+                    <div class="text-sm text-gray-500">ID: {{test.testName}}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">{{test.testType}}</div>
-                    <div class="text-sm text-gray-500">{{test.department}}</div>
+                    <div class="text-sm text-gray-900">{{test.testName}}</div>
+                    <div class="text-sm text-gray-500">{{test.testName}}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{test.testDate | date:'MM/dd/yyyy'}}
+                    {{test.testName | date:'MM/dd/yyyy'}}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <span [ngClass]="{
-                      'bg-gray-100 text-gray-800': test.priority === 'routine',
-                      'bg-orange-100 text-orange-800': test.priority === 'urgent',
-                      'bg-red-100 text-red-800': test.priority === 'stat'
+                      'bg-gray-100 text-gray-800': test.testName === 'routine',
+                      'bg-orange-100 text-orange-800': test.testName === 'urgent',
+                      'bg-red-100 text-red-800': test.testName === 'stat'
                     }" class="px-2 py-1 text-xs font-medium rounded-full">
-                      {{test.priority.toUpperCase()}}
+                      {{test.testName.toUpperCase()}}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <span [ngClass]="{
-                      'bg-yellow-100 text-yellow-800': test.status === 'pending',
-                      'bg-blue-100 text-blue-800': test.status === 'in-progress',
-                      'bg-green-100 text-green-800': test.status === 'completed',
-                      'bg-gray-100 text-gray-800': test.status === 'cancelled'
+                      'bg-yellow-100 text-yellow-800': test.testName === 'pending',
+                      'bg-blue-100 text-blue-800': test.testName === 'in-progress',
+                      'bg-green-100 text-green-800': test.testName === 'completed',
+                      'bg-gray-100 text-gray-800': test.testName === 'cancelled'
                     }" class="px-2 py-1 text-xs font-medium rounded-full">
-                      {{test.status.replace('-', ' ').toUpperCase()}}
+                      {{test.testName.replace('-', ' ').toUpperCase()}}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{test.orderedBy}}
+                    {{test.testName}}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div class="flex gap-2">
@@ -270,73 +270,18 @@ export class AdminLaboratoryComponent implements OnInit {
     // #region Methods
     initializeSampleData() {
         this.labTests = [
-            {
-                id: 'LAB001',
-                patientName: 'John Doe',
-                patientId: 'PT12345',
-                testType: 'Complete Blood Count',
-                testDate: new Date('2024-12-20'),
-                status: 'pending',
-                priority: 'routine',
-                orderedBy: 'Dr. Smith',
-                department: 'Hematology'
-            },
-            {
-                id: 'LAB002',
-                patientName: 'Jane Smith',
-                patientId: 'PT12346',
-                testType: 'Lipid Panel',
-                testDate: new Date('2024-12-20'),
-                status: 'in-progress',
-                priority: 'urgent',
-                orderedBy: 'Dr. Johnson',
-                department: 'Biochemistry'
-            },
-            {
-                id: 'LAB003',
-                patientName: 'Robert Brown',
-                patientId: 'PT12347',
-                testType: 'Liver Function Test',
-                testDate: new Date('2024-12-19'),
-                status: 'completed',
-                priority: 'routine',
-                orderedBy: 'Dr. Williams',
-                department: 'Biochemistry',
-                results: 'Normal'
-            },
-            {
-                id: 'LAB004',
-                patientName: 'Emily Davis',
-                patientId: 'PT12348',
-                testType: 'Urinalysis',
-                testDate: new Date('2024-12-20'),
-                status: 'pending',
-                priority: 'stat',
-                orderedBy: 'Dr. Martinez',
-                department: 'Pathology'
-            },
-            {
-                id: 'LAB005',
-                patientName: 'Michael Wilson',
-                patientId: 'PT12349',
-                testType: 'Blood Culture',
-                testDate: new Date('2024-12-19'),
-                status: 'in-progress',
-                priority: 'urgent',
-                orderedBy: 'Dr. Anderson',
-                department: 'Microbiology'
-            }
+
         ];
     }
 
     filterTests() {
         this.filteredTests = this.labTests.filter(test => {
             const matchesSearch = !this.searchTerm ||
-                test.patientName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                test.patientId.toLowerCase().includes(this.searchTerm.toLowerCase());
+                test.testName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+                test.testName.toLowerCase().includes(this.searchTerm.toLowerCase());
 
-            const matchesStatus = !this.filterStatus || test.status === this.filterStatus;
-            const matchesPriority = !this.filterPriority || test.priority === this.filterPriority;
+            const matchesStatus = !this.filterStatus || test.testName === this.filterStatus;
+            const matchesPriority = !this.filterPriority || test.testName === this.filterPriority;
 
             return matchesSearch && matchesStatus && matchesPriority;
         });
@@ -347,7 +292,7 @@ export class AdminLaboratoryComponent implements OnInit {
     }
 
     getTestsByStatus(status: string): number {
-        return this.labTests.filter(test => test.status === status).length;
+        return this.labTests.filter(test => test.sampleType === status).length;
     }
 
     openAddTestModal() {
@@ -357,16 +302,16 @@ export class AdminLaboratoryComponent implements OnInit {
 
     viewTest(test: LabTest) {
         console.log('View test:', test);
-        alert(`Viewing test: ${test.testType} for ${test.patientName}`);
+        alert(`Viewing test: ${test.sampleType} for ${test.sampleType}`);
     }
 
     editTest(test: LabTest) {
         console.log('Edit test:', test);
-        alert(`Edit test: ${test.testType}`);
+        alert(`Edit test: ${test.sampleType}`);
     }
 
     deleteTest(test: LabTest) {
-        if (confirm(`Are you sure you want to delete ${test.testType} for ${test.patientName}?`)) {
+        if (confirm(`Are you sure you want to delete ${test.sampleType} for ${test.sampleType}?`)) {
             this.labTests = this.labTests.filter(t => t.id !== test.id);
             this.filterTests();
         }

@@ -46,6 +46,16 @@ export const routes: Routes = [
                 data: { breadcrumb: ['supplier'] },
                 loadComponent: () => import('./supplier/list.component').then(m => m.CommonCategorySupplierListComponent)
             },
+            {
+                path: 'lab-test',
+                data: { breadcrumb: ['lab test'] },
+                loadComponent: () => import('./lab-test/list.component').then(m => m.CommonCategoryLabTestListComponent)
+            },
+            {
+                path: 'lab-test-category',
+                data: { breadcrumb: ['lab test category'] },
+                loadComponent: () => import('./lab-test-category/list.component').then(m => m.CommonCategoryLabTestCategoryListComponent)
+            },
         ]
     }
 ]

@@ -1,12 +1,12 @@
 import { Component, ElementRef, EventEmitter, forwardRef, Input, Output, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { finalize } from 'rxjs';
+import { environment } from '../../../../environments/environment.development';
+import { CloudinaryService } from '../../../services/common/cloudinary.service';
+import { LocalLoadingService } from '../../../services/common/local-loading.service';
+import { ToastService } from '../../../services/common/toast.service';
 import { SharedModule } from '../../../shared/shared-imports'; // Chứa CommonModule, Icon...
 import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
-import { CloudinaryService } from '../../../services/common/cloudinary.service';
-import { environment } from '../../../../environments/environment.development';
-import { LocalLoadingService } from '../../../services/common/local-loading.service';
-import { finalize } from 'rxjs';
-import { ToastService } from '../../../services/common/toast.service';
 
 @Component({
   selector: 'boo-upload',
@@ -205,6 +205,11 @@ export class BooUploadComponent implements ControlValueAccessor {
 
   writeValue(value: any): void {
     this.previewUrl = value || null;
+    if (typeof value === 'string' && value.trim().toLowerCase().startsWith('<svg')) {
+      this.isSvgString = true;
+    } else {
+      this.isSvgString = false;
+    }
   }
 
   registerOnChange(fn: any): void { this.onChange = fn; }

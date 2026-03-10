@@ -30,30 +30,21 @@ import { Category } from "../../../../shared/types/category";
                       [routerLink]="category.route"
                       routerLinkActive="active" 
                       #rla="routerLinkActive" 
-                      
-                      [class.bg-primary]="rla.isActive"
-                      [class.text-surface]="rla.isActive"
-                      [class.bg-borderGray]="!rla.isActive"
-                      [class.text-[#1F232B]]="!rla.isActive"
+                      [class.bg-[#0000000d]]="rla.isActive"
                     >
                       <boo-icon 
                         [name]="category.icon" 
-                        [iconClass]="rla.isActive ? 'stroke-surface' : 'stroke-primary'"
                       ></boo-icon>
                       <div class="flex min-w-0 flex-auto flex-col items-start gap-1">
                         <p 
                           class="leading-none truncate max-w-full m-0 text-[13px] text-primary"
-                          [class.text-surface]="rla.isActive"
-                          [class.text-primary]="!rla.isActive"
                         >
                           {{ category.name }}
                         </p>
                         <p 
                           class="leading-none text-[11px] truncate max-w-full m-0 text-regular"
-                          [class.text-surface]="rla.isActive"
-                          [class.text-primary]="!rla.isActive"
                         >
-                            {{ category.description }}
+                          {{ category.description }}
                         </p>
                       </div>
                     </a>

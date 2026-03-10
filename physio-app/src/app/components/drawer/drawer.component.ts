@@ -20,8 +20,6 @@ import { SharedModule } from '../../shared/shared-imports';
         aria-hidden="true"
         (click)="onClose()"
         class="transition-opacity duration-300 ease-in-out fixed inset-0 bg-[rgba(0,_0,_0,_0.5)]"
-        style="opacity: 0;"
-        style="opacity: 0;"
         [style.opacity]="isOpen ? '1' : '0'"
       ></div>
 

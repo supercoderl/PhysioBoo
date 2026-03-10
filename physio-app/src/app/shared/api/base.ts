@@ -58,4 +58,26 @@ export const BASE_API = {
     DELETE: '/api/suppliers/delete',
     UPDATE: '/api/suppliers/update'
   },
+  LABTESTCATEGORY: {
+    SEARCH: '/api/lab-test-categories/search',
+    LOOKUP: '/api/lab-test-categories/lookup',
+    SEARCH_BY_ID: '/api/lab-test-categories/search-by-id',
+    CREATE: '/api/lab-test-categories/create',
+    DELETE: '/api/lab-test-categories/delete',
+    UPDATE: '/api/lab-test-categories/update'
+  },
+  LABTEST: {
+    SEARCH: '/api/lab-tests/search',
+    SEARCH_BY_ID: '/api/lab-tests/search-by-id',
+    CREATE: '/api/lab-tests/create',
+    DELETE: '/api/lab-tests/delete',
+    UPDATE: '/api/lab-tests/update'
+  },
+  SEQUENCETRACKER: {
+    SEARCH: '/api/sequence-trackers/search',
+    SEARCH_BY_ID: '/api/sequence-trackers/search-by-id',
+    CREATE: '/api/sequence-trackers/create',
+    DELETE: '/api/sequence-trackers/delete',
+    UPDATE: '/api/sequence-trackers/update'
+  },
 };

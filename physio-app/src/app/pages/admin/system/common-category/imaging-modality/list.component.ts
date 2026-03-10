@@ -1,27 +1,27 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { SharedModule } from "../../../../../shared/shared-imports";
-import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
-import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
-import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
-import { PaginationData } from "../../../../../shared/types/common";
-import { DialogService } from "../../../../../services/common/dialog.service";
 import { catchError, of, tap } from "rxjs";
-import { ToastService } from "../../../../../services/common/toast.service";
-import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
-import { BooSortAdminComponent } from "../../../../../components/table/boo-table-admin/boo-sort-admin.component";
-import { SortOption } from "../../../../../shared/types/sort";
-import { BooFilterAdminComponent } from "../../../../../components/table/boo-table-admin/boo-filter-admin.component";
-import { FilterConfig } from "../../../../../shared/types/filter";
-import { BooDateAdminComponent } from "../../../../../components/table/boo-table-admin/boo-date-admin.component";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
+import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
+import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
+import { CommonCategoryImagingModalityDrawerComponent } from "../../../../../components/layout/admin/system/common-category/imaging-modality/imaging-modality-drawer.component";
+import { CommonCategoryImagingModalityTableCardComponent } from "../../../../../components/layout/admin/system/common-category/imaging-modality/imaging-modality-table-card.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
-import { DateRange } from "../../../../../shared/types/date";
-import { DateService } from "../../../../../services/common/date.service";
-import { ImagingModality } from "../../../../../shared/types/laboratory-imaging";
+import { BooDateAdminComponent } from "../../../../../components/table/boo-table-admin/boo-date-admin.component";
+import { BooFilterAdminComponent } from "../../../../../components/table/boo-table-admin/boo-filter-admin.component";
+import { BooSortAdminComponent } from "../../../../../components/table/boo-table-admin/boo-sort-admin.component";
 import { ImagingModalityService } from "../../../../../services/admin/imaging-modality.service";
-import { CommonCategoryImagingModalityTableCardComponent } from "../../../../../components/layout/admin/setting/common-category/imaging-modality/imaging-modality-table-card.component";
-import { CommonCategoryImagingModalityDrawerComponent } from "../../../../../components/layout/admin/setting/common-category/imaging-modality/imaging-modality-drawer.component";
+import { DateService } from "../../../../../services/common/date.service";
+import { DialogService } from "../../../../../services/common/dialog.service";
+import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
+import { ToastService } from "../../../../../services/common/toast.service";
+import { SharedModule } from "../../../../../shared/shared-imports";
+import { PaginationData } from "../../../../../shared/types/common";
+import { DateRange } from "../../../../../shared/types/date";
+import { FilterConfig } from "../../../../../shared/types/filter";
+import { ImagingModality } from "../../../../../shared/types/laboratory-imaging";
+import { SortOption } from "../../../../../shared/types/sort";
 
 @Component({
     selector: 'common-category-imaging-modality-list',

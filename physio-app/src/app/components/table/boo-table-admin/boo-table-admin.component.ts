@@ -1,17 +1,26 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { AfterContentInit, Component, ContentChildren, EventEmitter, Input, Output, QueryList } from '@angular/core';
 import { ColumnDefDirective } from '../../../shared/directives/column-def.directive';
 import { SharedModule } from '../../../shared/shared-imports';
+import { Size } from '../../../shared/types/common';
 import { PHYSIO_BOO_ANIMATION } from '../../../shared/utils/animation.utils';
 import { PaginationComponent } from "./boo-pagination-admin.component";
-import { Size } from '../../../shared/types/common';
 
 @Component({
   selector: 'boo-table-admin',
   standalone: true,
   imports: [SharedModule, PaginationComponent],
+  animations: [
+    trigger('rowAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate('300ms cubic-bezier(0.4, 0, 0.2, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ])
+  ],
   template: `
     <div class="w-full overflow-hidden">
-      <div class="overflow-x-auto">
+      <div class="w-full" [ngClass]="loading ? 'overflow-hidden' : 'overflow-x-auto'">
         <table class="w-full table-auto">
           <thead 
             *ngIf="showHeader && columnDefs && columnDefs.length > 0" 
@@ -30,7 +39,7 @@ import { Size } from '../../../shared/types/common';
             </tr>
           </thead>
 
-          <tbody [autoAnimate]="booAnim" class="divide-y divide-gray-200 bg-surface relative">
+          <tbody class="divide-y divide-gray-200 bg-surface relative">
             @if (loading) {
               @for (item of skeletonRows; track $index) {
                 <tr class="h-14 border-b border-gray-100">
@@ -52,18 +61,27 @@ import { Size } from '../../../shared/types/common';
             @else {
               @for (row of data; track row.id; let isLast = $last) {
                 <tr 
+                  @rowAnimation
                   [class.border-b]="!isLast && showBorder" 
                   class="hover:bg-borderGray h-14 group transition-colors"
                   [ngClass]="rowHeightClass"
                 >
                   @for (col of columnDefs; track col) {
                     <td 
-                      class="whitespace-nowrap text-regular" 
+                      class="text-regular" 
                       [class]="tdClass" 
                       [ngClass]="[tdPaddingClass]"
                     >
-                      <div class="line-clamp-2 whitespace-normal break-words flex items-center" [ngClass]="[contentLimitClass, col.cellClass]">
-                        <ng-container *ngTemplateOutlet="col.template; context: { $implicit: row }"></ng-container>
+                      <div 
+                        class="flex items-center w-full overflow-hidden" 
+                        [ngClass]="[contentLimitClass]"
+                      >
+                        <div 
+                          class="line-clamp-2 whitespace-normal break-words w-full" 
+                          [ngClass]="[col.cellClass]"
+                        >
+                          <ng-container *ngTemplateOutlet="col.template; context: { $implicit: row }"></ng-container>
+                        </div>
                       </div>
                     </td>
                   }

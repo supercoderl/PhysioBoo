@@ -1,28 +1,27 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { SharedModule } from "../../../../../shared/shared-imports";
-import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
-import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
-import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
-import { PaginationData } from "../../../../../shared/types/common";
-import { MedicalSpecialty } from "../../../../../shared/types/medical-staff";
-import { DialogService } from "../../../../../services/common/dialog.service";
 import { catchError, of, tap } from "rxjs";
-import { ToastService } from "../../../../../services/common/toast.service";
-import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
-import { BooSortAdminComponent } from "../../../../../components/table/boo-table-admin/boo-sort-admin.component";
-import { SortOption } from "../../../../../shared/types/sort";
-import { BooFilterAdminComponent } from "../../../../../components/table/boo-table-admin/boo-filter-admin.component";
-import { FilterConfig } from "../../../../../shared/types/filter";
-import { BooDateAdminComponent } from "../../../../../components/table/boo-table-admin/boo-date-admin.component";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
+import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
+import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
+import { CommonCategoryManufacturerDrawerComponent } from "../../../../../components/layout/admin/system/common-category/manufacturer/manufacturer-drawer.component";
+import { CommonCategoryManufacturerTableCardComponent } from "../../../../../components/layout/admin/system/common-category/manufacturer/manufacturer-table-card.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
-import { DateRange } from "../../../../../shared/types/date";
-import { DateService } from "../../../../../services/common/date.service";
+import { BooDateAdminComponent } from "../../../../../components/table/boo-table-admin/boo-date-admin.component";
+import { BooFilterAdminComponent } from "../../../../../components/table/boo-table-admin/boo-filter-admin.component";
+import { BooSortAdminComponent } from "../../../../../components/table/boo-table-admin/boo-sort-admin.component";
 import { ManufacturerService } from "../../../../../services/admin/manufacturer.service";
+import { DateService } from "../../../../../services/common/date.service";
+import { DialogService } from "../../../../../services/common/dialog.service";
+import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
+import { ToastService } from "../../../../../services/common/toast.service";
+import { SharedModule } from "../../../../../shared/shared-imports";
+import { PaginationData } from "../../../../../shared/types/common";
+import { DateRange } from "../../../../../shared/types/date";
+import { FilterConfig } from "../../../../../shared/types/filter";
+import { SortOption } from "../../../../../shared/types/sort";
 import { Manufacturer } from "../../../../../shared/types/support";
-import { CommonCategoryManufacturerTableCardComponent } from "../../../../../components/layout/admin/setting/common-category/manufacturer/manufacturer-table-card.component";
-import { CommonCategoryManufacturerDrawerComponent } from "../../../../../components/layout/admin/setting/common-category/manufacturer/manufacturer-drawer.component";
 
 @Component({
     selector: 'common-category-manufacturer-list',

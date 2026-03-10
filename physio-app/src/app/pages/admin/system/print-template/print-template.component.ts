@@ -1,9 +1,9 @@
 import { Component, Input } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { PatientInfo } from "../../../../shared/types/patient";
 import { Doctor } from "../../../../shared/types/doctor";
+import { LabTest } from "../../../../shared/types/laboratory-imaging";
 import { Medication } from "../../../../shared/types/medication";
-import { LabTest } from "../../../../shared/types/lab-test";
+import { PatientInfo } from "../../../../shared/types/patient";
 
 @Component({
   selector: 'admin-print-template',
@@ -127,7 +127,6 @@ import { LabTest } from "../../../../shared/types/lab-test";
                 <td class="border border-gray-300 px-4 py-2 text-sm">
                   <span 
                     [class]="'text-green-600 font-semibold'">
-                    {{ test.status }}
                   </span>
                 </td>
               </tr>

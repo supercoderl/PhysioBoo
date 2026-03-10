@@ -40,6 +40,11 @@ export const routes: Routes = [
                 path: 'theme',
                 data: { breadcrumb: ['theme'] },
                 loadComponent: () => import('./theme/theme.component').then(m => m.AdminSystemSettingThemeComponent)
+            },
+            {
+                path: 'sequence-tracker',
+                data: { breadcrumb: ['sequence tracker'] },
+                loadComponent: () => import('./sequence-tracker/list.component').then(m => m.SettingSequenceTrackerListComponent)
             }
         ]
     }

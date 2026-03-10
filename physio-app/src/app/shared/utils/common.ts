@@ -69,3 +69,7 @@ export function convertEnumToSelection(enumVal: any): { label: string, value: an
     value: enumVal[key]
   }))
 }
+
+export function getEnumKey(enumObj: any, value: number): string {
+  return enumObj[value];
+}

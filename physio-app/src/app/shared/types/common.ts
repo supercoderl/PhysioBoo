@@ -61,3 +61,8 @@ export interface ActionItem {
     onClick?: (data?: any) => void;
     isDanger?: boolean;
 }
+
+export interface Lookup {
+    id: string;
+    name: string;
+}

@@ -5,8 +5,8 @@ import { ButtonIconComponent } from "../../../../../components/button/button-ico
 import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
-import { CommonCategoryMedicineCategoryDrawerComponent } from "../../../../../components/layout/admin/setting/common-category/medicine-category/medicine-category-drawer.component";
-import { CommonCategoryMedicineCategoryTableCardComponent } from "../../../../../components/layout/admin/setting/common-category/medicine-category/medicine-category-table-card.component";
+import { CommonCategoryMedicineCategoryDrawerComponent } from "../../../../../components/layout/admin/system/common-category/medicine-category/medicine-category-drawer.component";
+import { CommonCategoryMedicineCategoryTableCardComponent } from "../../../../../components/layout/admin/system/common-category/medicine-category/medicine-category-table-card.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { BooDateAdminComponent } from "../../../../../components/table/boo-table-admin/boo-date-admin.component";
 import { BooFilterAdminComponent } from "../../../../../components/table/boo-table-admin/boo-filter-admin.component";

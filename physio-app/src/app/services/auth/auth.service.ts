@@ -1,10 +1,11 @@
+import { SocialAuthService } from '@abacritt/angularx-social-login';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, finalize, from, map, of, switchMap, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, map, Observable, switchMap, tap, throwError } from 'rxjs';
+import { BASE_API } from '../../shared/api/base';
 import { PagedResponse } from '../../shared/types/common';
 import { User } from '../../shared/types/user';
-import { BASE_API } from '../../shared/api/base';
-import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
+import { LocalStorage } from '../../shared/utils/storage';
 
 @Injectable({
     providedIn: 'root'
@@ -24,7 +25,8 @@ export class AuthService {
     ) { }
 
     public isAuthenticated(): boolean {
-        return this.userInfoSubject.value != null;
+        const status = LocalStorage.load('is_logged_in');
+        return status === true || status === 'true';
     }
 
     login<T>(body: { identifier: string, password: string, otp: string }): Observable<PagedResponse<T>> {
@@ -60,6 +62,7 @@ export class AuthService {
         return this.http.post<PagedResponse<string>>(BASE_API.LOGOUT, null).pipe(
             finalize(() => {
                 this.userInfoSubject.next(null);
+                LocalStorage.remove('is_logged_in');
             })
         );
     }
@@ -67,7 +70,16 @@ export class AuthService {
     getProfile() {
         return this.http.post<PagedResponse<User>>(BASE_API.PROFILE, null).pipe(
             tap((res) => {
-                if (res.success && res.data) this.userInfoSubject.next(res.data);
+                if (res.success && res.data) {
+                    this.userInfoSubject.next(res.data);
+                    LocalStorage.save('is_logged_in', 'true');
+                } else {
+                    LocalStorage.remove('is_logged_in');
+                }
+            }),
+            catchError((err) => {
+                LocalStorage.remove('is_logged_in');
+                return throwError(() => err);
             })
         );
     }

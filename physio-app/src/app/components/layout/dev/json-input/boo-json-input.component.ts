@@ -5,7 +5,7 @@ import { SharedModule } from '../../../../shared/shared-imports';
 import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 
 @Component({
-    selector: 'boo-json-input',
+    selector: 'boo-json-editor',
     standalone: true,
     imports: [
         SharedModule,

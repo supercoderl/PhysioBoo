@@ -61,3 +61,18 @@ export interface SupplierFilter {
     start: string,
     end: string,
 }
+
+export interface LabTestCategoryFilter {
+    start: string,
+    end: string,
+}
+
+export interface LabTestFilter {
+    start: string,
+    end: string,
+}
+
+export interface SequenceTrackerFilter {
+    start: string,
+    end: string,
+}

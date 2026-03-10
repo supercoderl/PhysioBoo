@@ -31,7 +31,7 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasMaxLength(255);
 
             builder.Property(t => t.TestCode)
-                   .HasMaxLength(20);
+                   .HasMaxLength(100);
 
             builder.Property(t => t.Description);
 
@@ -83,6 +83,10 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(t => t.IsActive).IsRequired();
 
             builder.Property(t => t.CreatedAt).IsRequired();
+
+            builder.Property(t => t.SearchVector)
+                   .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"TestName\", '') || ' ' || coalesce(\"TestCode\", '')))", stored: true)
+                   .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

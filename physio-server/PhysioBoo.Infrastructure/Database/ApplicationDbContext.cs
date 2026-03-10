@@ -80,6 +80,7 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<Sys_Device> Sys_Devices { get; set; } = null!;
         public DbSet<Sys_AppVersion> Sys_AppVersions { get; set; } = null!;
         public DbSet<Sys_AuditLog> Sys_AuditLogs { get; set; } = null!;
+        public DbSet<Sys_SequenceTracker> Sys_SequenceTrackers { get; set; } = null!;
         #endregion
 
         public ApplicationDbContext(

@@ -30,7 +30,7 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasMaxLength(200);
 
             builder.Property(ms => ms.Code)
-                   .HasMaxLength(20);
+                   .HasMaxLength(100);
 
             builder.Property(ms => ms.Category)
                    .HasMaxLength(100);

@@ -4,7 +4,6 @@
     (
         Guid Id,
         string Name,
-        string? CompanyCode,
         string? Address,
         string? City,
         string? State,

@@ -6,7 +6,6 @@ namespace PhysioBoo.Application.ViewModels.Suppliers
     (
         Guid Id,
         string SupplierName,
-        string? SupplierCode,
         SupplierType Type,
         string? ContactPerson,
         string? Phone,

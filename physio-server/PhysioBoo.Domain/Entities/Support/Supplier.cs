@@ -3,6 +3,7 @@ using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
+using ColumnAttribute = PhysioBoo.SharedKernel.Attributes.ColumnAttribute;
 
 namespace PhysioBoo.Domain.Entities.Support
 {
@@ -34,7 +35,10 @@ namespace PhysioBoo.Domain.Entities.Support
         public string? PaymentTerms { get; private set; }
         public decimal CreditLimit { get; private set; }
         public string Currency { get; private set; }
+
+        [Column("BankAccountDetails", TypeName = "jsonb")]
         public string? BankAccountDetails { get; private set; }
+
         public int LeadTimeDays { get; private set; }
         public decimal MinimumOrderValue { get; private set; }
         public decimal DeliveryReliabilityScore { get; private set; }

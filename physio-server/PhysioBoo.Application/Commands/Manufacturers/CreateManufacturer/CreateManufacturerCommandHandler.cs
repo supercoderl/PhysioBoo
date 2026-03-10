@@ -10,25 +10,30 @@ namespace PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer
     public sealed class CreateManufacturerCommandHandler : CommandHandlerBase, IRequestHandler<CreateManufacturerCommand>
     {
         private readonly IManufacturerRepository _manufacturerRepository;
+        private readonly ISys_SequenceTrackerRepository _sys_SequenceTrackerRepository;
 
         public CreateManufacturerCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IManufacturerRepository manufacturerRepository
+            IManufacturerRepository manufacturerRepository,
+            ISys_SequenceTrackerRepository sys_SequenceTrackerRepository
         ) : base(bus, unitOfWork, notifications)
         {
             _manufacturerRepository = manufacturerRepository;
+            _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
         public async Task Handle(CreateManufacturerCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Manufacturer), cancellationToken);
+
             Manufacturer newManufacturer = new Manufacturer(
                 request.NewManufacturer.Id,
                 request.NewManufacturer.Name,
-                request.NewManufacturer.CompanyCode,
+                newCode,
                 request.NewManufacturer.Address,
                 request.NewManufacturer.City,
                 request.NewManufacturer.State,

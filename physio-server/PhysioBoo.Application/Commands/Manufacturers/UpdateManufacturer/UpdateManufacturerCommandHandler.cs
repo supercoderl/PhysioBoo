@@ -38,7 +38,6 @@ namespace PhysioBoo.Application.Commands.Manufacturers.UpdateManufacturer
             }
 
             manufacturer.SetName(request.Manufacturer.Name);
-            manufacturer.SetCompanyCode(request.Manufacturer.CompanyCode);
             manufacturer.SetAddress(request.Manufacturer.Address);
             manufacturer.SetCity(request.Manufacturer.City);
             manufacturer.SetState(request.Manufacturer.State);

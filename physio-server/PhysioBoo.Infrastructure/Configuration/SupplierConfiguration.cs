@@ -26,7 +26,7 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasMaxLength(255);
 
             builder.Property(s => s.SupplierCode)
-                   .HasMaxLength(50);
+                   .HasMaxLength(100);
 
             builder.Property(s => s.Type)
                    .HasConversion<string>()

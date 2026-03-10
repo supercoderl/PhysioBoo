@@ -38,7 +38,6 @@ namespace PhysioBoo.Application.Commands.Suppliers.UpdateSupplier
             }
 
             supplier.SetSupplierName(request.Supplier.SupplierName);
-            supplier.SetSupplierCode(request.Supplier.SupplierCode);
             supplier.SetType(request.Supplier.Type);
             supplier.SetContactPerson(request.Supplier.ContactPerson);
             supplier.SetPhone(request.Supplier.Phone);

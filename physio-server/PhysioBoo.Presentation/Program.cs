@@ -320,6 +320,7 @@ namespace PhysioBoo.Presentation
             {
                 app.MapSys_ResourceEndpoints();
                 app.MapSystemEndpoints();
+                app.MapSys_SequenceTrackerEndpoints();
             }
 
             MapCommonEndpoints(app);

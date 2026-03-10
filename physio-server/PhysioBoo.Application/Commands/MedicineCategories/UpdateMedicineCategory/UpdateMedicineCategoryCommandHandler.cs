@@ -38,7 +38,6 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.UpdateMedicineCatego
             }
 
             medicineCategory.SetName(request.MedicineCategory.Name);
-            medicineCategory.SetCode(request.MedicineCategory.Code);
             medicineCategory.SetDescription(request.MedicineCategory.Description);
             medicineCategory.SetParentCategoryId(request.MedicineCategory.ParentCategoryId);
             medicineCategory.SetIsControlled(request.MedicineCategory.IsControlled);

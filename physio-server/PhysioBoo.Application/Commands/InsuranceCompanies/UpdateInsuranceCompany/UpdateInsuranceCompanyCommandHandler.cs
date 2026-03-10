@@ -38,7 +38,6 @@ namespace PhysioBoo.Application.Commands.InsuranceCompanies.UpdateInsuranceCompa
             }
 
             insuranceCompany.SetName(request.InsuranceCompany.Name);
-            insuranceCompany.SetCode(request.InsuranceCompany.Code);
             insuranceCompany.SetType(request.InsuranceCompany.Type);
             insuranceCompany.SetContactPerson(request.InsuranceCompany.ContactPerson);
             insuranceCompany.SetPhone(request.InsuranceCompany.Phone);

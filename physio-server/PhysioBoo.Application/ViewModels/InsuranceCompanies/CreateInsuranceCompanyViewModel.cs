@@ -6,7 +6,6 @@ namespace PhysioBoo.Application.ViewModels.InsuranceCompanies
     (
         Guid Id,
         string Name,
-        string? Code,
         InsuranceType Type,
         string? ContactPerson,
         string? Phone,

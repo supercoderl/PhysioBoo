@@ -10,25 +10,30 @@ namespace PhysioBoo.Application.Commands.Suppliers.CreateSupplier
     public sealed class CreateSupplierCommandHandler : CommandHandlerBase, IRequestHandler<CreateSupplierCommand>
     {
         private readonly ISupplierRepository _supplierRepository;
+        private readonly ISys_SequenceTrackerRepository _sys_SequenceTrackerRepository;
 
         public CreateSupplierCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            ISupplierRepository supplierRepository
+            ISupplierRepository supplierRepository,
+            ISys_SequenceTrackerRepository sys_SequenceTrackerRepository
         ) : base(bus, unitOfWork, notifications)
         {
             _supplierRepository = supplierRepository;
+            _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
         public async Task Handle(CreateSupplierCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Supplier), cancellationToken);
+
             Supplier newSupplier = new Supplier(
                 request.NewSupplier.Id,
                 request.NewSupplier.SupplierName,
-                request.NewSupplier.SupplierCode,
+                newCode,
                 request.NewSupplier.Type,
                 request.NewSupplier.ContactPerson,
                 request.NewSupplier.Phone,

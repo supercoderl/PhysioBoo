@@ -10,25 +10,30 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCatego
     public sealed class CreateMedicineCategoryCommandHandler : CommandHandlerBase, IRequestHandler<CreateMedicineCategoryCommand>
     {
         private readonly IMedicineCategoryRepository _medicineCategoryRepository;
+        private readonly ISys_SequenceTrackerRepository _sys_SequenceTrackerRepository;
 
         public CreateMedicineCategoryCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IMedicineCategoryRepository medicineCategoryRepository
+            IMedicineCategoryRepository medicineCategoryRepository,
+            ISys_SequenceTrackerRepository sys_SequenceTrackerRepository
         ) : base(bus, unitOfWork, notifications)
         {
             _medicineCategoryRepository = medicineCategoryRepository;
+            _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
         public async Task Handle(CreateMedicineCategoryCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(MedicineCategory), cancellationToken);
+
             MedicineCategory newMedicineCategory = new MedicineCategory(
                 request.NewMedicineCategory.Id,
                 request.NewMedicineCategory.Name,
-                request.NewMedicineCategory.Code,
+                newCode,
                 request.NewMedicineCategory.Description,
                 request.NewMedicineCategory.ParentCategoryId,
                 request.NewMedicineCategory.StorageConditions

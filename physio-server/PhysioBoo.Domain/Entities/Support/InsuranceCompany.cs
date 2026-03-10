@@ -3,6 +3,7 @@ using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
+using ColumnAttribute = PhysioBoo.SharedKernel.Attributes.ColumnAttribute;
 
 namespace PhysioBoo.Domain.Entities.Support
 {
@@ -19,7 +20,10 @@ namespace PhysioBoo.Domain.Entities.Support
         public string? Website { get; private set; }
         public bool CashlessFacility { get; private set; }
         public bool ReimbursementFacility { get; private set; }
+
+        [Column("NetworkHospitals", TypeName = "jsonb")]
         public string? NetworkHospitals { get; private set; } // JSONB
+
         public decimal? MaximumCoverageAmount { get; private set; }
         public decimal? ClaimSettlementRatio { get; private set; }
         public int AverageClaimSettlementTime { get; private set; } // in days

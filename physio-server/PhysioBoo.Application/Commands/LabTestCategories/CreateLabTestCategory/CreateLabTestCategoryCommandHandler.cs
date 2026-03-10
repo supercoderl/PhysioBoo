@@ -10,25 +10,30 @@ namespace PhysioBoo.Application.Commands.LabTestCategories.CreateLabTestCategory
     public sealed class CreateLabTestCategoryCommandHandler : CommandHandlerBase, IRequestHandler<CreateLabTestCategoryCommand>
     {
         private readonly ILabTestCategoryRepository _labTestCategoryRepository;
+        private readonly ISys_SequenceTrackerRepository _sys_SequenceTrackerRepository;
 
         public CreateLabTestCategoryCommandHandler(
             IMediatorHandler bus,
              IUnitOfWork unitOfWork,
              INotificationHandler<DomainNotification> notifications,
-             ILabTestCategoryRepository labTestCategoryRepository
+             ILabTestCategoryRepository labTestCategoryRepository,
+             ISys_SequenceTrackerRepository sys_SequenceTrackerRepository
         ) : base(bus, unitOfWork, notifications)
         {
             _labTestCategoryRepository = labTestCategoryRepository;
+            _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
         public async Task Handle(CreateLabTestCategoryCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(LabTestCategory), cancellationToken);
+
             SharedKernel.Results.DbResult<Guid> result = await _labTestCategoryRepository.InsertAsync<LabTestCategory, Guid>(new LabTestCategory(
                 request.NewLabTestCategory.Id,
                 request.NewLabTestCategory.Name,
-                request.NewLabTestCategory.Code,
+                newCode,
                 request.NewLabTestCategory.Description,
                 request.NewLabTestCategory.Department
             ));

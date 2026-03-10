@@ -10,25 +10,30 @@ namespace PhysioBoo.Application.Commands.InsuranceCompanies.CreateInsuranceCompa
     public sealed class CreateInsuranceCompanyCommandHandler : CommandHandlerBase, IRequestHandler<CreateInsuranceCompanyCommand>
     {
         private readonly IInsuranceCompanyRepository _insuranceCompanyRepository;
+        private readonly ISys_SequenceTrackerRepository _sys_SequenceTrackerRepository;
 
         public CreateInsuranceCompanyCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IInsuranceCompanyRepository insuranceCompanyRepository
+            IInsuranceCompanyRepository insuranceCompanyRepository,
+            ISys_SequenceTrackerRepository sys_SequenceTrackerRepository
         ) : base(bus, unitOfWork, notifications)
         {
             _insuranceCompanyRepository = insuranceCompanyRepository;
+            _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
         public async Task Handle(CreateInsuranceCompanyCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(InsuranceCompany), cancellationToken);
+
             InsuranceCompany newInsuranceCompany = new InsuranceCompany(
                 request.NewInsuranceCompany.Id,
                 request.NewInsuranceCompany.Name,
-                request.NewInsuranceCompany.Code,
+                newCode,
                 request.NewInsuranceCompany.Type,
                 request.NewInsuranceCompany.ContactPerson,
                 request.NewInsuranceCompany.Phone,

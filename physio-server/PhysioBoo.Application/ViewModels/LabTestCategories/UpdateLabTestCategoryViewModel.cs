@@ -4,7 +4,6 @@
     (
         Guid Id,
         string Name,
-        string? Code,
         string? Description,
         string? Department,
         bool IsActive

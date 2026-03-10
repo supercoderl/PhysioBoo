@@ -34,7 +34,11 @@ using PhysioBoo.Application.Commands.LabOrderItems.CreateLabOrderItem;
 using PhysioBoo.Application.Commands.LabOrders.CreateLabOrder;
 using PhysioBoo.Application.Commands.LabReports.CreateLabReport;
 using PhysioBoo.Application.Commands.LabTestCategories.CreateLabTestCategory;
+using PhysioBoo.Application.Commands.LabTestCategories.DeleteLabTestCategory;
+using PhysioBoo.Application.Commands.LabTestCategories.UpdateLabTestCategory;
 using PhysioBoo.Application.Commands.LabTests.CreateLabTest;
+using PhysioBoo.Application.Commands.LabTests.DeleteLabTest.Commands.DeleteLabTestCommand;
+using PhysioBoo.Application.Commands.LabTests.UpdateLabTest.Commands.UpdateLabTestCommand;
 using PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer;
 using PhysioBoo.Application.Commands.Manufacturers.DeleteManufacturer;
 using PhysioBoo.Application.Commands.Manufacturers.UpdateManufacturer;
@@ -66,6 +70,9 @@ using PhysioBoo.Application.Commands.Suppliers.UpdateSupplier;
 using PhysioBoo.Application.Commands.Sys_Media.CreateMedia;
 using PhysioBoo.Application.Commands.Sys_Resources.ImportLocalResource;
 using PhysioBoo.Application.Commands.Sys_Resources.ImportRemoteResource;
+using PhysioBoo.Application.Commands.Sys_SequenceTrackers.CreateSys_SequenceTracker;
+using PhysioBoo.Application.Commands.Sys_SequenceTrackers.DeleteSys_SequenceTracker;
+using PhysioBoo.Application.Commands.Sys_SequenceTrackers.UpdateSys_SequenceTracker;
 using PhysioBoo.Application.Commands.Systems.Ip;
 using PhysioBoo.Application.Commands.Users.AssignRoleToUser;
 using PhysioBoo.Application.Commands.Users.AssignRoleToUserUsingRoleId;
@@ -96,6 +103,9 @@ using PhysioBoo.Application.Queries.InsuranceCompanies.GetAll;
 using PhysioBoo.Application.Queries.InsuranceCompanies.GetById;
 using PhysioBoo.Application.Queries.LabTestCategories.GetAll;
 using PhysioBoo.Application.Queries.LabTestCategories.GetById;
+using PhysioBoo.Application.Queries.LabTestCategories.GetLookup;
+using PhysioBoo.Application.Queries.LabTests.GetAll;
+using PhysioBoo.Application.Queries.LabTests.GetById;
 using PhysioBoo.Application.Queries.Manufacturers.GetAll;
 using PhysioBoo.Application.Queries.Manufacturers.GetById;
 using PhysioBoo.Application.Queries.MedicalSpecialties.GetAll;
@@ -109,6 +119,8 @@ using PhysioBoo.Application.Queries.Suppliers.GetAll;
 using PhysioBoo.Application.Queries.Suppliers.GetById;
 using PhysioBoo.Application.Queries.Sys_Languages.GetAllLanguages;
 using PhysioBoo.Application.Queries.Sys_Resources.GetAllResources;
+using PhysioBoo.Application.Queries.Sys_SequenceTrackers.GetAll;
+using PhysioBoo.Application.Queries.Sys_SequenceTrackers.GetById;
 using PhysioBoo.Application.Queries.Sys_Settings.GetAll;
 using PhysioBoo.Application.Queries.Users.GetAll;
 using PhysioBoo.Application.Queries.Users.GetByEmail;
@@ -124,6 +136,7 @@ using PhysioBoo.Application.ViewModels.Departments;
 using PhysioBoo.Application.ViewModels.ImagingModalities;
 using PhysioBoo.Application.ViewModels.InsuranceCompanies;
 using PhysioBoo.Application.ViewModels.LabTestCategories;
+using PhysioBoo.Application.ViewModels.LabTests;
 using PhysioBoo.Application.ViewModels.Manufacturers;
 using PhysioBoo.Application.ViewModels.MedicalSpecialties;
 using PhysioBoo.Application.ViewModels.MedicineCategories;
@@ -132,6 +145,7 @@ using PhysioBoo.Application.ViewModels.Roles;
 using PhysioBoo.Application.ViewModels.Sorting;
 using PhysioBoo.Application.ViewModels.Suppliers;
 using PhysioBoo.Application.ViewModels.Sys_Languages;
+using PhysioBoo.Application.ViewModels.Sys_SequenceTrackers;
 using PhysioBoo.Application.ViewModels.Sys_Settings;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Application.ViewModels.VerificationTokens;
@@ -141,6 +155,7 @@ using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.Support;
+using PhysioBoo.Domain.Entities.System;
 using PhysioBoo.Domain.Interfaces.EventHandlers;
 using PhysioBoo.Shared.Events.Users;
 using PhysioBoo.SharedKernel.Common;
@@ -246,6 +261,15 @@ namespace PhysioBoo.Application.Extensions
             // Lab Test Category
             services.AddScoped<IRequestHandler<GetAllLabTestCategoriesQuery, PagedResult<LabTestCategoryViewModel>>, GetAllLabTestCategoriesQueryHandler>();
             services.AddScoped<IRequestHandler<GetLabTestCategoryByIdQuery, LabTestCategoryViewModel?>, GetLabTestCategoryByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<GetLabTestCategoryLookupsQuery, PagedResult<LabTestCategoryLookupViewModel>>, GetLabTestCategoryLookupsQueryHandler>();
+
+            // Lab Test 
+            services.AddScoped<IRequestHandler<GetAllLabTestsQuery, PagedResult<LabTestViewModel>>, GetAllLabTestsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetLabTestByIdQuery, LabTestViewModel?>, GetLabTestByIdQueryHandler>();
+
+            // Sequence Tracker
+            services.AddScoped<IRequestHandler<GetAllSys_SequenceTrackersQuery, PagedResult<Sys_SequenceTrackerViewModel>>, GetAllSys_SequenceTrackersQueryHandler>();
+            services.AddScoped<IRequestHandler<GetSys_SequenceTrackerByIdQuery, Sys_SequenceTrackerViewModel?>, GetSys_SequenceTrackerByIdQueryHandler>();
 
             return services;
         }
@@ -345,6 +369,10 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<CreateLabTestCategoryCommand>, CreateLabTestCategoryCommandHandler>();
             services.AddScoped<IRequestHandler<DeleteImagingModalityCommand>, DeleteImagingModalityCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateImagingModalityCommand>, UpdateImagingModalityCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteLabTestCategoryCommand>, DeleteLabTestCategoryCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateLabTestCategoryCommand>, UpdateLabTestCategoryCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteLabTestCommand>, DeleteLabTestCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateLabTestCommand>, UpdateLabTestCommandHandler>();
             #endregion
 
             #region System Flow
@@ -354,6 +382,9 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<BlockIpCommand>, SecurityCommandHandler>();
             services.AddScoped<IRequestHandler<UnblockIpCommand>, SecurityCommandHandler>();
             services.AddScoped<IRequestHandler<DeleteFileCommand>, DeleteFileCommandHandler>();
+            services.AddScoped<IRequestHandler<CreateSys_SequenceTrackerCommand>, CreateSys_SequenceTrackerCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateSys_SequenceTrackerCommand>, UpdateSys_SequenceTrackerCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteSys_SequenceTrackerCommand>, DeleteSys_SequenceTrackerCommandHandler>();
             #endregion
 
             return services;
@@ -418,6 +449,8 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<ISortingExpressionProvider<ManufacturerViewModel, Manufacturer>, ManufacturerViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<SupplierViewModel, Supplier>, SupplierViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<LabTestCategoryViewModel, LabTestCategory>, LabTestCategoryViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<LabTestViewModel, LabTest>, LabTestViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<Sys_SequenceTrackerViewModel, Sys_SequenceTracker>, Sys_SequenceTrackerViewModelSortProvider>();
 
             return services;
         }

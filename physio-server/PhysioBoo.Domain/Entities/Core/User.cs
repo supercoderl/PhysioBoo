@@ -162,6 +162,12 @@ namespace PhysioBoo.Domain.Entities.Core
 
         [InverseProperty(nameof(User))]
         public virtual Profile? Profile { get; private set; }
+
+        [InverseProperty(nameof(Sys_SequenceTracker.Creator))]
+        public virtual ICollection<Sys_SequenceTracker> CreatedSequenceTrackers { get; private set; } = new List<Sys_SequenceTracker>();
+
+        [InverseProperty(nameof(Sys_SequenceTracker.Updater))]
+        public virtual ICollection<Sys_SequenceTracker> UpdatedSequenceTrackers { get; private set; } = new List<Sys_SequenceTracker>();
         #endregion
 
         #region Constructor (20)

@@ -362,8 +362,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("uuid");
 
                     b.Property<string>("Code")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -1299,8 +1299,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("character varying(50)");
 
                     b.Property<string>("Code")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -1966,9 +1966,14 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"TestName\", '') || ' ' || coalesce(\"TestCode\", '')))", true);
+
                     b.Property<string>("TestCode")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("TestName")
                         .IsRequired()
@@ -2003,8 +2008,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("uuid");
 
                     b.Property<string>("Code")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -2026,6 +2031,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"Code\", '')))", true);
 
                     b.HasKey("Id");
 
@@ -2926,8 +2936,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Code")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -3175,8 +3185,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("integer");
 
                     b.Property<string>("Code")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("ColorCode")
                         .HasMaxLength(7)
@@ -4173,8 +4183,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("numeric(5,2)");
 
                     b.Property<string>("Code")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("ContactPerson")
                         .HasMaxLength(255)
@@ -4255,8 +4265,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("CompanyCode")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Country")
                         .HasMaxLength(100)
@@ -4576,8 +4586,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("SupplierCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("SupplierName")
                         .IsRequired()
@@ -4853,6 +4863,60 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("LanguageId");
 
                     b.ToTable("Sys_Resources", (string)null);
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.System.Sys_SequenceTracker", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("CurrentSequence")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Prefix")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector");
+
+                    b.Property<int>("SequenceLength")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Suffix")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UseDateFormating")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.ToTable("Sys_SequenceTrackers");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.System.Sys_Setting", b =>
@@ -6014,6 +6078,24 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("Language");
                 });
 
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.System.Sys_SequenceTracker", b =>
+                {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedSequenceTrackers")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedSequenceTrackers")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("Updater");
+                });
+
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Clinical.MedicalRecord", b =>
                 {
                     b.Navigation("Prescriptions");
@@ -6083,6 +6165,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Navigation("CreatedRoles");
 
+                    b.Navigation("CreatedSequenceTrackers");
+
                     b.Navigation("CreatedUsers");
 
                     b.Navigation("Doctor");
@@ -6122,6 +6206,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("UpdatedMenus");
 
                     b.Navigation("UpdatedRoles");
+
+                    b.Navigation("UpdatedSequenceTrackers");
 
                     b.Navigation("UpdatedUsers");
 

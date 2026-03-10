@@ -105,6 +105,7 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<ISys_SettingRepository, Sys_SettingRepository>();
             services.AddScoped<ISys_DeviceRepository, Sys_DeviceRepository>();
             services.AddScoped<ISys_AppVersionRepository, Sys_AppVersionRepository>();
+            services.AddScoped<ISys_SequenceTrackerRepository, Sys_SequenceTrackerRepository>();
 
             return services;
         }

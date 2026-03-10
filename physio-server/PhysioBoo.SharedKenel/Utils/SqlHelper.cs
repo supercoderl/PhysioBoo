@@ -6,7 +6,6 @@ using PhysioBoo.SharedKernel.Metadata;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Reflection;
-using static Npgsql.Replication.PgOutput.Messages.RelationMessage;
 using ColumnAttribute = PhysioBoo.SharedKernel.Attributes.ColumnAttribute;
 
 namespace PhysioBoo.SharedKernel.Utils
@@ -58,8 +57,8 @@ namespace PhysioBoo.SharedKernel.Utils
         /// </summary>
         private static bool IsNavigationProperty(PropertyInfo property)
         {
-            var propertyType = property.PropertyType;
-            var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+            Type propertyType = property.PropertyType;
+            Type underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
 
             // If it's a primitive type, DateTime, string, etc., it's not a navigation property
             if (IsPrimitiveOrValueType(underlyingType))
@@ -70,19 +69,19 @@ namespace PhysioBoo.SharedKernel.Utils
                 return true;
 
             // Check if there's a corresponding foreign key property
-            var declaringType = property.DeclaringType;
+            Type? declaringType = property.DeclaringType;
             if (declaringType != null)
             {
                 // Look for foreign key properties that reference this navigation property
-                var foreignKeyProperty = declaringType.GetProperties()
+                PropertyInfo? foreignKeyProperty = declaringType.GetProperties()
                     .FirstOrDefault(p => p.GetCustomAttribute<ForeignKeyAttribute>()?.Name == property.Name);
 
                 if (foreignKeyProperty != null)
                     return true;
 
                 // Also check if this property name + "Id" exists (convention-based FK)
-                var conventionalFKName = property.Name + "Id";
-                var conventionalFK = declaringType.GetProperty(conventionalFKName);
+                string conventionalFKName = property.Name + "Id";
+                PropertyInfo? conventionalFK = declaringType.GetProperty(conventionalFKName);
                 if (conventionalFK != null && IsPrimitiveOrValueType(conventionalFK.PropertyType))
                     return true;
             }
@@ -112,14 +111,14 @@ namespace PhysioBoo.SharedKernel.Utils
         /// </summary>
         private static bool IsCollectionProperty(PropertyInfo property)
         {
-            var propertyType = property.PropertyType;
+            Type propertyType = property.PropertyType;
 
             if (propertyType == typeof(string))
                 return false;
 
             if (propertyType.IsArray)
             {
-                var elementType = propertyType.GetElementType();
+                Type? elementType = propertyType.GetElementType();
                 if (elementType != null && IsSupportedPropertyType(elementType))
                     return false;
             }
@@ -127,7 +126,7 @@ namespace PhysioBoo.SharedKernel.Utils
             // Remove generic collections (List<T>, ICollection<T>, IEnumerable<T>, …)
             if (propertyType.IsGenericType)
             {
-                var genericDef = propertyType.GetGenericTypeDefinition();
+                Type genericDef = propertyType.GetGenericTypeDefinition();
                 if (genericDef == typeof(List<>) ||
                     genericDef == typeof(IList<>) ||
                     genericDef == typeof(ICollection<>) ||
@@ -145,7 +144,7 @@ namespace PhysioBoo.SharedKernel.Utils
         /// </summary>
         private static bool IsSupportedPropertyType(Type propertyType)
         {
-            var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+            Type underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
 
             // Check for array types first
             if (IsArrayType(underlyingType))
@@ -182,7 +181,7 @@ namespace PhysioBoo.SharedKernel.Utils
             if (property.GetCustomAttribute<GeneratedColumnAttribute>() != null)
                 return true;
 
-            var dbGeneratedAttr = property.GetCustomAttribute<DatabaseGeneratedAttribute>();
+            DatabaseGeneratedAttribute? dbGeneratedAttr = property.GetCustomAttribute<DatabaseGeneratedAttribute>();
             if (dbGeneratedAttr != null)
             {
                 return dbGeneratedAttr.DatabaseGeneratedOption == DatabaseGeneratedOption.Identity ||
@@ -190,8 +189,8 @@ namespace PhysioBoo.SharedKernel.Utils
             }
 
             // Check for common naming patterns of generated columns
-            var propertyName = property.Name.ToLower();
-            var commonGeneratedNames = new[]
+            string propertyName = property.Name.ToLower();
+            string[] commonGeneratedNames = new[]
             {
                 "rowversion", "timestamp",
                 "emailnormalized", "usernamenormalized", "phonenormalized",
@@ -210,18 +209,18 @@ namespace PhysioBoo.SharedKernel.Utils
             if (property.GetCustomAttribute<ComputedColumnAttribute>() != null)
                 return true;
 
-            var dbGeneratedAttr = property.GetCustomAttribute<DatabaseGeneratedAttribute>();
+            DatabaseGeneratedAttribute? dbGeneratedAttr = property.GetCustomAttribute<DatabaseGeneratedAttribute>();
             if (dbGeneratedAttr?.DatabaseGeneratedOption == DatabaseGeneratedOption.Computed)
                 return true;
 
             // Check for computed column indicators in column attribute
-            var columnAttr = property.GetCustomAttribute<ColumnAttribute>();
+            ColumnAttribute? columnAttr = property.GetCustomAttribute<ColumnAttribute>();
             if (columnAttr?.TypeName?.ToLower().Contains("generated") == true)
                 return true;
 
             // Check for common computed column naming patterns
-            var propertyName = property.Name.ToLower();
-            var computedPatterns = new[]
+            string propertyName = property.Name.ToLower();
+            string[] computedPatterns = new[]
             {
                 "normalized", "computed", "calculated", "generated",
                 "fullname", "displayname", "searchtext", "vector"
@@ -232,14 +231,14 @@ namespace PhysioBoo.SharedKernel.Utils
 
         private static bool IsSupportedProperty(PropertyInfo property)
         {
-            var propertyType = property.PropertyType;
+            Type propertyType = property.PropertyType;
 
             // Check basic type support first
             if (!IsSupportedPropertyType(propertyType))
                 return false;
 
             // Additional check for JSON properties
-            var columnAttribute = property.GetCustomAttribute<ColumnAttribute>();
+            ColumnAttribute? columnAttribute = property.GetCustomAttribute<ColumnAttribute>();
             if (propertyType == typeof(string) &&
                 columnAttribute?.TypeName?.ToLower().Contains("json") == true)
             {
@@ -254,12 +253,14 @@ namespace PhysioBoo.SharedKernel.Utils
         /// </summary>
         public static bool IsJsonbType(ColumnMetadata? column)
         {
-            var colAttr = column?.Property?.GetCustomAttribute<ColumnAttribute>();
-            var typeName = colAttr?.TypeName;
-            var result = string.Equals(typeName, "jsonb", StringComparison.OrdinalIgnoreCase);
+            if (column?.Property == null) return false;
+            object? colAttr = column.Property.GetCustomAttributes(true).FirstOrDefault(a => a.GetType().Name == "ColumnAttribute");
+            if (colAttr == null) return false;
+            string? typeName = colAttr.GetType().GetProperty("TypeName")?.GetValue(colAttr)?.ToString();
+            bool result = string.Equals(typeName, "jsonb", StringComparison.OrdinalIgnoreCase);
 
             // Debug logging - remove after fixing
-            Console.WriteLine($"Column: {column?.ColumnName}, TypeName: '{typeName}', IsJsonb: {result}");
+            Console.WriteLine($"[DEBUG] Column: {column?.ColumnName}, TypeName: '{typeName}', IsJsonb: {result}");
 
             return result;
         }
@@ -354,7 +355,7 @@ namespace PhysioBoo.SharedKernel.Utils
             try
             {
                 Type? elementType = GetArrayElementType(arrayType);
-                var baseType = GetNpgsqlDbType(elementType);
+                NpgsqlDbType baseType = GetNpgsqlDbType(elementType);
                 return NpgsqlTypes.NpgsqlDbType.Array | baseType;
             }
             catch
@@ -371,7 +372,7 @@ namespace PhysioBoo.SharedKernel.Utils
         {
             if (type is null) return NpgsqlTypes.NpgsqlDbType.Text;
 
-            var underlyingType = Nullable.GetUnderlyingType(type) ?? type;
+            Type underlyingType = Nullable.GetUnderlyingType(type) ?? type;
 
             return underlyingType.Name switch
             {
@@ -403,12 +404,12 @@ namespace PhysioBoo.SharedKernel.Utils
             if (arrayValue == null)
                 return "{}";
 
-            var enumerable = arrayValue as System.Collections.IEnumerable;
+            System.Collections.IEnumerable? enumerable = arrayValue as System.Collections.IEnumerable;
             if (enumerable == null)
                 return "{}";
 
-            var elements = new List<string>();
-            foreach (var item in enumerable)
+            List<string> elements = new List<string>();
+            foreach (object? item in enumerable)
             {
                 if (item == null)
                 {
@@ -460,7 +461,7 @@ namespace PhysioBoo.SharedKernel.Utils
             NpgsqlDbType npgsqlType
         )
         {
-            var p = new NpgsqlParameter(name, npgsqlType) { Value = (object?)value ?? DBNull.Value };
+            NpgsqlParameter p = new NpgsqlParameter(name, npgsqlType) { Value = (object?)value ?? DBNull.Value };
             parameters.Add(name, p.Value, DbType.Object);
         }
     }

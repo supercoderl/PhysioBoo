@@ -503,7 +503,10 @@ namespace PhysioBoo.Infrastructure.Repositories
         private string GenerateInsertSql<T>(TableMetadata metadata, bool returnsKey)
         {
             string columns = string.Join(", ", metadata.InsertableColumns.Select(c => QuoteIdentifier(c.ColumnName)));
-            string parameters = string.Join(", ", metadata.InsertableColumns.Select(c => $"@{c.PropertyName}"));
+            string parameters = string.Join(", ", metadata.InsertableColumns.Select(c =>
+            {
+                return SqlHelper.IsJsonbType(c) ? $"@{c.PropertyName}::jsonb" : $"@{c.PropertyName}";
+            }));
 
             string sql = $"INSERT INTO {QuoteIdentifier(metadata.TableName)} ({columns}) VALUES ({parameters})";
 
@@ -536,13 +539,8 @@ namespace PhysioBoo.Infrastructure.Repositories
                 // Handle Jsonb types
                 if (SqlHelper.IsJsonbType(column))
                 {
-                    string jsonString = value is string s ? s : JsonSerializer.Serialize(value);
-                    parameters.Add($"@{columnName}", new NpgsqlParameter
-                    {
-                        ParameterName = $"@{columnName}",
-                        NpgsqlDbType = NpgsqlDbType.Jsonb,
-                        Value = (object?)value ?? DBNull.Value
-                    });
+                    string jsonValue = value is string s ? s : JsonSerializer.Serialize(value);
+                    parameters.Add($"@{column.PropertyName}", jsonValue, DbType.String);
                     continue;
                 }
 

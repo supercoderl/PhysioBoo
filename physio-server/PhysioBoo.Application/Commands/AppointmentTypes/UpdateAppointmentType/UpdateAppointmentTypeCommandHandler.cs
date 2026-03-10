@@ -38,7 +38,6 @@ namespace PhysioBoo.Application.Commands.AppointmentTypes.UpdateAppointmentType
             }
 
             appointmentType.SetName(request.AppointmentType.Name);
-            appointmentType.SetCode(request.AppointmentType.Code);
             appointmentType.SetDescription(request.AppointmentType.Description);
             appointmentType.SetDefaultDuration(request.AppointmentType.DefaultDuration);
             appointmentType.SetBufferTime(request.AppointmentType.BufferTime);

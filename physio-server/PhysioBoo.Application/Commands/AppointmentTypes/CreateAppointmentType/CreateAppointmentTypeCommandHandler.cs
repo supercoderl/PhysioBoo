@@ -10,25 +10,30 @@ namespace PhysioBoo.Application.Commands.AppointmentTypes.CreateAppointmentType
     public sealed class CreateAppointmentTypeCommandHandler : CommandHandlerBase, IRequestHandler<CreateAppointmentTypeCommand>
     {
         private readonly IAppointmentTypeRepository _appointmentTypeRepository;
+        private readonly ISys_SequenceTrackerRepository _sys_SequenceTrackerRepository;
 
         public CreateAppointmentTypeCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IAppointmentTypeRepository appointmentTypeRepository
+            IAppointmentTypeRepository appointmentTypeRepository,
+            ISys_SequenceTrackerRepository sys_SequenceTrackerRepository
         ) : base(bus, unitOfWork, notifications)
         {
             _appointmentTypeRepository = appointmentTypeRepository;
+            _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
         public async Task Handle(CreateAppointmentTypeCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(AppointmentType), cancellationToken);
+
             AppointmentType newAppointmentType = new AppointmentType(
                 request.NewAppointmentType.Id,
                 request.NewAppointmentType.Name,
-                request.NewAppointmentType.Code,
+                newCode,
                 request.NewAppointmentType.Description,
                 request.NewAppointmentType.PreparationInstructions,
                 request.NewAppointmentType.ColorCode

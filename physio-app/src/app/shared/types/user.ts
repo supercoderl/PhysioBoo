@@ -1,4 +1,4 @@
-import { Doctor } from "./doctor";
+import { Doctor } from "./medical-staff";
 import { Patient } from "./patient";
 import { Profile } from "./profile";
 

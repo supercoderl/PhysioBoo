@@ -1,7 +1,8 @@
 import { Component, Input } from "@angular/core";
+import { EmploymentStatus } from "../../../../shared/enums/employment-status";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { Doctor } from "../../../../shared/types/doctor";
 import { LabTest } from "../../../../shared/types/laboratory-imaging";
+import { Doctor } from "../../../../shared/types/medical-staff";
 import { Medication } from "../../../../shared/types/medication";
 import { PatientInfo } from "../../../../shared/types/patient";
 
@@ -288,7 +289,48 @@ export class AdminPrintTemplateComponent {
     averageRating: 0,
     totalReviews: 0,
     bio: null,
-    about: null
+    about: null,
+    languagesSpoken: [],
+    isAvailableOnline: false,
+    isAvailableHomeVisit: false,
+    isAvailableEmergency: false,
+    isFeature: false,
+    isVerified: false,
+    primarySpecialtyId: null,
+    medicalLicenseIssuingAuthority: null,
+    yearsOfPractice: 0,
+    archivements: null,
+    researchInterests: null,
+    publicationsCount: 0,
+    conferencePresentations: 0,
+    consultationFeeMin: 0,
+    consultationFeeMax: 0,
+    followUpFee: 0,
+    emergencyConsultationFee: 0,
+    homeVisitFee: 0,
+    videoConsultationFee: 0,
+    consultationDuration: 0,
+    bufferTime: 0,
+    advanceBookingDays: 0,
+    cancellationPolicy: null,
+    employeeId: null,
+    employmentStatus: EmploymentStatus.Active,
+    joiningDate: null,
+    terminationDate: null,
+    bankAccountDetails: null,
+    paymentMethods: [],
+    panNumber: null,
+    gstin: null,
+    totalPatientTreated: 0,
+    successRate: 0,
+    patientSatisfactionScore: 0,
+    totalSurgeriesPerformed: 0,
+    verificationDate: null,
+    verifiedBy: null,
+    createdAt: new Date(),
+    updatedAt: null,
+    fullName: "",
+    avatar: null
   };
   @Input() date: string = new Date().toLocaleDateString();
   @Input() medications: Medication[] = [

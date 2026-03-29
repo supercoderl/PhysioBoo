@@ -50,7 +50,7 @@ import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
                         (click)="applyJson()" 
                         class="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1.5"
                     >
-                        <boo-icon name="zap" [size]="14"></boo-icon>
+                        <boo-icon name="zap" [size]="14" color="white"></boo-icon>
                         Apply to Form
                     </button>
                 </div>
@@ -69,8 +69,11 @@ import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 })
 export class BooDevJsonFillerComponent {
     // #region Inputs, Ouputs, Properties
-    @Input({ required: true }) targetForm!: FormGroup;
+    @Input({ required: true }) set targetForms(value: FormGroup | FormGroup[]) {
+        this.forms = Array.isArray(value) ? value : [value];
+    }
 
+    forms: FormGroup[] = [];
     isExpanded = false;
     jsonText = '';
     // #endregion
@@ -88,15 +91,18 @@ export class BooDevJsonFillerComponent {
 
         try {
             const parsedData = JSON.parse(this.jsonText);
-            this.targetForm.patchValue(parsedData);
-            this.targetForm.markAsDirty();
-            Object.keys(this.targetForm.controls).forEach(key => {
-                this.targetForm.get(key)?.markAsTouched();
+
+            this.forms.forEach(form => {
+                form.patchValue(parsedData);
+                form.markAsDirty();
+
+                Object.keys(form.controls).forEach(key => {
+                    form.get(key)?.markAsTouched();
+                });
             });
 
             this.toastSrv.success('Mock data applied successfully!');
             this.isExpanded = false;
-
         } catch (e) {
             this.toastSrv.error('Invalid JSON format! Check for missing quotes or commas.');
             console.error('JSON Parse Error:', e);

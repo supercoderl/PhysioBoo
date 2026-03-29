@@ -1,0 +1,2 @@
+export const SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING = 'An error has been occurred, please reload to view your update!';
+export const CATCH_ERROR_AFTER_CREATING_OR_UPDATING = 'An error occurred while saving or retrieving data';

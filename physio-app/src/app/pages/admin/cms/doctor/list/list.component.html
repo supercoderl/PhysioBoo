@@ -3,7 +3,7 @@
     class="flex items-center md:flex-column gap-2 pb-3 mb-2 border-1 border-bottom"
   >
     <div class="flex-1">
-      <h4 class="text-[22px] text-primary font-semibold mb-0">Appointment Type</h4>
+      <h4 class="text-[22px] text-primary font-semibold mb-0">Doctor</h4>
     </div>
     <div class="text-right flex">
       <div class="relative me-1">
@@ -48,6 +48,29 @@
 
   <div class="flex items-center justify-between flex-wrap">
     <div class="flex items-center gap-2">
+      <div>
+        <div class="flex items-center flex-wrap gap-2">
+          <div class="table-search flex items-center mb-0">
+            <div class="search-input">
+              <boo-input
+                label="Search..."
+                size="small"
+                (search)="onSearch($event)"
+              >
+                <boo-icon
+                  [class.animate-spin]="loadingSrv.isLoading('search')"
+                  [name]="
+                    loadingSrv.isLoading('search') ? 'loader-circle' : 'search'
+                  "
+                  color="#64748B"
+                  endfix
+                />
+              </boo-input>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <boo-date-admin
         [startDate]="params.filter.start"
         [endDate]="params.filter.end"
@@ -62,7 +85,7 @@
         [icon]="{ name: 'refresh-cw', size: 14, color: '#6C7688' }"
         buttonClass="!bg-surface h-full"
         [border]="{ width: 1, color: '#e3e3e3' }"
-        (click)="loadAppointmentTypes()"
+        (click)="loadDoctors()"
       >
         <span class="text-placeholder">Reload</span>
       </boo-button-admin>
@@ -79,7 +102,7 @@
   </div>
 
   <div class="mt-2">
-    <common-category-appointment-type-table-card
+    <cms-doctor-table-card
       [data]="tableData()"
       (pageChange)="onPageChanged($event)"
       (editClick)="onOpenDrawer($event)"
@@ -88,11 +111,9 @@
     />
   </div>
 
-  <common-category-appointment-type-drawer
+  <cms-doctor-drawer
     [isOpen]="isDrawerOpen"
-    [currentId]="selectedId"
     (close)="onCloseDrawer()"
     (saveSuccess)="onSaveSuccess($event)"
-    (delete)="onDelete($event)"
   />
 </admin-content-header>

@@ -76,3 +76,8 @@ export interface SequenceTrackerFilter {
     start: string,
     end: string,
 }
+
+export interface DoctorFilter {
+    start: string,
+    end: string,
+}

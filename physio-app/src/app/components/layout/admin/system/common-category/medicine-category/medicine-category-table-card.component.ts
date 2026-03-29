@@ -53,7 +53,7 @@ import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo
           <boo-icon name="circle-check" *ngIf="item.isControlled"  />
         </ng-template>
 
-        <ng-template appColumnDef="actions" let-item cellClass="text-right">
+        <ng-template appColumnDef="actions" headerLabel="Actions" let-item headerClass="text-center" cellClass="text-center">
           <div class="relative">
             <boo-action-admin
               [items]="tableActions"

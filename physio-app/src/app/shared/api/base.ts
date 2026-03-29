@@ -80,4 +80,11 @@ export const BASE_API = {
     DELETE: '/api/sequence-trackers/delete',
     UPDATE: '/api/sequence-trackers/update'
   },
+  DOCTOR: {
+    SEARCH: '/api/doctors/search',
+    SEARCH_BY_ID: '/api/doctors/search-by-id',
+    CREATE: '/api/doctors/create',
+    DELETE: '/api/doctors/delete',
+    UPDATE: '/api/doctors/update'
+  },
 };

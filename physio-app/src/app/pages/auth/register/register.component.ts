@@ -2,17 +2,16 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
 import { FormWrapperComponent } from "../../../components/form/boo-form/boo-form.component";
+import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
+import { BooInputComponent } from '../../../components/input/boo-input/boo-input.component';
+import { LocalLoadingService } from '../../../services/common/local-loading.service';
+import { ToastService } from '../../../services/common/toast.service';
+import { BASE_API } from '../../../shared/api/base';
 import { SharedModule } from '../../../shared/shared-imports';
 import { PagedResponse } from '../../../shared/types/common';
 import { generateUUID } from '../../../shared/utils/common';
-import { ToastService } from '../../../services/common/toast.service';
-import { Role } from '../../../shared/enums/role';
-import { BASE_API } from '../../../shared/api/base';
-import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
-import { LocalLoadingService } from '../../../services/common/local-loading.service';
-import { BooInputComponent } from '../../../components/input/boo-input/boo-input.component';
-import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
 
 @Component({
   selector: 'app-register',
@@ -52,8 +51,7 @@ export class RegisterComponent {
   register(): void {
     const body = {
       id: generateUUID(),
-      ...this.form.value,
-      role: Role.Patient
+      ...this.form.value
     }
 
     this.http.post<PagedResponse<string>>(BASE_API.REGISTER, body).subscribe({

@@ -275,7 +275,7 @@ export const routes: Routes = [
                             },
                             {
                                 path: 'list',
-                                loadComponent: () => import('./cms/doctor/list/doctor-list.component').then(m => m.DoctorListComponent),
+                                loadComponent: () => import('./cms/doctor/list/list.component').then(m => m.CmsDoctorListComponent),
                                 data: { breadcrumb: ['list'] },
                             }
                         ]

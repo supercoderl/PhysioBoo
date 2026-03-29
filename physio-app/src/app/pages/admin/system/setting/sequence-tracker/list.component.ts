@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { catchError, of, tap } from "rxjs";
+import { catchError, of } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
 import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
@@ -173,9 +173,9 @@ export class SettingSequenceTrackerListComponent implements OnInit {
             const isNotFirstPage = currentData.pageNumber > 1;
 
             if (isLastItemOnPage && isNotFirstPage) {
+                this.toastSrv.success("Deleted 1 item.");
                 this.sequenceTrackerSrv.delete(id).subscribe({
                     next: () => {
-                        this.toastSrv.success("Deleted 1 item.");
                         this.params.pageNumber = currentData.pageNumber - 1;
                         this.loadSequenceTrackers();
                     },
@@ -197,9 +197,9 @@ export class SettingSequenceTrackerListComponent implements OnInit {
                 };
             });
 
+            this.toastSrv.success("Deleted 1 item.")
             this.sequenceTrackerSrv.delete(id)
                 .pipe(
-                    tap(() => this.toastSrv.success("Deleted 1 item.")),
                     catchError(_ => {
                         this.toastSrv.error("System error occurred. Rolling back data...");
                         this.tableData.update(data => {

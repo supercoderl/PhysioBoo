@@ -1,9 +1,10 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize } from "rxjs";
+import { finalize, firstValueFrom } from "rxjs";
 import { MedicalSpecialtyService } from "../../../../../../services/admin/medical-specialty.service";
 import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../../services/common/toast.service";
+import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { MedicalSpecialty } from "../../../../../../shared/types/medical-staff";
 import { generateUUID } from "../../../../../../shared/utils/common";
@@ -277,26 +278,31 @@ export class CommonCategoryMedicalSpecialtyDrawerComponent implements OnChanges 
         this.form.markAsDirty();
     }
 
-    onSave() {
+    async onSave() {
         if (this.form.invalid) {
             this.toastSrv.error('Please check required fields');
             this.form.markAllAsTouched();
             return;
         }
 
-        const formData = { ...this.form.getRawValue(), id: this.currentId ?? generateUUID() }
+        const targetId = this.currentId ?? generateUUID();
+        const formData = { ...this.form.getRawValue(), id: targetId }
 
         const request$ = this.currentId
             ? this.medicalSpecialtySrv.update(formData)
             : this.medicalSpecialtySrv.create(formData);
 
-        request$.subscribe({
-            next: (res) => this.saveSuccess.emit({
-                id: res.data,
-                ...this.form.getRawValue(),
-                createdAt: new Date()
-            })
-        });
+        try {
+            await firstValueFrom(request$);
+
+            const response = await firstValueFrom(this.medicalSpecialtySrv.search_by_id({ id: targetId }));
+            if (response.success && response.data) {
+                this.saveSuccess.emit(response.data);
+            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
+        } catch (error) {
+            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+            console.error(error);
+        }
     }
 
     resetForm() {
@@ -312,11 +318,11 @@ export class CommonCategoryMedicalSpecialtyDrawerComponent implements OnChanges 
         if (this.scrollContainer) {
             this.scrollContainer.nativeElement.scrollTop = 0;
         }
-        
+
         this.close.emit();
     }
 
     onDelete() {
-        if(this.currentId) this.delete.emit(this.currentId);
+        if (this.currentId) this.delete.emit(this.currentId);
     }
 }

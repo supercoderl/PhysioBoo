@@ -1,13 +1,12 @@
-import { Component, EventEmitter, Input, Output, signal } from "@angular/core";
-import { SharedModule } from "../../../../../../shared/shared-imports";
-import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo-table-admin.component";
-import { ColumnDefDirective } from "../../../../../../shared/directives/column-def.directive";
-import { MedicalSpecialty } from "../../../../../../shared/types/medical-staff";
-import { ActionItem, PaginationData } from "../../../../../../shared/types/common";
-import { ColorUtils } from "../../../../../../shared/utils/color.utils";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
-import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/boo-action-admin.component";
+import { ColumnDefDirective } from "../../../../../../shared/directives/column-def.directive";
+import { SharedModule } from "../../../../../../shared/shared-imports";
+import { ActionItem, PaginationData } from "../../../../../../shared/types/common";
 import { Manufacturer } from "../../../../../../shared/types/support";
+import { ColorUtils } from "../../../../../../shared/utils/color.utils";
+import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/boo-action-admin.component";
+import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo-table-admin.component";
 
 @Component({
   selector: 'common-category-manufacturer-table-card',
@@ -52,7 +51,7 @@ import { Manufacturer } from "../../../../../../shared/types/support";
           <div class="text-sm">{{ item.phone }}</div>
         </ng-template>
 
-        <ng-template appColumnDef="actions" let-item cellClass="text-right">
+        <ng-template appColumnDef="actions" headerLabel="Actions" let-item headerClass="text-center" cellClass="text-center">
           <div class="relative">
             <boo-action-admin
               [items]="tableActions"

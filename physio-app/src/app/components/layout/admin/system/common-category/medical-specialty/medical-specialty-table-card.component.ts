@@ -62,7 +62,7 @@ import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo
           <div class="text-sm">{{ item.averageConsultationDuration }}</div>
         </ng-template>
 
-        <ng-template appColumnDef="actions" let-item cellClass="text-right">
+        <ng-template appColumnDef="actions" headerLabel="Actions" let-item headerClass="text-center" cellClass="text-center">
           <div class="relative">
             <boo-action-admin
               [items]="tableActions"

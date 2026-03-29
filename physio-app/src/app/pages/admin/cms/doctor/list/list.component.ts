@@ -1,17 +1,17 @@
-import { Component, OnInit, signal } from "@angular/core";
+import { Component, signal } from "@angular/core";
 import { catchError, of } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
 import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { CmsDoctorDrawerComponent } from "../../../../../components/layout/admin/cms/doctor/doctor-drawer.component";
+import { CmsDoctorTableCardComponent } from "../../../../../components/layout/admin/cms/doctor/doctor-table-card.component";
 import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
-import { CommonCategoryImagingModalityDrawerComponent } from "../../../../../components/layout/admin/system/common-category/imaging-modality/imaging-modality-drawer.component";
-import { CommonCategoryImagingModalityTableCardComponent } from "../../../../../components/layout/admin/system/common-category/imaging-modality/imaging-modality-table-card.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { BooDateAdminComponent } from "../../../../../components/table/boo-table-admin/boo-date-admin.component";
 import { BooFilterAdminComponent } from "../../../../../components/table/boo-table-admin/boo-filter-admin.component";
 import { BooSortAdminComponent } from "../../../../../components/table/boo-table-admin/boo-sort-admin.component";
-import { ImagingModalityService } from "../../../../../services/admin/imaging-modality.service";
+import { DoctorService } from "../../../../../services/admin/doctor.service";
 import { DateService } from "../../../../../services/common/date.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
@@ -20,32 +20,32 @@ import { SharedModule } from "../../../../../shared/shared-imports";
 import { PaginationData } from "../../../../../shared/types/common";
 import { DateRange } from "../../../../../shared/types/date";
 import { FilterConfig } from "../../../../../shared/types/filter";
-import { ImagingModality } from "../../../../../shared/types/laboratory-imaging";
+import { Doctor } from "../../../../../shared/types/medical-staff";
 import { SortOption } from "../../../../../shared/types/sort";
 
 @Component({
-    selector: 'common-category-imaging-modality-list',
+    selector: 'cms-doctor-list',
     standalone: true,
     imports: [
     SharedModule,
+    CmsDoctorTableCardComponent,
     AdminContentHeaderComponent,
-    BooButtonAdminComponent,
-    BooIconComponent,
+    BooSelectComponent,
     ButtonIconComponent,
     BooInputComponent,
-    BooSortAdminComponent,
-    BooFilterAdminComponent,
+    BooIconComponent,
     BooDateAdminComponent,
-    BooSelectComponent,
-    CommonCategoryImagingModalityTableCardComponent,
-    CommonCategoryImagingModalityDrawerComponent
+    BooButtonAdminComponent,
+    BooFilterAdminComponent,
+    BooSortAdminComponent,
+    CmsDoctorDrawerComponent
 ],
     templateUrl: `./list.component.html`
 })
 
-export class CommonCategoryImagingModalityListComponent implements OnInit {
-    // #region Inputs, Outputs, Properties
-    tableData = signal<PaginationData<ImagingModality> | null>(null);
+export class CmsDoctorListComponent {
+// #region Inputs, Outputs, Properties
+    tableData = signal<PaginationData<Doctor> | null>(null);
     params = {
         pageNumber: 1,
         pageSize: 5,
@@ -53,10 +53,7 @@ export class CommonCategoryImagingModalityListComponent implements OnInit {
         sort: 'createdAt:desc',
         filter: {
             start: null as Date | null,
-            end: null as Date | null,
-            requiresContrast: null as boolean | null,
-            preparationRequired: null as boolean | null,
-            isActive: null as boolean | null
+            end: null as Date | null
         }
     };
     isDrawerOpen: boolean = false;
@@ -84,7 +81,7 @@ export class CommonCategoryImagingModalityListComponent implements OnInit {
 
     // #region Init (Lifecycle + Setup)
     constructor(
-        private imagingModalitySrv: ImagingModalityService,
+        private doctorSrv: DoctorService,
         private dialogSrv: DialogService,
         private toastSrv: ToastService,
         protected loadingSrv: LocalLoadingService,
@@ -92,13 +89,13 @@ export class CommonCategoryImagingModalityListComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.loadImagingModalities();
+        this.loadDoctors();
     }
     // #endregion
 
     // #region Methods
-    loadImagingModalities() {
-        this.imagingModalitySrv.search({
+    loadDoctors() {
+        this.doctorSrv.search({
             pageNumber: this.params.pageNumber,
             pageSize: this.params.pageSize,
             search: this.params.search,
@@ -118,7 +115,7 @@ export class CommonCategoryImagingModalityListComponent implements OnInit {
 
     onPageChanged(newPage: number) {
         this.params.pageNumber = newPage;
-        this.loadImagingModalities();
+        this.loadDoctors();
     }
 
     onOpenDrawer(id: string | null) {
@@ -131,7 +128,7 @@ export class CommonCategoryImagingModalityListComponent implements OnInit {
         this.selectedId = null;
     }
 
-    onSaveSuccess(result: ImagingModality) {
+    onSaveSuccess(result: Doctor) {
         this.onCloseDrawer();
         this.tableData.update((currentData) => {
             if (!currentData) {
@@ -177,10 +174,10 @@ export class CommonCategoryImagingModalityListComponent implements OnInit {
 
             if (isLastItemOnPage && isNotFirstPage) {
                 this.toastSrv.success("Deleted 1 item.");
-                this.imagingModalitySrv.delete(id).subscribe({
+                this.doctorSrv.delete(id).subscribe({
                     next: () => {
                         this.params.pageNumber = currentData.pageNumber - 1;
-                        this.loadImagingModalities();
+                        this.loadDoctors();
                     },
                     error: () => this.toastSrv.error("System error occurred.")
                 });
@@ -201,7 +198,7 @@ export class CommonCategoryImagingModalityListComponent implements OnInit {
             });
 
             this.toastSrv.success("Deleted 1 item.")
-            this.imagingModalitySrv.delete(id)
+            this.doctorSrv.delete(id)
                 .pipe(
                     catchError(_ => {
                         this.toastSrv.error("System error occurred. Rolling back data...");
@@ -218,12 +215,12 @@ export class CommonCategoryImagingModalityListComponent implements OnInit {
 
     onSearch(val: string) {
         this.params = { ...this.params, pageNumber: 1, search: val };
-        this.loadImagingModalities();
+        this.loadDoctors();
     }
 
     onSortChange(sort: SortOption) {
         this.params = { ...this.params, pageNumber: 1, sort: sort.value };
-        this.loadImagingModalities();
+        this.loadDoctors();
     }
 
     onFilterApply(event: any) {
@@ -237,7 +234,7 @@ export class CommonCategoryImagingModalityListComponent implements OnInit {
                 ...event
             }
         }
-        this.loadImagingModalities();
+        this.loadDoctors();
     }
 
     onDateChange(range: DateRange) {
@@ -250,7 +247,7 @@ export class CommonCategoryImagingModalityListComponent implements OnInit {
                 end: range.end
             }
         };
-        this.loadImagingModalities();
+        this.loadDoctors();
     }
     // #endregion
 }

@@ -1,9 +1,10 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize } from "rxjs";
+import { finalize, firstValueFrom } from "rxjs";
 import { ManufacturerService } from "../../../../../../services/admin/manufacturer.service";
 import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../../services/common/toast.service";
+import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { Manufacturer } from "../../../../../../shared/types/support";
 import { generateUUID } from "../../../../../../shared/utils/common";
@@ -18,14 +19,14 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
     selector: 'common-category-manufacturer-drawer',
     standalone: true,
     imports: [
-    SharedModule,
-    DrawerComponent,
-    BooInputComponent,
-    BooIconComponent,
-    BooButtonAdminComponent,
-    BooCheckboxComponent,
-    BooDevJsonFillerComponent
-],
+        SharedModule,
+        DrawerComponent,
+        BooInputComponent,
+        BooIconComponent,
+        BooButtonAdminComponent,
+        BooCheckboxComponent,
+        BooDevJsonFillerComponent
+    ],
     template: `
         <drawer
             [isOpen]="isOpen"
@@ -47,7 +48,7 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
                 </div>
 
                 <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
-                    <boo-json-editor [targetForm]="form"></boo-json-editor>
+                    <boo-json-editor [targetForms]="form"></boo-json-editor>
                     
                     <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
                         <boo-icon name="loader" class="animate-spin text-primary" [size]="32"></boo-icon>
@@ -256,26 +257,31 @@ export class CommonCategoryManufacturerDrawerComponent implements OnChanges {
         this.form.markAsDirty();
     }
 
-    onSave() {
+    async onSave() {
         if (this.form.invalid) {
             this.toastSrv.error('Please check required fields');
             this.form.markAllAsTouched();
             return;
         }
 
-        const formData = { ...this.form.getRawValue(), id: this.currentId ?? generateUUID() }
+        const targetId = this.currentId ?? generateUUID();
+        const formData = { ...this.form.getRawValue(), id: targetId }
 
         const request$ = this.currentId
             ? this.manufacturerSrv.update(formData)
             : this.manufacturerSrv.create(formData);
 
-        request$.subscribe({
-            next: (res) => this.saveSuccess.emit({
-                id: res.data,
-                ...this.form.getRawValue(),
-                createdAt: new Date()
-            })
-        });
+        try {
+            await firstValueFrom(request$);
+
+            const response = await firstValueFrom(this.manufacturerSrv.search_by_id({ id: targetId }));
+            if (response.success && response.data) {
+                this.saveSuccess.emit(response.data);
+            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
+        } catch (error) {
+            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+            console.error(error);
+        }
     }
 
     resetForm() {

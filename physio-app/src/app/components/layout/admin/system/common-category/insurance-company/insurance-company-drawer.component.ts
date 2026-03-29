@@ -1,9 +1,10 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize } from "rxjs";
+import { finalize, firstValueFrom } from "rxjs";
 import { InsuranceCompanyService } from "../../../../../../services/admin/insurance-company.service";
 import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../../services/common/toast.service";
+import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { InsuranceType } from "../../../../../../shared/enums/insurance-type";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { InsuranceCompany } from "../../../../../../shared/types/support";
@@ -22,17 +23,17 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
     selector: 'common-category-insurance-company-drawer',
     standalone: true,
     imports: [
-    SharedModule,
-    DrawerComponent,
-    BooInputComponent,
-    BooIconComponent,
-    BooTextareaComponent,
-    BooButtonAdminComponent,
-    BooSelectComponent,
-    BooCheckboxComponent,
-    BooJsonInputComponent,
-    BooDevJsonFillerComponent
-],
+        SharedModule,
+        DrawerComponent,
+        BooInputComponent,
+        BooIconComponent,
+        BooTextareaComponent,
+        BooButtonAdminComponent,
+        BooSelectComponent,
+        BooCheckboxComponent,
+        BooJsonInputComponent,
+        BooDevJsonFillerComponent
+    ],
     template: `
         <drawer
             [isOpen]="isOpen"
@@ -54,7 +55,7 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
                 </div>
 
                 <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
-                    <boo-json-editor [targetForm]="form"></boo-json-editor>
+                    <boo-json-editor [targetForms]="form"></boo-json-editor>
                     
                     <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
                         <boo-icon name="loader" class="animate-spin text-primary" [size]="32"></boo-icon>
@@ -285,7 +286,7 @@ export class CommonCategoryInsuranceCompanyDrawerComponent implements OnChanges 
         this.form.markAsDirty();
     }
 
-    onSave() {
+    async onSave() {
         if (this.form.invalid) {
             this.toastSrv.error('Please check required fields');
             this.form.markAllAsTouched();
@@ -312,9 +313,11 @@ export class CommonCategoryInsuranceCompanyDrawerComponent implements OnChanges 
                 parsedDocuments = rawDocs;
         }
 
+        const targetId = this.currentId ?? generateUUID();
+
         const payload = {
             ...formValues,
-            id: this.currentId ?? generateUUID(),
+            id: targetId,
             type: Number(formValues.type ?? InsuranceType.Health),
             averageClaimSettlementTime: Number(formValues.averageClaimSettlementTime) || 0,
             maximumCoverageAmount: formValues.maximumCoverageAmount ? Number(formValues.maximumCoverageAmount) : null,
@@ -326,13 +329,17 @@ export class CommonCategoryInsuranceCompanyDrawerComponent implements OnChanges 
             ? this.insuranceCompanySrv.update(payload)
             : this.insuranceCompanySrv.create(payload);
 
-        request$.subscribe({
-            next: (res) => this.saveSuccess.emit({
-                id: res.data,
-                ...this.form.getRawValue(),
-                createdAt: new Date()
-            })
-        });
+        try {
+            await firstValueFrom(request$);
+
+            const response = await firstValueFrom(this.insuranceCompanySrv.search_by_id({ id: targetId }));
+            if (response.success && response.data) {
+                this.saveSuccess.emit(response.data);
+            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
+        } catch (error) {
+            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+            console.error(error);
+        }
     }
 
     resetForm() {

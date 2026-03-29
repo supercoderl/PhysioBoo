@@ -1,9 +1,10 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize } from "rxjs";
+import { finalize, firstValueFrom } from "rxjs";
 import { LabTestCategoryService } from "../../../../../../services/admin/lab-test-category.service";
 import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../../services/common/toast.service";
+import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { LabTestCategory } from "../../../../../../shared/types/laboratory-imaging";
 import { generateUUID } from "../../../../../../shared/utils/common";
@@ -179,26 +180,31 @@ export class CommonCategoryLabTestCategoryDrawerComponent implements OnChanges {
             })
     }
 
-    onSave() {
+    async onSave() {
         if (this.form.invalid) {
             this.toastSrv.error('Please check required fields');
             this.form.markAllAsTouched();
             return;
         }
 
-        const formData = { ...this.form.getRawValue(), id: this.currentId ?? generateUUID() }
+        const targetId = this.currentId ?? generateUUID();
+        const formData = { ...this.form.getRawValue(), id: targetId }
 
         const request$ = this.currentId
             ? this.labTestCategorySrv.update(formData)
             : this.labTestCategorySrv.create(formData);
 
-        request$.subscribe({
-            next: (res) => this.saveSuccess.emit({
-                id: res.data,
-                ...this.form.getRawValue(),
-                createdAt: new Date()
-            })
-        });
+        try {
+            await firstValueFrom(request$);
+
+            const response = await firstValueFrom(this.labTestCategorySrv.search_by_id({ id: targetId }));
+            if (response.success && response.data) {
+                this.saveSuccess.emit(response.data);
+            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
+        } catch (error) {
+            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+            console.error(error);
+        }
     }
 
     resetForm() {
@@ -218,6 +224,6 @@ export class CommonCategoryLabTestCategoryDrawerComponent implements OnChanges {
     }
 
     onDelete() {
-        if(this.currentId) this.delete.emit(this.currentId);
+        if (this.currentId) this.delete.emit(this.currentId);
     }
 }

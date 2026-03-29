@@ -1,9 +1,10 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize } from "rxjs";
+import { finalize, firstValueFrom } from "rxjs";
 import { SequenceTrackerService } from "../../../../../services/admin/sequence-tracker.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../services/common/toast.service";
+import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { SequenceTracker } from "../../../../../shared/types/system";
 import { generateUUID } from "../../../../../shared/utils/common";
@@ -206,10 +207,10 @@ export class SettingSequenceTrackerDrawerComponent implements OnChanges {
     }
 
     get previewSequence(): string {
-        const length = this.form.get('sequenceLength')?.value || 4;
-        const current = this.form.get('currentSequence')?.value || 1;
-        return current.toString().padStart(length, '0');
-    }
+        const length = this.form.get('sequenceLength')?.value || 4;
+        const current = this.form.get('currentSequence')?.value || 1;
+        return current.toString().padStart(length, '0');
+    }
 
     loadDetail(id: string) {
         this.form.disable();
@@ -232,26 +233,31 @@ export class SettingSequenceTrackerDrawerComponent implements OnChanges {
             })
     }
 
-    onSave() {
+    async onSave() {
         if (this.form.invalid) {
             this.toastSrv.error('Please check required fields');
             this.form.markAllAsTouched();
             return;
         }
 
-        const formData = { ...this.form.getRawValue(), id: this.currentId ?? generateUUID() }
+        const targetId = this.currentId ?? generateUUID();
+        const formData = { ...this.form.getRawValue(), id: targetId }
 
         const request$ = this.currentId
             ? this.sequenceTrackerSrv.update(formData)
             : this.sequenceTrackerSrv.create(formData);
 
-        request$.subscribe({
-            next: (res) => this.saveSuccess.emit({
-                id: res.data,
-                ...this.form.getRawValue(),
-                createdAt: new Date()
-            })
-        });
+        try {
+            await firstValueFrom(request$);
+
+            const response = await firstValueFrom(this.sequenceTrackerSrv.search_by_id({ id: targetId }));
+            if (response.success && response.data) {
+                this.saveSuccess.emit(response.data);
+            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
+        } catch (error) {
+            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+            console.error(error);
+        }
     }
 
     resetForm() {
@@ -274,6 +280,6 @@ export class SettingSequenceTrackerDrawerComponent implements OnChanges {
     }
 
     onDelete() {
-        if(this.currentId) this.delete.emit(this.currentId);
+        if (this.currentId) this.delete.emit(this.currentId);
     }
 }

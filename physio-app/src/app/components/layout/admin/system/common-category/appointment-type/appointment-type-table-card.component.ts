@@ -31,7 +31,17 @@ import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo
         (pageChange)="onPageClick($event)"
         [loading]="loadingSrv.isLoading('search')"
       >  
-        <ng-template appColumnDef="name" headerLabel="Name" headerClass="text-left" let-item>
+        <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
+
+        <ng-template 
+          appColumnDef="name" 
+          headerLabel="Name" 
+          headerClass="text-left" 
+          [sortable]="true" 
+          [draggable]="true" 
+          [hasActions]="true"
+          let-item
+        >
           <div class="flex items-center gap-3 overflow-hidden" (click)="onEditClick(item.id)">
             <div class="min-w-0 flex-1">
               <div class="truncate text-sm font-semibold text-danger cursor-pointer" [title]="item.name">
@@ -41,7 +51,7 @@ import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo
           </div>
         </ng-template>
 
-        <ng-template appColumnDef="code" headerLabel="Code" headerClass="text-left" let-item>
+        <ng-template appColumnDef="code" headerLabel="Code" headerClass="text-left" [sortable]="true" let-item>
           <div class="text-sm">{{ item.code }}</div>
         </ng-template>
 
@@ -57,7 +67,7 @@ import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo
           <div class="text-sm">{{ item.consultationFee }}</div>
         </ng-template>
 
-        <ng-template appColumnDef="actions" let-item cellClass="text-right">
+        <ng-template appColumnDef="actions" headerLabel="Actions" let-item headerClass="text-center" cellClass="text-center">
           <div class="relative">
             <boo-action-admin
               [items]="tableActions"

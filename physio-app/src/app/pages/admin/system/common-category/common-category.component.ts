@@ -9,7 +9,7 @@ import { Category } from "../../../../shared/types/category";
   standalone: true,
   imports: [
     SharedModule,
-    BooIconComponent
+    BooIconComponent 
   ],
   template: `
       <div class="z-10 flex h-full flex-auto flex-col">

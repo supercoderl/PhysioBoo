@@ -1,9 +1,7 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { catchError, of, tap } from "rxjs";
+import { catchError, of } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
 import { CommonCategoryAppointmentTypeDrawerComponent } from "../../../../../components/layout/admin/system/common-category/appointment-type/appointment-type-drawer.component";
 import { CommonCategoryAppointmentTypeTableCardComponent } from "../../../../../components/layout/admin/system/common-category/appointment-type/appointment-type-table-card.component";
@@ -30,9 +28,7 @@ import { SortOption } from "../../../../../shared/types/sort";
         SharedModule,
         AdminContentHeaderComponent,
         BooButtonAdminComponent,
-        BooIconComponent,
         ButtonIconComponent,
-        BooInputComponent,
         BooSortAdminComponent,
         BooFilterAdminComponent,
         BooDateAdminComponent,
@@ -177,9 +173,9 @@ export class CommonCategoryAppointmentTypeListComponent implements OnInit {
             const isNotFirstPage = currentData.pageNumber > 1;
 
             if (isLastItemOnPage && isNotFirstPage) {
+                this.toastSrv.success("Deleted 1 item.");
                 this.appointmentTypeSrv.delete(id).subscribe({
                     next: () => {
-                        this.toastSrv.success("Deleted 1 item.");
                         this.params.pageNumber = currentData.pageNumber - 1;
                         this.loadAppointmentTypes();
                     },
@@ -201,9 +197,9 @@ export class CommonCategoryAppointmentTypeListComponent implements OnInit {
                 };
             });
 
+            this.toastSrv.success("Deleted 1 item.")
             this.appointmentTypeSrv.delete(id)
                 .pipe(
-                    tap(() => this.toastSrv.success("Deleted 1 item.")),
                     catchError(_ => {
                         this.toastSrv.error("System error occurred. Rolling back data...");
                         this.tableData.update(data => {

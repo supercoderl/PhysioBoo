@@ -3,20 +3,22 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ColumnDefDirective } from "../../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ActionItem, PaginationData } from "../../../../../shared/types/common";
-import { SequenceTracker } from "../../../../../shared/types/system";
+import { Doctor } from "../../../../../shared/types/medical-staff";
 import { ColorUtils } from "../../../../../shared/utils/color.utils";
+import { BooAvatarComponent } from "../../../../image/avatar/boo-avatar.component";
 import { BooActionAdminComponent } from "../../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-table-admin.component";
 
 @Component({
-  selector: 'setting-sequence-tracker-table-card',
+  selector: 'cms-doctor-table-card',
   standalone: true,
   imports: [
     SharedModule,
     BooTableAdminComponent,
     ColumnDefDirective,
-    BooActionAdminComponent
-  ],
+    BooActionAdminComponent,
+    BooAvatarComponent
+],
   template: `
     <div class="bg-surface rounded-[6px] border border-gray-200 h-full overflow-hidden">
       <boo-table-admin 
@@ -29,26 +31,79 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
         (pageChange)="onPageClick($event)"
         [loading]="loadingSrv.isLoading('search')"
       >  
-        <ng-template appColumnDef="entityType" headerLabel="Entity" headerClass="text-left" let-item>
+        <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
+
+        <ng-template appColumnDef="avatar" headerLabel="Avatar" headerClass="text-left" [sortable]="true" let-item>
+          <boo-avatar [src]="item.avatar" />
+        </ng-template>
+
+        <ng-template 
+          appColumnDef="fullName" 
+          headerLabel="Name" 
+          headerClass="text-left" 
+          [sortable]="true" 
+          [draggable]="true" 
+          [hasActions]="true"
+          let-item
+        >
           <div class="flex items-center gap-3 overflow-hidden" (click)="onEditClick(item.id)">
             <div class="min-w-0 flex-1">
-              <div class="truncate text-sm font-semibold text-danger cursor-pointer" [title]="item.entityType">
-                {{ item.entityType }}
+              <div class="truncate text-sm font-semibold text-danger cursor-pointer" [title]="item.fullName">
+                {{ item.fullName }}
               </div>
             </div>
           </div>
         </ng-template>
 
-        <ng-template appColumnDef="prefix" headerLabel="Prefix" headerClass="text-left" let-item>
-          <div class="text-sm">{{ item.prefix }}</div>
+        <ng-template 
+            appColumnDef="employeeId" 
+            headerLabel="Emp Id" 
+            headerClass="text-left" 
+            [sortable]="true" 
+            [draggable]="true" 
+            [hasActions]="true"
+            let-item
+        >
+          <div class="text-sm">{{ item.employeeId }}</div>
         </ng-template>
 
-        <ng-template appColumnDef="sequenceLength" headerLabel="Length" headerClass="text-right" cellClass="text-right" let-item>
-          <div class="text-sm">{{ item.sequenceLength }}</div>
+        <ng-template 
+            appColumnDef="yearsOfExperience" 
+            headerLabel="Exp" 
+            headerClass="text-right" 
+            cellClass="text-right" 
+            [sortable]="true" 
+            [draggable]="true" 
+            [hasActions]="true"
+            let-item
+        >
+          <div class="text-sm">{{ item.yearsOfExperience }}</div>
         </ng-template>
 
-        <ng-template appColumnDef="currentSequence" headerLabel="Current" headerClass="text-right" cellClass="text-right" let-item>
-          <div class="text-sm">{{ item.currentSequence }}</div>
+        <ng-template 
+            appColumnDef="followUpFee" 
+            headerLabel="Fee" 
+            headerClass="text-center" 
+            cellClass="text-center" 
+            [sortable]="true" 
+            [draggable]="true" 
+            [hasActions]="true"
+            let-item
+        >
+          <div class="text-sm">{{ item.followUpFee }}</div>
+        </ng-template>
+
+        <ng-template 
+            appColumnDef="successRate" 
+            headerLabel="Success Rate" 
+            headerClass="text-right" 
+            cellClass="text-right" 
+            [sortable]="true" 
+            [draggable]="true" 
+            [hasActions]="true"
+            let-item
+        >
+          <div class="text-sm">{{ item.successRate }}</div>
         </ng-template>
 
         <ng-template appColumnDef="actions" headerLabel="Actions" let-item headerClass="text-center" cellClass="text-center">
@@ -70,9 +125,9 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
     }
   `]
 })
-export class SettingSequenceTrackerTableCardComponent {
+export class CmsDoctorTableCardComponent {
   // #region Inputs, Outputs, Properties
-  @Input() data: PaginationData<SequenceTracker> | null = null;
+  @Input() data: PaginationData<Doctor> | null = null;
   @Input() filter!: { pageNumber: number, pageSize: number };
   @Output() pageChange = new EventEmitter<number>();
   @Output() editClick = new EventEmitter<string>();

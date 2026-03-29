@@ -25,13 +25,27 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasForeignKey(p => p.DoctorId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasOne(p => p.Creator)
+                   .WithMany(u => u.CreatedDoctorPublications)
+                   .HasForeignKey(p => p.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(p => p.Updater)
+                  .WithMany(u => u.UpdatedDoctorPublications)
+                  .HasForeignKey(p => p.UpdatedBy)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(p => p.HospitalGroup)
+                   .WithMany(hg => hg.DoctorPublications)
+                   .HasForeignKey(p => p.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(p => p.Title)
                    .IsRequired();
 
             builder.Property(p => p.PublicationType)
                    .HasConversion<string>()
-                   .HasMaxLength(50)
                    .IsRequired();
 
             builder.Property(p => p.JournalName)
@@ -73,9 +87,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(p => p.PdfUrl)
                    .HasMaxLength(500);
-
-            builder.Property(p => p.CreatedAt)
-                   .IsRequired();
         }
     }
 }

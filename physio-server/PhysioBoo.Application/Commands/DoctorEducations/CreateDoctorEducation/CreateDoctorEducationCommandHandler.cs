@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.DoctorEducations.CreateDoctorEducation
     public sealed class CreateDoctorEducationCommandHandler : CommandHandlerBase, IRequestHandler<CreateDoctorEducationCommand>
     {
         private readonly IDoctorCertificationRepository _doctorCertificationRepository;
+        private readonly IUser _user;
 
         public CreateDoctorEducationCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IDoctorCertificationRepository doctorCertificationRepository
+            IDoctorCertificationRepository doctorCertificationRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _doctorCertificationRepository = doctorCertificationRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateDoctorEducationCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            SharedKernel.Results.DbResult<Guid> result = await _doctorCertificationRepository.InsertAsync<DoctorEducation, Guid>(new DoctorEducation(
+            DoctorEducation newDoctorEducation = new DoctorEducation(
                 request.NewDoctorEducation.Id,
                 request.NewDoctorEducation.DoctorId,
                 request.NewDoctorEducation.DegreeType,
@@ -44,7 +47,12 @@ namespace PhysioBoo.Application.Commands.DoctorEducations.CreateDoctorEducation
                 request.NewDoctorEducation.ThesisTitle,
                 request.NewDoctorEducation.ThesisGuide,
                 request.NewDoctorEducation.VerificationDocumentUrl
-            ));
+            );
+
+            newDoctorEducation.SetTenantId(_user.GetTenantId());
+            newDoctorEducation.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _doctorCertificationRepository.InsertAsync<DoctorEducation, Guid>(newDoctorEducation);
 
             if (!result.Success)
             {

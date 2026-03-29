@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.DoctorAwards.CreateDoctorAward
     public sealed class CreateDoctorAwardCommandHandler : CommandHandlerBase, IRequestHandler<CreateDoctorAwardCommand>
     {
         private readonly IDoctorAwardRepository _doctorAwardRepository;
+        private readonly IUser _user;
 
         public CreateDoctorAwardCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IDoctorAwardRepository doctorAwardRepository
+            IDoctorAwardRepository doctorAwardRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _doctorAwardRepository = doctorAwardRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateDoctorAwardCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            SharedKernel.Results.DbResult<Guid> result = await _doctorAwardRepository.InsertAsync<DoctorAward, Guid>(new DoctorAward(
+            DoctorAward newDoctorAward = new DoctorAward(
                 request.NewDoctorAward.Id,
                 request.NewDoctorAward.DoctorId,
                 request.NewDoctorAward.AwardName,
@@ -38,7 +41,12 @@ namespace PhysioBoo.Application.Commands.DoctorAwards.CreateDoctorAward
                 request.NewDoctorAward.MonetaryValue,
                 request.NewDoctorAward.CertificateUrl,
                 request.NewDoctorAward.MediaCoverageUrl
-            ));
+            );
+
+            newDoctorAward.SetTenantId(_user.GetTenantId());
+            newDoctorAward.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _doctorAwardRepository.InsertAsync<DoctorAward, Guid>(newDoctorAward);
 
             if (!result.Success)
             {

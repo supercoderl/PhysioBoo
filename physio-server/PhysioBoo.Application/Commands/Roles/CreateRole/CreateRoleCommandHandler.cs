@@ -32,7 +32,8 @@ namespace PhysioBoo.Application.Commands.Roles.CreateRole
                 request.NewRole.Description,
                 request.NewRole.Color,
                 request.NewRole.Icon,
-                request.UserId
+                false,
+                false
             ));
 
             if (!result.Success)

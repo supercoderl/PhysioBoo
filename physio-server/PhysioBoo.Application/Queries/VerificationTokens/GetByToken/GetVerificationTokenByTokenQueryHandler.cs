@@ -52,8 +52,7 @@ namespace PhysioBoo.Application.Queries.VerificationTokens.GetByToken
                         token.UserId,
                         !reader.IsDBNull("UserEmail") ? reader.GetString("UserEmail") : string.Empty,
                         string.Empty,
-                        string.Empty,
-                        null
+                        string.Empty
                     ));
 
                     return token;

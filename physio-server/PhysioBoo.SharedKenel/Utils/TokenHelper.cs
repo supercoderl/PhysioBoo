@@ -144,7 +144,8 @@ namespace PhysioBoo.SharedKernel.Utils
             {
                 new Claim(ClaimTypes.Email, claimDatas["Email"]),
                 new Claim(ClaimTypes.NameIdentifier, claimDatas["Id"]),
-                new Claim(ClaimTypes.Name, claimDatas["Name"])
+                new Claim(ClaimTypes.Name, claimDatas["Name"]),
+                new Claim("TenantId", claimDatas["TenantId"])
             };
 
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));

@@ -12,7 +12,7 @@ namespace PhysioBoo.Application.ViewModels.Sys_SequenceTrackers
         public int CurrentSequence { get; set; }
         public string? Suffix { get; set; }
         public DateTime CreatedAt { get; set; }
-        public Guid CreatedBy { get; set; }
+        public Guid? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public Guid? UpdatedBy { get; set; }
 

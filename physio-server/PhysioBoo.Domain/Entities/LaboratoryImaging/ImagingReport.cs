@@ -1,12 +1,12 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.LaboratoryImaging
 {
-    public class ImagingReport : Entity
+    public class ImagingReport : TenantEntity
     {
         #region Core Imaging Report Table (27)
         public string ReportNumber { get; private set; }
@@ -35,19 +35,13 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public string? DicomStudyUid { get; private set; }
         public string? ReportPdfUrl { get; private set; }
         public string? ImagesUrl { get; private set; }
-        public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey("ImagingOrderId")]
-        [InverseProperty("ImagingReports")]
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         public virtual ImagingOrder? ImagingOrder { get; private set; }
-
-        [ForeignKey("PatientId")]
-        [InverseProperty("ImagingReports")]
         public virtual Patient? Patient { get; private set; }
-
-        [ForeignKey("RadiologistId")]
-        [InverseProperty("ImagingReports")]
         public virtual User? Radiologist { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (27)
@@ -94,7 +88,6 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
             StudyDate = DateOnly.FromDateTime(TimeZoneHelper.GetLocalTimeNow());
             StudyTime = TimeOnly.FromDateTime(TimeZoneHelper.GetLocalTimeNow());
             Status = ReportStatus.Draft;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
             ImagesCount = 0;
             IsCritical = false;
             IsNormal = false;
@@ -130,7 +123,6 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public void SetImagesUrl(string? imagesUrl) { ImagesUrl = imagesUrl; }
         public void SetStudyDate(DateOnly studyDate) { StudyDate = studyDate; }
         public void SetStudyTime(TimeOnly studyTime) { StudyTime = studyTime; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         #endregion
     }
 }

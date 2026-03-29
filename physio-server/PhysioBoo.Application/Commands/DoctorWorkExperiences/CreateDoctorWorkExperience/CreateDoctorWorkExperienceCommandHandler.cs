@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.DoctorWorkExperiences.CreateDoctorWorkE
     public sealed class CreateDoctorWorkExperienceCommandHandler : CommandHandlerBase, IRequestHandler<CreateDoctorWorkExperienceCommand>
     {
         private readonly IDoctorWorkExperienceRepository _doctorWorkExperienceRepository;
+        private readonly IUser _user;
 
         public CreateDoctorWorkExperienceCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IDoctorWorkExperienceRepository doctorWorkExperienceRepository
+            IDoctorWorkExperienceRepository doctorWorkExperienceRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _doctorWorkExperienceRepository = doctorWorkExperienceRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateDoctorWorkExperienceCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            SharedKernel.Results.DbResult<Guid> result = await _doctorWorkExperienceRepository.InsertAsync<DoctorWorkExperience, Guid>(new DoctorWorkExperience(
+            DoctorWorkExperience newDoctorWorkExperience = new DoctorWorkExperience(
                 request.NewDoctorWorkExperience.Id,
                 request.NewDoctorWorkExperience.DoctorId,
                 request.NewDoctorWorkExperience.PositionTitle,
@@ -43,7 +46,12 @@ namespace PhysioBoo.Application.Commands.DoctorWorkExperiences.CreateDoctorWorkE
                 request.NewDoctorWorkExperience.ReasonForLeaving,
                 request.NewDoctorWorkExperience.SupervisorName,
                 request.NewDoctorWorkExperience.SupervisorContact
-            ));
+            );
+
+            newDoctorWorkExperience.SetTenantId(_user.GetTenantId());
+            newDoctorWorkExperience.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _doctorWorkExperienceRepository.InsertAsync<DoctorWorkExperience, Guid>(newDoctorWorkExperience);
 
             if (!result.Success)
             {

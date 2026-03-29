@@ -11,22 +11,25 @@ namespace PhysioBoo.Application.Commands.LabReports.CreateLabReport
     public sealed class CreateLabReportCommandHandler : CommandHandlerBase, IRequestHandler<CreateLabReportCommand>
     {
         private readonly ILabReportRepository _labReportRepository;
+        private readonly IUser _user;
 
         public CreateLabReportCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            ILabReportRepository labReportRepository
+            ILabReportRepository labReportRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _labReportRepository = labReportRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateLabReportCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            SharedKernel.Results.DbResult<Guid> result = await _labReportRepository.InsertAsync<LabReport, Guid>(new LabReport(
+            LabReport newLabReport = new LabReport(
                 request.NewLabReport.Id,
                 TextHelper.GenerateEntityNumber("REP"),
                 request.NewLabReport.LabOrderId,
@@ -43,7 +46,12 @@ namespace PhysioBoo.Application.Commands.LabReports.CreateLabReport
                 request.NewLabReport.ReportPdfUrl,
                 request.NewLabReport.DeliveredAt,
                 request.NewLabReport.DeliveryMethod
-            ));
+            );
+
+            newLabReport.SetTenantId(_user.GetTenantId());
+            newLabReport.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _labReportRepository.InsertAsync<LabReport, Guid>(newLabReport);
 
             if (!result.Success)
             {

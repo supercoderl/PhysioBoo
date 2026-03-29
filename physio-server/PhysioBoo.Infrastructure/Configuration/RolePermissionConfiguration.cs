@@ -32,10 +32,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(rp => rp.PermissionId)
                    .IsRequired();
-
-            builder.Property(rp => rp.CreatedAt)
-                .IsRequired()
-                .HasColumnType("timestamp without time zone");
         }
     }
 }

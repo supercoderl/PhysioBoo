@@ -22,11 +22,13 @@ namespace PhysioBoo.Infrastructure.Configuration
             // Self-relationships
             builder.HasOne(r => r.Creator)
                    .WithMany(u => u.CreatedRoles)
-                   .HasForeignKey(u => u.CreatedBy);
+                   .HasForeignKey(r => r.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasOne(r => r.Updater)
                    .WithMany(u => u.UpdatedRoles)
-                   .HasForeignKey(u => u.UpdatedBy);
+                   .HasForeignKey(r => r.UpdatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
 
             // Properties
             builder.Property(r => r.Name)
@@ -53,15 +55,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(r => r.IsPublicForRegistration)
                     .IsRequired();
-
-            builder.Property(r => r.CreatedAt)
-                .IsRequired()
-                .HasColumnType("timestamp without time zone");
-            builder.Property(r => r.CreatedBy);
-
-            builder.Property(r => r.UpdatedAt)
-                .HasColumnType("timestamp without time zone");
-            builder.Property(r => r.UpdatedBy);
         }
     }
 }

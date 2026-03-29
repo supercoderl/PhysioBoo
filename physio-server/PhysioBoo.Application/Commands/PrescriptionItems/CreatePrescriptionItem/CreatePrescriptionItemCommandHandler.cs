@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.PrescriptionItems.CreatePrescriptionIte
     public sealed class CreatePrescriptionItemCommandHandler : CommandHandlerBase, IRequestHandler<CreatePrescriptionItemCommand>
     {
         private readonly IPrescriptionItemRepository _prescriptionItemRepository;
+        private readonly IUser _user;
 
         public CreatePrescriptionItemCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IPrescriptionItemRepository prescriptionItemRepository
+            IPrescriptionItemRepository prescriptionItemRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _prescriptionItemRepository = prescriptionItemRepository;
+            _user = user;
         }
 
         public async Task Handle(CreatePrescriptionItemCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _prescriptionItemRepository.InsertAsync<PrescriptionItem, Guid>(new PrescriptionItem(
+            PrescriptionItem newPrescriptionItem = new PrescriptionItem(
                 request.NewPrescriptionItem.Id,
                 request.NewPrescriptionItem.PrescriptionId,
                 request.NewPrescriptionItem.MedicineId,
@@ -40,7 +43,12 @@ namespace PhysioBoo.Application.Commands.PrescriptionItems.CreatePrescriptionIte
                 request.NewPrescriptionItem.RouteOfAdministration,
                 request.NewPrescriptionItem.SpecialInstructions,
                 request.NewPrescriptionItem.PricePerUnit
-            ));
+            );
+
+            newPrescriptionItem.SetTenantId(_user.GetTenantId());
+            newPrescriptionItem.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _prescriptionItemRepository.InsertAsync<PrescriptionItem, Guid>(newPrescriptionItem);
 
             if (!result.Success)
             {

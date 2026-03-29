@@ -33,6 +33,21 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(h => h.PatientMedicalHistories)
                    .HasForeignKey(m => m.DiagnosisHospitalId);
 
+            builder.HasOne(m => m.Creator)
+                   .WithMany(u => u.CreatedPatientMedicalHistories)
+                   .HasForeignKey(m => m.CreatedBy)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(m => m.Updater)
+                   .WithMany(u => u.UpdatedPatientMedicalHistories)
+                   .HasForeignKey(m => m.UpdatedBy)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(m => m.HospitalGroup)
+                   .WithMany(hg => hg.PatientMedicalHistories)
+                   .HasForeignKey(m => m.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(m => m.ConditionName)
                    .IsRequired()
@@ -48,12 +63,10 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(m => m.Severity)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
 
             builder.Property(m => m.CurrentStatus)
                    .HasConversion<string>()
-                   .HasMaxLength(30)
                    .IsRequired();
 
             builder.Property(m => m.TreatmentSummary);
@@ -64,11 +77,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(m => m.NextReviewDate);
             builder.Property(m => m.Notes);
-
-            builder.Property(m => m.CreatedAt)
-                   .IsRequired();
-
-            builder.Property(m => m.UpdatedAt);
         }
     }
 }

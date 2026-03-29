@@ -1,11 +1,11 @@
-﻿using PhysioBoo.Domain.Entities.Support;
+﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
+using PhysioBoo.Domain.Entities.Support;
 using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Clinical
 {
-    public class Medicine : Entity
+    public class Medicine : TenantEntity
     {
         #region Core Medicine Table (48)
         public string Name { get; private set; }
@@ -54,21 +54,15 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public string? ApprovalNumber { get; private set; }
         public DateOnly? ApprovalDate { get; private set; }
         public bool IsActive { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey(nameof(CategoryId))]
-        [InverseProperty(nameof(Category.Medicines))]
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         public virtual MedicineCategory? Category { get; private set; }
-
-        [ForeignKey(nameof(ManufacturerId))]
-        [InverseProperty(nameof(Manufacturer.Medicines))]
         public virtual Manufacturer? Manufacturer { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty(nameof(Medicine))]
         public virtual ICollection<MedicineInventory> MedicineInventories { get; private set; } = new List<MedicineInventory>();
 
-        [InverseProperty(nameof(Medicine))]
         public virtual ICollection<PrescriptionItem> PrescriptionItems { get; private set; } = new List<PrescriptionItem>();
         #endregion
 
@@ -161,8 +155,6 @@ namespace PhysioBoo.Domain.Entities.Clinical
             ApprovalNumber = approvalNumber;
             ApprovalDate = approvalDate;
             IsActive = true;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -213,8 +205,6 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public void SetApprovalNumber(string? approvalNumber) { ApprovalNumber = approvalNumber; }
         public void SetApprovalDate(DateOnly? approvalDate) { ApprovalDate = approvalDate; }
         public void SetIsActive(bool isActive) { IsActive = isActive; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

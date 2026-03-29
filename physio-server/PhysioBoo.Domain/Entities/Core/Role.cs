@@ -1,9 +1,6 @@
-﻿using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace PhysioBoo.Domain.Entities.Core
+﻿namespace PhysioBoo.Domain.Entities.Core
 {
-    public class Role : Entity
+    public class Role : AuditEntity
     {
         #region Core Role Table (11)
         public string Name { get; private set; }
@@ -14,24 +11,12 @@ namespace PhysioBoo.Domain.Entities.Core
         public bool IsSystemRole { get; private set; }
         public bool IsActive { get; private set; }
         public bool IsPublicForRegistration { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public Guid CreatedBy { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
-        public Guid? UpdatedBy { get; private set; }
 
-        [ForeignKey("CreatedBy")]
-        [InverseProperty("CreatedRoles")]
         public virtual User? Creator { get; private set; }
-
-        [ForeignKey("UpdatedBy")]
-        [InverseProperty("UpdatedRoles")]
         public virtual User? Updater { get; private set; }
 
-        [InverseProperty("Role")]
-        public virtual ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
-
-        [InverseProperty("Role")]
         public virtual ICollection<RolePermission> RolePermissions { get; private set; } = new List<RolePermission>();
+        public virtual ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
         #endregion
 
         #region Constructor (10)
@@ -42,7 +27,8 @@ namespace PhysioBoo.Domain.Entities.Core
             string? description,
             string? color,
             string? icon,
-            Guid createdBy
+            bool isSystemRole = false,
+            bool isPublicForRegistration = false
         ) : base(id)
         {
             Name = name;
@@ -51,11 +37,8 @@ namespace PhysioBoo.Domain.Entities.Core
             Color = color;
             Icon = icon;
             IsActive = true;
-            IsPublicForRegistration = false;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            CreatedBy = createdBy;
-            UpdatedAt = null;
-            UpdatedBy = null;
+            IsSystemRole = isSystemRole;
+            IsPublicForRegistration = isPublicForRegistration;
         }
         #endregion
 
@@ -68,10 +51,6 @@ namespace PhysioBoo.Domain.Entities.Core
         public void SetIsSystemRole(bool isSystemRole) { IsSystemRole = isSystemRole; }
         public void SetIsPublicForRegistration(bool isPublicForRegistration) { IsPublicForRegistration = isPublicForRegistration; }
         public void SetIsActive(bool isActive) { IsActive = isActive; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetCreatedBy(Guid createdBy) { CreatedBy = createdBy; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
-        public void SetUpdatedBy(Guid? updatedBy) { UpdatedBy = updatedBy; }
         #endregion
     }
 }

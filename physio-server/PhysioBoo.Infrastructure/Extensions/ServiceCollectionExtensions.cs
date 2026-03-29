@@ -6,9 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 using PhysioBoo.Domain.DomainEvents;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
+using PhysioBoo.Domain.Interfaces.Seeding;
 using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Infrastructure.BackgroundJobs;
 using PhysioBoo.Infrastructure.Database;
+using PhysioBoo.Infrastructure.Database.Seeding;
 using PhysioBoo.Infrastructure.Email;
 using PhysioBoo.Infrastructure.EventSourcing;
 using PhysioBoo.Infrastructure.Outbox;
@@ -106,6 +108,9 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<ISys_DeviceRepository, Sys_DeviceRepository>();
             services.AddScoped<ISys_AppVersionRepository, Sys_AppVersionRepository>();
             services.AddScoped<ISys_SequenceTrackerRepository, Sys_SequenceTrackerRepository>();
+            services.AddScoped<IPrintTemplateRepository, PrintTemplateRepository>();
+            services.AddScoped<IPrintTemplateVersionRepository, PrintTemplateVersionRepository>();
+            services.AddScoped<IPrintLogRepository, PrintLogRepository>();
 
             return services;
         }
@@ -145,6 +150,12 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddSingleton(new Cloudinary(account));
             #endregion
 
+            return services;
+        }
+
+        public static IServiceCollection AddSeedingSerivce(this IServiceCollection services)
+        {
+            services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
             return services;
         }
     }

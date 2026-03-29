@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.Departments.CreateDepartment
     public sealed class CreateDepartmentCommandHandler : CommandHandlerBase, IRequestHandler<CreateDepartmentCommand>
     {
         private readonly IDepartmentRepository _departmentRepository;
+        private readonly IUser _user;
 
         public CreateDepartmentCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IDepartmentRepository departmentRepository
+            IDepartmentRepository departmentRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _departmentRepository = departmentRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateDepartmentCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _departmentRepository.InsertAsync<Department, Guid>(new Department(
+            Department newDepartment = new Department(
                 request.NewDepartment.Id,
                 request.NewDepartment.HospitalId,
                 request.NewDepartment.Name,
@@ -39,7 +42,12 @@ namespace PhysioBoo.Application.Commands.Departments.CreateDepartment
                 request.NewDepartment.BudgetAllocated,
                 request.NewDepartment.OperationHours,
                 request.NewDepartment.EquipmentList
-            ));
+            );
+
+            newDepartment.SetTenantId(_user.GetTenantId());
+            newDepartment.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _departmentRepository.InsertAsync<Department, Guid>(newDepartment);
 
             if (!result.Success)
             {

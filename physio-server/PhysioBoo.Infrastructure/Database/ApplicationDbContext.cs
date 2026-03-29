@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using PhysioBoo.Domain.Entities;
 using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
@@ -12,6 +13,7 @@ using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Infrastructure.Configuration;
 using PhysioBoo.Infrastructure.Entries;
 using PhysioBoo.Infrastructure.Outbox;
+using System.Reflection;
 
 namespace PhysioBoo.Infrastructure.Database
 {
@@ -81,6 +83,9 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<Sys_AppVersion> Sys_AppVersions { get; set; } = null!;
         public DbSet<Sys_AuditLog> Sys_AuditLogs { get; set; } = null!;
         public DbSet<Sys_SequenceTracker> Sys_SequenceTrackers { get; set; } = null!;
+        public DbSet<PrintTemplate> PrintTemplates { get; set; } = null!;
+        public DbSet<PrintTemplateVersion> PrintTemplateVersions { get; set; } = null!;
+        public DbSet<PrintLog> PrintLogs { get; set; } = null!;
         #endregion
 
         public ApplicationDbContext(
@@ -95,6 +100,7 @@ namespace PhysioBoo.Infrastructure.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             foreach (Microsoft.EntityFrameworkCore.Metadata.IMutableEntityType entity in modelBuilder.Model.GetEntityTypes())
             {
                 if (entity.ClrType == typeof(OutboxMessage))
@@ -102,7 +108,12 @@ namespace PhysioBoo.Infrastructure.Database
                     continue;
                 }
 
-                modelBuilder.Entity(entity.ClrType).HasQueryFilter(DbContextUtility.GetIsDeletedRestriction(entity.ClrType));
+                if (typeof(TenantEntity).IsAssignableFrom(entity.ClrType))
+                {
+                    MethodInfo? method = typeof(ApplicationDbContext).GetMethod(nameof(ApplyGlobalFilters), BindingFlags.NonPublic | BindingFlags.Instance)
+                                                             ?.MakeGenericMethod(entity.ClrType);
+                    method?.Invoke(this, new object[] { modelBuilder });
+                }
             }
 
             base.OnModelCreating(modelBuilder);
@@ -117,6 +128,8 @@ namespace PhysioBoo.Infrastructure.Database
             }
         }
 
+        internal Task<int> SaveSeedChangesAsync(CancellationToken cancellationToken = default) => base.SaveChangesAsync(cancellationToken);
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // Enable triggers
@@ -128,6 +141,7 @@ namespace PhysioBoo.Infrastructure.Database
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             Guid userId = _user.GetUserId();
+            OnTrackingTenant(_user.GetTenantId());
 
             List<AuditEntry> auditEntries = OnBeforeSaveChanges(userId);
 
@@ -200,6 +214,10 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new Sys_DeviceConfiguration());
             builder.ApplyConfiguration(new Sys_AppVersionConfiguration());
             builder.ApplyConfiguration(new Sys_AuditLogConfiguration());
+            builder.ApplyConfiguration(new Sys_SequenceTrackerConfiguration());
+            builder.ApplyConfiguration(new PrintTemplateConfiguration());
+            builder.ApplyConfiguration(new PrintTemplateVersionConfiguration());
+            builder.ApplyConfiguration(new PrintLogConfiguration());
         }
 
         private List<AuditEntry> OnBeforeSaveChanges(Guid userId)
@@ -342,6 +360,45 @@ namespace PhysioBoo.Infrastructure.Database
             if (hasNewAuditLogs)
             {
                 await base.SaveChangesAsync();
+            }
+        }
+
+        private void OnTrackingTenant(Guid tenantId)
+        {
+            foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<TenantEntity> entry in ChangeTracker.Entries<TenantEntity>())
+            {
+                // 1. Audit Logging (Applies to EVERYTHING)
+                if (entry.State == EntityState.Added)
+                {
+                    if (entry.Entity is TenantEntity tenantEntity)
+                    {
+                        if (tenantId == Guid.Empty)
+                            throw new Exception("Cannot save patient data without an active hospital session!");
+
+                        tenantEntity.TenantId = tenantId;
+                    }
+                }
+            }
+        }
+
+        private void ApplyGlobalFilters<T>(ModelBuilder builder) where T : class
+        {
+            bool isTenant = typeof(TenantEntity).IsAssignableFrom(typeof(T));
+            bool isSoftDelete = typeof(Entity).IsAssignableFrom(typeof(T));
+
+            if (isTenant && isSoftDelete)
+            {
+                builder.Entity<T>().HasQueryFilter(e =>
+                        ((TenantEntity)(object)e).TenantId == _user.GetTenantId() &&
+                        ((Entity)(object)e).DeletedAt == null);
+            }
+            else if (isTenant)
+            {
+                builder.Entity<T>().HasQueryFilter(e => ((TenantEntity)(object)e).TenantId == _user.GetTenantId());
+            }
+            else if (isSoftDelete)
+            {
+                builder.Entity<T>().HasQueryFilter(e => ((Entity)(object)e).DeletedAt == null);
             }
         }
     }

@@ -23,12 +23,12 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.HasOne(am => am.Creator)
                    .WithMany(u => u.CreatedMenus)
                    .HasForeignKey(am => am.CreatedBy)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasOne(am => am.Updater)
                    .WithMany(u => u.UpdatedMenus)
                    .HasForeignKey(am => am.UpdatedBy)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.SetNull);
 
             // Properties
             builder.Property(am => am.Label)
@@ -51,18 +51,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(am => am.Route)
                    .IsRequired();
-
-            builder.Property(am => am.CreatedAt)
-                   .IsRequired();
-
-            builder.Property(am => am.CreatedBy)
-                   .IsRequired();
-
-            builder.Property(am => am.UpdatedAt)
-                   .IsRequired(false);
-
-            builder.Property(am => am.UpdatedBy)
-                    .IsRequired(false);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using PhysioBoo.Domain.Entities.Clinical;
+﻿using NpgsqlTypes;
+using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.Operation;
@@ -9,7 +10,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
 {
-    public class Doctor : Entity
+    public class Doctor : TenantEntity
     {
         #region Core Doctor Table (46)
         public string? EmployeeId { get; private set; }
@@ -46,7 +47,10 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public int AdvanceBookingDays { get; private set; }
         public string? CancellationPolicy { get; private set; }
         public string[] PaymentMethods { get; private set; }
+
+        [Column("BankAccountDetails", TypeName = "jsonb")]
         public string? BankAccountDetails { get; private set; }
+
         public string? PanNumber { get; private set; }
         public string? Gstin { get; private set; }
         public DateTime? JoiningDate { get; private set; }
@@ -56,79 +60,36 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public bool IsVerified { get; private set; }
         public TimeOnly? VerificationDate { get; private set; }
         public Guid? VerifiedBy { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("PrimarySpecialtyId")]
-        [InverseProperty("Doctors")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public NpgsqlTsVector? SearchVector { get; private set; }
+
+        public virtual User? CreatedByUser { get; private set; }
+        public virtual User? UpdatedByUser { get; private set; }
         public virtual DoctorSpecialty? PrimarySpecialty { get; private set; }
-
-        [ForeignKey("VerifiedBy")]
-        [InverseProperty("VerifiedDoctors")]
         public virtual User? VerifiedByUser { get; private set; }
-
-        [ForeignKey("Id")]
-        [InverseProperty(nameof(Doctor))]
         public virtual User? User { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty("Doctor")]
         public virtual ICollection<Appointment> Appointments { get; private set; } = new List<Appointment>();
-
-        [InverseProperty("ReferringDoctor")]
         public virtual ICollection<Appointment> ReferredAppointments { get; private set; } = new List<Appointment>();
-
-        [InverseProperty("Doctor")]
         public virtual ICollection<DoctorAward> Awards { get; private set; } = new List<DoctorAward>();
-
-        [InverseProperty("Doctor")]
         public virtual ICollection<DoctorCertification> Certifications { get; private set; } = new List<DoctorCertification>();
-
-        [InverseProperty("Doctor")]
         public virtual ICollection<DoctorEducation> Educations { get; private set; } = new List<DoctorEducation>();
-
-        [InverseProperty("Doctor")]
         public virtual ICollection<DoctorLeave> Leaves { get; private set; } = new List<DoctorLeave>();
-
-        [InverseProperty("SubstituteDoctor")]
         public virtual ICollection<DoctorLeave> SubstitutedLeaves { get; private set; } = new List<DoctorLeave>();
-
-        [InverseProperty("Doctor")]
         public virtual ICollection<DoctorPublication> Publications { get; private set; } = new List<DoctorPublication>();
-
-        [InverseProperty("Doctor")]
         public virtual ICollection<DoctorSchedule> Schedules { get; private set; } = new List<DoctorSchedule>();
-
-        [InverseProperty("Doctor")]
         public virtual ICollection<DoctorSpecialty> Specialties { get; private set; } = new List<DoctorSpecialty>();
-
-        [InverseProperty("Doctor")]
         public virtual ICollection<DoctorWorkExperience> WorkExperiences { get; private set; } = new List<DoctorWorkExperience>();
-
-        [InverseProperty("Doctor")]
         public virtual ICollection<ImagingOrder> ImagingOrders { get; private set; } = new List<ImagingOrder>();
-
-        [InverseProperty("Doctor")]
         public virtual ICollection<LabOrder> LabOrders { get; private set; } = new List<LabOrder>();
-
-        [InverseProperty("Doctor")]
         public virtual ICollection<LabReport> LabReports { get; private set; } = new List<LabReport>();
-
-        [InverseProperty("Doctor")]
         public virtual ICollection<MedicalRecord> MedicalRecords { get; private set; } = new List<MedicalRecord>();
-
-        [InverseProperty("PrimaryDoctor")]
         public virtual ICollection<Patient> Patients { get; private set; } = new List<Patient>();
-
-        [InverseProperty("ReferringDoctor")]
         public virtual ICollection<Patient> ReferredPatients { get; private set; } = new List<Patient>();
-
-        [InverseProperty("PreferredDoctor")]
         public virtual ICollection<Patient> PreferredPatients { get; private set; } = new List<Patient>();
-
-        [InverseProperty("DiagnosedDoctor")]
         public virtual ICollection<PatientMedicalHistory> DiagnosedHistories { get; private set; } = new List<PatientMedicalHistory>();
-
-        [InverseProperty("Doctor")]
         public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();
         #endregion
 
@@ -144,13 +105,9 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
             string? about,
             string? archivements,
             string? researchInterests,
-            string? cancellationPolicy,
             string? bankAccountDetails,
             string? panNumber,
-            string? gstin,
-            DateTime? terminationDate,
-            TimeOnly? verificationDate,
-            Guid? verifiedBy
+            string? gstin
         ) : base(id)
         {
             EmployeeId = employeeId;
@@ -185,20 +142,14 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
             ConsultationDuration = 30; // Default to 30 minutes, can be updated later
             BufferTime = 10; // Default to 0, can be updated later
             AdvanceBookingDays = 30; // Default to 30 days, can be updated later
-            CancellationPolicy = cancellationPolicy;
             PaymentMethods = new string[] { "Card" };
             BankAccountDetails = bankAccountDetails;
             PanNumber = panNumber;
             Gstin = gstin;
             JoiningDate = TimeZoneHelper.GetLocalTimeNow();
-            TerminationDate = terminationDate;
             EmploymentStatus = EmploymentStatus.Active; // Default to Active, can be updated later
             IsFeatured = false; // Default to false, can be updated later
             IsVerified = false; // Default to false, can be updated later
-            VerificationDate = verificationDate;
-            VerifiedBy = verifiedBy;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion (46)
 
@@ -247,8 +198,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public void SetIsVerified(bool isVerified) { IsVerified = isVerified; }
         public void SetVerificationDate(TimeOnly? verificationDate) { VerificationDate = verificationDate; }
         public void SetVerifiedBy(Guid? verifiedBy) { VerifiedBy = verifiedBy; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

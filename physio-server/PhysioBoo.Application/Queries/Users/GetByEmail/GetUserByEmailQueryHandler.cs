@@ -34,10 +34,13 @@ namespace PhysioBoo.Application.Queries.Users.GetByEmail
                         reader.GetFieldValue<Guid>("Id"),
                         reader.GetString("Email"),
                         reader.GetString("Phone"),
-                        reader.GetString("PasswordHash"),
-                        !reader.IsDBNull(reader.GetOrdinal("CreatedBy")) ? reader.GetFieldValue<Guid>("CreatedBy") : (Guid?)null
+                        reader.GetString("PasswordHash")
                     );
 
+                    if (!reader.IsDBNull(reader.GetOrdinal("CreatedBy")))
+                    {
+                        user.SetCreatedBy(reader.GetFieldValue<Guid>("CreatedBy"));
+                    }
                     user.SetAlternatePhone(reader.IsDBNull(reader.GetOrdinal("AlternatePhone")) ? null : reader.GetString("AlternatePhone"));
                     user.SetIsActive(reader.GetBoolean("IsActive"));
                     user.SetIsVerified(reader.GetBoolean("IsVerified"));
@@ -52,7 +55,6 @@ namespace PhysioBoo.Application.Queries.Users.GetByEmail
                     user.SetPreferredLanguage(reader.GetString("PreferredLanguage"));
                     user.SetTimeZone(reader.GetString("TimeZone"));
                     user.SetCreatedAt(reader.GetDateTime("CreatedAt"));
-                    user.SetCreatedBy(reader.IsDBNull(reader.GetOrdinal("CreatedBy")) ? null : reader.GetGuid("CreatedBy"));
                     user.SetUpdatedAt(reader.IsDBNull(reader.GetOrdinal("UpdatedAt")) ? null : reader.GetDateTime("UpdatedAt"));
                     user.SetUpdatedBy(reader.IsDBNull(reader.GetOrdinal("UpdatedBy")) ? null : reader.GetGuid("UpdatedBy"));
 

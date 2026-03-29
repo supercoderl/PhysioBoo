@@ -31,7 +31,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(v => v.Type)
                 .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
         }
     }

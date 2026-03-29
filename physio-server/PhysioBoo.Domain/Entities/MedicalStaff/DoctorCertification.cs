@@ -1,10 +1,10 @@
-﻿using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
+using PhysioBoo.Domain.Enums;
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
 {
-    public class DoctorCertification : Entity
+    public class DoctorCertification : TenantEntity
     {
         #region Core Doctor Certification Table (12)
         public Guid DoctorId { get; private set; }
@@ -18,11 +18,11 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public CertificationStatus Status { get; private set; }
         public string? VerificationUrl { get; private set; }
         public string? CertificateDocumentUrl { get; private set; }
-        public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey("DoctorId")]
-        [InverseProperty("Certifications")]
         public virtual Doctor? Doctor { get; private set; }
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor(12)
@@ -51,7 +51,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
             Status = CertificationStatus.Active;
             VerificationUrl = verificationUrl;
             CertificateDocumentUrl = certificateDocumentUrl;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
         }
         #endregion
 
@@ -67,7 +66,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public void SetStatus(CertificationStatus status) { Status = status; }
         public void SetVerificationUrl(string? verificationUrl) { VerificationUrl = verificationUrl; }
         public void SetCertificateDocumentUrl(string? certificateDocumentUrl) { CertificateDocumentUrl = certificateDocumentUrl; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         #endregion
     }
 }

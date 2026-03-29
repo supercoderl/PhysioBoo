@@ -7,6 +7,7 @@ namespace PhysioBoo.Application.ViewModels.VerificationTokens
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
+        public Guid TenantId { get; set; }
         public string Token { get; set; } = string.Empty;
         public DateTime ExpiresAt { get; set; }
         public bool IsUsed { get; set; }
@@ -19,6 +20,7 @@ namespace PhysioBoo.Application.ViewModels.VerificationTokens
             {
                 Id = verificationToken.Id,
                 UserId = verificationToken.UserId,
+                TenantId = verificationToken.User?.TenantId ?? Guid.Empty,
                 Token = verificationToken.Token,
                 ExpiresAt = verificationToken.ExpiresAt,
                 Type = verificationToken.Type,

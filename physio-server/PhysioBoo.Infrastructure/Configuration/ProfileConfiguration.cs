@@ -19,6 +19,21 @@ namespace PhysioBoo.Infrastructure.Configuration
                 .WithOne(u => u.Profile)
                 .HasForeignKey<Profile>(p => p.Id);
 
+            builder.HasOne(p => p.Creator)
+                   .WithMany(u => u.CreatedProfiles)
+                   .HasForeignKey(p => p.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(p => p.Updater)
+                   .WithMany(u => u.UpdatedProfiles)
+                   .HasForeignKey(p => p.UpdatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(p => p.HospitalGroup)
+                   .WithMany(h => h.Profiles)
+                   .HasForeignKey(p => p.TenantId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
             // Indexes
             builder.HasIndex(p => new { p.FirstName, p.LastName });
             builder.HasIndex(p => p.IdentificationNumber).IsUnique(false);
@@ -40,17 +55,14 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(p => p.Gender)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
 
             builder.Property(p => p.BloodGroup)
                    .HasConversion<string>()
-                   .HasMaxLength(5)
                    .IsRequired();
 
             builder.Property(p => p.MaritalStatus)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
 
             builder.Property(p => p.Nationality).HasMaxLength(100);
@@ -65,11 +77,7 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(p => p.PreferredCommunication)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
-
-            builder.Property(p => p.CreatedAt).IsRequired();
-            builder.Property(p => p.UpdatedAt);
         }
     }
 }

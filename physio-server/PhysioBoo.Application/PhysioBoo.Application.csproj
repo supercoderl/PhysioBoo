@@ -32,4 +32,8 @@
     <Folder Include="Commands\DoctorSchedules\CreateDoctorSchedule\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="ViewModels\Doctors\UpdateDoctorViewModel.cs" />
+  </ItemGroup>
+
 </Project>

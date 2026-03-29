@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.PatientInformation
 {
-    public class Patient : Entity
+    public class Patient : TenantEntity
     {
         #region Core Patient Table (37)
         public string PatientNumber { get; private set; }
@@ -51,64 +51,27 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         public decimal OutstandingBalance { get; private set; }
         public int LoyaltyPoints { get; private set; }
         public RiskLevel RiskLevel { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("PrimaryDoctorId")]
-        [InverseProperty("Patients")]
+        public virtual User? CreatedByUser { get; private set; }
+        public virtual User? UpdatedByUser { get; private set; }
         public virtual Doctor? PrimaryDoctor { get; private set; }
-
-        [ForeignKey("ReferredBy")]
-        [InverseProperty("ReferredPatients")]
         public virtual Doctor? ReferringDoctor { get; private set; }
-
-        [ForeignKey("ReferralHospitalId")]
-        [InverseProperty("ReferredPatients")]
         public virtual Hospital? ReferralHospital { get; private set; }
-
-        [ForeignKey("PreferredHospitalId")]
-        [InverseProperty("PreferredPatients")]
         public virtual Hospital? PreferredHospital { get; private set; }
-
-        [ForeignKey("PreferredDoctorId")]
-        [InverseProperty("PreferredPatients")]
         public virtual Doctor? PreferredDoctor { get; private set; }
-
-        [ForeignKey(nameof(UserId))]
-        [InverseProperty("Patient")]
         public virtual User? User { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty("Patient")]
         public virtual ICollection<Appointment> Appointments { get; private set; } = new List<Appointment>();
-
-        [InverseProperty("Patient")]
         public virtual ICollection<Bill> Bills { get; private set; } = new List<Bill>();
-
-        [InverseProperty("Patient")]
         public virtual ICollection<ImagingOrder> ImagingOrders { get; private set; } = new List<ImagingOrder>();
-
-        [InverseProperty("Patient")]
         public virtual ICollection<ImagingReport> ImagingReports { get; private set; } = new List<ImagingReport>();
-
-        [InverseProperty("Patient")]
         public virtual ICollection<LabOrder> LabOrders { get; private set; } = new List<LabOrder>();
-
-        [InverseProperty("Patient")]
         public virtual ICollection<LabReport> LabReports { get; private set; } = new List<LabReport>();
-
-        [InverseProperty("Patient")]
         public virtual ICollection<MedicalRecord> MedicalRecords { get; private set; } = new List<MedicalRecord>();
-
-        [InverseProperty("Patient")]
         public virtual ICollection<PatientAllergy> Allergies { get; private set; } = new List<PatientAllergy>();
-
-        [InverseProperty("Patient")]
         public virtual ICollection<PatientMedicalHistory> MedicalHistories { get; private set; } = new List<PatientMedicalHistory>();
-
-        [InverseProperty("Patient")]
         public virtual ICollection<Payment> Payments { get; private set; } = new List<Payment>();
-
-        [InverseProperty("Patient")]
         public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();
         #endregion
 
@@ -176,8 +139,6 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
             OutstandingBalance = 0;
             LoyaltyPoints = 0;
             RiskLevel = RiskLevel.Low;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -218,8 +179,6 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         public void SetOutstandingBalance(decimal outstandingBalance) { OutstandingBalance = outstandingBalance; }
         public void SetLoyaltyPoints(int loyaltyPoints) { LoyaltyPoints = loyaltyPoints; }
         public void SetRiskLevel(RiskLevel riskLevel) { RiskLevel = riskLevel; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.Reviews
     public sealed class CreateReviewCommandHandler : CommandHandlerBase, IRequestHandler<CreateReviewCommand>
     {
         private readonly IReviewRepository _reviewRepository;
+        private readonly IUser _user;
 
         public CreateReviewCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IReviewRepository reviewRepository
+            IReviewRepository reviewRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _reviewRepository = reviewRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateReviewCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _reviewRepository.InsertAsync<Review, Guid>(new Review(
+            Review newReview = new Review(
                 request.NewReview.Id,
                 request.UserId,
                 request.NewReview.ReviewType,
@@ -51,7 +54,12 @@ namespace PhysioBoo.Application.Commands.Reviews
                 null,
                 null,
                 null
-            ));
+            );
+
+            newReview.SetTenantId(_user.GetTenantId());
+            newReview.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _reviewRepository.InsertAsync<Review, Guid>(newReview);
 
             if (!result.Success)
             {

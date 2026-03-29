@@ -28,7 +28,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(i => i.Type)
                    .HasConversion<string>()
-                   .HasMaxLength(50)
                    .IsRequired();
 
             builder.Property(i => i.ContactPerson)
@@ -66,8 +65,6 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(i => i.TermAndConditions);
 
             builder.Property(i => i.IsActive).IsRequired();
-
-            builder.Property(i => i.CreatedAt).IsRequired();
 
             builder.Property(ms => ms.SearchVector)
                    .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"Code\", '')))", stored: true)

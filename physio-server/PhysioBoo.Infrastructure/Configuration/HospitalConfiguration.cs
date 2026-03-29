@@ -15,15 +15,25 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.HasKey(h => h.Id);
 
             // Indexes
-            builder.HasIndex(h => h.HospitalGroupId);
+            builder.HasIndex(h => h.TenantId);
             builder.HasIndex(h => h.HospitalCode).IsUnique(false);
             builder.HasIndex(h => h.Name);
 
             // Relationships
             builder.HasOne(h => h.HospitalGroup)
                    .WithMany(g => g.Hospitals)
-                   .HasForeignKey(h => h.HospitalGroupId)
+                   .HasForeignKey(h => h.TenantId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(h => h.Creator)
+                   .WithMany(u => u.CreatedHospitals)
+                   .HasForeignKey(h => h.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(h => h.Updater)
+                   .WithMany(u => u.UpdatedHospitals)
+                   .HasForeignKey(h => h.UpdatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
 
             // Properties
             builder.Property(h => h.Name)
@@ -35,7 +45,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(h => h.HospitalType)
                    .HasConversion<string>()
-                   .HasMaxLength(50)
                    .IsRequired();
 
             builder.Property(h => h.BedCapacity).IsRequired();
@@ -109,8 +118,9 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(h => h.MissionStatement);
             builder.Property(h => h.VisionStatement);
 
-            builder.Property(h => h.CreatedAt).IsRequired();
-            builder.Property(h => h.UpdatedAt);
+            builder.Property(ms => ms.SearchVector)
+                   .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"HospitalCode\", '')))", stored: true)
+                   .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

@@ -11,17 +11,20 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCatego
     {
         private readonly IMedicineCategoryRepository _medicineCategoryRepository;
         private readonly ISys_SequenceTrackerRepository _sys_SequenceTrackerRepository;
+        private readonly IUser _user;
 
         public CreateMedicineCategoryCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
             IMedicineCategoryRepository medicineCategoryRepository,
-            ISys_SequenceTrackerRepository sys_SequenceTrackerRepository
+            ISys_SequenceTrackerRepository sys_SequenceTrackerRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _medicineCategoryRepository = medicineCategoryRepository;
             _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateMedicineCategoryCommand request, CancellationToken cancellationToken)
@@ -41,6 +44,8 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCatego
 
             newMedicineCategory.SetIsControlled(request.NewMedicineCategory.IsControlled);
             newMedicineCategory.SetRequiresPrescription(request.NewMedicineCategory.RequiresPrescription);
+            newMedicineCategory.SetTenantId(_user.GetTenantId());
+            newMedicineCategory.SetCreatedBy(_user.GetUserId());
 
             SharedKernel.Results.DbResult<Guid> result = await _medicineCategoryRepository.InsertAsync<MedicineCategory, Guid>(newMedicineCategory);
 

@@ -1,11 +1,10 @@
-﻿using PhysioBoo.Domain.Entities.Operation;
+﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.Support;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Clinical
 {
-    public class MedicineInventory : Entity
+    public class MedicineInventory : TenantEntity
     {
         #region Core Medicine Inventory Table (22)
         public Guid MedicineId { get; private set; }
@@ -29,19 +28,13 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public bool IsExpired { get; private set; }
         public bool IsNearExpiry { get; private set; }
         public DateTime? LastUpdated { get; private set; }
-        public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey(nameof(MedicineId))]
-        [InverseProperty(nameof(Medicine.MedicineInventories))]
         public virtual Medicine? Medicine { get; private set; }
-
-        [ForeignKey(nameof(HospitalId))]
-        [InverseProperty(nameof(Hospital.MedicineInventories))]
         public virtual Hospital? Hospital { get; private set; }
-
-        [ForeignKey(nameof(SupplierId))]
-        [InverseProperty(nameof(Supplier.MedicineInventories))]
         public virtual Supplier? Supplier { get; private set; }
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (22)
@@ -81,7 +74,6 @@ namespace PhysioBoo.Domain.Entities.Clinical
             IsExpired = false;
             IsNearExpiry = false;
             LastUpdated = lastUpdated;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
         }
         #endregion
 
@@ -107,7 +99,6 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public void SetIsExpired(bool isExpired) { IsExpired = isExpired; }
         public void SetIsNearExpiry(bool isNearExpiry) { IsNearExpiry = isNearExpiry; }
         public void SetLastUpdated(DateTime? lastUpdated) { LastUpdated = lastUpdated; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         #endregion
     }
 }

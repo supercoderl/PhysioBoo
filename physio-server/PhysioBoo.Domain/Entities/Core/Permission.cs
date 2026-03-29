@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace PhysioBoo.Domain.Entities.Core
+﻿namespace PhysioBoo.Domain.Entities.Core
 {
     public class Permission : Entity
     {
@@ -9,7 +7,6 @@ namespace PhysioBoo.Domain.Entities.Core
         public string Code { get; private set; }
         public string? Description { get; private set; }
 
-        [InverseProperty("Permission")]
         public virtual ICollection<RolePermission> RolePermissions { get; private set; } = new List<RolePermission>();
         #endregion
 

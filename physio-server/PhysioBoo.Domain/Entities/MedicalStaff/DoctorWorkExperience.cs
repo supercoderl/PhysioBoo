@@ -1,10 +1,10 @@
-﻿using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
+using PhysioBoo.Domain.Enums;
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
 {
-    public class DoctorWorkExperience : Entity
+    public class DoctorWorkExperience : TenantEntity
     {
         #region Core Doctor Work Experience Table (18)
         public Guid DoctorId { get; private set; }
@@ -24,11 +24,11 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public string? ReasonForLeaving { get; private set; }
         public string? SupervisorName { get; private set; }
         public string? SupervisorContact { get; private set; }
-        public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey("DoctorId")]
-        [InverseProperty("WorkExperiences")]
         public virtual Doctor? Doctor { get; private set; }
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (18)
@@ -69,7 +69,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
             ReasonForLeaving = reasonForLeaving;
             SupervisorName = supervisorName;
             SupervisorContact = supervisorContact;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
         }
         #endregion
 
@@ -94,7 +93,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public void SetReasonForLeaving(string? reasonForLeaving) { ReasonForLeaving = reasonForLeaving; }
         public void SetSupervisorName(string? supervisorName) { SupervisorName = supervisorName; }
         public void SetSupervisorContact(string? supervisorContact) { SupervisorContact = supervisorContact; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         #endregion
     }
 }

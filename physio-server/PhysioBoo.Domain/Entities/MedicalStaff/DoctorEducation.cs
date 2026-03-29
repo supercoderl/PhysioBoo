@@ -1,9 +1,9 @@
-﻿using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
 {
-    public class DoctorEducation : Entity
+    public class DoctorEducation : TenantEntity
     {
         #region Core Doctor Education Table (19)
         public Guid DoctorId { get; private set; }
@@ -24,11 +24,11 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public string? ThesisGuide { get; private set; }
         public bool IsVerified { get; private set; }
         public string? VerificationDocumentUrl { get; private set; }
-        public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey("DoctorId")]
-        [InverseProperty("Educations")]
         public virtual Doctor? Doctor { get; private set; }
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (19)
@@ -71,7 +71,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
             ThesisGuide = thesisGuide;
             IsVerified = false;
             VerificationDocumentUrl = verificationDocumentUrl;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
         }
         #endregion
 
@@ -94,7 +93,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public void SetThesisGuide(string? thesisGuide) { ThesisGuide = thesisGuide; }
         public void SetIsVerified(bool isVerified) { IsVerified = isVerified; }
         public void SetVerificationDocumentUrl(string? verificationDocumentUrl) { VerificationDocumentUrl = verificationDocumentUrl; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         #endregion
     }
 }

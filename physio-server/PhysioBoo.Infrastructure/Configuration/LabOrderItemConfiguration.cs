@@ -41,6 +41,21 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(u => u.VerifiedLabTests)
                    .HasForeignKey(i => i.VerifiedBy);
 
+            builder.HasOne(i => i.Creator)
+                   .WithMany(u => u.CreatedLabOrderItems)
+                   .HasForeignKey(i => i.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(i => i.Updater)
+                     .WithMany(u => u.UpdatedLabOrderItems)
+                     .HasForeignKey(i => i.UpdatedBy)
+                     .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(i => i.HospitalGroup)
+                     .WithMany(hg => hg.LabOrderItems)
+                     .HasForeignKey(i => i.TenantId)
+                     .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(i => i.TestName)
                    .IsRequired()
@@ -56,7 +71,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(i => i.Status)
                    .HasConversion<string>()
-                   .HasMaxLength(30)
                    .IsRequired();
 
             builder.Property(i => i.ResultValue);
@@ -68,8 +82,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(i => i.VerifiedAt);
             builder.Property(i => i.Notes);
-
-            builder.Property(i => i.CreatedAt).IsRequired();
         }
     }
 }

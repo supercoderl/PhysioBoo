@@ -6,6 +6,8 @@ namespace PhysioBoo.Application.ViewModels.Doctors
     public sealed class DoctorViewModel
     {
         public Guid Id { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public string? Avatar { get; set; }
         public string? Bio { get; set; }
         public string? About { get; set; }
         public string[] LanguagesSpoken { get; set; } = [];
@@ -48,13 +50,19 @@ namespace PhysioBoo.Application.ViewModels.Doctors
         public decimal AverageRating { get; set; } // out of 5
         public int TotalReviews { get; set; }
         public int TotalSurgeriesPerformed { get; set; }
-
+        public bool IsFeatured { get; set; }
+        public TimeOnly? VerificationDate { get; set; }
+        public Guid? VerifiedBy { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         public static DoctorViewModel FromDoctor(Doctor doctor)
         {
             return new DoctorViewModel
             {
                 Id = doctor.Id,
+                FullName = doctor.User?.Profile?.FullName ?? string.Empty,
+                Avatar = doctor.User?.ProfilePicture,
                 Bio = doctor.Bio,
                 About = doctor.About,
                 LanguagesSpoken = doctor.LanguagesSpoken,
@@ -96,7 +104,12 @@ namespace PhysioBoo.Application.ViewModels.Doctors
                 PatientSatisfactionScore = doctor.PatientSatisfactionScore,
                 AverageRating = doctor.AverageRating,
                 TotalReviews = doctor.TotalReviews,
-                TotalSurgeriesPerformed = doctor.TotalSurgeriesPerformed
+                TotalSurgeriesPerformed = doctor.TotalSurgeriesPerformed,
+                IsFeatured = doctor.IsFeatured,
+                VerificationDate = doctor.VerificationDate,
+                VerifiedBy = doctor.VerifiedBy,
+                CreatedAt = doctor.CreatedAt,
+                UpdatedAt = doctor.UpdatedAt
             };
         }
     }

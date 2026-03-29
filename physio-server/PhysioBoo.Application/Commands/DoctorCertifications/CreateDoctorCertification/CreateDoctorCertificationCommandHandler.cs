@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.DoctorCertifications.CreateDoctorCertif
     public sealed class CreateDoctorCertificationCommandHandler : CommandHandlerBase, IRequestHandler<CreateDoctorCertificationCommand>
     {
         private readonly IDoctorCertificationRepository _doctorCertificationRepository;
+        private readonly IUser _user;
 
         public CreateDoctorCertificationCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IDoctorCertificationRepository doctorCertificationRepository
+            IDoctorCertificationRepository doctorCertificationRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _doctorCertificationRepository = doctorCertificationRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateDoctorCertificationCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            SharedKernel.Results.DbResult<Guid> result = await _doctorCertificationRepository.InsertAsync<DoctorCertification, Guid>(new DoctorCertification(
+            DoctorCertification newDoctorCertification = new DoctorCertification(
                 request.NewDoctorCertification.Id,
                 request.NewDoctorCertification.DoctorId,
                 request.NewDoctorCertification.CertificationName,
@@ -37,7 +40,12 @@ namespace PhysioBoo.Application.Commands.DoctorCertifications.CreateDoctorCertif
                 request.NewDoctorCertification.IsLifetime,
                 request.NewDoctorCertification.VerificationUrl,
                 request.NewDoctorCertification.CertificateDocumentUrl
-            ));
+            );
+
+            newDoctorCertification.SetTenantId(_user.GetTenantId());
+            newDoctorCertification.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _doctorCertificationRepository.InsertAsync<DoctorCertification, Guid>(newDoctorCertification);
 
             if (!result.Success)
             {

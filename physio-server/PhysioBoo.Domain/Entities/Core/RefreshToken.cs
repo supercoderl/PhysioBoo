@@ -1,5 +1,4 @@
 ﻿using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Core
 {
@@ -11,9 +10,7 @@ namespace PhysioBoo.Domain.Entities.Core
         public DateTime ExpiresAt { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
-        [InverseProperty("RefreshTokens")]
-        [ForeignKey("UserId")]
-        public virtual User? User { get; set; }
+        public virtual User? User { get; private set; }
         #endregion
 
         #region Constructor (4)

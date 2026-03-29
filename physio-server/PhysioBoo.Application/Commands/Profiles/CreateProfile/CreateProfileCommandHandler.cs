@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.Profiles.CreateProfile
     public sealed class CreateProfileCommandHandler : CommandHandlerBase, IRequestHandler<CreateProfileCommand>
     {
         private readonly IProfileRepository _profileRepository;
+        private readonly IUser _user;
 
         public CreateProfileCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IProfileRepository profileRepository
+            IProfileRepository profileRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _profileRepository = profileRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateProfileCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _profileRepository.InsertAsync<Profile, Guid>(new Profile(
+            Profile newProfile = new Profile(
                 request.UserId,
                 request.NewProfile.FirstName,
                 request.NewProfile.LastName,
@@ -42,7 +45,12 @@ namespace PhysioBoo.Application.Commands.Profiles.CreateProfile
                 request.NewProfile.EmergencyContactPhone,
                 request.NewProfile.EmergencyContactRelationship,
                 request.NewProfile.PreferredCommunication
-            ));
+            );
+
+            newProfile.SetTenantId(_user.GetUserId());
+            newProfile.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _profileRepository.InsertAsync<Profile, Guid>(newProfile);
 
             if (!result.Success)
             {

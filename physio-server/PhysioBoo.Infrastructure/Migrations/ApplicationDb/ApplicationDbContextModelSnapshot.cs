@@ -32,8 +32,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("AccessLevel")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("AppointmentId")
                         .HasColumnType("uuid");
@@ -47,7 +46,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<Guid>("CreatedBy")
+                    b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
@@ -124,8 +123,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("RecordType")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ReviewOfSystems")
                         .HasColumnType("text");
@@ -133,11 +131,17 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("SocialHistory")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("TreatmentPlan")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("VitalSigns")
                         .HasColumnType("text");
@@ -156,6 +160,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("RecordNumber")
                         .IsUnique();
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("MedicalRecords", (string)null);
                 });
@@ -204,6 +212,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -212,8 +223,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("DosageForm")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("DrugCode")
                         .HasMaxLength(50)
@@ -320,12 +330,18 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<decimal>("TaxPercentage")
                         .HasColumnType("numeric(5,2)");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("TherapeuticClass")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("UsageInstructions")
                         .HasColumnType("text");
@@ -342,6 +358,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("DrugCode");
 
                     b.HasIndex("GenericName");
@@ -351,6 +369,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("Name");
 
                     b.HasIndex("QrCode");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("Medicines", (string)null);
                 });
@@ -367,6 +389,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -396,13 +421,28 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("StorageConditions")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Code");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("Name");
 
                     b.HasIndex("ParentCategoryId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("MedicineCategories", (string)null);
                 });
@@ -419,6 +459,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -475,6 +518,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<Guid>("SupplierId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal?>("TotalPurchaseValue")
                         .HasColumnType("numeric(12,2)");
 
@@ -484,13 +530,25 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<decimal?>("UnitSellingPrice")
                         .HasColumnType("numeric(10,2)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("HospitalId");
 
                     b.HasIndex("MedicineId");
 
                     b.HasIndex("SupplierId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.HasIndex("MedicineId", "HospitalId", "BatchNumber");
 
@@ -508,6 +566,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -555,8 +616,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("numeric(10,2)");
@@ -564,12 +627,17 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateOnly?>("ValidUntil")
                         .HasColumnType("date");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AppoinmentId");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("DoctorId");
 
@@ -582,6 +650,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("PrescriptionNumber")
                         .IsUnique();
 
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
+
                     b.ToTable("Prescriptions", (string)null);
                 });
 
@@ -593,6 +665,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -654,14 +729,29 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<bool>("SubtituteAllowed")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("numeric(10,2)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("MedicineId");
 
                     b.HasIndex("PrescriptionId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("PrescriptionItems", (string)null);
                 });
@@ -674,8 +764,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("AddressType")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ApartmentUnit")
                         .HasMaxLength(50)
@@ -693,6 +782,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -719,13 +811,25 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.HasIndex("UserId");
 
@@ -741,7 +845,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<Guid>("CreatedBy")
+                    b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
@@ -829,11 +933,13 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("BloodGroup")
                         .IsRequired()
-                        .HasMaxLength(5)
-                        .HasColumnType("character varying(5)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date");
@@ -860,8 +966,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Gender")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("IdentificationExpiry")
                         .HasColumnType("timestamp without time zone");
@@ -881,8 +986,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("MaritalStatus")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<string>("MiddleName")
                         .IsRequired()
@@ -895,15 +999,26 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("PreferredCommunication")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("IdentificationNumber");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.HasIndex("FirstName", "LastName");
 
@@ -957,7 +1072,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<Guid>("CreatedBy")
+                    b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
@@ -965,6 +1080,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("HospitalGroupId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Icon")
                         .HasMaxLength(255)
@@ -996,6 +1114,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .IsUnique();
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("HospitalGroupId");
 
                     b.HasIndex("IsActive");
 
@@ -1044,6 +1164,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1067,16 +1193,25 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("UpdaterId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Value")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ValueType")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatorId");
+
+                    b.HasIndex("UpdaterId");
 
                     b.ToTable("SystemSettings", (string)null);
                 });
@@ -1150,6 +1285,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("TimeZone")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -1179,6 +1317,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("Phone")
                         .IsUnique();
+
+                    b.HasIndex("TenantId");
 
                     b.HasIndex("UpdatedBy");
 
@@ -1272,8 +1412,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -1380,7 +1519,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<Guid>("CreatedBy")
+                    b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
@@ -1403,8 +1542,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("LabPriority")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("ModalityId")
                         .HasColumnType("uuid");
@@ -1425,8 +1563,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("PregnancyStatus")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("PreparationGiven")
                         .HasColumnType("boolean");
@@ -1448,10 +1585,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("TechnicianId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("TotalCost")
@@ -1459,6 +1598,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("UpdaterId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -1481,6 +1626,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("TechnicianId");
 
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdaterId");
+
                     b.ToTable("ImagingOrders", (string)null);
                 });
 
@@ -1498,6 +1647,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("CriticalFindings")
                         .HasColumnType("text");
@@ -1562,8 +1714,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<DateOnly>("StudyDate")
                         .HasColumnType("date");
@@ -1574,13 +1725,24 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("Technique")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("TranscribedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("VerifiedAt")
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("ImagingOrderId");
 
@@ -1590,6 +1752,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("ReportNumber")
                         .IsUnique();
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("ImagingReports", (string)null);
                 });
@@ -1618,13 +1784,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("CollectionType")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<Guid>("CreatedBy")
+                    b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
@@ -1644,8 +1809,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("LabPriority")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<DateOnly>("OrderDate")
                         .HasColumnType("date");
@@ -1657,8 +1821,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("OrderStatus")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<TimeOnly>("OrderTime")
                         .HasColumnType("time without time zone");
@@ -1668,25 +1831,29 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("PaymentStatus")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PrivisionalDiagnosis")
                         .HasColumnType("text");
 
                     b.Property<string>("ReportDeliveryMethod")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<string>("SpecialInstructions")
                         .HasColumnType("text");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("numeric(10,2)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -1703,6 +1870,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("PatientId");
 
+                    b.HasIndex("TenantId");
+
                     b.ToTable("LabOrders", (string)null);
                 });
 
@@ -1718,6 +1887,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("CritialFlag")
                         .HasColumnType("boolean");
@@ -1758,10 +1930,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("TechnicianId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("TestCost")
@@ -1772,6 +1946,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("VerifiedAt")
                         .HasColumnType("timestamp without time zone");
 
@@ -1780,6 +1960,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("LabOrderId");
 
                     b.HasIndex("LabTestId");
@@ -1787,6 +1969,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("SampleCollectorId");
 
                     b.HasIndex("TechnicianId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.HasIndex("VerifiedBy");
 
@@ -1807,6 +1993,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("CriticalValues")
                         .HasColumnType("text");
@@ -1870,7 +2059,18 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<TimeOnly>("ReportTime")
                         .HasColumnType("time without time zone");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("DoctorId");
 
@@ -1884,6 +2084,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("ReportNumber")
                         .IsUnique();
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("LabReports", (string)null);
                 });
@@ -2064,7 +2268,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("numeric(3,2)");
 
                     b.Property<string>("BankAccountDetails")
-                        .HasColumnType("text");
+                        .HasColumnType("jsonb")
+                        .HasColumnName("BankAccountDetails");
 
                     b.Property<string>("Bio")
                         .HasColumnType("text");
@@ -2090,6 +2295,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -2097,13 +2305,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("numeric(10,2)");
 
                     b.Property<string>("EmployeeId")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("EmploymentStatus")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<decimal>("FollowUpFee")
                         .HasColumnType("numeric(10,2)");
@@ -2169,8 +2376,16 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("ResearchInterests")
                         .HasColumnType("text");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"EmployeeId\", '')))", true);
+
                     b.Property<decimal>("SuccessRate")
                         .HasColumnType("numeric(5,2)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("TerminationDate")
                         .HasColumnType("timestamp without time zone");
@@ -2186,6 +2401,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<TimeOnly?>("VerificationDate")
                         .HasColumnType("time without time zone");
@@ -2204,12 +2422,18 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("EmployeeId");
 
                     b.HasIndex("MedicalLicenseNumber")
                         .IsUnique();
 
                     b.HasIndex("PrimarySpecialtyId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.HasIndex("VerifiedBy");
 
@@ -2253,6 +2477,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -2269,9 +2496,24 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<decimal?>("MonetaryValue")
                         .HasColumnType("numeric(10,2)");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("DoctorId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("DoctorAwards", (string)null);
                 });
@@ -2302,6 +2544,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -2324,8 +2569,16 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("VerificationUrl")
                         .HasMaxLength(500)
@@ -2333,7 +2586,13 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("DoctorId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("DoctorCertifications", (string)null);
                 });
@@ -2353,6 +2612,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("DegreeName")
                         .IsRequired()
@@ -2402,6 +2664,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateOnly?>("StartDate")
                         .HasColumnType("date");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("ThesisGuide")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
@@ -2413,13 +2678,25 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("VerificationDocumentUrl")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("DoctorId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("DoctorEducations", (string)null);
                 });
@@ -2438,6 +2715,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -2461,8 +2741,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("LeaveType")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Reason")
                         .HasColumnType("text");
@@ -2475,10 +2754,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("SubstituteDoctorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("TotalDays")
@@ -2487,13 +2768,22 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApprovedBy");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("DoctorId");
 
                     b.HasIndex("SubstituteDoctorId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("DoctorLeaves", (string)null);
                 });
@@ -2519,6 +2809,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -2569,8 +2862,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("PublicationType")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PublicationUrl")
                         .HasMaxLength(500)
@@ -2580,9 +2872,18 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Volume")
                         .HasMaxLength(20)
@@ -2590,11 +2891,17 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("DoctorId");
 
                     b.HasIndex("Doi");
 
                     b.HasIndex("Pmid");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("DoctorPublications", (string)null);
                 });
@@ -2616,6 +2923,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("integer");
@@ -2654,8 +2964,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("ScheduleType")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<int>("SlotDuration")
                         .HasColumnType("integer");
@@ -2663,16 +2972,28 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time without time zone");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("DoctorId");
 
                     b.HasIndex("HospitalId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("DoctorSchedules", (string)null);
                 });
@@ -2696,6 +3017,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -2707,10 +3031,18 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("ProficiencyLevel")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("SpecialtyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uuid");
 
                     b.Property<int>("YearsOfExperience")
@@ -2718,9 +3050,15 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("DoctorId");
 
                     b.HasIndex("SpecialtyId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("DoctorSpecialties", (string)null);
                 });
@@ -2741,6 +3079,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -2753,8 +3094,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("EmploymentType")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<DateOnly?>("EndDate")
                         .HasColumnType("date");
@@ -2801,9 +3141,24 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("DoctorId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("DoctorWorkExperiences", (string)null);
                 });
@@ -2823,6 +3178,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -2845,13 +3203,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("EmploymentStatus")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<string>("EmploymentType")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<string>("EsiNumber")
                         .HasMaxLength(20)
@@ -2899,8 +3255,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("StaffType")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateOnly?>("TerminationDate")
                         .HasColumnType("date");
@@ -2908,7 +3266,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("DepartmentId");
 
@@ -2918,6 +3281,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("HospitalId");
 
                     b.HasIndex("ReportingManger");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("HospitalStaffs", (string)null);
                 });
@@ -3140,6 +3507,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("Symptoms")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("numeric(10,2)");
 
@@ -3148,6 +3518,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -3171,6 +3544,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("ReferringDoctorId");
 
                     b.HasIndex("RescheduledFromAppointmentId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("Appointments", (string)null);
                 });
@@ -3272,7 +3649,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<Guid>("CreatedBy")
+                    b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Currency")
@@ -3328,8 +3705,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("PaymentStatus")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PaymentTerms")
                         .HasMaxLength(100)
@@ -3341,6 +3717,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<decimal>("TaxAmount")
                         .HasColumnType("numeric(12,2)");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("TermsAndConditions")
                         .HasColumnType("text");
 
@@ -3349,11 +3728,16 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("UpdaterId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -3374,6 +3758,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("PatientId");
 
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdaterId");
+
                     b.ToTable("Bills", (string)null);
                 });
 
@@ -3388,6 +3776,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -3433,22 +3824,36 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<decimal>("TaxPercentage")
                         .HasColumnType("numeric(5,2)");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("numeric(10,2)");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("numeric(10,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BillId");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("PerformedBy");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("BillItems", (string)null);
                 });
@@ -3467,6 +3872,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -3526,8 +3934,14 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("tsvector")
                         .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"DepartmentCode\", '')))", true);
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Wing")
                         .HasMaxLength(50)
@@ -3535,11 +3949,17 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("DepartmentCode");
 
                     b.HasIndex("HeadOfDepartment");
 
                     b.HasIndex("HospitalId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("Departments", (string)null);
                 });
@@ -3582,6 +4002,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -3603,7 +4026,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Facilities")
-                        .HasColumnType("jsonb");
+                        .HasColumnType("jsonb")
+                        .HasColumnName("Facilities");
 
                     b.Property<string>("Fax")
                         .HasMaxLength(20)
@@ -3613,19 +4037,16 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
-                    b.Property<Guid>("HospitalGroupId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("HospitalType")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<int>("IcuCapacity")
                         .HasColumnType("integer");
 
                     b.Property<string>("Images")
-                        .HasColumnType("jsonb");
+                        .HasColumnType("jsonb")
+                        .HasColumnName("Images");
 
                     b.PrimitiveCollection<string[]>("InsuranceAccepted")
                         .IsRequired()
@@ -3667,7 +4088,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("OperatingHours")
-                        .HasColumnType("jsonb");
+                        .HasColumnType("jsonb")
+                        .HasColumnName("OperatingHours");
 
                     b.Property<int>("OperationTheaters")
                         .HasColumnType("integer");
@@ -3680,13 +4102,24 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"HospitalCode\", '')))", true);
+
                     b.Property<string>("StateProvince")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("VisionStatement")
                         .HasColumnType("text");
@@ -3697,11 +4130,15 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("HospitalCode");
 
-                    b.HasIndex("HospitalGroupId");
-
                     b.HasIndex("Name");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("Hospitals", (string)null);
                 });
@@ -3713,10 +4150,14 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("uuid");
 
                     b.Property<string>("AccreditationDetails")
-                        .HasColumnType("jsonb");
+                        .HasColumnType("jsonb")
+                        .HasColumnName("AccreditationDetails");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -3754,8 +4195,16 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '')))", true);
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Website")
                         .HasMaxLength(255)
@@ -3763,7 +4212,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("Name");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("HospitalGroups", (string)null);
                 });
@@ -3791,6 +4244,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -3802,8 +4258,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Method")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Notes")
                         .HasColumnType("text");
@@ -3847,8 +4302,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("TransactionId")
                         .HasMaxLength(100)
@@ -3857,9 +4314,14 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BillId");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("PatientId");
 
@@ -3867,6 +4329,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .IsUnique();
 
                     b.HasIndex("ProcessedBy");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("Payments", (string)null);
                 });
@@ -3895,6 +4361,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("CurrentMedications")
                         .HasColumnType("text");
@@ -3960,8 +4429,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("PatientType")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PreferredAppointmentTime")
                         .HasMaxLength(20)
@@ -3987,11 +4455,13 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("RiskLevel")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<string>("SurgicalHistory")
                         .HasColumnType("text");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("TotalAmountSpent")
                         .HasColumnType("numeric(12,2)");
@@ -4002,10 +4472,15 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("PatientNumber")
                         .IsUnique();
@@ -4019,6 +4494,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("ReferralHospitalId");
 
                     b.HasIndex("ReferredBy");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -4039,11 +4518,13 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("AllergenType")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -4069,17 +4550,31 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Severity")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("TreatmentGiven")
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AllergenName");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("PatientId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("PatientAllergies", (string)null);
                 });
@@ -4102,10 +4597,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("CurrentStatus")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -4140,8 +4637,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Severity")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("TreatmentSummary")
                         .HasColumnType("text");
@@ -4149,9 +4648,14 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ConditionName");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("DiagnosedBy");
 
@@ -4160,6 +4664,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("Icd10Code");
 
                     b.HasIndex("PatientId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("PatientMedicals", (string)null);
                 });
@@ -4235,8 +4743,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Website")
                         .HasMaxLength(255)
@@ -4354,6 +4861,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -4430,6 +4940,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<int>("StaffBehavior")
                         .HasColumnType("integer");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Title")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
@@ -4439,6 +4952,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("ValueForMoney")
                         .HasColumnType("integer");
@@ -4456,6 +4972,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("AppointmentId");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("EntityId");
 
                     b.HasIndex("ModeratedBy");
@@ -4463,6 +4981,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("RespondedBy");
 
                     b.HasIndex("ReviewerId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("Reviews", (string)null);
                 });
@@ -4606,8 +5128,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -4627,6 +5148,167 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("SupplierName");
 
                     b.ToTable("Suppliers", (string)null);
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.System.PrintLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EntityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("PrintedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("PrintedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TemplateVersionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PrintedBy");
+
+                    b.ToTable("PrintLogs", (string)null);
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.System.PrintTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CurrentVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DocumentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsSystemDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Module")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("CurrentVersionId");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.HasIndex("Name", "Code");
+
+                    b.ToTable("PrintTemplates", (string)null);
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.System.PrintTemplateVersion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BodyHtml")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CustomCss")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FooterHtml")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("HeaderHtml")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Orientation")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaperSize")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TemplateId")
+                        .HasMaxLength(100)
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("VersionNumber")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TemplateId");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.ToTable("PrintTemplateVersions", (string)null);
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.System.Sys_AppVersion", b =>
@@ -4654,8 +5336,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Platform")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("StoreUrl")
                         .IsRequired()
@@ -4748,8 +5429,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Platform")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -4874,7 +5554,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<Guid>("CreatedBy")
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CreatorId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("CurrentSequence")
@@ -4893,7 +5576,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<NpgsqlTsVector>("SearchVector")
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("tsvector");
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"EntityType\", '')))", true);
 
                     b.Property<int>("SequenceLength")
                         .HasColumnType("integer");
@@ -4907,16 +5591,21 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("UpdaterId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("UseDateFormating")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
+                    b.HasIndex("CreatorId");
 
-                    b.HasIndex("UpdatedBy");
+                    b.HasIndex("EntityType");
 
-                    b.ToTable("Sys_SequenceTrackers");
+                    b.HasIndex("UpdaterId");
+
+                    b.ToTable("Sys_SequenceTrackers", (string)null);
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.System.Sys_Setting", b =>
@@ -5016,8 +5705,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
                         .WithMany("CreatedMedicalRecords")
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "Doctor")
                         .WithMany("MedicalRecords")
@@ -5037,6 +5725,17 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("MedicalRecords")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedMedicalRecords")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Appointment");
 
                     b.Navigation("Creator");
@@ -5045,7 +5744,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Navigation("Hospital");
 
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("Patient");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Clinical.Medicine", b =>
@@ -5056,29 +5759,78 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedMedicines")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Support.Manufacturer", "Manufacturer")
                         .WithMany("Medicines")
                         .HasForeignKey("ManufacturerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("Medicines")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedMedicines")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Category");
 
+                    b.Navigation("Creator");
+
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("Manufacturer");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Clinical.MedicineCategory", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedMedicineCategories")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Clinical.MedicineCategory", "ParentCategory")
                         .WithMany("SubCategories")
                         .HasForeignKey("ParentCategoryId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("MedicineCategories")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedMedicineCategories")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("ParentCategory");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Clinical.MedicineInventory", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedMedicineInventories")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Operation.Hospital", "Hospital")
                         .WithMany("MedicineInventories")
                         .HasForeignKey("HospitalId")
@@ -5097,11 +5849,28 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("MedicineInventories")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedMedicineInventories")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
                     b.Navigation("Hospital");
+
+                    b.Navigation("HospitalGroup");
 
                     b.Navigation("Medicine");
 
                     b.Navigation("Supplier");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Clinical.Prescription", b =>
@@ -5111,6 +5880,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("AppoinmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedPrescriptions")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "Doctor")
                         .WithMany("Prescriptions")
@@ -5136,19 +5910,41 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("Prescriptions")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedPrescriptions")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Appointment");
+
+                    b.Navigation("Creator");
 
                     b.Navigation("Doctor");
 
                     b.Navigation("Hospital");
 
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("MedicalRecord");
 
                     b.Navigation("Patient");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Clinical.PrescriptionItem", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedPrescriptionItems")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Clinical.Medicine", "Medicine")
                         .WithMany("PrescriptionItems")
                         .HasForeignKey("MedicineId")
@@ -5161,18 +5957,57 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("PrescriptionItems")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedPrescriptionItems")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("Medicine");
 
                     b.Navigation("Prescription");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Address", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedAddresses")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("Addresses")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedAddresses")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "User")
                         .WithMany("Addresses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("HospitalGroup");
+
+                    b.Navigation("Updater");
 
                     b.Navigation("User");
                 });
@@ -5182,8 +6017,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
                         .WithMany("CreatedMenus")
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhysioBoo.Domain.Entities.Core.AdminMenu", "ParentMenu")
                         .WithMany("SubMenus")
@@ -5204,11 +6038,33 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Profile", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedProfiles")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "User")
                         .WithOne("Profile")
                         .HasForeignKey("PhysioBoo.Domain.Entities.Core.Profile", "Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("Profiles")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedProfiles")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("HospitalGroup");
+
+                    b.Navigation("Updater");
 
                     b.Navigation("User");
                 });
@@ -5229,8 +6085,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
                         .WithMany("CreatedRoles")
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", null)
+                        .WithMany("Roles")
+                        .HasForeignKey("HospitalGroupId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
                         .WithMany("UpdatedRoles")
@@ -5261,6 +6121,23 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.SystemSetting", b =>
+                {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany()
+                        .HasForeignKey("UpdaterId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("Updater");
+                });
+
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.User", b =>
                 {
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
@@ -5268,12 +6145,20 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("Users")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
                         .WithMany("UpdatedUsers")
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Creator");
+
+                    b.Navigation("HospitalGroup");
 
                     b.Navigation("Updater");
                 });
@@ -5337,8 +6222,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
                         .WithMany("CreatedImagingOrders")
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "Doctor")
                         .WithMany("ImagingOrders")
@@ -5374,6 +6258,17 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("TechnicianId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("ImagingOrders")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedImagingOrders")
+                        .HasForeignKey("UpdaterId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Appointment");
 
                     b.Navigation("Creator");
@@ -5382,6 +6277,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Navigation("Hospital");
 
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("Modality");
 
                     b.Navigation("Patient");
@@ -5389,10 +6286,17 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("Radiologist");
 
                     b.Navigation("Technician");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.ImagingReport", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedImagingReports")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.LaboratoryImaging.ImagingOrder", "ImagingOrder")
                         .WithMany("ImagingReports")
                         .HasForeignKey("ImagingOrderId")
@@ -5410,11 +6314,28 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("RadiologistId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("ImagingReports")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedImagingReports")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("ImagingOrder");
 
                     b.Navigation("Patient");
 
                     b.Navigation("Radiologist");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.LabOrder", b =>
@@ -5428,8 +6349,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
                         .WithMany("CreatedLabOrders")
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "Doctor")
                         .WithMany("LabOrders")
@@ -5449,6 +6369,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("LabOrders")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Appointment");
 
                     b.Navigation("Creator");
@@ -5457,11 +6383,18 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Navigation("Hospital");
 
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.LabOrderItem", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedLabOrderItems")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.LaboratoryImaging.LabOrder", "LabOrder")
                         .WithMany("LabOrderItems")
                         .HasForeignKey("LabOrderId")
@@ -5484,10 +6417,25 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("TechnicianId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("LabOrderItems")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedLabOrderItems")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Verifier")
                         .WithMany("VerifiedLabTests")
                         .HasForeignKey("VerifiedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("HospitalGroup");
 
                     b.Navigation("LabOrder");
 
@@ -5497,11 +6445,18 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Navigation("Technician");
 
+                    b.Navigation("Updater");
+
                     b.Navigation("Verifier");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.LabReport", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedLabReports")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "Doctor")
                         .WithMany("LabReports")
                         .HasForeignKey("DoctorId")
@@ -5532,7 +6487,22 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("LabReports")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedLabReports")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
                     b.Navigation("Doctor");
+
+                    b.Navigation("HospitalGroup");
 
                     b.Navigation("LabOrder");
 
@@ -5541,6 +6511,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("Pathologist");
 
                     b.Navigation("Patient");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.LabTest", b =>
@@ -5556,6 +6528,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "CreatedByUser")
+                        .WithMany("CreatedDoctors")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "User")
                         .WithOne("Doctor")
                         .HasForeignKey("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "Id")
@@ -5567,12 +6544,29 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("PrimarySpecialtyId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("Doctors")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "UpdatedByUser")
+                        .WithMany("UpdatedDoctors")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "VerifiedByUser")
                         .WithMany("VerifiedDoctors")
                         .HasForeignKey("VerifiedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("PrimarySpecialty");
+
+                    b.Navigation("UpdatedByUser");
 
                     b.Navigation("User");
 
@@ -5581,35 +6575,101 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorAward", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedDoctorAwards")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "Doctor")
                         .WithMany("Awards")
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("DoctorAwards")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedDoctorAwards")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
                     b.Navigation("Doctor");
+
+                    b.Navigation("HospitalGroup");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorCertification", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedDoctorCertifications")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "Doctor")
                         .WithMany("Certifications")
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("DoctorCertifications")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedDoctorCertifications")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
                     b.Navigation("Doctor");
+
+                    b.Navigation("HospitalGroup");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorEducation", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedDoctorEducations")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "Doctor")
                         .WithMany("Educations")
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("DoctorEducations")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedDoctorEducations")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
                     b.Navigation("Doctor");
+
+                    b.Navigation("HospitalGroup");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorLeave", b =>
@@ -5617,6 +6677,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Approver")
                         .WithMany("ApprovedLeaves")
                         .HasForeignKey("ApprovedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedDoctorLeaves")
+                        .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "Doctor")
@@ -5630,26 +6695,70 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("SubstituteDoctorId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("DoctorLeaves")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedDoctorLeaves")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Approver");
+
+                    b.Navigation("Creator");
 
                     b.Navigation("Doctor");
 
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("SubstituteDoctor");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorPublication", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedDoctorPublications")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "Doctor")
                         .WithMany("Publications")
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("DoctorPublications")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedDoctorPublications")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
                     b.Navigation("Doctor");
+
+                    b.Navigation("HospitalGroup");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorSchedule", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedDoctorSchedules")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Operation.Department", "Department")
                         .WithMany("DoctorSchedules")
                         .HasForeignKey("DepartmentId")
@@ -5668,15 +6777,37 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("DoctorSchedules")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedDoctorSchedules")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
                     b.Navigation("Department");
 
                     b.Navigation("Doctor");
 
                     b.Navigation("Hospital");
+
+                    b.Navigation("HospitalGroup");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorSpecialty", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedDoctorSpecialties")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "Doctor")
                         .WithMany("Specialties")
                         .HasForeignKey("DoctorId")
@@ -5689,24 +6820,68 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("DoctorSpecialties")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedDoctorSpecialties")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
                     b.Navigation("Doctor");
 
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("Specialty");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.DoctorWorkExperience", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedDoctorWorkExperiences")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "Doctor")
                         .WithMany("WorkExperiences")
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("DoctorWorkExperiences")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedDoctorWorkExperiences")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
                     b.Navigation("Doctor");
+
+                    b.Navigation("HospitalGroup");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.HospitalStaff", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedHospitalStaffs")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Operation.Department", "Department")
                         .WithMany("HospitalStaffs")
                         .HasForeignKey("DepartmentId")
@@ -5724,11 +6899,28 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("ReportingManger")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("HospitalStaffs")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedHospitalStaffs")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
                     b.Navigation("Department");
 
                     b.Navigation("Hospital");
 
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("Manager");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.MedicalSpecialty", b =>
@@ -5754,7 +6946,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("CancelledBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "CreatedByUser")
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
                         .WithMany("CreatedAppointments")
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -5793,11 +6985,22 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("RescheduledFromAppointmentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("Appointments")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedAppointments")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("AppointmentType");
 
                     b.Navigation("CancelledByUser");
 
-                    b.Navigation("CreatedByUser");
+                    b.Navigation("Creator");
 
                     b.Navigation("Department");
 
@@ -5805,11 +7008,15 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Navigation("Hospital");
 
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("Patient");
 
                     b.Navigation("ReferringDoctor");
 
                     b.Navigation("RescheduledFromAppointment");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.Bill", b =>
@@ -5828,8 +7035,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
                         .WithMany("CreatedBills")
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhysioBoo.Domain.Entities.Operation.Department", "Department")
                         .WithMany("Bills")
@@ -5854,6 +7060,17 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("Bills")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedBills")
+                        .HasForeignKey("UpdaterId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Appointment");
 
                     b.Navigation("Approver");
@@ -5864,9 +7081,13 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Navigation("Hospital");
 
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("InsuranceCompany");
 
                     b.Navigation("Patient");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.BillItem", b =>
@@ -5877,18 +7098,45 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedBillItems")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "PerformedByUser")
                         .WithMany("PerformedBillItems")
                         .HasForeignKey("PerformedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("BillItems")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedBillItems")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Bill");
 
+                    b.Navigation("Creator");
+
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("PerformedByUser");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.Department", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedDepartments")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "HeadOfDeptUser")
                         .WithMany("HeadedDepartments")
                         .HasForeignKey("HeadOfDepartment")
@@ -5900,20 +7148,68 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("Departments")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedDepartments")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
                     b.Navigation("HeadOfDeptUser");
 
                     b.Navigation("Hospital");
+
+                    b.Navigation("HospitalGroup");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.Hospital", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedHospitals")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
                         .WithMany("Hospitals")
-                        .HasForeignKey("HospitalGroupId")
+                        .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedHospitals")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
                     b.Navigation("HospitalGroup");
+
+                    b.Navigation("Updater");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.HospitalGroup", b =>
+                {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedHospitalGroups")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedHospitalGroups")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.Payment", b =>
@@ -5923,6 +7219,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("BillId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedPayments")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhysioBoo.Domain.Entities.PatientInformation.Patient", "Patient")
                         .WithMany("Payments")
@@ -5935,15 +7236,37 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("ProcessedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("Payments")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedPayments")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Bill");
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("HospitalGroup");
 
                     b.Navigation("Patient");
 
                     b.Navigation("Processor");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.PatientInformation.Patient", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "CreatedByUser")
+                        .WithMany("CreatedPatients")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "PreferredDoctor")
                         .WithMany("PreferredPatients")
                         .HasForeignKey("PreferredDoctorId")
@@ -5970,10 +7293,25 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("ReferredBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("Patients")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "UpdatedByUser")
+                        .WithMany("UpdatedPatients")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "User")
                         .WithOne("Patient")
                         .HasForeignKey("PhysioBoo.Domain.Entities.PatientInformation.Patient", "UserId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("HospitalGroup");
 
                     b.Navigation("PreferredDoctor");
 
@@ -5985,22 +7323,51 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Navigation("ReferringDoctor");
 
+                    b.Navigation("UpdatedByUser");
+
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.PatientInformation.PatientAllergy", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedPatientAllergies")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.PatientInformation.Patient", "Patient")
                         .WithMany("Allergies")
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("PatientAllergies")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedPatientAllergies")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("Patient");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.PatientInformation.PatientMedicalHistory", b =>
                 {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedPatientMedicalHistories")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", "DiagnosedDoctor")
                         .WithMany("DiagnosedHistories")
                         .HasForeignKey("DiagnosedBy")
@@ -6017,11 +7384,28 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("PatientMedicalHistories")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedPatientMedicalHistories")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
                     b.Navigation("DiagnosedDoctor");
 
                     b.Navigation("DiagnosisHospital");
 
+                    b.Navigation("HospitalGroup");
+
                     b.Navigation("Patient");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Support.Review", b =>
@@ -6029,6 +7413,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasOne("PhysioBoo.Domain.Entities.Operation.Appointment", "Appointment")
                         .WithMany("Reviews")
                         .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedReviews")
+                        .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Moderator")
@@ -6047,13 +7436,91 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("Reviews")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedReviews")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Appointment");
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("HospitalGroup");
 
                     b.Navigation("Moderator");
 
                     b.Navigation("Responder");
 
                     b.Navigation("Reviewer");
+
+                    b.Navigation("Updater");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.System.PrintLog", b =>
+                {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "PrintedByUser")
+                        .WithMany("PrintLogs")
+                        .HasForeignKey("PrintedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PrintedByUser");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.System.PrintTemplate", b =>
+                {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedPrintTemplates")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PhysioBoo.Domain.Entities.System.PrintTemplateVersion", "PrintTemplateVersion")
+                        .WithMany("PrintTemplates")
+                        .HasForeignKey("CurrentVersionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedPrintTemplates")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("PrintTemplateVersion");
+
+                    b.Navigation("Updater");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.System.PrintTemplateVersion", b =>
+                {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
+                        .WithMany("CreatedPrintTemplateVersions")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PhysioBoo.Domain.Entities.System.PrintTemplate", "PrintTemplate")
+                        .WithMany("PrintTemplateVersions")
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
+                        .WithMany("UpdatedPrintTemplateVersions")
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("PrintTemplate");
+
+                    b.Navigation("Updater");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.System.Sys_Device", b =>
@@ -6082,13 +7549,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                 {
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Creator")
                         .WithMany("CreatedSequenceTrackers")
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
                         .WithMany("UpdatedSequenceTrackers")
-                        .HasForeignKey("UpdatedBy")
+                        .HasForeignKey("UpdaterId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Creator");
@@ -6151,17 +7617,79 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Navigation("CollectedLabSamples");
 
+                    b.Navigation("CreatedAddresses");
+
                     b.Navigation("CreatedAppointments");
+
+                    b.Navigation("CreatedBillItems");
 
                     b.Navigation("CreatedBills");
 
+                    b.Navigation("CreatedDepartments");
+
+                    b.Navigation("CreatedDoctorAwards");
+
+                    b.Navigation("CreatedDoctorCertifications");
+
+                    b.Navigation("CreatedDoctorEducations");
+
+                    b.Navigation("CreatedDoctorLeaves");
+
+                    b.Navigation("CreatedDoctorPublications");
+
+                    b.Navigation("CreatedDoctorSchedules");
+
+                    b.Navigation("CreatedDoctorSpecialties");
+
+                    b.Navigation("CreatedDoctorWorkExperiences");
+
+                    b.Navigation("CreatedDoctors");
+
+                    b.Navigation("CreatedHospitalGroups");
+
+                    b.Navigation("CreatedHospitalStaffs");
+
+                    b.Navigation("CreatedHospitals");
+
                     b.Navigation("CreatedImagingOrders");
+
+                    b.Navigation("CreatedImagingReports");
+
+                    b.Navigation("CreatedLabOrderItems");
 
                     b.Navigation("CreatedLabOrders");
 
+                    b.Navigation("CreatedLabReports");
+
                     b.Navigation("CreatedMedicalRecords");
 
+                    b.Navigation("CreatedMedicineCategories");
+
+                    b.Navigation("CreatedMedicineInventories");
+
+                    b.Navigation("CreatedMedicines");
+
                     b.Navigation("CreatedMenus");
+
+                    b.Navigation("CreatedPatientAllergies");
+
+                    b.Navigation("CreatedPatientMedicalHistories");
+
+                    b.Navigation("CreatedPatients");
+
+                    b.Navigation("CreatedPayments");
+
+                    b.Navigation("CreatedPrescriptionItems");
+
+                    b.Navigation("CreatedPrescriptions");
+
+                    b.Navigation("CreatedPrintTemplateVersions");
+
+                    b.Navigation("CreatedPrintTemplates");
+
+                    b.Navigation("CreatedProfiles");
+
+                    b.Navigation("CreatedReviews");
 
                     b.Navigation("CreatedRoles");
 
@@ -6187,6 +7715,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Navigation("PerformedBillItems");
 
+                    b.Navigation("PrintLogs");
+
                     b.Navigation("ProcessedLabTests");
 
                     b.Navigation("ProcessedPayments");
@@ -6203,7 +7733,77 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Navigation("Sys_Devices");
 
+                    b.Navigation("UpdatedAddresses");
+
+                    b.Navigation("UpdatedAppointments");
+
+                    b.Navigation("UpdatedBillItems");
+
+                    b.Navigation("UpdatedBills");
+
+                    b.Navigation("UpdatedDepartments");
+
+                    b.Navigation("UpdatedDoctorAwards");
+
+                    b.Navigation("UpdatedDoctorCertifications");
+
+                    b.Navigation("UpdatedDoctorEducations");
+
+                    b.Navigation("UpdatedDoctorLeaves");
+
+                    b.Navigation("UpdatedDoctorPublications");
+
+                    b.Navigation("UpdatedDoctorSchedules");
+
+                    b.Navigation("UpdatedDoctorSpecialties");
+
+                    b.Navigation("UpdatedDoctorWorkExperiences");
+
+                    b.Navigation("UpdatedDoctors");
+
+                    b.Navigation("UpdatedHospitalGroups");
+
+                    b.Navigation("UpdatedHospitalStaffs");
+
+                    b.Navigation("UpdatedHospitals");
+
+                    b.Navigation("UpdatedImagingOrders");
+
+                    b.Navigation("UpdatedImagingReports");
+
+                    b.Navigation("UpdatedLabOrderItems");
+
+                    b.Navigation("UpdatedLabReports");
+
+                    b.Navigation("UpdatedMedicalRecords");
+
+                    b.Navigation("UpdatedMedicineCategories");
+
+                    b.Navigation("UpdatedMedicineInventories");
+
+                    b.Navigation("UpdatedMedicines");
+
                     b.Navigation("UpdatedMenus");
+
+                    b.Navigation("UpdatedPatientAllergies");
+
+                    b.Navigation("UpdatedPatientMedicalHistories");
+
+                    b.Navigation("UpdatedPatients");
+
+                    b.Navigation("UpdatedPayments");
+
+                    b.Navigation("UpdatedPrescriptionItems");
+
+                    b.Navigation("UpdatedPrescriptions");
+
+                    b.Navigation("UpdatedPrintTemplateVersions");
+
+                    b.Navigation("UpdatedPrintTemplates");
+
+                    b.Navigation("UpdatedProfiles");
+
+                    b.Navigation("UpdatedReviews");
 
                     b.Navigation("UpdatedRoles");
 
@@ -6380,7 +7980,75 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Operation.HospitalGroup", b =>
                 {
+                    b.Navigation("Addresses");
+
+                    b.Navigation("Appointments");
+
+                    b.Navigation("BillItems");
+
+                    b.Navigation("Bills");
+
+                    b.Navigation("Departments");
+
+                    b.Navigation("DoctorAwards");
+
+                    b.Navigation("DoctorCertifications");
+
+                    b.Navigation("DoctorEducations");
+
+                    b.Navigation("DoctorLeaves");
+
+                    b.Navigation("DoctorPublications");
+
+                    b.Navigation("DoctorSchedules");
+
+                    b.Navigation("DoctorSpecialties");
+
+                    b.Navigation("DoctorWorkExperiences");
+
+                    b.Navigation("Doctors");
+
+                    b.Navigation("HospitalStaffs");
+
                     b.Navigation("Hospitals");
+
+                    b.Navigation("ImagingOrders");
+
+                    b.Navigation("ImagingReports");
+
+                    b.Navigation("LabOrderItems");
+
+                    b.Navigation("LabOrders");
+
+                    b.Navigation("LabReports");
+
+                    b.Navigation("MedicalRecords");
+
+                    b.Navigation("MedicineCategories");
+
+                    b.Navigation("MedicineInventories");
+
+                    b.Navigation("Medicines");
+
+                    b.Navigation("PatientAllergies");
+
+                    b.Navigation("PatientMedicalHistories");
+
+                    b.Navigation("Patients");
+
+                    b.Navigation("Payments");
+
+                    b.Navigation("PrescriptionItems");
+
+                    b.Navigation("Prescriptions");
+
+                    b.Navigation("Profiles");
+
+                    b.Navigation("Reviews");
+
+                    b.Navigation("Roles");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.PatientInformation.Patient", b =>
@@ -6421,6 +8089,16 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Support.Supplier", b =>
                 {
                     b.Navigation("MedicineInventories");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.System.PrintTemplate", b =>
+                {
+                    b.Navigation("PrintTemplateVersions");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.System.PrintTemplateVersion", b =>
+                {
+                    b.Navigation("PrintTemplates");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.System.Sys_Language", b =>

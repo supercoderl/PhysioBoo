@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.PatientMedicalHistories.CreatePatientMe
     public sealed class CreatePatientMedicalHistoryCommandHandler : CommandHandlerBase, IRequestHandler<CreatePatientMedicalHistoryCommand>
     {
         private readonly IPatientMedicalHistoryRepository _patientMedicalHistoryRepository;
+        private readonly IUser _user;
 
         public CreatePatientMedicalHistoryCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IPatientMedicalHistoryRepository patientMedicalHistoryRepository
+            IPatientMedicalHistoryRepository patientMedicalHistoryRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _patientMedicalHistoryRepository = patientMedicalHistoryRepository;
+            _user = user;
         }
 
         public async Task Handle(CreatePatientMedicalHistoryCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _patientMedicalHistoryRepository.InsertAsync<PatientMedicalHistory, Guid>(new PatientMedicalHistory(
+            PatientMedicalHistory newPatientMedicalHistory = new PatientMedicalHistory(
                 request.NewPatientMedicalHistory.Id,
                 request.NewPatientMedicalHistory.PatientId,
                 request.NewPatientMedicalHistory.ConditionName,
@@ -40,7 +43,12 @@ namespace PhysioBoo.Application.Commands.PatientMedicalHistories.CreatePatientMe
                 request.NewPatientMedicalHistory.MedicationsPrescribed,
                 request.NewPatientMedicalHistory.NextReviewDate,
                 request.NewPatientMedicalHistory.Notes
-            ));
+            );
+
+            newPatientMedicalHistory.SetTenantId(_user.GetTenantId());
+            newPatientMedicalHistory.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _patientMedicalHistoryRepository.InsertAsync<PatientMedicalHistory, Guid>(newPatientMedicalHistory);
 
             if (!result.Success)
             {

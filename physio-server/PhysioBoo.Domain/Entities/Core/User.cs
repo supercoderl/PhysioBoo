@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Core
 {
-    public class User : Entity
+    public class User : TenantEntity
     {
         #region Core User Table (20)
         public string Email { get; private set; }
@@ -33,141 +33,120 @@ namespace PhysioBoo.Domain.Entities.Core
         public string? ProfilePicture { get; private set; }
         public string PreferredLanguage { get; private set; }
         public string TimeZone { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public Guid? CreatedBy { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
-        public Guid? UpdatedBy { get; private set; }
 
-        [ForeignKey("CreatedBy")]
-        [InverseProperty("CreatedUsers")]
         public virtual User? Creator { get; private set; }
-
-        [ForeignKey("UpdatedBy")]
-        [InverseProperty("UpdatedUsers")]
         public virtual User? Updater { get; private set; }
 
-        [InverseProperty("Creator")]
-        public virtual ICollection<User> CreatedUsers { get; private set; } = new List<User>();
-
-        [InverseProperty("Updater")]
-        public virtual ICollection<User> UpdatedUsers { get; private set; } = new List<User>();
-
-        [InverseProperty("User")]
-        public virtual ICollection<Address> Addresses { get; private set; } = new List<Address>();
-
-        [InverseProperty(nameof(User))]
         public virtual Doctor? Doctor { get; private set; }
-
-        [InverseProperty(nameof(User))]
         public virtual Patient? Patient { get; private set; }
-
-        [InverseProperty("CancelledByUser")]
-        public virtual ICollection<Appointment> CancelledAppointments { get; private set; } = new List<Appointment>();
-
-        [InverseProperty("CreatedByUser")]
-        public virtual ICollection<Appointment> CreatedAppointments { get; private set; } = new List<Appointment>();
-
-        [InverseProperty("Creator")]
-        public virtual ICollection<Bill> CreatedBills { get; private set; } = new List<Bill>();
-
-        [InverseProperty("Approver")]
-        public virtual ICollection<Bill> ApprovedBills { get; private set; } = new List<Bill>();
-
-        [InverseProperty("PerformedByUser")]
-        public virtual ICollection<BillItem> PerformedBillItems { get; private set; } = new List<BillItem>();
-
-        [InverseProperty("HeadOfDeptUser")]
-        public virtual ICollection<Department> HeadedDepartments { get; private set; } = new List<Department>();
-
-        [InverseProperty("VerifiedByUser")]
-        public virtual ICollection<Doctor> VerifiedDoctors { get; private set; } = new List<Doctor>();
-
-        [InverseProperty("Approver")]
-        public virtual ICollection<DoctorLeave> ApprovedLeaves { get; private set; } = new List<DoctorLeave>();
-
-        [InverseProperty("Manager")]
-        public virtual ICollection<HospitalStaff> HospitalStaffs { get; private set; } = new List<HospitalStaff>();
-
-        [InverseProperty("Technician")]
-        public virtual ICollection<ImagingOrder> ImagingOrders { get; private set; } = new List<ImagingOrder>();
-
-        [InverseProperty("Radiologist")]
-        public virtual ICollection<ImagingOrder> RadiologistImagingOrders { get; private set; } = new List<ImagingOrder>();
-
-        [InverseProperty("Creator")]
-        public virtual ICollection<ImagingOrder> CreatedImagingOrders { get; private set; } = new List<ImagingOrder>();
-
-        [InverseProperty("Radiologist")]
-        public virtual ICollection<ImagingReport> ImagingReports { get; private set; } = new List<ImagingReport>();
-
-        [InverseProperty("Creator")]
-        public virtual ICollection<LabOrder> CreatedLabOrders { get; private set; } = new List<LabOrder>();
-
-        [InverseProperty("SampleCollector")]
-        public virtual ICollection<LabOrderItem> CollectedLabSamples { get; private set; } = new List<LabOrderItem>();
-
-        [InverseProperty("Technician")]
-        public virtual ICollection<LabOrderItem> ProcessedLabTests { get; private set; } = new List<LabOrderItem>();
-
-        [InverseProperty("Verifier")]
-        public virtual ICollection<LabOrderItem> VerifiedLabTests { get; private set; } = new List<LabOrderItem>();
-
-        [InverseProperty("Pathologist")]
-        public virtual ICollection<LabReport> PathologistLabReports { get; private set; } = new List<LabReport>();
-
-        [InverseProperty("Creator")]
-        public virtual ICollection<MedicalRecord> CreatedMedicalRecords { get; private set; } = new HashSet<MedicalRecord>();
-
-        [InverseProperty("Processor")]
-        public virtual ICollection<Payment> ProcessedPayments { get; private set; } = new List<Payment>();
-
-        [InverseProperty("Reviewer")]
-        public virtual ICollection<Review> Reviews { get; private set; } = new List<Review>();
-
-        [InverseProperty("Moderator")]
-        public virtual ICollection<Review> ModeratedReviews { get; private set; } = new List<Review>();
-
-        [InverseProperty("Responder")]
-        public virtual ICollection<Review> Responses { get; private set; } = new List<Review>();
-
-        [InverseProperty("User")]
-        public virtual ICollection<VerificationToken> VerificationTokens { get; private set; } = new List<VerificationToken>();
-
-        [InverseProperty("User")]
-        public virtual ICollection<RefreshToken> RefreshTokens { get; private set; } = new List<RefreshToken>();
-
-        [InverseProperty("Creator")]
-        public virtual ICollection<Role> CreatedRoles { get; private set; } = new List<Role>();
-
-        [InverseProperty("Updater")]
-        public virtual ICollection<Role> UpdatedRoles { get; private set; } = new List<Role>();
-
-        [InverseProperty("User")]
-        public virtual ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
-
-        [InverseProperty("Assigner")]
-        public virtual ICollection<UserRole> AssignedUserRoles { get; private set; } = new List<UserRole>();
-
-        [InverseProperty("Creator")]
-        public virtual ICollection<AdminMenu> CreatedMenus { get; private set; } = new List<AdminMenu>();
-
-        [InverseProperty("Updater")]
-        public virtual ICollection<AdminMenu> UpdatedMenus { get; private set; } = new List<AdminMenu>();
-
-        [InverseProperty("User")]
-        public virtual ICollection<UserLogin> UserLogins { get; private set; } = new List<UserLogin>();
-
-        [InverseProperty(nameof(Sys_Device.User))]
-        public virtual ICollection<Sys_Device> Sys_Devices { get; private set; } = new List<Sys_Device>();
-
-        [InverseProperty(nameof(User))]
         public virtual Profile? Profile { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty(nameof(Sys_SequenceTracker.Creator))]
+        public virtual ICollection<User> CreatedUsers { get; private set; } = new List<User>();
+        public virtual ICollection<User> UpdatedUsers { get; private set; } = new List<User>();
+        public virtual ICollection<Address> Addresses { get; private set; } = new List<Address>();
+        public virtual ICollection<Appointment> CancelledAppointments { get; private set; } = new List<Appointment>();
+        public virtual ICollection<Appointment> CreatedAppointments { get; private set; } = new List<Appointment>();
+        public virtual ICollection<Appointment> UpdatedAppointments { get; private set; } = new List<Appointment>();
+        public virtual ICollection<Bill> CreatedBills { get; private set; } = new List<Bill>();
+        public virtual ICollection<Bill> UpdatedBills { get; private set; } = new List<Bill>();
+        public virtual ICollection<Bill> ApprovedBills { get; private set; } = new List<Bill>();
+        public virtual ICollection<BillItem> PerformedBillItems { get; private set; } = new List<BillItem>();
+        public virtual ICollection<Department> HeadedDepartments { get; private set; } = new List<Department>();
+        public virtual ICollection<Doctor> VerifiedDoctors { get; private set; } = new List<Doctor>();
+        public virtual ICollection<DoctorLeave> ApprovedLeaves { get; private set; } = new List<DoctorLeave>();
+        public virtual ICollection<HospitalStaff> HospitalStaffs { get; private set; } = new List<HospitalStaff>();
+        public virtual ICollection<ImagingOrder> ImagingOrders { get; private set; } = new List<ImagingOrder>();
+        public virtual ICollection<ImagingOrder> RadiologistImagingOrders { get; private set; } = new List<ImagingOrder>();
+        public virtual ICollection<ImagingOrder> CreatedImagingOrders { get; private set; } = new List<ImagingOrder>();
+        public virtual ICollection<ImagingOrder> UpdatedImagingOrders { get; private set; } = new List<ImagingOrder>();
+        public virtual ICollection<ImagingReport> ImagingReports { get; private set; } = new List<ImagingReport>();
+        public virtual ICollection<LabOrder> CreatedLabOrders { get; private set; } = new List<LabOrder>();
+        public virtual ICollection<LabOrderItem> CollectedLabSamples { get; private set; } = new List<LabOrderItem>();
+        public virtual ICollection<LabOrderItem> ProcessedLabTests { get; private set; } = new List<LabOrderItem>();
+        public virtual ICollection<LabOrderItem> VerifiedLabTests { get; private set; } = new List<LabOrderItem>();
+        public virtual ICollection<LabReport> PathologistLabReports { get; private set; } = new List<LabReport>();
+        public virtual ICollection<MedicalRecord> CreatedMedicalRecords { get; private set; } = new HashSet<MedicalRecord>();
+        public virtual ICollection<MedicalRecord> UpdatedMedicalRecords { get; private set; } = new HashSet<MedicalRecord>();
+        public virtual ICollection<Payment> ProcessedPayments { get; private set; } = new List<Payment>();
+        public virtual ICollection<Review> Reviews { get; private set; } = new List<Review>();
+        public virtual ICollection<Review> ModeratedReviews { get; private set; } = new List<Review>();
+        public virtual ICollection<Review> Responses { get; private set; } = new List<Review>();
+        public virtual ICollection<VerificationToken> VerificationTokens { get; private set; } = new List<VerificationToken>();
+        public virtual ICollection<RefreshToken> RefreshTokens { get; private set; } = new List<RefreshToken>();
+        public virtual ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
+        public virtual ICollection<UserRole> AssignedUserRoles { get; private set; } = new List<UserRole>();
+        public virtual ICollection<AdminMenu> CreatedMenus { get; private set; } = new List<AdminMenu>();
+        public virtual ICollection<AdminMenu> UpdatedMenus { get; private set; } = new List<AdminMenu>();
+        public virtual ICollection<UserLogin> UserLogins { get; private set; } = new List<UserLogin>();
+        public virtual ICollection<Sys_Device> Sys_Devices { get; private set; } = new List<Sys_Device>();
+        public virtual ICollection<PrintTemplate> CreatedPrintTemplates { get; private set; } = new List<PrintTemplate>();
+        public virtual ICollection<PrintTemplate> UpdatedPrintTemplates { get; private set; } = new List<PrintTemplate>();
+        public virtual ICollection<PrintTemplateVersion> CreatedPrintTemplateVersions { get; private set; } = new List<PrintTemplateVersion>();
+        public virtual ICollection<PrintTemplateVersion> UpdatedPrintTemplateVersions { get; private set; } = new List<PrintTemplateVersion>();
+        public virtual ICollection<PrintLog> PrintLogs { get; private set; } = new List<PrintLog>();
         public virtual ICollection<Sys_SequenceTracker> CreatedSequenceTrackers { get; private set; } = new List<Sys_SequenceTracker>();
-
-        [InverseProperty(nameof(Sys_SequenceTracker.Updater))]
         public virtual ICollection<Sys_SequenceTracker> UpdatedSequenceTrackers { get; private set; } = new List<Sys_SequenceTracker>();
+        public virtual ICollection<Prescription> CreatedPrescriptions { get; private set; } = new List<Prescription>();
+        public virtual ICollection<Prescription> UpdatedPrescriptions { get; private set; } = new List<Prescription>();
+        public virtual ICollection<Payment> CreatedPayments { get; private set; } = new List<Payment>();
+        public virtual ICollection<Payment> UpdatedPayments { get; private set; } = new List<Payment>();
+        public virtual ICollection<LabReport> CreatedLabReports { get; private set; } = new List<LabReport>();
+        public virtual ICollection<LabReport> UpdatedLabReports { get; private set; } = new List<LabReport>();
+        public virtual ICollection<ImagingReport> CreatedImagingReports { get; private set; } = new List<ImagingReport>();
+        public virtual ICollection<ImagingReport> UpdatedImagingReports { get; private set; } = new List<ImagingReport>();
+        public virtual ICollection<HospitalStaff> CreatedHospitalStaffs { get; private set; } = new List<HospitalStaff>();
+        public virtual ICollection<HospitalStaff> UpdatedHospitalStaffs { get; private set; } = new List<HospitalStaff>();
+        public virtual ICollection<DoctorSchedule> CreatedDoctorSchedules { get; private set; } = new List<DoctorSchedule>();
+        public virtual ICollection<DoctorSchedule> UpdatedDoctorSchedules { get; private set; } = new List<DoctorSchedule>();
+        public virtual ICollection<DoctorLeave> CreatedDoctorLeaves { get; private set; } = new List<DoctorLeave>();
+        public virtual ICollection<DoctorLeave> UpdatedDoctorLeaves { get; private set; } = new List<DoctorLeave>();
+        public virtual ICollection<Medicine> CreatedMedicines { get; private set; } = new List<Medicine>();
+        public virtual ICollection<Medicine> UpdatedMedicines { get; private set; } = new List<Medicine>();
+        public virtual ICollection<MedicineCategory> CreatedMedicineCategories { get; private set; } = new List<MedicineCategory>();
+        public virtual ICollection<MedicineCategory> UpdatedMedicineCategories { get; private set; } = new List<MedicineCategory>();
+        public virtual ICollection<MedicineInventory> CreatedMedicineInventories { get; private set; } = new List<MedicineInventory>();
+        public virtual ICollection<MedicineInventory> UpdatedMedicineInventories { get; private set; } = new List<MedicineInventory>();
+        public virtual ICollection<PrescriptionItem> CreatedPrescriptionItems { get; private set; } = new List<PrescriptionItem>();
+        public virtual ICollection<PrescriptionItem> UpdatedPrescriptionItems { get; private set; } = new List<PrescriptionItem>();
+        public virtual ICollection<Address> CreatedAddresses { get; private set; } = new List<Address>();
+        public virtual ICollection<Address> UpdatedAddresses { get; private set; } = new List<Address>();
+        public virtual ICollection<Profile> CreatedProfiles { get; private set; } = new List<Profile>();
+        public virtual ICollection<Profile> UpdatedProfiles { get; private set; } = new List<Profile>();
+        public virtual ICollection<Role> CreatedRoles { get; private set; } = new List<Role>();
+        public virtual ICollection<Role> UpdatedRoles { get; private set; } = new List<Role>();
+        public virtual ICollection<LabOrderItem> CreatedLabOrderItems { get; private set; } = new List<LabOrderItem>();
+        public virtual ICollection<LabOrderItem> UpdatedLabOrderItems { get; private set; } = new List<LabOrderItem>();
+        public virtual ICollection<DoctorAward> CreatedDoctorAwards { get; private set; } = new List<DoctorAward>();
+        public virtual ICollection<DoctorAward> UpdatedDoctorAwards { get; private set; } = new List<DoctorAward>();
+        public virtual ICollection<DoctorCertification> CreatedDoctorCertifications { get; private set; } = new List<DoctorCertification>();
+        public virtual ICollection<DoctorCertification> UpdatedDoctorCertifications { get; private set; } = new List<DoctorCertification>();
+        public virtual ICollection<DoctorEducation> CreatedDoctorEducations { get; private set; } = new List<DoctorEducation>();
+        public virtual ICollection<DoctorEducation> UpdatedDoctorEducations { get; private set; } = new List<DoctorEducation>();
+        public virtual ICollection<DoctorPublication> CreatedDoctorPublications { get; private set; } = new List<DoctorPublication>();
+        public virtual ICollection<DoctorPublication> UpdatedDoctorPublications { get; private set; } = new List<DoctorPublication>();
+        public virtual ICollection<DoctorSpecialty> CreatedDoctorSpecialties { get; private set; } = new List<DoctorSpecialty>();
+        public virtual ICollection<DoctorSpecialty> UpdatedDoctorSpecialties { get; private set; } = new List<DoctorSpecialty>();
+        public virtual ICollection<DoctorWorkExperience> CreatedDoctorWorkExperiences { get; private set; } = new List<DoctorWorkExperience>();
+        public virtual ICollection<DoctorWorkExperience> UpdatedDoctorWorkExperiences { get; private set; } = new List<DoctorWorkExperience>();
+        public virtual ICollection<BillItem> CreatedBillItems { get; private set; } = new List<BillItem>();
+        public virtual ICollection<BillItem> UpdatedBillItems { get; private set; } = new List<BillItem>();
+        public virtual ICollection<Department> CreatedDepartments { get; private set; } = new List<Department>();
+        public virtual ICollection<Department> UpdatedDepartments { get; private set; } = new List<Department>();
+        public virtual ICollection<Hospital> CreatedHospitals { get; private set; } = new List<Hospital>();
+        public virtual ICollection<Hospital> UpdatedHospitals { get; private set; } = new List<Hospital>();
+        public virtual ICollection<HospitalGroup> CreatedHospitalGroups { get; private set; } = new List<HospitalGroup>();
+        public virtual ICollection<HospitalGroup> UpdatedHospitalGroups { get; private set; } = new List<HospitalGroup>();
+        public virtual ICollection<Patient> CreatedPatients { get; private set; } = new List<Patient>();
+        public virtual ICollection<Patient> UpdatedPatients { get; private set; } = new List<Patient>();
+        public virtual ICollection<PatientAllergy> CreatedPatientAllergies { get; private set; } = new List<PatientAllergy>();
+        public virtual ICollection<PatientAllergy> UpdatedPatientAllergies { get; private set; } = new List<PatientAllergy>();
+        public virtual ICollection<PatientMedicalHistory> CreatedPatientMedicalHistories { get; private set; } = new List<PatientMedicalHistory>();
+        public virtual ICollection<PatientMedicalHistory> UpdatedPatientMedicalHistories { get; private set; } = new List<PatientMedicalHistory>();
+        public virtual ICollection<Doctor> CreatedDoctors { get; private set; } = new List<Doctor>();
+        public virtual ICollection<Doctor> UpdatedDoctors { get; private set; } = new List<Doctor>();
+        public virtual ICollection<Review> CreatedReviews { get; private set; } = new List<Review>();
+        public virtual ICollection<Review> UpdatedReviews { get; private set; } = new List<Review>();
         #endregion
 
         #region Constructor (20)
@@ -175,8 +154,7 @@ namespace PhysioBoo.Domain.Entities.Core
             Guid id,
             string email,
             string phone,
-            string passwordHash,
-            Guid? createdBy
+            string passwordHash
         ) : base(id)
         {
             Email = email;
@@ -195,10 +173,6 @@ namespace PhysioBoo.Domain.Entities.Core
             ProfilePicture = null;
             PreferredLanguage = "en";
             TimeZone = "Asia/Ho_Chi_Minh";
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            CreatedBy = createdBy;
-            UpdatedAt = null;
-            UpdatedBy = null;
         }
         #endregion
 
@@ -219,10 +193,6 @@ namespace PhysioBoo.Domain.Entities.Core
         public void SetProfilePicture(string? profilePicture) { ProfilePicture = profilePicture; }
         public void SetPreferredLanguage(string preferredLanguage) { PreferredLanguage = preferredLanguage; }
         public void SetTimeZone(string timezone) { TimeZone = timezone; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetCreatedBy(Guid? createdBy) { CreatedBy = createdBy; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
-        public void SetUpdatedBy(Guid? updatedBy) { UpdatedBy = updatedBy; }
         public void RegisterFailedLogin(int maxFailedAttempts, int lockoutMinutes)
         {
             if (FailedLoginAttempts >= maxFailedAttempts)
@@ -236,6 +206,18 @@ namespace PhysioBoo.Domain.Entities.Core
                 // Increase the number of mistakes
                 FailedLoginAttempts++;
             }
+        }
+
+        public void CreateDoctor(Profile profile, Doctor doctor)
+        {
+            Profile = profile;
+            Doctor = doctor;
+        }
+
+        public void CreatePatient(Profile profile, Patient patient)
+        {
+            Profile = profile;
+            Patient = patient;
         }
         #endregion
     }

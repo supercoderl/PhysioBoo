@@ -31,21 +31,21 @@ namespace PhysioBoo.Application.Commands.LabTests.CreateLabTest
             string newCode = await _sequenceTrackerRepository.GenerateNextCodeAsync(nameof(LabTest), cancellationToken);
 
             LabTest newLabTest = new LabTest(
-              request.NewLabTest.Id,
-              request.NewLabTest.TestName,
-              newCode,
-              request.NewLabTest.CategoryId,
-              request.NewLabTest.Description,
-              request.NewLabTest.SampleType,
-              request.NewLabTest.SampleVolume,
-              request.NewLabTest.CollectionInstructions,
-              request.NewLabTest.PreparationInstructions,
-              request.NewLabTest.NormalRangeMale,
-              request.NewLabTest.NormalRangeFemale,
-              request.NewLabTest.NormalPediatric,
-              request.NewLabTest.UnitOfMeasurement,
-              request.NewLabTest.Methodology
-          );
+                request.NewLabTest.Id,
+                request.NewLabTest.TestName,
+                newCode,
+                request.NewLabTest.CategoryId,
+                request.NewLabTest.Description,
+                request.NewLabTest.SampleType,
+                request.NewLabTest.SampleVolume,
+                request.NewLabTest.CollectionInstructions,
+                request.NewLabTest.PreparationInstructions,
+                request.NewLabTest.NormalRangeMale,
+                request.NewLabTest.NormalRangeFemale,
+                request.NewLabTest.NormalPediatric,
+                request.NewLabTest.UnitOfMeasurement,
+                request.NewLabTest.Methodology
+            );
 
             newLabTest.SetPreparationRequired(request.NewLabTest.PreparationRequired);
             newLabTest.SetFastingRequired(request.NewLabTest.FastingRequired);

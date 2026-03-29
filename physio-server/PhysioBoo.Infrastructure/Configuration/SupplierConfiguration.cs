@@ -30,7 +30,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(s => s.Type)
                    .HasConversion<string>()
-                   .HasMaxLength(50)
                    .IsRequired();
 
             builder.Property(s => s.ContactPerson).HasMaxLength(255);
@@ -86,10 +85,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(s => s.TotalOrders).IsRequired();
             builder.Property(s => s.TotalPurchaseValue).HasColumnType("numeric(15,2)").IsRequired();
-
-            builder.Property(s => s.LastOrderDate);
-            builder.Property(s => s.CreatedAt).IsRequired();
-            builder.Property(s => s.UpdatedAt);
 
             builder.Property(s => s.SearchVector)
                    .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"SupplierName\", '') || ' ' || coalesce(\"SupplierCode\", '')))", stored: true)

@@ -96,7 +96,8 @@ namespace PhysioBoo.Application.EventHandlers.User
                         {
                             ["Email"] = token.UserEmail,
                             ["Id"] = token.UserId.ToString(),
-                            ["Name"] = token.UserEmail.Split("@")[0]
+                            ["Name"] = token.UserEmail.Split("@")[0],
+                            ["TenantId"] = token.TenantId.ToString()
                         }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes
                     );
 

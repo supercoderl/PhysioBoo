@@ -52,11 +52,14 @@ namespace PhysioBoo.Infrastructure.Repositories
                 reader.GetFieldValue<Guid>("Id"),
                 reader.GetString("Email"),
                 reader.GetString("Phone"),
-                reader.GetString("PasswordHash"),
-                reader.IsDBNull("CreatedBy") ? null : reader.GetGuid("CreatedBy")
+                reader.GetString("PasswordHash")
             );
 
             // Only set properties needed for login validation
+            if (!reader.IsDBNull("CreatedBy"))
+            {
+                user.SetCreatedBy(reader.GetGuid("CreatedBy"));
+            }
             user.SetIsActive(reader.GetBoolean("IsActive"));
             user.SetIsVerified(reader.GetBoolean("IsVerified"));
             user.SetEmailVerifiedAt(reader.IsDBNull("EmailVerifiedAt") ? null : reader.GetDateTime("EmailVerifiedAt"));

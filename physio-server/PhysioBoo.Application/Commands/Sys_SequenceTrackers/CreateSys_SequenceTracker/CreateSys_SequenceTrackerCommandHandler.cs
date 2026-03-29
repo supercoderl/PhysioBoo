@@ -33,10 +33,10 @@ namespace PhysioBoo.Application.Commands.Sys_SequenceTrackers.CreateSys_Sequence
                 request.NewSys_SequenceTracker.EntityType,
                 request.NewSys_SequenceTracker.Prefix,
                 request.NewSys_SequenceTracker.UseDateFormating,
-                request.NewSys_SequenceTracker.Suffix,
-                _user.GetUserId()
+                request.NewSys_SequenceTracker.Suffix
             );
 
+            sys_SequenceTracker.SetCreatedBy(_user.GetUserId());
             sys_SequenceTracker.SetSequenceLength(request.NewSys_SequenceTracker.SequenceLength);
             sys_SequenceTracker.SetCurrentSequence(request.NewSys_SequenceTracker.CurrentSequence);
 

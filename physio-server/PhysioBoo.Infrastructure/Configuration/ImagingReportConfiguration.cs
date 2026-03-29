@@ -35,6 +35,21 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(u => u.ImagingReports)
                    .HasForeignKey(r => r.RadiologistId);
 
+            builder.HasOne(r => r.Creator)
+                   .WithMany(u => u.CreatedImagingReports)
+                   .HasForeignKey(r => r.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(r => r.Updater)
+                   .WithMany(u => u.UpdatedImagingReports)
+                   .HasForeignKey(r => r.UpdatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(r => r.HospitalGroup)
+                   .WithMany(hg => hg.ImagingReports)
+                   .HasForeignKey(r => r.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(r => r.ReportNumber)
                    .IsRequired()
@@ -64,7 +79,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(r => r.Status)
                    .HasConversion<string>()
-                   .HasMaxLength(30)
                    .IsRequired();
 
             builder.Property(r => r.ImagesCount).IsRequired();
@@ -76,8 +90,6 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasMaxLength(500);
 
             builder.Property(r => r.ImagesUrl).HasColumnType("jsonb");
-
-            builder.Property(r => r.CreatedAt).IsRequired();
         }
     }
 }

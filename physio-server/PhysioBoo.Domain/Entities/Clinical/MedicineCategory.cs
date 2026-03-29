@@ -1,10 +1,11 @@
 ﻿using NpgsqlTypes;
-using PhysioBoo.SharedKernel.Utils;
+using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Clinical
 {
-    public class MedicineCategory : Entity
+    public class MedicineCategory : TenantEntity
     {
         #region Core Medicine Category Table (8)
         public string Name { get; private set; }
@@ -14,19 +15,16 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public bool IsControlled { get; private set; }
         public bool RequiresPrescription { get; private set; }
         public string? StorageConditions { get; private set; }
-        public DateTime CreatedAt { get; private set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public NpgsqlTsVector? SearchVector { get; private set; }
 
-        [ForeignKey(nameof(ParentCategoryId))]
-        [InverseProperty(nameof(ParentCategory.SubCategories))]
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         public virtual MedicineCategory? ParentCategory { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty(nameof(Medicine.Category))]
         public virtual ICollection<Medicine> Medicines { get; private set; } = new List<Medicine>();
-
-        [InverseProperty(nameof(ParentCategory))]
         public virtual ICollection<MedicineCategory> SubCategories { get; private set; } = new List<MedicineCategory>();
         #endregion
 
@@ -47,7 +45,6 @@ namespace PhysioBoo.Domain.Entities.Clinical
             IsControlled = false;
             RequiresPrescription = true;
             StorageConditions = storageConditions;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
         }
         #endregion
 
@@ -59,7 +56,6 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public void SetIsControlled(bool isControlled) { IsControlled = isControlled; }
         public void SetRequiresPrescription(bool requiresPrescription) { RequiresPrescription = requiresPrescription; }
         public void SetStorageConditions(string? storageConditions) { StorageConditions = storageConditions; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         #endregion
     }
 }

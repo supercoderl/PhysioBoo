@@ -37,6 +37,21 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(u => u.Responses)
                    .HasForeignKey(r => r.RespondedBy);
 
+            builder.HasOne(r => r.Creator)
+                   .WithMany(u => u.CreatedReviews)
+                   .HasForeignKey(r => r.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(r => r.Updater)
+                   .WithMany(u => u.UpdatedReviews)
+                   .HasForeignKey(r => r.UpdatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(r => r.HospitalGroup)
+                   .WithMany(hg => hg.Reviews)
+                   .HasForeignKey(r => r.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(r => r.ReviewType)
                    .HasConversion<string>()
@@ -81,9 +96,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(r => r.ResponseText);
             builder.Property(r => r.ResponseDate);
-
-            builder.Property(r => r.CreatedAt).IsRequired();
-            builder.Property(r => r.UpdatedAt);
         }
     }
 }

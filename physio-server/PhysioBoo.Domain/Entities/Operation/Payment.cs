@@ -2,11 +2,10 @@
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Operation
 {
-    public class Payment : Entity
+    public class Payment : TenantEntity
     {
         #region Core Payment Table (23)
         public string PaymentNumber { get; private set; }
@@ -30,20 +29,13 @@ namespace PhysioBoo.Domain.Entities.Operation
         public DateTime? RefundDate { get; private set; }
         public string? RefundReason { get; private set; }
         public string? Notes { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("BillId")]
-        [InverseProperty("Payments")]
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         public virtual Bill? Bill { get; private set; }
-
-        [ForeignKey("PatientId")]
-        [InverseProperty("Payments")]
         public virtual Patient? Patient { get; private set; }
-
-        [ForeignKey("ProcessedBy")]
-        [InverseProperty("ProcessedPayments")]
         public virtual User? Processor { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (23)
@@ -88,8 +80,6 @@ namespace PhysioBoo.Domain.Entities.Operation
             RefundDate = refundDate;
             RefundReason = refundReason;
             Notes = notes;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -115,8 +105,6 @@ namespace PhysioBoo.Domain.Entities.Operation
         public void SetRefundReason(string? refundReason) { RefundReason = refundReason; }
         public void SetNotes(string? notes) { Notes = notes; }
         public void SetStatus(PaymentStatus status) { Status = status; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

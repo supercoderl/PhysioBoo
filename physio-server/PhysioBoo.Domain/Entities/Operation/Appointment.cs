@@ -5,12 +5,10 @@ using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
 using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Operation
 {
-    public class Appointment : Entity
+    public class Appointment : TenantEntity
     {
         #region Core Appointment Table (48)
         public string AppointmentNumber { get; private set; }
@@ -58,65 +56,25 @@ namespace PhysioBoo.Domain.Entities.Operation
         public Guid? CancelledBy { get; private set; }
         public DateTime? CancelledAt { get; private set; }
         public Guid? RescheduledFromAppointmentId { get; private set; }
-        public Guid? CreatedBy { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("PatientId")]
-        [InverseProperty("Appointments")]
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         public virtual Patient? Patient { get; private set; }
-
-        [ForeignKey("DoctorId")]
-        [InverseProperty("Appointments")]
         public virtual Doctor? Doctor { get; private set; }
-
-        [ForeignKey("HospitalId")]
-        [InverseProperty("Appointments")]
         public virtual Hospital? Hospital { get; private set; }
-
-        [ForeignKey("DepartmentId")]
-        [InverseProperty("Appointments")]
         public virtual Department? Department { get; private set; }
-
-        [ForeignKey("AppointmentTypeId")]
-        [InverseProperty("Appointments")]
         public virtual AppointmentType? AppointmentType { get; private set; }
-
-        [ForeignKey("ReferringDoctorId")]
-        [InverseProperty("ReferredAppointments")]
         public virtual Doctor? ReferringDoctor { get; private set; }
-
-        [ForeignKey("CancelledBy")]
-        [InverseProperty("CancelledAppointments")]
         public virtual User? CancelledByUser { get; private set; }
-
-        [ForeignKey("RescheduledFromAppointmentId")]
-        [InverseProperty("RescheduledAppointments")]
         public virtual Appointment? RescheduledFromAppointment { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [ForeignKey("CreatedBy")]
-        [InverseProperty("CreatedAppointments")]
-        public virtual User? CreatedByUser { get; private set; }
-
-        [InverseProperty("RescheduledFromAppointment")]
         public virtual ICollection<Appointment> RescheduledAppointments { get; private set; } = new List<Appointment>();
-
-        [InverseProperty("Appointment")]
         public virtual ICollection<Bill> Bills { get; private set; } = new List<Bill>();
-
-        [InverseProperty("Appointment")]
         public virtual ICollection<ImagingOrder> ImagingOrders { get; private set; } = new List<ImagingOrder>();
-
-        [InverseProperty("Appointment")]
         public virtual ICollection<LabOrder> LabOrders { get; private set; } = new List<LabOrder>();
-
-        [InverseProperty("Appointment")]
         public virtual ICollection<MedicalRecord> MedicalRecords { get; private set; } = new List<MedicalRecord>();
-
-        [InverseProperty("Appointment")]
         public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();
-
-        [InverseProperty("Appointment")]
         public virtual ICollection<Review> Reviews { get; private set; } = new List<Review>();
         #endregion
 
@@ -157,8 +115,7 @@ namespace PhysioBoo.Domain.Entities.Operation
             string? cancellationReason,
             Guid? cancelledBy,
             DateTime? cancelledAt,
-            Guid? rescheduledFromAppointmentId,
-            Guid? createdBy
+            Guid? rescheduledFromAppointmentId
         ) : base(id)
         {
             AppointmentNumber = appointmentNumber;
@@ -206,9 +163,6 @@ namespace PhysioBoo.Domain.Entities.Operation
             CancelledBy = cancelledBy;
             CancelledAt = cancelledAt;
             RescheduledFromAppointmentId = rescheduledFromAppointmentId;
-            CreatedBy = createdBy;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -258,9 +212,6 @@ namespace PhysioBoo.Domain.Entities.Operation
         public void SetCancelledBy(Guid? cancelledBy) { CancelledBy = cancelledBy; }
         public void SetCancelledAt(DateTime? cancelledAt) { CancelledAt = cancelledAt; }
         public void SetRescheduledFromAppointmentId(Guid? rescheduledFromAppointmentId) { RescheduledFromAppointmentId = rescheduledFromAppointmentId; }
-        public void SetCreatedBy(Guid? createdBy) { CreatedBy = createdBy; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
     }
     #endregion
 }

@@ -1,12 +1,12 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.MedicalStaff;
+using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.LaboratoryImaging
 {
-    public class LabReport : Entity
+    public class LabReport : TenantEntity
     {
         #region Core Lab Report Table (21)
         public string ReportNumber { get; private set; }
@@ -29,29 +29,16 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public bool DeliveredToPatient { get; private set; }
         public DateTime? DeliveredAt { get; private set; }
         public string? DeliveryMethod { get; private set; }
-        public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey("LabOrderId")]
-        [InverseProperty("LabReports")]
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         public virtual LabOrder? LabOrder { get; private set; }
-
-        [ForeignKey("PatientId")]
-        [InverseProperty("LabReports")]
         public virtual Patient? Patient { get; private set; }
-
-        [ForeignKey("DoctorId")]
-        [InverseProperty("LabReports")]
         public virtual Doctor? Doctor { get; private set; }
-
-        [ForeignKey("PathologistId")]
-        [InverseProperty("PathologistLabReports")]
         public virtual User? Pathologist { get; private set; }
-
-        [ForeignKey("OriginalReportId")]
-        [InverseProperty("AmendedReports")]
         public virtual LabReport? OriginalReport { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty("OriginalReport")]
         public virtual ICollection<LabReport> AmendedReports { get; private set; } = new List<LabReport>();
         #endregion
 
@@ -95,7 +82,6 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
             DeliveredToPatient = false;
             DeliveredAt = deliveredAt;
             DeliveryMethod = deliveryMethod;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
         }
         #endregion
 

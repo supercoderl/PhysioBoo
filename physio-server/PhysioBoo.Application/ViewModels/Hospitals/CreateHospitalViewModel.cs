@@ -5,7 +5,6 @@ namespace PhysioBoo.Application.ViewModels.Hospitals
     public sealed record CreateHospitalViewModel
     (
         Guid Id,
-        Guid HospitalGroupId,
         string Name,
         HospitalType HospitalType,
         int EmergencyCapacity,

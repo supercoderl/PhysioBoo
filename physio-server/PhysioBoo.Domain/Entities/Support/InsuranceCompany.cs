@@ -35,7 +35,6 @@ namespace PhysioBoo.Domain.Entities.Support
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public NpgsqlTsVector? SearchVector { get; private set; }
 
-        [InverseProperty("InsuranceCompany")]
         public virtual ICollection<Bill> Bills { get; private set; } = new List<Bill>();
         #endregion
 

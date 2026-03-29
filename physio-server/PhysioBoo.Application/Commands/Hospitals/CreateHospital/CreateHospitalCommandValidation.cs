@@ -7,7 +7,6 @@ namespace PhysioBoo.Application.Commands.Hospitals.CreateHospital
     {
         public CreateHospitalCommandValidation()
         {
-            RuleForHospitalGroupId();
             RuleForName();
             RuleForAddress();
             RuleForCity();
@@ -16,14 +15,6 @@ namespace PhysioBoo.Application.Commands.Hospitals.CreateHospital
             RuleForAccreditationBody();
             RuleForInsuranceAccepted();
             RuleForLanguagesSupported();
-        }
-
-        public void RuleForHospitalGroupId()
-        {
-            RuleFor(cmd => cmd.NewHospital.HospitalGroupId)
-                .NotEmpty()
-                .WithErrorCode(DomainErrorCodes.Hospital.EmptyHospitalGroupId)
-                .WithMessage("HospitalGroupId may not be empty.");
         }
 
         public void RuleForName()

@@ -48,6 +48,20 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasForeignKey(p => p.HospitalId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasOne(p => p.Creator)
+                   .WithMany(u => u.CreatedPrescriptions)
+                   .HasForeignKey(p => p.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(p => p.Updater)
+                   .WithMany(u => u.UpdatedPrescriptions)
+                   .HasForeignKey(p => p.UpdatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(p => p.HospitalGroup)
+                   .WithMany(hg => hg.Prescriptions)
+                   .HasForeignKey(p => p.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
             // Properties
             builder.Property(p => p.PrescriptionNumber)
                    .IsRequired()
@@ -65,7 +79,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(p => p.Status)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
 
             builder.Property(p => p.ValidUntil);
@@ -77,9 +90,6 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(p => p.IsPrinted).IsRequired();
 
             builder.Property(p => p.PharmacistNotes);
-
-            builder.Property(p => p.CreatedAt).IsRequired();
-            builder.Property(p => p.UpdatedAt);
         }
     }
 }

@@ -4,31 +4,38 @@ using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
-using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Application.Commands.Appointments.CreateAppointment
 {
     public sealed class CreateAppointmentCommandHandler : CommandHandlerBase, IRequestHandler<CreateAppointmentCommand>
     {
         private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IUser _user;
+        private readonly ISys_SequenceTrackerRepository _sys_SequenceTrackerRepository;
 
         public CreateAppointmentCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IAppointmentRepository appointmentRepository
+            IAppointmentRepository appointmentRepository,
+            IUser user,
+            ISys_SequenceTrackerRepository sys_SequenceTrackerRepository
         ) : base(bus, unitOfWork, notifications)
         {
             _appointmentRepository = appointmentRepository;
+            _user = user;
+            _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
         public async Task Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _appointmentRepository.InsertAsync<Appointment, Guid>(new Appointment(
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Appointment), cancellationToken);
+
+            Appointment newAppointment = new Appointment(
                 request.NewAppointment.Id,
-                Generate(),
+                newCode,
                 request.NewAppointment.PatientId,
                 request.NewAppointment.DoctorId,
                 request.NewAppointment.HospitalId,
@@ -62,9 +69,13 @@ namespace PhysioBoo.Application.Commands.Appointments.CreateAppointment
                 null,
                 null,
                 null,
-                null,
-                request.UserId
-            ));
+                null
+            );
+
+            newAppointment.SetTenantId(_user.GetTenantId());
+            newAppointment.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _appointmentRepository.InsertAsync<Appointment, Guid>(newAppointment);
 
             if (!result.Success)
             {
@@ -76,18 +87,6 @@ namespace PhysioBoo.Application.Commands.Appointments.CreateAppointment
 
                 return;
             }
-        }
-
-        /// <summary>
-        /// Generate appointment number based on current time.
-        /// Format: APP-YYYYMMDD-HHMMSS-fff-RND
-        /// Ví dụ: APP-20250923-182530-123-57
-        /// </summary>
-        public static string Generate()
-        {
-            var now = TimeZoneHelper.GetLocalTimeNow();
-
-            return $"APP-{now:yyyyMMdd-HHmmss}";
         }
     }
 }

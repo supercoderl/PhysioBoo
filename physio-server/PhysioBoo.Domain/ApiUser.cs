@@ -12,6 +12,7 @@ namespace PhysioBoo.Domain
         private string? _name;
         private string? _timeZoneId;
         private Guid _userId = Guid.Empty;
+        private Guid _tenantId = Guid.Empty;
 
         public ApiUser(IHttpContextAccessor httpContextAccessor, ILogger<ApiUser> logger)
         {
@@ -110,6 +111,26 @@ namespace PhysioBoo.Domain
             }
 
             return string.Empty;
+        }
+
+        public Guid GetTenantId()
+        {
+            if (_tenantId != Guid.Empty)
+            {
+                return _tenantId;
+            }
+
+            Claim? claim = _httpContextAccessor.HttpContext?.User.Claims
+            .FirstOrDefault(x => string.Equals(x.Type, "TenantId"));
+
+            if (Guid.TryParse(claim?.Value, out Guid tenantId))
+            {
+                _tenantId = tenantId;
+                return tenantId;
+            }
+
+            _logger.LogWarning("Could not parse tenant id to guid");
+            return Guid.Empty;
         }
     }
 }

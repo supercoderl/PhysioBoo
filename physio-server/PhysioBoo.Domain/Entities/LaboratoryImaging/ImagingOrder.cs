@@ -3,12 +3,10 @@ using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.LaboratoryImaging
 {
-    public class ImagingOrder : Entity
+    public class ImagingOrder : TenantEntity
     {
         #region Core Imaging Order Table (32)
         public string OrderNumber { get; private set; }
@@ -40,43 +38,18 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public ImagingOrderStatus Status { get; private set; }
         public Guid? TechnicianId { get; private set; }
         public Guid? RadiologistId { get; private set; }
-        public Guid CreatedBy { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("PatientId")]
-        [InverseProperty("ImagingOrders")]
         public virtual Patient? Patient { get; private set; }
-
-        [ForeignKey("DoctorId")]
-        [InverseProperty("ImagingOrders")]
         public virtual Doctor? Doctor { get; private set; }
-
-        [ForeignKey("AppointmentId")]
-        [InverseProperty("ImagingOrders")]
         public virtual Appointment? Appointment { get; private set; }
-
-        [ForeignKey("HospitalId")]
-        [InverseProperty("ImagingOrders")]
         public virtual Hospital? Hospital { get; private set; }
-
-        [ForeignKey("ModalityId")]
-        [InverseProperty("ImagingOrders")]
         public virtual ImagingModality? Modality { get; private set; }
-
-        [ForeignKey("TechnicianId")]
-        [InverseProperty("ImagingOrders")]
         public virtual User? Technician { get; private set; }
-
-        [ForeignKey("RadiologistId")]
-        [InverseProperty("RadiologistImagingOrders")]
         public virtual User? Radiologist { get; private set; }
-
-        [ForeignKey("CreatedBy")]
-        [InverseProperty("CreatedImagingOrders")]
         public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty("ImagingOrder")]
         public virtual ICollection<ImagingReport> ImagingReports { get; private set; } = new List<ImagingReport>();
         #endregion
 
@@ -105,8 +78,7 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
             bool implantsPresent,
             string? implantDetails,
             Guid? technicianId,
-            Guid? radiologistId,
-            Guid createdBy
+            Guid? radiologistId
         ) : base(id)
         {
             OrderNumber = orderNumber;
@@ -138,9 +110,6 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
             Status = ImagingOrderStatus.Ordered;
             TechnicianId = technicianId;
             RadiologistId = radiologistId;
-            CreatedBy = createdBy;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -174,9 +143,6 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public void SetStatus(ImagingOrderStatus status) { Status = status; }
         public void SetTechnicianId(Guid? technicianId) { TechnicianId = technicianId; }
         public void SetRadiologistId(Guid? radiologistId) { RadiologistId = radiologistId; }
-        public void SetCreatedBy(Guid createdBy) { CreatedBy = createdBy; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

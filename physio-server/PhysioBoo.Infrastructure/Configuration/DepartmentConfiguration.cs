@@ -28,6 +28,21 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(u => u.HeadedDepartments)
                    .HasForeignKey(d => d.HeadOfDepartment);
 
+            builder.HasOne(d => d.Creator)
+                   .WithMany(u => u.CreatedDepartments)
+                   .HasForeignKey(d => d.CreatedBy)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(d => d.Updater)
+                   .WithMany(u => u.UpdatedDepartments)
+                   .HasForeignKey(d => d.UpdatedBy)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(d => d.HospitalGroup)
+                   .WithMany(hg => hg.Departments)
+                   .HasForeignKey(d => d.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(d => d.Name)
                    .IsRequired()
@@ -63,9 +78,6 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(d => d.EquipmentList).HasColumnType("jsonb");
 
             builder.Property(d => d.IsActive).IsRequired();
-
-            builder.Property(d => d.CreatedAt).IsRequired();
-            builder.Property(d => d.UpdatedAt).IsRequired(false);
 
             builder.Property(ms => ms.SearchVector)
                    .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"DepartmentCode\", '')))", stored: true)

@@ -4,11 +4,10 @@ using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.LaboratoryImaging
 {
-    public class LabOrder : Entity
+    public class LabOrder : TenantEntity
     {
         #region Core Lab Order Table (24)
         public string OrderNumber { get; private set; }
@@ -32,34 +31,15 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public PaymentStatus PaymentStatus { get; private set; }
         public OrderStatus OrderStatus { get; private set; }
         public ReportDeliveryMethod ReportDeliveryMethod { get; private set; }
-        public Guid CreatedBy { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("PatientId")]
-        [InverseProperty("LabOrders")]
         public virtual Patient? Patient { get; private set; }
-
-        [ForeignKey("DoctorId")]
-        [InverseProperty("LabOrders")]
         public virtual Doctor? Doctor { get; private set; }
-
-        [ForeignKey("AppointmentId")]
-        [InverseProperty("LabOrders")]
         public virtual Appointment? Appointment { get; private set; }
-
-        [ForeignKey("HospitalId")]
-        [InverseProperty("LabOrders")]
         public virtual Hospital? Hospital { get; private set; }
-
-        [ForeignKey("CreatedBy")]
-        [InverseProperty("CreatedLabOrders")]
         public virtual User? Creator { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty("LabOrder")]
         public virtual ICollection<LabOrderItem> LabOrderItems { get; private set; } = new List<LabOrderItem>();
-
-        [InverseProperty("LabOrder")]
         public virtual ICollection<LabReport> LabReports { get; private set; } = new List<LabReport>();
         #endregion
 
@@ -101,9 +81,6 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
             PaymentStatus = PaymentStatus.Pending;
             OrderStatus = OrderStatus.Ordered;
             ReportDeliveryMethod = ReportDeliveryMethod.Email;
-            CreatedBy = doctorId;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -126,9 +103,6 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public void SetPaymentStatus(PaymentStatus paymentStatus) { PaymentStatus = paymentStatus; }
         public void SetOrderStatus(OrderStatus orderStatus) { OrderStatus = orderStatus; }
         public void SetReportDeliveryMethod(ReportDeliveryMethod reportDeliveryMethod) { ReportDeliveryMethod = reportDeliveryMethod; }
-        public void SetCreatedBy(Guid createdBy) { CreatedBy = createdBy; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime updatedAt) { UpdatedAt = updatedAt; }
         private void UpdateFinalAmount()
         {
             FinalAmount = TotalAmount - DiscountAmount;

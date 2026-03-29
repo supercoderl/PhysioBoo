@@ -1,13 +1,13 @@
-﻿using PhysioBoo.Domain.Entities.MedicalStaff;
+﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Clinical
 {
-    public class Prescription : Entity
+    public class Prescription : TenantEntity
     {
         #region Core Prescription Table (19)
         public string PrescriptionNumber { get; private set; }
@@ -27,30 +27,16 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public bool IsDigital { get; private set; }
         public bool IsPrinted { get; private set; }
         public string? PharmacistNotes { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("PatientId")]
-        [InverseProperty("Prescriptions")]
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         public virtual Patient? Patient { get; private set; }
-
-        [ForeignKey("DoctorId")]
-        [InverseProperty("Prescriptions")]
         public virtual Doctor? Doctor { get; private set; }
-
-        [ForeignKey("AppoinmentId")]
-        [InverseProperty("Prescriptions")]
         public virtual Appointment? Appointment { get; private set; }
-
-        [ForeignKey("MedicalRecordId")]
-        [InverseProperty("Prescriptions")]
         public virtual MedicalRecord? MedicalRecord { get; private set; }
-
-        [ForeignKey("HospitalId")]
-        [InverseProperty("Prescriptions")]
         public virtual Hospital? Hospital { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty("Prescription")]
         public virtual ICollection<PrescriptionItem> PrescriptionItems { get; private set; } = new List<PrescriptionItem>();
         #endregion
 
@@ -87,8 +73,6 @@ namespace PhysioBoo.Domain.Entities.Clinical
             IsDigital = false;
             IsPrinted = false;
             PharmacistNotes = pharmacistNotes;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -110,8 +94,6 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public void SetIsDigital(bool isDigital) { IsDigital = isDigital; }
         public void SetIsPrinted(bool isPrinted) { IsPrinted = isPrinted; }
         public void SetPharmacistNotes(string? pharmacistNotes) { PharmacistNotes = pharmacistNotes; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

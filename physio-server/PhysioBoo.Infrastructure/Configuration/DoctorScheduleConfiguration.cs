@@ -35,6 +35,21 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasForeignKey(s => s.DepartmentId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasOne(s => s.Creator)
+                    .WithMany(u => u.CreatedDoctorSchedules)
+                    .HasForeignKey(s => s.CreatedBy)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(s => s.Updater)
+                    .WithMany(u => u.UpdatedDoctorSchedules)
+                    .HasForeignKey(s => s.UpdatedBy)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(s => s.HospitalGroup)
+                    .WithMany(hg => hg.DoctorSchedules)
+                    .HasForeignKey(s => s.TenantId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(s => s.DayOfWeek)
                    .IsRequired();
@@ -54,7 +69,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(s => s.ScheduleType)
                    .HasConversion<string>()
-                   .HasMaxLength(30)
                    .IsRequired();
 
             builder.Property(s => s.EffectiveFrom).IsRequired();
@@ -64,9 +78,6 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasColumnType("numeric(10,2)");
 
             builder.Property(s => s.Notes);
-
-            builder.Property(s => s.CreatedAt).IsRequired();
-            builder.Property(s => s.UpdatedAt);
         }
     }
 }

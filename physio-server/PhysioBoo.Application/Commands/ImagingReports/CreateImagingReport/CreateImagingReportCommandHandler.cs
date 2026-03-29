@@ -11,22 +11,25 @@ namespace PhysioBoo.Application.Commands.ImagingReports.CreateImagingReport
     public sealed class CreateImagingReportCommandHandler : CommandHandlerBase, IRequestHandler<CreateImagingReportCommand>
     {
         private readonly IImagingReportRepository _imagingReportRepository;
+        private readonly IUser _user;
 
         public CreateImagingReportCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IImagingReportRepository imagingReportRepository
+            IImagingReportRepository imagingReportRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _imagingReportRepository = imagingReportRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateImagingReportCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _imagingReportRepository.InsertAsync<ImagingReport, Guid>(new ImagingReport(
+            ImagingReport newImagingReport = new ImagingReport(
                 request.NewImagingReport.Id,
                 TextHelper.GenerateEntityNumber("IR"),
                 request.NewImagingReport.ImagingOrderId,
@@ -46,7 +49,12 @@ namespace PhysioBoo.Application.Commands.ImagingReports.CreateImagingReport
                 request.NewImagingReport.DicomStudyUid,
                 request.NewImagingReport.ReportPdfUrl,
                 request.NewImagingReport.ImagesUrl
-            ));
+            );
+
+            newImagingReport.SetTenantId(_user.GetTenantId());
+            newImagingReport.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _imagingReportRepository.InsertAsync<ImagingReport, Guid>(newImagingReport);
 
             if (!result.Success)
             {

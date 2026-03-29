@@ -61,6 +61,11 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasForeignKey(o => o.CreatedBy)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasOne(o => o.HospitalGroup)
+                   .WithMany(hg => hg.ImagingOrders)
+                   .HasForeignKey(o => o.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(o => o.OrderNumber)
                    .IsRequired()
@@ -81,7 +86,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(o => o.LabPriority)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
 
             builder.Property(o => o.ScheduledDate);
@@ -102,7 +106,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(o => o.PregnancyStatus)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
 
             builder.Property(o => o.ImplantsPresent).IsRequired();
@@ -116,11 +119,7 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(o => o.Status)
                    .HasConversion<string>()
-                   .HasMaxLength(30)
                    .IsRequired();
-
-            builder.Property(o => o.CreatedAt).IsRequired();
-            builder.Property(o => o.UpdatedAt);
         }
     }
 }

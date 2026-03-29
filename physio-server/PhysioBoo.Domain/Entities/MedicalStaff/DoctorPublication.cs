@@ -1,10 +1,10 @@
-﻿using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
+using PhysioBoo.Domain.Enums;
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
 {
-    public class DoctorPublication : Entity
+    public class DoctorPublication : TenantEntity
     {
         #region Core Doctor Publication Table (22)
         public Guid DoctorId { get; private set; }
@@ -28,11 +28,11 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public bool IsPeerReviewed { get; private set; }
         public string? PublicationUrl { get; private set; }
         public string? PdfUrl { get; private set; }
-        public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey("DoctorId")]
-        [InverseProperty("Publications")]
         public virtual Doctor? Doctor { get; private set; }
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (22)
@@ -81,7 +81,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
             IsPeerReviewed = false;
             PublicationUrl = publicationUrl;
             PdfUrl = pdfUrl;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
         }
         #endregion
 
@@ -107,7 +106,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public void SetIsPeerReviewed(bool isPeerReviewed) { IsPeerReviewed = isPeerReviewed; }
         public void SetPublicationUrl(string? publicationUrl) { PublicationUrl = publicationUrl; }
         public void SetPdfUrl(string? pdfUrl) { PdfUrl = pdfUrl; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         #endregion
     }
 }

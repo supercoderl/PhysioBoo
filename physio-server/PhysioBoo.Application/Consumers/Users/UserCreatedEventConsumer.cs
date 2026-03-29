@@ -1,9 +1,7 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
-using PhysioBoo.Application.Commands.Doctors.CreateDoctor;
 using PhysioBoo.Application.Commands.Patients.CreatePatient;
 using PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken;
-using PhysioBoo.Application.ViewModels.Doctors;
 using PhysioBoo.Application.ViewModels.Patients;
 using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Enums;
@@ -44,37 +42,16 @@ namespace PhysioBoo.Application.Consumers.Users
                 ))
             };
 
-            if (Enum.TryParse<Role>(context.Message.Role, ignoreCase: true, out Role role)
-                && Enum.IsDefined(typeof(Role), role))
-            {
-                switch (role)
-                {
-                    case Role.Patient:
-                        tasks.Add(_bus.SendCommandAsync(new CreatePatientCommand(
-                            Guid.NewGuid(),
-                            new CreatePatientViewModel(
-                                context.Message.AggregateId,
-                                Guid.NewGuid(),
-                                null, null, null, null, null, null,
-                                null, null, null, null, null, null,
-                                null, null, null, null, null, null
-                            )
-                        )));
-                        break;
-                    case Role.Doctor:
-                        tasks.Add(_bus.SendCommandAsync(new CreateDoctorCommand(
-                            context.Message.AggregateId,
-                            new CreateDoctorViewModel(
-                                string.Empty,
-                                DateOnly.MinValue,
-                                null, null, null, null, null, null,
-                                null, null, null, null, null, null,
-                                null
-                            )
-                        )));
-                        break;
-                }
-            }
+            tasks.Add(_bus.SendCommandAsync(new CreatePatientCommand(
+                Guid.NewGuid(),
+                new CreatePatientViewModel(
+                    context.Message.AggregateId,
+                    Guid.NewGuid(),
+                    null, null, null, null, null, null,
+                    null, null, null, null, null, null,
+                    null, null, null, null, null, null
+                )
+            )));
 
             await Task.WhenAll(tasks);
         }

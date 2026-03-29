@@ -24,6 +24,21 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasForeignKey(a => a.PatientId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasOne(a => a.Creator)
+                   .WithMany(u => u.CreatedPatientAllergies)
+                   .HasForeignKey(a => a.CreatedBy)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(a => a.Updater)
+                   .WithMany(u => u.UpdatedPatientAllergies)
+                   .HasForeignKey(a => a.UpdatedBy)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(a => a.HospitalGroup)
+                   .WithMany(hg => hg.PatientAllergies)
+                   .HasForeignKey(a => a.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(a => a.AllergenName)
                    .IsRequired()
@@ -31,7 +46,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(a => a.AllergenType)
                    .HasConversion<string>()
-                   .HasMaxLength(50)
                    .IsRequired();
 
             builder.Property(a => a.ReactionType)
@@ -39,7 +53,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(a => a.Severity)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
 
             builder.Property(a => a.FirstOccurenceDate);
@@ -49,9 +62,6 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(a => a.Notes);
 
             builder.Property(a => a.IsActive)
-                   .IsRequired();
-
-            builder.Property(a => a.CreatedAt)
                    .IsRequired();
         }
     }

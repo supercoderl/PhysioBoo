@@ -4,31 +4,38 @@ using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
-using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Application.Commands.Bills.CreateBill
 {
     public sealed class CreateBillCommandHandler : CommandHandlerBase, IRequestHandler<CreateBillCommand>
     {
         private readonly IBillRepository _billRepository;
+        private readonly IUser _user;
+        private readonly ISys_SequenceTrackerRepository _sys_SequenceTrackerRepository;
 
         public CreateBillCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IBillRepository billRepository
+            IBillRepository billRepository,
+            IUser user,
+            ISys_SequenceTrackerRepository sys_SequenceTrackerRepository
         ) : base(bus, unitOfWork, notifications)
         {
             _billRepository = billRepository;
+            _user = user;
+            _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
         public async Task Handle(CreateBillCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _billRepository.InsertAsync<Bill, Guid>(new Bill(
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Bill), cancellationToken);
+
+            Bill newBill = new Bill(
                 request.NewBill.Id,
-                Generate(),
+                newCode,
                 request.NewBill.PatientId,
                 request.NewBill.AppointmentId,
                 request.NewBill.HospitalId,
@@ -39,9 +46,13 @@ namespace PhysioBoo.Application.Commands.Bills.CreateBill
                 request.NewBill.InsuranceCompanyId,
                 request.NewBill.InsuranceClaimNumber,
                 request.NewBill.Notes,
-                request.NewBill.TermsAndConditions,
-                request.UserId
-            ));
+                request.NewBill.TermsAndConditions
+            );
+
+            newBill.SetTenantId(_user.GetTenantId());
+            newBill.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _billRepository.InsertAsync<Bill, Guid>(newBill);
 
             if (!result.Success)
             {
@@ -53,18 +64,6 @@ namespace PhysioBoo.Application.Commands.Bills.CreateBill
 
                 return;
             }
-        }
-
-        /// <summary>
-        /// Generate appointment number based on current time.
-        /// Format: APP-YYYYMMDD-HHMMSS-fff-RND
-        /// Ví dụ: APP-20250923-182530-123-57
-        /// </summary>
-        public static string Generate()
-        {
-            var now = TimeZoneHelper.GetLocalTimeNow();
-
-            return $"BILL-{now:yyyyMMdd-HHmmss}";
         }
     }
 }

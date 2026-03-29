@@ -4,33 +4,31 @@ using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhysioBoo.Application.Commands.Medicines.CreateMedicine
 {
     public sealed class CreateMedicineCommandHandler : CommandHandlerBase, IRequestHandler<CreateMedicineCommand>
     {
         private readonly IMedicineRepository _medicineRepository;
+        private readonly IUser _user;
 
         public CreateMedicineCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IMedicineRepository medicineRepository
+            IMedicineRepository medicineRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _medicineRepository = medicineRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateMedicineCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _medicineRepository.InsertAsync<Medicine, Guid>(new Medicine(
+            Medicine newMedicine = new Medicine(
                 request.NewMedicine.Id,
                 request.NewMedicine.Name,
                 request.NewMedicine.GenericName,
@@ -70,9 +68,14 @@ namespace PhysioBoo.Application.Commands.Medicines.CreateMedicine
                 request.NewMedicine.PharmacologicalClass,
                 request.NewMedicine.ApprovalNumber,
                 request.NewMedicine.ApprovalDate
-            ));
+            );
 
-            if(!result.Success)
+            newMedicine.SetTenantId(_user.GetTenantId());
+            newMedicine.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _medicineRepository.InsertAsync<Medicine, Guid>(newMedicine);
+
+            if (!result.Success)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,

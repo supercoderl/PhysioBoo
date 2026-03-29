@@ -17,6 +17,17 @@ namespace PhysioBoo.Infrastructure.Configuration
             // Indexes
             builder.HasIndex(hg => hg.Name);
 
+            // Relationships
+            builder.HasOne(hg => hg.Creator)
+                   .WithMany(u => u.CreatedHospitalGroups)
+                   .HasForeignKey(hg => hg.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(hg => hg.Updater)
+                   .WithMany(u => u.UpdatedHospitalGroups)
+                   .HasForeignKey(hg => hg.UpdatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
             // Properties
             builder.Property(hg => hg.Name)
                    .IsRequired()
@@ -50,10 +61,9 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(hg => hg.IsActive)
                    .IsRequired();
 
-            builder.Property(hg => hg.CreatedAt)
-                   .IsRequired();
-
-            builder.Property(hg => hg.UpdatedAt);
+            builder.Property(ms => ms.SearchVector)
+                   .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '')))", stored: true)
+                   .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

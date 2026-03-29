@@ -3,11 +3,10 @@ using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Operation
 {
-    public class Bill : Entity
+    public class Bill : TenantEntity
     {
         #region Core Bill Table (31)
         public string BillNumber { get; private set; }
@@ -36,44 +35,20 @@ namespace PhysioBoo.Domain.Entities.Operation
         public decimal PatientCopayAmount { get; private set; }
         public string? Notes { get; private set; }
         public string? TermsAndConditions { get; private set; }
-        public Guid CreatedBy { get; private set; }
         public Guid? ApprovedBy { get; private set; }
         public DateTime? ApprovedAt { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("PatientId")]
-        [InverseProperty("Bills")]
         public virtual Patient? Patient { get; private set; }
-
-        [ForeignKey("AppointmentId")]
-        [InverseProperty("Bills")]
         public virtual Appointment? Appointment { get; private set; }
-
-        [ForeignKey("HospitalId")]
-        [InverseProperty("Bills")]
         public virtual Hospital? Hospital { get; private set; }
-
-        [ForeignKey("DepartmentId")]
-        [InverseProperty("Bills")]
         public virtual Department? Department { get; private set; }
-
-        [ForeignKey("InsuranceCompanyId")]
-        [InverseProperty("Bills")]
         public virtual InsuranceCompany? InsuranceCompany { get; private set; }
-
-        [ForeignKey("CreatedBy")]
-        [InverseProperty("CreatedBills")]
         public virtual User? Creator { get; private set; }
-
-        [ForeignKey("ApprovedBy")]
-        [InverseProperty("ApprovedBills")]
+        public virtual User? Updater { get; private set; }
         public virtual User? Approver { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty("Bill")]
         public virtual ICollection<BillItem> BillItems { get; private set; } = new List<BillItem>();
-
-        [InverseProperty("Bill")]
         public virtual ICollection<Payment> Payments { get; private set; } = new List<Payment>();
         #endregion
 
@@ -91,8 +66,7 @@ namespace PhysioBoo.Domain.Entities.Operation
             Guid? insuranceCompanyId,
             string? insuranceClaimNumber,
             string? notes,
-            string? termsAndConditions,
-            Guid createdBy
+            string? termsAndConditions
         ) : base(id)
         {
             BillNumber = billNumber;
@@ -121,9 +95,6 @@ namespace PhysioBoo.Domain.Entities.Operation
             PatientCopayAmount = 0;
             Notes = notes;
             TermsAndConditions = termsAndConditions;
-            CreatedBy = createdBy;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
             ApprovedBy = null;
             ApprovedAt = null;
         }
@@ -164,11 +135,8 @@ namespace PhysioBoo.Domain.Entities.Operation
         }
         public void SetNotes(string? notes) { Notes = notes; }
         public void SetTermsAndConditions(string? termsAndConditions) { TermsAndConditions = termsAndConditions; }
-        public void SetCreatedBy(Guid createdBy) { CreatedBy = createdBy; }
         public void SetApprovedBy(Guid? approvedBy) { ApprovedBy = approvedBy; }
         public void SetApprovedAt(DateTime? approvedAt) { ApprovedAt = approvedAt; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

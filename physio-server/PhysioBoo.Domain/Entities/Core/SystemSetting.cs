@@ -1,9 +1,8 @@
 ﻿using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Domain.Entities.Core
 {
-    public sealed class SystemSetting : Entity
+    public class SystemSetting : AuditEntity
     {
         #region Core System Setting Table (9)
         public string Key { get; private set; }
@@ -13,8 +12,9 @@ namespace PhysioBoo.Domain.Entities.Core
         public string? Description { get; private set; }
         public bool IsEditable { get; private set; }
         public bool IsActive { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
+
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         #endregion
 
         #region Constructor(9)
@@ -35,7 +35,6 @@ namespace PhysioBoo.Domain.Entities.Core
             Description = description;
             IsEditable = isEditable;
             IsActive = true;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
         }
         #endregion
 
@@ -47,8 +46,6 @@ namespace PhysioBoo.Domain.Entities.Core
         public void SetDescription(string? description) { Description = description; }
         public void SetIsEditable(bool isEditable) { IsEditable = isEditable; }
         public void SetIsActive(bool isActive) { IsActive = isActive; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdateAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

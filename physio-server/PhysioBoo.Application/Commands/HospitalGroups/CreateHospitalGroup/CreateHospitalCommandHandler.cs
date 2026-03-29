@@ -11,22 +11,25 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup
     public sealed class CreateHospitalGroupCommandHandler : CommandHandlerBase, IRequestHandler<CreateHospitalGroupCommand>
     {
         private readonly IHospitalGroupRepository _hospitalGroupRepository;
+        private readonly IUser _user;
 
         public CreateHospitalGroupCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IHospitalGroupRepository hospitalGroupRepository
+            IHospitalGroupRepository hospitalGroupRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _hospitalGroupRepository = hospitalGroupRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateHospitalGroupCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _hospitalGroupRepository.InsertAsync<HospitalGroup, Guid>(new HospitalGroup(
+            HospitalGroup newHospitalGroup = new HospitalGroup(
                 request.NewHospitalGroup.Id,
                 request.NewHospitalGroup.Name,
                 request.NewHospitalGroup.Description,
@@ -38,7 +41,11 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup
                 request.NewHospitalGroup.EstablishedDate,
                 request.NewHospitalGroup.LicenseNumber,
                 request.NewHospitalGroup.AccreditationDetails
-            ));
+            );
+
+            newHospitalGroup.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _hospitalGroupRepository.InsertAsync<HospitalGroup, Guid>(newHospitalGroup);
 
             if (!result.Success)
             {

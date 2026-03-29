@@ -2,11 +2,10 @@
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
 {
-    public class HospitalStaff : Entity
+    public class HospitalStaff : TenantEntity
     {
         #region Core HospitalStaff Table (25)
         public string EmployeeId { get; private set; }
@@ -32,20 +31,13 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public string? PanNumber { get; private set; }
         public string? EsiNumber { get; private set; }
         public string? PfNumber { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("HospitalId")]
-        [InverseProperty("HospitalStaffs")]
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         public virtual Hospital? Hospital { get; private set; }
-
-        [ForeignKey("DepartmentId")]
-        [InverseProperty("HospitalStaffs")]
         public virtual Department? Department { get; private set; }
-
-        [ForeignKey("ReportingManger")]
-        [InverseProperty("HospitalStaffs")]
         public virtual User? Manager { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (25)
@@ -96,8 +88,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
             PanNumber = panNumber;
             EsiNumber = esiNumber;
             PfNumber = pfNumber;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -125,8 +115,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public void SetPanNumber(string? panNumber) { PanNumber = panNumber; }
         public void SetEsiNumber(string? esiNumber) { EsiNumber = esiNumber; }
         public void SetPfNumber(string? pfNumber) { PfNumber = pfNumber; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

@@ -4,11 +4,10 @@ using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Clinical
 {
-    public class MedicalRecord : Entity
+    public class MedicalRecord : TenantEntity
     {
         #region Core Medical Record Table (34)
         public string RecordNumber { get; private set; }
@@ -42,31 +41,15 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public string? DischargeSummary { get; private set; }
         public bool IsConfidential { get; private set; }
         public AccessLevel AccessLevel { get; private set; }
-        public Guid CreatedBy { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey(nameof(PatientId))]
-        [InverseProperty(nameof(Patient.MedicalRecords))]
         public virtual Patient? Patient { get; private set; }
-
-        [ForeignKey(nameof(AppointmentId))]
-        [InverseProperty(nameof(Appointment.MedicalRecords))]
         public virtual Appointment? Appointment { get; private set; }
-
-        [ForeignKey(nameof(DoctorId))]
-        [InverseProperty(nameof(Doctor.MedicalRecords))]
         public virtual Doctor? Doctor { get; private set; }
-
-        [ForeignKey(nameof(HospitalId))]
-        [InverseProperty(nameof(Hospital.MedicalRecords))]
         public virtual Hospital? Hospital { get; private set; }
-
-        [ForeignKey(nameof(CreatedBy))]
-        [InverseProperty(nameof(Creator.CreatedMedicalRecords))]
         public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty(nameof(MedicalRecord))]
         public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();
         #endregion
 
@@ -100,8 +83,7 @@ namespace PhysioBoo.Domain.Entities.Clinical
             string? prognosis,
             string? doctorNotes,
             string? patientEducationProvided,
-            string? dischargeSummary,
-            Guid createdBy
+            string? dischargeSummary
         ) : base(id)
         {
             RecordNumber = recordNumber;
@@ -135,9 +117,6 @@ namespace PhysioBoo.Domain.Entities.Clinical
             DischargeSummary = dischargeSummary;
             IsConfidential = false;
             AccessLevel = AccessLevel.Restricted;
-            CreatedBy = createdBy;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -173,9 +152,6 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public void SetDischargeSummary(string? dischargeSummary) { DischargeSummary = dischargeSummary; }
         public void SetIsConfidential(bool isConfidential) { IsConfidential = isConfidential; }
         public void SetAccessLevel(AccessLevel accessLevel) { AccessLevel = accessLevel; }
-        public void SetCreatedBy(Guid createdBy) { CreatedBy = createdBy; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

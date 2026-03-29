@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.HospitalStaffs.CreateHospitalStaff
     public sealed class CreateHospitalStaffCommandHandler : CommandHandlerBase, IRequestHandler<CreateHospitalStaffCommand>
     {
         private readonly IHospitalStaffRepository _hospitalStaffRepository;
+        private readonly IUser _user;
 
         public CreateHospitalStaffCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IHospitalStaffRepository hospitalStaffRepository
+            IHospitalStaffRepository hospitalStaffRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _hospitalStaffRepository = hospitalStaffRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateHospitalStaffCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            SharedKernel.Results.DbResult<Guid> result = await _hospitalStaffRepository.InsertAsync<HospitalStaff, Guid>(new HospitalStaff(
+            HospitalStaff newHospitalStaff = new HospitalStaff(
                 request.NewHospitalStaff.Id,
                 request.NewHospitalStaff.EmployeeId,
                 request.NewHospitalStaff.HospitalId,
@@ -47,7 +50,12 @@ namespace PhysioBoo.Application.Commands.HospitalStaffs.CreateHospitalStaff
                 request.NewHospitalStaff.PanNumber,
                 request.NewHospitalStaff.EsiNumber,
                 request.NewHospitalStaff.PfNumber
-            ));
+            );
+
+            newHospitalStaff.SetTenantId(_user.GetTenantId());
+            newHospitalStaff.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _hospitalStaffRepository.InsertAsync<HospitalStaff, Guid>(newHospitalStaff);
 
             if (!result.Success)
             {

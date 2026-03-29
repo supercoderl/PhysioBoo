@@ -5,33 +5,39 @@ using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Shared.Events.Hospitals;
-using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Application.Commands.Hospitals.CreateHospital
 {
     public sealed class CreateHospitalCommandHandler : CommandHandlerBase, IRequestHandler<CreateHospitalCommand>
     {
         private readonly IHospitalRepository _hospitalRepository;
+        private readonly IUser _user;
+        private readonly ISys_SequenceTrackerRepository _sys_SequenceTrackerRepository;
 
         public CreateHospitalCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IHospitalRepository hospitalRepository
+            IHospitalRepository hospitalRepository,
+            IUser user,
+            ISys_SequenceTrackerRepository sys_SequenceTrackerRepository
         ) : base(bus, unitOfWork, notifications)
         {
             _hospitalRepository = hospitalRepository;
+            _user = user;
+            _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
         public async Task Handle(CreateHospitalCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _hospitalRepository.InsertAsync<Hospital, Guid>(new Hospital(
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Hospital), cancellationToken);
+
+            Hospital newHospital = new Hospital(
                 request.NewHospital.Id,
-                request.NewHospital.HospitalGroupId,
                 request.NewHospital.Name,
-                Generate(),
+                newCode,
                 request.NewHospital.HospitalType,
                 request.NewHospital.EmergencyCapacity,
                 request.NewHospital.OperationTheaters,
@@ -62,7 +68,12 @@ namespace PhysioBoo.Application.Commands.Hospitals.CreateHospital
                 request.NewHospital.Description,
                 request.NewHospital.MissionStatement,
                 request.NewHospital.VisionStatement
-            ));
+            );
+
+            newHospital.SetTenantId(_user.GetTenantId());
+            newHospital.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _hospitalRepository.InsertAsync<Hospital, Guid>(newHospital);
 
             if (!result.Success)
             {
@@ -76,17 +87,6 @@ namespace PhysioBoo.Application.Commands.Hospitals.CreateHospital
             }
 
             await Bus.RaiseEventAsync(new HospitalCreatedEvent(result.Id));
-        }
-
-        /// <summary>
-        /// Create hospital code base on current time.
-        /// Format: HOS-YYYYMMDD-HHMMSS
-        /// Ví dụ: HOS-20250923-174523
-        /// </summary>
-        private string Generate()
-        {
-            var now = TimeZoneHelper.GetLocalTimeNow();
-            return $"HOS-{now:yyyyMMdd-HHmmss}";
         }
     }
 }

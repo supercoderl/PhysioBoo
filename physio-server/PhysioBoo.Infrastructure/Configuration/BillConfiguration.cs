@@ -55,6 +55,11 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(u => u.ApprovedBills)
                    .HasForeignKey(b => b.ApprovedBy);
 
+            builder.HasOne(b => b.HospitalGroup)
+                   .WithMany(hg => hg.Bills)
+                   .HasForeignKey(b => b.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(b => b.BillNumber)
                    .IsRequired()
@@ -62,7 +67,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(b => b.Type)
                    .HasConversion<string>()  // store enum as string
-                   .HasMaxLength(50)
                    .IsRequired();
 
             builder.Property(b => b.BillDate).IsRequired();
@@ -77,7 +81,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(b => b.PaymentStatus)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
 
             builder.Property(b => b.PaymentTerms).HasMaxLength(100);
@@ -91,10 +94,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(b => b.Notes);
             builder.Property(b => b.TermsAndConditions);
-
-            builder.Property(b => b.CreatedAt).IsRequired();
-            builder.Property(b => b.UpdatedAt).IsRequired(false);
-            builder.Property(b => b.ApprovedAt).IsRequired(false);
         }
     }
 }

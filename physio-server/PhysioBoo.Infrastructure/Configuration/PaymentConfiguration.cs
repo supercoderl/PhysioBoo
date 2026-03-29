@@ -35,6 +35,21 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(u => u.ProcessedPayments)
                    .HasForeignKey(p => p.ProcessedBy);
 
+            builder.HasOne(p => p.Creator)
+                   .WithMany(u => u.CreatedPayments)
+                   .HasForeignKey(p => p.CreatedBy)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(p => p.Updater)
+                   .WithMany(u => u.UpdatedPayments)
+                   .HasForeignKey(p => p.UpdatedBy)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(p => p.HospitalGroup)
+                   .WithMany(hg => hg.Payments)
+                   .HasForeignKey(p => p.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(p => p.PaymentNumber)
                    .IsRequired()
@@ -49,7 +64,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(p => p.Method)
                    .HasConversion<string>()
-                   .HasMaxLength(50)
                    .IsRequired();
 
             builder.Property(p => p.TransactionId).HasMaxLength(100);
@@ -62,7 +76,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(p => p.Status)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
 
             builder.Property(p => p.FailureReason);
@@ -77,9 +90,6 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(p => p.RefundDate);
             builder.Property(p => p.RefundReason);
             builder.Property(p => p.Notes);
-
-            builder.Property(p => p.CreatedAt).IsRequired();
-            builder.Property(p => p.UpdatedAt);
         }
     }
 }

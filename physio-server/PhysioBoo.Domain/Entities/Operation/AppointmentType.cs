@@ -24,7 +24,6 @@ namespace PhysioBoo.Domain.Entities.Operation
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public NpgsqlTsVector? SearchVector { get; private set; }
 
-        [InverseProperty("AppointmentType")]
         public virtual ICollection<Appointment> Appointments { get; private set; } = new List<Appointment>();
         #endregion
 

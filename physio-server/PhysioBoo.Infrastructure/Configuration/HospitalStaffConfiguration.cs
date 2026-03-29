@@ -34,6 +34,21 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(u => u.HospitalStaffs)
                    .HasForeignKey(s => s.ReportingManger);
 
+            builder.HasOne(s => s.Creator)
+                   .WithMany(u => u.CreatedHospitalStaffs)
+                   .HasForeignKey(s => s.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(s => s.Updater)
+                    .WithMany(u => u.UpdatedHospitalStaffs)
+                    .HasForeignKey(s => s.UpdatedBy)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(s => s.HospitalGroup)
+                    .WithMany(hg => hg.HospitalStaffs)
+                    .HasForeignKey(s => s.TenantId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(s => s.EmployeeId)
                    .IsRequired()
@@ -41,7 +56,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(s => s.StaffType)
                    .HasConversion<string>()
-                   .HasMaxLength(50)
                    .IsRequired();
 
             builder.Property(s => s.Position)
@@ -49,7 +63,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(s => s.EmploymentType)
                    .HasConversion<string>()
-                   .HasMaxLength(30)
                    .IsRequired();
 
             builder.Property(s => s.Salary)
@@ -64,7 +77,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(s => s.EmploymentStatus)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
 
             builder.Property(s => s.ShiftPattern)
@@ -95,9 +107,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(s => s.PfNumber)
                    .HasMaxLength(20);
-
-            builder.Property(s => s.CreatedAt).IsRequired();
-            builder.Property(s => s.UpdatedAt);
         }
     }
 }

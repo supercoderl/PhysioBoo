@@ -43,8 +43,7 @@ namespace PhysioBoo.Infrastructure.Repositories
                 refreshToken.UserId,
                 reader.IsDBNull("UserEmail") ? string.Empty : reader.GetString("UserEmail"),
                 string.Empty,
-                string.Empty,
-                null
+                string.Empty
             ));
 
             return refreshToken;

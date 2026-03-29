@@ -1,12 +1,10 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Support
 {
-    public class Review : Entity
+    public class Review : TenantEntity
     {
         #region Core Review Table (34)
         public Guid ReviewerId { get; private set; }
@@ -41,24 +39,14 @@ namespace PhysioBoo.Domain.Entities.Support
         public string? ResponseText { get; private set; }
         public DateTime? ResponseDate { get; private set; }
         public Guid? RespondedBy { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("ReviewerId")]
-        [InverseProperty("Reviews")]
         public virtual User? Reviewer { get; private set; }
-
-        [ForeignKey("AppointmentId")]
-        [InverseProperty("Reviews")]
         public virtual Appointment? Appointment { get; private set; }
-
-        [ForeignKey("ModeratedBy")]
-        [InverseProperty("ModeratedReviews")]
         public virtual User? Moderator { get; private set; }
-
-        [ForeignKey("RespondedBy")]
-        [InverseProperty("Responses")]
         public virtual User? Responder { get; private set; }
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (34)
@@ -122,8 +110,6 @@ namespace PhysioBoo.Domain.Entities.Support
             ResponseText = responseText;
             ResponseDate = responseDate;
             RespondedBy = respondedBy;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -160,8 +146,6 @@ namespace PhysioBoo.Domain.Entities.Support
         public void SetResponseText(string? responseText) { ResponseText = responseText; }
         public void SetResponseDate(DateTime? responseDate) { ResponseDate = responseDate; }
         public void SetRespondedBy(Guid? respondedBy) { RespondedBy = respondedBy; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

@@ -11,22 +11,25 @@ namespace PhysioBoo.Application.Commands.ImagingOrders.CreateImagingOrder
     public sealed class CreateImagingOrderCommandHandler : CommandHandlerBase, IRequestHandler<CreateImagingOrderCommand>
     {
         private readonly IImagingOrderRepository _imagingOrderRepository;
+        private readonly IUser _user;
 
         public CreateImagingOrderCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IImagingOrderRepository imagingOrderRepository
+            IImagingOrderRepository imagingOrderRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _imagingOrderRepository = imagingOrderRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateImagingOrderCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _imagingOrderRepository.InsertAsync<ImagingOrder, Guid>(new ImagingOrder(
+            ImagingOrder newImagingOrder = new ImagingOrder(
                 request.NewImagingOrder.Id,
                 TextHelper.GenerateEntityNumber("ORD"),
                 request.NewImagingOrder.PatientId,
@@ -50,9 +53,13 @@ namespace PhysioBoo.Application.Commands.ImagingOrders.CreateImagingOrder
                 request.NewImagingOrder.ImplantsPresent,
                 request.NewImagingOrder.ImplantDetails,
                 request.NewImagingOrder.TechnicianId,
-                request.NewImagingOrder.RadiologistId,
-                request.UserId
-            ));
+                request.NewImagingOrder.RadiologistId
+            );
+
+            newImagingOrder.SetTenantId(_user.GetTenantId());
+            newImagingOrder.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _imagingOrderRepository.InsertAsync<ImagingOrder, Guid>(newImagingOrder);
 
             if (!result.Success)
             {

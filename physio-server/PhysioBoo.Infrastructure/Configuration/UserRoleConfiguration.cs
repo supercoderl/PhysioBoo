@@ -28,7 +28,8 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.HasOne(u => u.Assigner)
                  .WithMany(ur => ur.AssignedUserRoles)
-                 .HasForeignKey(ur => ur.AssignedBy);
+                 .HasForeignKey(ur => ur.AssignedBy)
+                 .OnDelete(DeleteBehavior.SetNull);
 
             // Properties
             builder.Property(ur => ur.RoleId)
@@ -36,11 +37,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(ur => ur.UserId)
                    .IsRequired();
-
-            builder.Property(ur => ur.AssignedAt)
-                .IsRequired()
-                .HasColumnType("timestamp without time zone");
-            builder.Property(ur => ur.AssignedBy);
         }
     }
 }

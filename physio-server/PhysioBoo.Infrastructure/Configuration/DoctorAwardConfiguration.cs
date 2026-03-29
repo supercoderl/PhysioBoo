@@ -23,6 +23,21 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasForeignKey(a => a.DoctorId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasOne(a => a.Creator)
+                    .WithMany(u => u.CreatedDoctorAwards)
+                    .HasForeignKey(a => a.CreatedBy)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(a => a.Updater)
+                    .WithMany(u => u.UpdatedDoctorAwards)
+                    .HasForeignKey(a => a.UpdatedBy)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(a => a.HospitalGroup)
+                    .WithMany(hg => hg.DoctorAwards)
+                    .HasForeignKey(a => a.TenantId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(a => a.AwardName)
                    .IsRequired()
@@ -52,9 +67,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(a => a.MediaCoverageUrl)
                    .HasMaxLength(500);
-
-            builder.Property(a => a.CreatedAt)
-                   .IsRequired();
         }
     }
 }

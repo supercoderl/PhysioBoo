@@ -10,23 +10,26 @@ namespace PhysioBoo.Application.Commands.DoctorLeaves.CreateDoctorLeave
     public sealed class CreateDoctorLeaveCommandHandler : CommandHandlerBase, IRequestHandler<CreateDoctorLeaveCommand>
     {
         private readonly IDoctorLeaveRepository _doctorLeaveRepository;
+        private readonly IUser _user;
 
         // TODO: Add your dependencies via constructor
         public CreateDoctorLeaveCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IDoctorLeaveRepository doctorLeaveRepository
+            IDoctorLeaveRepository doctorLeaveRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _doctorLeaveRepository = doctorLeaveRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateDoctorLeaveCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            SharedKernel.Results.DbResult<Guid> result = await _doctorLeaveRepository.InsertAsync<DoctorLeave, Guid>(new DoctorLeave(
+            DoctorLeave newDoctorLeave = new DoctorLeave(
                 request.NewDoctorLeave.Id,
                 request.NewDoctorLeave.DoctorId,
                 request.NewDoctorLeave.LeaveType,
@@ -41,7 +44,12 @@ namespace PhysioBoo.Application.Commands.DoctorLeaves.CreateDoctorLeave
                 request.NewDoctorLeave.SubstituteDoctorId,
                 request.NewDoctorLeave.EmergencyContact,
                 request.NewDoctorLeave.DocumentsUrl
-            ));
+            );
+
+            newDoctorLeave.SetTenantId(_user.GetTenantId());
+            newDoctorLeave.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _doctorLeaveRepository.InsertAsync<DoctorLeave, Guid>(newDoctorLeave);
 
             if (!result.Success)
             {

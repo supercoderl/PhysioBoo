@@ -1,10 +1,10 @@
-﻿using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
+using PhysioBoo.Domain.Enums;
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
 {
-    public class DoctorSpecialty : Entity
+    public class DoctorSpecialty : TenantEntity
     {
         #region Core Doctor Specialty Table (9)
         public Guid DoctorId { get; private set; }
@@ -15,17 +15,13 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public DateOnly? CertificationDate { get; private set; }
         public DateOnly? CertificationExpiry { get; private set; }
         public bool IsPrimary { get; private set; }
-        public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey("DoctorId")]
-        [InverseProperty("Specialties")]
         public virtual Doctor? Doctor { get; private set; }
-
-        [ForeignKey("SpecialtyId")]
-        [InverseProperty("DoctorSpecialties")]
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         public virtual MedicalSpecialty? Specialty { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty("PrimarySpecialty")]
         public virtual ICollection<Doctor> Doctors { get; private set; } = new List<Doctor>();
         #endregion
 
@@ -47,7 +43,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
             CertificationDate = certificationDate;
             CertificationExpiry = certificationExpiry;
             IsPrimary = false;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
         }
         #endregion
 
@@ -60,7 +55,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public void SetCertificationDate(DateOnly? certificationDate) { CertificationDate = certificationDate; }
         public void SetCertificationExpiry(DateOnly? certificationExpiry) { CertificationExpiry = certificationExpiry; }
         public void SetIsPrimary(bool isPrimary) { IsPrimary = isPrimary; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         #endregion
     }
 }

@@ -48,6 +48,21 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasForeignKey(r => r.OriginalReportId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasOne(r => r.Creator)
+                    .WithMany(u => u.CreatedLabReports)
+                    .HasForeignKey(r => r.CreatedBy)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(r => r.Updater)
+                    .WithMany(u => u.UpdatedLabReports)
+                    .HasForeignKey(r => r.UpdatedBy)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(r => r.HospitalGroup)
+                    .WithMany(hg => hg.LabReports)
+                    .HasForeignKey(r => r.TenantId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(r => r.ReportNumber)
                    .IsRequired()
@@ -72,8 +87,6 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(r => r.DeliveredToPatient).IsRequired();
             builder.Property(r => r.DeliveredAt);
             builder.Property(r => r.DeliveryMethod).HasMaxLength(30);
-
-            builder.Property(r => r.CreatedAt).IsRequired();
         }
     }
 }

@@ -20,6 +20,21 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasForeignKey(a => a.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasOne(a => a.HospitalGroup)
+                        .WithMany(h => h.Addresses)
+                        .HasForeignKey(a => a.TenantId)
+                        .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(a => a.Creator)
+                   .WithMany(u => u.CreatedAddresses)
+                   .HasForeignKey(a => a.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(a => a.Updater)
+                   .WithMany(u => u.UpdatedAddresses)
+                   .HasForeignKey(a => a.UpdatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
             // Properties
             builder.Property(a => a.Street)
                    .IsRequired();
@@ -50,17 +65,10 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(a => a.AddressType)
                    .IsRequired()
-                   .HasConversion<string>()     // store enum as string
-                   .HasMaxLength(20);
+                   .HasConversion<string>();     // store enum as string
 
             builder.Property(a => a.IsPrimary)
                    .IsRequired();
-
-            builder.Property(a => a.CreatedAt)
-                   .IsRequired();
-
-            builder.Property(a => a.UpdatedAt)
-                   .IsRequired(false);
         }
     }
 }

@@ -65,8 +65,9 @@ namespace PhysioBoo.Application.Commands.Users.OAuthLoginUser
                     if (user == null)
                     {
                         Guid newId = Guid.NewGuid();
-                        user = new User(newId, email, "+000000000000", AuthHelper.HashPassword(UserConstants.Password), newId);
+                        user = new User(newId, email, "+000000000000", AuthHelper.HashPassword(UserConstants.Password));
                         user.SetProfilePicture(picture);
+                        user.SetCreatedBy(newId);
                         await _userRepository.InsertAsync(user);
                     }
 
@@ -95,6 +96,7 @@ namespace PhysioBoo.Application.Commands.Users.OAuthLoginUser
                         ["Email"] = user.Email,
                         ["Id"] = user.Id.ToString(),
                         ["Name"] = user.Email.Split("@")[0],
+                        ["TenantId"] = user.TenantId.ToString()
                     }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes
                 );
 
@@ -150,7 +152,7 @@ namespace PhysioBoo.Application.Commands.Users.OAuthLoginUser
                     "USER_IS_NOT_VERIFIED_YET"
                 ));
 
-                await Bus.RaiseEventAsync(new UsersCreatedEvent(user.Id, string.Empty, VerificationType.Email.ToString()));
+                await Bus.RaiseEventAsync(new UsersCreatedEvent(user.Id, VerificationType.Email.ToString()));
 
                 return (false, false);
             }

@@ -22,11 +22,18 @@ namespace PhysioBoo.Infrastructure.Configuration
             // Self-relationships
             builder.HasOne(u => u.Creator)
                    .WithMany(c => c.CreatedUsers)
-                   .HasForeignKey(u => u.CreatedBy);
+                   .HasForeignKey(u => u.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasOne(u => u.Updater)
                    .WithMany(c => c.UpdatedUsers)
-                   .HasForeignKey(u => u.UpdatedBy);
+                   .HasForeignKey(u => u.UpdatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(u => u.HospitalGroup)
+                   .WithMany(h => h.Users)
+                   .HasForeignKey(u => u.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             // Properties
             builder.Property(u => u.Email)
@@ -75,15 +82,6 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(u => u.TimeZone)
                    .IsRequired()
                    .HasMaxLength(50);
-
-            builder.Property(u => u.CreatedAt)
-                .IsRequired()
-                .HasColumnType("timestamp without time zone");
-            builder.Property(u => u.CreatedBy);
-
-            builder.Property(u => u.UpdatedAt)
-                .HasColumnType("timestamp without time zone");
-            builder.Property(u => u.UpdatedBy);
         }
     }
 }

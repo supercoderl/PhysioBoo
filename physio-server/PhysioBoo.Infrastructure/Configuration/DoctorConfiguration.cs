@@ -19,6 +19,11 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.HasIndex(d => d.MedicalLicenseNumber).IsUnique();
 
             // Relationships
+            builder.HasOne(d => d.User)
+                   .WithOne(u => u.Doctor)
+                   .HasForeignKey<Doctor>(d => d.Id)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasOne(d => d.PrimarySpecialty)
                    .WithMany(s => s.Doctors)
                    .HasForeignKey(d => d.PrimarySpecialtyId);
@@ -27,13 +32,24 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(u => u.VerifiedDoctors)
                    .HasForeignKey(d => d.VerifiedBy);
 
-            builder.HasOne(d => d.User)
-                .WithOne(u => u.Doctor)
-                .HasForeignKey<Doctor>(d => d.Id);
+            builder.HasOne(d => d.CreatedByUser)
+                .WithMany(u => u.CreatedDoctors)
+                .HasForeignKey(d => d.CreatedBy)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(d => d.UpdatedByUser)
+                .WithMany(u => u.UpdatedDoctors)
+                .HasForeignKey(d => d.UpdatedBy)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(d => d.HospitalGroup)
+                   .WithMany(h => h.Doctors)
+                   .HasForeignKey(d => d.TenantId)
+                   .OnDelete(DeleteBehavior.SetNull);
 
             // Properties
             builder.Property(d => d.EmployeeId)
-                   .HasMaxLength(50);
+                   .HasMaxLength(100);
 
             builder.Property(d => d.MedicalLicenseNumber)
                    .IsRequired()
@@ -78,7 +94,7 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(d => d.Archivements);
             builder.Property(d => d.ResearchInterests);
             builder.Property(d => d.CancellationPolicy);
-            builder.Property(d => d.BankAccountDetails);
+            builder.Property(d => d.BankAccountDetails).HasColumnType("jsonb");
             builder.Property(d => d.PanNumber).HasMaxLength(20);
             builder.Property(d => d.Gstin).HasMaxLength(20);
 
@@ -99,7 +115,6 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(d => d.TerminationDate);
             builder.Property(d => d.EmploymentStatus)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
 
             builder.Property(d => d.IsFeatured).IsRequired();
@@ -107,9 +122,9 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(d => d.VerificationDate).IsRequired(false);
 
-            // Audit fields
-            builder.Property(d => d.CreatedAt).IsRequired();
-            builder.Property(d => d.UpdatedAt).IsRequired(false);
+            builder.Property(ms => ms.SearchVector)
+                   .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"EmployeeId\", '')))", stored: true)
+                   .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

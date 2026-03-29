@@ -46,8 +46,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(m => m.IsActive).IsRequired();
 
-            builder.Property(m => m.CreatedAt).IsRequired();
-
             builder.Property(m => m.SearchVector)
                    .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"CompanyCode\", '')))", stored: true)
                    .ValueGeneratedOnAddOrUpdate();

@@ -23,14 +23,25 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.HasIndex(p => p.PreferredDoctorId);
 
             // Relationships
+            builder.HasOne(p => p.User)
+                   .WithOne(u => u.Patient)
+                   .HasForeignKey<Patient>(p => p.UserId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasOne(p => p.PrimaryDoctor)
                    .WithMany(d => d.Patients)
                    .HasForeignKey(p => p.PrimaryDoctorId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(p => p.User)
-                   .WithOne(u => u.Patient)
-                   .HasForeignKey<Patient>(p => p.UserId);
+            builder.HasOne(p => p.CreatedByUser)
+                   .WithMany(u => u.CreatedPatients)
+                   .HasForeignKey(p => p.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(p => p.UpdatedByUser)
+                   .WithMany(u => u.UpdatedPatients)
+                   .HasForeignKey(p => p.UpdatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasOne(p => p.ReferringDoctor)
                    .WithMany(d => d.ReferredPatients)
@@ -48,6 +59,11 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(d => d.PreferredPatients)
                    .HasForeignKey(p => p.PreferredDoctorId);
 
+            builder.HasOne(p => p.HospitalGroup)
+                   .WithMany(hg => hg.Patients)
+                   .HasForeignKey(p => p.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(p => p.PatientNumber)
                    .IsRequired()
@@ -60,7 +76,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(p => p.PatientType)
                    .HasConversion<string>()
-                   .HasMaxLength(30)
                    .IsRequired();
 
             builder.Property(p => p.InssuranceProvider).HasMaxLength(255);
@@ -100,11 +115,7 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(p => p.RiskLevel)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
-
-            builder.Property(p => p.CreatedAt).IsRequired();
-            builder.Property(p => p.UpdatedAt);
         }
     }
 }

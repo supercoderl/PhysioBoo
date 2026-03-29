@@ -1,12 +1,11 @@
 ﻿using NpgsqlTypes;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.MedicalStaff;
-using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Operation
 {
-    public class Department : Entity
+    public class Department : TenantEntity
     {
         #region Core Department Table (20)
         public Guid HospitalId { get; private set; }
@@ -27,30 +26,19 @@ namespace PhysioBoo.Domain.Entities.Operation
         public string? OperationHours { get; private set; }
         public string? EquipmentList { get; private set; }
         public bool IsActive { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public NpgsqlTsVector? SearchVector { get; private set; }
 
-        [ForeignKey("HospitalId")]
-        [InverseProperty("Departments")]
         public virtual Hospital? Hospital { get; private set; }
-
-        [ForeignKey("HeadOfDepartment")]
-        [InverseProperty("HeadedDepartments")]
         public virtual User? HeadOfDeptUser { get; private set; }
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty("Department")]
         public virtual ICollection<Appointment> Appointments { get; private set; } = new List<Appointment>();
-
-        [InverseProperty("Department")]
         public virtual ICollection<Bill> Bills { get; private set; } = new List<Bill>();
-
-        [InverseProperty("Department")]
         public virtual ICollection<DoctorSchedule> DoctorSchedules { get; private set; } = new List<DoctorSchedule>();
-
-        [InverseProperty("Department")]
         public virtual ICollection<HospitalStaff> HospitalStaffs { get; private set; } = new List<HospitalStaff>();
         #endregion
 
@@ -89,8 +77,6 @@ namespace PhysioBoo.Domain.Entities.Operation
             OperationHours = operationHours;
             EquipmentList = equipmentList;
             IsActive = true; // Default to active
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -113,8 +99,6 @@ namespace PhysioBoo.Domain.Entities.Operation
         public void SetOperationHours(string? operationHours) { OperationHours = operationHours; }
         public void SetEquipmentList(string? equipmentList) { EquipmentList = equipmentList; }
         public void SetIsActive(bool isActive) { IsActive = isActive; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

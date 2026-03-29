@@ -10,23 +10,26 @@ namespace PhysioBoo.Application.Commands.DoctorPublications.CreateDoctorPublicat
     public sealed class CreateDoctorPublicationCommandHandler : CommandHandlerBase, IRequestHandler<CreateDoctorPublicationCommand>
     {
         private readonly IDoctorPublicationRepository _doctorPublicationRepository;
+        private readonly IUser _user;
 
         // TODO: Add your dependencies via constructor
         public CreateDoctorPublicationCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IDoctorPublicationRepository doctorPublicationRepository
+            IDoctorPublicationRepository doctorPublicationRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _doctorPublicationRepository = doctorPublicationRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateDoctorPublicationCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            SharedKernel.Results.DbResult<Guid> result = await _doctorPublicationRepository.InsertAsync<DoctorPublication, Guid>(new DoctorPublication(
+            DoctorPublication newDoctorPublication = new DoctorPublication(
                 request.NewDoctorPublication.Id,
                 request.NewDoctorPublication.DoctorId,
                 request.NewDoctorPublication.Title,
@@ -48,7 +51,12 @@ namespace PhysioBoo.Application.Commands.DoctorPublications.CreateDoctorPublicat
                 request.NewDoctorPublication.IsPeerReviewed,
                 request.NewDoctorPublication.PublicationUrl,
                 request.NewDoctorPublication.PdfUrl
-            ));
+            );
+
+            newDoctorPublication.SetTenantId(_user.GetTenantId());
+            newDoctorPublication.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _doctorPublicationRepository.InsertAsync<DoctorPublication, Guid>(newDoctorPublication);
 
             if (!result.Success)
             {

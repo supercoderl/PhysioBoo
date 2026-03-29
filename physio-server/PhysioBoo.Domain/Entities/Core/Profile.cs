@@ -1,10 +1,9 @@
-﻿using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using PhysioBoo.Domain.Entities.Operation;
+using PhysioBoo.Domain.Enums;
 
 namespace PhysioBoo.Domain.Entities.Core
 {
-    public class Profile : Entity
+    public class Profile : TenantEntity
     {
         #region Core Profile Table (17)
         public string FirstName { get; private set; }
@@ -22,12 +21,13 @@ namespace PhysioBoo.Domain.Entities.Core
         public string? EmergencyContactPhone { get; private set; }
         public string? EmergencyContactRelationship { get; private set; }
         public PreferredCommunication PreferredCommunication { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("Id")]
-        [InverseProperty(nameof(Profile))]
+        public string FullName => $"{FirstName} {(string.IsNullOrEmpty(MiddleName) ? "" : MiddleName + " ")}{LastName}".Trim();
+
         public virtual User? User { get; private set; }
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (17)
@@ -65,8 +65,6 @@ namespace PhysioBoo.Domain.Entities.Core
             EmergencyContactPhone = emergencyContactPhone;
             EmergencyContactRelationship = emergencyContactRelationship;
             PreferredCommunication = preferredCommunication;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -86,8 +84,6 @@ namespace PhysioBoo.Domain.Entities.Core
         public void SetEmergencyContactPhone(string? emergencyContactPhone) { EmergencyContactPhone = emergencyContactPhone; }
         public void SetEmergencyContactRelationship(string? emergencyContactRelationship) { EmergencyContactRelationship = emergencyContactRelationship; }
         public void SetPreferredCommunication(PreferredCommunication preferredCommunication) { PreferredCommunication = preferredCommunication; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

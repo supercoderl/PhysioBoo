@@ -10,29 +10,37 @@ namespace PhysioBoo.Application.Commands.DoctorSpecialties.CreateDoctorSpecialty
     public sealed class CreateDoctorSpecialtyCommandHandler : CommandHandlerBase, IRequestHandler<CreateDoctorSpecialtyCommand>
     {
         private readonly IDoctorSpecialtyRepository _doctorSpecialtyRepository;
+        private readonly IUser _user;
 
         public CreateDoctorSpecialtyCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IDoctorSpecialtyRepository doctorSpecialtyRepository
+            IDoctorSpecialtyRepository doctorSpecialtyRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _doctorSpecialtyRepository = doctorSpecialtyRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateDoctorSpecialtyCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            SharedKernel.Results.DbResult<Guid> result = await _doctorSpecialtyRepository.InsertAsync<DoctorSpecialty, Guid>(new DoctorSpecialty(
+            DoctorSpecialty newDoctorSpecialty = new DoctorSpecialty(
                 request.NewDoctorSpecialty.Id,
                 request.NewDoctorSpecialty.DoctorId,
                 request.NewDoctorSpecialty.SpecialtyId,
                 request.NewDoctorSpecialty.CertificationNumber,
                 request.NewDoctorSpecialty.CertificationDate,
                 request.NewDoctorSpecialty.CertificationExpiry
-            ));
+            );
+
+            newDoctorSpecialty.SetTenantId(_user.GetTenantId());
+            newDoctorSpecialty.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _doctorSpecialtyRepository.InsertAsync<DoctorSpecialty, Guid>(newDoctorSpecialty);
 
             if (!result.Success)
             {

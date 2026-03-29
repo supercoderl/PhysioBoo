@@ -27,10 +27,24 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(u => u.PerformedBillItems)
                    .HasForeignKey(bi => bi.PerformedBy);
 
+            builder.HasOne(bi => bi.Creator)
+                   .WithMany(u => u.CreatedBillItems)
+                   .HasForeignKey(bi => bi.CreatedBy)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(bi => bi.Updater)
+                   .WithMany(u => u.UpdatedBillItems)
+                   .HasForeignKey(bi => bi.UpdatedBy)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(bi => bi.HospitalGroup)
+                   .WithMany(hg => hg.BillItems)
+                   .HasForeignKey(bi => bi.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(bi => bi.Type)
                    .HasConversion<string>() // Enum stored as string
-                   .HasMaxLength(50)
                    .IsRequired();
 
             builder.Property(bi => bi.ItemCode).HasMaxLength(100);
@@ -50,10 +64,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(bi => bi.IsInsuranceCovered).IsRequired();
             builder.Property(bi => bi.InsuranceCopayPercentage).HasColumnType("numeric(5,2)");
-
-            builder.Property(bi => bi.PerformedDate).IsRequired(false);
-
-            builder.Property(bi => bi.CreatedAt).IsRequired();
         }
     }
 }

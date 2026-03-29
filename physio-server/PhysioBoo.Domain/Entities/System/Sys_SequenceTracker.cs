@@ -1,11 +1,10 @@
 ﻿using NpgsqlTypes;
 using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.System
 {
-    public class Sys_SequenceTracker : Entity
+    public class Sys_SequenceTracker : AuditEntity
     {
         #region Core SequenceTracker Table (10)
         public string EntityType { get; private set; }
@@ -14,20 +13,11 @@ namespace PhysioBoo.Domain.Entities.System
         public int SequenceLength { get; private set; }
         public int CurrentSequence { get; private set; }
         public string? Suffix { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public Guid CreatedBy { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
-        public Guid? UpdatedBy { get; private set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public NpgsqlTsVector? SearchVector { get; private set; }
 
-        [ForeignKey(nameof(CreatedBy))]
-        [InverseProperty(nameof(User.CreatedSequenceTrackers))]
         public virtual User? Creator { get; private set; }
-
-        [ForeignKey(nameof(UpdatedBy))]
-        [InverseProperty(nameof(User.UpdatedSequenceTrackers))]
         public virtual User? Updater { get; private set; }
         #endregion
 
@@ -37,8 +27,7 @@ namespace PhysioBoo.Domain.Entities.System
             string entityType,
             string prefix,
             string? useDateFormating,
-            string? suffix,
-            Guid createdBy
+            string? suffix
         ) : base(id)
         {
             EntityType = entityType;
@@ -47,8 +36,6 @@ namespace PhysioBoo.Domain.Entities.System
             SequenceLength = 6;
             CurrentSequence = 0;
             Suffix = suffix;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            CreatedBy = createdBy;
         }
         #endregion
 
@@ -59,10 +46,6 @@ namespace PhysioBoo.Domain.Entities.System
         public void SetSequenceLength(int sequenceLength) { SequenceLength = sequenceLength; }
         public void SetCurrentSequence(int currentSequence) { CurrentSequence = currentSequence; }
         public void SetSuffix(string? suffix) { Suffix = suffix; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetCreatedBy(Guid createdBy) { CreatedBy = createdBy; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
-        public void SetUpdatedBy(Guid? updatedBy) { UpdatedBy = updatedBy; }
         #endregion
 
         public void GenerateNext(DateTime currentDateFormatted)

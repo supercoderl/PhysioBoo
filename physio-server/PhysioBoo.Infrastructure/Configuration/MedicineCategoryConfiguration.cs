@@ -23,6 +23,20 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(p => p.SubCategories)
                    .HasForeignKey(c => c.ParentCategoryId);
 
+            builder.HasOne(c => c.Creator)
+                   .WithMany(u => u.CreatedMedicineCategories)
+                   .HasForeignKey(c => c.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(c => c.Updater)
+                   .WithMany(u => u.UpdatedMedicineCategories)
+                   .HasForeignKey(c => c.UpdatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(c => c.HospitalGroup)
+                   .WithMany(hg => hg.MedicineCategories)
+                   .HasForeignKey(c => c.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
             // Properties
             builder.Property(c => c.Name)
                    .IsRequired()
@@ -40,9 +54,6 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .IsRequired();
 
             builder.Property(c => c.StorageConditions);
-
-            builder.Property(c => c.CreatedAt)
-                   .IsRequired();
 
             builder.Property(ms => ms.SearchVector)
                    .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Name\", '') || ' ' || coalesce(\"Code\", '')))", stored: true)

@@ -29,10 +29,24 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasForeignKey(ds => ds.SpecialtyId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasOne(ds => ds.Creator)
+                   .WithMany(u => u.CreatedDoctorSpecialties)
+                   .HasForeignKey(ds => ds.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(ds => ds.Updater)
+                    .WithMany(u => u.UpdatedDoctorSpecialties)
+                    .HasForeignKey(ds => ds.UpdatedBy)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(ds => ds.HospitalGroup)
+                    .WithMany(hg => hg.DoctorSpecialties)
+                    .HasForeignKey(ds => ds.TenantId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(ds => ds.ProficiencyLevel)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
 
             builder.Property(ds => ds.YearsOfExperience)
@@ -45,9 +59,6 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(ds => ds.CertificationExpiry);
 
             builder.Property(ds => ds.IsPrimary)
-                   .IsRequired();
-
-            builder.Property(ds => ds.CreatedAt)
                    .IsRequired();
         }
     }

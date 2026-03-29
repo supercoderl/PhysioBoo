@@ -33,10 +33,24 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(d => d.SubstitutedLeaves)
                    .HasForeignKey(l => l.SubstituteDoctorId);
 
+            builder.HasOne(l => l.Creator)
+                    .WithMany(u => u.CreatedDoctorLeaves)
+                    .HasForeignKey(l => l.CreatedBy)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(l => l.Updater)
+                    .WithMany(u => u.UpdatedDoctorLeaves)
+                    .HasForeignKey(l => l.UpdatedBy)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(l => l.HospitalGroup)
+                   .WithMany(hg => hg.DoctorLeaves)
+                   .HasForeignKey(l => l.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             // Properties
             builder.Property(l => l.LeaveType)
                    .HasConversion<string>()
-                   .HasMaxLength(50)
                    .IsRequired();
 
             builder.Property(l => l.StartDate).IsRequired();
@@ -53,7 +67,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(l => l.Status)
                    .HasConversion<string>()
-                   .HasMaxLength(20)
                    .IsRequired();
 
             builder.Property(l => l.ApprovedAt);
@@ -63,11 +76,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(l => l.DocumentsUrl)
                    .HasMaxLength(500);
-
-            builder.Property(l => l.CreatedAt)
-                   .IsRequired();
-
-            builder.Property(l => l.UpdatedAt);
         }
     }
 }

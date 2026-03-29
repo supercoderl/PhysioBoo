@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.DoctorSchedules.CreateDoctorSchedule
     public sealed class CreateDoctorScheduleCommandHandler : CommandHandlerBase, IRequestHandler<CreateDoctorScheduleCommand>
     {
         private readonly IDoctorScheduleRepository _doctorScheduleRepository;
+        private readonly IUser _user;
 
         public CreateDoctorScheduleCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IDoctorScheduleRepository doctorScheduleRepository
+            IDoctorScheduleRepository doctorScheduleRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _doctorScheduleRepository = doctorScheduleRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateDoctorScheduleCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            SharedKernel.Results.DbResult<Guid> result = await _doctorScheduleRepository.InsertAsync<DoctorSchedule, Guid>(new DoctorSchedule(
+            DoctorSchedule newDoctorSchedule = new DoctorSchedule(
                 request.NewDoctorSchedule.Id,
                 request.NewDoctorSchedule.DoctorId,
                 request.NewDoctorSchedule.HospitalId,
@@ -39,7 +42,12 @@ namespace PhysioBoo.Application.Commands.DoctorSchedules.CreateDoctorSchedule
                 request.NewDoctorSchedule.EffectiveTo,
                 request.NewDoctorSchedule.ConsultationFee,
                 request.NewDoctorSchedule.Notes
-            ));
+            );
+
+            newDoctorSchedule.SetTenantId(_user.GetTenantId());
+            newDoctorSchedule.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _doctorScheduleRepository.InsertAsync<DoctorSchedule, Guid>(newDoctorSchedule);
 
             if (!result.Success)
             {

@@ -1,17 +1,17 @@
-﻿using PhysioBoo.Domain.Entities.Clinical;
+﻿using NpgsqlTypes;
+using PhysioBoo.Domain.Entities.Clinical;
+using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Operation
 {
-    public class Hospital : Entity
+    public class Hospital : TenantEntity
     {
         #region Core Hospital Table (39)
-        public Guid HospitalGroupId { get; private set; }
         public string Name { get; private set; }
         public string? HospitalCode { get; private set; }
         public HospitalType HospitalType { get; private set; }
@@ -39,66 +39,47 @@ namespace PhysioBoo.Domain.Entities.Operation
         public DateTime? AccreditationExpiry { get; private set; }
         public string[] InsuranceAccepted { get; private set; }
         public string[] LanguagesSupported { get; private set; }
+
+        [Column("Facilities", TypeName = "jsonb")]
         public string? Facilities { get; private set; } // JSONB
+
+        [Column("OperatingHours", TypeName = "jsonb")]
         public string? OperatingHours { get; private set; } // JSONB
         public bool Is24Hours { get; private set; }
         public bool IsActive { get; private set; }
         public string? LogoUrl { get; private set; }
+
+        [Column("Images", TypeName = "jsonb")]
         public string? Images { get; private set; } // JSONB
         public string? Description { get; private set; }
         public string? MissionStatement { get; private set; }
         public string? VisionStatement { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("HospitalGroupId")]
-        [InverseProperty("Hospitals")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public NpgsqlTsVector? SearchVector { get; private set; }
+
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         public virtual HospitalGroup? HospitalGroup { get; private set; }
 
-        [InverseProperty("Hospital")]
         public virtual ICollection<Appointment> Appointments { get; private set; } = new List<Appointment>();
-
-        [InverseProperty("Hospital")]
         public virtual ICollection<Bill> Bills { get; private set; } = new List<Bill>();
-
-        [InverseProperty("Hospital")]
         public virtual ICollection<Department> Departments { get; private set; } = new List<Department>();
-
-        [InverseProperty("Hospital")]
         public virtual ICollection<DoctorSchedule> DoctorSchedules { get; private set; } = new List<DoctorSchedule>();
-
-        [InverseProperty("Hospital")]
         public virtual ICollection<HospitalStaff> HospitalStaffs { get; private set; } = new List<HospitalStaff>();
-
-        [InverseProperty("Hospital")]
         public virtual ICollection<ImagingOrder> ImagingOrders { get; private set; } = new List<ImagingOrder>();
-
-        [InverseProperty("Hospital")]
         public virtual ICollection<LabOrder> LabOrders { get; private set; } = new List<LabOrder>();
-
-        [InverseProperty("Hospital")]
         public virtual ICollection<MedicalRecord> MedicalRecords { get; private set; } = new List<MedicalRecord>();
-
-        [InverseProperty("Hospital")]
         public virtual ICollection<MedicineInventory> MedicineInventories { get; private set; } = new List<MedicineInventory>();
-
-        [InverseProperty("ReferralHospital")]
         public virtual ICollection<Patient> ReferredPatients { get; private set; } = new List<Patient>();
-
-        [InverseProperty("PreferredHospital")]
         public virtual ICollection<Patient> PreferredPatients { get; private set; } = new List<Patient>();
-
-        [InverseProperty("DiagnosisHospital")]
-        public virtual ICollection<PatientMedicalHistory> PatientMedicalHistories  { get; private set; } = new List<PatientMedicalHistory>();
-
-        [InverseProperty("Hospital")]
+        public virtual ICollection<PatientMedicalHistory> PatientMedicalHistories { get; private set; } = new List<PatientMedicalHistory>();
         public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();
         #endregion
 
         #region Constructor (41)
         public Hospital(
             Guid id,
-            Guid hospitalGroupId,
             string name,
             string? hospitalCode,
             HospitalType hospitalType,
@@ -133,7 +114,6 @@ namespace PhysioBoo.Domain.Entities.Operation
             string? visionStatement
         ) : base(id)
         {
-            HospitalGroupId = hospitalGroupId;
             Name = name;
             HospitalCode = hospitalCode;
             HospitalType = hospitalType;
@@ -170,13 +150,10 @@ namespace PhysioBoo.Domain.Entities.Operation
             Description = description;
             MissionStatement = missionStatement;
             VisionStatement = visionStatement;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
         #region Setter Methods (39)
-        public void SetHospitalGroupId(Guid hospitalGroupId) { HospitalGroupId = hospitalGroupId; }
         public void SetName(string name) { Name = name; }
         public void SetHospitalCode(string? hospitalCode) { HospitalCode = hospitalCode; }
         public void SetHospitalType(HospitalType hospitalType) { HospitalType = hospitalType; }
@@ -213,8 +190,6 @@ namespace PhysioBoo.Domain.Entities.Operation
         public void SetDescription(string? description) { Description = description; }
         public void SetMissionStatement(string? missionStatement) { MissionStatement = missionStatement; }
         public void SetVisionStatement(string? visionStatement) { VisionStatement = visionStatement; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

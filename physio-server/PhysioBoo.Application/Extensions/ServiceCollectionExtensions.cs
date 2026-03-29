@@ -16,11 +16,17 @@ using PhysioBoo.Application.Commands.DoctorEducations.CreateDoctorEducation;
 using PhysioBoo.Application.Commands.DoctorLeaves.CreateDoctorLeave;
 using PhysioBoo.Application.Commands.DoctorPublications.CreateDoctorPublication;
 using PhysioBoo.Application.Commands.Doctors.CreateDoctor;
+using PhysioBoo.Application.Commands.Doctors.DeleteDoctor;
+using PhysioBoo.Application.Commands.Doctors.UpdateDoctor;
 using PhysioBoo.Application.Commands.DoctorSchedules.CreateDoctorSchedule;
 using PhysioBoo.Application.Commands.DoctorSpecialties.CreateDoctorSpecialty;
 using PhysioBoo.Application.Commands.DoctorWorkExperiences.CreateDoctorWorkExperience;
 using PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup;
+using PhysioBoo.Application.Commands.HospitalGroups.DeleteHospitalGroup;
+using PhysioBoo.Application.Commands.HospitalGroups.UpdateHospitalGroup;
 using PhysioBoo.Application.Commands.Hospitals.CreateHospital;
+using PhysioBoo.Application.Commands.Hospitals.DeleteHospital;
+using PhysioBoo.Application.Commands.Hospitals.UpdateHospital;
 using PhysioBoo.Application.Commands.HospitalStaffs.CreateHospitalStaff;
 using PhysioBoo.Application.Commands.ImagingModalities.CreateImagingModality;
 using PhysioBoo.Application.Commands.ImagingModalities.DeleteImagingModality;
@@ -97,6 +103,12 @@ using PhysioBoo.Application.Queries.AppointmentTypes.GetById;
 using PhysioBoo.Application.Queries.Configurations.GetInitData;
 using PhysioBoo.Application.Queries.Departments.GetAll;
 using PhysioBoo.Application.Queries.Departments.GetById;
+using PhysioBoo.Application.Queries.Doctors.GetAll;
+using PhysioBoo.Application.Queries.Doctors.GetById;
+using PhysioBoo.Application.Queries.HospitalGroups.GetAll;
+using PhysioBoo.Application.Queries.HospitalGroups.GetById;
+using PhysioBoo.Application.Queries.Hospitals.GetAll;
+using PhysioBoo.Application.Queries.Hospitals.GetById;
 using PhysioBoo.Application.Queries.ImagingModalities.GetAll;
 using PhysioBoo.Application.Queries.ImagingModalities.GetById;
 using PhysioBoo.Application.Queries.InsuranceCompanies.GetAll;
@@ -133,6 +145,9 @@ using PhysioBoo.Application.ViewModels.AdminMenus;
 using PhysioBoo.Application.ViewModels.AppointmentTypes;
 using PhysioBoo.Application.ViewModels.Configurations;
 using PhysioBoo.Application.ViewModels.Departments;
+using PhysioBoo.Application.ViewModels.Doctors;
+using PhysioBoo.Application.ViewModels.HospitalGroups;
+using PhysioBoo.Application.ViewModels.Hospitals;
 using PhysioBoo.Application.ViewModels.ImagingModalities;
 using PhysioBoo.Application.ViewModels.InsuranceCompanies;
 using PhysioBoo.Application.ViewModels.LabTestCategories;
@@ -188,6 +203,9 @@ namespace PhysioBoo.Application.Extensions
 
             // Cloudinary
             services.AddScoped<ICloudinaryService, CloudinaryService>();
+
+            // Template Dictionary
+            services.AddScoped<ITemplateDictionaryService, TemplateDictionaryService>();
 
             return services;
         }
@@ -271,6 +289,18 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<GetAllSys_SequenceTrackersQuery, PagedResult<Sys_SequenceTrackerViewModel>>, GetAllSys_SequenceTrackersQueryHandler>();
             services.AddScoped<IRequestHandler<GetSys_SequenceTrackerByIdQuery, Sys_SequenceTrackerViewModel?>, GetSys_SequenceTrackerByIdQueryHandler>();
 
+            // Doctor
+            services.AddScoped<IRequestHandler<GetAllDoctorsQuery, PagedResult<DoctorViewModel>>, GetAllDoctorsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetDoctorByIdQuery, DoctorViewModel?>, GetDoctorByIdQueryHandler>();
+
+            // Hospital Group
+            services.AddScoped<IRequestHandler<GetAllHospitalGroupsQuery, PagedResult<HospitalGroupViewModel>>, GetAllHospitalGroupsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetHospitalGroupByIdQuery, HospitalGroupViewModel?>, GetHospitalGroupByIdQueryHandler>();
+
+            // Hospital
+            services.AddScoped<IRequestHandler<GetAllHospitalsQuery, PagedResult<HospitalViewModel>>, GetAllHospitalsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetHospitalByIdQuery, HospitalViewModel?>, GetHospitalByIdQueryHandler>();
+
             return services;
         }
 
@@ -290,6 +320,8 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<CreateMedicalSpecialtyCommand>, CreateMedicalSpecialtyCommandHandler>();
             services.AddScoped<IRequestHandler<DeleteMedicalSpecialtyCommand>, DeleteMedicalSpecialtyCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateMedicalSpecialtyCommand>, UpdateMedicalSpecialtyCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateDoctorCommand>, UpdateDoctorCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteDoctorCommand>, DeleteDoctorCommandHandler>();
             #endregion
 
             #region Core Flow
@@ -332,6 +364,10 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<CreatePaymentCommand>, CreatePaymentCommandHandler>();
             services.AddScoped<IRequestHandler<DeleteAppointmentTypeCommand>, DeleteAppointmentTypeCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateAppointmentTypeCommand>, UpdateAppointmentTypeCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateHospitalCommand>, UpdateHospitalCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteHospitalCommand>, DeleteHospitalCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateHospitalGroupCommand>, UpdateHospitalGroupCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteHospitalGroupCommand>, DeleteHospitalGroupCommandHandler>();
             #endregion
 
             #region Support Flow
@@ -451,6 +487,9 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<ISortingExpressionProvider<LabTestCategoryViewModel, LabTestCategory>, LabTestCategoryViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<LabTestViewModel, LabTest>, LabTestViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<Sys_SequenceTrackerViewModel, Sys_SequenceTracker>, Sys_SequenceTrackerViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<DoctorViewModel, Doctor>, DoctorViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<HospitalGroupViewModel, HospitalGroup>, HospitalGroupViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<HospitalViewModel, Hospital>, HospitalViewModelSortProvider>();
 
             return services;
         }

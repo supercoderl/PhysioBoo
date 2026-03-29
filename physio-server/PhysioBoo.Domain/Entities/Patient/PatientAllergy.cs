@@ -1,10 +1,10 @@
-﻿using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
+using PhysioBoo.Domain.Enums;
 
 namespace PhysioBoo.Domain.Entities.PatientInformation
 {
-    public class PatientAllergy : Entity
+    public class PatientAllergy : TenantEntity
     {
         #region Core Patient Allergy Table (11)
         public Guid PatientId { get; private set; }
@@ -17,11 +17,11 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         public string? TreatmentGiven { get; private set; }
         public string? Notes { get; private set; }
         public bool IsActive { get; private set; }
-        public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey("PatientId")]
-        [InverseProperty("Allergies")]
         public virtual Patient? Patient { get; private set; }
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (11)
@@ -48,7 +48,6 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
             TreatmentGiven = treatmentGiven;
             Notes = notes;
             IsActive = true;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
         }
         #endregion
 
@@ -63,7 +62,6 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         public void SetTreatmentGiven(string? treatmentGiven) { TreatmentGiven = treatmentGiven; }
         public void SetNotes(string? notes) { Notes = notes; }
         public void SetIsActive(bool isActive) { IsActive = isActive; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         #endregion
     }
 }

@@ -67,6 +67,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
                     ["Email"] = user.Email,
                     ["Id"] = user.Id.ToString(),
                     ["Name"] = user.Email.Split("@")[0],
+                    ["TenantId"] = user.TenantId.ToString()
                 }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes
             );
 
@@ -118,7 +119,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
                     "USER_IS_NOT_VERIFIED_YET"
                 ));
 
-                await Bus.RaiseEventAsync(new UsersCreatedEvent(user.Id, string.Empty, VerificationType.Email.ToString()));
+                await Bus.RaiseEventAsync(new UsersCreatedEvent(user.Id, VerificationType.Email.ToString()));
 
                 return (false, false);
             }

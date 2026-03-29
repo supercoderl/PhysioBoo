@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.MedicalRecords.CreateMedicalRecord
     public sealed class CreateMedicalRecordCommandHandler : CommandHandlerBase, IRequestHandler<CreateMedicalRecordCommand>
     {
         private readonly IMedicalRecordRepository _medicalRecordRepository;
+        private readonly IUser _user;
 
         public CreateMedicalRecordCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IMedicalRecordRepository medicalRecordRepository
+            IMedicalRecordRepository medicalRecordRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _medicalRecordRepository = medicalRecordRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateMedicalRecordCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _medicalRecordRepository.InsertAsync<MedicalRecord, Guid>(new MedicalRecord(
+            MedicalRecord newMedicalRecord = new MedicalRecord(
                 request.NewMedicalRecord.Id,
                 request.NewMedicalRecord.RecordNumber,
                 request.NewMedicalRecord.PatientId,
@@ -54,9 +57,13 @@ namespace PhysioBoo.Application.Commands.MedicalRecords.CreateMedicalRecord
                 request.NewMedicalRecord.Prognosis,
                 request.NewMedicalRecord.DoctorNotes,
                 request.NewMedicalRecord.PatientEducationProvided,
-                request.NewMedicalRecord.DischargeSummary,
-                request.UserId
-            ));
+                request.NewMedicalRecord.DischargeSummary
+            );
+
+            newMedicalRecord.SetTenantId(_user.GetTenantId());
+            newMedicalRecord.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _medicalRecordRepository.InsertAsync<MedicalRecord, Guid>(newMedicalRecord);
 
             if (!result.Success)
             {

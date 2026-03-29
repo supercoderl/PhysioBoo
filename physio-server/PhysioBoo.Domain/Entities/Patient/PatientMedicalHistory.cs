@@ -1,12 +1,11 @@
-﻿using PhysioBoo.Domain.Entities.MedicalStaff;
+﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.PatientInformation
 {
-    public class PatientMedicalHistory : Entity
+    public class PatientMedicalHistory : TenantEntity
     {
         #region Core Patient Medical History Table (16)
         public Guid PatientId { get; private set; }
@@ -23,20 +22,13 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         public bool FollowUpRequired { get; private set; }
         public DateOnly? NextReviewDate { get; private set; }
         public string? Notes { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("PatientId")]
-        [InverseProperty("MedicalHistories")]
         public virtual Patient? Patient { get; private set; }
-
-        [ForeignKey("DiagnosedBy")]
-        [InverseProperty("DiagnosedHistories")]
         public virtual Doctor? DiagnosedDoctor { get; private set; }
-
-        [ForeignKey("DiagnosisHospitalId")]
-        [InverseProperty("PatientMedicalHistories")]
         public virtual Hospital? DiagnosisHospital { get; private set; }
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (16)
@@ -71,8 +63,6 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
             FollowUpRequired = false;
             NextReviewDate = nextReviewDate;
             Notes = notes;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -91,8 +81,6 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         public void SetFollowUpRequired(bool followUpRequired) { FollowUpRequired = followUpRequired; }
         public void SetNextReviewDate(DateOnly? nextReviewDate) { NextReviewDate = nextReviewDate; }
         public void SetNotes(string? notes) { Notes = notes; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

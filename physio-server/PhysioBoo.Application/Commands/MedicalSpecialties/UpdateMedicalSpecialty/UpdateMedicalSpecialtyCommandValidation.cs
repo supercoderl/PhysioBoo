@@ -8,7 +8,5 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.UpdateMedicalSpecial
         {
 
         }
-
-
     }
 }

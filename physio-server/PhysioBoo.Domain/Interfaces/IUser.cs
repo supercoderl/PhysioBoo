@@ -5,6 +5,7 @@
         string Name { get; }
         string? TimeZoneId { get; }
         Guid GetUserId();
+        Guid GetTenantId();
         string GetUserRole();
         string GetUserEmail();
         bool IsAuthenticated { get; }

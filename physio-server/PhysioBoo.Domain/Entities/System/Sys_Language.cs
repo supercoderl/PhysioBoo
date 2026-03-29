@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace PhysioBoo.Domain.Entities.System
+﻿namespace PhysioBoo.Domain.Entities.System
 {
     public class Sys_Language : Entity
     {
@@ -12,7 +10,6 @@ namespace PhysioBoo.Domain.Entities.System
         public string? NativeName { get; private set; }
         public int Index { get; private set; }
 
-        [InverseProperty("Language")]
         public virtual ICollection<Sys_Resource> Sys_Resources { get; set; } = new HashSet<Sys_Resource>();
 
         public Sys_Language(

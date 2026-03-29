@@ -1,10 +1,9 @@
-﻿using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using PhysioBoo.Domain.Entities.Operation;
+using PhysioBoo.Domain.Enums;
 
 namespace PhysioBoo.Domain.Entities.Core
 {
-    public class Address : Entity
+    public class Address : TenantEntity
     {
         #region Core Address Table (13)
         public Guid UserId { get; private set; }
@@ -18,11 +17,10 @@ namespace PhysioBoo.Domain.Entities.Core
         public decimal Latitude { get; private set; }
         public decimal Longitude { get; private set; }
         public bool IsPrimary { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("UserId")]
-        [InverseProperty("Addresses")]
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         public virtual User? User { get; private set; }
         #endregion
 
@@ -51,8 +49,6 @@ namespace PhysioBoo.Domain.Entities.Core
             Latitude = latitude;
             Longitude = longitude;
             IsPrimary = false; // Default to false, can be changed later
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -68,8 +64,6 @@ namespace PhysioBoo.Domain.Entities.Core
         public void SetLatitude(decimal latitude) { Latitude = latitude; }
         public void SetLongitude(decimal longitude) { Longitude = longitude; }
         public void SetIsPrimary(bool isPrimary) { IsPrimary = isPrimary; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt() { UpdatedAt = TimeZoneHelper.GetLocalTimeNow(); }
         #endregion
     }
 }

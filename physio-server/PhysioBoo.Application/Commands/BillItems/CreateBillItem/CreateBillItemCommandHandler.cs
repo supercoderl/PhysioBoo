@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.BillItems.CreateBillItem
     public sealed class CreateBillItemCommandHandler : CommandHandlerBase, IRequestHandler<CreateBillItemCommand>
     {
         private readonly IBillItemRepository _billItemRepository;
+        private readonly IUser _user;
 
         public CreateBillItemCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IBillItemRepository billItemRepository
+            IBillItemRepository billItemRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _billItemRepository = billItemRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateBillItemCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _billItemRepository.InsertAsync<BillItem, Guid>(new BillItem(
+            BillItem newBillItem = new BillItem(
                 request.NewBillItem.Id,
                 request.NewBillItem.BillId,
                 request.NewBillItem.Type,
@@ -37,7 +40,12 @@ namespace PhysioBoo.Application.Commands.BillItems.CreateBillItem
                 request.NewBillItem.PerformedBy,
                 request.NewBillItem.PerformedDate,
                 request.NewBillItem.ReferenceId
-            ));
+            );
+
+            newBillItem.SetTenantId(_user.GetTenantId());
+            newBillItem.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _billItemRepository.InsertAsync<BillItem, Guid>(newBillItem);
 
             if (!result.Success)
             {

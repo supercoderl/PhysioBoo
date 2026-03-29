@@ -1,9 +1,9 @@
-﻿using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
 {
-    public class DoctorAward : Entity
+    public class DoctorAward : TenantEntity
     {
         #region Core Doctor Award Table (12)
         public Guid DoctorId { get; private set; }
@@ -17,11 +17,11 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public decimal? MonetaryValue { get; private set; }
         public string? CertificateUrl { get; private set; }
         public string? MediaCoverageUrl { get; private set; }
-        public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey("DoctorId")]
-        [InverseProperty("Awards")]
         public virtual Doctor? Doctor { get; private set; }
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (12)
@@ -51,7 +51,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
             MonetaryValue = monetaryValue;
             CertificateUrl = certificateUrl;
             MediaCoverageUrl = mediaCoverageUrl;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
         }
         #endregion
 
@@ -67,7 +66,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public void SetMonetaryValue(decimal? monetaryValue) { MonetaryValue = monetaryValue; }
         public void SetCertificateUrl(string? certificateUrl) { CertificateUrl = certificateUrl; }
         public void SetMediaCoverageUrl(string? mediaCoverageUrl) { MediaCoverageUrl = mediaCoverageUrl; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         #endregion
     }
 }

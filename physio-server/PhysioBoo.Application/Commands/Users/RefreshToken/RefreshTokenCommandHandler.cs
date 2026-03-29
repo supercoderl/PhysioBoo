@@ -67,7 +67,8 @@ namespace PhysioBoo.Application.Commands.Users.RefreshToken
                 {
                     ["Email"] = token.User?.Email ?? string.Empty,
                     ["Id"] = token.UserId.ToString(),
-                    ["Name"] = (token.User?.Email ?? string.Empty).Split("@")[0]
+                    ["Name"] = (token.User?.Email ?? string.Empty).Split("@")[0],
+                    ["TenantId"] = token.User?.TenantId.ToString() ?? string.Empty
                 }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes
             );
 

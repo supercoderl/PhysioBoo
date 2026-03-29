@@ -22,7 +22,6 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public NpgsqlTsVector? SearchVector { get; private set; }
 
-        [InverseProperty("Modality")]
         public virtual ICollection<ImagingOrder> ImagingOrders { get; private set; } = new List<ImagingOrder>();
         #endregion
 

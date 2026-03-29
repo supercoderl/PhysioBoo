@@ -43,9 +43,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(ss => ss.Suffix);
 
-            builder.Property(ss => ss.CreatedAt).IsRequired();
-            builder.Property(ss => ss.UpdatedAt);
-
             builder.Property(ms => ms.SearchVector)
                    .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"EntityType\", '')))", stored: true)
                    .ValueGeneratedOnAddOrUpdate();

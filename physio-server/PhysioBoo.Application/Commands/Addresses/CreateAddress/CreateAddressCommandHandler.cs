@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.Addresses.CreateAddress
     public sealed class CreateAddressCommandHandler : CommandHandlerBase, IRequestHandler<CreateAddressCommand>
     {
         private readonly IAddressRepository _addressRepository;
+        private readonly IUser _user;
 
         public CreateAddressCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IAddressRepository addressRepository
+            IAddressRepository addressRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _addressRepository = addressRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateAddressCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _addressRepository.InsertAsync<Address, Guid>(new Address(
+            Address newAddress = new Address(
                 request.NewAddress.Id,
                 request.UserId,
                 request.NewAddress.Street,
@@ -36,7 +39,12 @@ namespace PhysioBoo.Application.Commands.Addresses.CreateAddress
                 request.NewAddress.Country,
                 request.NewAddress.Latitude,
                 request.NewAddress.Longitude
-            ));
+            );
+
+            newAddress.SetTenantId(_user.GetTenantId());
+            newAddress.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _addressRepository.InsertAsync<Address, Guid>(newAddress);
 
             if (!result.Success)
             {

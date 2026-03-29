@@ -25,7 +25,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(sa => sa.Platform)
                    .HasConversion<string>()
-                   .HasMaxLength(50)
                    .IsRequired();
 
             builder.Property(sa => sa.VersionNo).IsRequired();

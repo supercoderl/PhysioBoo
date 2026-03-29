@@ -1,7 +1,6 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.System
 {
@@ -13,8 +12,6 @@ namespace PhysioBoo.Domain.Entities.System
         public Platform Platform { get; private set; }
         public DateTime LastActiveAt { get; private set; }
 
-        [ForeignKey(nameof(UserId))]
-        [InverseProperty(nameof(User.Sys_Devices))]
         public virtual User? User { get; private set; }
 
         public Sys_Device(

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Caching.Memory;
 using PhysioBoo.Application.Extensions;
 using PhysioBoo.Application.gRPC;
 using PhysioBoo.Domain.Extensions;
+using PhysioBoo.Domain.Interfaces.Seeding;
 using PhysioBoo.Domain.Settings;
 using PhysioBoo.Infrastructure.Database;
 using PhysioBoo.Infrastructure.Extensions;
@@ -39,10 +40,11 @@ namespace PhysioBoo.Presentation
                 : builder.Configuration["ConnectionStrings:DefaultConnection"];
             LogStep("Configuration loaded", ref stepTimer);
 
-            // Add services to the container.
+            #region Add services to the container
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             LogStep("Controllers added", ref stepTimer);
+            #endregion
 
             #region DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -105,7 +107,9 @@ namespace PhysioBoo.Presentation
             builder.Services.AddRegisterThirdPartyService(builder.Configuration);
             builder.Services.AddHttpClient();
             builder.Services.AddSortProviders();
+            builder.Services.AddSeedingSerivce();
 
+            #region ZenFirewall & Cookie Policy for Production
             if (builder.Environment.IsProduction())
             {
                 builder.Services.AddZenFirewall();
@@ -117,6 +121,7 @@ namespace PhysioBoo.Presentation
                     options.Cookie.SameSite = SameSiteMode.None;
                 });
             }
+            #endregion
 
             #region Handle Reference Loop - Avoid Errors When Using EF Core Navigation Properties
             builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
@@ -215,6 +220,13 @@ namespace PhysioBoo.Presentation
 
             WebApplication app = builder.Build();
             LogStep("App built", ref stepTimer);
+
+            if (args.Contains("--seed"))
+            {
+                Console.WriteLine("Seeding database...");
+                Seed(app).GetAwaiter().GetResult();
+                return;
+            }
 
             app.MapDefaultEndpoints();
 
@@ -321,6 +333,7 @@ namespace PhysioBoo.Presentation
                 app.MapSys_ResourceEndpoints();
                 app.MapSystemEndpoints();
                 app.MapSys_SequenceTrackerEndpoints();
+                app.MapPrintTemplateEndpoints();
             }
 
             MapCommonEndpoints(app);
@@ -359,6 +372,18 @@ namespace PhysioBoo.Presentation
         {
             Console.WriteLine($"[{timer.ElapsedMilliseconds,5}ms] {stepName}");
             timer.Restart();
+        }
+
+        static async Task Seed(WebApplication app)
+        {
+            using (IServiceScope scope = app.Services.CreateScope())
+            {
+                IDatabaseSeeder seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
+                await seeder.MigrateAsync();
+                await seeder.SeedAsync();
+                Console.WriteLine("Seeding complete. Exiting.");
+                return;
+            }
         }
     }
 }

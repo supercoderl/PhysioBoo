@@ -12,23 +12,26 @@ namespace PhysioBoo.Application.Commands.Patients.CreatePatient
     public sealed class CreatePatientCommandHandler : CommandHandlerBase, IRequestHandler<CreatePatientCommand>
     {
         private readonly IPatientRepository _patientRepository;
+        private readonly IUser _user;
         private readonly Random _random = new();
 
         public CreatePatientCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IPatientRepository patientRepository
+            IPatientRepository patientRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _patientRepository = patientRepository;
+            _user = user;
         }
 
         public async Task Handle(CreatePatientCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            SharedKernel.Results.DbResult<Guid> result = await _patientRepository.InsertAsync<Patient, Guid>(new Patient(
+            Patient newPatient = new Patient(
                 request.Id,
                 CodeGenerationHelper.GeneratePatientCode(),
                 request.NewPatient.UserId,
@@ -53,7 +56,12 @@ namespace PhysioBoo.Application.Commands.Patients.CreatePatient
                 request.NewPatient.CommunicationPreferences,
                 null,
                 null
-            ));
+            );
+
+            newPatient.SetTenantId(_user.GetTenantId());
+            newPatient.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _patientRepository.InsertAsync<Patient, Guid>(newPatient);
 
             if (!result.Success)
             {

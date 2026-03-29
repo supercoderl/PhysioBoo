@@ -23,6 +23,20 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasForeignKey(w => w.DoctorId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasOne(w => w.Creator)
+                   .WithMany(u => u.CreatedDoctorWorkExperiences)
+                   .HasForeignKey(w => w.CreatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(w => w.Updater)
+                   .WithMany(u => u.UpdatedDoctorWorkExperiences)
+                   .HasForeignKey(w => w.UpdatedBy)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(w => w.HospitalGroup)
+                   .WithMany(hg => hg.DoctorWorkExperiences)
+                   .HasForeignKey(w => w.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
             // Properties
             builder.Property(w => w.PositionTitle)
                    .IsRequired()
@@ -30,7 +44,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(w => w.EmploymentType)
                    .HasConversion<string>()
-                   .HasMaxLength(50)
                    .IsRequired();
 
             builder.Property(w => w.OrganizationName)
@@ -71,9 +84,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(w => w.SupervisorContact)
                    .HasMaxLength(255);
-
-            builder.Property(w => w.CreatedAt)
-                   .IsRequired();
         }
     }
 }

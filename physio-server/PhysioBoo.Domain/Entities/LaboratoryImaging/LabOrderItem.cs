@@ -1,11 +1,10 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.LaboratoryImaging
 {
-    public class LabOrderItem : Entity
+    public class LabOrderItem : TenantEntity
     {
         #region Core Lab Order Item Table (19)
         public Guid LabOrderId { get; private set; }
@@ -26,27 +25,15 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public Guid? VerifiedBy { get; private set; }
         public DateTime? VerifiedAt { get; private set; }
         public string? Notes { get; private set; }
-        public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey("LabOrderId")]
-        [InverseProperty("LabOrderItems")]
         public virtual LabOrder? LabOrder { get; private set; }
-
-        [ForeignKey("LabTestId")]
-        [InverseProperty("LabOrderItems")]
         public virtual LabTest? LabTest { get; private set; }
-
-        [ForeignKey("SampleCollectorId")]
-        [InverseProperty("CollectedLabSamples")]
         public virtual User? SampleCollector { get; private set; }
-
-        [ForeignKey("TechnicianId")]
-        [InverseProperty("ProcessedLabTests")]
         public virtual User? Technician { get; private set; }
-
-        [ForeignKey("VerifiedBy")]
-        [InverseProperty("VerifiedLabTests")]
         public virtual User? Verifier { get; private set; }
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (19)
@@ -87,7 +74,6 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
             VerifiedBy = verifiedBy;
             VerifiedAt = verifiedAt;
             Notes = notes;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
         }
         #endregion
 
@@ -110,7 +96,6 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public void SetVerifiedBy(Guid? verifiedBy) { VerifiedBy = verifiedBy; }
         public void SetVerifiedAt(DateTime? verifiedAt) { VerifiedAt = verifiedAt; }
         public void SetNotes(string? notes) { Notes = notes; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         #endregion
     }
 }

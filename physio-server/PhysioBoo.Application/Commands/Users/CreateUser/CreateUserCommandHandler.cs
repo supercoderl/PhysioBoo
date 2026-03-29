@@ -31,13 +31,17 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
         {
             if (!await TestValidityAsync(request)) return;
 
-            SharedKernel.Results.DbResult<Guid> result = await _userRepository.InsertAsync<User, Guid>(new User(
+            User newUser = new User(
                 request.NewUser.Id,
                 request.NewUser.Email,
                 request.NewUser.Phone,
-                AuthHelper.HashPassword(request.NewUser.Password),
-                _user.GetUserId() == Guid.Empty ? request.NewUser.Id : _user.GetUserId()
-            ));
+                AuthHelper.HashPassword(request.NewUser.Password)
+            );
+
+            newUser.SetTenantId(_user.GetTenantId());
+            newUser.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _userRepository.InsertAsync<User, Guid>(newUser);
 
             if (!result.Success)
             {
@@ -52,7 +56,6 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
 
             await Bus.RaiseEventAsync(new UsersCreatedEvent(
                 result.Id,
-                request.NewUser.Role.ToString(),
                 VerificationType.Email.ToString()
             ));
         }

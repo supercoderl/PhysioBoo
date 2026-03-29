@@ -1,9 +1,9 @@
-﻿using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
 
 namespace PhysioBoo.Domain.Entities.Clinical
 {
-    public class PrescriptionItem : Entity
+    public class PrescriptionItem : TenantEntity
     {
         #region Core Prescription Item Table (18)
         public Guid PrescriptionId { get; private set; }
@@ -23,15 +23,12 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public decimal TotalPrice { get; private set; }
         public bool SubtituteAllowed { get; private set; }
         public bool IsControlledSubstance { get; private set; }
-        public DateTime CreatedAt { get; private set; }
 
-        [ForeignKey("PrescriptionId")]
-        [InverseProperty("PrescriptionItems")]
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         public virtual Prescription? Prescription { get; private set; }
-
-        [ForeignKey("MedicineId")]
-        [InverseProperty("PrescriptionItems")]
         public virtual Medicine? Medicine { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (18)
@@ -69,7 +66,6 @@ namespace PhysioBoo.Domain.Entities.Clinical
             TotalPrice = quantityPrescribed * pricePerUnit;
             SubtituteAllowed = true;
             IsControlledSubstance = false;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
         }
         #endregion
 
@@ -98,7 +94,6 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public void SetQuantityDispensed(int quantityDispensed) { QuantityDispensed = quantityDispensed; }
         public void SetSubtituteAllowed(bool subtituteAllowed) { SubtituteAllowed = subtituteAllowed; }
         public void SetIsControlledSubstance(bool isControlledSubstance) { IsControlledSubstance = isControlledSubstance; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
         #endregion
     }
 }

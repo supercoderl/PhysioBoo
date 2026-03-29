@@ -58,9 +58,18 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(r => r.RescheduledAppointments)
                    .HasForeignKey(a => a.RescheduledFromAppointmentId);
 
-            builder.HasOne(a => a.CreatedByUser)
+            builder.HasOne(a => a.Creator)
                    .WithMany(u => u.CreatedAppointments)
                    .HasForeignKey(a => a.CreatedBy);
+
+            builder.HasOne(a => a.Updater)
+                   .WithMany(u => u.UpdatedAppointments)
+                   .HasForeignKey(a => a.UpdatedBy);
+
+            builder.HasOne(a => a.HospitalGroup)
+                   .WithMany(g => g.Appointments)
+                   .HasForeignKey(a => a.TenantId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             // Property configs
             builder.Property(a => a.AppointmentNumber)
@@ -112,9 +121,6 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(a => a.QueueNumber).IsRequired();
             builder.Property(a => a.EstimatedWaitTime).IsRequired();
             builder.Property(a => a.PatientSatisfactionRating);
-
-            builder.Property(a => a.CreatedAt).IsRequired();
-            builder.Property(a => a.UpdatedAt).IsRequired(false);
         }
     }
 }

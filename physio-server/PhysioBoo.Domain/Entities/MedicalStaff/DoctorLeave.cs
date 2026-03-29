@@ -1,11 +1,10 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
 {
-    public class DoctorLeave : Entity
+    public class DoctorLeave : TenantEntity
     {
         #region Core Doctor Leave Table (16)
         public Guid DoctorId { get; private set; }
@@ -22,20 +21,13 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public Guid? SubstituteDoctorId { get; private set; }
         public string? EmergencyContact { get; private set; }
         public string? DocumentsUrl { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("DoctorId")]
-        [InverseProperty("Leaves")]
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         public virtual Doctor? Doctor { get; private set; }
-
-        [ForeignKey("ApprovedBy")]
-        [InverseProperty("ApprovedLeaves")]
         public virtual User? Approver { get; private set; }
-
-        [ForeignKey("SubstituteDoctorId")]
-        [InverseProperty("SubstitutedLeaves")]
         public virtual Doctor? SubstituteDoctor { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (16)
@@ -70,8 +62,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
             SubstituteDoctorId = substituteDoctorId;
             EmergencyContact = emergencyContact;
             DocumentsUrl = documentsUrl;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -90,8 +80,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public void SetSubstituteDoctorId(Guid? substituteDoctorId) { SubstituteDoctorId = substituteDoctorId; }
         public void SetEmergencyContact(string? emergencyContact) { EmergencyContact = emergencyContact; }
         public void SetDocumentsUrl(string? documentsUrl) { DocumentsUrl = documentsUrl; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.LabOrders.CreateLabOrder
     public sealed class CreateLabOrderCommandHandler : CommandHandlerBase, IRequestHandler<CreateLabOrderCommand>
     {
         private readonly ILabOrderRepository _labOrderRepository;
+        private readonly IUser _user;
 
         public CreateLabOrderCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            ILabOrderRepository labOrderRepository
+            ILabOrderRepository labOrderRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _labOrderRepository = labOrderRepository;
+            _user = user;
         }
 
         public async Task Handle(CreateLabOrderCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _labOrderRepository.InsertAsync<LabOrder, Guid>(new LabOrder(
+            LabOrder newLabOrder = new LabOrder(
                 request.NewLabOrder.Id,
                 request.NewLabOrder.OrderNumber,
                 request.NewLabOrder.PatientId,
@@ -39,7 +42,12 @@ namespace PhysioBoo.Application.Commands.LabOrders.CreateLabOrder
                 request.NewLabOrder.CollectionTime,
                 request.NewLabOrder.CollectionAddress,
                 request.NewLabOrder.SpecialInstructions
-            ));
+            );
+
+            newLabOrder.SetTenantId(_user.GetTenantId());
+            newLabOrder.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _labOrderRepository.InsertAsync<LabOrder, Guid>(newLabOrder);
 
             if (!result.Success)
             {

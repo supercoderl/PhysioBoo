@@ -38,11 +38,8 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public NpgsqlTsVector? SearchVector { get; private set; }
 
-        [ForeignKey("CategoryId")]
-        [InverseProperty("LabTests")]
         public virtual LabTestCategory? Category { get; private set; }
 
-        [InverseProperty("LabTest")]
         public virtual ICollection<LabOrderItem> LabOrderItems { get; private set; } = new List<LabOrderItem>();
         #endregion
 

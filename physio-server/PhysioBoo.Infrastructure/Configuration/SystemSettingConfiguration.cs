@@ -26,8 +26,7 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(ss => ss.ValueType)
                    .IsRequired()
-                   .HasConversion<string>()     // store enum as string
-                   .HasMaxLength(20);
+                   .HasConversion<string>();     // store enum as string
 
             builder.Property(ss => ss.Description);
 
@@ -36,14 +35,6 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(ss => ss.IsActive)
                    .IsRequired();
-
-            builder.Property(ss => ss.CreatedAt)
-                   .IsRequired()
-                   .HasColumnType("timestamp without time zone");
-
-            builder.Property(ss => ss.UpdatedAt)
-                   .HasColumnType("timestamp without time zone");
-
         }
     }
 }

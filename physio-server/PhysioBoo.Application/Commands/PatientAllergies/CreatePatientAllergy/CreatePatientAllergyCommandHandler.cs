@@ -10,22 +10,25 @@ namespace PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy
     public sealed class CreatePatientAllergyCommandHandler : CommandHandlerBase, IRequestHandler<CreatePatientAllergyCommand>
     {
         private readonly IPatientAllergyRepository _patientAllergyRepository;
+        private readonly IUser _user;
 
         public CreatePatientAllergyCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IPatientAllergyRepository patientAllergyRepository
+            IPatientAllergyRepository patientAllergyRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _patientAllergyRepository = patientAllergyRepository;
+            _user = user;
         }
 
         public async Task Handle(CreatePatientAllergyCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _patientAllergyRepository.InsertAsync<PatientAllergy, Guid>(new PatientAllergy(
+            PatientAllergy newPatientAllergy = new PatientAllergy(
                 request.NewPatientAllergy.Id,
                 request.NewPatientAllergy.PatientId,
                 request.NewPatientAllergy.AllergenName,
@@ -36,7 +39,12 @@ namespace PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy
                 request.NewPatientAllergy.LastOccurenceDate,
                 request.NewPatientAllergy.TreatmentGiven,
                 request.NewPatientAllergy.Notes
-            ));
+            );
+
+            newPatientAllergy.SetTenantId(_user.GetTenantId());
+            newPatientAllergy.SetCreatedBy(_user.GetUserId());
+
+            SharedKernel.Results.DbResult<Guid> result = await _patientAllergyRepository.InsertAsync<PatientAllergy, Guid>(newPatientAllergy);
 
             if (!result.Success)
             {

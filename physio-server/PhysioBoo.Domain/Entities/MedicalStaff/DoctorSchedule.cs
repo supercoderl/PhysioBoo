@@ -1,11 +1,11 @@
-﻿using PhysioBoo.Domain.Entities.Operation;
+﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
 {
-    public class DoctorSchedule : Entity
+    public class DoctorSchedule : TenantEntity
     {
         #region Core Doctor Schedule Table (18)
         public Guid DoctorId { get; private set; }
@@ -24,20 +24,13 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public DateTime? EffectiveTo { get; private set; }
         public decimal ConsultationFee { get; private set; }
         public string? Notes { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
-        [ForeignKey("DoctorId")]
-        [InverseProperty("Schedules")]
+        public virtual User? Creator { get; private set; }
+        public virtual User? Updater { get; private set; }
         public virtual Doctor? Doctor { get; private set; }
-
-        [ForeignKey("HospitalId")]
-        [InverseProperty("DoctorSchedules")]
         public virtual Hospital? Hospital { get; private set; }
-
-        [ForeignKey("DepartmentId")]
-        [InverseProperty("DoctorSchedules")]
         public virtual Department? Department { get; private set; }
+        public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
         #region Constructor (18)
@@ -73,8 +66,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
             EffectiveTo = effectiveTo;
             ConsultationFee = consultationFee;
             Notes = notes;
-            CreatedAt = TimeZoneHelper.GetLocalTimeNow();
-            UpdatedAt = null;
         }
         #endregion
 
@@ -95,8 +86,6 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public void SetEffectiveTo(DateTime? effectiveTo) { EffectiveTo = effectiveTo; }
         public void SetConsultationFee(decimal consultationFee) { ConsultationFee = consultationFee; }
         public void SetNotes(string? notes) { Notes = notes; }
-        public void SetCreatedAt(DateTime createdAt) { CreatedAt = createdAt; }
-        public void SetUpdatedAt(DateTime? updatedAt) { UpdatedAt = updatedAt; }
         #endregion
     }
 }

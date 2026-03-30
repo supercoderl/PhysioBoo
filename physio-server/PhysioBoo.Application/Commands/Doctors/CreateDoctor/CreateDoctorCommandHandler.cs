@@ -44,7 +44,7 @@ namespace PhysioBoo.Application.Commands.Doctors.CreateDoctor
                 AuthHelper.HashPassword(request.NewDoctor.Password)
             );
 
-            newUser.SetCreatedBy(request.CreatedBy);
+            newUser.SetCreatedBy(_user.GetUserId());
 
             Profile newProfile = new Profile(
                 request.NewDoctor.Id,

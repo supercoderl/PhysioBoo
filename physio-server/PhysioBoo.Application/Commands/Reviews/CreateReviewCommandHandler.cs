@@ -30,7 +30,7 @@ namespace PhysioBoo.Application.Commands.Reviews
 
             Review newReview = new Review(
                 request.NewReview.Id,
-                request.UserId,
+                _user.GetUserId(),
                 request.NewReview.ReviewType,
                 request.NewReview.EntityId,
                 request.NewReview.AppointmentId,

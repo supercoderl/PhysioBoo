@@ -9,7 +9,7 @@ namespace PhysioBoo.Infrastructure.Entries
     public class AuditEntry
     {
         public EntityEntry Entry { get; }
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         public string TableName { get; set; } = string.Empty;
         public Dictionary<string, object> KeyValues { get; } = new();
         public Dictionary<string, object> OldValues { get; } = new();

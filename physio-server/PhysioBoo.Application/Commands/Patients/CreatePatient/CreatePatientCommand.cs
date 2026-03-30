@@ -8,12 +8,10 @@ namespace PhysioBoo.Application.Commands.Patients.CreatePatient
     {
         private static readonly CreatePatientCommandValidation s_validation = new();
 
-        public Guid Id { get; }
         public CreatePatientViewModel NewPatient { get; }
 
-        public CreatePatientCommand(Guid id, CreatePatientViewModel newPatient) : base(Guid.NewGuid())
+        public CreatePatientCommand(CreatePatientViewModel newPatient) : base(Guid.NewGuid())
         {
-            Id = id;
             NewPatient = newPatient;
         }
 

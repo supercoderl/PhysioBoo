@@ -19,11 +19,10 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreateAddressViewModel newAddress,
                 IMediatorHandler bus,
-                IUser user,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateAddressCommand(newAddress, user.GetUserId()));
+                await bus.SendCommandAsync(new CreateAddressCommand(newAddress));
 
                 return Results.Created($"/api/addresses/create/{newAddress.Id}", new ResponseMessage<Guid>
                 {

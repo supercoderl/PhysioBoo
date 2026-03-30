@@ -9,12 +9,10 @@ namespace PhysioBoo.Application.Commands.MedicalRecords.CreateMedicalRecord
         private static readonly CreateMedicalRecordCommandValidation s_validation = new();
 
         public CreateMedicalRecordViewModel NewMedicalRecord { get; }
-        public Guid UserId { get; }
 
-        public CreateMedicalRecordCommand(CreateMedicalRecordViewModel newMedicalRecord, Guid userId) : base(Guid.NewGuid())
+        public CreateMedicalRecordCommand(CreateMedicalRecordViewModel newMedicalRecord) : base(Guid.NewGuid())
         {
             NewMedicalRecord = newMedicalRecord;
-            UserId = userId;
         }
 
         public override bool IsValid()

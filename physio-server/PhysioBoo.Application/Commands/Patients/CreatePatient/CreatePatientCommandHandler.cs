@@ -5,7 +5,6 @@ using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Shared.Events.Patients;
-using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Application.Commands.Patients.CreatePatient
 {
@@ -13,6 +12,7 @@ namespace PhysioBoo.Application.Commands.Patients.CreatePatient
     {
         private readonly IPatientRepository _patientRepository;
         private readonly IUser _user;
+        private readonly ISys_SequenceTrackerRepository _sequenceTrackerRepository;
         private readonly Random _random = new();
 
         public CreatePatientCommandHandler(
@@ -20,20 +20,24 @@ namespace PhysioBoo.Application.Commands.Patients.CreatePatient
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
             IPatientRepository patientRepository,
-            IUser user
+            IUser user,
+            ISys_SequenceTrackerRepository sequenceTrackerRepository
         ) : base(bus, unitOfWork, notifications)
         {
             _patientRepository = patientRepository;
             _user = user;
+            _sequenceTrackerRepository = sequenceTrackerRepository;
         }
 
         public async Task Handle(CreatePatientCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
+            string newCode = await _sequenceTrackerRepository.GenerateNextCodeAsync("Patient", cancellationToken);
+
             Patient newPatient = new Patient(
-                request.Id,
-                CodeGenerationHelper.GeneratePatientCode(),
+                _user.GetUserId(),
+                newCode,
                 request.NewPatient.UserId,
                 request.NewPatient.PrimaryDoctorId,
                 request.NewPatient.ReferredBy,

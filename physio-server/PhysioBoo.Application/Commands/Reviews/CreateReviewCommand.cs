@@ -9,12 +9,10 @@ namespace PhysioBoo.Application.Commands.Reviews
         private static readonly CreateReviewCommandValidation s_validation = new();
 
         public CreateReviewViewModel NewReview { get; }
-        public Guid UserId { get; }
 
-        public CreateReviewCommand(CreateReviewViewModel newReview, Guid userId) : base(Guid.NewGuid())
+        public CreateReviewCommand(CreateReviewViewModel newReview) : base(Guid.NewGuid())
         {
             NewReview = newReview;
-            UserId = userId;
         }
 
         public override bool IsValid()

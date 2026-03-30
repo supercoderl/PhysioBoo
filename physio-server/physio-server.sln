@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysioBoo.Proto", "PhysioBo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysioBoo.gRPC", "PhysioBoo.gRPC\PhysioBoo.gRPC.csproj", "{B5781ADB-D4A6-4362-A2EA-B314FD93BDE9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysioBoo.Application.Test", "PhysioBoo.Application.Test\PhysioBoo.Application.Test.csproj", "{5DAEBD7A-8121-438F-A9C0-74F80BE830E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,9 +67,16 @@ Global
 		{B5781ADB-D4A6-4362-A2EA-B314FD93BDE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5781ADB-D4A6-4362-A2EA-B314FD93BDE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5781ADB-D4A6-4362-A2EA-B314FD93BDE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DAEBD7A-8121-438F-A9C0-74F80BE830E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DAEBD7A-8121-438F-A9C0-74F80BE830E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DAEBD7A-8121-438F-A9C0-74F80BE830E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DAEBD7A-8121-438F-A9C0-74F80BE830E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5DAEBD7A-8121-438F-A9C0-74F80BE830E4} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F88D4E8C-7B63-4174-95C4-104464CF2598}

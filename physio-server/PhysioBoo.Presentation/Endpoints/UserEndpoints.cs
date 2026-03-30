@@ -59,11 +59,10 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/resend-verification", async (
                 ResendVerificationViewModel request,
                 IMediatorHandler bus,
-                IUser user,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new ResendVerificationCommand(user.GetUserId(), request.VerificationType));
+                await bus.SendCommandAsync(new ResendVerificationCommand(request.VerificationType));
 
                 return Results.Ok(new ResponseMessage<string>
                 {
@@ -175,7 +174,11 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new LogoutUserCommand(user.GetUserId()));
+                Guid? id = user.GetUserId();
+
+                if (!id.HasValue) return Results.Ok();
+
+                await bus.SendCommandAsync(new LogoutUserCommand(id.Value));
 
                 AuthHelper.RemoveTokenCookie(response, "access_token");
                 AuthHelper.RemoveTokenCookie(response, "refresh_token");
@@ -200,7 +203,11 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new ChangePasswordUserCommand(user.GetUserId(), request.OldPassword, request.NewPassword));
+                Guid? id = user.GetUserId();
+
+                if (!id.HasValue) return Results.Unauthorized();
+
+                await bus.SendCommandAsync(new ChangePasswordUserCommand(id.Value, request.OldPassword, request.NewPassword));
 
                 return Results.Ok(new ResponseMessage<string>
                 {
@@ -336,7 +343,11 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                UserViewModel? result = await bus.QueryAsync(new GetUserByIdQuery(user.GetUserId()));
+                Guid? id = user.GetUserId();
+
+                if (!id.HasValue) return Results.Unauthorized();
+
+                UserViewModel? result = await bus.QueryAsync(new GetUserByIdQuery(id.Value));
 
                 return Results.Ok(new ResponseMessage<UserViewModel?>
                 {

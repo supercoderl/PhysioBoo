@@ -6,7 +6,7 @@ namespace PhysioBoo.Domain.Entities.System
 {
     public class Sys_AuditLog : Entity
     {
-        public Guid UserId { get; private set; }
+        public Guid? UserId { get; private set; }
         public AuditAction Action { get; private set; }
         public string TableName { get; private set; }
         public string PrimaryKey { get; private set; }
@@ -27,7 +27,7 @@ namespace PhysioBoo.Domain.Entities.System
 
         public Sys_AuditLog(
             Guid id,
-            Guid userId,
+            Guid? userId,
             AuditAction action,
             string tableName,
             string primaryKey,
@@ -52,7 +52,7 @@ namespace PhysioBoo.Domain.Entities.System
             RequestId = requestId;
         }
 
-        public void SetUserId(Guid userId) { UserId = userId; }
+        public void SetUserId(Guid? userId) { UserId = userId; }
         public void SetAction(AuditAction action) { Action = action; }
         public void SetTableName(string tableName) { TableName = tableName; }
         public void SetPrimaryKey(string primaryKey) { PrimaryKey = primaryKey; }

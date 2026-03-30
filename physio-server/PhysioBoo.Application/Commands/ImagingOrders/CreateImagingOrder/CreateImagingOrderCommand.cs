@@ -9,12 +9,10 @@ namespace PhysioBoo.Application.Commands.ImagingOrders.CreateImagingOrder
         private static readonly CreateImagingOrderCommandValidation s_validation = new();
 
         public CreateImagingOrderViewModel NewImagingOrder { get; }
-        public Guid UserId { get; }
 
-        public CreateImagingOrderCommand(CreateImagingOrderViewModel newImagingOrder, Guid userId) : base(Guid.NewGuid())
+        public CreateImagingOrderCommand(CreateImagingOrderViewModel newImagingOrder) : base(Guid.NewGuid())
         {
             NewImagingOrder = newImagingOrder;
-            UserId = userId;
         }
 
         public override bool IsValid()

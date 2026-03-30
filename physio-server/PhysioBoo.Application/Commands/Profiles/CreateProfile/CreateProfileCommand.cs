@@ -9,12 +9,10 @@ namespace PhysioBoo.Application.Commands.Profiles.CreateProfile
         private static readonly CreateProfileCommandValidation s_validation = new();
 
         public CreateProfileViewModel NewProfile { get; }
-        public Guid UserId { get; }
 
-        public CreateProfileCommand(CreateProfileViewModel newProfile, Guid userId) : base(Guid.NewGuid())
+        public CreateProfileCommand(CreateProfileViewModel newProfile) : base(Guid.NewGuid())
         {
             NewProfile = newProfile;
-            UserId = userId;
         }
 
         public override bool IsValid()

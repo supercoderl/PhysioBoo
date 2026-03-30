@@ -23,12 +23,10 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 [FromBody] CreateRoleViewModel newRole,
                 IMediatorHandler bus,
-                IUser user,
-
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateRoleCommand(newRole, user.GetUserId()));
+                await bus.SendCommandAsync(new CreateRoleCommand(newRole));
 
                 return Results.Created($"/api/roles/{newRole.Id}", new ResponseMessage<Guid>
                 {

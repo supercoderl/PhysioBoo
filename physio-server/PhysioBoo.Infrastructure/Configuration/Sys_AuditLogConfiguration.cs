@@ -19,8 +19,7 @@ namespace PhysioBoo.Infrastructure.Configuration
             // Self-relationships
 
             // Properties
-            builder.Property(sa => sa.UserId)
-                   .IsRequired();
+            builder.Property(sa => sa.UserId);
 
             builder.Property(sa => sa.Action)
                     .IsRequired()

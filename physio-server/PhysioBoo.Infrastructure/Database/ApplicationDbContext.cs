@@ -140,7 +140,7 @@ namespace PhysioBoo.Infrastructure.Database
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            Guid userId = _user.GetUserId();
+            Guid? userId = _user.GetUserId();
             OnTrackingTenant(_user.GetTenantId());
 
             List<AuditEntry> auditEntries = OnBeforeSaveChanges(userId);
@@ -220,7 +220,7 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new PrintLogConfiguration());
         }
 
-        private List<AuditEntry> OnBeforeSaveChanges(Guid userId)
+        private List<AuditEntry> OnBeforeSaveChanges(Guid? userId)
         {
             ChangeTracker.DetectChanges();
             List<AuditEntry> auditEntries = new List<AuditEntry>();

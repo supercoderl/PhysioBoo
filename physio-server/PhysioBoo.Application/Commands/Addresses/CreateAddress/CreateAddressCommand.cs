@@ -9,12 +9,10 @@ namespace PhysioBoo.Application.Commands.Addresses.CreateAddress
         private static readonly CreateAddressCommandValidation s_validation = new();
 
         public CreateAddressViewModel NewAddress { get; }
-        public Guid UserId { get; }
 
-        public CreateAddressCommand(CreateAddressViewModel newAddress, Guid userId) : base(Guid.NewGuid())
+        public CreateAddressCommand(CreateAddressViewModel newAddress) : base(Guid.NewGuid())
         {
             NewAddress = newAddress;
-            UserId = userId;
         }
 
         public override bool IsValid()

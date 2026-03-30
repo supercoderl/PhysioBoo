@@ -30,7 +30,7 @@ namespace PhysioBoo.Application.Commands.Addresses.CreateAddress
 
             Address newAddress = new Address(
                 request.NewAddress.Id,
-                request.UserId,
+                _user.GetUserId(),
                 request.NewAddress.Street,
                 request.NewAddress.ApartmentUnit,
                 request.NewAddress.City,

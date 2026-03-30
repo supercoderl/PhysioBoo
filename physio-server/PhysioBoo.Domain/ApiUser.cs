@@ -36,8 +36,7 @@ namespace PhysioBoo.Domain
                 return userId;
             }
 
-            _logger.LogWarning("Could not parse user id to guid");
-            return Guid.Empty;
+            throw new Exception("The user has not logged in yet.");
         }
 
         public string GetUserRole()
@@ -129,8 +128,7 @@ namespace PhysioBoo.Domain
                 return tenantId;
             }
 
-            _logger.LogWarning("Could not parse tenant id to guid");
-            return Guid.Empty;
+            throw new Exception("Could not parse tenant id to guid");
         }
     }
 }

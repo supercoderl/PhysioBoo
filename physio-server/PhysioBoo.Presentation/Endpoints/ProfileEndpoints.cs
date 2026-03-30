@@ -19,23 +19,20 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreateProfileViewModel newProfile,
                 IMediatorHandler bus,
-                IUser user,
                 CancellationToken cancellationToken
             ) =>
             {
-                Guid id = user.GetUserId();
+                await bus.SendCommandAsync(new CreateProfileCommand(newProfile));
 
-                await bus.SendCommandAsync(new CreateProfileCommand(newProfile, id));
-
-                return Results.Created($"/api/profiles/create/{id}", new ResponseMessage<Guid>
+                return Results.Created($"/api/profiles/create", new ResponseMessage<Guid>
                 {
                     Success = true,
-                    Data = id
+                    Data = "Profile has been created successfully."
                 });
             }).WithName("CreateProfile")
             .WithSummary("Create new profile")
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .Produces<ResponseMessage<string>>(StatusCodes.Status201Created)
+            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
             .RequireAuthorization();
         }
     }

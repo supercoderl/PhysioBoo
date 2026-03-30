@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Commands.Profiles.CreateProfile
             if (!await TestValidityAsync(request)) return;
 
             Profile newProfile = new Profile(
-                request.UserId,
+                _user.GetUserId(),
                 request.NewProfile.FirstName,
                 request.NewProfile.LastName,
                 request.NewProfile.MiddleName,
@@ -47,7 +47,7 @@ namespace PhysioBoo.Application.Commands.Profiles.CreateProfile
                 request.NewProfile.PreferredCommunication
             );
 
-            newProfile.SetTenantId(_user.GetUserId());
+            newProfile.SetTenantId(_user.GetTenantId());
             newProfile.SetCreatedBy(_user.GetUserId());
 
             SharedKernel.Results.DbResult<Guid> result = await _profileRepository.InsertAsync<Profile, Guid>(newProfile);

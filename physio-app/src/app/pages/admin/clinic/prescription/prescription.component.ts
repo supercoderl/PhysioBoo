@@ -1,9 +1,9 @@
 import { Component, OnInit } from "@angular/core";
+import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { Diagnosis } from "../../../../shared/types/diagnosis";
 import { Medication } from "../../../../shared/types/medication";
 import { Patient } from "../../../../shared/types/patient";
-import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 
 @Component({
   selector: 'admin-prescription',
@@ -286,7 +286,26 @@ export class AdminPrescriptionComponent implements OnInit {
     totalVisits: 0,
     totalAmountSpent: 0,
     loyaltyPoints: 0,
-    riskLevel: RiskLevel.Low
+    riskLevel: RiskLevel.Low,
+    userId: null,
+    fullName: "",
+    dateOfBirth: null,
+    gender: null,
+    bloodType: null,
+    phone: null,
+    email: null,
+    address: null,
+    city: null,
+    country: null,
+    occupation: null,
+    isVip: false,
+    isSeniorCitizen: false,
+    emergencyContactName: null,
+    emergencyContactPhone: null,
+    lastVisitDate: null,
+    nextFollowUpDate: null,
+    isActive: false,
+    createdAt: new Date()
   };
 
   chiefComplaint: string = 'Chest pain and shortness of breath';

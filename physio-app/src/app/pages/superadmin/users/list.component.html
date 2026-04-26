@@ -1,0 +1,208 @@
+<div class="space-y-5">
+
+  <!-- Page header -->
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+      <h2 class="text-xl font-bold text-primary mb-0.5">Users</h2>
+      <p class="text-sm text-secondary m-0">All registered users across the platform</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div class="bg-surface rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+        <boo-icon name="users-round" [size]="16" class="text-primary"></boo-icon>
+      </div>
+      <div>
+        <div class="text-lg font-bold text-primary leading-none">{{ tableData()?.totalCount ?? 0 }}</div>
+        <div class="text-[11px] text-secondary mt-0.5">Total Users</div>
+      </div>
+    </div>
+    <div class="bg-surface rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
+        <boo-icon name="circle-check" [size]="16" class="text-green-600"></boo-icon>
+      </div>
+      <div>
+        <div class="text-lg font-bold text-primary leading-none">{{ totalActive }}</div>
+        <div class="text-[11px] text-secondary mt-0.5">Active</div>
+      </div>
+    </div>
+    <div class="bg-surface rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+        <boo-icon name="badge-check" [size]="16" class="text-blue-600"></boo-icon>
+      </div>
+      <div>
+        <div class="text-lg font-bold text-primary leading-none">{{ totalVerified }}</div>
+        <div class="text-[11px] text-secondary mt-0.5">Verified</div>
+      </div>
+    </div>
+    <div class="bg-surface rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+        <boo-icon name="shield-check" [size]="16" class="text-amber-600"></boo-icon>
+      </div>
+      <div>
+        <div class="text-lg font-bold text-primary leading-none">
+          {{ (tableData()?.totalCount ?? 0) - totalActive }}
+        </div>
+        <div class="text-[11px] text-secondary mt-0.5">Inactive</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <div class="flex items-center gap-2">
+      <boo-input label="Search users..." size="small" (search)="onSearch($event)">
+        <boo-icon
+          [class.animate-spin]="loadingSrv.isLoading('search')"
+          [name]="loadingSrv.isLoading('search') ? 'loader-circle' : 'search'"
+          color="#64748B"
+          endfix
+        />
+      </boo-input>
+      <boo-date-admin
+        [startDate]="params.filter.start"
+        [endDate]="params.filter.end"
+        (rangeChange)="onDateChange($event)"
+      />
+    </div>
+    <div class="flex items-center gap-2">
+      <boo-button-admin
+        [icon]="{ name: 'refresh-cw', size: 14, color: '#6C7688' }"
+        buttonClass="!bg-surface"
+        [border]="{ width: 1, color: '#e3e3e3' }"
+        (click)="loadUsers()"
+      >
+        <span class="text-placeholder">Reload</span>
+      </boo-button-admin>
+      <boo-filter-admin [filters]="filter_configs" (apply)="onFilterApply($event)" />
+      <boo-sort-admin [(value)]="params.sort" (change)="onSortChange($event)" [options]="sort_options" />
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-surface rounded-xl border border-gray-200 overflow-hidden">
+
+    <!-- Loading skeleton -->
+    <div *ngIf="loadingSrv.isLoading('search')" class="divide-y divide-gray-100">
+      <div *ngFor="let _ of [1,2,3,4,5]" class="flex items-center gap-4 px-5 py-3.5 animate-pulse">
+        <div class="w-8 h-8 rounded-full bg-gray-200 shrink-0"></div>
+        <div class="flex-1 space-y-1.5">
+          <div class="h-3.5 bg-gray-200 rounded w-48"></div>
+          <div class="h-3 bg-gray-100 rounded w-32"></div>
+        </div>
+        <div class="h-5 w-14 bg-gray-200 rounded-full"></div>
+        <div class="h-5 w-16 bg-gray-100 rounded-full"></div>
+        <div class="w-5 h-5 bg-gray-100 rounded"></div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!loadingSrv.isLoading('search') && (!tableData() || tableData()!.items.length === 0)"
+      class="flex flex-col items-center justify-center py-20">
+      <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+        <boo-icon name="users-round" [size]="24" class="text-gray-400"></boo-icon>
+      </div>
+      <p class="text-sm font-medium text-primary mb-0.5">No users found</p>
+      <p class="text-xs text-secondary">Try adjusting your filters or search query.</p>
+    </div>
+
+    <!-- Table rows -->
+    <div *ngIf="!loadingSrv.isLoading('search') && tableData() && tableData()!.items.length > 0">
+
+      <!-- Header -->
+      <div class="flex items-center gap-4 px-5 py-2.5 bg-gray-50 border-b border-gray-200 text-[11px] font-bold text-secondary uppercase tracking-wider">
+        <div class="w-8 shrink-0"></div>
+        <div class="flex-1">User</div>
+        <div class="w-24 hidden sm:block">Phone</div>
+        <div class="w-20">Status</div>
+        <div class="w-20 hidden md:block">Verified</div>
+        <div class="w-32 hidden lg:block">Last Login</div>
+        <div class="w-8"></div>
+      </div>
+
+      <!-- Rows -->
+      <div class="divide-y divide-gray-100">
+        <div *ngFor="let user of tableData()!.items"
+          class="flex items-center gap-4 px-5 py-3.5 hover:bg-blue-50/40 transition-colors">
+
+          <!-- Avatar -->
+          <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-xs font-bold text-primary">
+            {{ user.email.charAt(0).toUpperCase() }}
+          </div>
+
+          <!-- Email + Phone -->
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-medium text-primary truncate">{{ user.email }}</div>
+            <div *ngIf="user.profile?.fullName" class="text-xs text-secondary truncate">{{ user.profile!.fullName }}</div>
+          </div>
+
+          <!-- Phone -->
+          <div class="w-24 text-xs text-secondary hidden sm:block truncate">{{ user.phone || '—' }}</div>
+
+          <!-- Active badge -->
+          <div class="w-20">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold"
+              [ngClass]="user.isActive ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'">
+              {{ user.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+
+          <!-- Verified badge -->
+          <div class="w-20 hidden md:flex items-center gap-1">
+            <boo-icon
+              [name]="user.isVerified ? 'badge-check' : 'circle-x'"
+              [size]="14"
+              [class]="user.isVerified ? 'text-blue-500' : 'text-gray-300'"
+            ></boo-icon>
+            <span class="text-xs text-secondary">{{ user.isVerified ? 'Yes' : 'No' }}</span>
+          </div>
+
+          <!-- Last login -->
+          <div class="w-32 text-xs text-secondary hidden lg:block">
+            {{ user.lastLoginAt ? (user.lastLoginAt | date:'mediumDate') : 'Never' }}
+          </div>
+
+          <!-- Actions -->
+          <div class="w-8 flex justify-end">
+            <boo-action-admin [items]="tableActions" [data]="user" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="tableData() && tableData()!.totalCount > 0"
+    class="flex items-center justify-between pt-1">
+    <span class="text-xs text-secondary">
+      Showing {{ (tableData()!.pageNumber - 1) * tableData()!.pageSize + 1 }}–{{ min(tableData()!.pageNumber * tableData()!.pageSize, tableData()!.totalCount) }} of {{ tableData()!.totalCount }} users
+    </span>
+    <div class="flex items-center gap-1">
+      <button
+        class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-secondary hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        [disabled]="!tableData()!.hasPrevious"
+        (click)="onPageClick(tableData()!.pageNumber - 1)">
+        <boo-icon name="chevron-left" [size]="14"></boo-icon>
+      </button>
+      <ng-container *ngFor="let page of getPages(tableData()!.pageNumber, tableData()!.totalPages)">
+        <button
+          class="w-8 h-8 flex items-center justify-center rounded-lg border text-xs font-medium transition-colors"
+          [ngClass]="page === tableData()!.pageNumber
+            ? 'border-primary bg-primary text-white'
+            : 'border-gray-200 text-secondary hover:bg-gray-50'"
+          (click)="onPageClick(page)">
+          {{ page }}
+        </button>
+      </ng-container>
+      <button
+        class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-secondary hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        [disabled]="!tableData()!.hasNext"
+        (click)="onPageClick(tableData()!.pageNumber + 1)">
+        <boo-icon name="chevron-right" [size]="14"></boo-icon>
+      </button>
+    </div>
+  </div>
+
+</div>

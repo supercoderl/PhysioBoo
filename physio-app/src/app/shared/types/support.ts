@@ -1,4 +1,6 @@
+import { HospitalType } from "../enums/hospital-type";
 import { InsuranceType } from "../enums/insurance-type";
+import { SubscriptionPlan } from "../enums/subscription-plan";
 import { SupplierType } from "../enums/supplier-type";
 
 export interface InsuranceCompany {
@@ -82,4 +84,45 @@ export interface Supplier {
     lastOrderDate: Date | null;
     createdAt: Date;
     updatedAt: Date | null;
+}
+
+export interface HospitalGroup {
+    id: string;
+    name: string;
+    code: string | null;
+    description: string | null;
+    logoUrl: string | null;
+    contactPerson: string | null;
+    email: string | null;
+    phone: string | null;
+    address: string | null;
+    city: string | null;
+    country: string | null;
+    subscriptionPlan: SubscriptionPlan;
+    hospitalCount: number;
+    isActive: boolean;
+    createdAt: Date;
+}
+
+export interface Hospital {
+    id: string;
+    name: string;
+    code: string | null;
+    hospitalGroupId: string;
+    hospitalGroupName: string | null;
+    type: HospitalType;
+    address: string | null;
+    city: string | null;
+    country: string | null;
+    phone: string | null;
+    email: string | null;
+    website: string | null;
+    totalBeds: number;
+    operatingRooms: number;
+    hasEmergencyServices: boolean;
+    hasIcu: boolean;
+    accreditationNumber: string | null;
+    licenseNumber: string | null;
+    isActive: boolean;
+    createdAt: Date;
 }

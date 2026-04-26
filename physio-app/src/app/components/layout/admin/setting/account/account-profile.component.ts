@@ -1,12 +1,12 @@
 import { Component, Input } from "@angular/core";
-import { SharedModule } from "../../../../../shared/shared-imports";
-import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
-import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
+import { BloodGroup } from "../../../../../shared/enums/blood-group";
 import { Gender } from "../../../../../shared/enums/gender";
 import { MaritalStatus } from "../../../../../shared/enums/marital-status";
+import { SharedModule } from "../../../../../shared/shared-imports";
+import { UserProfile } from "../../../../../shared/types/core";
 import { BooDatepickerComponent } from "../../../../date-picker/boo-date-picker.component";
-import { User } from "../../../../../shared/types/user";
-import { BloodGroup } from "../../../../../shared/enums/blood-group";
+import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
+import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 
 @Component({
   selector: 'admin-account-profile',
@@ -177,7 +177,7 @@ import { BloodGroup } from "../../../../../shared/enums/blood-group";
 
 export class AdminAccountProfileComponent {
   // #region Inputs, Outputs, Properties
-  @Input() userInfo?: User | null;
+  @Input() userInfo?: UserProfile | null;
   genderOptions = Object.keys(Gender)
     .filter(key => isNaN(Number(key)))
     .map(key => ({

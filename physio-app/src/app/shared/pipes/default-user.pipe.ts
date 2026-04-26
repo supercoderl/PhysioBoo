@@ -1,13 +1,13 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { User } from '../types/user';
-import { USER } from '../data/dummy';
+import { USER_PROFILE } from '../data/dummy';
+import { UserProfile } from '../types/core';
 
 @Pipe({
     name: 'defaultUser',
     standalone: true
 })
 export class DefaultUserPipe implements PipeTransform {
-    transform(value: User | null | undefined | ''): User {
-        return value || USER;
+    transform(value: UserProfile | null | undefined | ''): UserProfile {
+        return value || USER_PROFILE;
     }
 }

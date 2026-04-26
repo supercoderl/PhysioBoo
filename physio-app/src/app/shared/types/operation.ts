@@ -14,3 +14,25 @@ export interface AppointmentType {
     isActive: boolean;
     createdAt: Date;
 }
+
+export interface Department {
+    id: string;
+    hospitalId: string;
+    name: string;
+    departmentCode: string | null;
+    description: string | null;
+    headOfDepartment: string | null;
+    floorNumber: number | null;
+    wing: string | null;
+    phone: string | null;
+    email: string | null;
+    budgetAllocated: string | null;
+    bedCount: number;
+    isEmergency: boolean;
+    isCriticalCare: boolean;
+    isOutPatient: boolean;
+    isInPatient: boolean;
+    operationHours: string | null;
+    equipmentList: string | null;
+    isActive: boolean;
+}

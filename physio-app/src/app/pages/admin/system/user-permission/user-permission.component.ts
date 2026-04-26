@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { User } from "../../../../shared/types/user";
+import { User } from "../../../../shared/types/core";
 import { Permission } from "../../../../shared/types/permission";
 
 @Component({

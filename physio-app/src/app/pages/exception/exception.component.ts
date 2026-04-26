@@ -1,119 +1,106 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzResultModule } from 'ng-zorro-antd/result';
 
 @Component({
   selector: 'app-exception',
   standalone: true,
   imports: [CommonModule, NzResultModule, NzButtonModule, NzIconModule],
   template: `
-    <div class="min-h-screen flex-center-center p-6 bg-gray-50">
-      <div class="bg-surface rounded-lg shadow-lg border border-gray-200 w-full max-w-md overflow-hidden">
-        
-        <!-- Header -->
-        <div class="px-8 pt-8 pb-6 border-b border-gray-100">
-          <div class="flex-center-center gap-4">
-            <span class="text-5xl font-bold text-gray-800 tracking-tight">{{ errorCode }}</span>
-            <div [class]="getIconContainerClass()">
-              <i nz-icon [nzType]="getIconName()" nzTheme="outline" class="text-xl"></i>
-            </div>
+    <section class="h-dvh flex-center-center">
+      <div class="text-center animate-fade-in bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-2xl p-10 max-w-xl mx-auto shadow-2xl border border-white border-opacity-20">
+          <div class="relative mb-6">
+              <span class="text-9xl font-extrabold text-blue-300 block animate-bounce-in leading-none">{{ errorCode }}</span>
           </div>
-        </div>
-        
-        <!-- Content -->
-        <div class="px-8 py-6 text-center">
-          <h1 class="text-2xl font-semibold text-gray-900 mb-2 leading-tight">{{ getErrorTitle() }}</h1>
-          <p class="text-gray-600 leading-relaxed mb-8">{{ getErrorSubtitle() }}</p>
-          
-          <div class="flex gap-3 justify-center">
-            <button 
-              nz-button 
-              class="h-10 px-5 rounded-md font-medium bg-blue-600 text-white hover:bg-blue-500 border-blue-600 hover:border-blue-700 flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-600/25 hover:text-white"
-              (click)="goHome()">
-              <i nz-icon nzType="home" nzTheme="outline"></i>
-              <span class="!m-0">Home</span>
-            </button>
-            <button 
-              nz-button 
-              class="h-10 px-5 rounded-md font-medium bg-green-600 text-white hover:bg-gray-50 border-gray-300 hover:border-gray-400 flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:bg-green-500 hover:text-white"
-              (click)="goBack()">
-              <i nz-icon nzType="arrow-left" nzTheme="outline"></i>
-              <span class="!m-0">Back</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="px-8 py-5 bg-gray-50 border-t border-gray-100 text-center">
-          <span class="text-sm text-gray-600">
-            Need assistance? <a href="/contact" class="text-blue-600 hover:text-blue-700 font-medium no-underline hover:underline transition-colors">Contact support</a>
-          </span>
-        </div>
+          <h1 class="text-3xl md:text-4xl font-bold mb-4">{{ getErrorTitle() }}</h1>
+          <p class="text-md md:text-xl text-opacity-80 mb-6">
+              {{ getErrorSubtitle() }}
+          </p>
+          <a 
+            class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+            (click)="goHome()"
+          >
+              Go to Home
+          </a>
       </div>
-    </div>
+    </section>                                     
   `,
-  styles: [`
-    /* Override ng-zorro button styles for better integration */
-    ::ng-deep .ant-btn {
-      border: none !important;
-      box-shadow: none !important;
-      outline: none !important;
-    }
-
-    ::ng-deep .ant-btn-primary {
-      background-color: transparent !important;
-    }
-
-    ::ng-deep .ant-btn:focus {
-      box-shadow: none !important;
-    }
-
-    /* Mobile responsiveness */
-    @media (max-width: 640px) {
-      .exception-container {
-        padding: 1rem;
+  styles: `
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
       }
-
-      .error-header {
-        padding: 1.5rem 1.25rem 1.25rem;
-      }
-
-      .error-content {
-        padding: 1.25rem;
-      }
-
-      .error-footer {
-        padding: 1rem 1.25rem 1.25rem;
-      }
-
-      .error-code {
-        font-size: 2.5rem;
-      }
-
-      .error-title {
-        font-size: 1.25rem;
-      }
-
-      .error-description {
-        font-size: 0.9375rem;
-        margin-bottom: 1.5rem;
-      }
-
-      .error-actions {
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-
-      .btn-primary,
-      .btn-secondary {
-        width: 100%;
-        justify-content: center;
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
-  `]
+    .animate-fade-in {
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    @keyframes bounceIn {
+      0%, 20%, 40%, 60%, 80%, 100% {
+        transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+      }
+      0% {
+        opacity: 0;
+        transform: scale3d(.3, .3, .3);
+      }
+      20% {
+        transform: scale3d(1.1, 1.1, 1.1);
+      }
+      40% {
+        transform: scale3d(.9, .9, .9);
+      }
+      60% {
+        opacity: 1;
+        transform: scale3d(1.03, 1.03, 1.03);
+      }
+      80% {
+        transform: scale3d(.97, .97, .97);
+      }
+      100% {
+        opacity: 1;
+        transform: scale3d(1, 1, 1);
+      }
+    }
+        
+    .animate-bounce-in {
+      animation: bounceIn 1.2s ease-out forwards;
+    }
+
+    @keyframes wiggle {
+      0%, 7% {
+        transform: rotateZ(0);
+      }
+      15% {
+        transform: rotateZ(-15deg);
+      }
+      20% {
+        transform: rotateZ(10deg);
+      }
+      25% {
+        transform: rotateZ(-10deg);
+      }
+      30% {
+        transform: rotateZ(6deg);
+      }
+      35% {
+        transform: rotateZ(-4deg);
+      }
+      40%, 100% {
+        transform: rotateZ(0);
+      }
+    }
+    .animate-wiggle {
+      animation: wiggle 2s infinite ease-in-out; /* Infinite loop */
+    }
+  `
 })
 export class ExceptionComponent implements OnInit {
   errorCode: '404' | '403' | '500' | '401' = '404';
@@ -180,13 +167,5 @@ export class ExceptionComponent implements OnInit {
 
   goHome(): void {
     this.router.navigate(['/']);
-  }
-
-  goBack(): void {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      this.router.navigate(['/']);
-    }
   }
 }

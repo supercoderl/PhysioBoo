@@ -1,12 +1,15 @@
 export enum Role {
-    Admin,
-    Doctor,
-    Patient,
-    Nurse,
-    Receptionist,
-    Pharmacist,
-    LabTechnician,
-    Radiologist,
-    Accountant,
-    SuperAdmin
+    SUPER_ADMIN,
+    ADMIN,
+    NURSE,
+    PHAMACIST,
+    CASHIER,
+    LAB_TECHNICIAN,
+    RADIOLOGIST,
+    RECEPTIONIST,
+    ACCOUNTANT,
+    INVENTORY_MANAGER,
+    IT_SUPPORT,
+    DOCTOR,
+    PATIENT
 }

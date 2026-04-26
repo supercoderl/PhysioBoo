@@ -87,4 +87,49 @@ export const BASE_API = {
     DELETE: '/api/doctors/delete',
     UPDATE: '/api/doctors/update'
   },
+  ADMINMENU: {
+    SEARCH: '/api/admin-menus/search',
+    SEARCH_BY_ID: '/api/admin-menus/search-by-id',
+    CREATE: '/api/admin-menus/create',
+    DELETE: '/api/admin-menus/delete',
+    UPDATE: '/api/admin-menus/update'
+  },
+  HOSPITALGROUP: {
+    SEARCH: '/api/hospital-groups/search',
+    SEARCH_BY_ID: '/api/hospital-groups/search-by-id',
+    CREATE: '/api/hospital-groups/create',
+    DELETE: '/api/hospital-groups/delete',
+    UPDATE: '/api/hospital-groups/update'
+  },
+  HOSPITAL: {
+    SEARCH: '/api/hospitals/search',
+    SEARCH_BY_ID: '/api/hospitals/search-by-id',
+    CREATE: '/api/hospitals/create',
+    DELETE: '/api/hospitals/delete',
+    UPDATE: '/api/hospitals/update'
+  },
+  DEPARTMENT: {
+    SEARCH: '/api/departments/search',
+    SEARCH_BY_ID: '/api/departments/search-by-id',
+    CREATE: '/api/departments/create',
+    DELETE: '/api/departments/delete',
+    UPDATE: '/api/departments/update'
+  },
+  PATIENT: {
+    SEARCH: '/api/patients/search',
+    SEARCH_BY_ID: '/api/patients/search-by-id',
+    CREATE: '/api/patients/create',
+    DELETE: '/api/patients/delete',
+    UPDATE: '/api/patients/update'
+  },
+  USER: {
+    SEARCH: '/api/users/search',
+    SEARCH_BY_ID: '/api/users/me',
+    ASSIGN_ROLE: '/api/users/assign-role-to-user'
+  },
+  ROLE: {
+    SEARCH: '/api/roles/search',
+    CREATE: '/api/roles/create',
+    ASSIGN_PERMISSION: '/api/roles/assign-permission-to-role'
+  },
 };

@@ -1,10 +1,10 @@
 import { Component, OnInit } from "@angular/core";
-import { SharedModule } from "../../../../shared/shared-imports";
-import { LabResult } from "../../../../shared/types/lab-result";
-import { Visit } from "../../../../shared/types/visit";
-import { Patient } from "../../../../shared/types/patient";
-import { Document } from "../../../../shared/types/document";
 import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
+import { SharedModule } from "../../../../shared/shared-imports";
+import { Document } from "../../../../shared/types/document";
+import { LabResult } from "../../../../shared/types/lab-result";
+import { Patient } from "../../../../shared/types/patient";
+import { Visit } from "../../../../shared/types/visit";
 
 @Component({
   selector: 'admin-medical-record',
@@ -305,7 +305,26 @@ export class AdminMedicalRecordComponent implements OnInit {
     totalVisits: 0,
     totalAmountSpent: 0,
     loyaltyPoints: 0,
-    riskLevel: RiskLevel.Low
+    riskLevel: RiskLevel.Low,
+    userId: null,
+    fullName: "",
+    dateOfBirth: null,
+    gender: null,
+    bloodType: null,
+    phone: null,
+    email: null,
+    address: null,
+    city: null,
+    country: null,
+    occupation: null,
+    isVip: false,
+    isSeniorCitizen: false,
+    emergencyContactName: null,
+    emergencyContactPhone: null,
+    lastVisitDate: null,
+    nextFollowUpDate: null,
+    isActive: false,
+    createdAt: new Date()
   };
 
   visits: Visit[] = [

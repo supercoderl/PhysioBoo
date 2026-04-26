@@ -1,18 +1,18 @@
 import { EmploymentStatus } from "../enums/employment-status";
 
 export interface MedicalSpecialty {
-    id: string;
-    name: string;
-    code?: string | null;
-    category?: string | null;
-    description?: string | null;
-    requiredQualifications?: string | null;
-    averageConsultationDuration: number;
-    isSurgical: boolean;
-    isDiagnostic: boolean;
-    parentSpecialtyId?: string | null;
-    iconUrl?: string | null;
-    createdAt: Date;
+  id: string;
+  name: string;
+  code?: string | null;
+  category?: string | null;
+  description?: string | null;
+  requiredQualifications?: string | null;
+  averageConsultationDuration: number;
+  isSurgical: boolean;
+  isDiagnostic: boolean;
+  parentSpecialtyId?: string | null;
+  iconUrl?: string | null;
+  createdAt: Date;
 }
 
 export interface Doctor {
@@ -65,4 +65,16 @@ export interface Doctor {
   verifiedBy: string | null;
   createdAt: Date;
   updatedAt: Date | null;
+}
+
+export interface DoctorProfile {
+  userId: string;
+  bio: string | null;
+  about: string | null;
+  languagesSpoken: string[];
+  yearsOfExperience: number;
+  consultationFeeMin: number;
+  consultationFeeMax: number;
+  averageRating: number;
+  totalReviews: number;
 }

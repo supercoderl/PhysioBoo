@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { SharedModule } from "../../../../shared/shared-imports";
-import { Patient } from "../../../../shared/types/patient";
-import { Vitals } from "../../../../shared/types/vital";
-import { Medication } from "../../../../shared/types/medication";
-import { Procedure } from "../../../../shared/types/procedure";
-import { Note } from "../../../../shared/types/note";
-import { FluidBalance } from "../../../../shared/types/fluid-balance";
 import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
+import { SharedModule } from "../../../../shared/shared-imports";
+import { FluidBalance } from "../../../../shared/types/fluid-balance";
+import { Medication } from "../../../../shared/types/medication";
+import { Note } from "../../../../shared/types/note";
+import { Patient } from "../../../../shared/types/patient";
+import { Procedure } from "../../../../shared/types/procedure";
+import { Vitals } from "../../../../shared/types/vital";
 
 @Component({
   selector: 'admin-treatment-sheet',
@@ -395,7 +395,26 @@ export class AdminTreatmentSheetComponent implements OnInit, OnDestroy {
     totalVisits: 0,
     totalAmountSpent: 0,
     loyaltyPoints: 0,
-    riskLevel: RiskLevel.Low
+    riskLevel: RiskLevel.Low,
+    userId: null,
+    fullName: "",
+    dateOfBirth: null,
+    gender: null,
+    bloodType: null,
+    phone: null,
+    email: null,
+    address: null,
+    city: null,
+    country: null,
+    occupation: null,
+    isVip: false,
+    isSeniorCitizen: false,
+    emergencyContactName: null,
+    emergencyContactPhone: null,
+    lastVisitDate: null,
+    nextFollowUpDate: null,
+    isActive: false,
+    createdAt: new Date()
   };
 
   vitalSigns: Vitals[] = [

@@ -81,3 +81,46 @@ export interface DoctorFilter {
     start: string,
     end: string,
 }
+
+export interface PatientFilter {
+    start: string,
+    end: string,
+    patientType: number | null,
+    riskLevel: number | null,
+    isActive: boolean | null,
+    isVip: boolean | null,
+}
+
+export interface HospitalGroupFilter {
+    start: string,
+    end: string,
+    isActive: boolean | null,
+    subscriptionPlan: number | null,
+}
+
+export interface HospitalFilter {
+    start: string,
+    end: string,
+    hospitalGroupId: string | null,
+    type: number | null,
+    isActive: boolean | null,
+    hasEmergencyServices: boolean | null,
+}
+
+export interface DepartmentFilter {
+    start: string,
+    end: string
+}
+
+export interface UserFilter {
+    start: string,
+    end: string,
+    isActive: boolean | null,
+}
+
+export interface RoleFilter {
+    start: string,
+    end: string,
+    isActive: boolean | null,
+    isSystemRole: boolean | null,
+}

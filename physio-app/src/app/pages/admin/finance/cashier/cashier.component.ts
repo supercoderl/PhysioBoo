@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
+import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { BillItem } from "../../../../shared/types/bill";
 import { Patient } from "../../../../shared/types/patient";
-import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
 
 @Component({
   selector: 'admin-cashier',
@@ -241,7 +241,26 @@ export class AdminCashierComponent implements OnInit {
     totalVisits: 0,
     totalAmountSpent: 0,
     loyaltyPoints: 0,
-    riskLevel: RiskLevel.Low
+    riskLevel: RiskLevel.Low,
+    userId: null,
+    fullName: "",
+    dateOfBirth: null,
+    gender: null,
+    bloodType: null,
+    phone: null,
+    email: null,
+    address: null,
+    city: null,
+    country: null,
+    occupation: null,
+    isVip: false,
+    isSeniorCitizen: false,
+    emergencyContactName: null,
+    emergencyContactPhone: null,
+    lastVisitDate: null,
+    nextFollowUpDate: null,
+    isActive: false,
+    createdAt: new Date()
   };
   billNumber = '';
 

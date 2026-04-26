@@ -22,11 +22,6 @@ export const routes: Routes = [
                 loadComponent: () => import('./security/security.component').then(m => m.SecurityComponent)
             },
             {
-                path: 'billing',
-                data: { breadcrumb: ['billing'] },
-                loadComponent: () => import('./billing/billing.component').then(m => m.BillingComponent)
-            },
-            {
                 path: 'notification',
                 data: { breadcrumb: ['notification'] },
                 loadComponent: () => import('./notification/notification.component').then(m => m.NotificationComponent)
@@ -45,6 +40,11 @@ export const routes: Routes = [
                 path: 'sequence-tracker',
                 data: { breadcrumb: ['sequence tracker'] },
                 loadComponent: () => import('./sequence-tracker/list.component').then(m => m.SettingSequenceTrackerListComponent)
+            },
+            {
+                path: 'admin-menu',
+                data: { breadcrumb: ['admin menu'] },
+                loadComponent: () => import('./admin-menu/admin-menu.component').then(m => m.SettingAdminMenuComponent)
             }
         ]
     }

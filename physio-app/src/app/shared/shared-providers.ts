@@ -1,4 +1,4 @@
-import { ALargeSmall, Angry, Annoyed, ArrowLeft, ArrowRight, ArrowUpDown, Badge, BadgeCheck, Banknote, BarChart3, Bell, Blocks, BookCopy, Bookmark, BoomBox, Brain, Briefcase, BriefcaseMedical, Building2, Calendar, CalendarCheck, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, CircleCheck, CircleCheckBig, CirclePlus, CirclePower, CircleUser, CircleX, Clipboard, ClipboardCheck, ClipboardList, ClipboardPlus, Clock, Cloud, Code, CreditCard, Database, DatabaseBackup, Download, Droplet, Ellipsis, EllipsisVertical, Eye, EyeOff, Factory, FileBadge, FileCheck, FilePlus, FileText, Flag, Flame, FlaskConical, FlaskRound, Folder, FolderOpen, Frown, Funnel, Gauge, Gift, Globe, GraduationCap, Handbag, Hash, Headphones, Heart, HeartPulse, House, IdCard, Image, Info, Key, Landmark, LandPlot, Layers, LayoutGrid, LayoutTemplate, List, ListFilter, Loader, LoaderCircle, Lock, LogIn, LucideIconData, Mail, MapPin, Maximize, Megaphone, Meh, Menu, MessageCircleQuestionMark, MessageCircleWarning, Minimize, MonitorCheck, Moon, MoveLeft, Newspaper, Origami, Palette, PanelLeft, Pencil, Phone, PhoneCall, Pi, Pill, Play, Plus, Printer, Rainbow, RefreshCw, Scan, Scissors, Search, Settings, Share, ShieldCheck, ShoppingCart, Smile, SquareActivity, Star, Stethoscope, Sun, Telescope, TestTube, Trash2, Triangle, TriangleAlert, Truck, Undo2, Upload, User, UserCheck, UserCog, UserPlus, UserRound, Users, Warehouse, X, Zap } from 'lucide-angular';
+import { ALargeSmall, Angry, Annoyed, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpDown, Badge, BadgeCheck, Banknote, BarChart3, Bed, Bell, Blocks, BookCopy, Bookmark, BoomBox, Boxes, Brain, Briefcase, BriefcaseMedical, Building2, Calculator, Calendar, CalendarCheck, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, CircleCheck, CircleCheckBig, CirclePlus, CirclePower, CircleUser, CircleX, Clipboard, ClipboardCheck, ClipboardList, ClipboardPlus, Clock, Cloud, Code, Columns3Cog, ConciergeBell, Contact, CreditCard, Crown, Database, DatabaseBackup, Download, Droplet, Ellipsis, EllipsisVertical, Eye, EyeOff, Factory, FileBadge, FileCheck, FilePlus, FileText, Flag, Flame, FlaskConical, FlaskRound, Folder, FolderOpen, Frown, Funnel, Gauge, Gift, Globe, GraduationCap, Handbag, Hash, Headphones, Headset, Heart, HeartPulse, Hospital, House, IdCard, Image, Info, Key, Landmark, LandPlot, Layers, LayoutDashboard, LayoutGrid, LayoutList, LayoutTemplate, List, ListFilter, Loader, LoaderCircle, Lock, LogIn, LucideIconData, Mail, MapPin, Maximize, Megaphone, Meh, Menu, MessageCircleQuestionMark, MessageCircleWarning, Microscope, Minimize, MonitorCheck, Moon, MoveLeft, Newspaper, Origami, Palette, PanelLeft, Pencil, Phone, PhoneCall, Pi, Pill, Play, Plus, Printer, Rainbow, RefreshCw, Rows4, Scan, Scissors, Search, Settings, Settings2, Share, Shield, ShieldCheck, ShoppingCart, Smile, SquareActivity, Star, Stethoscope, Sun, Telescope, TestTube, Trash2, TreeDeciduous, Triangle, TriangleAlert, Truck, Undo2, Upload, User, UserCheck, UserCog, UserPlus, UserRound, Users, UsersRound, Wallet, Warehouse, X, Zap } from 'lucide-angular';
 import { NzAffixModule } from 'ng-zorro-antd/affix';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzAnchorModule } from 'ng-zorro-antd/anchor';
@@ -187,6 +187,8 @@ export const SHARED_LUCIDE_ICONS: Record<string, LucideIconData> = {
     Folder,
     FileText,
     Menu,
+    ArrowUp,
+    ArrowDown,
     ArrowUpDown,
     CircleCheck,
     Blocks,
@@ -302,7 +304,25 @@ export const SHARED_LUCIDE_ICONS: Record<string, LucideIconData> = {
     FileBadge,
     PhoneCall,
     ArrowLeft,
-    Landmark
+    Landmark,
+    LayoutList,
+    Microscope,
+    Bed,
+    LayoutDashboard,
+    UsersRound,
+    Wallet,
+    ConciergeBell,
+    Hospital,
+    Crown,
+    Contact,
+    Settings2,
+    Rows4,
+    Columns3Cog,
+    Shield,
+    Calculator,
+    Boxes,
+    Headset,
+    TreeDeciduous
 }
 
 export const SHARED_PIPES = [

@@ -1,0 +1,134 @@
+<admin-content-header>
+  <!-- Page header -->
+  <div
+    class="flex items-center md:flex-column gap-2 pb-3 mb-2 border-1 border-bottom"
+  >
+    <div class="flex-1">
+      <h4 class="text-[22px] text-primary font-semibold mb-0">
+        Menu Management
+      </h4>
+    </div>
+    <div class="text-right flex items-center gap-2">
+      <button-icon
+        buttonClass="!bg-primary ms-2 text-white"
+        (onClick)="onOpenDrawer(null)"
+      >
+        New Item
+      </button-icon>
+    </div>
+  </div>
+
+  <!-- Search toolbar -->
+  <div class="flex items-center gap-2 mb-2">
+    <div class="table-search flex items-center">
+      <div class="search-input">
+        <boo-input
+          label="Search menus..."
+          size="small"
+          (search)="onSearch($event)"
+        >
+          <boo-icon
+            [class.animate-spin]="loadingSrv.isLoading('search')"
+            [name]="loadingSrv.isLoading('search') ? 'loader-circle' : 'search'"
+            color="#64748B"
+            endfix
+          />
+        </boo-input>
+      </div>
+    </div>
+    <boo-button-admin
+      [icon]="{ name: 'refresh-cw', size: 14, color: '#6C7688' }"
+      buttonClass="!bg-surface h-full"
+      [border]="{ width: 1, color: '#e3e3e3' }"
+      (click)="loadMenus()"
+    >
+      <span class="text-placeholder">Reload</span>
+    </boo-button-admin>
+  </div>
+
+  <!-- Stats row -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+    <div
+      class="bg-surface border border-gray-200 rounded-lg p-3 flex items-center gap-3"
+    >
+      <div
+        class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center"
+      >
+        <boo-icon
+          name="layout-list"
+          [size]="18"
+          class="text-primary"
+        ></boo-icon>
+      </div>
+      <div>
+        <p class="text-xs text-secondary m-0">Total Items</p>
+        <p class="text-lg font-bold text-primary m-0">{{ flatMenus.length }}</p>
+      </div>
+    </div>
+
+    <div
+      class="bg-surface border border-gray-200 rounded-lg p-3 flex items-center gap-3"
+    >
+      <div
+        class="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center"
+      >
+        <boo-icon name="circle-check" [size]="18" color="#16a34a"></boo-icon>
+      </div>
+      <div>
+        <p class="text-xs text-secondary m-0">Active</p>
+        <p class="text-lg font-bold text-primary m-0">
+          {{ (flatMenus | filter: "isActive" : true).length }}
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="bg-surface border border-gray-200 rounded-lg p-3 flex items-center gap-3"
+    >
+      <div
+        class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center"
+      >
+        <boo-icon name="layers" [size]="18" color="#2563eb"></boo-icon>
+      </div>
+      <div>
+        <p class="text-xs text-secondary m-0">Root Menus</p>
+        <p class="text-lg font-bold text-primary m-0">{{ menus().length }}</p>
+      </div>
+    </div>
+
+    <div
+      class="bg-surface border border-gray-200 rounded-lg p-3 flex items-center gap-3"
+    >
+      <div
+        class="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center"
+      >
+        <boo-icon name="layout-list" [size]="18" color="#d97706"></boo-icon>
+      </div>
+      <div>
+        <p class="text-xs text-secondary m-0">Child Items</p>
+        <p class="text-lg font-bold text-primary m-0">
+          {{ flatMenus.length - menus().length }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tree card -->
+  <setting-admin-menu-tree-card
+    [data]="filteredMenus()"
+    (editClick)="onOpenDrawer($event)"
+    (deleteClick)="onDelete($event)"
+    (addChildClick)="onOpenDrawer(null, $event)"
+  />
+
+  <!-- Drawer -->
+  <setting-admin-menu-drawer
+    [isOpen]="isDrawerOpen"
+    [currentItem]="selectedItem"
+    [parentId]="pendingParentId"
+    [allMenus]="menus()"
+    (close)="onCloseDrawer()"
+    (saveSuccess)="onSaveSuccess($event)"
+    (delete)="onDelete($event)"
+  />
+</admin-content-header>

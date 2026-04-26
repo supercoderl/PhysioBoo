@@ -1,5 +1,5 @@
+import { User, UserProfile } from "../types/core"
 import { MenuItem } from "../types/menu"
-import { User } from "../types/user"
 import { generateUUID } from "../utils/common"
 
 // #region Categories
@@ -1225,6 +1225,18 @@ export const USER: User = {
     updatedAt: null,
     updatedBy: null,
 }
+
+export const USER_PROFILE: UserProfile = {
+    id: generateUUID(),
+    email: "",
+    phone: null,
+    isVerified: false,
+    profilePicture: null,
+    profile: null,
+    doctor: null,
+    patient: null,
+    roles: []
+}
 // #endregion
 
 // #region Category Management
@@ -1300,6 +1312,14 @@ export const CATEGORIES_MANAGEMENT = [
             "Manage suppliers responsible for distributing medicines, medical supplies, and equipment.",
         icon: "truck",
         route: "/admin/system/common-category/supplier"
+    },
+    {
+        id: 10,
+        name: "Departments",
+        description:
+            "Manage medical and administrative departments, staff assignments, and facility allocation.",
+        icon: "department",
+        route: "/admin/system/common-category/department"
     }
 ];
 // #endregion
@@ -1361,6 +1381,14 @@ export const SETTINGS_MANAGEMENT = [
             "Track and manage the order of system records and processes.",
         icon: "pi",
         route: "/admin/system/settings/sequence-tracker"
+    },
+    {
+        id: 8,
+        name: "Admin Menu",
+        description:
+            "Manage administrative menus, configurations, and system settings.",
+        icon: "layout-list",
+        route: "/admin/system/settings/admin-menu"
     },
 ]
 // #endregion

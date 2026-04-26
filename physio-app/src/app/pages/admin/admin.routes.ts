@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { Role } from '../../shared/enums/role';
 
 export const routes: Routes = [
     {
@@ -210,8 +211,13 @@ export const routes: Routes = [
                 children: [
                     {
                         path: '',
-                        redirectTo: 'customer',
+                        redirectTo: 'patient',
                         pathMatch: 'full'
+                    },
+                    {
+                        path: 'patient',
+                        loadComponent: () => import('./crm/patient/list.component').then(m => m.CrmPatientListComponent),
+                        data: { breadcrumb: ['patient'] },
                     },
                     {
                         path: 'customer',
@@ -237,6 +243,11 @@ export const routes: Routes = [
                         path: 'member-point',
                         data: { breadcrumb: ['member-point'] },
                         loadComponent: () => import('./crm/member-point/member-point.component').then(m => m.AdminMemberPointComponent),
+                    },
+                    {
+                        path: 'patient',
+                        data: { breadcrumb: ['patient'] },
+                        loadComponent: () => import('./crm/patient/list.component').then(m => m.CrmPatientListComponent),
                     }
                 ]
             },
@@ -346,7 +357,7 @@ export const routes: Routes = [
                     },
                     {
                         path: 'user-permission',
-                        data: { breadcrumb: ['user-permission'] },
+                        data: { breadcrumb: ['user-permission'], requiredRoles: [Role.ADMIN.toString()] },
                         loadComponent: () => import('./system/user-permission/user-permission.component').then(m => m.AdminUserPermissionComponent),
                     },
                     {

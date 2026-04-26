@@ -1,16 +1,18 @@
+import { GoogleSigninButtonDirective, SocialAuthService } from '@abacritt/angularx-social-login';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { take } from 'rxjs';
 import { BooButtonComponent } from "../../../components/button/boo-button/boo-button.component";
 import { FormWrapperComponent } from '../../../components/form/boo-form/boo-form.component';
 import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
-import { LocalLoadingService } from '../../../services/common/local-loading.service';
-import { SharedModule } from '../../../shared/shared-imports';
 import { AuthService } from '../../../services/auth/auth.service';
-import { GoogleSigninButtonDirective, SocialAuthService } from '@abacritt/angularx-social-login';
-import { AppValidators } from '../../../shared/validator/validator-config.validator';
+import { LocalLoadingService } from '../../../services/common/local-loading.service';
 import { ToastService } from '../../../services/common/toast.service';
+import { Role } from '../../../shared/enums/role';
+import { SharedModule } from '../../../shared/shared-imports';
+import { AppValidators } from '../../../shared/validator/validator-config.validator';
 
 @Component({
   selector: 'app-login',
@@ -59,8 +61,8 @@ export class LoginComponent implements OnInit, OnDestroy {
           user.provider.toLocaleLowerCase()
         ).subscribe({
           next: _ => {
-            this.router.navigate(['/admin']);
             this.loadingSrv.clear('login');
+            this.redirectByRole();
           }
         });
       }
@@ -77,15 +79,27 @@ export class LoginComponent implements OnInit, OnDestroy {
     if(this.state == 'phone' && data.otp != '123456') {
       this.toastSrv.error("OTP does not correct.");
       return;
-    } 
+    }
 
     this.authSrv.login(data).subscribe({
       next: _ => {
-        this.router.navigate(['/admin']);
         this.loadingSrv.clear('login');
-        // this.form.reset();
+        this.redirectByRole();
       },
     })
+  }
+
+  private redirectByRole() {
+    this.authSrv.userInfo$.pipe(take(1)).subscribe(user => {
+      const roles = user?.roles ?? [];
+      if (roles.includes(Role[Role.SUPER_ADMIN])) {
+        this.router.navigate(['/superadmin']);
+      } else if (roles.some(r => r !== Role[Role.PATIENT])) {
+        this.router.navigate(['/admin']);
+      } else {
+        this.router.navigate(['/']);
+      }
+    });
   }
 
   onChangeState = (newState: string) => {

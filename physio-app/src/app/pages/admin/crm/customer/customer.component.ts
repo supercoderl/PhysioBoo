@@ -1,14 +1,13 @@
 import { Component } from "@angular/core";
+import { PatientType } from "../../../../shared/enums/patient";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { MedicalRecord } from "../../../../shared/types/medical-record";
-import { Patient, PatientProfile } from "../../../../shared/types/patient";
-import { Appointment } from "../../../../shared/types/appointment";
-import { Billing } from "../../../../shared/types/bill";
-import { Visit } from "../../../../shared/types/visit";
-import { Medication } from "../../../../shared/types/medication";
-import { LabResult } from "../../../../shared/types/lab-result";
-import { Document } from "../../../../shared/types/document";
 import { Allergy } from "../../../../shared/types/allergy";
+import { Appointment } from "../../../../shared/types/appointment";
+import { Document } from "../../../../shared/types/document";
+import { LabResult } from "../../../../shared/types/lab-result";
+import { Medication } from "../../../../shared/types/medication";
+import { PatientProfile } from "../../../../shared/types/patient";
+import { Visit } from "../../../../shared/types/visit";
 
 @Component({
   selector: 'admin-customer-360',
@@ -25,22 +24,10 @@ import { Allergy } from "../../../../shared/types/allergy";
       <div class="flex items-start justify-between">
         <div class="flex items-start space-x-6">
           <!-- Patient Photo -->
-          <div class="flex-shrink-0">
-            <img [src]="patient.photo" [alt]="patient.name" 
-                 class="w-24 h-24 rounded-full border-4 border-indigo-500">
-          </div>
+
           
           <!-- Patient Basic Info -->
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ patient.name }}</h1>
-            <div class="grid grid-cols-2 gap-x-8 gap-y-1 text-sm">
-              <div><span class="font-semibold text-gray-700">Patient ID:</span> <span class="text-gray-600">{{ patient.id }}</span></div>
-              <div><span class="font-semibold text-gray-700">Blood Type:</span> <span class="text-gray-600">{{ patient.bloodType }}</span></div>
-              <div><span class="font-semibold text-gray-700">Age/Gender:</span> <span class="text-gray-600">{{ patient.age }} / {{ patient.gender }}</span></div>
-              <div><span class="font-semibold text-gray-700">Phone:</span> <span class="text-gray-600">{{ patient.phone }}</span></div>
-              <div class="col-span-2"><span class="font-semibold text-gray-700">Email:</span> <span class="text-gray-600">{{ patient.email }}</span></div>
-            </div>
-          </div>
+
         </div>
         
         <!-- Quick Actions -->
@@ -199,24 +186,7 @@ import { Allergy } from "../../../../shared/types/allergy";
             <div class="space-y-6">
               
               <!-- Contact Information -->
-              <div class="bg-gray-50 p-4 rounded-lg">
-                <h3 class="text-sm font-bold text-gray-900 mb-3">Contact Information</h3>
-                <div class="space-y-2 text-sm">
-                  <div>
-                    <p class="text-gray-600 font-medium">Address</p>
-                    <p class="text-gray-800">{{ patient.address }}</p>
-                  </div>
-                  <div>
-                    <p class="text-gray-600 font-medium">Emergency Contact</p>
-                    <p class="text-gray-800">{{ patient.emergencyContact }}</p>
-                    <p class="text-gray-800">{{ patient.emergencyPhone }}</p>
-                  </div>
-                  <div>
-                    <p class="text-gray-600 font-medium">Registered Since</p>
-                    <p class="text-gray-800">{{ patient.registrationDate }}</p>
-                  </div>
-                </div>
-              </div>
+              
 
               <!-- Active Medications -->
               <div class="bg-yellow-50 p-4 rounded-lg">
@@ -477,18 +447,16 @@ export class AdminCustomer360Component {
   activeTab: string = 'overview';
 
   patient: PatientProfile = {
-    id: 'P-2024-001',
-    name: 'John Michael Doe',
-    age: 45,
-    gender: 'Male',
-    bloodType: 'O+',
-    phone: '+1 234 567 8900',
-    email: 'john.doe@email.com',
-    address: '123 Main Street, Springfield, IL 62701',
-    emergencyContact: 'Jane Doe (Wife)',
-    emergencyPhone: '+1 234 567 8901',
-    photo: 'https://ui-avatars.com/api/?name=John+Doe&size=200&background=4F46E5&color=fff',
-    registrationDate: '2020-05-15'
+    userId: 'P-2024-001',
+    patientNumber: "",
+    patientType: PatientType.Outpatient,
+    occupation: null,
+    isVip: false,
+    isSeniorCitizen: false,
+    primaryDoctorId: "",
+    lastVisitDate: null,
+    nextFollowUpDate: null,
+    totalVisits: 0
   };
 
   visits: Visit[] = [

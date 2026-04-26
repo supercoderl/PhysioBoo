@@ -4,7 +4,7 @@ import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, finalize, map, Observable, switchMap, tap, throwError } from 'rxjs';
 import { BASE_API } from '../../shared/api/base';
 import { PagedResponse } from '../../shared/types/common';
-import { User } from '../../shared/types/user';
+import { UserProfile } from '../../shared/types/core';
 import { LocalStorage } from '../../shared/utils/storage';
 
 @Injectable({
@@ -13,7 +13,7 @@ import { LocalStorage } from '../../shared/utils/storage';
 export class AuthService {
     // #region Inputs, Outputs, Properties
     private permissionsSubject = new BehaviorSubject<string[]>([]);
-    private userInfoSubject = new BehaviorSubject<User | null>(null);
+    private userInfoSubject = new BehaviorSubject<UserProfile | null>(null);
     private oauthService = inject(SocialAuthService);
 
     permissions$ = this.permissionsSubject.asObservable();
@@ -68,7 +68,7 @@ export class AuthService {
     }
 
     getProfile() {
-        return this.http.post<PagedResponse<User>>(BASE_API.PROFILE, null).pipe(
+        return this.http.post<PagedResponse<UserProfile>>(BASE_API.PROFILE, null).pipe(
             tap((res) => {
                 if (res.success && res.data) {
                     this.userInfoSubject.next(res.data);

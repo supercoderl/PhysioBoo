@@ -16,7 +16,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 .AddEndpointFilter<NotificationResultFilter>();
 
             #region Get configuration data
-            group.MapPost("/config", async (
+            group.MapGet("", async (
                 HttpRequest request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
@@ -36,7 +36,7 @@ namespace PhysioBoo.Presentation.Endpoints
             #endregion
 
             #region Get version
-            group.MapPost("/config/version", (
+            group.MapGet("/version", (
                 HttpContext context,
                 IConfiguration configuration
             ) =>

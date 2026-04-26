@@ -5,7 +5,7 @@ namespace PhysioBoo.Application.ViewModels.Profiles
 {
     public sealed class ProfileViewModel
     {
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string MiddleName { get; set; } = string.Empty;
@@ -26,7 +26,7 @@ namespace PhysioBoo.Application.ViewModels.Profiles
         {
             return new ProfileViewModel
             {
-                Id = profile.Id,
+                UserId = profile.Id,
                 FirstName = profile.FirstName,
                 LastName = profile.LastName,
                 MiddleName = profile.MiddleName,

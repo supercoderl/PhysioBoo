@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.LabTests.CreateLabTest;
 using PhysioBoo.Application.Commands.LabTests.DeleteLabTest.Commands.DeleteLabTestCommand;
 using PhysioBoo.Application.Commands.LabTests.UpdateLabTest.Commands.UpdateLabTestCommand;
@@ -22,27 +22,33 @@ namespace PhysioBoo.Presentation.Endpoints
                 .AddEndpointFilter<NotificationResultFilter>();
 
             #region Create New Lab Test
-            group.MapPost("/create", async (
-                CreateLabTestViewModel newLabTest,
+            group.MapPost("", async (
+                [FromBody] CreateLabTestViewModel request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateLabTestCommand(newLabTest));
+                Guid newId = Guid.NewGuid();
+                await bus.SendCommandAsync(new CreateLabTestCommand(request, newId));
 
-                return Results.Created($"/api/lab-tests/{newLabTest.Id}", new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = newLabTest.Id
-                });
+                return Results.CreatedAtRoute(
+                    "GetLabTestById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
             }).WithName("CreateLabTest")
             .WithSummary("Create new lab test")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Get All Lab Tests
-            group.MapPost("/search", async (
+            group.MapPost("search", async (
                 [FromBody] PagedRequest<LabTestFilter> request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
@@ -55,70 +61,68 @@ namespace PhysioBoo.Presentation.Endpoints
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchLabTests")
+            }).WithName("GetLabTests")
             .WithSummary("Retrieve a paginated list of lab tests with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<LabTestViewModel>>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<PagedResult<LabTestViewModel>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<PagedResult<LabTestViewModel>>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Delete Lab Test
-            group.MapPost("/delete", async (
-                DeleteLabTestViewModel request,
+            group.MapDelete("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new DeleteLabTestCommand(request.Id, request.IsHard));
+                await bus.SendCommandAsync(new DeleteLabTestCommand(id));
 
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "Lab test has been deleted successfully."
-                });
+                return Results.NoContent();
             }).WithName("DeleteLabTest")
-            .WithSummary("Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .WithSummary("Handles requests to delete a specific lab test by its identifier.")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Update Lab Test
-            group.MapPost("/update", async (
-                UpdateLabTestViewModel LabTest,
+            group.MapPatch("{id:guid}", async (
+                Guid id,
+                [FromBody] UpdateLabTestViewModel request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new UpdateLabTestCommand(LabTest));
+                await bus.SendCommandAsync(new UpdateLabTestCommand(request, id));
 
-                return Results.Ok(new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = LabTest.Id
-                });
+                return Results.NoContent();
             }).WithName("UpdateLabTest")
             .WithSummary("Update lab test")
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
             #endregion
 
             #region Get Lab Test By Id
-            group.MapPost("/search-by-id", async (
-                [FromBody] LabTestSingleFilter request,
+            group.MapGet("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                LabTestViewModel? result = await bus.QueryAsync(new GetLabTestByIdQuery(request.Id));
+                LabTestViewModel? result = await bus.QueryAsync(new GetLabTestByIdQuery(id));
 
                 return Results.Ok(new ResponseMessage<LabTestViewModel?>
                 {
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchLabTest")
+            }).WithName("GetLabTestById")
             .WithSummary("Retrieve a lab test record.")
             .Produces<ResponseMessage<LabTestViewModel?>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<LabTestViewModel?>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<LabTestViewModel?>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
         }
     }

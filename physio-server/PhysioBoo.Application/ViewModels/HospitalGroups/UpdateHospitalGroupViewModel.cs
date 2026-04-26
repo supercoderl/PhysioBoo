@@ -2,7 +2,6 @@
 {
     public sealed record UpdateHospitalGroupViewModel
     (
-        Guid Id,
         string Name,
         string? Description,
         string? HeadquartersAddress,

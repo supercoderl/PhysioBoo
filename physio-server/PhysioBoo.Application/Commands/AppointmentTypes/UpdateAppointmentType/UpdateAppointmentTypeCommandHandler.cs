@@ -24,13 +24,13 @@ namespace PhysioBoo.Application.Commands.AppointmentTypes.UpdateAppointmentType
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.Operation.AppointmentType? appointmentType = await _appointmentTypeRepository.GetByIdAsync(request.AppointmentType.Id);
+            Domain.Entities.Operation.AppointmentType? appointmentType = await _appointmentTypeRepository.GetByIdAsync(request.Id);
 
             if (appointmentType == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"Appointment type with Id {request.AppointmentType.Id} not found.",
+                    $"Appointment type with Id {request.Id} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 

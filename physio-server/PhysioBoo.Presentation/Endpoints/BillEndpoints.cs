@@ -1,4 +1,5 @@
-﻿using PhysioBoo.Application.Commands.Bills.CreateBill;
+﻿using Microsoft.AspNetCore.Mvc;
+using PhysioBoo.Application.Commands.Bills.CreateBill;
 using PhysioBoo.Application.ViewModels.Bills;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
@@ -15,25 +16,32 @@ namespace PhysioBoo.Presentation.Endpoints
                 .WithOpenApi()
                 .AddEndpointFilter<NotificationResultFilter>();
 
-            // Create bill
-            group.MapPost("/create", async (
-                CreateBillViewModel newBill,
+            #region Create New Bill
+            group.MapPost("", async (
+                [FromBody] CreateBillViewModel newBill,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateBillCommand(newBill));
+                Guid newId = Guid.NewGuid();
 
-                return Results.Created($"/api/bills/{newBill.Id}", new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = newBill.Id
-                });
+                await bus.SendCommandAsync(new CreateBillCommand(newBill, newId));
+
+                return Results.CreatedAtRoute(
+                    "GetBillById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newBill.Id
+                    }
+                );
             }).WithName("CreateBill")
             .WithSummary("Create new bill")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
             .RequireAuthorization();
+            #endregion
         }
     }
 }

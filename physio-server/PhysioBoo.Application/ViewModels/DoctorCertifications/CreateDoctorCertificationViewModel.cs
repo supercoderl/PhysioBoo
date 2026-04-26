@@ -2,7 +2,6 @@
 {
     public sealed record CreateDoctorCertificationViewModel
     (
-        Guid Id,
         Guid DoctorId,
         string CertificationName,
         string? CertificationType,

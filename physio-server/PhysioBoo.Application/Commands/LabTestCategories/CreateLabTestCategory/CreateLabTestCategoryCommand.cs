@@ -9,10 +9,12 @@ namespace PhysioBoo.Application.Commands.LabTestCategories.CreateLabTestCategory
         private static readonly CreateLabTestCategoryCommandValidation s_validation = new();
 
         public CreateLabTestCategoryViewModel NewLabTestCategory { get; }
+        public Guid NewId { get; }
 
-        public CreateLabTestCategoryCommand(CreateLabTestCategoryViewModel newLabTestCategory) : base(Guid.NewGuid())
+        public CreateLabTestCategoryCommand(CreateLabTestCategoryViewModel newLabTestCategory, Guid newId) : base(Guid.NewGuid())
         {
             NewLabTestCategory = newLabTestCategory;
+            NewId = newId;
         }
 
         public override bool IsValid()

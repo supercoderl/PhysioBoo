@@ -70,7 +70,7 @@ namespace PhysioBoo.Application.Commands.Hospitals.CreateHospital
                 request.NewHospital.VisionStatement
             );
 
-            newHospital.SetTenantId(_user.GetTenantId());
+            newHospital.SetTenantId(request.NewHospital.HospitalGroupId);
             newHospital.SetCreatedBy(_user.GetUserId());
 
             SharedKernel.Results.DbResult<Guid> result = await _hospitalRepository.InsertAsync<Hospital, Guid>(newHospital);

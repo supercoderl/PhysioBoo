@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.LabTestCategories.CreateLabTestCategory;
 using PhysioBoo.Application.Commands.LabTestCategories.DeleteLabTestCategory;
 using PhysioBoo.Application.Commands.LabTestCategories.UpdateLabTestCategory;
@@ -18,32 +18,38 @@ namespace PhysioBoo.Presentation.Endpoints
         public static void MapLabTestCategoryEndpoints(this IEndpointRouteBuilder app)
         {
             RouteGroupBuilder group = app.MapGroup("api/lab-test-categories")
-                .WithTags("Lab Test Category")
+                .WithTags("Lab Test Categories")
                 .WithOpenApi()
                 .AddEndpointFilter<NotificationResultFilter>();
 
-            #region Create New Lab Test Category    
-            group.MapPost("/create", async (
-                CreateLabTestCategoryViewModel newLabTestCategory,
+            #region Create New Lab Test Category
+            group.MapPost("", async (
+                [FromBody] CreateLabTestCategoryViewModel request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateLabTestCategoryCommand(newLabTestCategory));
+                Guid newId = Guid.NewGuid();
+                await bus.SendCommandAsync(new CreateLabTestCategoryCommand(request, newId));
 
-                return Results.Created($"/api/lab-test-categories/{newLabTestCategory.Id}", new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = newLabTestCategory.Id
-                });
+                return Results.CreatedAtRoute(
+                    "GetLabTestCategoryById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
             }).WithName("CreateLabTestCategory")
             .WithSummary("Create new lab test category")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Get All Lab Test Categories
-            group.MapPost("/search", async (
+            group.MapPost("search", async (
                 [FromBody] PagedRequest<LabTestCategoryFilter> request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
@@ -56,14 +62,15 @@ namespace PhysioBoo.Presentation.Endpoints
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchLabTestCategories")
+            }).WithName("GetLabTestCategories")
             .WithSummary("Retrieve a paginated list of lab test categories with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<LabTestCategoryViewModel>>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<PagedResult<LabTestCategoryViewModel>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<PagedResult<LabTestCategoryViewModel>>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Get Lab Test Category Lookups
-            group.MapPost("/lookup", async (
+            group.MapPost("lookup", async (
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
@@ -76,69 +83,67 @@ namespace PhysioBoo.Presentation.Endpoints
                     Data = result
                 });
             }).WithName("GetLabTestCategoryLookups")
-            .WithSummary("Retrieve a paginated list of lab test categories for selection.")
+            .WithSummary("Retrieve a list of lab test categories for selection.")
             .Produces<ResponseMessage<PagedResult<LabTestCategoryLookupViewModel>>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<PagedResult<LabTestCategoryLookupViewModel>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<PagedResult<LabTestCategoryLookupViewModel>>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Delete Lab Test Category
-            group.MapPost("/delete", async (
-                DeleteLabTestCategoryViewModel request,
+            group.MapDelete("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new DeleteLabTestCategoryCommand(request.Id, request.IsHard));
+                await bus.SendCommandAsync(new DeleteLabTestCategoryCommand(id));
 
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "Lab test category has been deleted successfully."
-                });
+                return Results.NoContent();
             }).WithName("DeleteLabTestCategory")
-            .WithSummary("Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .WithSummary("Handles requests to delete a specific lab test category by its identifier.")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Update Lab Test Category
-            group.MapPost("/update", async (
-                UpdateLabTestCategoryViewModel LabTestCategory,
+            group.MapPatch("{id:guid}", async (
+                Guid id,
+                [FromBody] UpdateLabTestCategoryViewModel request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new UpdateLabTestCategoryCommand(LabTestCategory));
+                await bus.SendCommandAsync(new UpdateLabTestCategoryCommand(request, id));
 
-                return Results.Ok(new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = LabTestCategory.Id
-                });
+                return Results.NoContent();
             }).WithName("UpdateLabTestCategory")
             .WithSummary("Update lab test category")
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
             #endregion
 
             #region Get Lab Test Category By Id
-            group.MapPost("/search-by-id", async (
-                [FromBody] LabTestCategorySingleFilter request,
+            group.MapGet("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                LabTestCategoryViewModel? result = await bus.QueryAsync(new GetLabTestCategoryByIdQuery(request.Id));
+                LabTestCategoryViewModel? result = await bus.QueryAsync(new GetLabTestCategoryByIdQuery(id));
 
                 return Results.Ok(new ResponseMessage<LabTestCategoryViewModel?>
                 {
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchLabTestCategory")
-            .WithSummary("Retrieve a medical specialty record.")
+            }).WithName("GetLabTestCategoryById")
+            .WithSummary("Retrieve a lab test category record.")
             .Produces<ResponseMessage<LabTestCategoryViewModel?>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<LabTestCategoryViewModel?>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<LabTestCategoryViewModel?>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
         }
     }

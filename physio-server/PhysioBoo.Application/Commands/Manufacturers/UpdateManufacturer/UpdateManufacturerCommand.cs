@@ -8,10 +8,12 @@ namespace PhysioBoo.Application.Commands.Manufacturers.UpdateManufacturer
         private static readonly UpdateManufacturerCommandValidation s_validation = new();
 
         public UpdateManufacturerViewModel Manufacturer { get; }
+        public Guid Id { get; }
 
-        public UpdateManufacturerCommand(UpdateManufacturerViewModel manufacturer) : base(Guid.NewGuid())
+        public UpdateManufacturerCommand(UpdateManufacturerViewModel manufacturer, Guid id) : base(Guid.NewGuid())
         {
             Manufacturer = manufacturer;
+            Id = id;
         }
 
         public override bool IsValid()

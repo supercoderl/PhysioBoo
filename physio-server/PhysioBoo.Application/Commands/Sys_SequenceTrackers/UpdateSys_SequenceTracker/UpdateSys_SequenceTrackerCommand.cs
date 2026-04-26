@@ -8,10 +8,12 @@ namespace PhysioBoo.Application.Commands.Sys_SequenceTrackers.UpdateSys_Sequence
         private static readonly UpdateSys_SequenceTrackerCommandValidation s_validation = new();
 
         public UpdateSys_SequenceTrackerViewModel Sys_SequenceTracker { get; }
+        public Guid Id { get; }
 
-        public UpdateSys_SequenceTrackerCommand(UpdateSys_SequenceTrackerViewModel sys_SequenceTracker) : base(Guid.NewGuid())
+        public UpdateSys_SequenceTrackerCommand(UpdateSys_SequenceTrackerViewModel sys_SequenceTracker, Guid id) : base(Guid.NewGuid())
         {
             Sys_SequenceTracker = sys_SequenceTracker;
+            Id = id;
         }
 
         public override bool IsValid()

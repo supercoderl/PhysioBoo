@@ -1,4 +1,7 @@
-﻿namespace PhysioBoo.Domain.Entities.Core
+﻿using NpgsqlTypes;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace PhysioBoo.Domain.Entities.Core
 {
     public class AdminMenu : AuditEntity
     {
@@ -14,6 +17,9 @@
         public virtual AdminMenu? ParentMenu { get; private set; }
         public virtual User? Creator { get; private set; }
         public virtual User? Updater { get; private set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public NpgsqlTsVector? SearchVector { get; private set; }
 
         public virtual ICollection<AdminMenu> SubMenus { get; private set; } = new List<AdminMenu>();
         #endregion

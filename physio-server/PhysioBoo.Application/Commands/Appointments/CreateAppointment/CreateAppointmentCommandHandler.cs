@@ -34,7 +34,7 @@ namespace PhysioBoo.Application.Commands.Appointments.CreateAppointment
             string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Appointment), cancellationToken);
 
             Appointment newAppointment = new Appointment(
-                request.NewAppointment.Id,
+                request.NewId,
                 newCode,
                 request.NewAppointment.PatientId,
                 request.NewAppointment.DoctorId,

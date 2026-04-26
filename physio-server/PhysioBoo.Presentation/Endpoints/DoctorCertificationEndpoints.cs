@@ -1,4 +1,5 @@
-﻿using PhysioBoo.Application.Commands.DoctorCertifications.CreateDoctorCertification;
+﻿using Microsoft.AspNetCore.Mvc;
+using PhysioBoo.Application.Commands.DoctorCertifications.CreateDoctorCertification;
 using PhysioBoo.Application.ViewModels.DoctorCertifications;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
@@ -15,24 +16,32 @@ namespace PhysioBoo.Presentation.Endpoints
                 .WithOpenApi()
                 .AddEndpointFilter<NotificationResultFilter>();
 
-            // Create doctor certification
-            group.MapPost("/create", async (
-                CreateDoctorCertificationViewModel newDoctorCertification,
+            #region Create New Doctor Certification
+            group.MapPost("", async (
+                [FromBody] CreateDoctorCertificationViewModel newDoctorCertification,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateDoctorCertificationCommand(newDoctorCertification));
+                Guid newId = Guid.NewGuid();
 
-                return Results.Created($"/api/doctor-certifications/{newDoctorCertification.Id}", new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = newDoctorCertification.Id
-                });
+                await bus.SendCommandAsync(new CreateDoctorCertificationCommand(newDoctorCertification, newId));
+
+                return Results.CreatedAtRoute(
+                    "GetDoctorCertificationById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
             }).WithName("CreateDoctorCertification")
             .WithSummary("Create new doctor certification")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
+            #endregion
         }
     }
 }

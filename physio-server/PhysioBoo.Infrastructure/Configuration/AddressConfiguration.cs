@@ -69,6 +69,10 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(a => a.IsPrimary)
                    .IsRequired();
+
+            builder.Property(ms => ms.SearchVector)
+                   .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Street\", '') || ' ' || coalesce(\"Country\", '')))", stored: true)
+                   .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

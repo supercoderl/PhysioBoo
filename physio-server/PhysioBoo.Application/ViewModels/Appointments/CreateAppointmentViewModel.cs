@@ -2,7 +2,6 @@
 {
     public sealed record CreateAppointmentViewModel
     (
-        Guid Id,
         Guid PatientId,
         Guid DoctorId,
         Guid HospitalId,

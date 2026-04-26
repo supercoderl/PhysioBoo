@@ -30,7 +30,7 @@ namespace PhysioBoo.Infrastructure.Repositories
                 }),
                 OccurredOn = @event.Timestamp,
                 AggregateId = @event.AggregateId,
-                UserId = _user.GetUserId().ToString()
+                UserId = _user.IsAuthenticated ? _user.GetUserId().ToString() : string.Empty
             };
 
             await _context.OutboxMessages.AddAsync(outboxMessage);

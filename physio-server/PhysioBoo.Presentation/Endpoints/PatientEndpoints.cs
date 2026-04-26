@@ -1,8 +1,9 @@
-﻿using PhysioBoo.Application.Commands.Patients.CreatePatient;
+using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.ViewModels.Patients;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
+using PhysioBoo.SharedKernel.Common;
 
 namespace PhysioBoo.Presentation.Endpoints
 {
@@ -15,25 +16,83 @@ namespace PhysioBoo.Presentation.Endpoints
                 .WithOpenApi()
                 .AddEndpointFilter<NotificationResultFilter>();
 
-            // Create patient
-            group.MapPost("/create", async (
-                CreatePatientViewModel newPatient,
+            #region Get All Patients
+            group.MapPost("search", async (
+                [FromBody] PagedRequest<PatientFilter> request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreatePatientCommand(newPatient));
+                PagedResult<PatientViewModel> result = await bus.QueryAsync(new GetAllPatientsQuery(request));
 
-                return Results.Created($"/api/patients/create", new ResponseMessage<Guid>
+                return Results.Ok(new ResponseMessage<PagedResult<PatientViewModel>>
                 {
                     Success = true,
-                    Data = "A new patient has been created successfully."
+                    Data = result
                 });
-            }).WithName("CreatePatient")
-            .WithSummary("Create new patient")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
+            }).WithName("GetPatients")
+            .WithSummary("Retrieve a paginated list of patients with filters and sorting.")
+            .Produces<ResponseMessage<PagedResult<PatientViewModel>>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<PagedResult<PatientViewModel>>>(StatusCodes.Status400BadRequest)
             .RequireAuthorization();
+            #endregion
+
+            #region Delete Patient
+            group.MapDelete("{id:guid}", async (
+                Guid id,
+                IMediatorHandler bus,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                await bus.SendCommandAsync(new DeletePatientCommand(id));
+
+                return Results.NoContent();
+            }).WithName("DeletePatient")
+            .WithSummary("Handles requests to delete a specific patient by its identifier.")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
+            #endregion
+
+            #region Update Patient
+            group.MapPatch("{id:guid}", async (
+                Guid id,
+                [FromBody] UpdatePatientViewModel request,
+                IMediatorHandler bus,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                await bus.SendCommandAsync(new UpdatePatientCommand(request, id));
+
+                return Results.NoContent();
+            }).WithName("UpdatePatient")
+            .WithSummary("Update patient")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
+            #endregion
+
+            #region Get Patient By Id
+            group.MapGet("{id:guid}", async (
+                Guid id,
+                IMediatorHandler bus,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                PatientViewModel? result = await bus.QueryAsync(new GetPatientByIdQuery(id));
+
+                return Results.Ok(new ResponseMessage<PatientViewModel?>
+                {
+                    Success = true,
+                    Data = result
+                });
+            }).WithName("GetPatientById")
+            .WithSummary("Retrieve a patient record.")
+            .Produces<ResponseMessage<PatientViewModel?>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<PatientViewModel?>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
+            #endregion
         }
     }
 }

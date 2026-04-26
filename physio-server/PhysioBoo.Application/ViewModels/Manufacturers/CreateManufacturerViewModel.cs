@@ -2,7 +2,6 @@
 {
     public sealed record CreateManufacturerViewModel
     (
-        Guid Id,
         string Name,
         string? Address,
         string? City,

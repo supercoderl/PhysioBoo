@@ -9,10 +9,12 @@ namespace PhysioBoo.Application.Commands.Departments.CreateDepartment
         private static readonly CreateDepartmentCommandValidation s_validation = new();
 
         public CreateDepartmentViewModel NewDepartment { get; }
+        public Guid NewId { get; }
 
-        public CreateDepartmentCommand(CreateDepartmentViewModel newDepartment) : base(Guid.NewGuid())
+        public CreateDepartmentCommand(CreateDepartmentViewModel newDepartment, Guid newId) : base(Guid.NewGuid())
         {
             NewDepartment = newDepartment;
+            NewId = newId;
         }
 
         public override bool IsValid()

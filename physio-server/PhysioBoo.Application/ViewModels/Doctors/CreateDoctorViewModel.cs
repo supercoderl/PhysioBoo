@@ -5,7 +5,6 @@ namespace PhysioBoo.Application.ViewModels.Doctors
     public sealed record CreateDoctorViewModel
     (
         // User
-        Guid Id,
         string Email,
         string Phone,
         string Password,

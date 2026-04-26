@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.Suppliers.CreateSupplier;
 using PhysioBoo.Application.Commands.Suppliers.DeleteSupplier;
 using PhysioBoo.Application.Commands.Suppliers.UpdateSupplier;
@@ -17,32 +17,38 @@ namespace PhysioBoo.Presentation.Endpoints
         public static void MapSupplierEndpoints(this IEndpointRouteBuilder app)
         {
             RouteGroupBuilder group = app.MapGroup("api/suppliers")
-                .WithTags("Supplier")
+                .WithTags("Suppliers")
                 .WithOpenApi()
                 .AddEndpointFilter<NotificationResultFilter>();
 
             #region Create New Supplier
-            group.MapPost("/create", async (
-                CreateSupplierViewModel newSupplier,
+            group.MapPost("", async (
+                [FromBody] CreateSupplierViewModel request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateSupplierCommand(newSupplier));
+                Guid newId = Guid.NewGuid();
+                await bus.SendCommandAsync(new CreateSupplierCommand(request, newId));
 
-                return Results.Created($"/api/suppliers/{newSupplier.Id}", new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = newSupplier.Id
-                });
-            }).WithName("CreatSupplier")
+                return Results.CreatedAtRoute(
+                    "GetSupplierById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
+            }).WithName("CreateSupplier")
             .WithSummary("Create new supplier")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Get All Suppliers
-            group.MapPost("/search", async (
+            group.MapPost("search", async (
                 [FromBody] PagedRequest<SupplierFilter> request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
@@ -55,70 +61,68 @@ namespace PhysioBoo.Presentation.Endpoints
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchSuppliers")
+            }).WithName("GetSuppliers")
             .WithSummary("Retrieve a paginated list of suppliers with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<SupplierViewModel>>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<PagedResult<SupplierViewModel>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<PagedResult<SupplierViewModel>>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Delete Supplier
-            group.MapPost("/delete", async (
-                DeleteSupplierViewModel request,
+            group.MapDelete("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new DeleteSupplierCommand(request.Id, request.IsHard));
+                await bus.SendCommandAsync(new DeleteSupplierCommand(id));
 
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "Supplier has been deleted successfully."
-                });
+                return Results.NoContent();
             }).WithName("DeleteSupplier")
-            .WithSummary("Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .WithSummary("Handles requests to delete a specific supplier by its identifier.")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Update Supplier
-            group.MapPost("/update", async (
-                UpdateSupplierViewModel Supplier,
+            group.MapPatch("{id:guid}", async (
+                Guid id,
+                [FromBody] UpdateSupplierViewModel request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new UpdateSupplierCommand(Supplier));
+                await bus.SendCommandAsync(new UpdateSupplierCommand(request, id));
 
-                return Results.Ok(new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = Supplier.Id
-                });
+                return Results.NoContent();
             }).WithName("UpdateSupplier")
             .WithSummary("Update supplier")
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
             #endregion
 
             #region Get Supplier By Id
-            group.MapPost("/search-by-id", async (
-                [FromBody] SupplierSingleFilter request,
+            group.MapGet("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                SupplierViewModel? result = await bus.QueryAsync(new GetSupplierByIdQuery(request.Id));
+                SupplierViewModel? result = await bus.QueryAsync(new GetSupplierByIdQuery(id));
 
                 return Results.Ok(new ResponseMessage<SupplierViewModel?>
                 {
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchSupplier")
+            }).WithName("GetSupplierById")
             .WithSummary("Retrieve a supplier record.")
             .Produces<ResponseMessage<SupplierViewModel?>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<SupplierViewModel?>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<SupplierViewModel?>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
         }
     }

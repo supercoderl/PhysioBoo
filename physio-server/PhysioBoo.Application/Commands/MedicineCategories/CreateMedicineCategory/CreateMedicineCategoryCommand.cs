@@ -9,10 +9,12 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCatego
         private static readonly CreateMedicineCategoryCommandValidation s_validation = new();
 
         public CreateMedicineCategoryViewModel NewMedicineCategory { get; }
+        public Guid NewId { get; }
 
-        public CreateMedicineCategoryCommand(CreateMedicineCategoryViewModel newMedicineCategory) : base(Guid.NewGuid())
+        public CreateMedicineCategoryCommand(CreateMedicineCategoryViewModel newMedicineCategory, Guid newId) : base(Guid.NewGuid())
         {
             NewMedicineCategory = newMedicineCategory;
+            NewId = newId;
         }
 
         public override bool IsValid()

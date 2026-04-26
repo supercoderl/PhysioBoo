@@ -3,6 +3,11 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using OfficeOpenXml;
 using PhysioBoo.Application.Commands.Addresses.CreateAddress;
+using PhysioBoo.Application.Commands.Addresses.DeleteAddress;
+using PhysioBoo.Application.Commands.Addresses.UpdateAddress;
+using PhysioBoo.Application.Commands.AdminMenus.CreateAdminMenu;
+using PhysioBoo.Application.Commands.AdminMenus.DeleteAdminMenu;
+using PhysioBoo.Application.Commands.AdminMenus.UpdateAdminMenu;
 using PhysioBoo.Application.Commands.Appointments.CreateAppointment;
 using PhysioBoo.Application.Commands.AppointmentTypes.CreateAppointmentType;
 using PhysioBoo.Application.Commands.AppointmentTypes.DeleteAppointmentType;
@@ -10,6 +15,8 @@ using PhysioBoo.Application.Commands.AppointmentTypes.UpdateAppointmentType;
 using PhysioBoo.Application.Commands.BillItems.CreateBillItem;
 using PhysioBoo.Application.Commands.Bills.CreateBill;
 using PhysioBoo.Application.Commands.Departments.CreateDepartment;
+using PhysioBoo.Application.Commands.Departments.DeleteDepartment;
+using PhysioBoo.Application.Commands.Departments.UpdateDepartment;
 using PhysioBoo.Application.Commands.DoctorAwards.CreateDoctorAward;
 using PhysioBoo.Application.Commands.DoctorCertifications.CreateDoctorCertification;
 using PhysioBoo.Application.Commands.DoctorEducations.CreateDoctorEducation;
@@ -97,7 +104,10 @@ using PhysioBoo.Application.Commands.Users.VerifyUser;
 using PhysioBoo.Application.EventHandlers.Fanout;
 using PhysioBoo.Application.EventHandlers.User;
 using PhysioBoo.Application.Interfaces;
+using PhysioBoo.Application.Queries.Addresses.GetAll;
+using PhysioBoo.Application.Queries.Addresses.GetById;
 using PhysioBoo.Application.Queries.AdminMenus.GetAll;
+using PhysioBoo.Application.Queries.AdminMenus.GetById;
 using PhysioBoo.Application.Queries.AppointmentTypes.GetAll;
 using PhysioBoo.Application.Queries.AppointmentTypes.GetById;
 using PhysioBoo.Application.Queries.Configurations.GetInitData;
@@ -137,10 +147,12 @@ using PhysioBoo.Application.Queries.Sys_Settings.GetAll;
 using PhysioBoo.Application.Queries.Users.GetAll;
 using PhysioBoo.Application.Queries.Users.GetByEmail;
 using PhysioBoo.Application.Queries.Users.GetById;
+using PhysioBoo.Application.Queries.Users.GetProfile;
 using PhysioBoo.Application.Queries.VerificationTokens.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
 using PhysioBoo.Application.Services;
 using PhysioBoo.Application.SortProviders;
+using PhysioBoo.Application.ViewModels.Addresses;
 using PhysioBoo.Application.ViewModels.AdminMenus;
 using PhysioBoo.Application.ViewModels.AppointmentTypes;
 using PhysioBoo.Application.ViewModels.Configurations;
@@ -218,6 +230,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<GetUserByIdQuery, UserViewModel?>, GetUserByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetUserByEmailQuery, User?>, GetUserByEmailQueryHandler>();
             services.AddScoped<IRequestHandler<GetAllUsersQuery, PagedResult<UserViewModel>>, GetAllUsersQueryHandler>();
+            services.AddScoped<IRequestHandler<GetUserProfileQuery, UserProfileViewModel?>, GetUserProfileQueryHandler>();
 
             // Verification Token
             services.AddScoped<IRequestHandler<GetVerificationTokenByIdQuery, VerificationTokenViewModel?>, GetVerificationTokenByIdQueryHandler>();
@@ -234,6 +247,7 @@ namespace PhysioBoo.Application.Extensions
 
             // Admin Menu
             services.AddScoped<IRequestHandler<GetAllAdminMenusQuery, PagedResult<AdminMenuViewModel>>, GetAllAdminMenusQueryHandler>();
+            services.AddScoped<IRequestHandler<GetAdminMenuByIdQuery, AdminMenuViewModel?>, GetAdminMenuByIdQueryHandler>();
 
             // MedicalSpecialty
             services.AddScoped<IRequestHandler<GetAllMedicalSpecialtiesQuery, PagedResult<MedicalSpecialtyViewModel>>, GetAllMedicalSpecialtiesQueryHandler>();
@@ -301,6 +315,10 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<GetAllHospitalsQuery, PagedResult<HospitalViewModel>>, GetAllHospitalsQueryHandler>();
             services.AddScoped<IRequestHandler<GetHospitalByIdQuery, HospitalViewModel?>, GetHospitalByIdQueryHandler>();
 
+            // Address
+            services.AddScoped<IRequestHandler<GetAllAddressesQuery, PagedResult<AddressViewModel>>, GetAllAddressesQueryHandler>();
+            services.AddScoped<IRequestHandler<GetAddressByIdQuery, AddressViewModel?>, GetAddressByIdQueryHandler>();
+
             return services;
         }
 
@@ -345,6 +363,11 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<AssignRoleToUserCommand>, AssignRoleToUserCommandHandler>();
             services.AddScoped<IRequestHandler<AssignRoleToUserUsingRoleIdCommand>, AssignRoleToUserUsingRoleIdCommandHandler>();
             services.AddScoped<IRequestHandler<OAuthLoginUserCommand>, OAuthLoginUserCommandHandler>();
+            services.AddScoped<IRequestHandler<CreateAdminMenuCommand>, CreateAdminMenuCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateAdminMenuCommand>, UpdateAdminMenuCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteAdminMenuCommand>, DeleteAdminMenuCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteAddressCommand>, DeleteAddressCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateAddressCommand>, UpdateAddressCommandHandler>();
             #endregion
 
             #region Patient Flow
@@ -368,6 +391,8 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<DeleteHospitalCommand>, DeleteHospitalCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateHospitalGroupCommand>, UpdateHospitalGroupCommandHandler>();
             services.AddScoped<IRequestHandler<DeleteHospitalGroupCommand>, DeleteHospitalGroupCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteDepartmentCommand>, DeleteDepartmentCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateDepartmentCommand>, UpdateDepartmentCommandHandler>();
             #endregion
 
             #region Support Flow
@@ -490,6 +515,8 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<ISortingExpressionProvider<DoctorViewModel, Doctor>, DoctorViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<HospitalGroupViewModel, HospitalGroup>, HospitalGroupViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<HospitalViewModel, Hospital>, HospitalViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<AdminMenuViewModel, AdminMenu>, AdminMenuViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<AddressViewModel, Address>, AddressViewModelSortProvider>();
 
             return services;
         }

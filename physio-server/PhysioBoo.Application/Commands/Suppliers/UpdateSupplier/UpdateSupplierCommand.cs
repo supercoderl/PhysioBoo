@@ -8,10 +8,12 @@ namespace PhysioBoo.Application.Commands.Suppliers.UpdateSupplier
         private static readonly UpdateSupplierCommandValidation s_validation = new();
 
         public UpdateSupplierViewModel Supplier { get; }
+        public Guid Id { get; }
 
-        public UpdateSupplierCommand(UpdateSupplierViewModel supplier) : base(Guid.NewGuid())
+        public UpdateSupplierCommand(UpdateSupplierViewModel supplier, Guid id) : base(Guid.NewGuid())
         {
             Supplier = supplier;
+            Id = id;
         }
 
         public override bool IsValid()

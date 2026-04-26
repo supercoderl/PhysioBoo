@@ -2,7 +2,6 @@
 {
     public sealed record CreateSys_SequenceTrackerViewModel
     (
-        Guid Id,
         string EntityType,
         string Prefix,
         string? UseDateFormating,

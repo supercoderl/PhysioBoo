@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.Hospitals.CreateHospital;
 using PhysioBoo.Application.Commands.Hospitals.DeleteHospital;
 using PhysioBoo.Application.Commands.Hospitals.UpdateHospital;
@@ -22,27 +22,33 @@ namespace PhysioBoo.Presentation.Endpoints
                 .AddEndpointFilter<NotificationResultFilter>();
 
             #region Create New Hospital
-            group.MapPost("/create", async (
-                CreateHospitalViewModel newHospital,
+            group.MapPost("", async (
+                [FromBody] CreateHospitalViewModel request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateHospitalCommand(newHospital));
+                Guid newId = Guid.NewGuid();
+                await bus.SendCommandAsync(new CreateHospitalCommand(request, newId));
 
-                return Results.Created($"/api/hospitals/{newHospital.Id}", new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = newHospital.Id
-                });
+                return Results.CreatedAtRoute(
+                    "GetHospitalById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
             }).WithName("CreateHospital")
             .WithSummary("Create new hospital")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Get All Hospitals
-            group.MapPost("/search", async (
+            group.MapPost("search", async (
                 [FromBody] PagedRequest<HospitalFilter> request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
@@ -55,70 +61,68 @@ namespace PhysioBoo.Presentation.Endpoints
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchHospitals")
+            }).WithName("GetHospitals")
             .WithSummary("Retrieve a paginated list of hospitals with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<HospitalViewModel>>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<PagedResult<HospitalViewModel>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<PagedResult<HospitalViewModel>>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Delete Hospital
-            group.MapPost("/delete", async (
-                DeleteHospitalViewModel request,
+            group.MapDelete("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new DeleteHospitalCommand(request.Id, request.IsHard));
+                await bus.SendCommandAsync(new DeleteHospitalCommand(id));
 
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "Hospital has been deleted successfully."
-                });
+                return Results.NoContent();
             }).WithName("DeleteHospital")
-            .WithSummary("Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .WithSummary("Handles requests to delete a specific hospital by its identifier.")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Update Hospital
-            group.MapPost("/update", async (
-                UpdateHospitalViewModel Hospital,
+            group.MapPatch("{id:guid}", async (
+                Guid id,
+                [FromBody] UpdateHospitalViewModel request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new UpdateHospitalCommand(Hospital));
+                await bus.SendCommandAsync(new UpdateHospitalCommand(request, id));
 
-                return Results.Ok(new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = Hospital.Id
-                });
+                return Results.NoContent();
             }).WithName("UpdateHospital")
             .WithSummary("Update hospital")
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
             #endregion
 
             #region Get Hospital By Id
-            group.MapPost("/search-by-id", async (
-                [FromBody] HospitalSingleFilter request,
+            group.MapGet("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                HospitalViewModel? result = await bus.QueryAsync(new GetHospitalByIdQuery(request.Id));
+                HospitalViewModel? result = await bus.QueryAsync(new GetHospitalByIdQuery(id));
 
                 return Results.Ok(new ResponseMessage<HospitalViewModel?>
                 {
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchHospital")
+            }).WithName("GetHospitalById")
             .WithSummary("Retrieve a hospital record.")
             .Produces<ResponseMessage<HospitalViewModel?>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<HospitalViewModel?>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<HospitalViewModel?>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
         }
     }

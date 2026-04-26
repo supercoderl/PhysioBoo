@@ -51,6 +51,10 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(am => am.Route)
                    .IsRequired();
+
+            builder.Property(ms => ms.SearchVector)
+                   .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Label\", '') || ' ' || coalesce(\"Route\", '')))", stored: true)
+                   .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

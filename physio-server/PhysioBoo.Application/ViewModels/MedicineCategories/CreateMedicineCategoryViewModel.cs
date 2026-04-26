@@ -2,7 +2,6 @@
 {
     public sealed record CreateMedicineCategoryViewModel
     (
-        Guid Id,
         string Name,
         string? Description,
         Guid? ParentCategoryId,

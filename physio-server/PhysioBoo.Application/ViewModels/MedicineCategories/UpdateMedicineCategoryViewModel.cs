@@ -2,7 +2,6 @@
 {
     public sealed record UpdateMedicineCategoryViewModel
     (
-        Guid Id,
         string Name,
         string? Description,
         Guid? ParentCategoryId,

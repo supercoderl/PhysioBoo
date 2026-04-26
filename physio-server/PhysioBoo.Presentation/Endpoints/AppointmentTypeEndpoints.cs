@@ -22,23 +22,30 @@ namespace PhysioBoo.Presentation.Endpoints
                 .AddEndpointFilter<NotificationResultFilter>();
 
             #region Create New Appointment Type
-            group.MapPost("/create", async (
-                CreateAppointmentTypeViewModel newAppointmentType,
+            group.MapPost("", async (
+                [FromBody] CreateAppointmentTypeViewModel newAppointmentType,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateAppointmentTypeCommand(newAppointmentType));
+                Guid newId = Guid.NewGuid();
 
-                return Results.Created($"/api/appointment-types/{newAppointmentType.Id}", new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = newAppointmentType.Id
-                });
+                await bus.SendCommandAsync(new CreateAppointmentTypeCommand(newAppointmentType, newId));
+
+                return Results.CreatedAtRoute(
+                    "GetAppointmentTypeById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
             }).WithName("CreateAppointmentType")
             .WithSummary("Create new appointment type")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Get All Appointment Types
@@ -62,63 +69,61 @@ namespace PhysioBoo.Presentation.Endpoints
             #endregion
 
             #region Delete AppointmentType
-            group.MapPost("/delete", async (
-                DeleteAppointmentTypeViewModel request,
+            group.MapDelete("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new DeleteAppointmentTypeCommand(request.Id, request.IsHard));
+                await bus.SendCommandAsync(new DeleteAppointmentTypeCommand(id));
 
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "Appointment type has been deleted successfully."
-                });
+                return Results.NoContent();
             }).WithName("DeleteAppointmentType")
             .WithSummary("Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
             #endregion
 
             #region Update Appointment Type
-            group.MapPost("/update", async (
-                UpdateAppointmentTypeViewModel appointmentType,
+            group.MapPatch("{id:guid}", async (
+                Guid id,
+                [FromBody] UpdateAppointmentTypeViewModel appointmentType,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new UpdateAppointmentTypeCommand(appointmentType));
+                await bus.SendCommandAsync(new UpdateAppointmentTypeCommand(appointmentType, id));
 
-                return Results.Ok(new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = appointmentType.Id
-                });
+                return Results.NoContent;
             }).WithName("UpdateAppointmentType")
             .WithSummary("Update appointment type")
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
             #endregion
 
             #region Get Appointment Type By Id
-            group.MapPost("/search-by-id", async (
-                [FromBody] AppointmentTypeSingleFilter request,
+            group.MapGet("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                AppointmentTypeViewModel? result = await bus.QueryAsync(new GetAppointmentTypeByIdQuery(request.Id));
+                AppointmentTypeViewModel? result = await bus.QueryAsync(new GetAppointmentTypeByIdQuery(id));
 
                 return Results.Ok(new ResponseMessage<AppointmentTypeViewModel?>
                 {
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchAppointmentType")
+            }).WithName("GetAppointmentTypeById")
             .WithSummary("Retrieve a appointment type record.")
             .Produces<ResponseMessage<AppointmentTypeViewModel?>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<AppointmentTypeViewModel?>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<AppointmentTypeViewModel?>>(StatusCodes.Status400BadRequest)
+            .Produces<ResponseMessage<AppointmentTypeViewModel?>>(StatusCodes.Status404NotFound);
             #endregion
         }
     }

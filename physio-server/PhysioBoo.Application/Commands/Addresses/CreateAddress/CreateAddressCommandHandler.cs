@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Commands.Addresses.CreateAddress
             if (!await TestValidityAsync(request)) return;
 
             Address newAddress = new Address(
-                request.NewAddress.Id,
+                request.NewId,
                 _user.GetUserId(),
                 request.NewAddress.Street,
                 request.NewAddress.ApartmentUnit,
@@ -41,6 +41,7 @@ namespace PhysioBoo.Application.Commands.Addresses.CreateAddress
                 request.NewAddress.Longitude
             );
 
+            newAddress.SetIsPrimary(request.NewAddress.IsPrimary);
             newAddress.SetTenantId(_user.GetTenantId());
             newAddress.SetCreatedBy(_user.GetUserId());
 

@@ -29,21 +29,17 @@ namespace PhysioBoo.Application.Consumers.Users
                     context.Message.AggregateId, context.CorrelationId
                 );
 
-            List<Task> tasks = new List<Task>
-            {
-                 _bus.SendCommandAsync(new GenerateEmailVerificationTokenCommand(
-                    new CreateVerificationTokenViewModel(
-                        Guid.NewGuid(),
-                        context.Message.AggregateId,
-                        TokenHelper.GenerateTimestampedToken(24),
-                        TimeZoneHelper.GetLocalTimeNow().AddMinutes(15),
-                        Enum.Parse<VerificationType>(context.Message.Type)
+            await _bus.SendCommandAsync(new GenerateEmailVerificationTokenCommand(
+                new CreateVerificationTokenViewModel(
+                    Guid.NewGuid(),
+                    context.Message.AggregateId,
+                    TokenHelper.GenerateTimestampedToken(24),
+                    TimeZoneHelper.GetLocalTimeNow().AddMinutes(15),
+                    Enum.Parse<VerificationType>(context.Message.Type)
                 )
-                ))
-            };
+            ));
 
-            tasks.Add(_bus.SendCommandAsync(new CreatePatientCommand(
-                Guid.NewGuid(),
+            await _bus.SendCommandAsync(new CreatePatientCommand(
                 new CreatePatientViewModel(
                     context.Message.AggregateId,
                     Guid.NewGuid(),
@@ -51,9 +47,7 @@ namespace PhysioBoo.Application.Consumers.Users
                     null, null, null, null, null, null,
                     null, null, null, null, null, null
                 )
-            )));
-
-            await Task.WhenAll(tasks);
+            ));
         }
     }
 }

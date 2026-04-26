@@ -9,10 +9,12 @@ namespace PhysioBoo.Application.Commands.AppointmentTypes.CreateAppointmentType
         private static readonly CreateAppointmentTypeCommandValidation s_validation = new();
 
         public CreateAppointmentTypeViewModel NewAppointmentType { get; }
+        public Guid NewId { get; }
 
-        public CreateAppointmentTypeCommand(CreateAppointmentTypeViewModel newAppointmentType) : base(Guid.NewGuid())
+        public CreateAppointmentTypeCommand(CreateAppointmentTypeViewModel newAppointmentType, Guid newId) : base(Guid.NewGuid())
         {
             NewAppointmentType = newAppointmentType;
+            NewId = newId;
         }
 
         public override bool IsValid()

@@ -17,9 +17,9 @@ namespace PhysioBoo.Presentation.Extensions
 
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "CleanArchitecture",
+                    Title = "Physio Boo",
                     Version = "v1",
-                    Description = "A clean architecture API"
+                    Description = "A scalable and maintainable API for managing healthcare operations, including patients, appointments, and medical records."
                 });
 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -97,7 +97,7 @@ namespace PhysioBoo.Presentation.Extensions
 
         public static TokenValidationParameters CreateTokenValidationParameters(IConfiguration configuration)
         {
-            var result = new TokenValidationParameters
+            TokenValidationParameters result = new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
@@ -117,7 +117,7 @@ namespace PhysioBoo.Presentation.Extensions
 
         public static JwtBearerEvents CreateBearerEvents(IConfiguration configuration)
         {
-            var result = new JwtBearerEvents
+            JwtBearerEvents result = new JwtBearerEvents
             {
                 OnMessageReceived = context =>
                 {

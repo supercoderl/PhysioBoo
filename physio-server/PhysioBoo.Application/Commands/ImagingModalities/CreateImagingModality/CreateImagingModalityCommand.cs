@@ -9,10 +9,12 @@ namespace PhysioBoo.Application.Commands.ImagingModalities.CreateImagingModality
         private static readonly CreateImagingModalityCommandValidation s_validation = new();
 
         public CreateImagingModalityViewModel NewImagingModality { get; }
+        public Guid NewId { get; }
 
-        public CreateImagingModalityCommand(CreateImagingModalityViewModel newImagingModality) : base(Guid.NewGuid())
+        public CreateImagingModalityCommand(CreateImagingModalityViewModel newImagingModality, Guid newId) : base(Guid.NewGuid())
         {
             NewImagingModality = newImagingModality;
+            NewId = newId;
         }
 
         public override bool IsValid()

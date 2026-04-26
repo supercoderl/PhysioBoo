@@ -4,7 +4,6 @@ namespace PhysioBoo.Application.ViewModels.Hospitals
 {
     public sealed record UpdateHospitalViewModel
     (
-        Guid Id,
         Guid HospitalGroupId,
         string Name,
         HospitalType HospitalType,

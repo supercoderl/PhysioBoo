@@ -8,10 +8,12 @@ namespace PhysioBoo.Application.Commands.LabTests.UpdateLabTest.Commands.UpdateL
         private static readonly UpdateLabTestCommandValidation s_validation = new();
 
         public UpdateLabTestViewModel LabTest { get; }
+        public Guid Id { get; }
 
-        public UpdateLabTestCommand(UpdateLabTestViewModel labTest) : base(Guid.NewGuid())
+        public UpdateLabTestCommand(UpdateLabTestViewModel labTest, Guid id) : base(Guid.NewGuid())
         {
             LabTest = labTest;
+            Id = id;
         }
 
         public override bool IsValid()

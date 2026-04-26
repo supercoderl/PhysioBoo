@@ -2,7 +2,6 @@
 {
     public sealed record UpdateMedicalSpecialtyViewModel
     (
-        Guid Id,
         string Name,
         string? Code,
         string? Category,

@@ -46,6 +46,7 @@
         public static class Address
         {
             // Address
+            public const string EmptyId = "ADDRESS_EMPTY_ID";
             public const string EmptyStreet = "ADDRESS_EMPTY_STREET";
             public const string EmptyCity = "ADDRESS_EMPTY_CITY";
             public const string EmptyStateProvince = "ADDRESS_EMPTY_STATE_PROVINCE";
@@ -428,6 +429,17 @@
             public const string EmptyId = "USERLOGIN_EMPTY_ID";
             public const string EmptyLoginProvider = "USERLOGIN_EMPTY_LOGIN_PROVIDER";
             public const string EmptyProviderKey = "USERLOGIN_EMPTY_PROVIDER_KEY";
+        }
+
+        public static class AdminMenu
+        {
+            // Admin Menu Validation
+            public const string EmptyId = "ADMIN_MENU_EMPTY_ID";
+            public const string EmptyLabel = "ADMIN_MENU_EMPTY_LABEL";
+            public const string EmptyIcon = "ADMIN_MENU_EMPTY_ICON";
+            public const string EmptyRoute = "ADMIN_MENU_EMPTY_ROUTE";
+            public const string InvalidOrder = "ADMIN_MENU_INVALID_ORDER";
+            public const string EmptyPermissionCode = "ADMIN_MENU_EMPTY_PERMISSION_CODE";
         }
     }
 }

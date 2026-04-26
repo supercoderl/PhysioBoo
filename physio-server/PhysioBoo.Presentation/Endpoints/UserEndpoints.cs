@@ -12,7 +12,7 @@ using PhysioBoo.Application.Commands.Users.ResendVerification;
 using PhysioBoo.Application.Commands.Users.ResetPassword;
 using PhysioBoo.Application.Commands.Users.VerifyUser;
 using PhysioBoo.Application.Queries.Users.GetAll;
-using PhysioBoo.Application.Queries.Users.GetById;
+using PhysioBoo.Application.Queries.Users.GetProfile;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Settings;
@@ -347,9 +347,9 @@ namespace PhysioBoo.Presentation.Endpoints
 
                 if (!id.HasValue) return Results.Unauthorized();
 
-                UserViewModel? result = await bus.QueryAsync(new GetUserByIdQuery(id.Value));
+                UserProfileViewModel? result = await bus.QueryAsync(new GetUserProfileQuery());
 
-                return Results.Ok(new ResponseMessage<UserViewModel?>
+                return Results.Ok(new ResponseMessage<UserProfileViewModel?>
                 {
                     Success = true,
                     Data = result
@@ -357,8 +357,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("Profile")
             .WithSummary("Retrieve user profile.")
             .RequireAuthorization()
-            .Produces<ResponseMessage<UserViewModel?>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<UserViewModel?>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<UserProfileViewModel?>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<UserProfileViewModel?>>(StatusCodes.Status400BadRequest);
             #endregion
         }
     }

@@ -4,7 +4,6 @@ namespace PhysioBoo.Application.ViewModels.InsuranceCompanies
 {
     public sealed record CreateInsuranceCompanyViewModel
     (
-        Guid Id,
         string Name,
         InsuranceType Type,
         string? ContactPerson,

@@ -9,10 +9,12 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup
         private static readonly CreateHospitalGroupCommandValidation s_validation = new();
 
         public CreateHospitalGroupViewModel NewHospitalGroup { get; }
+        public Guid NewId { get; }
 
-        public CreateHospitalGroupCommand(CreateHospitalGroupViewModel newHospitalGroup) : base(Guid.NewGuid())
+        public CreateHospitalGroupCommand(CreateHospitalGroupViewModel newHospitalGroup, Guid newId) : base(Guid.NewGuid())
         {
             NewHospitalGroup = newHospitalGroup;
+            NewId = newId;
         }
 
         public override bool IsValid()

@@ -1,4 +1,5 @@
-﻿using PhysioBoo.Application.Commands.DoctorAwards.CreateDoctorAward;
+﻿using Microsoft.AspNetCore.Mvc;
+using PhysioBoo.Application.Commands.DoctorAwards.CreateDoctorAward;
 using PhysioBoo.Application.ViewModels.DoctorAwards;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
@@ -15,24 +16,32 @@ namespace PhysioBoo.Presentation.Endpoints
                 .WithOpenApi()
                 .AddEndpointFilter<NotificationResultFilter>();
 
-            // Create doctor award
-            group.MapPost("/create", async (
-                CreateDoctorAwardViewModel newDoctorAward,
+            #region Create New Doctor Award
+            group.MapPost("", async (
+                [FromBody] CreateDoctorAwardViewModel newDoctorAward,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateDoctorAwardCommand(newDoctorAward));
+                Guid newId = Guid.NewGuid();
 
-                return Results.Created($"/api/doctor-awards/{newDoctorAward.Id}", new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = newDoctorAward.Id
-                });
+                await bus.SendCommandAsync(new CreateDoctorAwardCommand(newDoctorAward, newId));
+
+                return Results.CreatedAtRoute(
+                    "GetDoctorAwardById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newDoctorAward.Id
+                    }
+                );
             }).WithName("CreateDoctorAward")
             .WithSummary("Create new doctor award")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
+            #endregion
         }
     }
 }

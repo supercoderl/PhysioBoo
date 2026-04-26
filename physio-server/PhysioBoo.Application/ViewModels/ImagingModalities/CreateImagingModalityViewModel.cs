@@ -2,7 +2,6 @@
 {
     public sealed record CreateImagingModalityViewModel
     (
-        Guid Id,
         string Name,
         string? Code,
         string? Description,

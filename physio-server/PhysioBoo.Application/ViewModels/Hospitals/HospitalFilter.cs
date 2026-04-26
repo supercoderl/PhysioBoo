@@ -6,6 +6,10 @@
     public sealed record HospitalFilter
     (
         string Start,
-        string End
+        string End,
+        Guid? HospitalGroupId,
+        int? Type,
+        bool? IsActive,
+        bool? HasEmergencyServices
     );
 }

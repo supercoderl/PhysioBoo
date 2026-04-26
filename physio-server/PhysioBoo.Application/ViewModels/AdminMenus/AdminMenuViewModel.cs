@@ -9,6 +9,7 @@ namespace PhysioBoo.Application.ViewModels.AdminMenus
         public string Icon { get; set; } = string.Empty;
         public string Route { get; set; } = string.Empty;
         public int Order { get; set; }
+        public bool IsActive { get; set; }
         public string PermissionCode { get; set; } = string.Empty;
         public IReadOnlyList<AdminMenuViewModel>? Children { get; set; }
 
@@ -21,6 +22,7 @@ namespace PhysioBoo.Application.ViewModels.AdminMenus
                 Icon = adminMenu.Icon,
                 Route = adminMenu.Route,
                 Order = adminMenu.Order,
+                IsActive = adminMenu.IsActive,
                 PermissionCode = adminMenu.PermissionCode,
                 Children = adminMenu.SubMenus.Any() ? adminMenu.SubMenus.Select(sub => FromAdminMenu(sub)).ToList() : null
             };

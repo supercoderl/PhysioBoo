@@ -9,10 +9,12 @@ namespace PhysioBoo.Application.Commands.Bills.CreateBill
         private static readonly CreateBillCommandValidation s_validation = new();
 
         public CreateBillViewModel NewBill { get; }
+        public Guid NewId { get; }
 
-        public CreateBillCommand(CreateBillViewModel newBill) : base(Guid.NewGuid())
+        public CreateBillCommand(CreateBillViewModel newBill, Guid newId) : base(Guid.NewGuid())
         {
             NewBill = newBill;
+            NewId = newId;
         }
 
         public override bool IsValid()

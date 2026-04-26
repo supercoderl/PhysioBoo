@@ -23,7 +23,11 @@ namespace PhysioBoo.Domain.Entities.Operation
         public bool IsCriticalCare { get; private set; }
         public bool IsOutPatient { get; private set; }
         public bool IsInPatient { get; private set; }
+
+        [Column("OperationHours", TypeName = "jsonb")]
         public string? OperationHours { get; private set; }
+
+        [Column("EquipmentList", TypeName = "jsonb")]
         public string? EquipmentList { get; private set; }
         public bool IsActive { get; private set; }
 

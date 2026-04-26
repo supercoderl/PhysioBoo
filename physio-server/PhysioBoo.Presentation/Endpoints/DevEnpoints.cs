@@ -33,7 +33,7 @@ namespace PhysioBoo.Presentation.Endpoints
             #endregion
 
             #region Get cookies
-            group.MapPost("/cookies", (
+            group.MapGet("/cookies", (
                 HttpRequest request,
                 CancellationToken cancellationToken
             ) =>
@@ -51,7 +51,7 @@ namespace PhysioBoo.Presentation.Endpoints
             #endregion
 
             #region Check is authenticated
-            group.MapPost("/is-authenticated", (
+            group.MapGet("/is-authenticated", (
                 HttpContext context,
                 CancellationToken cancellationToken
             ) =>

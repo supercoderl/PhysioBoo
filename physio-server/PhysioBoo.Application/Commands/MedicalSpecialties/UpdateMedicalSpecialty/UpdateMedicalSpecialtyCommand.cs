@@ -8,10 +8,12 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.UpdateMedicalSpecial
         private static readonly UpdateMedicalSpecialtyCommandValidation s_validation = new();
 
         public UpdateMedicalSpecialtyViewModel MedicalSpecialty { get; }
+        public Guid Id { get; }
 
-        public UpdateMedicalSpecialtyCommand(UpdateMedicalSpecialtyViewModel medicalSpecialty) : base(Guid.NewGuid())
+        public UpdateMedicalSpecialtyCommand(UpdateMedicalSpecialtyViewModel medicalSpecialty, Guid id) : base(Guid.NewGuid())
         {
             MedicalSpecialty = medicalSpecialty;
+            Id = id;
         }
 
         public override bool IsValid()

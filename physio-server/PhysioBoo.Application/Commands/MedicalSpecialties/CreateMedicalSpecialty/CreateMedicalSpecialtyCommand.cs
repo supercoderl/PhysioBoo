@@ -10,10 +10,12 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecial
         private static readonly CreateMedicalSpecialtyCommandValidation s_validation = new();
 
         public CreateMedicalSpecialtyViewModel NewMedicalSpecialty { get; }
+        public Guid NewId { get; }
 
-        public CreateMedicalSpecialtyCommand(CreateMedicalSpecialtyViewModel newMedicalSpecialty) : base(Guid.NewGuid())
+        public CreateMedicalSpecialtyCommand(CreateMedicalSpecialtyViewModel newMedicalSpecialty, Guid newId) : base(Guid.NewGuid())
         {
             NewMedicalSpecialty = newMedicalSpecialty;
+            NewId = newId;
         }
 
         public override bool IsValid()

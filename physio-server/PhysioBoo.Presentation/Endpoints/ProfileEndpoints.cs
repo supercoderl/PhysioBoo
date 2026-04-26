@@ -24,7 +24,7 @@ namespace PhysioBoo.Presentation.Endpoints
             {
                 await bus.SendCommandAsync(new CreateProfileCommand(newProfile));
 
-                return Results.Created($"/api/profiles/create", new ResponseMessage<Guid>
+                return Results.Created($"/api/profiles/create", new ResponseMessage<string>
                 {
                     Success = true,
                     Data = "Profile has been created successfully."

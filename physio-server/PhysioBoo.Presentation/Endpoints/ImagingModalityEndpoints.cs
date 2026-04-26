@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.ImagingModalities.CreateImagingModality;
 using PhysioBoo.Application.Commands.ImagingModalities.DeleteImagingModality;
 using PhysioBoo.Application.Commands.ImagingModalities.UpdateImagingModality;
@@ -22,27 +22,33 @@ namespace PhysioBoo.Presentation.Endpoints
                 .AddEndpointFilter<NotificationResultFilter>();
 
             #region Create New Imaging Modality
-            group.MapPost("/create", async (
-                CreateImagingModalityViewModel newImagingModality,
+            group.MapPost("", async (
+                [FromBody] CreateImagingModalityViewModel request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateImagingModalityCommand(newImagingModality));
+                Guid newId = Guid.NewGuid();
+                await bus.SendCommandAsync(new CreateImagingModalityCommand(request, newId));
 
-                return Results.Created($"/api/imaging-modalities/{newImagingModality.Id}", new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = newImagingModality.Id
-                });
+                return Results.CreatedAtRoute(
+                    "GetImagingModalityById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
             }).WithName("CreateImagingModality")
             .WithSummary("Create new imaging modality")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Get All Imaging Modalities
-            group.MapPost("/search", async (
+            group.MapPost("search", async (
                 [FromBody] PagedRequest<ImagingModalityFilter> request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
@@ -55,70 +61,68 @@ namespace PhysioBoo.Presentation.Endpoints
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchImagingModalities")
+            }).WithName("GetImagingModalities")
             .WithSummary("Retrieve a paginated list of imaging modalities with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<ImagingModalityViewModel>>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<PagedResult<ImagingModalityViewModel>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<PagedResult<ImagingModalityViewModel>>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Delete Imaging Modality
-            group.MapPost("/delete", async (
-                DeleteImagingModalityViewModel request,
+            group.MapDelete("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new DeleteImagingModalityCommand(request.Id, request.IsHard));
+                await bus.SendCommandAsync(new DeleteImagingModalityCommand(id));
 
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "Imaging modality has been deleted successfully."
-                });
+                return Results.NoContent();
             }).WithName("DeleteImagingModality")
-            .WithSummary("Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .WithSummary("Handles requests to delete a specific imaging modality by its identifier.")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Update Imaging Modality
-            group.MapPost("/update", async (
-                UpdateImagingModalityViewModel ImagingModality,
+            group.MapPatch("{id:guid}", async (
+                Guid id,
+                [FromBody] UpdateImagingModalityViewModel request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new UpdateImagingModalityCommand(ImagingModality));
+                await bus.SendCommandAsync(new UpdateImagingModalityCommand(request, id));
 
-                return Results.Ok(new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = ImagingModality.Id
-                });
+                return Results.NoContent();
             }).WithName("UpdateImagingModality")
             .WithSummary("Update imaging modality")
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
             #endregion
 
             #region Get Imaging Modality By Id
-            group.MapPost("/search-by-id", async (
-                [FromBody] ImagingModalitySingleFilter request,
+            group.MapGet("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                ImagingModalityViewModel? result = await bus.QueryAsync(new GetImagingModalityByIdQuery(request.Id));
+                ImagingModalityViewModel? result = await bus.QueryAsync(new GetImagingModalityByIdQuery(id));
 
                 return Results.Ok(new ResponseMessage<ImagingModalityViewModel?>
                 {
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchImagingModality")
-            .WithSummary("Retrieve a imaging modality record.")
+            }).WithName("GetImagingModalityById")
+            .WithSummary("Retrieve an imaging modality record.")
             .Produces<ResponseMessage<ImagingModalityViewModel?>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<ImagingModalityViewModel?>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<ImagingModalityViewModel?>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
         }
     }

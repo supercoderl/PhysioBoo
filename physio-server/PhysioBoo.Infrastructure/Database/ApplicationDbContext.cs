@@ -140,8 +140,9 @@ namespace PhysioBoo.Infrastructure.Database
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            Guid? userId = _user.GetUserId();
-            OnTrackingTenant(_user.GetTenantId());
+            Guid? userId = _user.IsAuthenticated ? _user.GetUserId() : null;
+            Guid? tenantId = _user.IsAuthenticated ? _user.GetTenantId() : null;
+            OnTrackingTenant(tenantId);
 
             List<AuditEntry> auditEntries = OnBeforeSaveChanges(userId);
 
@@ -363,8 +364,10 @@ namespace PhysioBoo.Infrastructure.Database
             }
         }
 
-        private void OnTrackingTenant(Guid tenantId)
+        private void OnTrackingTenant(Guid? tenantId)
         {
+            if (!tenantId.HasValue) return;
+
             foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<TenantEntity> entry in ChangeTracker.Entries<TenantEntity>())
             {
                 // 1. Audit Logging (Applies to EVERYTHING)
@@ -375,7 +378,7 @@ namespace PhysioBoo.Infrastructure.Database
                         if (tenantId == Guid.Empty)
                             throw new Exception("Cannot save patient data without an active hospital session!");
 
-                        tenantEntity.TenantId = tenantId;
+                        tenantEntity.TenantId = tenantId.Value;
                     }
                 }
             }

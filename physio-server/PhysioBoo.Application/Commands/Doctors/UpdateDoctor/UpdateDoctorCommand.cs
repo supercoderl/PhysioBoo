@@ -9,12 +9,15 @@ namespace PhysioBoo.Application.Commands.Doctors.UpdateDoctor
         private static readonly UpdateDoctorCommandValidation _validation = new();
 
         public UpdateDoctorViewModel Doctor { get; }
+        public Guid Id { get; }
 
         public UpdateDoctorCommand(
-            UpdateDoctorViewModel doctor
+            UpdateDoctorViewModel doctor,
+            Guid id
         ) : base(Guid.NewGuid())
         {
             Doctor = doctor;
+            Id = id;
         }
 
         public override bool IsValid()

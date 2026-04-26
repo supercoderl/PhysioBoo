@@ -1,4 +1,5 @@
-﻿using PhysioBoo.Application.Commands.Appointments.CreateAppointment;
+﻿using Microsoft.AspNetCore.Mvc;
+using PhysioBoo.Application.Commands.Appointments.CreateAppointment;
 using PhysioBoo.Application.ViewModels.Appointments;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
@@ -15,25 +16,33 @@ namespace PhysioBoo.Presentation.Endpoints
                 .WithOpenApi()
                 .AddEndpointFilter<NotificationResultFilter>();
 
-            // Create appointment
-            group.MapPost("/create", async (
-                CreateAppointmentViewModel newAppointment,
+            #region Create New Appointment
+            group.MapPost("", async (
+                [FromBody] CreateAppointmentViewModel newAppointment,
                 IMediatorHandler bus,
                 IUser user,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateAppointmentCommand(newAppointment, user.IsAuthenticated ? user.GetUserId() : null));
+                Guid newId = Guid.NewGuid();
 
-                return Results.Created($"/api/appointments/{newAppointment.Id}", new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = newAppointment.Id
-                });
+                await bus.SendCommandAsync(new CreateAppointmentCommand(newAppointment, newId));
+
+                return Results.CreatedAtRoute(
+                    "GetAppointmentById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
             }).WithName("CreateAppointment")
             .WithSummary("Create new appointment")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
+            #endregion
         }
     }
 }

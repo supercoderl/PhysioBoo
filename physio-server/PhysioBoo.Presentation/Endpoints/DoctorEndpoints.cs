@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PhysioBoo.Application.Commands.Doctors.CreateDoctor;
+using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.Doctors.DeleteDoctor;
 using PhysioBoo.Application.Commands.Doctors.UpdateDoctor;
 using PhysioBoo.Application.Queries.Doctors.GetAll;
@@ -21,29 +20,8 @@ namespace PhysioBoo.Presentation.Endpoints
                 .WithOpenApi()
                 .AddEndpointFilter<NotificationResultFilter>();
 
-            #region Create New Doctor
-            group.MapPost("/create", async (
-                CreateDoctorViewModel newDoctor,
-                IMediatorHandler bus,
-                CancellationToken cancellationToken
-            ) =>
-            {
-                await bus.SendCommandAsync(new CreateDoctorCommand(newDoctor));
-
-                return Results.Created($"/api/doctors/create", new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = "A new doctor has been created successfully."
-                });
-            }).WithName("CreateDoctor")
-            .WithSummary("Create new doctor information")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
-            #endregion
-
             #region Get All Doctors
-            group.MapPost("/search", async (
+            group.MapPost("search", async (
                 [FromBody] PagedRequest<DoctorFilter> request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
@@ -56,70 +34,68 @@ namespace PhysioBoo.Presentation.Endpoints
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchDoctors")
+            }).WithName("GetDoctors")
             .WithSummary("Retrieve a paginated list of doctors with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<DoctorViewModel>>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<PagedResult<DoctorViewModel>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<PagedResult<DoctorViewModel>>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Delete Doctor
-            group.MapPost("/delete", async (
-                DeleteDoctorViewModel request,
+            group.MapDelete("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new DeleteDoctorCommand(request.Id, request.IsHard));
+                await bus.SendCommandAsync(new DeleteDoctorCommand(id));
 
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "Doctor has been deleted successfully."
-                });
+                return Results.NoContent();
             }).WithName("DeleteDoctor")
-            .WithSummary("Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .WithSummary("Handles requests to delete a specific doctor by its identifier.")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Update Doctor
-            group.MapPost("/update", async (
-                UpdateDoctorViewModel Doctor,
+            group.MapPatch("{id:guid}", async (
+                Guid id,
+                [FromBody] UpdateDoctorViewModel request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new UpdateDoctorCommand(Doctor));
+                await bus.SendCommandAsync(new UpdateDoctorCommand(request, id));
 
-                return Results.Ok(new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = Doctor.Id
-                });
+                return Results.NoContent();
             }).WithName("UpdateDoctor")
             .WithSummary("Update doctor")
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
             #endregion
 
             #region Get Doctor By Id
-            group.MapPost("/search-by-id", async (
-                [FromBody] DoctorSingleFilter request,
+            group.MapGet("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                DoctorViewModel? result = await bus.QueryAsync(new GetDoctorByIdQuery(request.Id));
+                DoctorViewModel? result = await bus.QueryAsync(new GetDoctorByIdQuery(id));
 
                 return Results.Ok(new ResponseMessage<DoctorViewModel?>
                 {
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchDoctor")
+            }).WithName("GetDoctorById")
             .WithSummary("Retrieve a doctor record.")
             .Produces<ResponseMessage<DoctorViewModel?>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<DoctorViewModel?>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<DoctorViewModel?>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
         }
     }

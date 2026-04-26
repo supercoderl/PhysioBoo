@@ -34,7 +34,7 @@ namespace PhysioBoo.Application.Commands.Bills.CreateBill
             string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Bill), cancellationToken);
 
             Bill newBill = new Bill(
-                request.NewBill.Id,
+                request.NewId,
                 newCode,
                 request.NewBill.PatientId,
                 request.NewBill.AppointmentId,

@@ -9,10 +9,12 @@ namespace PhysioBoo.Application.Commands.InsuranceCompanies.CreateInsuranceCompa
         private static readonly CreateInsuranceCompanyCommandValidation s_validation = new();
 
         public CreateInsuranceCompanyViewModel NewInsuranceCompany { get; }
+        public Guid NewId { get; }
 
-        public CreateInsuranceCompanyCommand(CreateInsuranceCompanyViewModel newInsuranceCompany) : base(Guid.NewGuid())
+        public CreateInsuranceCompanyCommand(CreateInsuranceCompanyViewModel newInsuranceCompany, Guid newId) : base(Guid.NewGuid())
         {
             NewInsuranceCompany = newInsuranceCompany;
+            NewId = newId;
         }
 
         public override bool IsValid()

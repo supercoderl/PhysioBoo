@@ -27,8 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\Departments\DeleteDepartment\" />
-    <Folder Include="Commands\Departments\UpdateDepartment\" />
     <Folder Include="Commands\DoctorSchedules\CreateDoctorSchedule\" />
   </ItemGroup>
 

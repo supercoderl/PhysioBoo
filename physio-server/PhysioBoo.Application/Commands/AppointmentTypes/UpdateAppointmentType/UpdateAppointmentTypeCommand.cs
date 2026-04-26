@@ -8,10 +8,12 @@ namespace PhysioBoo.Application.Commands.AppointmentTypes.UpdateAppointmentType
         private static readonly UpdateAppointmentTypeCommandValidation s_validation = new();
 
         public UpdateAppointmentTypeViewModel AppointmentType { get; }
+        public Guid Id { get; }
 
-        public UpdateAppointmentTypeCommand(UpdateAppointmentTypeViewModel appointmentType) : base(Guid.NewGuid())
+        public UpdateAppointmentTypeCommand(UpdateAppointmentTypeViewModel appointmentType, Guid id) : base(Guid.NewGuid())
         {
             AppointmentType = appointmentType;
+            Id = id;
         }
 
         public override bool IsValid()

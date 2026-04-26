@@ -2,7 +2,6 @@
 {
     public sealed record CreateAppointmentTypeViewModel
     (
-        Guid Id,
         string Name,
         string? Description,
         int DefaultDuration,

@@ -2,7 +2,6 @@
 {
     public sealed record UpdateImagingModalityViewModel
     (
-        Guid Id,
         string Name,
         string? Code,
         string? Description,

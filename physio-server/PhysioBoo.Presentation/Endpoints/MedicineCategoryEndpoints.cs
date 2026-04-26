@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCategory;
 using PhysioBoo.Application.Commands.MedicineCategories.DeleteMedicineCategory;
 using PhysioBoo.Application.Commands.MedicineCategories.UpdateMedicineCategory;
@@ -22,27 +22,33 @@ namespace PhysioBoo.Presentation.Endpoints
                 .AddEndpointFilter<NotificationResultFilter>();
 
             #region Create New Medicine Category
-            group.MapPost("/create", async (
-                CreateMedicineCategoryViewModel newMedicineCategory,
+            group.MapPost("", async (
+                [FromBody] CreateMedicineCategoryViewModel request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateMedicineCategoryCommand(newMedicineCategory));
+                Guid newId = Guid.NewGuid();
+                await bus.SendCommandAsync(new CreateMedicineCategoryCommand(request, newId));
 
-                return Results.Created($"/api/medicine-categories/{newMedicineCategory.Id}", new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = newMedicineCategory.Id
-                });
+                return Results.CreatedAtRoute(
+                    "GetMedicineCategoryById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
             }).WithName("CreateMedicineCategory")
             .WithSummary("Create new medicine category")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Get All Medicine Categories
-            group.MapPost("/search", async (
+            group.MapPost("search", async (
                 [FromBody] PagedRequest<MedicineCategoryFilter> request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
@@ -55,70 +61,68 @@ namespace PhysioBoo.Presentation.Endpoints
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchMedicineCategories")
+            }).WithName("GetMedicineCategories")
             .WithSummary("Retrieve a paginated list of medicine categories with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<MedicineCategoryViewModel>>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<PagedResult<MedicineCategoryViewModel>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<PagedResult<MedicineCategoryViewModel>>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Delete Medicine Category
-            group.MapPost("/delete", async (
-                DeleteMedicineCategoryViewModel request,
+            group.MapDelete("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new DeleteMedicineCategoryCommand(request.Id, request.IsHard));
+                await bus.SendCommandAsync(new DeleteMedicineCategoryCommand(id));
 
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "Medicine category has been deleted successfully."
-                });
+                return Results.NoContent();
             }).WithName("DeleteMedicineCategory")
-            .WithSummary("Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .WithSummary("Handles requests to delete a specific medicine category by its identifier.")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
 
             #region Update Medicine Category
-            group.MapPost("/update", async (
-                UpdateMedicineCategoryViewModel MedicineCategory,
+            group.MapPatch("{id:guid}", async (
+                Guid id,
+                [FromBody] UpdateMedicineCategoryViewModel request,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new UpdateMedicineCategoryCommand(MedicineCategory));
+                await bus.SendCommandAsync(new UpdateMedicineCategoryCommand(request, id));
 
-                return Results.Ok(new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = MedicineCategory.Id
-                });
+                return Results.NoContent();
             }).WithName("UpdateMedicineCategory")
             .WithSummary("Update medicine category")
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
             #endregion
 
             #region Get Medicine Category By Id
-            group.MapPost("/search-by-id", async (
-                [FromBody] MedicineCategorySingleFilter request,
+            group.MapGet("{id:guid}", async (
+                Guid id,
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                MedicineCategoryViewModel? result = await bus.QueryAsync(new GetMedicineCategoryByIdQuery(request.Id));
+                MedicineCategoryViewModel? result = await bus.QueryAsync(new GetMedicineCategoryByIdQuery(id));
 
                 return Results.Ok(new ResponseMessage<MedicineCategoryViewModel?>
                 {
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchMedicineCategory")
+            }).WithName("GetMedicineCategoryById")
             .WithSummary("Retrieve a medicine category record.")
             .Produces<ResponseMessage<MedicineCategoryViewModel?>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<MedicineCategoryViewModel?>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<MedicineCategoryViewModel?>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
         }
     }

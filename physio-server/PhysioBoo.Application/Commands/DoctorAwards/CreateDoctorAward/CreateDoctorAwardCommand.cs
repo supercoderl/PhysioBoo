@@ -9,10 +9,12 @@ namespace PhysioBoo.Application.Commands.DoctorAwards.CreateDoctorAward
         private static readonly CreateDoctorAwardCommandValidation s_validation = new();
 
         public CreateDoctorAwardViewModel NewDoctorAward { get; }
+        public Guid NewId { get; }
 
-        public CreateDoctorAwardCommand(CreateDoctorAwardViewModel newDoctorAward) : base(Guid.NewGuid())
+        public CreateDoctorAwardCommand(CreateDoctorAwardViewModel newDoctorAward, Guid newId) : base(Guid.NewGuid())
         {
             NewDoctorAward = newDoctorAward;
+            NewId = newId;
         }
 
         public override bool IsValid()

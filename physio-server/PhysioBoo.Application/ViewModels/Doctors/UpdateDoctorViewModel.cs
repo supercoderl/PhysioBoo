@@ -4,7 +4,6 @@ namespace PhysioBoo.Application.ViewModels.Doctors
 {
     public sealed record UpdateDoctorViewModel
     (
-        Guid Id,
         // Professional Profile
         string? Bio,
         string? About,

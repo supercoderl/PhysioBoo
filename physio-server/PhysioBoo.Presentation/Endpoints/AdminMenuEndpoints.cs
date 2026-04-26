@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PhysioBoo.Application.Commands.AdminMenus.CreateAdminMenu;
+using PhysioBoo.Application.Commands.AdminMenus.DeleteAdminMenu;
+using PhysioBoo.Application.Commands.AdminMenus.UpdateAdminMenu;
 using PhysioBoo.Application.Queries.AdminMenus.GetAll;
+using PhysioBoo.Application.Queries.AdminMenus.GetById;
 using PhysioBoo.Application.ViewModels.AdminMenus;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
@@ -31,10 +35,97 @@ namespace PhysioBoo.Presentation.Endpoints
                     Success = true,
                     Data = result
                 });
-            }).WithName("SearchAdminMenus")
+            }).WithName("GetAdminMenus")
             .WithSummary("Retrieve a paginated list of menus with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<AdminMenuViewModel>>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<PagedResult<AdminMenuViewModel>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<PagedResult<AdminMenuViewModel>>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
+            #endregion
+
+            #region Create New Admin Menu
+            group.MapPost("", async (
+                [FromBody] CreateAdminMenuViewModel newAdminMenu,
+                IMediatorHandler bus,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                Guid newId = Guid.NewGuid();
+
+                await bus.SendCommandAsync(new CreateAdminMenuCommand(newAdminMenu, newId));
+
+                return Results.CreatedAtRoute(
+                    "GetAdminMenuById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
+            }).WithName("CreateAdminMenu")
+            .WithSummary("Create new admin menu")
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
+            #endregion
+
+            #region Delete Admin Menu
+            group.MapDelete("{id:guid}", async (
+                Guid id,
+                IMediatorHandler bus,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                await bus.SendCommandAsync(new DeleteAdminMenuCommand(id));
+
+                return Results.NoContent();
+            }).WithName("DeleteAdminMenu")
+            .WithSummary("Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.")
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
+            #endregion
+
+            #region Update Admin Menu
+            group.MapPatch("{id:guid}", async (
+                Guid id,
+                [FromBody] UpdateAdminMenuViewModel adminMenu,
+                IMediatorHandler bus,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                await bus.SendCommandAsync(new UpdateAdminMenuCommand(adminMenu, id));
+
+                return Results.NoContent();
+            }).WithName("UpdateAdminMenu")
+            .WithSummary("Update admin menu")
+            .Produces(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
+            #endregion
+
+            #region Get Admin Menu By Id
+            group.MapGet("{id:guid}", async (
+                Guid id,
+                IMediatorHandler bus,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                AdminMenuViewModel? result = await bus.QueryAsync(new GetAdminMenuByIdQuery(id));
+
+                return Results.Ok(new ResponseMessage<AdminMenuViewModel?>
+                {
+                    Success = true,
+                    Data = result
+                });
+            }).WithName("GetAdminMenuById")
+            .WithSummary("Retrieve a admin menu record.")
+            .Produces<ResponseMessage<AdminMenuViewModel?>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<AdminMenuViewModel?>>(StatusCodes.Status400BadRequest)
+            .Produces<ResponseMessage<AdminMenuViewModel?>>(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
             #endregion
         }
     }

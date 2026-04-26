@@ -2,7 +2,6 @@
 {
     public sealed record UpdateLabTestViewModel
     (
-        Guid Id,
         string TestName,
         Guid CategoryId,
         string? Description,

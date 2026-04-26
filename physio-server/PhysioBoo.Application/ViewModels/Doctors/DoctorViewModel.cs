@@ -5,7 +5,7 @@ namespace PhysioBoo.Application.ViewModels.Doctors
 {
     public sealed class DoctorViewModel
     {
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
         public string FullName { get; set; } = string.Empty;
         public string? Avatar { get; set; }
         public string? Bio { get; set; }
@@ -60,7 +60,7 @@ namespace PhysioBoo.Application.ViewModels.Doctors
         {
             return new DoctorViewModel
             {
-                Id = doctor.Id,
+                UserId = doctor.Id,
                 FullName = doctor.User?.Profile?.FullName ?? string.Empty,
                 Avatar = doctor.User?.ProfilePicture,
                 Bio = doctor.Bio,

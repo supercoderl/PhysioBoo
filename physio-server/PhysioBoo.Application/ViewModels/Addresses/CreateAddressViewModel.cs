@@ -2,7 +2,6 @@
 {
     public sealed record CreateAddressViewModel
     (
-        Guid Id,
         string Street,
         string? ApartmentUnit,
         string City,
@@ -10,6 +9,7 @@
         string? PostalCode,
         string Country,
         decimal Latitude,
-        decimal Longitude
+        decimal Longitude,
+        bool IsPrimary
     );
 }

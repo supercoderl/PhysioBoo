@@ -9,10 +9,12 @@ namespace PhysioBoo.Application.Commands.Suppliers.CreateSupplier
         private static readonly CreateSupplierCommandValidation s_validation = new();
 
         public CreateSupplierViewModel NewSupplier { get; }
+        public Guid Id { get; }
 
-        public CreateSupplierCommand(CreateSupplierViewModel newSupplier) : base(Guid.NewGuid())
+        public CreateSupplierCommand(CreateSupplierViewModel newSupplier, Guid id) : base(Guid.NewGuid())
         {
             NewSupplier = newSupplier;
+            Id = id;
         }
 
         public override bool IsValid()

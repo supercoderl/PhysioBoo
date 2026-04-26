@@ -9,10 +9,12 @@ namespace PhysioBoo.Application.Commands.LabTests.CreateLabTest
         private static readonly CreateLabTestCommandValidation s_validation = new();
 
         public CreateLabTestViewModel NewLabTest { get; }
+        public Guid NewId { get; }
 
-        public CreateLabTestCommand(CreateLabTestViewModel newLabTest) : base(Guid.NewGuid())
+        public CreateLabTestCommand(CreateLabTestViewModel newLabTest, Guid newId) : base(Guid.NewGuid())
         {
             NewLabTest = newLabTest;
+            NewId = newId;
         }
 
         public override bool IsValid()

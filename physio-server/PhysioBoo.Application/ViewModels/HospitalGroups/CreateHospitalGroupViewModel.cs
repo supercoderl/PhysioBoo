@@ -2,7 +2,6 @@
 {
     public sealed record CreateHospitalGroupViewModel
     (
-        Guid Id,
         string Name,
         string? Description,
         string? HeadquartersAddress,

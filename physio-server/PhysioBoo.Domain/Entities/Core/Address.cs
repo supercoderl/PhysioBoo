@@ -1,5 +1,7 @@
-﻿using PhysioBoo.Domain.Entities.Operation;
+﻿using NpgsqlTypes;
+using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.Core
 {
@@ -22,6 +24,9 @@ namespace PhysioBoo.Domain.Entities.Core
         public virtual User? Updater { get; private set; }
         public virtual HospitalGroup? HospitalGroup { get; private set; }
         public virtual User? User { get; private set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public NpgsqlTsVector? SearchVector { get; private set; }
         #endregion
 
         #region Constructor (13)

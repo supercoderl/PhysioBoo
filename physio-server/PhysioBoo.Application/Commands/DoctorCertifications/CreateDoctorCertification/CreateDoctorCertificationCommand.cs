@@ -9,10 +9,12 @@ namespace PhysioBoo.Application.Commands.DoctorCertifications.CreateDoctorCertif
         private static readonly CreateDoctorCertificationCommandValidation s_validation = new();
 
         public CreateDoctorCertificationViewModel NewDoctorCertification { get; }
+        public Guid NewId { get; }
 
-        public CreateDoctorCertificationCommand(CreateDoctorCertificationViewModel newDoctorCertification) : base(Guid.NewGuid())
+        public CreateDoctorCertificationCommand(CreateDoctorCertificationViewModel newDoctorCertification, Guid newId) : base(Guid.NewGuid())
         {
             NewDoctorCertification = newDoctorCertification;
+            NewId = newId;
         }
 
         public override bool IsValid()

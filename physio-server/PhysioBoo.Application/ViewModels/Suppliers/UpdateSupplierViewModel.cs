@@ -4,7 +4,6 @@ namespace PhysioBoo.Application.ViewModels.Suppliers
 {
     public sealed record UpdateSupplierViewModel
     (
-        Guid Id,
         string SupplierName,
         SupplierType Type,
         string? ContactPerson,

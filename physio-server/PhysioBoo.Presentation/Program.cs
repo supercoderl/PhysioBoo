@@ -352,6 +352,7 @@ namespace PhysioBoo.Presentation
             });
 
             app.MapControllers();
+            app.UseSwaggerUI();
             app.MapGrpcService<UsersApiImplementation>();
 
             totalTimer.Stop();

@@ -22,38 +22,42 @@ namespace PhysioBoo.Application.Test.Commands.AppointmentTypes.CreateAppointment
         [Fact]
         public void Should_Fail_When_Name_Is_Empty()
         {
-            CreateAppointmentTypeCommand command = new CreateAppointmentTypeCommand(new ViewModels.AppointmentTypes.CreateAppointmentTypeViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                "123",
-                0,
-                0,
-                false,
-                false,
-                null,
-                true,
-                0,
-                null
-            ));
+            CreateAppointmentTypeCommand command = new CreateAppointmentTypeCommand(
+                new ViewModels.AppointmentTypes.CreateAppointmentTypeViewModel(
+                    string.Empty,
+                    "123",
+                    0,
+                    0,
+                    false,
+                    false,
+                    null,
+                    true,
+                    0,
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             ShouldHaveSingleError(command, DomainErrorCodes.AppointmentType.EmptyName);
         }
 
         private static CreateAppointmentTypeCommand CreateTestCommand()
         {
-            return new CreateAppointmentTypeCommand(new ViewModels.AppointmentTypes.CreateAppointmentTypeViewModel(
-                Guid.NewGuid(),
-                "Test Street",
-                "123",
-                0,
-                0,
-                false,
-                false,
-                null,
-                true,
-                0,
-                null
-            ));
+            return new CreateAppointmentTypeCommand(
+                new ViewModels.AppointmentTypes.CreateAppointmentTypeViewModel(
+                    "Test Street",
+                    "123",
+                    0,
+                    0,
+                    false,
+                    false,
+                    null,
+                    true,
+                    0,
+                    null
+                ),
+                Guid.NewGuid()
+            );
         }
     }
 }

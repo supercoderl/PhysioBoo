@@ -14,20 +14,22 @@ namespace PhysioBoo.Application.Test.Commands.MedicalSpecialties.CreateMedicalSp
         {
             _fixture.SetupInsertSuccess();
 
-            CreateMedicalSpecialtyCommand command = new CreateMedicalSpecialtyCommand(new ViewModels.MedicalSpecialties.CreateMedicalSpecialtyViewModel(
-                Guid.NewGuid(),
-                "Test",
-                null,
-                null,
-                false,
-                false,
-                0,
-                null,
-                null,
-                null,
-                null,
-                null
-            ));
+            CreateMedicalSpecialtyCommand command = new CreateMedicalSpecialtyCommand(
+                new ViewModels.MedicalSpecialties.CreateMedicalSpecialtyViewModel(
+                    "Test",
+                    null,
+                    null,
+                    false,
+                    false,
+                    0,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyNoDomainNotification().VerifyNoCommit();
@@ -38,20 +40,22 @@ namespace PhysioBoo.Application.Test.Commands.MedicalSpecialties.CreateMedicalSp
         {
             _fixture.SetupInsertFailure();
 
-            CreateMedicalSpecialtyCommand command = new CreateMedicalSpecialtyCommand(new ViewModels.MedicalSpecialties.CreateMedicalSpecialtyViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                null,
-                null,
-                false,
-                false,
-                0,
-                null,
-                null,
-                null,
-                null,
-                null
-            ));
+            CreateMedicalSpecialtyCommand command = new CreateMedicalSpecialtyCommand(
+                new ViewModels.MedicalSpecialties.CreateMedicalSpecialtyViewModel(
+                    string.Empty,
+                    null,
+                    null,
+                    false,
+                    false,
+                    0,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyAnyDomainNotification().VerifyNoCommit();
@@ -60,20 +64,22 @@ namespace PhysioBoo.Application.Test.Commands.MedicalSpecialties.CreateMedicalSp
         [Fact]
         public async Task Should_Raise_Notification_When_Command_Is_Invalid()
         {
-            CreateMedicalSpecialtyCommand command = new CreateMedicalSpecialtyCommand(new ViewModels.MedicalSpecialties.CreateMedicalSpecialtyViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                null,
-                null,
-                false,
-                false,
-                0,
-                null,
-                null,
-                null,
-                null,
-                null
-            ));
+            CreateMedicalSpecialtyCommand command = new CreateMedicalSpecialtyCommand(
+                new ViewModels.MedicalSpecialties.CreateMedicalSpecialtyViewModel(
+                    string.Empty,
+                    null,
+                    null,
+                    false,
+                    false,
+                    0,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
 

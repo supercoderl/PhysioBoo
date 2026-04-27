@@ -14,23 +14,25 @@ namespace PhysioBoo.Application.Test.Commands.Manufacturers.CreateManufacturer
         {
             _fixture.SetupInsertSuccess();
 
-            CreateManufacturerCommand command = new CreateManufacturerCommand(new ViewModels.Manufacturers.CreateManufacturerViewModel(
-                Guid.NewGuid(),
-                "Test",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                false,
-                0
-            ));
+            CreateManufacturerCommand command = new CreateManufacturerCommand(
+                new ViewModels.Manufacturers.CreateManufacturerViewModel(
+                    "Test",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    false,
+                    false,
+                    0
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyNoDomainNotification().VerifyNoCommit();
@@ -41,23 +43,25 @@ namespace PhysioBoo.Application.Test.Commands.Manufacturers.CreateManufacturer
         {
             _fixture.SetupInsertFailure();
 
-            CreateManufacturerCommand command = new CreateManufacturerCommand(new ViewModels.Manufacturers.CreateManufacturerViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                false,
-                0
-            ));
+            CreateManufacturerCommand command = new CreateManufacturerCommand(
+                new ViewModels.Manufacturers.CreateManufacturerViewModel(
+                    string.Empty,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    false,
+                    false,
+                    0
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyAnyDomainNotification().VerifyNoCommit();
@@ -66,23 +70,25 @@ namespace PhysioBoo.Application.Test.Commands.Manufacturers.CreateManufacturer
         [Fact]
         public async Task Should_Raise_Notification_When_Command_Is_Invalid()
         {
-            CreateManufacturerCommand command = new CreateManufacturerCommand(new ViewModels.Manufacturers.CreateManufacturerViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                false,
-                0
-            ));
+            CreateManufacturerCommand command = new CreateManufacturerCommand(
+                new ViewModels.Manufacturers.CreateManufacturerViewModel(
+                    string.Empty,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    false,
+                    false,
+                    0
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
 

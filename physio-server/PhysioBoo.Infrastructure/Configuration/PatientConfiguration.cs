@@ -116,6 +116,10 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(p => p.RiskLevel)
                    .HasConversion<string>()
                    .IsRequired();
+
+            builder.Property(ms => ms.SearchVector)
+                   .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"PatientNumber\", '')))", stored: true)
+                   .ValueGeneratedOnAddOrUpdate();
         }
     }
 }

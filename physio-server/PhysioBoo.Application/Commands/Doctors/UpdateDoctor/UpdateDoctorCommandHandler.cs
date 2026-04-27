@@ -26,13 +26,13 @@ namespace PhysioBoo.Application.Commands.Doctors.UpdateDoctor
             if (!request.IsValid())
                 return;
 
-            Domain.Entities.MedicalStaff.Doctor? doctor = await _doctorRepository.GetByIdAsync(request.Doctor.Id);
+            Domain.Entities.MedicalStaff.Doctor? doctor = await _doctorRepository.GetByIdAsync(request.Id);
 
             if (doctor == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"Doctor with Id {request.Doctor.Id} not found.",
+                    $"Doctor with Id {request.Id} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 

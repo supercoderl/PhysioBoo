@@ -24,13 +24,13 @@ namespace PhysioBoo.Application.Commands.InsuranceCompanies.UpdateInsuranceCompa
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.Support.InsuranceCompany? insuranceCompany = await _insuranceCompanyRepository.GetByIdAsync(request.InsuranceCompany.Id);
+            Domain.Entities.Support.InsuranceCompany? insuranceCompany = await _insuranceCompanyRepository.GetByIdAsync(request.Id);
 
             if (insuranceCompany == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"Insurance company with Id {request.InsuranceCompany.Id} not found.",
+                    $"Insurance company with Id {request.Id} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 

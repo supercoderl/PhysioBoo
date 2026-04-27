@@ -24,13 +24,13 @@ namespace PhysioBoo.Application.Commands.Hospitals.UpdateHospital
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.Operation.Hospital? hospital = await _hospitalRepository.GetByIdAsync(request.Hospital.Id);
+            Domain.Entities.Operation.Hospital? hospital = await _hospitalRepository.GetByIdAsync(request.Id);
 
             if (hospital == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"Hospital with Id {request.Hospital.Id} not found.",
+                    $"Hospital with Id {request.Id} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 

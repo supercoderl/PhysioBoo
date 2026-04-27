@@ -26,7 +26,7 @@ namespace PhysioBoo.Application.Commands.ImagingModalities.CreateImagingModality
             if (!await TestValidityAsync(request)) return;
 
             ImagingModality newImagingModality = new ImagingModality(
-                request.NewImagingModality.Id,
+                request.NewId,
                 request.NewImagingModality.Name,
                 request.NewImagingModality.Code,
                 request.NewImagingModality.Description,

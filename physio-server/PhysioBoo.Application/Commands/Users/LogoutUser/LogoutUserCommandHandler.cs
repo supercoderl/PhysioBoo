@@ -10,31 +10,36 @@ namespace PhysioBoo.Application.Commands.Users.LogoutUser
     public sealed class LogoutUserCommandHandler : CommandHandlerBase, IRequestHandler<LogoutUserCommand>
     {
         private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly IUser _user;
 
         public LogoutUserCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
-            IRefreshTokenRepository refreshTokenRepository
+            IRefreshTokenRepository refreshTokenRepository,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
             _refreshTokenRepository = refreshTokenRepository;
+            _user = user;
         }
 
         public async Task Handle(LogoutUserCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
+            Guid userId = _user.GetUserId();
+
             // Revoke logic command
-            var result = await _refreshTokenRepository.BatchUpdateMultipleAsync(
-                predicate: rt => rt.UserId == request.UserId && rt.ExpiresAt > TimeZoneHelper.GetLocalTimeNow(),
+            int result = await _refreshTokenRepository.BatchUpdateMultipleAsync(
+                predicate: rt => rt.UserId == userId && rt.ExpiresAt > TimeZoneHelper.GetLocalTimeNow(),
                 setterExpression: setters => setters.SetProperty(rt => rt.ExpiresAt, _ => TimeZoneHelper.GetLocalTimeNow()),
                 cancellationToken: cancellationToken
             );
 
             if (result > 0)
             {
-                await Bus.RaiseEventAsync(new UserLoggedOutEvent(request.UserId));
+                await Bus.RaiseEventAsync(new UserLoggedOutEvent(userId));
             }
         }
     }

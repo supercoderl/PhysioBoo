@@ -42,13 +42,19 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateUserCommand(newUser));
+                Guid newId = Guid.NewGuid();
 
-                return Results.Created($"/api/users/{newUser.Id}", new ResponseMessage<Guid>
-                {
-                    Success = true,
-                    Data = newUser.Id
-                });
+                await bus.SendCommandAsync(new CreateUserCommand(newUser, newId));
+
+                return Results.CreatedAtRoute(
+                    "GetUserById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
             }).WithName("CreateUser")
             .WithSummary("Create new user")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
@@ -64,15 +70,11 @@ namespace PhysioBoo.Presentation.Endpoints
             {
                 await bus.SendCommandAsync(new ResendVerificationCommand(request.VerificationType));
 
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "Resend verification url successfully."
-                });
+                return Results.NoContent();
             }).WithName("Resend Verification")
             .WithSummary("Resend Email Verification Token For User")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
             .RequireAuthorization();
             #endregion
 
@@ -120,18 +122,14 @@ namespace PhysioBoo.Presentation.Endpoints
                     AuthHelper.SetTokenCookie(response, "access_token", requestCmd.Result.AccessToken, timeZoneId, env == "Development");
                     AuthHelper.SetTokenCookie(response, "refresh_token", requestCmd.Result.RefreshToken, timeZoneId, env == "Development");
 
-                    return Results.Ok(new ResponseMessage<string>
-                    {
-                        Success = true,
-                        Data = "Login successfully."
-                    });
+                    return Results.NoContent();
                 }
 
                 return Results.Unauthorized();
             }).WithName("Login")
             .WithSummary("Login user with email and password")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest);
             #endregion
 
             #region OAuth Login
@@ -151,18 +149,14 @@ namespace PhysioBoo.Presentation.Endpoints
                     AuthHelper.SetTokenCookie(response, "access_token", requestCmd.Result.AccessToken, timeZoneId, env == "Development");
                     AuthHelper.SetTokenCookie(response, "refresh_token", requestCmd.Result.RefreshToken, timeZoneId, env == "Development");
 
-                    return Results.Ok(new ResponseMessage<string>
-                    {
-                        Success = true,
-                        Data = "Login successfully."
-                    });
+                    return Results.NoContent();
                 }
 
                 return Results.Unauthorized();
             }).WithName("OAuthLogin")
             .WithSummary("Login user with oauth")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest);
             #endregion
 
             #region Logout
@@ -170,33 +164,24 @@ namespace PhysioBoo.Presentation.Endpoints
                 HttpRequest request,
                 HttpResponse response,
                 IMediatorHandler bus,
-                IUser user,
                 CancellationToken cancellationToken
             ) =>
             {
-                Guid? id = user.GetUserId();
-
-                if (!id.HasValue) return Results.Ok();
-
-                await bus.SendCommandAsync(new LogoutUserCommand(id.Value));
+                await bus.SendCommandAsync(new LogoutUserCommand());
 
                 AuthHelper.RemoveTokenCookie(response, "access_token");
                 AuthHelper.RemoveTokenCookie(response, "refresh_token");
 
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "logout successfully."
-                });
+                return Results.NoContent();
             }).WithName("Logout")
             .WithSummary("Logout current user")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
             .RequireAuthorization();
             #endregion
 
             #region Change password
-            group.MapPost("/change-password", async (
+            group.MapPatch("/change-password", async (
                 [FromBody] ChangePasswordViewModel request,
                 IMediatorHandler bus,
                 IUser user,
@@ -209,15 +194,12 @@ namespace PhysioBoo.Presentation.Endpoints
 
                 await bus.SendCommandAsync(new ChangePasswordUserCommand(id.Value, request.OldPassword, request.NewPassword));
 
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "Change password successfully. Please login again"
-                });
+                return Results.NoContent();
             }).WithName("Change password")
             .WithSummary("Change old password to new password")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
             .RequireAuthorization();
             #endregion
 
@@ -230,15 +212,11 @@ namespace PhysioBoo.Presentation.Endpoints
             {
                 await bus.SendCommandAsync(new ForgotPasswordCommand(request.Email));
 
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "An url has been sent to your email, please check."
-                });
+                return Results.NoContent();
             }).WithName("Forgot password")
             .WithSummary("Send an url with token to user for resetting password")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest);
             #endregion
 
             #region Reset password
@@ -250,15 +228,11 @@ namespace PhysioBoo.Presentation.Endpoints
             {
                 await bus.SendCommandAsync(new ResetPasswordCommand(request.Token, request.NewPassword));
 
-                return Results.Ok(new ResponseMessage<string>
-                {
-                    Success = true,
-                    Data = "Reset password successfully. Please login again"
-                });
+                return Results.NoContent();
             }).WithName("Reset password")
             .WithSummary("Change old password to new password")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
             .RequireAuthorization();
             #endregion
 
@@ -285,18 +259,14 @@ namespace PhysioBoo.Presentation.Endpoints
                     AuthHelper.SetTokenCookie(response, "access_token", requestCmd.Result.AccessToken, timeZoneId, env == "Development");
                     AuthHelper.SetTokenCookie(response, "refresh_token", requestCmd.Result.RefreshToken, timeZoneId, env == "Development");
 
-                    return Results.Ok(new ResponseMessage<string>
-                    {
-                        Success = true,
-                        Data = "Login successfully."
-                    });
+                    return Results.NoContent();
                 }
 
                 return Results.Unauthorized();
             }).WithName("Refresh Token")
             .WithSummary("Refresh new token")
-            .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest);
             #endregion
 
             #region Get All Users
@@ -328,25 +298,20 @@ namespace PhysioBoo.Presentation.Endpoints
             {
                 await bus.SendCommandAsync(new AssignRoleToUserCommand(roleForAssigning));
 
-                return Results.Ok();
+                return Results.NoContent();
             }).WithName("AssignRoleToUser")
             .WithSummary("Assign Role To User")
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
             .RequireAuthorization();
             #endregion
 
             #region Get Profile
-            group.MapPost("/me", async (
-                IUser user,
+            group.MapGet("/me", async (
                 IMediatorHandler bus,
                 CancellationToken cancellationToken
             ) =>
             {
-                Guid? id = user.GetUserId();
-
-                if (!id.HasValue) return Results.Unauthorized();
-
                 UserProfileViewModel? result = await bus.QueryAsync(new GetUserProfileQuery());
 
                 return Results.Ok(new ResponseMessage<UserProfileViewModel?>

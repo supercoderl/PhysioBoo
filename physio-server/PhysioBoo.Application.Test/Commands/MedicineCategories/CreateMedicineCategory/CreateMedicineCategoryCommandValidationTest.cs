@@ -22,30 +22,34 @@ namespace PhysioBoo.Application.Test.Commands.MedicineCategories.CreateMedicineC
         [Fact]
         public void Should_Fail_When_Name_Is_Empty()
         {
-            CreateMedicineCategoryCommand command = new CreateMedicineCategoryCommand(new ViewModels.MedicineCategories.CreateMedicineCategoryViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                null,
-                null,
-                false,
-                false,
-                null
-            ));
+            CreateMedicineCategoryCommand command = new CreateMedicineCategoryCommand(
+                new ViewModels.MedicineCategories.CreateMedicineCategoryViewModel(
+                    string.Empty,
+                    null,
+                    null,
+                    false,
+                    false,
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             ShouldHaveSingleError(command, DomainErrorCodes.MedicineCategory.EmptyName);
         }
 
         private static CreateMedicineCategoryCommand CreateTestCommand()
         {
-            return new CreateMedicineCategoryCommand(new ViewModels.MedicineCategories.CreateMedicineCategoryViewModel(
-                Guid.NewGuid(),
-                "Test",
-                null,
-                null,
-                false,
-                false,
-                null
-            ));
+            return new CreateMedicineCategoryCommand(
+                new ViewModels.MedicineCategories.CreateMedicineCategoryViewModel(
+                    "Test",
+                    null,
+                    null,
+                    false,
+                    false,
+                    null
+                ),
+                Guid.NewGuid()
+            );
         }
     }
 }

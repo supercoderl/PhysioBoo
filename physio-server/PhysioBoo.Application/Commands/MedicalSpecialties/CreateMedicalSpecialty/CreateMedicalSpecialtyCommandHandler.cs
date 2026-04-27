@@ -27,7 +27,7 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecial
             if (!await TestValidityAsync(request)) return;
 
             MedicalSpecialty medicalSpecialty = new MedicalSpecialty(
-                request.NewMedicalSpecialty.Id,
+                request.NewId,
                 request.NewMedicalSpecialty.Name,
                 request.NewMedicalSpecialty.Code,
                 request.NewMedicalSpecialty.Category,

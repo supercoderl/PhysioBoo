@@ -1,4 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using PhysioBoo.Application.Commands.Patients.DeletePatient;
+using PhysioBoo.Application.Commands.Patients.UpdatePatient;
+using PhysioBoo.Application.Queries.Patients.GetAll;
+using PhysioBoo.Application.Queries.Patients.GetById;
 using PhysioBoo.Application.ViewModels.Patients;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
@@ -62,7 +66,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new UpdatePatientCommand(request, id));
+                await bus.SendCommandAsync(new UpdatePatientCommand(id, request));
 
                 return Results.NoContent();
             }).WithName("UpdatePatient")

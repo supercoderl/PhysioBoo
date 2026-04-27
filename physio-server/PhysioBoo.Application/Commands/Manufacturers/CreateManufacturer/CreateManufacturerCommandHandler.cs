@@ -31,7 +31,7 @@ namespace PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer
             string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Manufacturer), cancellationToken);
 
             Manufacturer newManufacturer = new Manufacturer(
-                request.NewManufacturer.Id,
+                request.NewId,
                 request.NewManufacturer.Name,
                 newCode,
                 request.NewManufacturer.Address,

@@ -347,6 +347,7 @@
         {
             // Patient Validation
             public const string EmptyPrimaryDoctorId = "PATIENT_EMPTY_PRIMARY_DOCTOR_ID";
+            public const string EmptyId = "PATIENT_EMPTY_ID";
         }
 
         public static class Payment

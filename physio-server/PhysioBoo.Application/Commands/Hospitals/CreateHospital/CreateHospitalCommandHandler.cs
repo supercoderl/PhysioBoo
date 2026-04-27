@@ -35,7 +35,7 @@ namespace PhysioBoo.Application.Commands.Hospitals.CreateHospital
             string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Hospital), cancellationToken);
 
             Hospital newHospital = new Hospital(
-                request.NewHospital.Id,
+                request.NewId,
                 request.NewHospital.Name,
                 newCode,
                 request.NewHospital.HospitalType,

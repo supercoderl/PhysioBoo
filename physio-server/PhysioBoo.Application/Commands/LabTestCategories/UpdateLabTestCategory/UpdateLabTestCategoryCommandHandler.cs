@@ -24,13 +24,13 @@ namespace PhysioBoo.Application.Commands.LabTestCategories.UpdateLabTestCategory
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.LaboratoryImaging.LabTestCategory? labTestCategory = await _labTestCategoryRepository.GetByIdAsync(request.LabTestCategory.Id);
+            Domain.Entities.LaboratoryImaging.LabTestCategory? labTestCategory = await _labTestCategoryRepository.GetByIdAsync(request.Id);
 
             if (labTestCategory == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"Lab test category with Id {request.LabTestCategory.Id} not found.",
+                    $"Lab test category with Id {request.Id} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 

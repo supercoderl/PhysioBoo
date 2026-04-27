@@ -22,40 +22,44 @@ namespace PhysioBoo.Application.Test.Commands.MedicalSpecialties.CreateMedicalSp
         [Fact]
         public void Should_Fail_When_Name_Is_Empty()
         {
-            CreateMedicalSpecialtyCommand command = new CreateMedicalSpecialtyCommand(new ViewModels.MedicalSpecialties.CreateMedicalSpecialtyViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                null,
-                null,
-                false,
-                false,
-                0,
-                null,
-                null,
-                null,
-                null,
-                null
-            ));
+            CreateMedicalSpecialtyCommand command = new CreateMedicalSpecialtyCommand(
+                new ViewModels.MedicalSpecialties.CreateMedicalSpecialtyViewModel(
+                    string.Empty,
+                    null,
+                    null,
+                    false,
+                    false,
+                    0,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             ShouldHaveSingleError(command, DomainErrorCodes.MedicalSpecialty.EmptyName);
         }
 
         private static CreateMedicalSpecialtyCommand CreateTestCommand()
         {
-            return new CreateMedicalSpecialtyCommand(new ViewModels.MedicalSpecialties.CreateMedicalSpecialtyViewModel(
-                Guid.NewGuid(),
-                "Test",
-                null,
-                null,
-                false,
-                false,
-                0,
-                null,
-                null,
-                null,
-                null,
-                null
-            ));
+            return new CreateMedicalSpecialtyCommand(
+                new ViewModels.MedicalSpecialties.CreateMedicalSpecialtyViewModel(
+                    "Test",
+                    null,
+                    null,
+                    false,
+                    false,
+                    0,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                Guid.NewGuid()
+            );
         }
     }
 }

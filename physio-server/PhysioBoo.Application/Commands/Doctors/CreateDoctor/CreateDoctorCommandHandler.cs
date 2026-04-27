@@ -38,7 +38,7 @@ namespace PhysioBoo.Application.Commands.Doctors.CreateDoctor
             string newEmployeeId = await _sequenceTrackerRepository.GenerateNextCodeAsync(nameof(Doctor), cancellationToken);
 
             User newUser = new User(
-                request.NewDoctor.Id,
+                request.NewId,
                 request.NewDoctor.Email,
                 request.NewDoctor.Phone,
                 AuthHelper.HashPassword(request.NewDoctor.Password)
@@ -47,7 +47,7 @@ namespace PhysioBoo.Application.Commands.Doctors.CreateDoctor
             newUser.SetCreatedBy(_user.GetUserId());
 
             Profile newProfile = new Profile(
-                request.NewDoctor.Id,
+                request.NewId,
                 request.NewDoctor.FirstName,
                 request.NewDoctor.LastName,
                 request.NewDoctor.MiddleName,
@@ -66,7 +66,7 @@ namespace PhysioBoo.Application.Commands.Doctors.CreateDoctor
             );
 
             Doctor newDoctor = new Doctor(
-                request.NewDoctor.Id,
+                request.NewId,
                 newEmployeeId,
                 request.NewDoctor.MedicalLicenseNumber,
                 request.NewDoctor.MedicalLicenseExpiry,

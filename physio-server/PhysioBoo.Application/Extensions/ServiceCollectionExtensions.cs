@@ -68,6 +68,7 @@ using PhysioBoo.Application.Commands.Medicines.CreateMedicine;
 using PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy;
 using PhysioBoo.Application.Commands.PatientMedicalHistories.CreatePatientMedicalHistory;
 using PhysioBoo.Application.Commands.Patients.CreatePatient;
+using PhysioBoo.Application.Commands.Patients.DeletePatient;
 using PhysioBoo.Application.Commands.Payments.CreatePayment;
 using PhysioBoo.Application.Commands.Permissions.CreatePermission;
 using PhysioBoo.Application.Commands.PrescriptionItems.CreatePrescriptionItem;
@@ -134,6 +135,8 @@ using PhysioBoo.Application.Queries.MedicalSpecialties.GetAll;
 using PhysioBoo.Application.Queries.MedicalSpecialties.GetById;
 using PhysioBoo.Application.Queries.MedicineCategories.GetAll;
 using PhysioBoo.Application.Queries.MedicineCategories.GetById;
+using PhysioBoo.Application.Queries.Patients.GetAll;
+using PhysioBoo.Application.Queries.Patients.GetById;
 using PhysioBoo.Application.Queries.Permissions.GetAll;
 using PhysioBoo.Application.Queries.RefreshTokens.GetByUserId;
 using PhysioBoo.Application.Queries.Roles.GetAll;
@@ -167,6 +170,7 @@ using PhysioBoo.Application.ViewModels.LabTests;
 using PhysioBoo.Application.ViewModels.Manufacturers;
 using PhysioBoo.Application.ViewModels.MedicalSpecialties;
 using PhysioBoo.Application.ViewModels.MedicineCategories;
+using PhysioBoo.Application.ViewModels.Patients;
 using PhysioBoo.Application.ViewModels.Permissions;
 using PhysioBoo.Application.ViewModels.Roles;
 using PhysioBoo.Application.ViewModels.Sorting;
@@ -181,6 +185,7 @@ using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
+using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
 using PhysioBoo.Domain.Entities.System;
 using PhysioBoo.Domain.Interfaces.EventHandlers;
@@ -319,6 +324,10 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<GetAllAddressesQuery, PagedResult<AddressViewModel>>, GetAllAddressesQueryHandler>();
             services.AddScoped<IRequestHandler<GetAddressByIdQuery, AddressViewModel?>, GetAddressByIdQueryHandler>();
 
+            // Patient
+            services.AddScoped<IRequestHandler<GetAllPatientsQuery, PagedResult<PatientViewModel>>, GetAllPatientsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetPatientByIdQuery, PatientViewModel?>, GetPatientByIdQueryHandler>();
+
             return services;
         }
 
@@ -374,6 +383,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<CreatePatientCommand>, CreatePatientCommandHandler>();
             services.AddScoped<IRequestHandler<CreatePatientAllergyCommand>, CreatePatientAllergyCommandHandler>();
             services.AddScoped<IRequestHandler<CreatePatientMedicalHistoryCommand>, CreatePatientMedicalHistoryCommandHandler>();
+            services.AddScoped<IRequestHandler<DeletePatientCommand>, DeletePatientCommandHandler>();
             #endregion
 
             #region Operation Flow
@@ -517,6 +527,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<ISortingExpressionProvider<HospitalViewModel, Hospital>, HospitalViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<AdminMenuViewModel, AdminMenu>, AdminMenuViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<AddressViewModel, Address>, AddressViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<PatientViewModel, Patient>, PatientViewModelSortProvider>();
 
             return services;
         }

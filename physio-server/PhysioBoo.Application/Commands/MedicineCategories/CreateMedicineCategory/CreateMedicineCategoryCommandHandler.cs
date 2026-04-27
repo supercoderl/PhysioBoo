@@ -34,7 +34,7 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCatego
             string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(MedicineCategory), cancellationToken);
 
             MedicineCategory newMedicineCategory = new MedicineCategory(
-                request.NewMedicineCategory.Id,
+                request.NewId,
                 request.NewMedicineCategory.Name,
                 newCode,
                 request.NewMedicineCategory.Description,

@@ -14,18 +14,20 @@ namespace PhysioBoo.Application.Test.Commands.ImagingModalities.CreateImagingMod
         {
             _fixture.SetupInsertSuccess();
 
-            CreateImagingModalityCommand command = new CreateImagingModalityCommand(new ViewModels.ImagingModalities.CreateImagingModalityViewModel(
-                Guid.NewGuid(),
-                "Test",
-                "123",
-                "Test City",
-                "Test Category",
-                false,
-                false,
-                null,
-                0,
-                0
-            ));
+            CreateImagingModalityCommand command = new CreateImagingModalityCommand(
+                new ViewModels.ImagingModalities.CreateImagingModalityViewModel(
+                    "Test",
+                    "123",
+                    "Test City",
+                    "Test Category",
+                    false,
+                    false,
+                    null,
+                    0,
+                    0
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyNoDomainNotification().VerifyNoCommit();
@@ -36,18 +38,20 @@ namespace PhysioBoo.Application.Test.Commands.ImagingModalities.CreateImagingMod
         {
             _fixture.SetupInsertFailure();
 
-            CreateImagingModalityCommand command = new CreateImagingModalityCommand(new ViewModels.ImagingModalities.CreateImagingModalityViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                "123",
-                "Test City",
-                "Test Category",
-                false,
-                false,
-                null,
-                0,
-                0
-            ));
+            CreateImagingModalityCommand command = new CreateImagingModalityCommand(
+                new ViewModels.ImagingModalities.CreateImagingModalityViewModel(
+                    string.Empty,
+                    "123",
+                    "Test City",
+                    "Test Category",
+                    false,
+                    false,
+                    null,
+                    0,
+                    0
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyAnyDomainNotification().VerifyNoCommit();
@@ -56,18 +60,20 @@ namespace PhysioBoo.Application.Test.Commands.ImagingModalities.CreateImagingMod
         [Fact]
         public async Task Should_Raise_Notification_When_Command_Is_Invalid()
         {
-            CreateImagingModalityCommand command = new CreateImagingModalityCommand(new ViewModels.ImagingModalities.CreateImagingModalityViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                "123",
-                "Test City",
-                "Test Category",
-                false,
-                false,
-                null,
-                0,
-                0
-            ));
+            CreateImagingModalityCommand command = new CreateImagingModalityCommand(
+                new ViewModels.ImagingModalities.CreateImagingModalityViewModel(
+                    string.Empty,
+                    "123",
+                    "Test City",
+                    "Test Category",
+                    false,
+                    false,
+                    null,
+                    0,
+                    0
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
 

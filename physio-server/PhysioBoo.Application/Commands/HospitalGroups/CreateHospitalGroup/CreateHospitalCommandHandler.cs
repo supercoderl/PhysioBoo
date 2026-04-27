@@ -30,7 +30,7 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup
             if (!await TestValidityAsync(request)) return;
 
             HospitalGroup newHospitalGroup = new HospitalGroup(
-                request.NewHospitalGroup.Id,
+                request.NewId,
                 request.NewHospitalGroup.Name,
                 request.NewHospitalGroup.Description,
                 request.NewHospitalGroup.HeadquartersAddress,

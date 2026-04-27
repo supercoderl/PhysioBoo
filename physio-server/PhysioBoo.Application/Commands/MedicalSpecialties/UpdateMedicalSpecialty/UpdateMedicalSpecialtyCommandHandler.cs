@@ -25,13 +25,13 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.UpdateMedicalSpecial
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.MedicalStaff.MedicalSpecialty? medicalSpecialty = await _medicalSpecialtyRepository.GetByIdAsync(request.MedicalSpecialty.Id);
+            Domain.Entities.MedicalStaff.MedicalSpecialty? medicalSpecialty = await _medicalSpecialtyRepository.GetByIdAsync(request.Id);
 
             if (medicalSpecialty == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"Medical Specialty with Id {request.MedicalSpecialty.Id} not found.",
+                    $"Medical Specialty with Id {request.Id} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 
@@ -55,7 +55,7 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.UpdateMedicalSpecial
 
             if (resultCount > 0)
             {
-                await Bus.RaiseEventAsync(new MedicalSpecialtyUpdatedEvent(request.MedicalSpecialty.Id, request.MedicalSpecialty.IconPublicId, request.MedicalSpecialty.IconUrl, oldIconUrl));
+                await Bus.RaiseEventAsync(new MedicalSpecialtyUpdatedEvent(request.Id, request.MedicalSpecialty.IconPublicId, request.MedicalSpecialty.IconUrl, oldIconUrl));
             }
         }
     }

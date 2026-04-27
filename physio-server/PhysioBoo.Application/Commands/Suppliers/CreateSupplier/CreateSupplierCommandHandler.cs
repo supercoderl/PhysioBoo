@@ -31,7 +31,7 @@ namespace PhysioBoo.Application.Commands.Suppliers.CreateSupplier
             string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Supplier), cancellationToken);
 
             Supplier newSupplier = new Supplier(
-                request.NewSupplier.Id,
+                request.NewId,
                 request.NewSupplier.SupplierName,
                 newCode,
                 request.NewSupplier.Type,

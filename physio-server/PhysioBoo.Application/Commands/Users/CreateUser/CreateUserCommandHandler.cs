@@ -32,7 +32,7 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
             if (!await TestValidityAsync(request)) return;
 
             User newUser = new User(
-                request.NewUser.Id,
+                request.NewId,
                 request.NewUser.Email,
                 request.NewUser.Phone,
                 AuthHelper.HashPassword(request.NewUser.Password)

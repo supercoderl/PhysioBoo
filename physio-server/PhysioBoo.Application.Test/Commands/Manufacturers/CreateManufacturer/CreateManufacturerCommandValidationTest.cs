@@ -22,46 +22,50 @@ namespace PhysioBoo.Application.Test.Commands.Manufacturers.CreateManufacturer
         [Fact]
         public void Should_Fail_When_Name_Is_Empty()
         {
-            CreateManufacturerCommand command = new CreateManufacturerCommand(new ViewModels.Manufacturers.CreateManufacturerViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                false,
-                0
-            ));
+            CreateManufacturerCommand command = new CreateManufacturerCommand(
+                new ViewModels.Manufacturers.CreateManufacturerViewModel(
+                    string.Empty,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    false,
+                    false,
+                    0
+                ),
+                Guid.NewGuid()
+            );
 
             ShouldHaveSingleError(command, DomainErrorCodes.Manufacturer.EmptyName);
         }
 
         private static CreateManufacturerCommand CreateTestCommand()
         {
-            return new CreateManufacturerCommand(new ViewModels.Manufacturers.CreateManufacturerViewModel(
-                Guid.NewGuid(),
-                "Test",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                false,
-                0
-            ));
+            return new CreateManufacturerCommand(
+                new ViewModels.Manufacturers.CreateManufacturerViewModel(
+                    "Test",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    false,
+                    false,
+                    0
+                ),
+                Guid.NewGuid()
+            );
         }
     }
 }

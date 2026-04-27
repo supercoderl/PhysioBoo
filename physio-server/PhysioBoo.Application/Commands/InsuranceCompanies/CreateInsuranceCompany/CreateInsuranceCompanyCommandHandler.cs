@@ -31,7 +31,7 @@ namespace PhysioBoo.Application.Commands.InsuranceCompanies.CreateInsuranceCompa
             string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(InsuranceCompany), cancellationToken);
 
             InsuranceCompany newInsuranceCompany = new InsuranceCompany(
-                request.NewInsuranceCompany.Id,
+                request.NewId,
                 request.NewInsuranceCompany.Name,
                 newCode,
                 request.NewInsuranceCompany.Type,

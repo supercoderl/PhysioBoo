@@ -14,24 +14,26 @@ namespace PhysioBoo.Application.Test.Commands.InsuranceCompanies.CreateInsurance
         {
             _fixture.SetupInsertSuccess();
 
-            CreateInsuranceCompanyCommand command = new CreateInsuranceCompanyCommand(new ViewModels.InsuranceCompanies.CreateInsuranceCompanyViewModel(
-                Guid.NewGuid(),
-                "Test",
-                Domain.Enums.InsuranceType.Health,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                null,
-                0,
-                0,
-                0,
-                ["Test"],
-                null
-            ));
+            CreateInsuranceCompanyCommand command = new CreateInsuranceCompanyCommand(
+                new ViewModels.InsuranceCompanies.CreateInsuranceCompanyViewModel(
+                    "Test",
+                    Domain.Enums.InsuranceType.Health,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    false,
+                    null,
+                    0,
+                    0,
+                    0,
+                    ["Test"],
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyNoDomainNotification().VerifyNoCommit();
@@ -42,24 +44,26 @@ namespace PhysioBoo.Application.Test.Commands.InsuranceCompanies.CreateInsurance
         {
             _fixture.SetupInsertFailure();
 
-            CreateInsuranceCompanyCommand command = new CreateInsuranceCompanyCommand(new ViewModels.InsuranceCompanies.CreateInsuranceCompanyViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                Domain.Enums.InsuranceType.Health,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                null,
-                0,
-                0,
-                0,
-                ["Test"],
-                null
-            ));
+            CreateInsuranceCompanyCommand command = new CreateInsuranceCompanyCommand(
+                new ViewModels.InsuranceCompanies.CreateInsuranceCompanyViewModel(
+                    string.Empty,
+                    Domain.Enums.InsuranceType.Health,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    false,
+                    null,
+                    0,
+                    0,
+                    0,
+                    ["Test"],
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyAnyDomainNotification().VerifyNoCommit();
@@ -68,24 +72,26 @@ namespace PhysioBoo.Application.Test.Commands.InsuranceCompanies.CreateInsurance
         [Fact]
         public async Task Should_Raise_Notification_When_Command_Is_Invalid()
         {
-            CreateInsuranceCompanyCommand command = new CreateInsuranceCompanyCommand(new ViewModels.InsuranceCompanies.CreateInsuranceCompanyViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                Domain.Enums.InsuranceType.Health,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                null,
-                0,
-                0,
-                0,
-                ["Test"],
-                null
-            ));
+            CreateInsuranceCompanyCommand command = new CreateInsuranceCompanyCommand(
+                new ViewModels.InsuranceCompanies.CreateInsuranceCompanyViewModel(
+                    string.Empty,
+                    Domain.Enums.InsuranceType.Health,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    false,
+                    null,
+                    0,
+                    0,
+                    0,
+                    ["Test"],
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
 

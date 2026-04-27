@@ -14,19 +14,21 @@ namespace PhysioBoo.Application.Test.Commands.AppointmentTypes.CreateAppointment
         {
             _fixture.SetupInsertSuccess();
 
-            CreateAppointmentTypeCommand command = new CreateAppointmentTypeCommand(new ViewModels.AppointmentTypes.CreateAppointmentTypeViewModel(
-                Guid.NewGuid(),
-                "Test Street",
-                "123",
-                0,
-                0,
-                false,
-                false,
-                null,
-                true,
-                0,
-                null
-            ));
+            CreateAppointmentTypeCommand command = new CreateAppointmentTypeCommand(
+                new ViewModels.AppointmentTypes.CreateAppointmentTypeViewModel(
+                    "Test Street",
+                    "123",
+                    0,
+                    0,
+                    false,
+                    false,
+                    null,
+                    true,
+                    0,
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyNoDomainNotification().VerifyNoCommit();
@@ -37,19 +39,21 @@ namespace PhysioBoo.Application.Test.Commands.AppointmentTypes.CreateAppointment
         {
             _fixture.SetupInsertFailure();
 
-            CreateAppointmentTypeCommand command = new CreateAppointmentTypeCommand(new ViewModels.AppointmentTypes.CreateAppointmentTypeViewModel(
-                Guid.NewGuid(),
-                "Test Street",
-                "123",
-                0,
-                0,
-                false,
-                false,
-                null,
-                true,
-                0,
-                null
-            ));
+            CreateAppointmentTypeCommand command = new CreateAppointmentTypeCommand(
+                new ViewModels.AppointmentTypes.CreateAppointmentTypeViewModel(
+                    "Test Street",
+                    "123",
+                    0,
+                    0,
+                    false,
+                    false,
+                    null,
+                    true,
+                    0,
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyAnyDomainNotification().VerifyNoCommit();
@@ -58,19 +62,21 @@ namespace PhysioBoo.Application.Test.Commands.AppointmentTypes.CreateAppointment
         [Fact]
         public async Task Should_Raise_Notification_When_Command_Is_Invalid()
         {
-            CreateAppointmentTypeCommand command = new CreateAppointmentTypeCommand(new ViewModels.AppointmentTypes.CreateAppointmentTypeViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                "123",
-                0,
-                0,
-                false,
-                false,
-                null,
-                true,
-                0,
-                null
-            ));
+            CreateAppointmentTypeCommand command = new CreateAppointmentTypeCommand(
+                new ViewModels.AppointmentTypes.CreateAppointmentTypeViewModel(
+                    string.Empty,
+                    "123",
+                    0,
+                    0,
+                    false,
+                    false,
+                    null,
+                    true,
+                    0,
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
 

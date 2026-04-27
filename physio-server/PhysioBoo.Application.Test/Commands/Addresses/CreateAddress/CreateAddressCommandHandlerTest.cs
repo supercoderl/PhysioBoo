@@ -14,17 +14,20 @@ namespace PhysioBoo.Application.Test.Commands.Addresses.CreateAddress
         {
             _fixture.SetupInsertSuccess();
 
-            CreateAddressCommand command = new CreateAddressCommand(new ViewModels.Addresses.CreateAddressViewModel(
+            CreateAddressCommand command = new CreateAddressCommand(
                 Guid.NewGuid(),
-                "123 Main St",
-                "Apt 4B",
-                "Springfield",
-                "IL",
-                "62704",
-                "USA",
-                0,
-                0
-            ));
+                new ViewModels.Addresses.CreateAddressViewModel(
+                    "123 Main St",
+                    "Apt 4B",
+                    "Springfield",
+                    "IL",
+                    "62704",
+                    "USA",
+                    0,
+                    0,
+                    false
+                )
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyNoDomainNotification().VerifyNoCommit();
@@ -35,17 +38,20 @@ namespace PhysioBoo.Application.Test.Commands.Addresses.CreateAddress
         {
             _fixture.SetupInsertFailure();
 
-            CreateAddressCommand command = new CreateAddressCommand(new ViewModels.Addresses.CreateAddressViewModel(
+            CreateAddressCommand command = new CreateAddressCommand(
                 Guid.NewGuid(),
-                "123 Main St",
-                "Apt 4B",
-                "Springfield",
-                "IL",
-                "62704",
-                "USA",
-                0,
-                0
-            ));
+                new ViewModels.Addresses.CreateAddressViewModel(
+                    "123 Main St",
+                    "Apt 4B",
+                    "Springfield",
+                    "IL",
+                    "62704",
+                    "USA",
+                    0,
+                    0,
+                    false
+                )
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyAnyDomainNotification().VerifyNoCommit();
@@ -54,17 +60,20 @@ namespace PhysioBoo.Application.Test.Commands.Addresses.CreateAddress
         [Fact]
         public async Task Should_Raise_Notification_When_Command_Is_Invalid()
         {
-            CreateAddressCommand command = new CreateAddressCommand(new ViewModels.Addresses.CreateAddressViewModel(
+            CreateAddressCommand command = new CreateAddressCommand(
                 Guid.NewGuid(),
-                "",
-                null,
-                "Springfield",
-                "IL",
-                "62704",
-                "USA",
-                0,
-                0
-            ));
+                new ViewModels.Addresses.CreateAddressViewModel(
+                    "",
+                    null,
+                    "Springfield",
+                    "IL",
+                    "62704",
+                    "USA",
+                    0,
+                    0,
+                    false
+                )
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
 

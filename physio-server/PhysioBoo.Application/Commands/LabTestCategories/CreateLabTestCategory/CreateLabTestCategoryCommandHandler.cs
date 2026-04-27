@@ -31,7 +31,7 @@ namespace PhysioBoo.Application.Commands.LabTestCategories.CreateLabTestCategory
             string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(LabTestCategory), cancellationToken);
 
             SharedKernel.Results.DbResult<Guid> result = await _labTestCategoryRepository.InsertAsync<LabTestCategory, Guid>(new LabTestCategory(
-                request.NewLabTestCategory.Id,
+                request.NewId,
                 request.NewLabTestCategory.Name,
                 newCode,
                 request.NewLabTestCategory.Description,

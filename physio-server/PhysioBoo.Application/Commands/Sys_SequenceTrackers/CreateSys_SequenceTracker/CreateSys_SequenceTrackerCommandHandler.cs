@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Commands.Sys_SequenceTrackers.CreateSys_Sequence
             if (!await TestValidityAsync(request)) return;
 
             Sys_SequenceTracker sys_SequenceTracker = new Sys_SequenceTracker(
-                request.NewSys_SequenceTracker.Id,
+                request.NewId,
                 request.NewSys_SequenceTracker.EntityType,
                 request.NewSys_SequenceTracker.Prefix,
                 request.NewSys_SequenceTracker.UseDateFormating,

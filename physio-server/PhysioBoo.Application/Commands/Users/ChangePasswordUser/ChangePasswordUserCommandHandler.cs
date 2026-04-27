@@ -47,7 +47,7 @@ namespace PhysioBoo.Application.Commands.Users.ChangePasswordUser
 
             if (!await CheckStatus(result, request)) return;
 
-            await Bus.SendCommandAsync(new LogoutUserCommand(request.Id));
+            await Bus.SendCommandAsync(new LogoutUserCommand());
         }
 
         /// <summary>

@@ -24,13 +24,13 @@ namespace PhysioBoo.Application.Commands.ImagingModalities.UpdateImagingModality
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.LaboratoryImaging.ImagingModality? imagingModality = await _imagingModalityRepository.GetByIdAsync(request.ImagingModality.Id);
+            Domain.Entities.LaboratoryImaging.ImagingModality? imagingModality = await _imagingModalityRepository.GetByIdAsync(request.Id);
 
             if (imagingModality == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"Imaging modality with Id {request.ImagingModality.Id} not found.",
+                    $"Imaging modality with Id {request.Id} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 

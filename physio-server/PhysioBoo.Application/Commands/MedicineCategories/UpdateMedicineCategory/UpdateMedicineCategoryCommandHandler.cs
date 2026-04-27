@@ -24,13 +24,13 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.UpdateMedicineCatego
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.Clinical.MedicineCategory? medicineCategory = await _medicineCategoryRepository.GetByIdAsync(request.MedicineCategory.Id);
+            Domain.Entities.Clinical.MedicineCategory? medicineCategory = await _medicineCategoryRepository.GetByIdAsync(request.Id);
 
             if (medicineCategory == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"Medicine category with Id {request.MedicineCategory.Id} not found.",
+                    $"Medicine category with Id {request.Id} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 

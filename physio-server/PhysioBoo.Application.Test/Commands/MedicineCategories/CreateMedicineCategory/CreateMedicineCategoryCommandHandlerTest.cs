@@ -14,15 +14,17 @@ namespace PhysioBoo.Application.Test.Commands.MedicineCategories.CreateMedicineC
         {
             _fixture.SetupInsertSuccess();
 
-            CreateMedicineCategoryCommand command = new CreateMedicineCategoryCommand(new ViewModels.MedicineCategories.CreateMedicineCategoryViewModel(
-                Guid.NewGuid(),
-                "Test",
-                null,
-                null,
-                false,
-                false,
-                null
-            ));
+            CreateMedicineCategoryCommand command = new CreateMedicineCategoryCommand(
+                new ViewModels.MedicineCategories.CreateMedicineCategoryViewModel(
+                    "Test",
+                    null,
+                    null,
+                    false,
+                    false,
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyNoDomainNotification().VerifyNoCommit();
@@ -33,15 +35,17 @@ namespace PhysioBoo.Application.Test.Commands.MedicineCategories.CreateMedicineC
         {
             _fixture.SetupInsertFailure();
 
-            CreateMedicineCategoryCommand command = new CreateMedicineCategoryCommand(new ViewModels.MedicineCategories.CreateMedicineCategoryViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                null,
-                null,
-                false,
-                false,
-                null
-            ));
+            CreateMedicineCategoryCommand command = new CreateMedicineCategoryCommand(
+                new ViewModels.MedicineCategories.CreateMedicineCategoryViewModel(
+                    string.Empty,
+                    null,
+                    null,
+                    false,
+                    false,
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyAnyDomainNotification().VerifyNoCommit();
@@ -50,15 +54,17 @@ namespace PhysioBoo.Application.Test.Commands.MedicineCategories.CreateMedicineC
         [Fact]
         public async Task Should_Raise_Notification_When_Command_Is_Invalid()
         {
-            CreateMedicineCategoryCommand command = new CreateMedicineCategoryCommand(new ViewModels.MedicineCategories.CreateMedicineCategoryViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                null,
-                null,
-                false,
-                false,
-                null
-            ));
+            CreateMedicineCategoryCommand command = new CreateMedicineCategoryCommand(
+                new ViewModels.MedicineCategories.CreateMedicineCategoryViewModel(
+                    string.Empty,
+                    null,
+                    null,
+                    false,
+                    false,
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
 

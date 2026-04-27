@@ -28,13 +28,13 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.UpdateHospitalGroup
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.Operation.HospitalGroup? hospitalGroup = await _hospitalGroupRepository.GetByIdAsync(request.HospitalGroup.Id);
+            Domain.Entities.Operation.HospitalGroup? hospitalGroup = await _hospitalGroupRepository.GetByIdAsync(request.Id);
 
             if (hospitalGroup == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"Hospital group with Id {request.HospitalGroup.Id} not found.",
+                    $"Hospital group with Id {request.Id} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 

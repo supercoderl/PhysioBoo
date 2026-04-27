@@ -1,4 +1,5 @@
-﻿using PhysioBoo.Domain.Entities.Clinical;
+﻿using NpgsqlTypes;
+using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
@@ -51,6 +52,9 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         public decimal OutstandingBalance { get; private set; }
         public int LoyaltyPoints { get; private set; }
         public RiskLevel RiskLevel { get; private set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public NpgsqlTsVector? SearchVector { get; private set; }
 
         public virtual User? CreatedByUser { get; private set; }
         public virtual User? UpdatedByUser { get; private set; }

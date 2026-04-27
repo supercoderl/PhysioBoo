@@ -31,7 +31,7 @@ namespace PhysioBoo.Application.Commands.LabTests.CreateLabTest
             string newCode = await _sequenceTrackerRepository.GenerateNextCodeAsync(nameof(LabTest), cancellationToken);
 
             LabTest newLabTest = new LabTest(
-                request.NewLabTest.Id,
+                request.NewId,
                 request.NewLabTest.TestName,
                 newCode,
                 request.NewLabTest.CategoryId,

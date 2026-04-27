@@ -22,48 +22,52 @@ namespace PhysioBoo.Application.Test.Commands.InsuranceCompanies.CreateInsurance
         [Fact]
         public void Should_Fail_When_Name_Is_Empty()
         {
-            CreateInsuranceCompanyCommand command = new CreateInsuranceCompanyCommand(new ViewModels.InsuranceCompanies.CreateInsuranceCompanyViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                Domain.Enums.InsuranceType.Health,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                null,
-                0,
-                0,
-                0,
-                ["Test"],
-                null
-            ));
+            CreateInsuranceCompanyCommand command = new CreateInsuranceCompanyCommand(
+                new ViewModels.InsuranceCompanies.CreateInsuranceCompanyViewModel(
+                    string.Empty,
+                    Domain.Enums.InsuranceType.Health,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    false,
+                    null,
+                    0,
+                    0,
+                    0,
+                    ["Test"],
+                    null
+                ),
+                Guid.NewGuid()
+            );
 
             ShouldHaveSingleError(command, DomainErrorCodes.InsuranceCompany.EmptyName);
         }
 
         private static CreateInsuranceCompanyCommand CreateTestCommand()
         {
-            return new CreateInsuranceCompanyCommand(new ViewModels.InsuranceCompanies.CreateInsuranceCompanyViewModel(
-                Guid.NewGuid(),
-                "Test",
-                Domain.Enums.InsuranceType.Health,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                false,
-                null,
-                0,
-                0,
-                0,
-                ["Test"],
-                null
-            ));
+            return new CreateInsuranceCompanyCommand(
+                new ViewModels.InsuranceCompanies.CreateInsuranceCompanyViewModel(
+                    "Test",
+                    Domain.Enums.InsuranceType.Health,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    false,
+                    null,
+                    0,
+                    0,
+                    0,
+                    ["Test"],
+                    null
+                ),
+                Guid.NewGuid()
+            );
         }
     }
 }

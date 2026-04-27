@@ -9,10 +9,12 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
         private static readonly CreateUserCommandValidation s_validation = new();
 
         public CreateUserViewModel NewUser { get; }
+        public Guid NewId { get; }
 
-        public CreateUserCommand(CreateUserViewModel newUser) : base(newUser.Id)
+        public CreateUserCommand(CreateUserViewModel newUser, Guid newId) : base(Guid.NewGuid())
         {
             NewUser = newUser;
+            NewId = newId;
         }
 
         public override bool IsValid()

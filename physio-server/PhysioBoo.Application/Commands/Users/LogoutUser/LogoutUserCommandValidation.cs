@@ -6,12 +6,7 @@ namespace PhysioBoo.Application.Commands.Users.LogoutUser
     {
         public LogoutUserCommandValidation()
         {
-            RuleForUserId();
-        }
 
-        private void RuleForUserId()
-        {
-            RuleFor(cmd => cmd.UserId).NotEmpty().WithErrorCode("LOGOUT_EMPTY_USER_ID").WithMessage("User id may not be emtpy.");
         }
     }
 }

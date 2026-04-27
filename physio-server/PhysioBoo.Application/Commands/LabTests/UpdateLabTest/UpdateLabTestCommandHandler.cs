@@ -24,13 +24,13 @@ namespace PhysioBoo.Application.Commands.LabTests.UpdateLabTest.Commands.UpdateL
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.LaboratoryImaging.LabTest? labTest = await _labTestRepository.GetByIdAsync(request.LabTest.Id);
+            Domain.Entities.LaboratoryImaging.LabTest? labTest = await _labTestRepository.GetByIdAsync(request.Id);
 
             if (labTest == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"Lab test with Id {request.LabTest.Id} not found.",
+                    $"Lab test with Id {request.Id} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 

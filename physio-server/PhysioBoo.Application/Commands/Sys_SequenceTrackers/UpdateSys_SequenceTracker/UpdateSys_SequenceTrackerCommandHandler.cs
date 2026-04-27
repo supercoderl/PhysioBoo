@@ -28,13 +28,13 @@ namespace PhysioBoo.Application.Commands.Sys_SequenceTrackers.UpdateSys_Sequence
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.System.Sys_SequenceTracker? sys_SequenceTracker = await _sys_SequenceTrackerRepository.GetByIdAsync(request.Sys_SequenceTracker.Id);
+            Domain.Entities.System.Sys_SequenceTracker? sys_SequenceTracker = await _sys_SequenceTrackerRepository.GetByIdAsync(request.Id);
 
             if (sys_SequenceTracker == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"Sequence tracker with Id {request.Sys_SequenceTracker.Id} not found.",
+                    $"Sequence tracker with Id {request.Id} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 

@@ -22,36 +22,40 @@ namespace PhysioBoo.Application.Test.Commands.ImagingModalities.CreateImagingMod
         [Fact]
         public void Should_Fail_When_Name_Is_Empty()
         {
-            CreateImagingModalityCommand command = new CreateImagingModalityCommand(new ViewModels.ImagingModalities.CreateImagingModalityViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                "123",
-                "Test City",
-                "Test Category",
-                false,
-                false,
-                null,
-                0,
-                0
-            ));
+            CreateImagingModalityCommand command = new CreateImagingModalityCommand(
+                new ViewModels.ImagingModalities.CreateImagingModalityViewModel(
+                    string.Empty,
+                    "123",
+                    "Test City",
+                    "Test Category",
+                    false,
+                    false,
+                    null,
+                    0,
+                    0
+                ),
+                Guid.NewGuid()
+            );
 
             ShouldHaveSingleError(command, DomainErrorCodes.ImagingModality.EmptyName);
         }
 
         private static CreateImagingModalityCommand CreateTestCommand()
         {
-            return new CreateImagingModalityCommand(new ViewModels.ImagingModalities.CreateImagingModalityViewModel(
-                Guid.NewGuid(),
-                "Test",
-                "123",
-                "Test City",
-                "Test Category",
-                false,
-                false,
-                null,
-                0,
-                0
-            ));
+            return new CreateImagingModalityCommand(
+                new ViewModels.ImagingModalities.CreateImagingModalityViewModel(
+                    "Test",
+                    "123",
+                    "Test City",
+                    "Test Category",
+                    false,
+                    false,
+                    null,
+                    0,
+                    0
+                ),
+                Guid.NewGuid()
+            );
         }
     }
 }

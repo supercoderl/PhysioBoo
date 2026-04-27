@@ -14,33 +14,35 @@ namespace PhysioBoo.Application.Test.Commands.LabTests.CreateLabTest
         {
             _fixture.SetupInsertSuccess();
 
-            CreateLabTestCommand command = new CreateLabTestCommand(new ViewModels.LabTests.CreateLabTestViewModel(
-                Guid.NewGuid(),
-                "Test",
-                Guid.NewGuid(),
-                null,
-                null,
-                null,
-                null,
-                false,
-                null,
-                false,
-                0,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                0,
-                false,
-                false,
-                0,
-                0,
-                false,
-                0,
-                false
-            ));
+            CreateLabTestCommand command = new CreateLabTestCommand(
+                new ViewModels.LabTests.CreateLabTestViewModel(
+                    "Test",
+                    Guid.NewGuid(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    null,
+                    false,
+                    0,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    0,
+                    0,
+                    false,
+                    false,
+                    0,
+                    0,
+                    false,
+                    0,
+                    false
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyNoDomainNotification().VerifyNoCommit();
@@ -51,33 +53,35 @@ namespace PhysioBoo.Application.Test.Commands.LabTests.CreateLabTest
         {
             _fixture.SetupInsertFailure();
 
-            CreateLabTestCommand command = new CreateLabTestCommand(new ViewModels.LabTests.CreateLabTestViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                Guid.NewGuid(),
-                null,
-                null,
-                null,
-                null,
-                false,
-                null,
-                false,
-                0,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                0,
-                false,
-                false,
-                0,
-                0,
-                false,
-                0,
-                false
-            ));
+            CreateLabTestCommand command = new CreateLabTestCommand(
+                new ViewModels.LabTests.CreateLabTestViewModel(
+                    string.Empty,
+                    Guid.NewGuid(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    null,
+                    false,
+                    0,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    0,
+                    0,
+                    false,
+                    false,
+                    0,
+                    0,
+                    false,
+                    0,
+                    false
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
             _fixture.VerifyAnyDomainNotification().VerifyNoCommit();
@@ -86,33 +90,35 @@ namespace PhysioBoo.Application.Test.Commands.LabTests.CreateLabTest
         [Fact]
         public async Task Should_Raise_Notification_When_Command_Is_Invalid()
         {
-            CreateLabTestCommand command = new CreateLabTestCommand(new ViewModels.LabTests.CreateLabTestViewModel(
-                Guid.NewGuid(),
-                string.Empty,
-                Guid.NewGuid(),
-                null,
-                null,
-                null,
-                null,
-                false,
-                null,
-                false,
-                0,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                0,
-                false,
-                false,
-                0,
-                0,
-                false,
-                0,
-                false
-            ));
+            CreateLabTestCommand command = new CreateLabTestCommand(
+                new ViewModels.LabTests.CreateLabTestViewModel(
+                    string.Empty,
+                    Guid.NewGuid(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    null,
+                    false,
+                    0,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    0,
+                    0,
+                    false,
+                    false,
+                    0,
+                    0,
+                    false,
+                    0,
+                    false
+                ),
+                Guid.NewGuid()
+            );
 
             await _fixture.CommandHandler.Handle(command, default);
 

@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Commands.DoctorCertifications.CreateDoctorCertif
             if (!await TestValidityAsync(request)) return;
 
             DoctorCertification newDoctorCertification = new DoctorCertification(
-                request.NewDoctorCertification.Id,
+                request.NewId,
                 request.NewDoctorCertification.DoctorId,
                 request.NewDoctorCertification.CertificationName,
                 request.NewDoctorCertification.CertificationType,

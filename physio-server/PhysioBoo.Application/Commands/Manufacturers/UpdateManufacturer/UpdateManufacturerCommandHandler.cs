@@ -24,13 +24,13 @@ namespace PhysioBoo.Application.Commands.Manufacturers.UpdateManufacturer
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.Support.Manufacturer? manufacturer = await _manufacturerRepository.GetByIdAsync(request.Manufacturer.Id);
+            Domain.Entities.Support.Manufacturer? manufacturer = await _manufacturerRepository.GetByIdAsync(request.Id);
 
             if (manufacturer == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"Manufacturer with Id {request.Manufacturer.Id} not found.",
+                    $"Manufacturer with Id {request.Id} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 

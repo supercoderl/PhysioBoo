@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Domain.DomainEvents;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
@@ -14,6 +15,7 @@ using PhysioBoo.Infrastructure.Database.Seeding;
 using PhysioBoo.Infrastructure.Email;
 using PhysioBoo.Infrastructure.EventSourcing;
 using PhysioBoo.Infrastructure.Outbox;
+using PhysioBoo.Infrastructure.Print;
 using PhysioBoo.Infrastructure.Repositories;
 
 namespace PhysioBoo.Infrastructure.Extensions
@@ -111,6 +113,7 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IPrintTemplateRepository, PrintTemplateRepository>();
             services.AddScoped<IPrintTemplateVersionRepository, PrintTemplateVersionRepository>();
             services.AddScoped<IPrintLogRepository, PrintLogRepository>();
+            services.AddScoped<IUserPreferenceRepository, UserPreferenceRepository>();
 
             return services;
         }
@@ -119,7 +122,8 @@ namespace PhysioBoo.Infrastructure.Extensions
         {
             services.AddScoped<IEmailSender, SmtpEmailSender>();
             services.AddScoped<IEmailTemplateProvider, FileEmailTemplateProvider>();
-            services.AddScoped<IEmailTemplateRenderer, ScribanEmailTemplateRenderer>();
+            services.AddScoped<IEmailTemplateRenderer, EmailTemplateRenderer>();
+            services.AddScoped<IPrintTemplateRenderer, PrintTemplateRenderer>();
 
             return services;
         }

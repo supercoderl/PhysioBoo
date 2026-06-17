@@ -26,7 +26,7 @@ namespace PhysioBoo.Application.Commands.Permissions.CreatePermission
             if (!await TestValidityAsync(request)) return;
 
             SharedKernel.Results.DbResult<Guid> result = await _PermissionRepository.InsertAsync<Permission, Guid>(new Permission(
-                request.NewPermission.Id,
+                request.NewId,
                 request.NewPermission.Name,
                 request.NewPermission.Code,
                 request.NewPermission.Description

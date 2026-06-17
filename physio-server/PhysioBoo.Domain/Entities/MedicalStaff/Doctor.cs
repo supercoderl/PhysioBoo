@@ -5,60 +5,148 @@ using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Enums;
+using PhysioBoo.SharedKernel.Attributes;
 using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
+using Column = System.ComponentModel.DataAnnotations.Schema.ColumnAttribute;
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
 {
+    [PlaceholderGroup("Doctor", "doctor", Order = 2)]
     public class Doctor : TenantEntity
     {
         #region Core Doctor Table (46)
+        [Placeholder(Label = "Employee ID", Example = "EMP-2026-0001")]
         public string? EmployeeId { get; private set; }
+
+        [Placeholder(Label = "Medical License Number", Example = "MLN-2026-889921")]
         public string MedicalLicenseNumber { get; private set; }
+
+        [Placeholder(Label = "Medical License Expiry", Example = "2030-12-31")]
         public DateOnly MedicalLicenseExpiry { get; private set; }
+
+        [Placeholder(Label = "Medical License Issuing Authority", Example = "Vietnam Medical Association")]
         public string? MedicalLicenseIssuingAuthority { get; private set; }
+
+        [Placeholder(Label = "Primary Specialty ID", Example = "7c9b1d2f-3a9e-4c3f-8d11-2e7f8a9b4561")]
         public Guid? PrimarySpecialtyId { get; private set; }
+
+        [Placeholder(Label = "Years Of Experience", Example = "12")]
         public int YearsOfExperience { get; private set; }
+
+        [Placeholder(Label = "Years Of Practice", Example = "10")]
         public int YearsOfPractice { get; private set; }
+
+        [Placeholder(Label = "Consultation Fee Min", Example = "500000")]
         public decimal ConsultationFeeMin { get; private set; }
+
+        [Placeholder(Label = "Consultation Fee Max", Example = "1200000")]
         public decimal ConsultationFeeMax { get; private set; }
+
+        [Placeholder(Label = "Follow Up Fee", Example = "300000")]
         public decimal FollowUpFee { get; private set; }
+
+        [Placeholder(Label = "Emergency Consultation Fee", Example = "1500000")]
         public decimal EmergencyConsultationFee { get; private set; }
+
+        [Placeholder(Label = "Home Visit Fee", Example = "800000")]
         public decimal HomeVisitFee { get; private set; }
+
+        [Placeholder(Label = "Video Consultation Fee", Example = "250000")]
         public decimal VideoConsultationFee { get; private set; }
+
+        [Placeholder(Label = "Languages Spoken", Example = "English, Vietnamese, French")]
         public string[] LanguagesSpoken { get; private set; }
+
+        [Placeholder(Label = "Success Rate", Example = "96.5%")]
         public decimal SuccessRate { get; private set; } // percentage
+
+        [Placeholder(Label = "Patient Satisfaction Score", Example = "4.8")]
         public decimal PatientSatisfactionScore { get; private set; } // out of 5
+
+        [Placeholder(Label = "Average Rating", Example = "4.7")]
         public decimal AverageRating { get; private set; } // out of 5
+
+        [Placeholder(Label = "Total Reviews", Example = "428")]
         public int TotalReviews { get; private set; }
+
+        [Placeholder(Label = "Total Patient Treated", Example = "3200")]
         public int TotalPatientTreated { get; private set; }
+
+        [Placeholder(Label = "Total Surgeries Performed", Example = "186")]
         public int TotalSurgeriesPerformed { get; private set; }
+
+        [Placeholder(Label = "Bio", Example = "Board-certified cardiologist with 12 years of clinical experience.")]
         public string? Bio { get; private set; }
+
+        [Placeholder(Label = "About", Example = "Specializes in internal medicine, preventive care, and chronic disease management.")]
         public string? About { get; private set; }
+
+        [Placeholder(Label = "Achievements", Example = "Completed over 150 successful complex procedures.")]
         public string? Archivements { get; private set; }
+
+        [Placeholder(Label = "Research Interests", Example = "Cardiovascular disease, preventive medicine, telehealth")]
         public string? ResearchInterests { get; private set; }
+
+        [Placeholder(Label = "Publications Count", Example = "18")]
         public int PublicationsCount { get; private set; }
+
+        [Placeholder(Label = "Conference Presentations", Example = "24")]
         public int ConferencePresentations { get; private set; }
+
+        [Placeholder(Label = "Is Available Online", Example = "true")]
         public bool IsAvailableOnline { get; private set; }
+
+        [Placeholder(Label = "Is Available Home Visit", Example = "false")]
         public bool IsAvailableHomeVisit { get; private set; }
+
+        [Placeholder(Label = "Is Available Emergency", Example = "true")]
         public bool IsAvailableEmergency { get; private set; }
+
+        [Placeholder(Label = "Consultation Duration", Example = "30 minutes")]
         public int ConsultationDuration { get; private set; } // in minutes
+
+        [Placeholder(Label = "Buffer Time", Example = "15 minutes")]
         public int BufferTime { get; private set; } // in minutes
+
+        [Placeholder(Label = "Advance Booking Days", Example = "30")]
         public int AdvanceBookingDays { get; private set; }
+
+        [Placeholder(Label = "Cancellation Policy", Example = "Free cancellation up to 24 hours before appointment.")]
         public string? CancellationPolicy { get; private set; }
+
+        [Placeholder(Label = "Payment Methods", Example = "Cash, Bank Transfer, Credit Card")]
         public string[] PaymentMethods { get; private set; }
 
+        [Placeholder(Label = "Bank Account Details", Example = "{\"bankName\":\"Vietcombank\",\"accountNumber\":\"0123456789\",\"accountName\":\"Dr. Nguyen Van A\"}")]
         [Column("BankAccountDetails", TypeName = "jsonb")]
         public string? BankAccountDetails { get; private set; }
 
+        [Placeholder(Label = "PAN Number", Example = "ABCDE1234F")]
         public string? PanNumber { get; private set; }
+
+        [Placeholder(Label = "GSTIN", Example = "29ABCDE1234F1Z5")]
         public string? Gstin { get; private set; }
+
+        [Placeholder(Label = "Joining Date", Example = "2024-01-15 09:00:00")]
         public DateTime? JoiningDate { get; private set; }
+
+        [Placeholder(Label = "Termination Date", Example = "2026-12-31 17:30:00")]
         public DateTime? TerminationDate { get; private set; }
+
+        [Placeholder(Label = "Employment Status", Example = "Active")]
         public EmploymentStatus EmploymentStatus { get; private set; }
+
+        [Placeholder(Label = "Is Featured", Example = "true")]
         public bool IsFeatured { get; private set; }
+
+        [Placeholder(Label = "Is Verified", Example = "true")]
         public bool IsVerified { get; private set; }
+
+        [Placeholder(Label = "Verification Time", Example = "10:30 AM")]
         public TimeOnly? VerificationDate { get; private set; }
+
+        [Placeholder(Label = "Verified By", Example = "d4c3b2a1-9f8e-4d7c-8b6a-1f2e3d4c5b6a")]
         public Guid? VerifiedBy { get; private set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]

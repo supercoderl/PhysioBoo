@@ -71,13 +71,22 @@ using PhysioBoo.Application.Commands.Patients.CreatePatient;
 using PhysioBoo.Application.Commands.Patients.DeletePatient;
 using PhysioBoo.Application.Commands.Payments.CreatePayment;
 using PhysioBoo.Application.Commands.Permissions.CreatePermission;
+using PhysioBoo.Application.Commands.Permissions.DeletePermission;
+using PhysioBoo.Application.Commands.Permissions.UpdatePermission;
 using PhysioBoo.Application.Commands.PrescriptionItems.CreatePrescriptionItem;
 using PhysioBoo.Application.Commands.Prescriptions.CreatePrescription;
+using PhysioBoo.Application.Commands.PrintTemplates.CreatePrintTemplate;
+using PhysioBoo.Application.Commands.PrintTemplates.DeletePrintTemplate;
+using PhysioBoo.Application.Commands.PrintTemplates.SaveVersionPrintTemplate;
+using PhysioBoo.Application.Commands.PrintTemplates.UpdatePrintTemplate;
 using PhysioBoo.Application.Commands.Profiles.CreateProfile;
 using PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken;
 using PhysioBoo.Application.Commands.Reviews;
 using PhysioBoo.Application.Commands.Roles.AssignPermissionToRole;
 using PhysioBoo.Application.Commands.Roles.CreateRole;
+using PhysioBoo.Application.Commands.Roles.DeletePermissionFromRole;
+using PhysioBoo.Application.Commands.Roles.DeleteRole;
+using PhysioBoo.Application.Commands.Roles.UpdateRole;
 using PhysioBoo.Application.Commands.Suppliers.CreateSupplier;
 using PhysioBoo.Application.Commands.Suppliers.DeleteSupplier;
 using PhysioBoo.Application.Commands.Suppliers.UpdateSupplier;
@@ -88,10 +97,12 @@ using PhysioBoo.Application.Commands.Sys_SequenceTrackers.CreateSys_SequenceTrac
 using PhysioBoo.Application.Commands.Sys_SequenceTrackers.DeleteSys_SequenceTracker;
 using PhysioBoo.Application.Commands.Sys_SequenceTrackers.UpdateSys_SequenceTracker;
 using PhysioBoo.Application.Commands.Systems.Ip;
+using PhysioBoo.Application.Commands.UserPreferences.UpsertUserPreference;
 using PhysioBoo.Application.Commands.Users.AssignRoleToUser;
 using PhysioBoo.Application.Commands.Users.AssignRoleToUserUsingRoleId;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
 using PhysioBoo.Application.Commands.Users.CreateUser;
+using PhysioBoo.Application.Commands.Users.DeleteUser;
 using PhysioBoo.Application.Commands.Users.ForgotPassword;
 using PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken;
 using PhysioBoo.Application.Commands.Users.LoginUser;
@@ -138,8 +149,13 @@ using PhysioBoo.Application.Queries.MedicineCategories.GetById;
 using PhysioBoo.Application.Queries.Patients.GetAll;
 using PhysioBoo.Application.Queries.Patients.GetById;
 using PhysioBoo.Application.Queries.Permissions.GetAll;
+using PhysioBoo.Application.Queries.PrintTemplates.GetAll;
+using PhysioBoo.Application.Queries.PrintTemplates.GetByCode;
+using PhysioBoo.Application.Queries.PrintTemplates.GetById;
 using PhysioBoo.Application.Queries.RefreshTokens.GetByUserId;
 using PhysioBoo.Application.Queries.Roles.GetAll;
+using PhysioBoo.Application.Queries.Roles.GetById;
+using PhysioBoo.Application.Queries.Roles.GetPermissionsByRole;
 using PhysioBoo.Application.Queries.Suppliers.GetAll;
 using PhysioBoo.Application.Queries.Suppliers.GetById;
 using PhysioBoo.Application.Queries.Sys_Languages.GetAllLanguages;
@@ -150,6 +166,7 @@ using PhysioBoo.Application.Queries.Sys_Settings.GetAll;
 using PhysioBoo.Application.Queries.Users.GetAll;
 using PhysioBoo.Application.Queries.Users.GetByEmail;
 using PhysioBoo.Application.Queries.Users.GetById;
+using PhysioBoo.Application.Queries.Users.GetPreferences;
 using PhysioBoo.Application.Queries.Users.GetProfile;
 using PhysioBoo.Application.Queries.VerificationTokens.GetById;
 using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
@@ -172,6 +189,7 @@ using PhysioBoo.Application.ViewModels.MedicalSpecialties;
 using PhysioBoo.Application.ViewModels.MedicineCategories;
 using PhysioBoo.Application.ViewModels.Patients;
 using PhysioBoo.Application.ViewModels.Permissions;
+using PhysioBoo.Application.ViewModels.PrintTemplates;
 using PhysioBoo.Application.ViewModels.Roles;
 using PhysioBoo.Application.ViewModels.Sorting;
 using PhysioBoo.Application.ViewModels.Suppliers;
@@ -224,6 +242,9 @@ namespace PhysioBoo.Application.Extensions
             // Template Dictionary
             services.AddScoped<ITemplateDictionaryService, TemplateDictionaryService>();
 
+            // Print Context Enricher
+            services.AddScoped<IPrintContextEnricher, PrintContextEnricher>();
+
             return services;
         }
 
@@ -236,6 +257,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<GetUserByEmailQuery, User?>, GetUserByEmailQueryHandler>();
             services.AddScoped<IRequestHandler<GetAllUsersQuery, PagedResult<UserViewModel>>, GetAllUsersQueryHandler>();
             services.AddScoped<IRequestHandler<GetUserProfileQuery, UserProfileViewModel?>, GetUserProfileQueryHandler>();
+            services.AddScoped<IRequestHandler<GetPreferencesQuery, IReadOnlyDictionary<string, string>>, GetPreferencesQueryHandler>();
 
             // Verification Token
             services.AddScoped<IRequestHandler<GetVerificationTokenByIdQuery, VerificationTokenViewModel?>, GetVerificationTokenByIdQueryHandler>();
@@ -246,6 +268,8 @@ namespace PhysioBoo.Application.Extensions
 
             // Role
             services.AddScoped<IRequestHandler<GetAllRolesQuery, PagedResult<RoleViewModel>>, GetAllRolesQueryHandler>();
+            services.AddScoped<IRequestHandler<GetRoleByIdQuery, RoleViewModel?>, GetRoleByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<GetPermissionsByRoleQuery, IEnumerable<string>>, GetPermissionsByRoleQueryHandler>();
 
             // Permission
             services.AddScoped<IRequestHandler<GetAllPermissionsQuery, PagedResult<PermissionViewModel>>, GetAllPermissionsQueryHandler>();
@@ -328,6 +352,11 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<GetAllPatientsQuery, PagedResult<PatientViewModel>>, GetAllPatientsQueryHandler>();
             services.AddScoped<IRequestHandler<GetPatientByIdQuery, PatientViewModel?>, GetPatientByIdQueryHandler>();
 
+            // Print Template 
+            services.AddScoped<IRequestHandler<GetAllPrintTemplatesQuery, PagedResult<PrintTemplateViewModel>>, GetAllPrintTemplatesQueryHandler>();
+            services.AddScoped<IRequestHandler<GetPrintTemplateByIdQuery, PrintTemplateViewModel?>, GetPrintTemplateByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<GetPrintTemplateByCodeQuery, PrintTemplateViewModel?>, GetPrintTemplateByCodeQueryHandler>();
+
             return services;
         }
 
@@ -377,6 +406,13 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<DeleteAdminMenuCommand>, DeleteAdminMenuCommandHandler>();
             services.AddScoped<IRequestHandler<DeleteAddressCommand>, DeleteAddressCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateAddressCommand>, UpdateAddressCommandHandler>();
+            services.AddScoped<IRequestHandler<UpsertUserPreferenceCommand>, UpsertUserPreferenceCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteUserCommand>, DeleteUserCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdatePermissionCommand>, UpdatePermissionCommandHandler>();
+            services.AddScoped<IRequestHandler<DeletePermissionCommand>, DeletePermissionCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdateRoleCommand>, UpdateRoleCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteRoleCommand>, DeleteRoleCommandHandler>();
+            services.AddScoped<IRequestHandler<DeletePermissionFromRoleCommand>, DeletePermissionFromRoleCommandHandler>();
             #endregion
 
             #region Patient Flow
@@ -456,6 +492,10 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<CreateSys_SequenceTrackerCommand>, CreateSys_SequenceTrackerCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateSys_SequenceTrackerCommand>, UpdateSys_SequenceTrackerCommandHandler>();
             services.AddScoped<IRequestHandler<DeleteSys_SequenceTrackerCommand>, DeleteSys_SequenceTrackerCommandHandler>();
+            services.AddScoped<IRequestHandler<CreatePrintTemplateCommand>, CreatePrintTemplateCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdatePrintTemplateCommand>, UpdatePrintTemplateCommandHandler>();
+            services.AddScoped<IRequestHandler<DeletePrintTemplateCommand>, DeletePrintTemplateCommandHandler>();
+            services.AddScoped<IRequestHandler<SaveVersionPrintTemplateCommand>, SaveVersionPrintTemplateCommandHandler>();
             #endregion
 
             return services;
@@ -528,6 +568,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<ISortingExpressionProvider<AdminMenuViewModel, AdminMenu>, AdminMenuViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<AddressViewModel, Address>, AddressViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<PatientViewModel, Patient>, PatientViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<PrintTemplateViewModel, PrintTemplate>, PrintTemplateViewModelSortProvider>();
 
             return services;
         }

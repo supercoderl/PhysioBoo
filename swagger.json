@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.4",
   "info": {
-    "title": "CleanArchitecture",
-    "description": "A clean architecture API",
+    "title": "Physio Boo",
+    "description": "A scalable and maintainable API for managing healthcare operations, including patients, appointments, and medical records.",
     "version": "v1"
   },
   "paths": {
@@ -219,7 +219,7 @@
           "Admin Menu"
         ],
         "summary": "Retrieve a paginated list of menus with filters and sorting.",
-        "operationId": "SearchAdminMenus",
+        "operationId": "GetAdminMenus",
         "requestBody": {
           "content": {
             "application/json": {
@@ -254,7 +254,7 @@
         }
       }
     },
-    "/api/admin-menus/create": {
+    "/api/admin-menus": {
       "post": {
         "tags": [
           "Admin Menu"
@@ -301,54 +301,53 @@
         }
       }
     },
-    "/api/admin-menus/delete": {
-      "post": {
+    "/api/admin-menus/{id}": {
+      "delete": {
         "tags": [
           "Admin Menu"
         ],
         "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
         "operationId": "DeleteAdminMenu",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteAdminMenuViewModel"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
         }
-      }
-    },
-    "/api/admin-menus/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "Admin Menu"
         ],
         "summary": "Update admin menu",
         "operationId": "UpdateAdminMenu",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -367,45 +366,33 @@
             }
           },
           "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Created"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
-      }
-    },
-    "/api/admin-menus/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
           "Admin Menu"
         ],
         "summary": "Retrieve a admin menu record.",
-        "operationId": "SearchAdminMenu",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdminMenuSingleFilter"
-              }
+        "operationId": "GetAdminMenuById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -426,11 +413,21 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMenuViewModelResponseMessage"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/appointment-types/create": {
+    "/api/appointment-types": {
       "post": {
         "tags": [
           "Appointment Types"
@@ -518,54 +515,53 @@
         }
       }
     },
-    "/api/appointment-types/delete": {
-      "post": {
+    "/api/appointment-types/{id}": {
+      "delete": {
         "tags": [
           "Appointment Types"
         ],
         "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
         "operationId": "DeleteAppointmentType",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteAppointmentTypeViewModel"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
         }
-      }
-    },
-    "/api/appointment-types/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "Appointment Types"
         ],
         "summary": "Update appointment type",
         "operationId": "UpdateAppointmentType",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -580,7 +576,11 @@
           "200": {
             "description": "OK",
             "content": {
-              "application/json": { }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IResultFunc"
+                }
+              }
             }
           },
           "201": {
@@ -588,7 +588,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
+                  "$ref": "#/components/schemas/Void"
                 }
               }
             }
@@ -598,31 +598,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
+                  "$ref": "#/components/schemas/Void"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Void"
                 }
               }
             }
           }
         }
-      }
-    },
-    "/api/appointment-types/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
           "Appointment Types"
         ],
         "summary": "Retrieve a appointment type record.",
-        "operationId": "SearchAppointmentType",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AppointmentTypeSingleFilter"
-              }
+        "operationId": "GetAppointmentTypeById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -643,11 +652,21 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentTypeViewModelResponseMessage"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/appointments/create": {
+    "/api/appointments": {
       "post": {
         "tags": [
           "Appointments"
@@ -741,7 +760,7 @@
         }
       }
     },
-    "/api/bills/create": {
+    "/api/bills": {
       "post": {
         "tags": [
           "Bills"
@@ -789,7 +808,7 @@
       }
     },
     "/api/config": {
-      "post": {
+      "get": {
         "tags": [
           "Configuration"
         ],
@@ -820,7 +839,7 @@
       }
     },
     "/api/config/version": {
-      "post": {
+      "get": {
         "tags": [
           "Configuration"
         ],
@@ -882,7 +901,7 @@
       }
     },
     "/api/cookies": {
-      "post": {
+      "get": {
         "tags": [
           "Cookies"
         ],
@@ -913,7 +932,7 @@
       }
     },
     "/api/is-authenticated": {
-      "post": {
+      "get": {
         "tags": [
           "Cookies"
         ],
@@ -984,7 +1003,7 @@
         }
       }
     },
-    "/api/departments/create": {
+    "/api/departments": {
       "post": {
         "tags": [
           "Departments"
@@ -1072,54 +1091,53 @@
         }
       }
     },
-    "/api/departments/delete": {
-      "post": {
+    "/api/departments/{id}": {
+      "delete": {
         "tags": [
           "Departments"
         ],
         "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
         "operationId": "DeleteDepartment",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteDepartmentViewModel"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
         }
-      }
-    },
-    "/api/departments/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "Departments"
         ],
         "summary": "Update department",
         "operationId": "UpdateDepartment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1138,45 +1156,33 @@
             }
           },
           "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Created"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      }
-    },
-    "/api/departments/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
           "Departments"
         ],
         "summary": "Retrieve a department record.",
-        "operationId": "SearchDepartment",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DepartmentSingleFilter"
-              }
+        "operationId": "GetDepartmentById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1201,7 +1207,7 @@
         }
       }
     },
-    "/api/doctor-awards/create": {
+    "/api/doctor-awards": {
       "post": {
         "tags": [
           "Doctor Awards"
@@ -1248,7 +1254,7 @@
         }
       }
     },
-    "/api/doctor-certifications/create": {
+    "/api/doctor-certifications": {
       "post": {
         "tags": [
           "Doctor Certifications"
@@ -1577,60 +1583,13 @@
         }
       }
     },
-    "/api/doctors/create": {
-      "post": {
-        "tags": [
-          "Doctors"
-        ],
-        "summary": "Create new doctor information",
-        "operationId": "CreateDoctor",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateDoctorViewModel"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": { }
-            }
-          },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/doctors/search": {
       "post": {
         "tags": [
           "Doctors"
         ],
         "summary": "Retrieve a paginated list of doctors with filters and sorting.",
-        "operationId": "SearchDoctors",
+        "operationId": "GetDoctors",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1665,54 +1624,56 @@
         }
       }
     },
-    "/api/doctors/delete": {
-      "post": {
+    "/api/doctors/{id}": {
+      "delete": {
         "tags": [
           "Doctors"
         ],
-        "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
+        "summary": "Handles requests to delete a specific doctor by its identifier.",
         "operationId": "DeleteDoctor",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteDoctorViewModel"
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+              "application/json": { }
             }
           },
+          "204": {
+            "description": "No Content"
+          },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
-      }
-    },
-    "/api/doctors/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "Doctors"
         ],
         "summary": "Update doctor",
         "operationId": "UpdateDoctor",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1730,46 +1691,34 @@
               "application/json": { }
             }
           },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      }
-    },
-    "/api/doctors/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
           "Doctors"
         ],
         "summary": "Retrieve a doctor record.",
-        "operationId": "SearchDoctor",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DoctorSingleFilter"
-              }
+        "operationId": "GetDoctorById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1794,7 +1743,7 @@
         }
       }
     },
-    "/api/hospital-groups/create": {
+    "/api/hospital-groups": {
       "post": {
         "tags": [
           "Hospital Groups"
@@ -1847,7 +1796,7 @@
           "Hospital Groups"
         ],
         "summary": "Retrieve a paginated list of hospital groups with filters and sorting.",
-        "operationId": "SearchHospitalGroups",
+        "operationId": "GetHospitalGroups",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1882,54 +1831,56 @@
         }
       }
     },
-    "/api/hospital-groups/delete": {
-      "post": {
+    "/api/hospital-groups/{id}": {
+      "delete": {
         "tags": [
           "Hospital Groups"
         ],
-        "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
+        "summary": "Handles requests to delete a specific hospital group by its identifier.",
         "operationId": "DeleteHospitalGroup",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteHospitalGroupViewModel"
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+              "application/json": { }
             }
           },
+          "204": {
+            "description": "No Content"
+          },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
-      }
-    },
-    "/api/hospital-groups/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "Hospital Groups"
         ],
         "summary": "Update hospital group",
         "operationId": "UpdateHospitalGroup",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1947,46 +1898,34 @@
               "application/json": { }
             }
           },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      }
-    },
-    "/api/hospital-groups/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
           "Hospital Groups"
         ],
         "summary": "Retrieve a hospital group record.",
-        "operationId": "SearchHospitalGroup",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/HospitalGroupSingleFilter"
-              }
+        "operationId": "GetHospitalGroupById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2058,7 +1997,7 @@
         }
       }
     },
-    "/api/hospitals/create": {
+    "/api/hospitals": {
       "post": {
         "tags": [
           "Hospitals"
@@ -2111,7 +2050,7 @@
           "Hospitals"
         ],
         "summary": "Retrieve a paginated list of hospitals with filters and sorting.",
-        "operationId": "SearchHospitals",
+        "operationId": "GetHospitals",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2146,54 +2085,56 @@
         }
       }
     },
-    "/api/hospitals/delete": {
-      "post": {
+    "/api/hospitals/{id}": {
+      "delete": {
         "tags": [
           "Hospitals"
         ],
-        "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
+        "summary": "Handles requests to delete a specific hospital by its identifier.",
         "operationId": "DeleteHospital",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteHospitalViewModel"
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+              "application/json": { }
             }
           },
+          "204": {
+            "description": "No Content"
+          },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
-      }
-    },
-    "/api/hospitals/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "Hospitals"
         ],
         "summary": "Update hospital",
         "operationId": "UpdateHospital",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -2211,46 +2152,34 @@
               "application/json": { }
             }
           },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      }
-    },
-    "/api/hospitals/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
           "Hospitals"
         ],
         "summary": "Retrieve a hospital record.",
-        "operationId": "SearchHospital",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/HospitalSingleFilter"
-              }
+        "operationId": "GetHospitalById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2275,7 +2204,7 @@
         }
       }
     },
-    "/api/imaging-modalities/create": {
+    "/api/imaging-modalities": {
       "post": {
         "tags": [
           "Imaging Modalities"
@@ -2328,7 +2257,7 @@
           "Imaging Modalities"
         ],
         "summary": "Retrieve a paginated list of imaging modalities with filters and sorting.",
-        "operationId": "SearchImagingModalities",
+        "operationId": "GetImagingModalities",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2363,54 +2292,56 @@
         }
       }
     },
-    "/api/imaging-modalities/delete": {
-      "post": {
+    "/api/imaging-modalities/{id}": {
+      "delete": {
         "tags": [
           "Imaging Modalities"
         ],
-        "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
+        "summary": "Handles requests to delete a specific imaging modality by its identifier.",
         "operationId": "DeleteImagingModality",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteImagingModalityViewModel"
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+              "application/json": { }
             }
           },
+          "204": {
+            "description": "No Content"
+          },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
-      }
-    },
-    "/api/imaging-modalities/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "Imaging Modalities"
         ],
         "summary": "Update imaging modality",
         "operationId": "UpdateImagingModality",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -2428,46 +2359,34 @@
               "application/json": { }
             }
           },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      }
-    },
-    "/api/imaging-modalities/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
           "Imaging Modalities"
         ],
-        "summary": "Retrieve a imaging modality record.",
-        "operationId": "SearchImagingModality",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ImagingModalitySingleFilter"
-              }
+        "summary": "Retrieve an imaging modality record.",
+        "operationId": "GetImagingModalityById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2586,7 +2505,7 @@
         }
       }
     },
-    "/api/insurance-companies/create": {
+    "/api/insurance-companies": {
       "post": {
         "tags": [
           "Insurance Companies"
@@ -2639,7 +2558,7 @@
           "Insurance Companies"
         ],
         "summary": "Retrieve a paginated list of insurance companies with filters and sorting.",
-        "operationId": "SearchInsuranceCompanies",
+        "operationId": "GetInsuranceCompanies",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2674,54 +2593,56 @@
         }
       }
     },
-    "/api/insurance-companies/delete": {
-      "post": {
+    "/api/insurance-companies/{id}": {
+      "delete": {
         "tags": [
           "Insurance Companies"
         ],
-        "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
+        "summary": "Handles requests to delete a specific insurance company by its identifier.",
         "operationId": "DeleteInsuranceCompany",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteInsuranceCompanyViewModel"
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+              "application/json": { }
             }
           },
+          "204": {
+            "description": "No Content"
+          },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
-      }
-    },
-    "/api/insurance-companies/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "Insurance Companies"
         ],
         "summary": "Update insurance company",
         "operationId": "UpdateInsuranceCompany",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -2739,46 +2660,34 @@
               "application/json": { }
             }
           },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      }
-    },
-    "/api/insurance-companies/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
           "Insurance Companies"
         ],
-        "summary": "Retrieve a insurance company record.",
-        "operationId": "SearchInsuranceCompany",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InsuranceCompanySingleFilter"
-              }
+        "summary": "Retrieve an insurance company record.",
+        "operationId": "GetInsuranceCompanyById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2944,10 +2853,10 @@
         }
       }
     },
-    "/api/lab-test-categories/create": {
+    "/api/lab-test-categories": {
       "post": {
         "tags": [
-          "Lab Test Category"
+          "Lab Test Categories"
         ],
         "summary": "Create new lab test category",
         "operationId": "CreateLabTestCategory",
@@ -2994,10 +2903,10 @@
     "/api/lab-test-categories/search": {
       "post": {
         "tags": [
-          "Lab Test Category"
+          "Lab Test Categories"
         ],
         "summary": "Retrieve a paginated list of lab test categories with filters and sorting.",
-        "operationId": "SearchLabTestCategories",
+        "operationId": "GetLabTestCategories",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3035,9 +2944,9 @@
     "/api/lab-test-categories/lookup": {
       "post": {
         "tags": [
-          "Lab Test Category"
+          "Lab Test Categories"
         ],
-        "summary": "Retrieve a paginated list of lab test categories for selection.",
+        "summary": "Retrieve a list of lab test categories for selection.",
         "operationId": "GetLabTestCategoryLookups",
         "responses": {
           "200": {
@@ -3063,54 +2972,56 @@
         }
       }
     },
-    "/api/lab-test-categories/delete": {
-      "post": {
+    "/api/lab-test-categories/{id}": {
+      "delete": {
         "tags": [
-          "Lab Test Category"
+          "Lab Test Categories"
         ],
-        "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
+        "summary": "Handles requests to delete a specific lab test category by its identifier.",
         "operationId": "DeleteLabTestCategory",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteLabTestCategoryViewModel"
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+              "application/json": { }
             }
           },
+          "204": {
+            "description": "No Content"
+          },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
-      }
-    },
-    "/api/lab-test-categories/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
-          "Lab Test Category"
+          "Lab Test Categories"
         ],
         "summary": "Update lab test category",
         "operationId": "UpdateLabTestCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -3128,46 +3039,34 @@
               "application/json": { }
             }
           },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      }
-    },
-    "/api/lab-test-categories/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
-          "Lab Test Category"
+          "Lab Test Categories"
         ],
-        "summary": "Retrieve a medical specialty record.",
-        "operationId": "SearchLabTestCategory",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LabTestCategorySingleFilter"
-              }
+        "summary": "Retrieve a lab test category record.",
+        "operationId": "GetLabTestCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -3192,7 +3091,7 @@
         }
       }
     },
-    "/api/lab-tests/create": {
+    "/api/lab-tests": {
       "post": {
         "tags": [
           "Lab Tests"
@@ -3245,7 +3144,7 @@
           "Lab Tests"
         ],
         "summary": "Retrieve a paginated list of lab tests with filters and sorting.",
-        "operationId": "SearchLabTests",
+        "operationId": "GetLabTests",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3280,54 +3179,56 @@
         }
       }
     },
-    "/api/lab-tests/delete": {
-      "post": {
+    "/api/lab-tests/{id}": {
+      "delete": {
         "tags": [
           "Lab Tests"
         ],
-        "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
+        "summary": "Handles requests to delete a specific lab test by its identifier.",
         "operationId": "DeleteLabTest",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteLabTestViewModel"
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+              "application/json": { }
             }
           },
+          "204": {
+            "description": "No Content"
+          },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
-      }
-    },
-    "/api/lab-tests/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "Lab Tests"
         ],
         "summary": "Update lab test",
         "operationId": "UpdateLabTest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -3345,46 +3246,34 @@
               "application/json": { }
             }
           },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      }
-    },
-    "/api/lab-tests/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
           "Lab Tests"
         ],
         "summary": "Retrieve a lab test record.",
-        "operationId": "SearchLabTest",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LabTestSingleFilter"
-              }
+        "operationId": "GetLabTestById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -3409,7 +3298,7 @@
         }
       }
     },
-    "/api/manufacturers/create": {
+    "/api/manufacturers": {
       "post": {
         "tags": [
           "Manufacturers"
@@ -3462,7 +3351,7 @@
           "Manufacturers"
         ],
         "summary": "Retrieve a paginated list of manufacturers with filters and sorting.",
-        "operationId": "SearchManufacturers",
+        "operationId": "GetManufacturers",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3497,54 +3386,56 @@
         }
       }
     },
-    "/api/manufacturers/delete": {
-      "post": {
+    "/api/manufacturers/{id}": {
+      "delete": {
         "tags": [
           "Manufacturers"
         ],
-        "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
+        "summary": "Handles requests to delete a specific manufacturer by its identifier.",
         "operationId": "DeleteManufacturer",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteManufacturerViewModel"
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+              "application/json": { }
             }
           },
+          "204": {
+            "description": "No Content"
+          },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
-      }
-    },
-    "/api/manufacturers/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "Manufacturers"
         ],
         "summary": "Update manufacturer",
         "operationId": "UpdateManufacturer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -3562,46 +3453,34 @@
               "application/json": { }
             }
           },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      }
-    },
-    "/api/manufacturers/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
           "Manufacturers"
         ],
         "summary": "Retrieve a manufacturer record.",
-        "operationId": "SearchManufacturer",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ManufacturerSingleFilter"
-              }
+        "operationId": "GetManufacturerById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -3673,7 +3552,7 @@
         }
       }
     },
-    "/api/medical-specialties/create": {
+    "/api/medical-specialties": {
       "post": {
         "tags": [
           "Medical Specialties"
@@ -3726,7 +3605,7 @@
           "Medical Specialties"
         ],
         "summary": "Retrieve a paginated list of medical specialties with filters and sorting.",
-        "operationId": "SearchMedicalSpecialties",
+        "operationId": "GetMedicalSpecialties",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3761,54 +3640,56 @@
         }
       }
     },
-    "/api/medical-specialties/delete": {
-      "post": {
+    "/api/medical-specialties/{id}": {
+      "delete": {
         "tags": [
           "Medical Specialties"
         ],
-        "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
+        "summary": "Handles requests to delete a specific medical specialty by its identifier.",
         "operationId": "DeleteMedicalSpecialty",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteMedicalSpecialtyViewModel"
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+              "application/json": { }
             }
           },
+          "204": {
+            "description": "No Content"
+          },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
-      }
-    },
-    "/api/medical-specialties/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "Medical Specialties"
         ],
         "summary": "Update medical specialty",
         "operationId": "UpdateMedicalSpecialty",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -3826,46 +3707,34 @@
               "application/json": { }
             }
           },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      }
-    },
-    "/api/medical-specialties/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
           "Medical Specialties"
         ],
         "summary": "Retrieve a medical specialty record.",
-        "operationId": "SearchMedicalSpecialty",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MedicalSpecialtySingleFilter"
-              }
+        "operationId": "GetMedicalSpecialtyById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -3890,7 +3759,7 @@
         }
       }
     },
-    "/api/medicine-categories/create": {
+    "/api/medicine-categories": {
       "post": {
         "tags": [
           "Medicine Categories"
@@ -3943,7 +3812,7 @@
           "Medicine Categories"
         ],
         "summary": "Retrieve a paginated list of medicine categories with filters and sorting.",
-        "operationId": "SearchMedicineCategories",
+        "operationId": "GetMedicineCategories",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3978,54 +3847,56 @@
         }
       }
     },
-    "/api/medicine-categories/delete": {
-      "post": {
+    "/api/medicine-categories/{id}": {
+      "delete": {
         "tags": [
           "Medicine Categories"
         ],
-        "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
+        "summary": "Handles requests to delete a specific medicine category by its identifier.",
         "operationId": "DeleteMedicineCategory",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteMedicineCategoryViewModel"
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+              "application/json": { }
             }
           },
+          "204": {
+            "description": "No Content"
+          },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
-      }
-    },
-    "/api/medicine-categories/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "Medicine Categories"
         ],
         "summary": "Update medicine category",
         "operationId": "UpdateMedicineCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -4043,46 +3914,34 @@
               "application/json": { }
             }
           },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      }
-    },
-    "/api/medicine-categories/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
           "Medicine Categories"
         ],
         "summary": "Retrieve a medicine category record.",
-        "operationId": "SearchMedicineCategory",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MedicineCategorySingleFilter"
-              }
+        "operationId": "GetMedicineCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4295,18 +4154,102 @@
         }
       }
     },
-    "/api/patients/create": {
+    "/api/patients/search": {
       "post": {
         "tags": [
           "Patients"
         ],
-        "summary": "Create new patient",
-        "operationId": "CreatePatient",
+        "summary": "Retrieve a paginated list of patients with filters and sorting.",
+        "operationId": "GetPatients",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreatePatientViewModel"
+                "$ref": "#/components/schemas/PatientFilterPagedRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientViewModelPagedResultResponseMessage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientViewModelPagedResultResponseMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/patients/{id}": {
+      "delete": {
+        "tags": [
+          "Patients"
+        ],
+        "summary": "Handles requests to delete a specific patient by its identifier.",
+        "operationId": "DeletePatient",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Patients"
+        ],
+        "summary": "Update patient",
+        "operationId": "UpdatePatient",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePatientViewModel"
               }
             }
           },
@@ -4319,12 +4262,41 @@
               "application/json": { }
             }
           },
-          "201": {
-            "description": "Created",
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Patients"
+        ],
+        "summary": "Retrieve a patient record.",
+        "operationId": "GetPatientById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
+                  "$ref": "#/components/schemas/PatientViewModelResponseMessage"
                 }
               }
             }
@@ -4334,7 +4306,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
+                  "$ref": "#/components/schemas/PatientViewModelResponseMessage"
                 }
               }
             }
@@ -4747,13 +4719,13 @@
         }
       }
     },
-    "/api/sequence-trackers/create": {
+    "/api/sequence-trackers": {
       "post": {
         "tags": [
           "Sequence Trackers"
         ],
         "summary": "Create new sequence tracker",
-        "operationId": "CreateSys_SequenceTracker",
+        "operationId": "CreateSequenceTracker",
         "requestBody": {
           "content": {
             "application/json": {
@@ -4800,7 +4772,7 @@
           "Sequence Trackers"
         ],
         "summary": "Retrieve a paginated list of sequence trackers with filters and sorting.",
-        "operationId": "SearchSys_SequenceTrackers",
+        "operationId": "GetSequenceTrackers",
         "requestBody": {
           "content": {
             "application/json": {
@@ -4835,54 +4807,56 @@
         }
       }
     },
-    "/api/sequence-trackers/delete": {
-      "post": {
+    "/api/sequence-trackers/{id}": {
+      "delete": {
         "tags": [
           "Sequence Trackers"
         ],
-        "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
-        "operationId": "DeleteSys_SequenceTracker",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteSys_SequenceTrackerViewModel"
-              }
+        "summary": "Handles requests to delete a specific sequence tracker by its identifier.",
+        "operationId": "DeleteSequenceTracker",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+              "application/json": { }
             }
           },
+          "204": {
+            "description": "No Content"
+          },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
-      }
-    },
-    "/api/sequence-trackers/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "Sequence Trackers"
         ],
         "summary": "Update sequence tracker",
-        "operationId": "UpdateSys_SequenceTracker",
+        "operationId": "UpdateSequenceTracker",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -4900,46 +4874,34 @@
               "application/json": { }
             }
           },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      }
-    },
-    "/api/sequence-trackers/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
           "Sequence Trackers"
         ],
         "summary": "Retrieve a sequence tracker record.",
-        "operationId": "SearchSys_SequenceTracker",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Sys_SequenceTrackerSingleFilter"
-              }
+        "operationId": "GetSequenceTrackerById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -4964,13 +4926,13 @@
         }
       }
     },
-    "/api/suppliers/create": {
+    "/api/suppliers": {
       "post": {
         "tags": [
-          "Supplier"
+          "Suppliers"
         ],
         "summary": "Create new supplier",
-        "operationId": "CreatSupplier",
+        "operationId": "CreateSupplier",
         "requestBody": {
           "content": {
             "application/json": {
@@ -5014,10 +4976,10 @@
     "/api/suppliers/search": {
       "post": {
         "tags": [
-          "Supplier"
+          "Suppliers"
         ],
         "summary": "Retrieve a paginated list of suppliers with filters and sorting.",
-        "operationId": "SearchSuppliers",
+        "operationId": "GetSuppliers",
         "requestBody": {
           "content": {
             "application/json": {
@@ -5052,54 +5014,56 @@
         }
       }
     },
-    "/api/suppliers/delete": {
-      "post": {
+    "/api/suppliers/{id}": {
+      "delete": {
         "tags": [
-          "Supplier"
+          "Suppliers"
         ],
-        "summary": "Handles requests to delete a specific record by its identifier and returns the appropriate result after the operation.",
+        "summary": "Handles requests to delete a specific supplier by its identifier.",
         "operationId": "DeleteSupplier",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteSupplierViewModel"
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
+              "application/json": { }
             }
           },
+          "204": {
+            "description": "No Content"
+          },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
-      }
-    },
-    "/api/suppliers/update": {
-      "post": {
+      },
+      "patch": {
         "tags": [
-          "Supplier"
+          "Suppliers"
         ],
         "summary": "Update supplier",
         "operationId": "UpdateSupplier",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -5117,46 +5081,34 @@
               "application/json": { }
             }
           },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+          "204": {
+            "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      }
-    },
-    "/api/suppliers/search-by-id": {
-      "post": {
+      },
+      "get": {
         "tags": [
-          "Supplier"
+          "Suppliers"
         ],
         "summary": "Retrieve a supplier record.",
-        "operationId": "SearchSupplier",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SupplierSingleFilter"
-              }
+        "operationId": "GetSupplierById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -5391,6 +5343,47 @@
         }
       }
     },
+    "/api/user-preferences": {
+      "post": {
+        "tags": [
+          "User Preferences"
+        ],
+        "summary": "Insert user preference",
+        "operationId": "InsertKey",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertUserPreferenceViewModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuidResponseMessage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuidResponseMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/users/register": {
       "post": {
         "tags": [
@@ -5457,24 +5450,10 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
       }
@@ -5547,24 +5526,10 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
       }
@@ -5588,24 +5553,10 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
       }
@@ -5619,30 +5570,16 @@
         "operationId": "Logout",
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
       }
     },
     "/api/users/change-password": {
-      "post": {
+      "patch": {
         "tags": [
           "Users"
         ],
@@ -5660,24 +5597,13 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -5701,24 +5627,10 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
       }
@@ -5742,24 +5654,10 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
       }
@@ -5773,24 +5671,10 @@
         "operationId": "Refresh Token",
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StringResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
       }
@@ -5855,30 +5739,16 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GuidResponseMessage"
-                }
-              }
-            }
+            "description": "Bad Request"
           }
         }
       }
     },
     "/api/users/me": {
-      "post": {
+      "get": {
         "tags": [
           "Users"
         ],
@@ -5901,6 +5771,37 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserProfileViewModelResponseMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me/preferences": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retrieve user preferences.",
+        "operationId": "UserPreferences",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringStringIReadOnlyDictionaryResponseMessage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringStringIReadOnlyDictionaryResponseMessage"
                 }
               }
             }
@@ -6167,16 +6068,6 @@
         },
         "additionalProperties": false
       },
-      "AdminMenuSingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
       "AdminMenuViewModel": {
         "type": "object",
         "properties": {
@@ -6378,16 +6269,6 @@
         },
         "additionalProperties": false
       },
-      "AppointmentTypeSingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
       "AppointmentTypeViewModel": {
         "type": "object",
         "properties": {
@@ -6531,6 +6412,99 @@
         },
         "additionalProperties": false
       },
+      "Assembly": {
+        "type": "object",
+        "properties": {
+          "definedTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypeInfo"
+            },
+            "readOnly": true
+          },
+          "exportedTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Type"
+            },
+            "readOnly": true
+          },
+          "codeBase": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true,
+            "deprecated": true
+          },
+          "entryPoint": {
+            "$ref": "#/components/schemas/MethodInfo"
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "imageRuntimeVersion": {
+            "type": "string",
+            "readOnly": true
+          },
+          "isDynamic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "location": {
+            "type": "string",
+            "readOnly": true
+          },
+          "reflectionOnly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isCollectible": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFullyTrusted": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "customAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            },
+            "readOnly": true
+          },
+          "escapedCodeBase": {
+            "type": "string",
+            "readOnly": true,
+            "deprecated": true
+          },
+          "manifestModule": {
+            "$ref": "#/components/schemas/Module"
+          },
+          "modules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Module"
+            },
+            "readOnly": true
+          },
+          "globalAssemblyCache": {
+            "type": "boolean",
+            "readOnly": true,
+            "deprecated": true
+          },
+          "hostContext": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "securityRuleSet": {
+            "$ref": "#/components/schemas/SecurityRuleSet"
+          }
+        },
+        "additionalProperties": false
+      },
       "BillType": {
         "enum": [
           0,
@@ -6575,6 +6549,17 @@
         "type": "integer",
         "format": "int32"
       },
+      "CallingConventions": {
+        "enum": [
+          1,
+          2,
+          3,
+          32,
+          64
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "ChangePasswordViewModel": {
         "type": "object",
         "properties": {
@@ -6595,6 +6580,136 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "ConstructorInfo": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "declaringType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "reflectedType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "module": {
+            "$ref": "#/components/schemas/Module"
+          },
+          "customAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            },
+            "readOnly": true
+          },
+          "isCollectible": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "metadataToken": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/MethodAttributes"
+          },
+          "methodImplementationFlags": {
+            "$ref": "#/components/schemas/MethodImplAttributes"
+          },
+          "callingConvention": {
+            "$ref": "#/components/schemas/CallingConventions"
+          },
+          "isAbstract": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isConstructor": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFinal": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isHideBySig": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSpecialName": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isStatic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isVirtual": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFamily": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFamilyAndAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFamilyOrAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPublic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isConstructedGenericMethod": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericMethod": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericMethodDefinition": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "containsGenericParameters": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "methodHandle": {
+            "$ref": "#/components/schemas/RuntimeMethodHandle"
+          },
+          "isSecurityCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecuritySafeCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecurityTransparent": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "memberType": {
+            "$ref": "#/components/schemas/MemberTypes"
+          }
+        },
+        "additionalProperties": false
       },
       "CreateAddressViewModel": {
         "type": "object",
@@ -6636,10 +6751,6 @@
       "CreateAdminMenuViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "label": {
             "type": "string"
           },
@@ -6667,10 +6778,6 @@
       "CreateAppointmentTypeViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -6713,10 +6820,6 @@
       "CreateAppointmentViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "patientId": {
             "type": "string",
             "format": "uuid"
@@ -7066,10 +7169,6 @@
       "CreateDoctorCertificationViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "doctorId": {
             "type": "string",
             "format": "uuid"
@@ -7441,148 +7540,6 @@
         },
         "additionalProperties": false
       },
-      "CreateDoctorViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "email": {
-            "type": "string"
-          },
-          "phone": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "middleName": {
-            "type": "string"
-          },
-          "dateOfBirth": {
-            "type": "string",
-            "format": "date"
-          },
-          "gender": {
-            "$ref": "#/components/schemas/Gender"
-          },
-          "bloodGroup": {
-            "$ref": "#/components/schemas/BloodGroup"
-          },
-          "maritalStatus": {
-            "$ref": "#/components/schemas/MaritalStatus"
-          },
-          "nationality": {
-            "type": "string",
-            "nullable": true
-          },
-          "identificationType": {
-            "type": "string",
-            "nullable": true
-          },
-          "identificationNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "identificationExpiry": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "emergencyContactName": {
-            "type": "string",
-            "nullable": true
-          },
-          "emergencyContactPhone": {
-            "type": "string",
-            "nullable": true
-          },
-          "emergencyContactRelationship": {
-            "type": "string",
-            "nullable": true
-          },
-          "preferredCommunication": {
-            "$ref": "#/components/schemas/PreferredCommunication"
-          },
-          "bio": {
-            "type": "string",
-            "nullable": true
-          },
-          "about": {
-            "type": "string",
-            "nullable": true
-          },
-          "languagesSpoken": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "primarySpecialtyId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "medicalLicenseNumber": {
-            "type": "string"
-          },
-          "medicalLicenseExpiry": {
-            "type": "string",
-            "format": "date"
-          },
-          "medicalLicenseIssuingAuthority": {
-            "type": "string",
-            "nullable": true
-          },
-          "yearsOfExperience": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "yearsOfPractice": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "archivements": {
-            "type": "string",
-            "nullable": true
-          },
-          "researchInterests": {
-            "type": "string",
-            "nullable": true
-          },
-          "publicationsCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "conferencePresentations": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "employmentStatus": {
-            "$ref": "#/components/schemas/EmploymentStatus"
-          },
-          "bankAccountDetails": {
-            "type": "string",
-            "nullable": true
-          },
-          "panNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "gstin": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "CreateDoctorWorkExperienceViewModel": {
         "type": "object",
         "properties": {
@@ -7658,10 +7615,6 @@
       "CreateHospitalGroupViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -7801,10 +7754,6 @@
       "CreateHospitalViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -7941,10 +7890,6 @@
       "CreateImagingModalityViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -8166,10 +8111,6 @@
       "CreateInsuranceCompanyViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -8424,10 +8365,6 @@
       "CreateLabTestCategoryViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -8445,10 +8382,6 @@
       "CreateLabTestViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "testName": {
             "type": "string"
           },
@@ -8544,10 +8477,6 @@
       "CreateManufacturerViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -8728,10 +8657,6 @@
       "CreateMedicalSpecialtyViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -8780,10 +8705,6 @@
       "CreateMedicineCategoryViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -9137,99 +9058,6 @@
             "nullable": true
           },
           "notes": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "CreatePatientViewModel": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "primaryDoctorId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "referredBy": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "referralHospitalId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "inssuranceProvider": {
-            "type": "string",
-            "nullable": true
-          },
-          "inssurancePolicyNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "inssuranceExpiryDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "inssuranceCoverageAmount": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "medicalHistory": {
-            "type": "string",
-            "nullable": true
-          },
-          "familyHistory": {
-            "type": "string",
-            "nullable": true
-          },
-          "surgicalHistory": {
-            "type": "string",
-            "nullable": true
-          },
-          "allergyInformation": {
-            "type": "string",
-            "nullable": true
-          },
-          "currentMedications": {
-            "type": "string",
-            "nullable": true
-          },
-          "lifestyleNotes": {
-            "type": "string",
-            "nullable": true
-          },
-          "occupation": {
-            "type": "string",
-            "nullable": true
-          },
-          "annualIncomeRange": {
-            "type": "string",
-            "nullable": true
-          },
-          "preferredHospitalId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "preferredDoctorId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "preferredAppointmentTime": {
-            "type": "string",
-            "nullable": true
-          },
-          "communicationPreferences": {
             "type": "string",
             "nullable": true
           }
@@ -9605,10 +9433,6 @@
       "CreateSupplierViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "supplierName": {
             "type": "string"
           },
@@ -9738,10 +9562,6 @@
       "CreateSys_SequenceTrackerViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "entityType": {
             "type": "string"
           },
@@ -9770,10 +9590,6 @@
       "CreateUserViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "email": {
             "type": "string"
           },
@@ -9797,197 +9613,60 @@
         "type": "integer",
         "format": "int32"
       },
-      "DeleteAdminMenuViewModel": {
+      "CustomAttributeData": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
+          "attributeType": {
+            "$ref": "#/components/schemas/Type"
           },
-          "isHard": {
-            "type": "boolean"
+          "constructor": {
+            "$ref": "#/components/schemas/ConstructorInfo"
+          },
+          "constructorArguments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeTypedArgument"
+            },
+            "readOnly": true
+          },
+          "namedArguments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeNamedArgument"
+            },
+            "readOnly": true
           }
         },
         "additionalProperties": false
       },
-      "DeleteAppointmentTypeViewModel": {
+      "CustomAttributeNamedArgument": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
+          "memberInfo": {
+            "$ref": "#/components/schemas/MemberInfo"
           },
-          "isHard": {
-            "type": "boolean"
+          "typedValue": {
+            "$ref": "#/components/schemas/CustomAttributeTypedArgument"
+          },
+          "memberName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "isField": {
+            "type": "boolean",
+            "readOnly": true
           }
         },
         "additionalProperties": false
       },
-      "DeleteDepartmentViewModel": {
+      "CustomAttributeTypedArgument": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
+          "argumentType": {
+            "$ref": "#/components/schemas/Type"
           },
-          "isHard": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeleteDoctorViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isHard": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeleteHospitalGroupViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isHard": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeleteHospitalViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isHard": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeleteImagingModalityViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isHard": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeleteInsuranceCompanyViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isHard": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeleteLabTestCategoryViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isHard": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeleteLabTestViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isHard": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeleteManufacturerViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isHard": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeleteMedicalSpecialtyViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isHard": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeleteMedicineCategoryViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isHard": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeleteSupplierViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isHard": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeleteSys_SequenceTrackerViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isHard": {
-            "type": "boolean"
+          "value": {
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -10040,16 +9719,6 @@
           },
           "filter": {
             "$ref": "#/components/schemas/DepartmentFilter"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DepartmentSingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -10327,16 +9996,6 @@
           "totalReviews": {
             "type": "integer",
             "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DoctorSingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -10683,6 +10342,209 @@
         "type": "integer",
         "format": "int32"
       },
+      "EventAttributes": {
+        "enum": [
+          0,
+          512,
+          1024
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "EventInfo": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "declaringType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "reflectedType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "module": {
+            "$ref": "#/components/schemas/Module"
+          },
+          "customAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            },
+            "readOnly": true
+          },
+          "isCollectible": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "metadataToken": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "memberType": {
+            "$ref": "#/components/schemas/MemberTypes"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/EventAttributes"
+          },
+          "isSpecialName": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "addMethod": {
+            "$ref": "#/components/schemas/MethodInfo"
+          },
+          "removeMethod": {
+            "$ref": "#/components/schemas/MethodInfo"
+          },
+          "raiseMethod": {
+            "$ref": "#/components/schemas/MethodInfo"
+          },
+          "isMulticast": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "eventHandlerType": {
+            "$ref": "#/components/schemas/Type"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FieldAttributes": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024,
+          4096,
+          8192,
+          32768,
+          38144
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "FieldInfo": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "declaringType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "reflectedType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "module": {
+            "$ref": "#/components/schemas/Module"
+          },
+          "customAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            },
+            "readOnly": true
+          },
+          "isCollectible": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "metadataToken": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "memberType": {
+            "$ref": "#/components/schemas/MemberTypes"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/FieldAttributes"
+          },
+          "fieldType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "isInitOnly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isLiteral": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNotSerialized": {
+            "type": "boolean",
+            "readOnly": true,
+            "deprecated": true
+          },
+          "isPinvokeImpl": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSpecialName": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isStatic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFamily": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFamilyAndAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFamilyOrAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPublic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecurityCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecuritySafeCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecurityTransparent": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "fieldHandle": {
+            "$ref": "#/components/schemas/RuntimeFieldHandle"
+          }
+        },
+        "additionalProperties": false
+      },
       "ForgotPasswordViewModel": {
         "type": "object",
         "properties": {
@@ -10698,6 +10560,21 @@
           1,
           2,
           3
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "GenericParameterAttributes": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          8,
+          16,
+          28,
+          32
         ],
         "type": "integer",
         "format": "int32"
@@ -10850,16 +10727,6 @@
         },
         "additionalProperties": false
       },
-      "HospitalGroupSingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
       "HospitalGroupViewModel": {
         "type": "object",
         "properties": {
@@ -10995,16 +10862,6 @@
           },
           "data": {
             "$ref": "#/components/schemas/HospitalGroupViewModel"
-          }
-        },
-        "additionalProperties": false
-      },
-      "HospitalSingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -11281,6 +11138,10 @@
         },
         "additionalProperties": false
       },
+      "ICustomAttributeProvider": {
+        "type": "object",
+        "additionalProperties": false
+      },
       "IRequestCookieCollectionResponseMessage": {
         "type": "object",
         "properties": {
@@ -11306,6 +11167,19 @@
               "$ref": "#/components/schemas/StringStringKeyValuePair"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "IResultFunc": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "nullable": true,
+            "readOnly": true
+          },
+          "method": {
+            "$ref": "#/components/schemas/MethodInfo"
           }
         },
         "additionalProperties": false
@@ -11370,16 +11244,6 @@
           },
           "filter": {
             "$ref": "#/components/schemas/ImagingModalityFilter"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ImagingModalitySingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -11643,16 +11507,6 @@
         },
         "additionalProperties": false
       },
-      "InsuranceCompanySingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
       "InsuranceCompanyViewModel": {
         "type": "object",
         "properties": {
@@ -11830,6 +11684,10 @@
         "type": "integer",
         "format": "int32"
       },
+      "IntPtr": {
+        "type": "object",
+        "additionalProperties": false
+      },
       "ItemType": {
         "enum": [
           0,
@@ -11966,16 +11824,6 @@
           },
           "data": {
             "$ref": "#/components/schemas/LabTestCategoryLookupViewModelPagedResult"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LabTestCategorySingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -12146,16 +11994,6 @@
           },
           "filter": {
             "$ref": "#/components/schemas/LabTestFilter"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LabTestSingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -12390,6 +12228,15 @@
         },
         "additionalProperties": false
       },
+      "LayoutKind": {
+        "enum": [
+          0,
+          2,
+          3
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "LeaveType": {
         "enum": [
           0,
@@ -12464,16 +12311,6 @@
           },
           "filter": {
             "$ref": "#/components/schemas/ManufacturerFilter"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ManufacturerSingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -12703,16 +12540,6 @@
         },
         "additionalProperties": false
       },
-      "MedicalSpecialtySingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
       "MedicalSpecialtyViewModel": {
         "type": "object",
         "properties": {
@@ -12903,16 +12730,6 @@
         },
         "additionalProperties": false
       },
-      "MedicineCategorySingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
       "MedicineCategoryViewModel": {
         "type": "object",
         "properties": {
@@ -13039,6 +12856,433 @@
         },
         "additionalProperties": false
       },
+      "MemberInfo": {
+        "type": "object",
+        "properties": {
+          "memberType": {
+            "$ref": "#/components/schemas/MemberTypes"
+          },
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "declaringType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "reflectedType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "module": {
+            "$ref": "#/components/schemas/Module"
+          },
+          "customAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            },
+            "readOnly": true
+          },
+          "isCollectible": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "metadataToken": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MemberTypes": {
+        "enum": [
+          1,
+          2,
+          4,
+          8,
+          16,
+          32,
+          64,
+          128,
+          191
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "MethodAttributes": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024,
+          2048,
+          4096,
+          8192,
+          16384,
+          32768,
+          53248
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "MethodBase": {
+        "type": "object",
+        "properties": {
+          "memberType": {
+            "$ref": "#/components/schemas/MemberTypes"
+          },
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "declaringType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "reflectedType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "module": {
+            "$ref": "#/components/schemas/Module"
+          },
+          "customAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            },
+            "readOnly": true
+          },
+          "isCollectible": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "metadataToken": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/MethodAttributes"
+          },
+          "methodImplementationFlags": {
+            "$ref": "#/components/schemas/MethodImplAttributes"
+          },
+          "callingConvention": {
+            "$ref": "#/components/schemas/CallingConventions"
+          },
+          "isAbstract": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isConstructor": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFinal": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isHideBySig": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSpecialName": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isStatic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isVirtual": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFamily": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFamilyAndAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFamilyOrAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPublic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isConstructedGenericMethod": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericMethod": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericMethodDefinition": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "containsGenericParameters": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "methodHandle": {
+            "$ref": "#/components/schemas/RuntimeMethodHandle"
+          },
+          "isSecurityCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecuritySafeCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecurityTransparent": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MethodImplAttributes": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          8,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          4096,
+          65535
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "MethodInfo": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "declaringType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "reflectedType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "module": {
+            "$ref": "#/components/schemas/Module"
+          },
+          "customAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            },
+            "readOnly": true
+          },
+          "isCollectible": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "metadataToken": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/MethodAttributes"
+          },
+          "methodImplementationFlags": {
+            "$ref": "#/components/schemas/MethodImplAttributes"
+          },
+          "callingConvention": {
+            "$ref": "#/components/schemas/CallingConventions"
+          },
+          "isAbstract": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isConstructor": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFinal": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isHideBySig": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSpecialName": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isStatic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isVirtual": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFamily": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFamilyAndAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFamilyOrAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPublic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isConstructedGenericMethod": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericMethod": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericMethodDefinition": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "containsGenericParameters": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "methodHandle": {
+            "$ref": "#/components/schemas/RuntimeMethodHandle"
+          },
+          "isSecurityCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecuritySafeCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecurityTransparent": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "memberType": {
+            "$ref": "#/components/schemas/MemberTypes"
+          },
+          "returnParameter": {
+            "$ref": "#/components/schemas/ParameterInfo"
+          },
+          "returnType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "returnTypeCustomAttributes": {
+            "$ref": "#/components/schemas/ICustomAttributeProvider"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Module": {
+        "type": "object",
+        "properties": {
+          "assembly": {
+            "$ref": "#/components/schemas/Assembly"
+          },
+          "fullyQualifiedName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "mdStreamVersion": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "moduleVersionId": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "scopeName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "moduleHandle": {
+            "$ref": "#/components/schemas/ModuleHandle"
+          },
+          "customAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            },
+            "readOnly": true
+          },
+          "metadataToken": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ModuleHandle": {
+        "type": "object",
+        "properties": {
+          "mdStreamVersion": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
       "OAuthLoginUserViewModel": {
         "type": "object",
         "properties": {
@@ -13072,6 +13316,144 @@
           },
           "data": {
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ParameterAttributes": {
+        "enum": [
+          0,
+          1,
+          2,
+          4,
+          8,
+          16,
+          4096,
+          8192,
+          16384,
+          32768,
+          61440
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "ParameterInfo": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "$ref": "#/components/schemas/ParameterAttributes"
+          },
+          "member": {
+            "$ref": "#/components/schemas/MemberInfo"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "parameterType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "isIn": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isLcid": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isOptional": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isOut": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isRetval": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "defaultValue": {
+            "nullable": true,
+            "readOnly": true
+          },
+          "rawDefaultValue": {
+            "nullable": true,
+            "readOnly": true
+          },
+          "hasDefaultValue": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "customAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            },
+            "readOnly": true
+          },
+          "metadataToken": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PatientFilter": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string"
+          },
+          "end": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PatientFilterPagedRequest": {
+        "type": "object",
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "search": {
+            "type": "string",
+            "nullable": true
+          },
+          "sort": {
+            "type": "string",
+            "nullable": true
+          },
+          "filters": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "disableCache": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "export": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "filter": {
+            "$ref": "#/components/schemas/PatientFilter"
           }
         },
         "additionalProperties": false
@@ -13280,6 +13662,92 @@
         },
         "additionalProperties": false
       },
+      "PatientViewModelPagedResult": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PatientViewModel"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "hasNext": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PatientViewModelPagedResultResponseMessage": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "detailedErrors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DetailedError"
+            }
+          },
+          "data": {
+            "$ref": "#/components/schemas/PatientViewModelPagedResult"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PatientViewModelResponseMessage": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "detailedErrors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DetailedError"
+            }
+          },
+          "data": {
+            "$ref": "#/components/schemas/PatientViewModel"
+          }
+        },
+        "additionalProperties": false
+      },
       "PaymentMethod": {
         "enum": [
           0,
@@ -13306,6 +13774,21 @@
             "additionalProperties": {
               "type": "boolean"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PreferenceItem": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -13390,6 +13873,82 @@
           },
           "preferredCommunication": {
             "$ref": "#/components/schemas/PreferredCommunication"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PropertyAttributes": {
+        "enum": [
+          0,
+          512,
+          1024,
+          4096,
+          8192,
+          16384,
+          32768,
+          62464
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "PropertyInfo": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "declaringType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "reflectedType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "module": {
+            "$ref": "#/components/schemas/Module"
+          },
+          "customAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            },
+            "readOnly": true
+          },
+          "isCollectible": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "metadataToken": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "memberType": {
+            "$ref": "#/components/schemas/MemberTypes"
+          },
+          "propertyType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/PropertyAttributes"
+          },
+          "isSpecialName": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "canRead": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "canWrite": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "getMethod": {
+            "$ref": "#/components/schemas/MethodInfo"
+          },
+          "setMethod": {
+            "$ref": "#/components/schemas/MethodInfo"
           }
         },
         "additionalProperties": false
@@ -13647,12 +14206,48 @@
         },
         "additionalProperties": false
       },
+      "RuntimeFieldHandle": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/IntPtr"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RuntimeMethodHandle": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/IntPtr"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RuntimeTypeHandle": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/IntPtr"
+          }
+        },
+        "additionalProperties": false
+      },
       "ScheduleType": {
         "enum": [
           0,
           1,
           2,
           3
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "SecurityRuleSet": {
+        "enum": [
+          0,
+          1,
+          2
         ],
         "type": "integer",
         "format": "int32"
@@ -13710,6 +14305,36 @@
         },
         "additionalProperties": false
       },
+      "StringStringIReadOnlyDictionaryResponseMessage": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "detailedErrors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DetailedError"
+            }
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "StringStringKeyValuePair": {
         "type": "object",
         "properties": {
@@ -13720,6 +14345,18 @@
           "value": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "StructLayoutAttribute": {
+        "type": "object",
+        "properties": {
+          "typeId": {
+            "readOnly": true
+          },
+          "value": {
+            "$ref": "#/components/schemas/LayoutKind"
           }
         },
         "additionalProperties": false
@@ -13772,16 +14409,6 @@
           },
           "filter": {
             "$ref": "#/components/schemas/SupplierFilter"
-          }
-        },
-        "additionalProperties": false
-      },
-      "SupplierSingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -14086,16 +14713,6 @@
         },
         "additionalProperties": false
       },
-      "Sys_SequenceTrackerSingleFilter": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
       "Sys_SequenceTrackerViewModel": {
         "type": "object",
         "properties": {
@@ -14233,6 +14850,697 @@
         },
         "additionalProperties": false
       },
+      "Type": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "customAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            },
+            "readOnly": true
+          },
+          "isCollectible": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "metadataToken": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "memberType": {
+            "$ref": "#/components/schemas/MemberTypes"
+          },
+          "namespace": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "assemblyQualifiedName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "assembly": {
+            "$ref": "#/components/schemas/Assembly"
+          },
+          "module": {
+            "$ref": "#/components/schemas/Module"
+          },
+          "isInterface": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNested": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "declaringType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "declaringMethod": {
+            "$ref": "#/components/schemas/MethodBase"
+          },
+          "reflectedType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "underlyingSystemType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "isTypeDefinition": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isArray": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isByRef": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPointer": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isConstructedGenericType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericParameter": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericTypeParameter": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericMethodParameter": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericTypeDefinition": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSZArray": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isVariableBoundArray": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isByRefLike": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFunctionPointer": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isUnmanagedFunctionPointer": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "hasElementType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "genericTypeArguments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Type"
+            },
+            "readOnly": true
+          },
+          "genericParameterPosition": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "genericParameterAttributes": {
+            "$ref": "#/components/schemas/GenericParameterAttributes"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/TypeAttributes"
+          },
+          "isAbstract": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isImport": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSealed": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSpecialName": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isClass": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedFamANDAssem": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedFamily": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedFamORAssem": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedPrivate": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedPublic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNotPublic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPublic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isAutoLayout": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isExplicitLayout": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isLayoutSequential": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isAnsiClass": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isAutoClass": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isUnicodeClass": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isCOMObject": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isContextful": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isEnum": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isMarshalByRef": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPrimitive": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isValueType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSignatureType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecurityCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecuritySafeCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecurityTransparent": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "structLayoutAttribute": {
+            "$ref": "#/components/schemas/StructLayoutAttribute"
+          },
+          "typeInitializer": {
+            "$ref": "#/components/schemas/ConstructorInfo"
+          },
+          "typeHandle": {
+            "$ref": "#/components/schemas/RuntimeTypeHandle"
+          },
+          "guid": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "baseType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "isSerializable": {
+            "type": "boolean",
+            "readOnly": true,
+            "deprecated": true
+          },
+          "containsGenericParameters": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isVisible": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TypeAttributes": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          16,
+          24,
+          32,
+          128,
+          256,
+          1024,
+          2048,
+          4096,
+          8192,
+          16384,
+          65536,
+          131072,
+          196608,
+          262144,
+          264192,
+          1048576,
+          12582912
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "TypeInfo": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "customAttributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomAttributeData"
+            },
+            "readOnly": true
+          },
+          "isCollectible": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "metadataToken": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "memberType": {
+            "$ref": "#/components/schemas/MemberTypes"
+          },
+          "namespace": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "assemblyQualifiedName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "assembly": {
+            "$ref": "#/components/schemas/Assembly"
+          },
+          "module": {
+            "$ref": "#/components/schemas/Module"
+          },
+          "isInterface": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNested": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "declaringType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "declaringMethod": {
+            "$ref": "#/components/schemas/MethodBase"
+          },
+          "reflectedType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "underlyingSystemType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "isTypeDefinition": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isArray": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isByRef": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPointer": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isConstructedGenericType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericParameter": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericTypeParameter": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericMethodParameter": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isGenericTypeDefinition": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSZArray": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isVariableBoundArray": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isByRefLike": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isFunctionPointer": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isUnmanagedFunctionPointer": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "hasElementType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "genericTypeArguments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Type"
+            },
+            "readOnly": true
+          },
+          "genericParameterPosition": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "genericParameterAttributes": {
+            "$ref": "#/components/schemas/GenericParameterAttributes"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/TypeAttributes"
+          },
+          "isAbstract": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isImport": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSealed": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSpecialName": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isClass": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedAssembly": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedFamANDAssem": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedFamily": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedFamORAssem": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedPrivate": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNestedPublic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isNotPublic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPublic": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isAutoLayout": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isExplicitLayout": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isLayoutSequential": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isAnsiClass": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isAutoClass": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isUnicodeClass": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isCOMObject": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isContextful": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isEnum": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isMarshalByRef": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isPrimitive": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isValueType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSignatureType": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecurityCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecuritySafeCritical": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isSecurityTransparent": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "structLayoutAttribute": {
+            "$ref": "#/components/schemas/StructLayoutAttribute"
+          },
+          "typeInitializer": {
+            "$ref": "#/components/schemas/ConstructorInfo"
+          },
+          "typeHandle": {
+            "$ref": "#/components/schemas/RuntimeTypeHandle"
+          },
+          "guid": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "baseType": {
+            "$ref": "#/components/schemas/Type"
+          },
+          "isSerializable": {
+            "type": "boolean",
+            "readOnly": true,
+            "deprecated": true
+          },
+          "containsGenericParameters": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isVisible": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "genericTypeParameters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Type"
+            },
+            "readOnly": true
+          },
+          "declaredConstructors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConstructorInfo"
+            },
+            "readOnly": true
+          },
+          "declaredEvents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventInfo"
+            },
+            "readOnly": true
+          },
+          "declaredFields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldInfo"
+            },
+            "readOnly": true
+          },
+          "declaredMembers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MemberInfo"
+            },
+            "readOnly": true
+          },
+          "declaredMethods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MethodInfo"
+            },
+            "readOnly": true
+          },
+          "declaredNestedTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypeInfo"
+            },
+            "readOnly": true
+          },
+          "declaredProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PropertyInfo"
+            },
+            "readOnly": true
+          },
+          "implementedInterfaces": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Type"
+            },
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UnblockIpViewModel": {
         "type": "object",
         "properties": {
@@ -14285,10 +15593,6 @@
       "UpdateAdminMenuViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "label": {
             "type": "string"
           },
@@ -14319,10 +15623,6 @@
       "UpdateAppointmentTypeViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -14447,10 +15747,6 @@
       "UpdateDoctorViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "bio": {
             "type": "string",
             "nullable": true
@@ -14559,10 +15855,6 @@
       "UpdateHospitalGroupViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -14609,10 +15901,6 @@
       "UpdateHospitalViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "hospitalGroupId": {
             "type": "string",
             "format": "uuid"
@@ -14763,10 +16051,6 @@
       "UpdateImagingModalityViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -14809,10 +16093,6 @@
       "UpdateInsuranceCompanyViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -14882,10 +16162,6 @@
       "UpdateLabTestCategoryViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -14906,10 +16182,6 @@
       "UpdateLabTestViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "testName": {
             "type": "string"
           },
@@ -15008,10 +16280,6 @@
       "UpdateManufacturerViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -15073,10 +16341,6 @@
       "UpdateMedicalSpecialtyViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -15125,10 +16389,6 @@
       "UpdateMedicineCategoryViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "name": {
             "type": "string"
           },
@@ -15154,13 +16414,111 @@
         },
         "additionalProperties": false
       },
-      "UpdateSupplierViewModel": {
+      "UpdatePatientViewModel": {
         "type": "object",
         "properties": {
-          "id": {
+          "patientType": {
+            "$ref": "#/components/schemas/PatientType"
+          },
+          "primaryDoctorId": {
             "type": "string",
             "format": "uuid"
           },
+          "preferredHospitalId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "preferredDoctorId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "preferredAppointmentTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "inssuranceProvider": {
+            "type": "string",
+            "nullable": true
+          },
+          "inssurancePolicyNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "inssuranceExpiryDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "inssuranceCoverageAmount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "isVip": {
+            "type": "boolean"
+          },
+          "isSeniorCitizen": {
+            "type": "boolean"
+          },
+          "isChronicPatient": {
+            "type": "boolean"
+          },
+          "riskLevel": {
+            "$ref": "#/components/schemas/RiskLevel"
+          },
+          "medicalHistory": {
+            "type": "string",
+            "nullable": true
+          },
+          "familyHistory": {
+            "type": "string",
+            "nullable": true
+          },
+          "surgicalHistory": {
+            "type": "string",
+            "nullable": true
+          },
+          "allergyInformation": {
+            "type": "string",
+            "nullable": true
+          },
+          "currentMedications": {
+            "type": "string",
+            "nullable": true
+          },
+          "lifestyleNotes": {
+            "type": "string",
+            "nullable": true
+          },
+          "occupation": {
+            "type": "string",
+            "nullable": true
+          },
+          "annualIncomeRange": {
+            "type": "string",
+            "nullable": true
+          },
+          "communicationPreferences": {
+            "type": "string",
+            "nullable": true
+          },
+          "consentForResearch": {
+            "type": "boolean"
+          },
+          "consentForMarketing": {
+            "type": "boolean"
+          },
+          "dataSharingConsent": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateSupplierViewModel": {
+        "type": "object",
+        "properties": {
           "supplierName": {
             "type": "string"
           },
@@ -15293,10 +16651,6 @@
       "UpdateSys_SequenceTrackerViewModel": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "entityType": {
             "type": "string"
           },
@@ -15318,6 +16672,18 @@
           "suffix": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpsertUserPreferenceViewModel": {
+        "type": "object",
+        "properties": {
+          "preferences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PreferenceItem"
+            }
           }
         },
         "additionalProperties": false
@@ -15602,6 +16968,10 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "Void": {
+        "type": "object",
+        "additionalProperties": false
       }
     },
     "securitySchemes": {

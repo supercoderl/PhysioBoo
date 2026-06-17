@@ -147,6 +147,7 @@ namespace PhysioBoo.Domain.Entities.Core
         public virtual ICollection<Doctor> UpdatedDoctors { get; private set; } = new List<Doctor>();
         public virtual ICollection<Review> CreatedReviews { get; private set; } = new List<Review>();
         public virtual ICollection<Review> UpdatedReviews { get; private set; } = new List<Review>();
+        public virtual ICollection<UserPreference> UserPreferences { get; private set; } = new List<UserPreference>();
         #endregion
 
         #region Constructor (20)

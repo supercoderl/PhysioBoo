@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.SharedKernel.Commands;
 
 namespace PhysioBoo.Application.Commands.Users.UpdateUser
@@ -8,9 +9,9 @@ namespace PhysioBoo.Application.Commands.Users.UpdateUser
         private static readonly UpdateUserCommandValidation s_validation = new();
 
         public Guid Id { get; }
-        public object UpdateUserData { get; }
+        public UpdateUserViewModel UpdateUserData { get; }
 
-        public UpdateUserCommand(Guid id, object updateUserData) : base(Guid.NewGuid())
+        public UpdateUserCommand(Guid id, UpdateUserViewModel updateUserData) : base(Guid.NewGuid())
         {
             Id = id;
             UpdateUserData = updateUserData;

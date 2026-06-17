@@ -1,4 +1,4 @@
-﻿namespace PhysioBoo.Domain.Interfaces
+﻿namespace PhysioBoo.Application.Interfaces
 {
     public interface IEmailSender
     {

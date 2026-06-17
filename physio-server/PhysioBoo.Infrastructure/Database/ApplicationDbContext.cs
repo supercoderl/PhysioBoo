@@ -86,6 +86,7 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<PrintTemplate> PrintTemplates { get; set; } = null!;
         public DbSet<PrintTemplateVersion> PrintTemplateVersions { get; set; } = null!;
         public DbSet<PrintLog> PrintLogs { get; set; } = null!;
+        public DbSet<UserPreference> UserPreferences { get; set; } = null!;
         #endregion
 
         public ApplicationDbContext(
@@ -98,8 +99,15 @@ namespace PhysioBoo.Infrastructure.Database
             _httpContextAccessor = httpContextAccessor;
         }
 
+        public Guid CurrentTenantId => _user != null && _user.IsAuthenticated ? _user.GetTenantId() : Guid.Empty;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.HasPostgresExtension("unaccent");
+
+            ApplyConfigurations(modelBuilder);
 
             foreach (Microsoft.EntityFrameworkCore.Metadata.IMutableEntityType entity in modelBuilder.Model.GetEntityTypes())
             {
@@ -108,19 +116,16 @@ namespace PhysioBoo.Infrastructure.Database
                     continue;
                 }
 
-                if (typeof(TenantEntity).IsAssignableFrom(entity.ClrType))
-                {
-                    MethodInfo? method = typeof(ApplicationDbContext).GetMethod(nameof(ApplyGlobalFilters), BindingFlags.NonPublic | BindingFlags.Instance)
-                                                             ?.MakeGenericMethod(entity.ClrType);
-                    method?.Invoke(this, new object[] { modelBuilder });
-                }
+                bool isTenant = typeof(TenantEntity).IsAssignableFrom(entity.ClrType);
+                bool isSoftDelete = typeof(Entity).IsAssignableFrom(entity.ClrType);
+
+                if (!isTenant && !isSoftDelete) continue;
+
+                MethodInfo? method = typeof(ApplicationDbContext)
+                    .GetMethod(nameof(ApplyGlobalFilters), BindingFlags.NonPublic | BindingFlags.Instance)
+                    ?.MakeGenericMethod(entity.ClrType);
+                method?.Invoke(this, new object[] { modelBuilder });
             }
-
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.HasPostgresExtension("unaccent");
-
-            ApplyConfigurations(modelBuilder);
 
             foreach (Microsoft.EntityFrameworkCore.Metadata.IMutableForeignKey? relationship in modelBuilder.Model.GetEntityTypes().SelectMany(x => x.GetForeignKeys()))
             {
@@ -153,6 +158,7 @@ namespace PhysioBoo.Infrastructure.Database
             return result;
         }
 
+        #region Apply Configurations
         private static void ApplyConfigurations(ModelBuilder builder)
         {
             // Apply configurations for each entity type
@@ -219,7 +225,9 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new PrintTemplateConfiguration());
             builder.ApplyConfiguration(new PrintTemplateVersionConfiguration());
             builder.ApplyConfiguration(new PrintLogConfiguration());
+            builder.ApplyConfiguration(new UserPreferenceConfiguration());
         }
+        #endregion
 
         private List<AuditEntry> OnBeforeSaveChanges(Guid? userId)
         {
@@ -392,12 +400,15 @@ namespace PhysioBoo.Infrastructure.Database
             if (isTenant && isSoftDelete)
             {
                 builder.Entity<T>().HasQueryFilter(e =>
-                        ((TenantEntity)(object)e).TenantId == _user.GetTenantId() &&
-                        ((Entity)(object)e).DeletedAt == null);
+                    !_user.IsAuthenticated ||
+                    (((TenantEntity)(object)e).TenantId == _user.GetTenantId() &&
+                     ((Entity)(object)e).DeletedAt == null));
             }
             else if (isTenant)
             {
-                builder.Entity<T>().HasQueryFilter(e => ((TenantEntity)(object)e).TenantId == _user.GetTenantId());
+                builder.Entity<T>().HasQueryFilter(e =>
+                    !_user.IsAuthenticated ||
+                    ((TenantEntity)(object)e).TenantId == _user.GetTenantId());
             }
             else if (isSoftDelete)
             {

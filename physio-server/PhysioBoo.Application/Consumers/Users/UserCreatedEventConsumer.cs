@@ -41,12 +41,12 @@ namespace PhysioBoo.Application.Consumers.Users
 
             await _bus.SendCommandAsync(new CreatePatientCommand(
                 new CreatePatientViewModel(
-                    context.Message.AggregateId,
                     Guid.NewGuid(),
                     null, null, null, null, null, null,
                     null, null, null, null, null, null,
                     null, null, null, null, null, null
-                )
+                ),
+                context.Message.AggregateId
             ));
         }
     }

@@ -25,24 +25,35 @@ namespace PhysioBoo.Application.Commands.Users.UpdateUser
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _userRepository.BatchUpdateAsync(
-                predicate: u => u.Id == request.Id,
-                updateDto: request.UpdateUserData,
-                cancellationToken
-            );
+            Domain.Entities.Core.User? user = await _userRepository.GetByIdAsync(request.Id);
 
-            if (result <= 0)
+            if (user == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"There is no any user with id {request.Id}.",
+                    $"User with Id {request.Id} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 
                 return;
             }
 
-            await Bus.RaiseEventAsync(new UserUpdatedEvent(request.Id));
+            user.SetEmail(request.UpdateUserData.Email);
+            user.SetPhone(request.UpdateUserData.Phone);
+            user.SetAlternatePhone(request.UpdateUserData.AlternatePhone);
+            user.SetIsActive(request.UpdateUserData.IsActive);
+            if (!string.IsNullOrEmpty(request.UpdateUserData.TwoFactorSecret))
+            {
+                user.SetTwoFactorSecret(request.UpdateUserData.TwoFactorSecret);
+                user.SetTwoFactorEnabled(true);
+            }
+            user.SetProfilePicture(request.UpdateUserData.ProfilePicture);
+            user.SetPreferredLanguage(request.UpdateUserData.PreferredLanguage);
+            user.SetTimeZone(request.UpdateUserData.TimeZone);
+
+            int resultCount = await _userRepository.UpdateTrackedAsync(user, cancellationToken);
+
+            if (resultCount > 0) await Bus.RaiseEventAsync(new UserUpdatedEvent(request.Id));
         }
     }
 }

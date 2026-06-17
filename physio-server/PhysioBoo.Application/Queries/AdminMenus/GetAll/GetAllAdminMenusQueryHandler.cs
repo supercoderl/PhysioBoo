@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using PhysioBoo.Application.ViewModels.AdminMenus;
 using PhysioBoo.Application.ViewModels.Sorting;
 using PhysioBoo.Domain.Entities.Core;
@@ -24,17 +25,30 @@ namespace PhysioBoo.Application.Queries.AdminMenus.GetAll
         public async Task<PagedResult<AdminMenuViewModel>> Handle(GetAllAdminMenusQuery q, CancellationToken cancellationToken)
         {
             AdminMenusSearchSpec spec = new AdminMenusSearchSpec(q, _sortingExpressionProvider);
+            PagedResult<AdminMenu> rootsPage = await _adminMenuRepository.ListAsync(spec, q.Request.PageNumber, q.Request.PageSize, cancellationToken);
 
-            PagedResult<AdminMenu> paged = await _adminMenuRepository.ListAsync(
-                spec,
-                q.Request.PageNumber,
-                q.Request.PageSize,
-                cancellationToken
-            );
+            List<AdminMenu> all = await _adminMenuRepository.GetAllNoTracking().ToListAsync(cancellationToken);
+            ILookup<Guid?, AdminMenu> byParent = all.ToLookup(m => m.ParentId);
 
             // Map to view model
-            List<AdminMenuViewModel> items = paged.Items.Select(am => AdminMenuViewModel.FromAdminMenu(am)).ToList();
-            return new PagedResult<AdminMenuViewModel>(paged.TotalCount, items, q.Request.PageNumber, q.Request.PageSize);
+            AdminMenuViewModel Build(AdminMenu m) => new()
+            {
+                Id = m.Id,
+                Label = m.Label,
+                Icon = m.Icon,
+                Route = m.Route,
+                Order = m.Order,
+                IsActive = m.IsActive,
+                PermissionCode = m.PermissionCode,
+                Children = byParent[m.Id]
+                    .OrderBy(c => c.Order)
+                    .Select(Build)
+                    .ToList() is { Count: > 0 } kids ? kids : null
+            };
+
+            List<AdminMenuViewModel> items = rootsPage.Items.Select(Build).ToList();
+            return new PagedResult<AdminMenuViewModel>(
+                rootsPage.TotalCount, items, q.Request.PageNumber, q.Request.PageSize);
         }
     }
 }

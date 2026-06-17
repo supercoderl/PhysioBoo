@@ -5,54 +5,143 @@ using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Enums;
+using PhysioBoo.SharedKernel.Attributes;
 using System.ComponentModel.DataAnnotations.Schema;
+using Column = System.ComponentModel.DataAnnotations.Schema.ColumnAttribute;
 
 namespace PhysioBoo.Domain.Entities.Operation
 {
+    [PlaceholderGroup("Hospital", "hospital", Order = 3)]
     public class Hospital : TenantEntity
     {
         #region Core Hospital Table (39)
+        [Placeholder(Label = "Hospital Name", Example = "Sunrise International Hospital")]
         public string Name { get; private set; }
+
+        [Placeholder(Label = "Hospital Code", Example = "HSP-SIH-2026")]
         public string? HospitalCode { get; private set; }
+
+        [Placeholder(Label = "Hospital Type", Example = "General")]
         public HospitalType HospitalType { get; private set; }
+
+        [Placeholder(Label = "Bed Capacity", Example = "500")]
         public int BedCapacity { get; private set; }
+
+        [Placeholder(Label = "ICU Capacity", Example = "50")]
         public int IcuCapacity { get; private set; }
+
+        [Placeholder(Label = "Emergency Capacity", Example = "120")]
         public int EmergencyCapacity { get; private set; }
+
+        [Placeholder(Label = "Operation Theaters", Example = "12")]
         public int OperationTheaters { get; private set; }
+
+        [Placeholder(Label = "Address", Example = "123 Nguyen Hue Boulevard")]
         public string Address { get; private set; }
+
+        [Placeholder(Label = "City", Example = "Ho Chi Minh City")]
         public string City { get; private set; }
+
+        [Placeholder(Label = "State / Province", Example = "Ho Chi Minh")]
         public string StateProvince { get; private set; }
+
+        [Placeholder(Label = "Postal Code", Example = "700000")]
         public string? PostalCode { get; private set; }
+
+        [Placeholder(Label = "Country", Example = "Vietnam")]
         public string Country { get; private set; }
+
+        [Placeholder(Label = "Phone", Example = "+84 28 3822 9999")]
         public string? Phone { get; private set; }
+
+        [Placeholder(Label = "Fax", Example = "+84 28 3822 8888")]
         public string? Fax { get; private set; }
+
+        [Placeholder(Label = "Email", Example = "contact@sunrisehospital.vn")]
         public string? Email { get; private set; }
+
+        [Placeholder(Label = "Website", Example = "https://www.sunrisehospital.vn")]
         public string? Website { get; private set; }
+
+        [Placeholder(Label = "Emergency Phone", Example = "+84 28 115")]
         public string? EmergencyPhone { get; private set; }
+
+        [Placeholder(Label = "Ambulance Phone", Example = "+84 28 1022")]
         public string? AmbulancePhone { get; private set; }
+
+        [Placeholder(Label = "Latitude", Example = "10.7769")]
         public decimal? Latitude { get; private set; }
+
+        [Placeholder(Label = "Longitude", Example = "106.7009")]
         public decimal? Longtitude { get; private set; }
+
+        [Placeholder(Label = "Established Date", Example = "2005-08-15 00:00:00")]
         public DateTime? EstablishedDate { get; private set; }
+
+        [Placeholder(Label = "License Number", Example = "VN-HOSP-2026-9981")]
         public string? LicenseNumber { get; private set; }
+
+        [Placeholder(Label = "License Expiry", Example = "2030-12-31 00:00:00")]
         public DateTime? LicenseExpiry { get; private set; }
+
+        [Placeholder(Label = "Accreditation Body", Example = "Joint Commission International (JCI)")]
         public string AccreditationBody { get; private set; }
+
+        [Placeholder(Label = "Accreditation Expiry", Example = "2029-06-30 00:00:00")]
         public DateTime? AccreditationExpiry { get; private set; }
+
+        [Placeholder(Label = "Insurance Accepted", Example = "AIA, Bao Viet, Prudential")]
         public string[] InsuranceAccepted { get; private set; }
+
+        [Placeholder(Label = "Languages Supported", Example = "Vietnamese, English, French")]
         public string[] LanguagesSupported { get; private set; }
 
+        [Placeholder(
+            Label = "Facilities",
+            Example = "{\"pharmacy\":true,\"laboratory\":true,\"parking\":true,\"cafeteria\":true}"
+        )]
         [Column("Facilities", TypeName = "jsonb")]
         public string? Facilities { get; private set; } // JSONB
 
+        [Placeholder(
+            Label = "Operating Hours",
+            Example = "{\"monday\":\"08:00-17:00\",\"tuesday\":\"08:00-17:00\",\"sunday\":\"Closed\"}"
+        )]
         [Column("OperatingHours", TypeName = "jsonb")]
         public string? OperatingHours { get; private set; } // JSONB
+
+        [Placeholder(Label = "Open 24 Hours", Example = "true")]
         public bool Is24Hours { get; private set; }
+
+        [Placeholder(Label = "Is Active", Example = "true")]
         public bool IsActive { get; private set; }
+
+        [Placeholder(Label = "Logo URL", Example = "https://cdn.hospital.vn/logo.png")]
         public string? LogoUrl { get; private set; }
 
+        [Placeholder(
+            Label = "Images",
+            Example = "[\"https://cdn.hospital.vn/image1.jpg\",\"https://cdn.hospital.vn/image2.jpg\"]"
+        )]
         [Column("Images", TypeName = "jsonb")]
         public string? Images { get; private set; } // JSONB
+
+        [Placeholder(
+            Label = "Description",
+            Example = "A multi-specialty hospital providing advanced healthcare services and emergency care."
+        )]
         public string? Description { get; private set; }
+
+        [Placeholder(
+            Label = "Mission Statement",
+            Example = "To deliver compassionate, affordable, and high-quality healthcare services."
+        )]
         public string? MissionStatement { get; private set; }
+
+        [Placeholder(
+            Label = "Vision Statement",
+            Example = "To become the leading smart healthcare institution in Southeast Asia."
+        )]
         public string? VisionStatement { get; private set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]

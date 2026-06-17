@@ -8,10 +8,12 @@ namespace PhysioBoo.Application.Commands.Permissions.CreatePermission
     {
         private static readonly CreatePermissionCommandValidation s_validation = new();
 
+        public Guid NewId { get; }
         public CreatePermissionViewModel NewPermission { get; }
 
-        public CreatePermissionCommand(CreatePermissionViewModel newPermission) : base(Guid.NewGuid())
+        public CreatePermissionCommand(Guid newId, CreatePermissionViewModel newPermission) : base(Guid.NewGuid())
         {
+            NewId = newId;
             NewPermission = newPermission;
         }
 

@@ -802,6 +802,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Street\", '') || ' ' || coalesce(\"Country\", '')))", true);
+
                     b.Property<string>("StateProvince")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -875,6 +880,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("Route")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"Label\", '') || ' ' || coalesce(\"Route\", '')))", true);
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -1356,6 +1366,55 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .IsUnique();
 
                     b.ToTable("UserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.UserPreference", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Group")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UserId", "Key")
+                        .IsUnique();
+
+                    b.ToTable("UserPreferences", (string)null);
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.UserRole", b =>
@@ -3891,7 +3950,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("EquipmentList")
-                        .HasColumnType("jsonb");
+                        .HasColumnType("jsonb")
+                        .HasColumnName("EquipmentList");
 
                     b.Property<int?>("FloorNumber")
                         .HasColumnType("integer");
@@ -3923,7 +3983,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("OperationHours")
-                        .HasColumnType("jsonb");
+                        .HasColumnType("jsonb")
+                        .HasColumnName("OperationHours");
 
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
@@ -4456,6 +4517,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("RiskLevel")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("to_tsvector('english', unaccent(coalesce(\"PatientNumber\", '')))", true);
 
                     b.Property<string>("SurgicalHistory")
                         .HasColumnType("text");
@@ -5199,7 +5265,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CurrentVersionId")
+                    b.Property<Guid?>("CurrentVersionId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
@@ -5399,7 +5465,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("UserAgent")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -6170,6 +6236,25 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.UserPreference", b =>
+                {
+                    b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
+                        .WithMany("UserPreferences")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "User")
+                        .WithMany("UserPreferences")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("HospitalGroup");
 
                     b.Navigation("User");
                 });
@@ -7483,8 +7568,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasOne("PhysioBoo.Domain.Entities.System.PrintTemplateVersion", "PrintTemplateVersion")
                         .WithMany("PrintTemplates")
                         .HasForeignKey("CurrentVersionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Updater")
                         .WithMany("UpdatedPrintTemplates")
@@ -7813,6 +7897,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Navigation("UserLogins");
 
+                    b.Navigation("UserPreferences");
+
                     b.Navigation("UserRoles");
 
                     b.Navigation("VerificationTokens");
@@ -8047,6 +8133,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("Reviews");
 
                     b.Navigation("Roles");
+
+                    b.Navigation("UserPreferences");
 
                     b.Navigation("Users");
                 });

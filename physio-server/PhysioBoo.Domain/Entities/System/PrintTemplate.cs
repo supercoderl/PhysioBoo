@@ -13,7 +13,7 @@ namespace PhysioBoo.Domain.Entities.System
         public string DocumentType { get; private set; }
         public bool IsSystemDefault { get; private set; }
         public bool IsActive { get; private set; }
-        public Guid CurrentVersionId { get; private set; }
+        public Guid? CurrentVersionId { get; private set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public NpgsqlTsVector? SearchVector { get; private set; }
@@ -32,7 +32,7 @@ namespace PhysioBoo.Domain.Entities.System
             string code,
             string module,
             string documentType,
-            Guid currentVersionId
+            Guid? currentVersionId
         ) : base(id)
         {
             Name = name;
@@ -52,7 +52,7 @@ namespace PhysioBoo.Domain.Entities.System
         public void SetDocumentType(string documentType) { DocumentType = documentType; }
         public void SetIsDefault(bool isSystemDefault) { IsSystemDefault = isSystemDefault; }
         public void SetIsActive(bool isActive) { IsActive = isActive; }
-        public void SetCurrentVersionId(Guid currentVersionId) { CurrentVersionId = currentVersionId; }
+        public void SetCurrentVersionId(Guid? currentVersionId) { CurrentVersionId = currentVersionId; }
         #endregion
     }
 }

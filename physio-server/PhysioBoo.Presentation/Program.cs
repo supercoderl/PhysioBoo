@@ -4,6 +4,7 @@ using HealthChecks.ApplicationStatus.DependencyInjection;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using PhysioBoo.Application.Extensions;
 using PhysioBoo.Application.gRPC;
@@ -62,6 +63,7 @@ namespace PhysioBoo.Presentation
                 );
 
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTrackingWithIdentityResolution);
+                options.ReplaceService<IModelCacheKeyFactory, TenantModelCacheKeyFactory>();
 
                 if (builder.Environment.IsDevelopment())
                 {
@@ -320,6 +322,7 @@ namespace PhysioBoo.Presentation
             void MapCommonEndpoints(WebApplication app)
             {
                 app.MapUserEndpoints();
+                app.MapUserPreferenceEndpoints();
                 app.MapAddressEndpoints();
                 app.MapProfileEndpoints();
                 app.MapReviewEndpoints();
@@ -327,6 +330,7 @@ namespace PhysioBoo.Presentation
                 app.MapRoleEndpoints();
                 app.MapConfigEndpoints();
                 app.MapAdminMenuEndpoints();
+                app.MapPermissionEndpoints();
             }
             void MapSystemEndpoints(WebApplication app)
             {

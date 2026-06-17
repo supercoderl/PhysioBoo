@@ -27,7 +27,8 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.HasOne(pt => pt.PrintTemplateVersion)
                 .WithMany(ptv => ptv.PrintTemplates)
-                .HasForeignKey(pt => pt.CurrentVersionId);
+                .HasForeignKey(pt => pt.CurrentVersionId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Indexes
             builder.HasIndex(pt => new { pt.Name, pt.Code });
@@ -54,8 +55,7 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(pt => pt.IsActive)
                    .IsRequired();
 
-            builder.Property(pt => pt.CurrentVersionId)
-                   .IsRequired();
+            builder.Property(pt => pt.CurrentVersionId);
         }
     }
 }

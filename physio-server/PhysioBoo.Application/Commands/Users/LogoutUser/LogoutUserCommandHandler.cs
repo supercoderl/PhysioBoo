@@ -28,7 +28,16 @@ namespace PhysioBoo.Application.Commands.Users.LogoutUser
         {
             if (!await TestValidityAsync(request)) return;
 
-            Guid userId = _user.GetUserId();
+            Guid userId;
+
+            try
+            {
+                userId = _user.GetUserId();
+            }
+            catch (Exception)
+            {
+                return;
+            }
 
             // Revoke logic command
             int result = await _refreshTokenRepository.BatchUpdateMultipleAsync(

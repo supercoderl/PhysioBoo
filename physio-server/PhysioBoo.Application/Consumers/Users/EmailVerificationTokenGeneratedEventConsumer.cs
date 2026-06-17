@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Interfaces;
@@ -44,7 +45,7 @@ namespace PhysioBoo.Application.Consumers.Users
             {
                 if (context.Message.UserId.HasValue)
                 {
-                    var user = await _bus.QueryAsync(new GetUserByIdQuery(context.Message.UserId.Value));
+                    ViewModels.Users.UserViewModel? user = await _bus.QueryAsync(new GetUserByIdQuery(context.Message.UserId.Value));
 
                     if (user != null)
                     {

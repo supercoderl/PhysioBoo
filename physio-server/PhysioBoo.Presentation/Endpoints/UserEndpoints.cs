@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using PhysioBoo.Application.Commands.Users.AssignRoleToUser;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
 using PhysioBoo.Application.Commands.Users.CreateUser;
+using PhysioBoo.Application.Commands.Users.DeleteUser;
 using PhysioBoo.Application.Commands.Users.ForgotPassword;
 using PhysioBoo.Application.Commands.Users.LoginUser;
 using PhysioBoo.Application.Commands.Users.LogoutUser;
@@ -10,8 +11,10 @@ using PhysioBoo.Application.Commands.Users.OAuthLoginUser;
 using PhysioBoo.Application.Commands.Users.RefreshToken;
 using PhysioBoo.Application.Commands.Users.ResendVerification;
 using PhysioBoo.Application.Commands.Users.ResetPassword;
+using PhysioBoo.Application.Commands.Users.UpdateUser;
 using PhysioBoo.Application.Commands.Users.VerifyUser;
 using PhysioBoo.Application.Queries.Users.GetAll;
+using PhysioBoo.Application.Queries.Users.GetPreferences;
 using PhysioBoo.Application.Queries.Users.GetProfile;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Interfaces;
@@ -176,8 +179,7 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("Logout")
             .WithSummary("Logout current user")
             .Produces(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .Produces(StatusCodes.Status400BadRequest);
             #endregion
 
             #region Change password
@@ -324,6 +326,61 @@ namespace PhysioBoo.Presentation.Endpoints
             .RequireAuthorization()
             .Produces<ResponseMessage<UserProfileViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<UserProfileViewModel?>>(StatusCodes.Status400BadRequest);
+            #endregion
+
+            #region Get Preferences
+            group.MapGet("/me/preferences", async (
+                IMediatorHandler bus,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                IReadOnlyDictionary<string, string> result = await bus.QueryAsync(new GetPreferencesQuery());
+
+                return Results.Ok(new ResponseMessage<IReadOnlyDictionary<string, string>>
+                {
+                    Success = true,
+                    Data = result
+                });
+            }).WithName("UserPreferences")
+            .WithSummary("Retrieve user preferences.")
+            .RequireAuthorization()
+            .Produces<ResponseMessage<IReadOnlyDictionary<string, string>>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<IReadOnlyDictionary<string, string>>>(StatusCodes.Status400BadRequest);
+            #endregion
+
+            #region Update user
+            group.MapPatch("{id:guid}", async (
+                Guid id,
+                [FromBody] UpdateUserViewModel user,
+                IMediatorHandler bus,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                await bus.SendCommandAsync(new UpdateUserCommand(id, user));
+
+                return Results.NoContent();
+            }).WithName("UpdateUser")
+            .WithSummary("Update user")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound);
+            #endregion
+
+            #region Delete User
+            group.MapDelete("{id:guid}", async (
+                Guid id,
+                IMediatorHandler bus,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                await bus.SendCommandAsync(new DeleteUserCommand(id));
+
+                return Results.NoContent();
+            }).WithName("DeleteUser")
+            .WithSummary("Handles requests to delete a user by its identifier.")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
         }
     }

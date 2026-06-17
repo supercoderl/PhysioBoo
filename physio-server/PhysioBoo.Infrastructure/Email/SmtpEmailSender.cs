@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Settings;
 using System.Net;

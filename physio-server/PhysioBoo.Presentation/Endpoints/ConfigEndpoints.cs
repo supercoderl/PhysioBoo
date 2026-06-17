@@ -10,7 +10,7 @@ namespace PhysioBoo.Presentation.Endpoints
     {
         public static void MapConfigEndpoints(this IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api")
+            RouteGroupBuilder group = app.MapGroup("api/config")
                 .WithTags("Configuration")
                 .WithOpenApi()
                 .AddEndpointFilter<NotificationResultFilter>();

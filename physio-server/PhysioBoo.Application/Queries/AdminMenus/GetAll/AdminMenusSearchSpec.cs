@@ -14,6 +14,8 @@ namespace PhysioBoo.Application.Queries.AdminMenus.GetAll
             ISortingExpressionProvider<AdminMenuViewModel, AdminMenu> sortingExpressionProvider
         )
         {
+            Query.Where(x => x.ParentId == null);
+
             // Apply filters
             if (!string.IsNullOrEmpty(q.Request.Search))
             {
@@ -32,9 +34,9 @@ namespace PhysioBoo.Application.Queries.AdminMenus.GetAll
             // Apply filter
             if (q.Request.Filter != null)
             {
-                if (q.Request.Filter.IsActive.HasValue)
+                if (q.Request.Filter?.IsActive is bool isActive)
                 {
-                    Query.Where(x => q.Request.Filter.IsActive.Value);
+                    Query.Where(x => x.IsActive == isActive);
                 }
             }
 

@@ -2,7 +2,6 @@
 {
     public sealed record CreatePatientViewModel
     (
-        Guid? UserId,
         Guid PrimaryDoctorId,
         Guid? ReferredBy,
         Guid? ReferralHospitalId,

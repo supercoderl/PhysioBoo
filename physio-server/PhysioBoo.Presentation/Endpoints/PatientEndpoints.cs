@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using PhysioBoo.Application.Commands.Patients.CreatePatient;
 using PhysioBoo.Application.Commands.Patients.DeletePatient;
 using PhysioBoo.Application.Commands.Patients.UpdatePatient;
 using PhysioBoo.Application.Queries.Patients.GetAll;
@@ -55,6 +56,33 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a specific patient by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
+            #endregion
+
+            #region Create Patient
+            group.MapPost("", async (
+                [FromBody] CreatePatientViewModel request,
+                IMediatorHandler bus,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                Guid newId = Guid.NewGuid();
+                await bus.SendCommandAsync(new CreatePatientCommand(request, newId));
+
+                return Results.CreatedAtRoute(
+                "GetPatientById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
+            }).WithName("CreatePatient")
+            .WithSummary("Create patient")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization();
             #endregion
 

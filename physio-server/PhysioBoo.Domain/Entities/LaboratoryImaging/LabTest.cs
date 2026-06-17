@@ -1,38 +1,102 @@
 ﻿using NpgsqlTypes;
+using PhysioBoo.SharedKernel.Attributes;
 using PhysioBoo.SharedKernel.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhysioBoo.Domain.Entities.LaboratoryImaging
 {
+    [PlaceholderGroup("Lab", "lab", Modules = new[] { "lab" }, Order = 10)]
     public class LabTest : Entity
     {
         #region Core Lab Test Table (27)
+        [Placeholder(Label = "Test Name", Example = "Complete Blood Count")]
         public string TestName { get; private set; }
+
+        [Placeholder(Label = "Test Code", Example = "LAB-CBC-001")]
         public string? TestCode { get; private set; }
+
+        [Placeholder(Label = "Category ID", Example = "3e2f1a9b-7d6c-4f8b-9a1e-5c3d7e9f2b11")]
         public Guid CategoryId { get; private set; }
+
+        [Placeholder(
+            Label = "Description",
+            Example = "Measures red blood cells, white blood cells, hemoglobin, and platelets."
+        )]
         public string? Description { get; private set; }
+
+        [Placeholder(Label = "Sample Type", Example = "Venous Blood")]
         public string? SampleType { get; private set; }
+
+        [Placeholder(Label = "Sample Volume", Example = "5 mL")]
         public string? SampleVolume { get; private set; }
+
+        [Placeholder(
+            Label = "Collection Instructions",
+            Example = "Collect sample in EDTA tube and mix gently."
+        )]
         public string? CollectionInstructions { get; private set; }
+
+        [Placeholder(Label = "Preparation Required", Example = "true")]
         public bool PreparationRequired { get; private set; }
+
+        [Placeholder(
+            Label = "Preparation Instructions",
+            Example = "Avoid alcohol and strenuous exercise 24 hours before the test."
+        )]
         public string? PreparationInstructions { get; private set; }
+
+        [Placeholder(Label = "Fasting Required", Example = "true")]
         public bool FastingRequired { get; private set; }
+
+        [Placeholder(Label = "Fasting Hours", Example = "8")]
         public int FastingHours { get; private set; }
+
+        [Placeholder(Label = "Normal Range Male", Example = "13.5 - 17.5 g/dL")]
         public string? NormalRangeMale { get; private set; }
+
+        [Placeholder(Label = "Normal Range Female", Example = "12.0 - 15.5 g/dL")]
         public string? NormalRangeFemale { get; private set; }
+
+        [Placeholder(Label = "Normal Pediatric Range", Example = "11.0 - 16.0 g/dL")]
         public string? NormalPediatric { get; private set; }
+
+        [Placeholder(Label = "Unit Of Measurement", Example = "mg/dL")]
         public string? UnitOfMeasurement { get; private set; }
+
+        [Placeholder(Label = "Methodology", Example = "Automated Hematology Analyzer")]
         public string? Methodology { get; private set; }
+
+        [Placeholder(Label = "Reporting Time (Hours)", Example = "24")]
         public int ReportingTimeHours { get; private set; }
+
+        [Placeholder(Label = "Cost", Example = "350000")]
         public decimal Cost { get; private set; }
+
+        [Placeholder(Label = "Is Profile Test", Example = "false")]
         public bool IsProfile { get; private set; }
+
+        [Placeholder(Label = "Urgent Service Available", Example = "true")]
         public bool IsUrgentAvailable { get; private set; }
+
+        [Placeholder(Label = "Urgent Cost", Example = "500000")]
         public decimal UrgentCost { get; private set; }
+
+        [Placeholder(Label = "Urgent Reporting Time (Hours)", Example = "4")]
         public int UrgentReportingTimeHours { get; private set; }
+
+        [Placeholder(Label = "Home Collection Available", Example = "true")]
         public bool IsHomeCollectionAvailable { get; private set; }
+
+        [Placeholder(Label = "Home Collection Charge", Example = "100000")]
         public decimal HomeCollectionCharge { get; private set; }
+
+        [Placeholder(Label = "Requires Appointment", Example = "false")]
         public bool RequiresAppoinment { get; private set; }
+
+        [Placeholder(Label = "Is Active", Example = "true")]
         public bool IsActive { get; private set; }
+
+        [Placeholder(Label = "Created At", Example = "2026-05-24 10:15:00")]
         public DateTime CreatedAt { get; private set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]

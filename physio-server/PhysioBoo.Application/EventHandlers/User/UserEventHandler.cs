@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
-using PhysioBoo.Application.Commands.Users.UpdateUser;
 using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
 using PhysioBoo.Domain;
 using PhysioBoo.Domain.Enums;
@@ -78,41 +77,41 @@ namespace PhysioBoo.Application.EventHandlers.User
 
             VerificationType type = Enum.Parse<VerificationType>(notification.Type);
 
-            switch (type)
-            {
-                case VerificationType.Email:
-                    await _bus.SendCommandAsync(new UpdateUserCommand(
-                        token.UserId,
-                        new
-                        {
-                            IsVerified = true,
-                            EmailVerifiedAt = (DateTime?)TimeZoneHelper.GetLocalTimeNow()
-                        })
-                    );
-                    break;
-                case VerificationType.PasswordReset:
-                    (string accessToken, string refreshToken) = TokenHelper.BuildAuthToken(
-                        new Dictionary<string, string>
-                        {
-                            ["Email"] = token.UserEmail,
-                            ["Id"] = token.UserId.ToString(),
-                            ["Name"] = token.UserEmail.Split("@")[0],
-                            ["TenantId"] = token.TenantId.ToString()
-                        }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes
-                    );
+            //switch (type)
+            //{
+            //    case VerificationType.Email:
+            //        await _bus.SendCommandAsync(new UpdateUserCommand(
+            //            token.UserId,
+            //            new
+            //            {
+            //                IsVerified = true,
+            //                EmailVerifiedAt = (DateTime?)TimeZoneHelper.GetLocalTimeNow()
+            //            })
+            //        );
+            //        break;
+            //    case VerificationType.PasswordReset:
+            //        (string accessToken, string refreshToken) = TokenHelper.BuildAuthToken(
+            //            new Dictionary<string, string>
+            //            {
+            //                ["Email"] = token.UserEmail,
+            //                ["Id"] = token.UserId.ToString(),
+            //                ["Name"] = token.UserEmail.Split("@")[0],
+            //                ["TenantId"] = token.TenantId.ToString()
+            //            }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes
+            //        );
 
-                    await _bus.RaiseEventAsync(new UserLoggedEvent(token.UserId, accessToken, refreshToken));
-                    break;
-                case VerificationType.Phone:
-                    await _bus.SendCommandAsync(new UpdateUserCommand(
-                        token.UserId,
-                        new
-                        {
-                            PhoneVerifiedAt = (DateTime?)TimeZoneHelper.GetLocalTimeNow()
-                        })
-                    );
-                    break;
-            }
+            //        await _bus.RaiseEventAsync(new UserLoggedEvent(token.UserId, accessToken, refreshToken));
+            //        break;
+            //    case VerificationType.Phone:
+            //        await _bus.SendCommandAsync(new UpdateUserCommand(
+            //            token.UserId,
+            //            new
+            //            {
+            //                PhoneVerifiedAt = (DateTime?)TimeZoneHelper.GetLocalTimeNow()
+            //            })
+            //        );
+            //        break;
+            //}
         }
     }
 }

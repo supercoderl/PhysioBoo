@@ -36,9 +36,9 @@ namespace PhysioBoo.Application.Commands.Patients.CreatePatient
             string newCode = await _sequenceTrackerRepository.GenerateNextCodeAsync("Patient", cancellationToken);
 
             Patient newPatient = new Patient(
-                _user.GetUserId(),
+                request.NewId,
                 newCode,
-                request.NewPatient.UserId,
+                _user.GetUserId(),
                 request.NewPatient.PrimaryDoctorId,
                 request.NewPatient.ReferredBy,
                 request.NewPatient.ReferralHospitalId,

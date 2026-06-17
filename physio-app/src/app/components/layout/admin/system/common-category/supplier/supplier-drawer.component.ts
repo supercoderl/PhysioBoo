@@ -8,7 +8,7 @@ import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREAT
 import { SupplierType } from "../../../../../../shared/enums/supplier-type";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { Supplier } from "../../../../../../shared/types/support";
-import { convertEnumToSelection, generateUUID } from "../../../../../../shared/utils/common";
+import { convertEnumToSelection } from "../../../../../../shared/utils/common";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
@@ -297,7 +297,7 @@ export class CommonCategorySupplierDrawerComponent implements OnChanges {
     loadDetail(id: string) {
         this.form.disable();
 
-        this.supplierSrv.search_by_id({ id })
+        this.supplierSrv.search_by_id(id)
             .pipe(
                 finalize(() => this.form.enable())
             )
@@ -358,23 +358,36 @@ export class CommonCategorySupplierDrawerComponent implements OnChanges {
             return;
         }
 
-        const targetId = this.currentId ?? generateUUID();
-        const formData = { ...this.form.getRawValue(), id: targetId }
-
-        const request$ = this.currentId
-            ? this.supplierSrv.update(formData)
-            : this.supplierSrv.create(formData);
+        const formData = { ...this.form.getRawValue() }
 
         try {
-            await firstValueFrom(request$);
+            let id: string;
 
-            const response = await firstValueFrom(this.supplierSrv.search_by_id({ id: targetId }));
+            if (this.currentId) {
+                const updateRes = await firstValueFrom(this.supplierSrv.update(this.currentId, formData));
+                if (!updateRes.success) {
+                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+                    return;
+                }
+                id = this.currentId;
+            } else {
+                const createRes = await firstValueFrom(this.supplierSrv.create(formData));
+                if (!createRes.success || !createRes.data) {
+                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+                    return;
+                }
+                id = createRes.data;
+            }
+
+            const response = await firstValueFrom(this.supplierSrv.search_by_id(id));
             if (response.success && response.data) {
                 this.saveSuccess.emit(response.data);
-            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (error) {
+            } else {
+                this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
+            }
+        } catch (err) {
             this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            console.error(error);
+            console.error(err);
         }
     }
 

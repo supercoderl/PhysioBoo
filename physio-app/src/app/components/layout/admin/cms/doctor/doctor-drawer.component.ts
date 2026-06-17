@@ -529,7 +529,7 @@ export class CmsDoctorDrawerComponent implements OnChanges {
         try {
             await firstValueFrom(request$);
 
-            const response = await firstValueFrom(this.doctorSrv.search_by_id({ id: targetId }));
+            const response = await firstValueFrom(this.doctorSrv.search_by_id(targetId));
             if (response.success && response.data) {
                 this.saveSuccess.emit(response.data);
             } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);

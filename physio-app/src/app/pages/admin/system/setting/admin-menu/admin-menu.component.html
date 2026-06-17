@@ -1,125 +1,102 @@
 <admin-content-header>
-  <!-- Page header -->
-  <div
-    class="flex items-center md:flex-column gap-2 pb-3 mb-2 border-1 border-bottom"
-  >
-    <div class="flex-1">
-      <h4 class="text-[22px] text-primary font-semibold mb-0">
-        Menu Management
-      </h4>
-    </div>
-    <div class="text-right flex items-center gap-2">
+
+  <header class="flex flex-col mb-6">
+    <div class="flex items-start justify-between mt-2 gap-4 flex-wrap">
+      <div>
+        <p class="tracking-tight font-bold leading-none text-[22px] m-0 text-primary">Menu Management</p>
+        <p class="text-sm text-gray-500 mt-1">Organize the sidebar and top-nav items that appear across the admin app.</p>
+      </div>
       <button-icon
-        buttonClass="!bg-primary ms-2 text-white"
-        (onClick)="onOpenDrawer(null)"
-      >
-        New Item
+        buttonClass="!bg-primary text-white"
+        (onClick)="onOpenDrawer(null)">
+        + New Item
       </button-icon>
     </div>
-  </div>
-
-  <!-- Search toolbar -->
-  <div class="flex items-center gap-2 mb-2">
-    <div class="table-search flex items-center">
-      <div class="search-input">
-        <boo-input
-          label="Search menus..."
-          size="small"
-          (search)="onSearch($event)"
-        >
-          <boo-icon
-            [class.animate-spin]="loadingSrv.isLoading('search')"
-            [name]="loadingSrv.isLoading('search') ? 'loader-circle' : 'search'"
-            color="#64748B"
-            endfix
-          />
-        </boo-input>
-      </div>
-    </div>
-    <boo-button-admin
-      [icon]="{ name: 'refresh-cw', size: 14, color: '#6C7688' }"
-      buttonClass="!bg-surface h-full"
-      [border]="{ width: 1, color: '#e3e3e3' }"
-      (click)="loadMenus()"
-    >
-      <span class="text-placeholder">Reload</span>
-    </boo-button-admin>
-  </div>
+  </header>
 
   <!-- Stats row -->
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-    <div
-      class="bg-surface border border-gray-200 rounded-lg p-3 flex items-center gap-3"
-    >
-      <div
-        class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center"
-      >
-        <boo-icon
-          name="layout-list"
-          [size]="18"
-          class="text-primary"
-        ></boo-icon>
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+    <div class="bg-surface border border-gray-200 rounded-lg p-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+        <boo-icon name="layout-list" [size]="18" class="text-primary"></boo-icon>
       </div>
       <div>
-        <p class="text-xs text-secondary m-0">Total Items</p>
-        <p class="text-lg font-bold text-primary m-0">{{ flatMenus.length }}</p>
+        <p class="text-xs text-gray-500 m-0">Total items</p>
+        <p class="text-lg font-bold text-gray-900 m-0 leading-tight">{{ flatMenus.length }}</p>
       </div>
     </div>
 
-    <div
-      class="bg-surface border border-gray-200 rounded-lg p-3 flex items-center gap-3"
-    >
-      <div
-        class="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center"
-      >
+    <div class="bg-surface border border-gray-200 rounded-lg p-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
         <boo-icon name="circle-check" [size]="18" color="#16a34a"></boo-icon>
       </div>
       <div>
-        <p class="text-xs text-secondary m-0">Active</p>
-        <p class="text-lg font-bold text-primary m-0">
+        <p class="text-xs text-gray-500 m-0">Active</p>
+        <p class="text-lg font-bold text-gray-900 m-0 leading-tight">
           {{ (flatMenus | filter: "isActive" : true).length }}
         </p>
       </div>
     </div>
 
-    <div
-      class="bg-surface border border-gray-200 rounded-lg p-3 flex items-center gap-3"
-    >
-      <div
-        class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center"
-      >
+    <div class="bg-surface border border-gray-200 rounded-lg p-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
         <boo-icon name="layers" [size]="18" color="#2563eb"></boo-icon>
       </div>
       <div>
-        <p class="text-xs text-secondary m-0">Root Menus</p>
-        <p class="text-lg font-bold text-primary m-0">{{ menus().length }}</p>
+        <p class="text-xs text-gray-500 m-0">Root menus</p>
+        <p class="text-lg font-bold text-gray-900 m-0 leading-tight">{{ menus().length }}</p>
       </div>
     </div>
 
-    <div
-      class="bg-surface border border-gray-200 rounded-lg p-3 flex items-center gap-3"
-    >
-      <div
-        class="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center"
-      >
-        <boo-icon name="layout-list" [size]="18" color="#d97706"></boo-icon>
+    <div class="bg-surface border border-gray-200 rounded-lg p-4 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
+        <boo-icon name="git-branch" [size]="18" color="#d97706"></boo-icon>
       </div>
       <div>
-        <p class="text-xs text-secondary m-0">Child Items</p>
-        <p class="text-lg font-bold text-primary m-0">
+        <p class="text-xs text-gray-500 m-0">Child items</p>
+        <p class="text-lg font-bold text-gray-900 m-0 leading-tight">
           {{ flatMenus.length - menus().length }}
         </p>
       </div>
     </div>
   </div>
 
-  <!-- Tree card -->
-  <setting-admin-menu-tree-card
-    [data]="filteredMenus()"
-    (editClick)="onOpenDrawer($event)"
-    (deleteClick)="onDelete($event)"
-    (addChildClick)="onOpenDrawer(null, $event)"
-  />
+  <!-- Tree section -->
+  <section class="bg-surface rounded-lg border border-gray-200">
+    <div class="p-5 border-b border-gray-100 flex items-center justify-between gap-4 flex-wrap">
+      <div class="min-w-0">
+        <h2 class="text-base font-semibold text-gray-900 mb-1">Menu tree</h2>
+        <p class="text-sm text-gray-500">Drag items to re-order. Use the kebab menu on any row to edit, add a child, or delete.</p>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="inline-flex items-center gap-2 h-9 px-3 border border-gray-200 rounded-md bg-surface focus-within:border-primary w-56">
+          <boo-icon
+            [class.animate-spin]="loadingSrv.isLoading('search')"
+            [name]="loadingSrv.isLoading('search') ? 'loader-circle' : 'search'"
+            iconClass="w-4 h-4 text-gray-400" />
+          <boo-input
+            label="Search menus..."
+            size="small"
+            wrapperClass="!border-0 !p-0 !h-auto"
+            (search)="onSearch($event)" />
+        </div>
+        <button type="button"
+          (click)="loadMenus()"
+          class="inline-flex items-center gap-1.5 h-9 px-3 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+          <boo-icon name="refresh-cw" iconClass="w-3.5 h-3.5" />
+          Reload
+        </button>
+      </div>
+    </div>
+
+    <div class="p-5">
+      <setting-admin-menu-tree-card
+        [data]="filteredMenus()"
+        (editClick)="onOpenDrawer($event)"
+        (deleteClick)="onDelete($event)"
+        (addChildClick)="onOpenDrawer(null, $event)" />
+    </div>
+  </section>
 
   <!-- Drawer -->
   <setting-admin-menu-drawer
@@ -129,6 +106,6 @@
     [allMenus]="menus()"
     (close)="onCloseDrawer()"
     (saveSuccess)="onSaveSuccess($event)"
-    (delete)="onDelete($event)"
-  />
+    (delete)="onDelete($event)" />
+
 </admin-content-header>

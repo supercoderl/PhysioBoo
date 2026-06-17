@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ConnectionComponent } from './connection.component';
+import { AdminConnectionComponent } from './connection.component';
 
-describe('ConnectionComponent', () => {
-  let component: ConnectionComponent;
-  let fixture: ComponentFixture<ConnectionComponent>;
+describe('AdminConnectionComponent', () => {
+  let component: AdminConnectionComponent;
+  let fixture: ComponentFixture<AdminConnectionComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ConnectionComponent]
+      imports: [AdminConnectionComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(ConnectionComponent);
+    fixture = TestBed.createComponent(AdminConnectionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

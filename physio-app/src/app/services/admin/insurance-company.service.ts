@@ -13,21 +13,19 @@ export class InsuranceCompanyService {
         return this.http.post<PagedResponse<PaginationData<InsuranceCompany>>>(BASE_API.INSURANCECOMPANY.SEARCH, request);
     }
 
-    search_by_id(params: { id: string }) {
-        return this.http.post<PagedResponse<InsuranceCompany | null>>(BASE_API.INSURANCECOMPANY.SEARCH_BY_ID, params);
+    search_by_id(id: string) {
+        return this.http.get<PagedResponse<InsuranceCompany | null>>(`${BASE_API.INSURANCECOMPANY.BASE}/${id}`);
     }
 
     create(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.INSURANCECOMPANY.CREATE, params);
+        return this.http.post<PagedResponse<string>>(BASE_API.INSURANCECOMPANY.BASE, params);
     }
 
-    update(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.INSURANCECOMPANY.UPDATE, params);
+    update(id: string, params: any) {
+        return this.http.patch<PagedResponse<string>>(`${BASE_API.INSURANCECOMPANY.BASE}/${id}`, params);
     }
 
-    delete(id: string, isHard: boolean = false) {
-        return this.http.post<PagedResponse<string>>(BASE_API.INSURANCECOMPANY.DELETE, {
-            id, isHard
-        });
+    delete(id: string) {
+        return this.http.delete<PagedResponse<string>>(`${BASE_API.INSURANCECOMPANY.BASE}/${id}`);
     }
 }

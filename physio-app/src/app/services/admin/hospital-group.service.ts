@@ -13,19 +13,19 @@ export class HospitalGroupService {
         return this.http.post<PagedResponse<PaginationData<HospitalGroup>>>(BASE_API.HOSPITALGROUP.SEARCH, request);
     }
 
-    search_by_id(params: { id: string }) {
-        return this.http.post<PagedResponse<HospitalGroup | null>>(BASE_API.HOSPITALGROUP.SEARCH_BY_ID, params);
+    search_by_id(id: string) {
+        return this.http.get<PagedResponse<HospitalGroup | null>>(`${BASE_API.HOSPITALGROUP.BASE}/${id}`);
     }
 
     create(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.HOSPITALGROUP.CREATE, params);
+        return this.http.post<PagedResponse<string>>(BASE_API.HOSPITALGROUP.BASE, params);
     }
 
-    update(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.HOSPITALGROUP.UPDATE, params);
+    update(id: string, params: any) {
+        return this.http.patch<PagedResponse<string>>(`${BASE_API.HOSPITALGROUP.BASE}/${id}`, params);
     }
 
-    delete(id: string, isHard: boolean = false) {
-        return this.http.post<PagedResponse<string>>(BASE_API.HOSPITALGROUP.DELETE, { id, isHard });
+    delete(id: string) {
+        return this.http.delete<PagedResponse<string>>(`${BASE_API.HOSPITALGROUP.BASE}/${id}`);
     }
 }

@@ -1,19 +1,19 @@
+import { SocialAuthService } from "@abacritt/angularx-social-login";
 import { Component, Input, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
 import { ChevronUp, FileCheck, Info } from "lucide-angular";
-import { SharedModule } from "../../../../shared/shared-imports";
-import { SidebarItemComponent } from "./sidebar-item/sidebar-item.component";
-import { LocalStorage } from "../../../../shared/utils/storage";
-import { MenuItem } from "../../../../shared/types/menu";
-import { PaginationData } from "../../../../shared/types/common";
 import { AuthService } from "../../../../services/auth/auth.service";
+import { LocalLoadingService } from "../../../../services/common/local-loading.service";
+import { ToastService } from "../../../../services/common/toast.service";
 import { AVATAR } from "../../../../shared/data/dummy";
+import { SharedModule } from "../../../../shared/shared-imports";
+import { PaginationData } from "../../../../shared/types/common";
+import { MenuItem } from "../../../../shared/types/menu";
+import { LocalStorage } from "../../../../shared/utils/storage";
+import { ButtonIconComponent } from "../../../button/button-icon/button-icon.component";
 import { BooAvatarComponent } from "../../../image/avatar/boo-avatar.component";
 import { PopupComponent } from "../../../popup/popup.component";
-import { LocalLoadingService } from "../../../../services/common/local-loading.service";
-import { ButtonIconComponent } from "../../../button/button-icon/button-icon.component";
-import { Router } from "@angular/router";
-import { ToastService } from "../../../../services/common/toast.service";
-import { SocialAuthService } from "@abacritt/angularx-social-login";
+import { SidebarItemComponent } from "./sidebar-item/sidebar-item.component";
 
 @Component({
     selector: 'admin-layout-sidebar',

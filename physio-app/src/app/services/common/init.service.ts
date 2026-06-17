@@ -1,17 +1,20 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { catchError, firstValueFrom, lastValueFrom, of, throwError } from 'rxjs';
-import { AppConfig, PagedResponse } from '../../shared/types/common';
-import { LocalStorage } from '../../shared/utils/storage';
-import { MenuCache, MenuItem } from '../../shared/types/menu';
 import { BASE_API } from '../../shared/api/base';
-import { AuthService } from '../auth/auth.service';
+import { SERVER_HAS_NOT_RESPONSED } from '../../shared/constants/error.constant';
 import { CONFIG_CACHE_KEY, MENU_CACHE_KEY } from '../../shared/data/cache';
+import { AppConfig, PagedResponse } from '../../shared/types/common';
+import { MenuCache, MenuItem } from '../../shared/types/menu';
+import { LocalStorage } from '../../shared/utils/storage';
+import { AuthService } from '../auth/auth.service';
+import { LoggerService } from './logger.service';
 
 @Injectable({ providedIn: 'root' })
 export class InitService {
     private http = inject(HttpClient);
     private authSrv = inject(AuthService);
+    private loggerSrv = inject(LoggerService);
 
     private config: AppConfig | null = null;
     private menus: MenuItem[] = [];
@@ -21,11 +24,15 @@ export class InitService {
      * Using Promise.all to load in parallel for faster app startup
     **/
     async load(): Promise<void> {
-        await Promise.all([
-            this.loadConfig(),
-            this.loadMenu(),
-            this.loadCurrentUser(),
-        ]);
+        try {
+            await Promise.all([
+                this.loadConfig(),
+                this.loadMenu(),
+                lastValueFrom(this.authSrv.getProfile()),
+            ]);
+        } catch (err) {
+            console.log(this.loggerSrv.error(SERVER_HAS_NOT_RESPONSED, err));
+        }
     }
 
     private async loadConfig(): Promise<void> {
@@ -39,7 +46,7 @@ export class InitService {
             }
 
             const versionResp = await firstValueFrom(
-                this.http.post(BASE_API.VERSION, null, {
+                this.http.get(BASE_API.VERSION, {
                     observe: 'response',
                     headers
                 }).pipe(
@@ -58,7 +65,7 @@ export class InitService {
             }
 
             const res = await firstValueFrom(
-                this.http.post<PagedResponse<AppConfig>>(BASE_API.CONFIG, null, {
+                this.http.get<PagedResponse<AppConfig>>(BASE_API.CONFIG, {
                     headers: { 'X-Global-Loading': 'true' }
                 })
             );
@@ -71,8 +78,8 @@ export class InitService {
                 this.config = this.getDefaultConfig();
             }
         } catch (err) {
-            console.error(err);
             this.config = this.getDefaultConfig();
+            throwError;
         }
     }
 
@@ -87,8 +94,8 @@ export class InitService {
             }
 
             const request$ = this.http.post<PagedResponse<MenuCache>>(BASE_API.MENU, {
-                observe: 'response',
-                headers
+                pageSize: 6783,
+                pageNumber: 1
             }).pipe(
                 catchError(err => {
                     if (err.status === 304) {
@@ -108,21 +115,13 @@ export class InitService {
             }
 
         } catch (err) {
-            console.error("Load Menu Error", err);
             const cache = LocalStorage.load<MenuCache>(MENU_CACHE_KEY);
             if (cache) {
                 this.menus = cache.items;
             } else {
                 this.menus = [];
             }
-        }
-    }
-
-    private async loadCurrentUser() {
-        try {
-            await lastValueFrom(this.authSrv.getProfile());
-        } catch (error) {
-            console.log('Người dùng chưa đăng nhập hoặc phiên đã hết hạn.');
+            throwError;
         }
     }
 

@@ -34,21 +34,19 @@ export class LabTestCategoryService {
         return this.labTestCategories$;
     }
 
-    search_by_id(params: { id: string }) {
-        return this.http.post<PagedResponse<LabTestCategory | null>>(BASE_API.LABTESTCATEGORY.SEARCH_BY_ID, params);
+    search_by_id(id: string) {
+        return this.http.get<PagedResponse<LabTestCategory | null>>(`${BASE_API.LABTESTCATEGORY.BASE}/${id}`);
     }
 
     create(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.LABTESTCATEGORY.CREATE, params);
+        return this.http.post<PagedResponse<string>>(BASE_API.LABTESTCATEGORY.BASE, params);
     }
 
-    update(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.LABTESTCATEGORY.UPDATE, params);
+    update(id: string, params: any) {
+        return this.http.patch<PagedResponse<string>>(`${BASE_API.LABTESTCATEGORY.BASE}/${id}`, params);
     }
 
-    delete(id: string, isHard: boolean = false) {
-        return this.http.post<PagedResponse<string>>(BASE_API.LABTESTCATEGORY.DELETE, {
-            id, isHard
-        });
+    delete(id: string) {
+        return this.http.delete<PagedResponse<string>>(`${BASE_API.LABTESTCATEGORY.BASE}/${id}`);
     }
 }

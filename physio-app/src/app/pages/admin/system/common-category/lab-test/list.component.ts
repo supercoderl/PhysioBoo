@@ -1,5 +1,5 @@
-import { Component, OnInit, signal } from "@angular/core";
-import { catchError, of } from "rxjs";
+import { Component, ElementRef, OnInit, signal, ViewChild } from "@angular/core";
+import { catchError, forkJoin, of } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
 import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
@@ -15,6 +15,7 @@ import { LabTestService } from "../../../../../services/admin/lab-test.service";
 import { DateService } from "../../../../../services/common/date.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
+import { TablePageSizeService } from "../../../../../services/common/table-page-size.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PaginationData } from "../../../../../shared/types/common";
@@ -22,28 +23,32 @@ import { DateRange } from "../../../../../shared/types/date";
 import { FilterConfig } from "../../../../../shared/types/filter";
 import { LabTest } from "../../../../../shared/types/laboratory-imaging";
 import { SortOption } from "../../../../../shared/types/sort";
+import { BulkAction, SavedView, TableComment } from "../../../../../shared/types/table";
 
 @Component({
     selector: 'common-category-lab-test-list',
     standalone: true,
     imports: [
-    SharedModule,
-    AdminContentHeaderComponent,
-    BooButtonAdminComponent,
-    BooIconComponent,
-    ButtonIconComponent,
-    BooInputComponent,
-    BooSortAdminComponent,
-    BooFilterAdminComponent,
-    BooDateAdminComponent,
-    BooSelectComponent,
-    CommonCategoryLabTestTableCardComponent,
-    CommonCategoryLabTestDrawerComponent
-],
-    templateUrl: `./list.component.html`
+        SharedModule,
+        AdminContentHeaderComponent,
+        BooButtonAdminComponent,
+        BooIconComponent,
+        ButtonIconComponent,
+        BooInputComponent,
+        BooSortAdminComponent,
+        BooFilterAdminComponent,
+        BooDateAdminComponent,
+        BooSelectComponent,
+        CommonCategoryLabTestTableCardComponent,
+        CommonCategoryLabTestDrawerComponent
+    ],
+    templateUrl: `./list.component.html`,
+    host: { class: 'block h-full min-h-0' }
 })
 
 export class CommonCategoryLabTestListComponent implements OnInit {
+    @ViewChild('tableHost', { static: false }) tableHost?: ElementRef<HTMLElement>;
+
     // #region Inputs, Outputs, Properties
     tableData = signal<PaginationData<LabTest> | null>(null);
     params = {
@@ -58,6 +63,13 @@ export class CommonCategoryLabTestListComponent implements OnInit {
     };
     isDrawerOpen: boolean = false;
     selectedId: string | null = null;
+
+    savedViews: SavedView[] = [
+        { id: 'all', name: 'All Types', isDefault: true, icon: 'rows-4' },
+    ];
+    currentViewId: string | null = 'all';
+    currentGroupBy: string | null = null;
+    comments: TableComment[] = [];
     sort_options: SortOption[] = [
         { label: 'Recent', value: '-createdAt' },
         { label: 'Oldest', value: '+createdAt' },
@@ -67,16 +79,8 @@ export class CommonCategoryLabTestListComponent implements OnInit {
         { label: 'Code (Z-A)', value: '-code' },
     ];
 
-    filter_configs: FilterConfig[] = [
-        {
-            key: 'isSurgical',
-            label: 'Classification',
-            type: 'boolean',
-            value: null,
-            trueLabel: 'Surgical',
-            falseLabel: 'Diagnostic'
-        },
-    ];
+
+    filter_configs: FilterConfig[] = [];
     // #endregion
 
     // #region Init (Lifecycle + Setup)
@@ -85,11 +89,32 @@ export class CommonCategoryLabTestListComponent implements OnInit {
         private dialogSrv: DialogService,
         private toastSrv: ToastService,
         protected loadingSrv: LocalLoadingService,
-        private dateSrv: DateService
+        private dateSrv: DateService,
+        private pageSizeSrv: TablePageSizeService
     ) { }
 
-    ngOnInit(): void {
-        this.loadLabTests();
+    ngOnInit(): void { }
+
+    ngAfterViewInit(): void {
+        this.pageSizeSrv
+            .watch({
+                hostElement: this.tableHost,
+                rowHeight: 48,
+                toolbarHeight: 48,
+                headerHeight: 48,
+                footerHeight: 44,
+                extraOffset: 16,
+                min: 10,
+                max: 50
+            })
+            .subscribe(size => {
+                const isFirst = !this.tableData();
+                const changed = size !== this.params.pageSize;
+                if (!isFirst && !changed) return;
+                this.params.pageSize = size;
+                this.params.pageNumber = 1;
+                this.loadLabTests();
+            });
     }
     // #endregion
 
@@ -235,6 +260,111 @@ export class CommonCategoryLabTestListComponent implements OnInit {
             }
         }
         this.loadLabTests();
+    }
+
+    onSingleFilterChange(event: { key: string; value: any }) {
+        this.params = {
+            ...this.params,
+            pageNumber: 1,
+            filter: { ...this.params.filter, [event.key]: event.value }
+        };
+        this.loadLabTests();
+    }
+
+    onViewSelect(v: SavedView) {
+        this.currentViewId = v.id;
+        switch (v.id) {
+            case 'all':
+                this.params = {
+                    ...this.params, pageNumber: 1, filter: {
+                        start: null,
+                        end: null
+                    }, sort: '-createdAt'
+                };
+                break;
+            case 'surgical':
+                this.params = { ...this.params, pageNumber: 1, filter: { ...this.params.filter } };
+                break;
+            case 'recent':
+                this.params = { ...this.params, pageNumber: 1, sort: '-createdAt' };
+                break;
+        }
+        this.loadLabTests();
+    }
+
+    onViewSaveAsNew() {
+        const name = prompt('Name for this view?');
+        if (!name) return;
+        const newView: SavedView = { id: `view_${Date.now()}`, name, icon: 'bookmark' };
+        this.savedViews = [...this.savedViews, newView];
+        this.currentViewId = newView.id;
+    }
+
+    onViewDelete(v: SavedView) {
+        this.savedViews = this.savedViews.filter(x => x.id !== v.id);
+        if (this.currentViewId === v.id) this.currentViewId = 'all';
+    }
+
+    onGroupApply(key: string | null) {
+        this.currentGroupBy = key;
+    }
+
+    onCommentAdd(text: string) {
+        this.comments = [
+            ...this.comments,
+            {
+                id: `c_${Date.now()}`,
+                author: 'You',
+                text,
+                createdAt: new Date().toLocaleString()
+            }
+        ];
+    }
+
+    onCommentDelete(c: TableComment) {
+        this.comments = this.comments.filter(x => x.id !== c.id);
+    }
+
+    onResetView() {
+        this.params = {
+            pageNumber: 1,
+            pageSize: this.params.pageSize,
+            search: '',
+            sort: '-createdAt',
+            filter: {
+                start: null,
+                end: null,
+            }
+        };
+        this.currentGroupBy = null;
+        this.currentViewId = 'all';
+        this.loadLabTests();
+    }
+
+    onBulkAction(event: { action: BulkAction; ids: (number | string)[]; selectAllPages: boolean }) {
+        const { action, ids } = event;
+        if (!ids.length) return;
+
+        if (action.key === 'delete') {
+            const calls = ids.map(id => this.labTestSrv.delete(String(id)).pipe(
+                catchError(_ => of(null))
+            ));
+            forkJoin(calls).subscribe(results => {
+                const failed = results.filter(r => r === null).length;
+                if (failed === 0) {
+                    this.toastSrv.success(`Deleted ${ids.length} item(s).`);
+                } else {
+                    this.toastSrv.error(`${failed} of ${ids.length} item(s) failed to delete.`);
+                }
+                this.loadLabTests();
+            });
+            return;
+        }
+
+        if (action.key === 'export') {
+            this.toastSrv.success(`Exporting ${ids.length} item(s)...`);
+            return;
+        }
     }
 
     onDateChange(range: DateRange) {

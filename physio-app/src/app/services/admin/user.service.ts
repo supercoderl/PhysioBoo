@@ -4,6 +4,7 @@ import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
 import { User } from "../../shared/types/core";
 import { UserFilter } from "../../shared/types/filter";
+import { AssignRoleRequest } from "../../shared/types/permission";
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -13,7 +14,27 @@ export class UserService {
         return this.http.post<PagedResponse<PaginationData<User>>>(BASE_API.USER.SEARCH, request);
     }
 
-    assignRole(params: { userId: string; roleId: string }) {
+    search_by_id(id: string) {
+        return this.http.get<PagedResponse<User | null>>(`${BASE_API.USER.BASE}/${id}`);
+    }
+
+    register(params: any) {
+        return this.http.post<PagedResponse<string>>(BASE_API.USER.REGISTER, params);
+    }
+
+    update(id: string, params: any) {
+        return this.http.patch<PagedResponse<string>>(`${BASE_API.USER.BASE}/${id}`, params);
+    }
+
+    delete(id: string) {
+        return this.http.delete<PagedResponse<string>>(`${BASE_API.USER.BASE}/${id}`);
+    }
+
+    assignRole(params: AssignRoleRequest) {
         return this.http.post<PagedResponse<string>>(BASE_API.USER.ASSIGN_ROLE, params);
+    }
+
+    removeRole(params: AssignRoleRequest) {
+        return this.http.delete<PagedResponse<string>>(`${BASE_API.USER.BASE}/${params.userId}/roles/${params.roleId}`);
     }
 }

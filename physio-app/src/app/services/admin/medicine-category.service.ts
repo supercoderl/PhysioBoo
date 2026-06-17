@@ -13,21 +13,19 @@ export class MedicineCategoryService {
         return this.http.post<PagedResponse<PaginationData<MedicineCategory>>>(BASE_API.MEDICINECATEGORY.SEARCH, request);
     }
 
-    search_by_id(params: { id: string }) {
-        return this.http.post<PagedResponse<MedicineCategory | null>>(BASE_API.MEDICINECATEGORY.SEARCH_BY_ID, params);
+    search_by_id(id: string) {
+        return this.http.get<PagedResponse<MedicineCategory | null>>(`${BASE_API.MEDICINECATEGORY.BASE}/${id}`);
     }
 
     create(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.MEDICINECATEGORY.CREATE, params);
+        return this.http.post<PagedResponse<string>>(BASE_API.MEDICINECATEGORY.BASE, params);
     }
 
-    update(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.MEDICINECATEGORY.UPDATE, params);
+    update(id: string, params: any) {
+        return this.http.patch<PagedResponse<string>>(`${BASE_API.MEDICINECATEGORY.BASE}/${id}`, params);
     }
 
-    delete(id: string, isHard: boolean = false) {
-        return this.http.post<PagedResponse<string>>(BASE_API.MEDICINECATEGORY.DELETE, {
-            id, isHard
-        });
+    delete(id: string) {
+        return this.http.delete<PagedResponse<string>>(`${BASE_API.MEDICINECATEGORY.BASE}/${id}`);
     }
 }

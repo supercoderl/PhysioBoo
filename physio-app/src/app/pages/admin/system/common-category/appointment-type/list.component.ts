@@ -1,18 +1,14 @@
-import { Component, OnInit, signal } from "@angular/core";
-import { catchError, of } from "rxjs";
-import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { Component, ElementRef, OnInit, signal, ViewChild } from "@angular/core";
+import { catchError, forkJoin, of } from "rxjs";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
 import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
 import { CommonCategoryAppointmentTypeDrawerComponent } from "../../../../../components/layout/admin/system/common-category/appointment-type/appointment-type-drawer.component";
 import { CommonCategoryAppointmentTypeTableCardComponent } from "../../../../../components/layout/admin/system/common-category/appointment-type/appointment-type-table-card.component";
-import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
-import { BooDateAdminComponent } from "../../../../../components/table/boo-table-admin/boo-date-admin.component";
-import { BooFilterAdminComponent } from "../../../../../components/table/boo-table-admin/boo-filter-admin.component";
-import { BooSortAdminComponent } from "../../../../../components/table/boo-table-admin/boo-sort-admin.component";
 import { AppointmentTypeService } from "../../../../../services/admin/appointment-type.service";
 import { DateService } from "../../../../../services/common/date.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
+import { TablePageSizeService } from "../../../../../services/common/table-page-size.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PaginationData } from "../../../../../shared/types/common";
@@ -20,6 +16,7 @@ import { DateRange } from "../../../../../shared/types/date";
 import { FilterConfig } from "../../../../../shared/types/filter";
 import { AppointmentType } from "../../../../../shared/types/operation";
 import { SortOption } from "../../../../../shared/types/sort";
+import { BulkAction, SavedView, TableComment } from "../../../../../shared/types/table";
 
 @Component({
     selector: 'common-category-appointment-type-list',
@@ -27,24 +24,22 @@ import { SortOption } from "../../../../../shared/types/sort";
     imports: [
         SharedModule,
         AdminContentHeaderComponent,
-        BooButtonAdminComponent,
         ButtonIconComponent,
-        BooSortAdminComponent,
-        BooFilterAdminComponent,
-        BooDateAdminComponent,
-        BooSelectComponent,
         CommonCategoryAppointmentTypeTableCardComponent,
         CommonCategoryAppointmentTypeDrawerComponent
     ],
-    templateUrl: `./list.component.html`
+    templateUrl: `./list.component.html`,
+    host: { class: 'block h-full min-h-0' }
 })
 
 export class CommonCategoryAppointmentTypeListComponent implements OnInit {
+    @ViewChild('tableHost', { static: false }) tableHost?: ElementRef<HTMLElement>;
+
     // #region Inputs, Outputs, Properties
     tableData = signal<PaginationData<AppointmentType> | null>(null);
     params = {
         pageNumber: 1,
-        pageSize: 5,
+        pageSize: 10,
         search: '',
         sort: 'createdAt:desc',
         filter: {
@@ -58,6 +53,13 @@ export class CommonCategoryAppointmentTypeListComponent implements OnInit {
     };
     isDrawerOpen: boolean = false;
     selectedId: string | null = null;
+
+    savedViews: SavedView[] = [
+        { id: 'all', name: 'All Types', isDefault: true, icon: 'rows-4' },
+    ];
+    currentViewId: string | null = 'all';
+    currentGroupBy: string | null = null;
+    comments: TableComment[] = [];
     sort_options: SortOption[] = [
         { label: 'Recent', value: '-createdAt' },
         { label: 'Oldest', value: '+createdAt' },
@@ -67,16 +69,7 @@ export class CommonCategoryAppointmentTypeListComponent implements OnInit {
         { label: 'Code (Z-A)', value: '-code' },
     ];
 
-    filter_configs: FilterConfig[] = [
-        {
-            key: 'isSurgical',
-            label: 'Classification',
-            type: 'boolean',
-            value: null,
-            trueLabel: 'Surgical',
-            falseLabel: 'Diagnostic'
-        },
-    ];
+    filter_configs: FilterConfig[] = [];
     // #endregion
 
     // #region Init (Lifecycle + Setup)
@@ -85,11 +78,32 @@ export class CommonCategoryAppointmentTypeListComponent implements OnInit {
         private dialogSrv: DialogService,
         private toastSrv: ToastService,
         protected loadingSrv: LocalLoadingService,
-        private dateSrv: DateService
+        private dateSrv: DateService,
+        private pageSizeSrv: TablePageSizeService
     ) { }
 
-    ngOnInit(): void {
-        this.loadAppointmentTypes();
+    ngOnInit(): void { }
+
+    ngAfterViewInit(): void {
+        this.pageSizeSrv
+            .watch({
+                hostElement: this.tableHost,
+                rowHeight: 48,
+                toolbarHeight: 48,
+                headerHeight: 48,
+                footerHeight: 44,
+                extraOffset: 16,
+                min: 10,
+                max: 50
+            })
+            .subscribe(size => {
+                const isFirst = !this.tableData();
+                const changed = size !== this.params.pageSize;
+                if (!isFirst && !changed) return;
+                this.params.pageSize = size;
+                this.params.pageNumber = 1;
+                this.loadAppointmentTypes();
+            });
     }
     // #endregion
 
@@ -235,6 +249,119 @@ export class CommonCategoryAppointmentTypeListComponent implements OnInit {
             }
         }
         this.loadAppointmentTypes();
+    }
+
+    onSingleFilterChange(event: { key: string; value: any }) {
+        this.params = {
+            ...this.params,
+            pageNumber: 1,
+            filter: { ...this.params.filter, [event.key]: event.value }
+        };
+        this.loadAppointmentTypes();
+    }
+
+    onViewSelect(v: SavedView) {
+        this.currentViewId = v.id;
+        switch (v.id) {
+            case 'all':
+                this.params = {
+                    ...this.params, pageNumber: 1, filter: {
+                        start: null,
+                        end: null,
+                        isEmergency: null,
+                        requiresPreparation: null,
+                        isFollowUp: null,
+                        isActive: null
+                    }, sort: '-createdAt'
+                };
+                break;
+            case 'surgical':
+                this.params = { ...this.params, pageNumber: 1, filter: { ...this.params.filter } };
+                break;
+            case 'recent':
+                this.params = { ...this.params, pageNumber: 1, sort: '-createdAt' };
+                break;
+        }
+        this.loadAppointmentTypes();
+    }
+
+    onViewSaveAsNew() {
+        const name = prompt('Name for this view?');
+        if (!name) return;
+        const newView: SavedView = { id: `view_${Date.now()}`, name, icon: 'bookmark' };
+        this.savedViews = [...this.savedViews, newView];
+        this.currentViewId = newView.id;
+    }
+
+    onViewDelete(v: SavedView) {
+        this.savedViews = this.savedViews.filter(x => x.id !== v.id);
+        if (this.currentViewId === v.id) this.currentViewId = 'all';
+    }
+
+    onGroupApply(key: string | null) {
+        this.currentGroupBy = key;
+    }
+
+    onCommentAdd(text: string) {
+        this.comments = [
+            ...this.comments,
+            {
+                id: `c_${Date.now()}`,
+                author: 'You',
+                text,
+                createdAt: new Date().toLocaleString()
+            }
+        ];
+    }
+
+    onCommentDelete(c: TableComment) {
+        this.comments = this.comments.filter(x => x.id !== c.id);
+    }
+
+    onResetView() {
+        this.params = {
+            pageNumber: 1,
+            pageSize: this.params.pageSize,
+            search: '',
+            sort: '-createdAt',
+            filter: {
+                start: null,
+                end: null,
+                isEmergency: null,
+                requiresPreparation: null,
+                isFollowUp: null,
+                isActive: null
+            }
+        };
+        this.currentGroupBy = null;
+        this.currentViewId = 'all';
+        this.loadAppointmentTypes();
+    }
+
+    onBulkAction(event: { action: BulkAction; ids: (number | string)[]; selectAllPages: boolean }) {
+        const { action, ids } = event;
+        if (!ids.length) return;
+
+        if (action.key === 'delete') {
+            const calls = ids.map(id => this.appointmentTypeSrv.delete(String(id)).pipe(
+                catchError(_ => of(null))
+            ));
+            forkJoin(calls).subscribe(results => {
+                const failed = results.filter(r => r === null).length;
+                if (failed === 0) {
+                    this.toastSrv.success(`Deleted ${ids.length} item(s).`);
+                } else {
+                    this.toastSrv.error(`${failed} of ${ids.length} item(s) failed to delete.`);
+                }
+                this.loadAppointmentTypes();
+            });
+            return;
+        }
+
+        if (action.key === 'export') {
+            this.toastSrv.success(`Exporting ${ids.length} item(s)...`);
+            return;
+        }
     }
 
     onDateChange(range: DateRange) {

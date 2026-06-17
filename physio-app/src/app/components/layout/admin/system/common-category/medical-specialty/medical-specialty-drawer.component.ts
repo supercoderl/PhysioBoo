@@ -7,7 +7,6 @@ import { ToastService } from "../../../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { MedicalSpecialty } from "../../../../../../shared/types/medical-staff";
-import { generateUUID } from "../../../../../../shared/utils/common";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
@@ -237,7 +236,7 @@ export class CommonCategoryMedicalSpecialtyDrawerComponent implements OnChanges 
     loadDetail(id: string) {
         this.form.disable();
 
-        this.medicalSpecialtySrv.search_by_id({ id })
+        this.medicalSpecialtySrv.search_by_id(id)
             .pipe(
                 finalize(() => this.form.enable())
             )
@@ -285,23 +284,33 @@ export class CommonCategoryMedicalSpecialtyDrawerComponent implements OnChanges 
             return;
         }
 
-        const targetId = this.currentId ?? generateUUID();
-        const formData = { ...this.form.getRawValue(), id: targetId }
-
-        const request$ = this.currentId
-            ? this.medicalSpecialtySrv.update(formData)
-            : this.medicalSpecialtySrv.create(formData);
+        const formData = { ...this.form.getRawValue() }
 
         try {
-            await firstValueFrom(request$);
+            let id: string;
+            if (this.currentId) {
+                const updateRes = await firstValueFrom(this.medicalSpecialtySrv.update(this.currentId, formData));
+                if (!updateRes.success) {
+                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+                    return;
+                }
+                id = this.currentId;
+            } else {
+                const createRes = await firstValueFrom(this.medicalSpecialtySrv.create(formData));
+                if (!createRes.success || !createRes.data) {
+                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+                    return;
+                }
+                id = createRes.data;
+            }
 
-            const response = await firstValueFrom(this.medicalSpecialtySrv.search_by_id({ id: targetId }));
+            const response = await firstValueFrom(this.medicalSpecialtySrv.search_by_id(id));
             if (response.success && response.data) {
                 this.saveSuccess.emit(response.data);
             } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (error) {
+        } catch (err) {
             this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            console.error(error);
+            return;
         }
     }
 

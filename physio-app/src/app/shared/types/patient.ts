@@ -1,33 +1,118 @@
 import { PatientType, RiskLevel } from "../enums/patient";
 
+/**
+ * Mirrors server PhysioBoo.Application.ViewModels.Patients.PatientViewModel.
+ * Field spellings (incl. the "Inssurance" typo) follow the server contract.
+ */
 export interface Patient {
   id: string;
-  userId: string | null;
   patientNumber: string;
-  fullName: string;
-  dateOfBirth: Date | null;
-  gender: string | null;
-  bloodType: string | null;
-  phone: string | null;
-  email: string | null;
-  address: string | null;
-  city: string | null;
-  country: string | null;
+
   patientType: PatientType;
   riskLevel: RiskLevel;
-  primaryDoctorId: string | null;
-  occupation: string | null;
+
+  primaryDoctorId: string;
+  preferredDoctorId: string | null;
+  preferredHospitalId: string | null;
+  preferredAppointmentTime: string | null;
+
+  referredBy: string | null;
+  referralHospitalId: string | null;
+
+  inssuranceProvider: string | null;
+  inssurancePolicyNumber: string | null;
+  inssuranceExpiryDate: string | null;
+  inssuranceCoverageAmount: number | null;
+
   isVip: boolean;
   isSeniorCitizen: boolean;
-  emergencyContactName: string | null;
-  emergencyContactPhone: string | null;
+  isChronicPatient: boolean;
+
+  medicalHistory: string | null;
+  familyHistory: string | null;
+  surgicalHistory: string | null;
+  allergyInformation: string | null;
+  currentMedications: string | null;
+  lifestyleNotes: string | null;
+
+  occupation: string | null;
+  annualIncomeRange: string | null;
+
+  communicationPreferences: string | null;
+
+  consentForResearch: boolean;
+  consentForMarketing: boolean;
+  dataSharingConsent: boolean;
+
+  registrationDate: string | null;
+  lastVisitDate: string | null;
+  nextFollowUpDate: string | null;
+
   totalVisits: number;
   totalAmountSpent: number;
+  outstandingBalance: number;
   loyaltyPoints: number;
-  lastVisitDate: Date | null;
-  nextFollowUpDate: Date | null;
-  isActive: boolean;
-  createdAt: Date;
+}
+
+/** Mirrors server CreatePatientViewModel. */
+export interface CreatePatientRequest {
+  primaryDoctorId: string;
+  referredBy: string | null;
+  referralHospitalId: string | null;
+
+  inssuranceProvider: string | null;
+  inssurancePolicyNumber: string | null;
+  inssuranceExpiryDate: string | null;
+  inssuranceCoverageAmount: number | null;
+
+  medicalHistory: string | null;
+  familyHistory: string | null;
+  surgicalHistory: string | null;
+  allergyInformation: string | null;
+  currentMedications: string | null;
+  lifestyleNotes: string | null;
+
+  occupation: string | null;
+  annualIncomeRange: string | null;
+
+  preferredHospitalId: string | null;
+  preferredDoctorId: string | null;
+  preferredAppointmentTime: string | null;
+  communicationPreferences: string | null;
+}
+
+/** Mirrors server UpdatePatientViewModel. */
+export interface UpdatePatientRequest {
+  patientType: PatientType;
+  primaryDoctorId: string;
+  preferredHospitalId: string | null;
+  preferredDoctorId: string | null;
+  preferredAppointmentTime: string | null;
+
+  inssuranceProvider: string | null;
+  inssurancePolicyNumber: string | null;
+  inssuranceExpiryDate: string | null;
+  inssuranceCoverageAmount: number | null;
+
+  isVip: boolean;
+  isSeniorCitizen: boolean;
+  isChronicPatient: boolean;
+  riskLevel: RiskLevel;
+
+  medicalHistory: string | null;
+  familyHistory: string | null;
+  surgicalHistory: string | null;
+  allergyInformation: string | null;
+  currentMedications: string | null;
+  lifestyleNotes: string | null;
+
+  occupation: string | null;
+  annualIncomeRange: string | null;
+  communicationPreferences: string | null;
+
+  consentForResearch: boolean;
+  consentForMarketing: boolean;
+  dataSharingConsent: boolean;
 }
 
 export interface PaymentSummary {

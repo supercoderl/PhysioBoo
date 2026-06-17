@@ -1,7 +1,7 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input } from '@angular/core';
+import { Component, ElementRef, HostListener, Input } from '@angular/core';
+import { SharedModule } from '../../../shared/shared-imports';
 import { ActionItem } from '../../../shared/types/common';
 import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
-import { SharedModule } from '../../../shared/shared-imports';
 
 @Component({
     selector: 'boo-action-admin',
@@ -87,7 +87,6 @@ export class BooActionAdminComponent {
     }
 
     handleAction(item: ActionItem, event: MouseEvent) {
-        console.log(item);
         event.stopPropagation();
         this.close();
         if (item.onClick) {

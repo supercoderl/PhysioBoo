@@ -1137,7 +1137,7 @@ export const MENUS: MenuItem[] = [
             {
                 id: "print-templates",
                 label: "Print Templates",
-                route: "system/print-template",
+                route: "system/print-templates",
                 icon: "printer",
                 isActive: false,
                 order: 0,
@@ -1318,7 +1318,7 @@ export const CATEGORIES_MANAGEMENT = [
         name: "Departments",
         description:
             "Manage medical and administrative departments, staff assignments, and facility allocation.",
-        icon: "department",
+        icon: "theater",
         route: "/admin/system/common-category/department"
     }
 ];

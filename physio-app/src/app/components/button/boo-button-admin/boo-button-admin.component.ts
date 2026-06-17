@@ -51,7 +51,7 @@ import { SharedModule } from "../../../shared/shared-imports";
 export class BooButtonAdminComponent {
     // #region Inputs, Outputs, Properties
     @Input() icon?: { name: string, size: number, color?: string, iconClass?: string };
-    @Input() background: string = "#1565C0";
+    @Input() background: string = "rgb(var(--twc-primary))";
     @Input() border: { width: number, style?: string, color: string } = { width: 0, style: "solid", color: "#000000" }
     @Input() textColor: string = "#000000";
     @Input() fontWeight: string = "400";

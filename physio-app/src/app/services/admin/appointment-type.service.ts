@@ -13,21 +13,19 @@ export class AppointmentTypeService {
         return this.http.post<PagedResponse<PaginationData<AppointmentType>>>(BASE_API.APPOINTMENTTYPE.SEARCH, request);
     }
 
-    search_by_id(params: { id: string }) {
-        return this.http.post<PagedResponse<AppointmentType | null>>(BASE_API.APPOINTMENTTYPE.SEARCH_BY_ID, params);
+    search_by_id(id: string) {
+        return this.http.get<PagedResponse<AppointmentType | null>>(`${BASE_API.APPOINTMENTTYPE.BASE}/${id}`);
     }
 
     create(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.APPOINTMENTTYPE.CREATE, params);
+        return this.http.post<PagedResponse<string>>(BASE_API.APPOINTMENTTYPE.BASE, params);
     }
 
-    update(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.APPOINTMENTTYPE.UPDATE, params);
+    update(id: string, params: any) {
+        return this.http.patch<PagedResponse<string>>(`${BASE_API.APPOINTMENTTYPE.BASE}/${id}`, params);
     }
 
-    delete(id: string, isHard: boolean = false) {
-        return this.http.post<PagedResponse<string>>(BASE_API.APPOINTMENTTYPE.DELETE, {
-            id, isHard
-        });
+    delete(id: string) {
+        return this.http.delete<PagedResponse<string>>(`${BASE_API.APPOINTMENTTYPE.BASE}/${id}`);
     }
 }

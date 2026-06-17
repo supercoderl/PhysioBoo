@@ -36,7 +36,7 @@ import { BooButtonAdminComponent } from "../../button/boo-button-admin/boo-butto
                     @if (page !== '...') {
                         <boo-button-admin 
                             [active]="page === currentPage()"
-                            [background]="'#1565C0'" 
+                            [background]="'rgb(var(--twc-primary))'"
                             [radius]="4"
                             [padding]="'0 10px'"
                             [fontWeight]="page === currentPage() ? '600' : '400'"    

@@ -366,9 +366,20 @@ export const routes: Routes = [
                         loadChildren: () => import('./system/common-category/common-category.routes').then(r => r.routes),
                     },
                     {
-                        path: 'print-template',
-                        data: { breadcrumb: ['print-template'] },
-                        loadComponent: () => import('./system/print-template/print-template.component').then(m => m.AdminPrintTemplateComponent),
+                        path: 'print-templates',
+                        data: { breadcrumb: ['print templates'] },
+                        children: [
+                            {
+                                path: '',
+                                pathMatch: 'full',
+                                loadComponent: () => import('./system/print-template/list.component').then(m => m.AdminPrintTemplateListComponent),
+                            },
+                            {
+                                path: ':id',
+                                data: { breadcrumb: ['designer'] },
+                                loadComponent: () => import('./system/print-template/designer.component').then(m => m.AdminPrintTemplateDesignerComponent),
+                            },
+                        ]
                     },
                     {
                         path: 'settings',

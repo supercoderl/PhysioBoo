@@ -44,7 +44,7 @@ import { PostareaComponent } from "../../../../components/textarea/postarea/post
                                     <span class="block m-0 text-[13px] leading-[1.5]">
                                         <div class="flex">
                                             <p
-                                                class="whitespace-nowrap m-0 text-[13px] leading-[1.5] text-[#1565C0]"
+                                                class="whitespace-nowrap m-0 text-[13px] leading-[1.5] text-primary"
                                             >
                                                 Bernard Langley
                                             </p>

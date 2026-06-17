@@ -1,4 +1,4 @@
-import { Component, signal } from "@angular/core";
+import { Component, OnInit, signal } from "@angular/core";
 import { catchError, of } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
@@ -27,9 +27,10 @@ import { MenuItem } from "../../../../../shared/types/menu";
         SettingAdminMenuTreeCardComponent,
         SettingAdminMenuDrawerComponent
     ],
-    templateUrl: './admin-menu.component.html'
+    templateUrl: './admin-menu.component.html',
+    host: { class: 'block h-full min-h-0' }
 })
-export class SettingAdminMenuComponent {
+export class SettingAdminMenuComponent implements OnInit {
     // #region Inputs, Outputs, Properties
     menus = signal<MenuItem[]>([]);
     filteredMenus = signal<MenuItem[]>([]);
@@ -99,7 +100,7 @@ export class SettingAdminMenuComponent {
         this.pendingParentId = null;
     }
 
-    onSaveSuccess(result: MenuItem) {
+    onSaveSuccess(_result: MenuItem) {
         this.onCloseDrawer();
         this.loadMenus();
         this.toastSrv.success('Menu item saved successfully.');

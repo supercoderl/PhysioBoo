@@ -1,75 +1,85 @@
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, catchError, delay, filter, switchMap, take, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
-import { AuthService } from '../auth/auth.service';
 import { BASE_API } from '../../shared/api/base';
 import { USER_ERROR_CODES } from '../../shared/errors/code.component';
-import { ToastService } from '../common/toast.service';
 import { SKIP_ERROR_TOAST } from '../../shared/tokens/http-context.tokens';
+import { AuthService } from '../auth/auth.service';
+import { ToastService } from '../common/toast.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InterceptorService implements HttpInterceptor {
   private readonly baseUrl = environment.API_URL;
+  private _authSrv?: AuthService;
+  private get authSrv(): AuthService {
+    return this._authSrv ??= this.injector.get(AuthService);
+  }
 
   constructor(
     private router: Router,
-    private authSrv: AuthService,
-    private toastSrv: ToastService
+    private toastSrv: ToastService,
+    private injector: Injector
   ) { }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (this.authSrv.isAuthenticated() != null) {
-
-    }
-
+    // 1. External absolute URLs bypass everything
     if (/^https?:\/\//i.test(request.url)) {
       return next.handle(request);
     }
 
+    // 2. Always rewrite to absolute API URL (including the refresh request)
     const apiReq = request.clone({
       url: `${this.baseUrl}${request.url.startsWith('/') ? '' : '/'}${request.url}`,
       withCredentials: true
     });
 
-    return next.handle(apiReq).pipe(delay(environment.DELAY_TIMES), catchError((err: HttpErrorResponse) => {
-      if (err.status === 401) {
-        const isRefreshUrl = request.url.includes(BASE_API.REFRESHTOKEN);
+    // 3. The refresh/logout requests skip the 401-retry pipeline so they can't recurse
+    const isAuthLifecycleUrl =
+      apiReq.url.endsWith(BASE_API.REFRESHTOKEN) ||
+      apiReq.url.endsWith(BASE_API.LOGOUT);
+    if (isAuthLifecycleUrl) {
+      return next.handle(apiReq);
+    }
 
-        if (isRefreshUrl) {
-          this.authSrv.logout();
-          this.router.navigate(['/auth/login']);
+    // 4. Normal requests run through catchError + refresh-retry
+    return next.handle(apiReq).pipe(
+      delay(environment.DELAY_TIMES),
+      catchError((err: HttpErrorResponse) => {
+        if (err.status === 401) {
+          // If user was never logged in, don't even attempt to refresh — short-circuit
+          if (!this.authSrv.isAuthenticated()) {
+            return throwError(() => err);
+          }
+          return this.handle401Error(apiReq, next);
+        }
+
+        if (err.status === 304) {
           return throwError(() => err);
         }
 
-        return this.handle401Error(apiReq, next);
-      }
+        this.handleUnactiveUser(err);
 
-      if (err.status === 304) {
+        switch (err.status) {
+          case 403:
+            this.router.navigate(['exception/403']);
+            break;
+          case 404:
+            this.router.navigate(['exception/404']);
+            break;
+        }
+
+        const shouldSkipToast = request.context.get(SKIP_ERROR_TOAST);
+        if (!shouldSkipToast) {
+          this.handleGlobalErrorToast(err);
+        }
+
         return throwError(() => err);
-      }
-
-      this.handleUnactiveUser(err);
-
-      switch (err.status) {
-        case 403:
-          this.router.navigate(['exception/403']);
-          break;
-        case 404:
-          this.router.navigate(['exception/404']);
-          break;
-      }
-
-      const shouldSkipToast = request.context.get(SKIP_ERROR_TOAST);
-      if (!shouldSkipToast) {
-        this.handleGlobalErrorToast(err);
-      }
-
-      return throwError(() => err);
-    }));
+      })
+    );
   }
 
   private isRefreshing = false;
@@ -88,7 +98,10 @@ export class InterceptorService implements HttpInterceptor {
         }),
         catchError((error) => {
           this.isRefreshing = false;
-          this.authSrv.logout();
+          // Wake up any queued requests so they fail fast instead of hanging
+          this.refreshTokenSubject.next(false);
+          // Clear local session state synchronously (don't make another HTTP call)
+          this.authSrv.clearSession();
           this.router.navigate(['/auth/login']);
           return throwError(() => error);
         })
@@ -97,7 +110,10 @@ export class InterceptorService implements HttpInterceptor {
       return this.refreshTokenSubject.pipe(
         filter(token => token != null),
         take(1),
-        switchMap(() => {
+        switchMap((token) => {
+          if (token === false) {
+            return throwError(() => new Error('Session expired'));
+          }
           return next.handle(request);
         })
       );

@@ -8,7 +8,7 @@ import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREAT
 import { InsuranceType } from "../../../../../../shared/enums/insurance-type";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { InsuranceCompany } from "../../../../../../shared/types/support";
-import { convertEnumToSelection, generateUUID } from "../../../../../../shared/utils/common";
+import { convertEnumToSelection } from "../../../../../../shared/utils/common";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
@@ -250,7 +250,7 @@ export class CommonCategoryInsuranceCompanyDrawerComponent implements OnChanges 
     loadDetail(id: string) {
         this.form.disable();
 
-        this.insuranceCompanySrv.search_by_id({ id })
+        this.insuranceCompanySrv.search_by_id(id)
             .pipe(
                 finalize(() => this.form.enable())
             )
@@ -313,11 +313,8 @@ export class CommonCategoryInsuranceCompanyDrawerComponent implements OnChanges 
                 parsedDocuments = rawDocs;
         }
 
-        const targetId = this.currentId ?? generateUUID();
-
         const payload = {
             ...formValues,
-            id: targetId,
             type: Number(formValues.type ?? InsuranceType.Health),
             averageClaimSettlementTime: Number(formValues.averageClaimSettlementTime) || 0,
             maximumCoverageAmount: formValues.maximumCoverageAmount ? Number(formValues.maximumCoverageAmount) : null,
@@ -325,20 +322,31 @@ export class CommonCategoryInsuranceCompanyDrawerComponent implements OnChanges 
             requiredDocuments: parsedDocuments
         }
 
-        const request$ = this.currentId
-            ? this.insuranceCompanySrv.update(payload)
-            : this.insuranceCompanySrv.create(payload);
-
         try {
-            await firstValueFrom(request$);
+            let id: string;
+            if (this.currentId) {
+                const updateRes = await firstValueFrom(this.insuranceCompanySrv.update(this.currentId, payload));
+                if (!updateRes.success) {
+                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+                    return;
+                }
+                id = this.currentId;
+            } else {
+                const createRes = await firstValueFrom(this.insuranceCompanySrv.create(payload));
+                if (!createRes.success || !createRes.data) {
+                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+                    return;
+                }
+                id = createRes.data;
+            }
 
-            const response = await firstValueFrom(this.insuranceCompanySrv.search_by_id({ id: targetId }));
+            const response = await firstValueFrom(this.insuranceCompanySrv.search_by_id(id));
             if (response.success && response.data) {
                 this.saveSuccess.emit(response.data);
             } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (error) {
+        } catch (err) {
             this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            console.error(error);
+            console.error(err);
         }
     }
 

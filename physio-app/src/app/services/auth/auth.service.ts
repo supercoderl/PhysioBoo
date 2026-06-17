@@ -6,6 +6,8 @@ import { BASE_API } from '../../shared/api/base';
 import { PagedResponse } from '../../shared/types/common';
 import { UserProfile } from '../../shared/types/core';
 import { LocalStorage } from '../../shared/utils/storage';
+import { PreferenceService } from '../common/preference.service';
+import { ThemeConfigService } from '../common/theme-config.service';
 
 @Injectable({
     providedIn: 'root'
@@ -15,6 +17,8 @@ export class AuthService {
     private permissionsSubject = new BehaviorSubject<string[]>([]);
     private userInfoSubject = new BehaviorSubject<UserProfile | null>(null);
     private oauthService = inject(SocialAuthService);
+    private prefSrv = inject(PreferenceService);
+    private themeSrv = inject(ThemeConfigService);
 
     permissions$ = this.permissionsSubject.asObservable();
     public userInfo$ = this.userInfoSubject.asObservable();
@@ -29,15 +33,12 @@ export class AuthService {
         return status === true || status === 'true';
     }
 
-    login<T>(body: { identifier: string, password: string, otp: string }): Observable<PagedResponse<T>> {
-        return this.http.post<PagedResponse<T>>(BASE_API.LOGIN, body).pipe(
-            switchMap(res => {
-                if (!res.success) {
-                    return throwError(() => res);
-                }
-                return this.getProfile().pipe(
-                    map(() => res)
-                );
+    login<T>(body: { identifier: string, password: string, otp: string }): Observable<PagedResponse<UserProfile>> {
+        return this.http.post(BASE_API.LOGIN, body).pipe(
+            switchMap(() => this.getProfile()),
+            catchError(err => {
+                console.error('Login failed:', err);
+                return throwError(() => err);
             })
         );
     }
@@ -60,15 +61,19 @@ export class AuthService {
 
     logout() {
         return this.http.post<PagedResponse<string>>(BASE_API.LOGOUT, null).pipe(
-            finalize(() => {
-                this.userInfoSubject.next(null);
-                LocalStorage.remove('is_logged_in');
-            })
+            finalize(() => this.clearSession())
         );
     }
 
+    /** Clear local session state without making an HTTP call. Safe to call from interceptor. */
+    clearSession(): void {
+        this.userInfoSubject.next(null);
+        this.permissionsSubject.next([]);
+        LocalStorage.remove('is_logged_in');
+    }
+
     getProfile() {
-        return this.http.post<PagedResponse<UserProfile>>(BASE_API.PROFILE, null).pipe(
+        return this.http.get<PagedResponse<UserProfile>>(BASE_API.PROFILE).pipe(
             tap((res) => {
                 if (res.success && res.data) {
                     this.userInfoSubject.next(res.data);
@@ -76,6 +81,17 @@ export class AuthService {
                 } else {
                     LocalStorage.remove('is_logged_in');
                 }
+            }),
+            switchMap((res) => {
+                if (!res.success || !res.data) return [res];
+                return this.prefSrv.loadAll().pipe(
+                    tap(() => this.themeSrv.hydrateFromCache()),
+                    map(() => res),
+                    catchError(() => {
+                        this.themeSrv.hydrateFromCache();
+                        return [res];
+                    })
+                );
             }),
             catchError((err) => {
                 LocalStorage.remove('is_logged_in');

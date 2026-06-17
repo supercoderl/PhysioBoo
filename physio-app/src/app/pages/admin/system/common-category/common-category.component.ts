@@ -58,7 +58,7 @@ import { Category } from "../../../../shared/types/category";
               class="ps bg-surface relative flex flex-col flex-1 min-h-0 overscroll-contain h-screen shadow-card"
               style="border-top-left-radius: 12px; scrollbar-width: none; position: relative; overflow-y: auto;"
             >
-              <div class="flex-auto px-6 py-2">
+              <div class="flex-1 min-h-0 px-6 py-2 flex flex-col">
                 <router-outlet></router-outlet>
               </div>
             </div>

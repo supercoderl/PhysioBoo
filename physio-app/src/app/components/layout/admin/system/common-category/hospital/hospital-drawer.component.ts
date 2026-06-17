@@ -8,14 +8,12 @@ import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREAT
 import { HospitalType } from "../../../../../../shared/enums/hospital-type";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { Hospital } from "../../../../../../shared/types/support";
-import { generateUUID } from "../../../../../../shared/utils/common";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
 import { BooIconComponent } from "../../../../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../../select/boo-select/boo-select.component";
-import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";
 
 @Component({
     selector: 'common-category-hospital-drawer',
@@ -25,7 +23,6 @@ import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-t
         DrawerComponent,
         BooInputComponent,
         BooIconComponent,
-        BooTextareaComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
         BooCheckboxComponent
@@ -192,7 +189,7 @@ export class CommonCategoryHospitalDrawerComponent implements OnChanges {
 
     loadDetail(id: string) {
         this.form.disable();
-        this.hospitalSrv.search_by_id({ id })
+        this.hospitalSrv.search_by_id(id)
             .pipe(finalize(() => this.form.enable()))
             .subscribe(_res => {
                 if (_res.success) {
@@ -231,22 +228,33 @@ export class CommonCategoryHospitalDrawerComponent implements OnChanges {
             return;
         }
 
-        const targetId = this.currentId ?? generateUUID();
-        const formData = { ...this.form.getRawValue(), id: targetId };
-
-        const request$ = this.currentId
-            ? this.hospitalSrv.update(formData)
-            : this.hospitalSrv.create(formData);
+        const formData = { ...this.form.getRawValue() };
 
         try {
-            await firstValueFrom(request$);
-            const response = await firstValueFrom(this.hospitalSrv.search_by_id({ id: targetId }));
+            let id: string;
+            if (this.currentId) {
+                const updateRes = await firstValueFrom(this.hospitalSrv.update(this.currentId, formData));
+                if (!updateRes.success) {
+                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+                    return;
+                }
+                id = this.currentId;
+            } else {
+                const createRes = await firstValueFrom(this.hospitalSrv.create(formData));
+                if (!createRes.success || !createRes.data) {
+                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+                    return;
+                }
+                id = createRes.data;
+            }
+
+            const response = await firstValueFrom(this.hospitalSrv.search_by_id(id));
             if (response.success && response.data) {
                 this.saveSuccess.emit(response.data);
             } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (error) {
+        } catch (err) {
             this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            console.error(error);
+            return;
         }
     }
 

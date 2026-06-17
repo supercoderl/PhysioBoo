@@ -13,21 +13,19 @@ export class SupplierService {
         return this.http.post<PagedResponse<PaginationData<Supplier>>>(BASE_API.SUPPLIER.SEARCH, request);
     }
 
-    search_by_id(params: { id: string }) {
-        return this.http.post<PagedResponse<Supplier | null>>(BASE_API.SUPPLIER.SEARCH_BY_ID, params);
+    search_by_id(id: string) {
+        return this.http.get<PagedResponse<Supplier | null>>(`${BASE_API.SUPPLIER.BASE}/${id}`);
     }
 
     create(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.SUPPLIER.CREATE, params);
+        return this.http.post<PagedResponse<string>>(BASE_API.SUPPLIER.BASE, params);
     }
 
-    update(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.SUPPLIER.UPDATE, params);
+    update(id: string, params: any) {
+        return this.http.patch<PagedResponse<string>>(`${BASE_API.SUPPLIER.BASE}/${id}`, params);
     }
 
-    delete(id: string, isHard: boolean = false) {
-        return this.http.post<PagedResponse<string>>(BASE_API.SUPPLIER.DELETE, {
-            id, isHard
-        });
+    delete(id: string) {
+        return this.http.delete<PagedResponse<string>>(`${BASE_API.SUPPLIER.BASE}/${id}`);
     }
 }

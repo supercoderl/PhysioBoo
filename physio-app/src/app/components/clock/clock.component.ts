@@ -26,12 +26,9 @@ export class ClockComponent implements AfterViewInit, OnDestroy {
       const minutes = now.getMinutes();
       const seconds = now.getSeconds();
       const ms = now.getMilliseconds();
-
       const secondDeg = ((seconds + ms / 1000) / 60) * 360;
       const minuteDeg = ((minutes + seconds / 60) / 60) * 360;
       const hourDeg = ((hours % 12 + minutes / 60) / 12) * 360;
-
-      // Query selector thay vì ViewChild
       const hourHand = window.document.querySelector('.needle.hours') as HTMLElement;
       const minuteHand = window.document.querySelector('.needle.minute') as HTMLElement;
       const secondHand = window.document.querySelector('.needle.second') as HTMLElement;

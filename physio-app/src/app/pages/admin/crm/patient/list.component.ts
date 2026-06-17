@@ -1,16 +1,9 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { catchError, of } from "rxjs";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
-import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
 import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
 import { CrmPatientDrawerComponent } from "../../../../components/layout/admin/crm/patient/patient-drawer.component";
 import { CrmPatientTableCardComponent } from "../../../../components/layout/admin/crm/patient/patient-table-card.component";
-import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
-import { BooDateAdminComponent } from "../../../../components/table/boo-table-admin/boo-date-admin.component";
-import { BooFilterAdminComponent } from "../../../../components/table/boo-table-admin/boo-filter-admin.component";
-import { BooSortAdminComponent } from "../../../../components/table/boo-table-admin/boo-sort-admin.component";
 import { PatientService } from "../../../../services/admin/patient.service";
 import { DateService } from "../../../../services/common/date.service";
 import { DialogService } from "../../../../services/common/dialog.service";
@@ -29,16 +22,9 @@ import { SortOption } from "../../../../shared/types/sort";
     imports: [
         SharedModule,
         AdminContentHeaderComponent,
-        BooButtonAdminComponent,
-        BooIconComponent,
         ButtonIconComponent,
-        BooInputComponent,
         CrmPatientTableCardComponent,
         CrmPatientDrawerComponent,
-        BooSortAdminComponent,
-        BooFilterAdminComponent,
-        BooDateAdminComponent,
-        BooSelectComponent
     ],
     template: `
         <admin-content-header>
@@ -47,58 +33,9 @@ import { SortOption } from "../../../../shared/types/sort";
                     <h4 class="text-[22px] text-primary font-semibold mb-0">Patients</h4>
                 </div>
                 <div class="text-right flex">
-                    <div class="relative me-1">
-                        <boo-select
-                            label="Export"
-                            size="large"
-                            [fitLabel]="true"
-                            [height]="40"
-                            [options]="[
-                                { label: 'Xlsx', value: 'xlsx' },
-                                { label: 'Pdf', value: 'pdf' },
-                                { label: 'Csv', value: 'csv' }
-                            ]"
-                        />
-                    </div>
                     <button-icon buttonClass="!bg-primary ms-2 text-white" (onClick)="onOpenDrawer(null)">
                         New Patient
                     </button-icon>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-between flex-wrap">
-                <div class="flex items-center gap-2">
-                    <div class="flex items-center flex-wrap gap-2">
-                        <div class="table-search flex items-center mb-0">
-                            <div class="search-input">
-                                <boo-input label="Search..." size="small" (search)="onSearch($event)">
-                                    <boo-icon
-                                        [class.animate-spin]="loadingSrv.isLoading('search')"
-                                        [name]="loadingSrv.isLoading('search') ? 'loader-circle' : 'search'"
-                                        color="#64748B"
-                                        endfix
-                                    />
-                                </boo-input>
-                            </div>
-                        </div>
-                    </div>
-                    <boo-date-admin
-                        [startDate]="params.filter.start"
-                        [endDate]="params.filter.end"
-                        (rangeChange)="onDateChange($event)"
-                    />
-                </div>
-                <div class="flex table-dropdown right-content items-center flex-wrap gap-3">
-                    <boo-button-admin
-                        [icon]="{ name: 'refresh-cw', size: 14, color: '#6C7688' }"
-                        buttonClass="!bg-surface h-full"
-                        [border]="{ width: 1, color: '#e3e3e3' }"
-                        (click)="loadPatients()"
-                    >
-                        <span class="text-placeholder">Reload</span>
-                    </boo-button-admin>
-                    <boo-filter-admin [filters]="filter_configs" (apply)="onFilterApply($event)" />
-                    <boo-sort-admin [(value)]="params.sort" (change)="onSortChange($event)" [options]="sort_options" />
                 </div>
             </div>
 
@@ -129,36 +66,28 @@ export class CrmPatientListComponent implements OnInit {
         pageNumber: 1,
         pageSize: 5,
         search: '',
-        sort: 'createdAt:desc',
+        sort: '-registrationDate',
         filter: {
             start: null as Date | null,
             end: null as Date | null,
             patientType: null as number | null,
             riskLevel: null as number | null,
-            isActive: null as boolean | null,
             isVip: null as boolean | null,
+            isChronicPatient: null as boolean | null,
         }
     };
     isDrawerOpen = false;
     selectedId: string | null = null;
 
     sort_options: SortOption[] = [
-        { label: 'Recent', value: '-createdAt' },
-        { label: 'Oldest', value: '+createdAt' },
-        { label: 'Name (A-Z)', value: '+fullName' },
-        { label: 'Name (Z-A)', value: '-fullName' },
+        { label: 'Recent', value: '-registrationDate' },
+        { label: 'Oldest', value: '+registrationDate' },
+        { label: 'Patient # (A-Z)', value: '+patientNumber' },
+        { label: 'Patient # (Z-A)', value: '-patientNumber' },
         { label: 'Most Visits', value: '-totalVisits' },
     ];
 
     filter_configs: FilterConfig[] = [
-        {
-            key: 'isActive',
-            label: 'Status',
-            type: 'boolean',
-            value: null,
-            trueLabel: 'Active',
-            falseLabel: 'Inactive'
-        },
         {
             key: 'isVip',
             label: 'VIP',
@@ -166,6 +95,14 @@ export class CrmPatientListComponent implements OnInit {
             value: null,
             trueLabel: 'VIP Only',
             falseLabel: 'Non-VIP'
+        },
+        {
+            key: 'isChronicPatient',
+            label: 'Chronic',
+            type: 'boolean',
+            value: null,
+            trueLabel: 'Chronic Only',
+            falseLabel: 'Non-Chronic'
         },
     ];
     // #endregion

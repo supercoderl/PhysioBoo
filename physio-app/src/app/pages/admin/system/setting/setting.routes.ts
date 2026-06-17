@@ -37,6 +37,11 @@ export const routes: Routes = [
                 loadComponent: () => import('./theme/theme.component').then(m => m.AdminSystemSettingThemeComponent)
             },
             {
+                path: 'billing',
+                data: { breadcrumb: ['plan & billing'] },
+                loadComponent: () => import('./billing/billing.component').then(m => m.SettingBillingComponent)
+            },
+            {
                 path: 'sequence-tracker',
                 data: { breadcrumb: ['sequence tracker'] },
                 loadComponent: () => import('./sequence-tracker/list.component').then(m => m.SettingSequenceTrackerListComponent)

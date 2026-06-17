@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
 import { PatientFilter } from "../../shared/types/filter";
-import { Patient } from "../../shared/types/patient";
+import { CreatePatientRequest, Patient, UpdatePatientRequest } from "../../shared/types/patient";
 
 @Injectable({ providedIn: 'root' })
 export class PatientService {
@@ -13,19 +13,19 @@ export class PatientService {
         return this.http.post<PagedResponse<PaginationData<Patient>>>(BASE_API.PATIENT.SEARCH, request);
     }
 
-    search_by_id(params: { id: string }) {
-        return this.http.post<PagedResponse<Patient | null>>(BASE_API.PATIENT.SEARCH_BY_ID, params);
+    search_by_id(id: string) {
+        return this.http.get<PagedResponse<Patient | null>>(`${BASE_API.PATIENT.BASE}/${id}`);
     }
 
-    create(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.PATIENT.CREATE, params);
+    create(params: CreatePatientRequest) {
+        return this.http.post<PagedResponse<string>>(BASE_API.PATIENT.BASE, params);
     }
 
-    update(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.PATIENT.UPDATE, params);
+    update(id: string, params: UpdatePatientRequest) {
+        return this.http.patch<PagedResponse<string>>(`${BASE_API.PATIENT.BASE}/${id}`, params);
     }
 
-    delete(id: string, isHard: boolean = false) {
-        return this.http.post<PagedResponse<string>>(BASE_API.PATIENT.DELETE, { id, isHard });
+    delete(id: string) {
+        return this.http.delete<PagedResponse<string>>(`${BASE_API.PATIENT.BASE}/${id}`);
     }
 }

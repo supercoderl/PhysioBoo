@@ -64,3 +64,9 @@ export interface UserProfile {
     patient: PatientProfile | null;
     roles: string[];
 }
+
+export interface PreferenceItem{
+  key: string;
+  value: string;
+  group: string;
+}

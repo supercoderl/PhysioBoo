@@ -1,97 +1,199 @@
-<div
-  id=""
-  class="ps bg-surface relative flex flex-col flex-1 min-h-0 overscroll-contain h-screen shadow-card"
-  custom-scrollbar
+<div class="py-4 flex flex-col flex-1 min-h-0 h-screen overflow-y-auto"
   style="border-top-left-radius: 12px"
->
+  custom-scrollbar>
   <div class="container">
-    <div class="max-w-2xl flex-auto p-4 md:p-6">
-      <div class="flex flex-col mb-4">
+    <div class="flex-auto w-full">
+
+      <header class="flex flex-col mb-6">
         <admin-breadcrumb></admin-breadcrumb>
-        <div class="flex items-center gap-2">
-          <p
-            class="lg:ml-0 tracking-tight font-bold leading-none text-[22px] m-0"
-          >
-            Security
-          </p>
+        <div class="flex items-start justify-between mt-2">
+          <div>
+            <p class="tracking-tight font-bold leading-none text-[22px] m-0">Security</p>
+            <p class="text-sm text-gray-500 mt-1">Manage your password, two-factor authentication, and active sessions.</p>
+          </div>
         </div>
-      </div>
-      <div class="w-full max-w-5xl">
-        <form class="flex w-full flex-col gap-12">
-          <div class="flex flex-col gap-4">
-            <div class="w-full">
-              <p class="font-medium text-base m-0">Change your password</p>
-              <p class="m-0 text-[13px] text-[#4B5563] leading-[1.5]">
-                You can only change your password twice within 24 hours!
-              </p>
+      </header>
+
+      <section class="bg-surface rounded-lg border border-gray-200 mb-6">
+        <div class="p-5 border-b border-gray-100">
+          <h2 class="text-base font-semibold text-gray-900 mb-1">Change password</h2>
+          <p class="text-sm text-gray-500">You can change your password twice within 24 hours.</p>
+        </div>
+        <form class="p-5 flex flex-col gap-4" (submit)="$event.preventDefault(); onChangePassword()">
+          <label class="flex flex-col gap-1.5">
+            <span class="text-xs font-medium text-gray-600">Current password</span>
+            <div class="inline-flex items-center gap-2 h-10 px-3 border border-gray-200 rounded-md bg-surface focus-within:border-primary transition-colors">
+              <boo-icon name="lock" iconClass="w-4 h-4 text-gray-400" />
+              <input [type]="showCurrent() ? 'text' : 'password'"
+                placeholder="Enter your current password"
+                class="flex-1 min-w-0 text-sm bg-transparent outline-none border-0"
+                [ngModel]="currentPassword()"
+                (ngModelChange)="currentPassword.set($event)"
+                name="currentPassword"
+                autocomplete="current-password" />
+              <button type="button" (click)="showCurrent.set(!showCurrent())"
+                class="text-gray-400 hover:text-gray-600 p-0.5">
+                <boo-icon [name]="showCurrent() ? 'eye-off' : 'eye'" iconClass="w-4 h-4" />
+              </button>
             </div>
-            <div class="grid w-full gap-4 sm:grid-cols-4">
-              <div class="sm:col-span-4">
-                <boo-input-v2
-                  [label]="{ text: 'Current password (default:changeme)' }"
-                >
-                  <boo-icon name="key" class="leading-none" prefix></boo-icon>
-                </boo-input-v2>
-              </div>
-              <div class="sm:col-span-4">
-                <boo-input-v2 [label]="{ text: 'New password' }">
-                  <boo-icon name="key" class="leading-none" prefix></boo-icon>
-                </boo-input-v2>
-              </div>
+          </label>
+
+          <label class="flex flex-col gap-1.5">
+            <span class="text-xs font-medium text-gray-600">New password</span>
+            <div class="inline-flex items-center gap-2 h-10 px-3 border border-gray-200 rounded-md bg-surface focus-within:border-primary transition-colors">
+              <boo-icon name="key" iconClass="w-4 h-4 text-gray-400" />
+              <input [type]="showNew() ? 'text' : 'password'"
+                placeholder="At least 8 characters"
+                class="flex-1 min-w-0 text-sm bg-transparent outline-none border-0"
+                [ngModel]="newPassword()"
+                (ngModelChange)="newPassword.set($event)"
+                name="newPassword"
+                autocomplete="new-password" />
+              <button type="button" (click)="showNew.set(!showNew())"
+                class="text-gray-400 hover:text-gray-600 p-0.5">
+                <boo-icon [name]="showNew() ? 'eye-off' : 'eye'" iconClass="w-4 h-4" />
+              </button>
             </div>
-          </div>
-          <div class="flex flex-col gap-4">
-            <div class="w-full">
-              <p class="font-medium text-base m-0">Security preferences</p>
-              <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
-                Keep your account more secure with following preferences.
-              </p>
-            </div>
-            <div class="grid w-full gap-4 sm:grid-cols-4">
-              <div class="flex items-center justify-between sm:col-span-4">
-                <div class="flex w-full flex-col">
-                  <label
-                    class="z-[99] m-0 inline-flex items-center cursor-pointer align-middle"
-                  >
-                    <span class="flex-1 flex m-0 text-[13px] leading-[1.5]">
-                      Enable 2-step authentication
-                    </span>
-                    <switch></switch>
-                  </label>
-                  <p
-                    class="text-[#4B5563] leading-[1.66] mt-0.75 mb-0 text-[12px]"
-                  >
-                    Protects you against password theft by requesting an
-                    authentication code via SMS on every login.
-                  </p>
-                </div>
+            <div *ngIf="newPassword()" class="flex items-center gap-2 mt-1">
+              <div class="flex-1 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                <div class="h-full transition-all" [class]="strengthColorClass()"
+                  [style.width.%]="(passwordStrength() / 4) * 100"></div>
               </div>
-              <div class="flex items-center justify-between sm:col-span-4">
-                <div class="flex w-full flex-col">
-                  <label
-                    class="z-[99] m-0 inline-flex items-center cursor-pointer align-middle"
-                  >
-                    <span class="flex-1 flex m-0 text-[13px] leading-[1.5]"
-                      >Ask to change password on every 6 months
-                    </span>
-                    <switch></switch>
-                  </label>
-                  <p
-                    class="text-[#4B5563] leading-[1.66] mt-0.75 mb-0 text-[12px]"
-                  >
-                    A simple but an effective way to be protected against data
-                    leaks and password theft.
-                  </p>
-                </div>
-              </div>
+              <span class="text-[11px] font-medium text-gray-600 min-w-[60px] text-right">{{ strengthLabel() }}</span>
             </div>
-          </div>
-          <div class="flex items-center justify-end gap-2">
-            <boo-button-admin>Cancel</boo-button-admin>
-            <boo-button-admin>Save</boo-button-admin>
+          </label>
+
+          <label class="flex flex-col gap-1.5">
+            <span class="text-xs font-medium text-gray-600">Confirm new password</span>
+            <div class="inline-flex items-center gap-2 h-10 px-3 border rounded-md bg-surface focus-within:border-primary transition-colors"
+              [class.border-red-300]="!passwordsMatch()"
+              [class.border-gray-200]="passwordsMatch()">
+              <boo-icon name="key" iconClass="w-4 h-4 text-gray-400" />
+              <input [type]="showConfirm() ? 'text' : 'password'"
+                placeholder="Re-enter your new password"
+                class="flex-1 min-w-0 text-sm bg-transparent outline-none border-0"
+                [ngModel]="confirmPassword()"
+                (ngModelChange)="confirmPassword.set($event)"
+                name="confirmPassword"
+                autocomplete="new-password" />
+              <button type="button" (click)="showConfirm.set(!showConfirm())"
+                class="text-gray-400 hover:text-gray-600 p-0.5">
+                <boo-icon [name]="showConfirm() ? 'eye-off' : 'eye'" iconClass="w-4 h-4" />
+              </button>
+            </div>
+            <span *ngIf="!passwordsMatch()" class="text-[11px] text-red-500">Passwords don't match.</span>
+          </label>
+
+          <div class="flex justify-end">
+            <button type="submit"
+              [disabled]="!canSavePassword() || savingPassword()"
+              class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              <boo-icon *ngIf="savingPassword()" name="loader-circle" iconClass="w-4 h-4 animate-spin" />
+              <span>{{ savingPassword() ? 'Updating…' : 'Update password' }}</span>
+            </button>
           </div>
         </form>
-      </div>
+      </section>
+
+      <section class="bg-surface rounded-lg border border-gray-200 mb-6">
+        <div class="p-5 border-b border-gray-100">
+          <h2 class="text-base font-semibold text-gray-900 mb-1">Security preferences</h2>
+          <p class="text-sm text-gray-500">Extra protections for your account.</p>
+        </div>
+        <div class="divide-y divide-gray-100">
+          <label class="flex items-start justify-between gap-4 px-5 py-4 cursor-pointer hover:bg-gray-50/60 transition-colors">
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-gray-900">Two-factor authentication</div>
+              <div class="text-xs text-gray-500 mt-0.5">Require a one-time code from your authenticator app or SMS on every login.</div>
+            </div>
+            <div class="shrink-0 pt-0.5">
+              <switch [isOpen]="isPrefOn(KEYS.TWO_FACTOR)" (change)="togglePref(KEYS.TWO_FACTOR)"></switch>
+            </div>
+          </label>
+          <label class="flex items-start justify-between gap-4 px-5 py-4 cursor-pointer hover:bg-gray-50/60 transition-colors">
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-gray-900">Rotate password every 6 months</div>
+              <div class="text-xs text-gray-500 mt-0.5">We'll prompt you to set a new password regularly. Helps mitigate breach risk.</div>
+            </div>
+            <div class="shrink-0 pt-0.5">
+              <switch [isOpen]="isPrefOn(KEYS.ROTATE_PASSWORD)" (change)="togglePref(KEYS.ROTATE_PASSWORD)"></switch>
+            </div>
+          </label>
+          <label class="flex items-start justify-between gap-4 px-5 py-4 cursor-pointer hover:bg-gray-50/60 transition-colors">
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-gray-900">Email me on new device sign-in</div>
+              <div class="text-xs text-gray-500 mt-0.5">Get notified whenever someone (you, hopefully) signs in from an unrecognized device.</div>
+            </div>
+            <div class="shrink-0 pt-0.5">
+              <switch [isOpen]="isPrefOn(KEYS.EMAIL_NEW_LOGIN)" (change)="togglePref(KEYS.EMAIL_NEW_LOGIN)"></switch>
+            </div>
+          </label>
+        </div>
+
+        <div class="p-5 border-t border-gray-100 flex justify-end gap-2">
+          <button type="button"
+            (click)="onCancelPrefs()"
+            [disabled]="savingPrefs() || !isPrefsDirty()"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50">
+            Discard
+          </button>
+          <button type="button"
+            (click)="onSavePrefs()"
+            [disabled]="savingPrefs() || !isPrefsDirty()"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <boo-icon *ngIf="savingPrefs()" name="loader-circle" iconClass="w-4 h-4 animate-spin" />
+            <span>{{ savingPrefs() ? 'Saving…' : 'Save preferences' }}</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="bg-surface rounded-lg border border-gray-200">
+        <div class="p-5 border-b border-gray-100 flex items-center justify-between gap-4">
+          <div>
+            <h2 class="text-base font-semibold text-gray-900 mb-1">Active sessions</h2>
+            <p class="text-sm text-gray-500">Devices currently signed in to your account.</p>
+          </div>
+          <button type="button"
+            *ngIf="sessions().length > 1"
+            (click)="revokeAllOtherSessions()"
+            class="text-sm text-red-600 hover:text-red-700 hover:underline transition-colors">
+            Sign out all other devices
+          </button>
+        </div>
+        <div class="divide-y divide-gray-100">
+          <div *ngIf="!sessions().length" class="p-10 text-center text-sm text-gray-400">
+            No active sessions.
+          </div>
+          <div *ngFor="let s of sessions()"
+            class="flex items-center gap-4 px-5 py-3 hover:bg-gray-50/60 transition-colors">
+            <div class="w-9 h-9 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center shrink-0">
+              <boo-icon
+                [name]="s.device.toLowerCase().includes('iphone') || s.device.toLowerCase().includes('android') ? 'smartphone' : 'monitor'"
+                iconClass="w-4 h-4" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-gray-900 truncate">{{ s.device }} · {{ s.browser }}</span>
+                <span *ngIf="s.current"
+                  class="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                  This device
+                </span>
+              </div>
+              <div class="text-xs text-gray-500 mt-0.5">
+                {{ s.location }} · {{ s.ip }} · {{ s.lastActiveAt }}
+              </div>
+            </div>
+            <button type="button"
+              [disabled]="s.current"
+              (click)="revokeSession(s)"
+              class="text-xs text-gray-500 hover:text-red-600 hover:underline disabled:opacity-30 disabled:no-underline disabled:cursor-not-allowed transition-colors"
+              [title]="s.current ? 'You can\'t sign out from your current device' : 'Sign out'">
+              Sign out
+            </button>
+          </div>
+        </div>
+      </section>
+
     </div>
   </div>
 </div>

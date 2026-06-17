@@ -29,14 +29,14 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
                 (pageChange)="onPageClick($event)"
                 [loading]="loadingSrv.isLoading('search')"
             >
-                <ng-template appColumnDef="fullName" headerLabel="Patient" headerClass="text-left" let-item>
+                <ng-template appColumnDef="patientNumber" headerLabel="Patient" headerClass="text-left" let-item>
                     <div class="flex items-center gap-3 cursor-pointer" (click)="onEditClick(item.id)">
                         <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            <span class="text-xs font-bold text-primary">{{ item.fullName?.charAt(0) }}</span>
+                            <span class="text-xs font-bold text-primary">{{ item.patientNumber?.charAt(0) }}</span>
                         </div>
                         <div class="min-w-0">
-                            <div class="text-sm font-semibold text-danger truncate" [title]="item.fullName">{{ item.fullName }}</div>
-                            <div class="text-xs text-secondary">{{ item.patientNumber }}</div>
+                            <div class="text-sm font-semibold text-danger truncate" [title]="item.patientNumber">{{ item.patientNumber }}</div>
+                            <div class="text-xs text-secondary">{{ item.occupation ?? '—' }}</div>
                         </div>
                     </div>
                 </ng-template>
@@ -65,9 +65,9 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
                     </span>
                 </ng-template>
 
-                <ng-template appColumnDef="contact" headerLabel="Contact" headerClass="text-left" let-item>
-                    <div class="text-sm">{{ item.phone ?? '—' }}</div>
-                    <div class="text-xs text-secondary">{{ item.email ?? '' }}</div>
+                <ng-template appColumnDef="lastVisit" headerLabel="Last Visit" headerClass="text-left" let-item>
+                    <div class="text-sm">{{ item.lastVisitDate ? (item.lastVisitDate | date:'mediumDate') : '—' }}</div>
+                    <div class="text-xs text-secondary">{{ item.nextFollowUpDate ? ('Next: ' + (item.nextFollowUpDate | date:'mediumDate')) : '' }}</div>
                 </ng-template>
 
                 <ng-template appColumnDef="totalVisits" headerLabel="Visits" headerClass="text-center" cellClass="text-center" let-item>
@@ -78,14 +78,8 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
                     <div class="flex justify-center gap-1">
                         <span *ngIf="item.isVip" class="inline-flex px-1.5 py-0.5 rounded text-xs bg-yellow-100 text-yellow-700">VIP</span>
                         <span *ngIf="item.isSeniorCitizen" class="inline-flex px-1.5 py-0.5 rounded text-xs bg-blue-100 text-blue-700">Senior</span>
+                        <span *ngIf="item.isChronicPatient" class="inline-flex px-1.5 py-0.5 rounded text-xs bg-red-100 text-red-700">Chronic</span>
                     </div>
-                </ng-template>
-
-                <ng-template appColumnDef="isActive" headerLabel="Status" headerClass="text-center" cellClass="text-center" let-item>
-                    <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium"
-                        [ngClass]="item.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'">
-                        {{ item.isActive ? 'Active' : 'Inactive' }}
-                    </span>
                 </ng-template>
 
                 <ng-template appColumnDef="actions" headerLabel="Actions" let-item headerClass="text-center" cellClass="text-center">

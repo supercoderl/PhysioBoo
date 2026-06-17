@@ -1,4 +1,4 @@
-import { Component, ElementRef, forwardRef, HostListener, Input } from '@angular/core';
+import { Component, ElementRef, forwardRef, HostListener, Input, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared-imports';
 import { Size } from '../../../shared/types/common';
@@ -46,8 +46,13 @@ import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
       </div>
 
       <div 
+        #dropdownList
         *ngIf="isOpen"
         class="absolute top-[calc(100%+4px)] left-0 w-full bg-surface shadow-xl border border-slate-100 overflow-hidden z-50 animate-fade-in-down"
+        [ngClass]="{
+          'top-[calc(100%+4px)] animate-fade-in-down': !dropUp,
+          'bottom-[calc(100%+4px)] animate-fade-in-up': dropUp
+        }"
         [style.border-radius.px]="radius"
       >
         <ul class="max-h-60 overflow-y-auto py-1 m-0" custom-scrollbar>
@@ -94,6 +99,15 @@ import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
         to { opacity: 1; transform: translateY(0); }
     }
     
+    .animate-fade-in-up {
+        animation: fadeInUp 0.2s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
@@ -104,6 +118,7 @@ import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
 })
 export class BooSelectComponent implements ControlValueAccessor {
   // #region Inputs
+  @ViewChild('container') containerRef!: ElementRef<HTMLDivElement>;
   @Input() label: string = '';
   @Input({ transform: (v: unknown) => v === '' || v === true || v === 'true' }) required: boolean = false;
   @Input() height?: number;
@@ -119,6 +134,7 @@ export class BooSelectComponent implements ControlValueAccessor {
   model: any = null;
   isOpen: boolean = false;
   disabled: boolean = false;
+  dropUp: boolean = false;
 
   constructor(private _elementRef: ElementRef) { }
 
@@ -176,7 +192,26 @@ export class BooSelectComponent implements ControlValueAccessor {
   // #region Methods
   toggleDropdown() {
     if (this.disabled) return;
+    if (!this.isOpen) {
+      this.calculateDropdownPosition();
+    }
+
     this.isOpen = !this.isOpen;
+  }
+
+  calculateDropdownPosition() {
+    if (!this.containerRef) return;
+
+    const rect = this.containerRef.nativeElement.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - rect.bottom;
+    const expectedDropdownHeight = 250;
+
+    if (spaceBelow < expectedDropdownHeight && rect.top > spaceBelow) {
+      this.dropUp = true;
+    } else {
+      this.dropUp = false;
+    }
   }
 
   selectOption(opt: any | null) {

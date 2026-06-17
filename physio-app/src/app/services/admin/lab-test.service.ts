@@ -13,21 +13,19 @@ export class LabTestService {
         return this.http.post<PagedResponse<PaginationData<LabTest>>>(BASE_API.LABTEST.SEARCH, request);
     }
 
-    search_by_id(params: { id: string }) {
-        return this.http.post<PagedResponse<LabTest | null>>(BASE_API.LABTEST.SEARCH_BY_ID, params);
+    search_by_id(id: string) {
+        return this.http.get<PagedResponse<LabTest | null>>(`${BASE_API.LABTEST.BASE}/${id}`);
     }
 
     create(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.LABTEST.CREATE, params);
+        return this.http.post<PagedResponse<string>>(BASE_API.LABTEST.BASE, params);
     }
 
-    update(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.LABTEST.UPDATE, params);
+    update(id: string, params: any) {
+        return this.http.patch<PagedResponse<string>>(`${BASE_API.LABTEST.BASE}/${id}`, params);
     }
 
-    delete(id: string, isHard: boolean = false) {
-        return this.http.post<PagedResponse<string>>(BASE_API.LABTEST.DELETE, {
-            id, isHard
-        });
+    delete(id: string) {
+        return this.http.delete<PagedResponse<string>>(`${BASE_API.LABTEST.BASE}/${id}`);
     }
 }

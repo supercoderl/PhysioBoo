@@ -1,423 +1,551 @@
-import { Component } from "@angular/core";
+import { Component, OnInit, computed, signal } from "@angular/core";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { firstValueFrom } from "rxjs";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooCheckboxComponent } from "../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
+import { DrawerComponent } from "../../../../components/drawer/drawer.component";
+import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
+import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
+import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
+import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
+import { PermissionService } from "../../../../services/admin/permission.service";
+import { RoleService } from "../../../../services/admin/role.service";
+import { UserService } from "../../../../services/admin/user.service";
+import { DialogService } from "../../../../services/common/dialog.service";
+import { LocalLoadingService } from "../../../../services/common/local-loading.service";
+import { ToastService } from "../../../../services/common/toast.service";
+import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING } from "../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../shared/shared-imports";
+import { PagedRequest, PaginationData } from "../../../../shared/types/common";
 import { User } from "../../../../shared/types/core";
+import { UserFilter } from "../../../../shared/types/filter";
 import { Permission } from "../../../../shared/types/permission";
+import { Role } from "../../../../shared/types/role";
+import { AdminUserPermissionPermissionTabComponent } from "./user-permission-permission-tab.component";
+import { AdminUserPermissionRoleTabComponent } from "./user-permission-role-tab.component";
+import { AdminUserPermissionUserTabComponent } from "./user-permission-user-tab.component";
+
+type TabKey = 'users' | 'roles' | 'permissions';
+
+interface TabDef {
+    key: TabKey;
+    label: string;
+    icon: string;
+    hint: string;
+}
 
 @Component({
     selector: 'admin-user-permission',
     standalone: true,
     imports: [
-        SharedModule
-    ],
-    template: `
-    <div class="min-h-screen bg-gray-50 p-6">
-      <div class="max-w-7xl mx-auto">
-        <!-- Page Header -->
-        <div class="mb-6">
-          <h1 class="text-3xl font-bold text-gray-900">User & Permission Management</h1>
-          <p class="text-gray-600 mt-2">Manage hospital staff users and their access permissions</p>
-        </div>
-
-        <!-- Tabs -->
-        <div class="bg-surface rounded-lg shadow-sm mb-6">
-          <div class="border-b border-gray-200">
-            <nav class="flex -mb-px">
-              <button
-                (click)="activeTab = 'users'"
-                [class.border-blue-500]="activeTab === 'users'"
-                [class.text-blue-600]="activeTab === 'users'"
-                [class.text-gray-500]="activeTab !== 'users'"
-                class="px-6 py-4 text-sm font-medium border-b-2 hover:text-blue-600 hover:border-blue-300 transition-colors">
-                Users
-              </button>
-              <button
-                (click)="activeTab = 'permissions'"
-                [class.border-blue-500]="activeTab === 'permissions'"
-                [class.text-blue-600]="activeTab === 'permissions'"
-                [class.text-gray-500]="activeTab !== 'permissions'"
-                class="px-6 py-4 text-sm font-medium border-b-2 hover:text-blue-600 hover:border-blue-300 transition-colors">
-                Permissions
-              </button>
-              <button
-                (click)="activeTab = 'roles'"
-                [class.border-blue-500]="activeTab === 'roles'"
-                [class.text-blue-600]="activeTab === 'roles'"
-                [class.text-gray-500]="activeTab !== 'roles'"
-                class="px-6 py-4 text-sm font-medium border-b-2 hover:text-blue-600 hover:border-blue-300 transition-colors">
-                Roles
-              </button>
-            </nav>
-          </div>
-        </div>
-
-        <!-- Users Tab -->
-        <div *ngIf="activeTab === 'users'" class="space-y-6">
-          <!-- Search and Filter Bar -->
-          <div class="bg-surface p-4 rounded-lg shadow-sm">
-            <div class="flex flex-col md:flex-row gap-4">
-              <div class="flex-1">
-                <input
-                  type="text"
-                  [(ngModel)]="searchTerm"
-                  placeholder="Search users by name or email..."
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              </div>
-              <select [(ngModel)]="filterRole" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <option value="">All Roles</option>
-                <option value="Doctor">Doctor</option>
-                <option value="Nurse">Nurse</option>
-                <option value="Administrator">Administrator</option>
-                <option value="Receptionist">Receptionist</option>
-              </select>
-              <select [(ngModel)]="filterStatus" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-              <button
-                (click)="showAddUserModal = true"
-                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium whitespace-nowrap">
-                + Add User
-              </button>
-            </div>
-          </div>
-
-          <!-- Users Table -->
-          <div class="bg-surface rounded-lg shadow-sm overflow-hidden">
-            <div class="overflow-x-auto">
-              <table class="w-full">
-                <thead class="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Permissions</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="bg-surface divide-y divide-gray-200">
-                  <tr *ngFor="let user of filteredUsers()" class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span class="text-blue-600 font-medium">asd</span>
-                        </div>
-                        <div class="ml-4">
-                          <div class="text-sm font-medium text-gray-900">asd</div>
-                          <div class="text-sm text-gray-500">asd</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="text-sm text-gray-900">asd</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="text-sm text-gray-900">asd</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span
-                        [class.bg-green-100]="user.isActive"
-                        [class.text-green-800]="user.isActive"
-                        [class.bg-red-100]="!user.isActive"
-                        [class.text-red-800]="!user.isActive"
-                        class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
-                        asd
-                      </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <button
-                        (click)="editUserPermissions(user)"
-                        class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                        asd assigned
-                      </button>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button (click)="editUser(user)" class="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
-                      <button (click)="deleteUser(user)" class="text-red-600 hover:text-red-900">Delete</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Permissions Tab -->
-        <div *ngIf="activeTab === 'permissions'" class="space-y-6">
-          <div class="bg-surface p-4 rounded-lg shadow-sm">
-            <div class="flex justify-between items-center">
-              <input
-                type="text"
-                [(ngModel)]="permissionSearch"
-                placeholder="Search permissions..."
-                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <button
-                (click)="showAddPermissionModal = true"
-                class="ml-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                + Add Permission
-              </button>
-            </div>
-          </div>
-
-          <!-- Permission Categories -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div *ngFor="let category of getPermissionCategories()" class="bg-surface rounded-lg shadow-sm p-6">
-              <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ category }}</h3>
-              <div class="space-y-3">
-                <div *ngFor="let permission of getPermissionsByCategory(category)" class="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
-                  <div class="flex-1">
-                    <div class="font-medium text-gray-900">{{ permission.name }}</div>
-                    <div class="text-sm text-gray-500 mt-1">{{ permission.description }}</div>
-                  </div>
-                  <button class="ml-4 text-gray-400 hover:text-red-600 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Roles Tab -->
-        <div *ngIf="activeTab === 'roles'" class="space-y-6">
-          <div class="bg-surface p-4 rounded-lg shadow-sm">
-            <div class="flex justify-between items-center">
-              <h2 class="text-xl font-semibold text-gray-900">Role Templates</h2>
-              <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                + Create Role
-              </button>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div *ngFor="let role of roles" class="bg-surface rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">{{ role.name }}</h3>
-                <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                  {{ role.userCount }} users
-                </span>
-              </div>
-              <p class="text-sm text-gray-600 mb-4">{{ role.description }}</p>
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-500">{{ role.permissionCount }} permissions</span>
-                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Configure</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Add/Edit User Modal -->
-        <div *ngIf="showAddUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div class="bg-surface rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b border-gray-200">
-              <h2 class="text-2xl font-bold text-gray-900">Add New User</h2>
-            </div>
-            <div class="p-6">
-              <form class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                    <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                    <input type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                      <option>Doctor</option>
-                      <option>Nurse</option>
-                      <option>Administrator</option>
-                      <option>Receptionist</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
-                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                      <option>Cardiology</option>
-                      <option>Emergency</option>
-                      <option>Pediatrics</option>
-                      <option>Surgery</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                  <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
-              </form>
-            </div>
-            <div class="p-6 border-t border-gray-200 flex justify-end gap-3">
-              <button
-                (click)="showAddUserModal = false"
-                class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                Cancel
-              </button>
-              <button
-                (click)="showAddUserModal = false"
-                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                Add User
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Permission Assignment Modal -->
-        <div *ngIf="showPermissionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div class="bg-surface rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b border-gray-200">
-              <h2 class="text-2xl font-bold text-gray-900">Edit Permissions for asd</h2>
-            </div>
-            <div class="p-6">
-              <div class="space-y-6">
-                <div *ngFor="let category of getPermissionCategories()">
-                  <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ category }}</h3>
-                  <div class="space-y-2">
-                    <label *ngFor="let permission of getPermissionsByCategory(category)" class="flex items-start p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
-                      <input
-                        type="checkbox"
-                        [checked]="isPermissionAssigned(permission.id)"
-                        (change)="togglePermission(permission.id)"
-                        class="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                      <div class="ml-3 flex-1">
-                        <div class="font-medium text-gray-900">{{ permission.name }}</div>
-                        <div class="text-sm text-gray-500">{{ permission.description }}</div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="p-6 border-t border-gray-200 flex justify-end gap-3">
-              <button
-                (click)="showPermissionModal = false"
-                class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                Cancel
-              </button>
-              <button
-                (click)="savePermissions()"
-                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-    `
+    SharedModule,
+    AdminContentHeaderComponent,
+    DrawerComponent,
+    BooIconComponent,
+    BooInputComponent,
+    BooCheckboxComponent,
+    BooButtonAdminComponent,
+    BooTextareaComponent,
+    AdminUserPermissionUserTabComponent,
+    AdminUserPermissionRoleTabComponent,
+    AdminUserPermissionPermissionTabComponent
+],
+    templateUrl: './user-permission.component.html',
+    host: { class: 'block h-full min-h-0' }
 })
+export class AdminUserPermissionComponent implements OnInit {
+    // #region Tab & shared state
+    readonly tabs: TabDef[] = [
+        { key: 'users', label: 'Users', icon: 'users', hint: 'Accounts that can sign in' },
+        { key: 'roles', label: 'Roles', icon: 'shield', hint: 'Bundles of permissions' },
+        { key: 'permissions', label: 'Permissions', icon: 'key', hint: 'Atomic access rights' },
+    ];
+    activeTab = signal<TabKey>('users');
 
-export class AdminUserPermissionComponent {
-    // #region Inputs, Outputs, Properties
-    activeTab: 'users' | 'permissions' | 'roles' = 'users';
-    searchTerm = '';
-    permissionSearch = '';
-    filterRole = '';
-    filterStatus = '';
-    showAddUserModal = false;
-    showAddPermissionModal = false;
-    showPermissionModal = false;
-    selectedUser: User | null = null;
-    tempPermissions: string[] = [];
+    statUsers = computed(() => this.usersData()?.totalCount ?? 0);
+    statRoles = computed(() => this.rolesData()?.totalCount ?? 0);
+    statPermissions = computed(() => this.permissionsData()?.totalCount ?? 0);
+    // #endregion
 
-    users: User[] = [
-        // { id: 1, name: 'Dr. Sarah Johnson', email: 'sarah.j@hospital.com', role: 'Doctor', department: 'Cardiology', status: 'active', permissions: ['view_patients', 'edit_patients', 'view_medical_records'] },
-        // { id: 2, name: 'Michael Chen', email: 'michael.c@hospital.com', role: 'Nurse', department: 'Emergency', status: 'active', permissions: ['view_patients', 'update_vitals'] },
-        // { id: 3, name: 'Emily Rodriguez', email: 'emily.r@hospital.com', role: 'Administrator', department: 'Administration', status: 'active', permissions: ['view_patients', 'manage_users', 'view_reports', 'manage_billing'] },
-        // { id: 4, name: 'James Wilson', email: 'james.w@hospital.com', role: 'Receptionist', department: 'Front Desk', status: 'active', permissions: ['view_appointments', 'create_appointments'] },
-        // { id: 5, name: 'Dr. Lisa Anderson', email: 'lisa.a@hospital.com', role: 'Doctor', department: 'Pediatrics', status: 'inactive', permissions: ['view_patients', 'edit_patients'] },
+    // #region Users tab
+    usersData = signal<PaginationData<User> | null>(null);
+    userParams = signal<PagedRequest<UserFilter>>({
+        pageNumber: 1,
+        pageSize: 10,
+        search: '',
+        sort: '-createdAt',
+        filter: {
+            isActive: null,
+        }
+    });
+    userForm: FormGroup;
+    userRolesDraft = signal<Set<string>>(new Set());
+
+    isUserDrawerOpen = signal(false);
+    selectedUserId = signal<string | null>(null);
+    selectedUser = signal<User | null>(null);
+    // #endregion
+
+    // #region Roles tab
+    rolesData = signal<PaginationData<Role> | null>(null);
+    roleParams = {
+        pageNumber: 1,
+        pageSize: 50,
+        search: '',
+        sort: '+name',
+        filter: { start: '', end: '', isActive: null as boolean | null, isSystemRole: null as boolean | null }
+    };
+
+    isRoleDrawerOpen = signal(false);
+    selectedRoleId = signal<string | null>(null);
+    selectedRole = signal<Role | null>(null);
+    roleForm: FormGroup;
+    rolePermissionsDraft = signal<Set<string>>(new Set());
+
+    readonly roleColors = [
+        { label: 'Slate', value: '#64748b' },
+        { label: 'Blue', value: '#3b82f6' },
+        { label: 'Indigo', value: '#6366f1' },
+        { label: 'Purple', value: '#a855f7' },
+        { label: 'Pink', value: '#ec4899' },
+        { label: 'Red', value: '#ef4444' },
+        { label: 'Orange', value: '#f97316' },
+        { label: 'Amber', value: '#f59e0b' },
+        { label: 'Emerald', value: '#10b981' },
+        { label: 'Teal', value: '#14b8a6' },
     ];
 
-    permissions: Permission[] = [
-        { id: 'view_patients', name: 'View Patients', description: 'View patient information and records', category: 'Patient Management' },
-        { id: 'edit_patients', name: 'Edit Patients', description: 'Modify patient information', category: 'Patient Management' },
-        { id: 'view_medical_records', name: 'View Medical Records', description: 'Access patient medical history', category: 'Patient Management' },
-        { id: 'update_vitals', name: 'Update Vitals', description: 'Record patient vital signs', category: 'Patient Management' },
-        { id: 'view_appointments', name: 'View Appointments', description: 'See scheduled appointments', category: 'Appointments' },
-        { id: 'create_appointments', name: 'Create Appointments', description: 'Schedule new appointments', category: 'Appointments' },
-        { id: 'cancel_appointments', name: 'Cancel Appointments', description: 'Cancel or reschedule appointments', category: 'Appointments' },
-        { id: 'manage_users', name: 'Manage Users', description: 'Create, edit, and delete users', category: 'System Administration' },
-        { id: 'view_reports', name: 'View Reports', description: 'Access system reports', category: 'System Administration' },
-        { id: 'manage_billing', name: 'Manage Billing', description: 'Handle patient billing', category: 'Billing & Finance' },
-        { id: 'view_invoices', name: 'View Invoices', description: 'View patient invoices', category: 'Billing & Finance' },
-    ];
-
-    roles = [
-        { name: 'Doctor', description: 'Full access to patient care and medical records', userCount: 45, permissionCount: 12 },
-        { name: 'Nurse', description: 'Patient care and vital monitoring', userCount: 120, permissionCount: 8 },
-        { name: 'Administrator', description: 'System and user management', userCount: 15, permissionCount: 15 },
-        { name: 'Receptionist', description: 'Appointment and front desk management', userCount: 30, permissionCount: 5 },
+    readonly roleIcons = [
+        'shield', 'shield-check', 'crown', 'briefcase', 'stethoscope',
+        'heart-pulse', 'user-cog', 'wrench', 'lock', 'key'
     ];
     // #endregion
 
-    // #region Methods
-    filteredUsers(): User[] {
-        // return this.users.filter(user => {
-        //     const matchesSearch = user.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        //         user.email.toLowerCase().includes(this.searchTerm.toLowerCase());
-        //     const matchesRole = !this.filterRole || user.role === this.filterRole;
-        //     const matchesStatus = !this.filterStatus || user.status === this.filterStatus;
-        //     return matchesSearch && matchesRole && matchesStatus;
-        // });
-        return [];
+    // #region Permissions tab
+    permissionsData = signal<PaginationData<Permission> | null>(null);
+    permParams = {
+        pageNumber: 1,
+        pageSize: 200,                       
+        search: '',
+        sort: '+category',
+        filter: { start: '', end: '', category: null as string | null, isActive: null as boolean | null }
+    };
+
+    isPermDrawerOpen = signal(false);
+    selectedPermissionId = signal<string | null>(null);
+    permForm: FormGroup;
+
+    /** Grouped by category, derived from current permission list. */
+    permissionGroups = computed(() => {
+        const items = this.permissionsData()?.items ?? [];
+        const q = this.permParams.search.toLowerCase().trim();
+        const filtered = q
+            ? items.filter(p =>
+                p.name.toLowerCase().includes(q) ||
+                p.code.toLowerCase().includes(q) ||
+                p.category.toLowerCase().includes(q) ||
+                (p.description ?? '').toLowerCase().includes(q))
+            : items;
+        const map = new Map<string, Permission[]>();
+        for (const p of filtered) {
+            const cat = p.category || 'Uncategorized';
+            if (!map.has(cat)) map.set(cat, []);
+            map.get(cat)!.push(p);
+        }
+        return Array.from(map.entries()).map(([category, items]) => ({ category, items }));
+    });
+
+    permissionCategories = computed(() => {
+        const set = new Set<string>();
+        for (const p of this.permissionsData()?.items ?? []) set.add(p.category);
+        return Array.from(set).sort();
+    });
+
+    permsByCategory(category: string): Permission[] {
+        return (this.permissionsData()?.items ?? []).filter(p => p.category === category);
+    }
+    // #endregion
+
+    constructor(
+        private fb: FormBuilder,
+        private userSrv: UserService,
+        private roleSrv: RoleService,
+        private permSrv: PermissionService,
+        private toastSrv: ToastService,
+        private dialogSrv: DialogService,
+        protected loadingSrv: LocalLoadingService
+    ) {
+        this.userForm = this.fb.group({
+            email: ['', [Validators.required, Validators.email]],
+            phone: [''],
+            password: [''],                            // shown only for new users
+        });
+
+        this.roleForm = this.fb.group({
+            name: ['', [Validators.required]],
+            code: ['', [Validators.required]],
+            description: [''],
+            color: [this.roleColors[1].value],
+            icon: [this.roleIcons[0]],
+            isSystemRole: [false],
+        });
+
+        this.permForm = this.fb.group({
+            name: ['', [Validators.required]],
+            code: ['', [Validators.required]],
+            category: ['', [Validators.required]],
+            description: [''],
+            isActive: [true],
+        });
     }
 
-    getInitials(name: string): string {
-        return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    ngOnInit(): void {
+        this.loadAll();
     }
 
-    getPermissionCategories(): string[] {
-        return [...new Set(this.permissions.map(p => p.category))];
+    private loadAll(): void {
+        this.loadUsers();
+        this.loadRoles();
+        this.loadPermissions();
     }
 
-    getPermissionsByCategory(category: string): Permission[] {
-        return this.permissions.filter(p => p.category === category &&
-            (!this.permissionSearch || p.name.toLowerCase().includes(this.permissionSearch.toLowerCase())));
+    // #region Tab navigation
+    setTab(key: TabKey): void {
+        this.activeTab.set(key);
+    }
+    // #endregion
+
+    // ────────────────────────────────────────────────────────────
+    // Users
+    // ────────────────────────────────────────────────────────────
+    loadUsers(): void {
+        const p = this.userParams();
+        this.userSrv.search({
+            pageNumber: p.pageNumber,
+            pageSize: p.pageSize,
+            search: p.search,
+            sort: p.sort,
+            filter: { ...(p.filter ?? { isActive: null }) },
+        }).subscribe(res => {
+            if (res.success) this.usersData.set(res.data);
+        });
+    }
+    openNewUser(): void {
+        this.selectedUserId.set(null);
+        this.selectedUser.set(null);
+        this.userRolesDraft.set(new Set());
+        this.userForm.reset({ email: '', phone: '', password: '' });
+        this.userForm.get('password')?.setValidators([Validators.required, Validators.minLength(8)]);
+        this.userForm.get('password')?.updateValueAndValidity();
+        this.isUserDrawerOpen.set(true);
     }
 
-    editUser(user: User): void {
-        console.log('Edit user:', user);
+    openEditUser(user: User): void {
+        this.selectedUserId.set(user.id);
+        this.selectedUser.set(user);
+        const roleIds = new Set((user.roles ?? []).map(r => r.id));
+        this.userRolesDraft.set(roleIds);
+        this.userForm.reset({ email: user.email, phone: user.phone ?? '', password: '' });
+        this.userForm.get('password')?.clearValidators();
+        this.userForm.get('password')?.updateValueAndValidity();
+        this.isUserDrawerOpen.set(true);
+    }
+
+    toggleUserRole(roleId: string): void {
+        const next = new Set(this.userRolesDraft());
+        if (next.has(roleId)) next.delete(roleId);
+        else next.add(roleId);
+        this.userRolesDraft.set(next);
+    }
+
+    isUserRoleSelected(roleId: string): boolean {
+        return this.userRolesDraft().has(roleId);
+    }
+
+    async saveUser(): Promise<void> {
+        if (this.userForm.invalid) {
+            this.userForm.markAllAsTouched();
+            this.toastSrv.error('Please complete required fields');
+            return;
+        }
+        const v = this.userForm.getRawValue();
+        try {
+            let userId: string;
+            if (this.selectedUserId()) {
+                userId = this.selectedUserId()!;
+                await firstValueFrom(this.userSrv.update(userId, { email: v.email, phone: v.phone }));
+            } else {
+                const res = await firstValueFrom(this.userSrv.register({
+                    email: v.email, phone: v.phone, password: v.password
+                }));
+                if (!res.success || !res.data) {
+                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+                    return;
+                }
+                userId = res.data;
+            }
+
+            // Sync roles — diff between draft and current
+            const currentRoleIds = new Set((this.selectedUser()?.roles ?? []).map(r => r.id));
+            const draft = this.userRolesDraft();
+            const toAdd = [...draft].filter(id => !currentRoleIds.has(id));
+            const toRemove = [...currentRoleIds].filter(id => !draft.has(id));
+            await Promise.all([
+                ...toAdd.map(roleId => firstValueFrom(this.userSrv.assignRole({ userId, roleId }))),
+                ...toRemove.map(roleId => firstValueFrom(this.userSrv.removeRole({ userId, roleId }))),
+            ]);
+
+            this.toastSrv.success(this.selectedUserId() ? 'User updated' : 'User created');
+            this.closeUserDrawer();
+            this.loadUsers();
+        } catch {
+            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+        }
+    }
+
+    closeUserDrawer(): void {
+        this.isUserDrawerOpen.set(false);
+        this.selectedUserId.set(null);
+        this.selectedUser.set(null);
     }
 
     deleteUser(user: User): void {
-        if (confirm(`Are you sure you want to delete asd?`)) {
-            this.users = this.users.filter(u => u.id !== user.id);
+        this.dialogSrv.confirmDelete(() => {
+            this.userSrv.delete(user.id).subscribe({
+                next: () => { this.toastSrv.success('User deleted'); this.loadUsers(); },
+                error: () => this.toastSrv.error('Failed to delete user'),
+            });
+        });
+    }
+
+    // ────────────────────────────────────────────────────────────
+    // Roles
+    // ────────────────────────────────────────────────────────────
+    loadRoles(): void {
+        this.roleSrv.search({
+            pageNumber: this.roleParams.pageNumber,
+            pageSize: this.roleParams.pageSize,
+            search: this.roleParams.search,
+            sort: this.roleParams.sort,
+            filter: { ...this.roleParams.filter },
+        }).subscribe(res => {
+            if (res.success) this.rolesData.set(res.data);
+        });
+    }
+
+    onRoleSearch(value: string): void {
+        this.roleParams = { ...this.roleParams, search: value, pageNumber: 1 };
+        this.loadRoles();
+    }
+
+    openNewRole(): void {
+        this.selectedRoleId.set(null);
+        this.selectedRole.set(null);
+        this.rolePermissionsDraft.set(new Set());
+        this.roleForm.reset({
+            name: '', code: '', description: '',
+            color: this.roleColors[1].value,
+            icon: this.roleIcons[0],
+            isSystemRole: false
+        });
+        this.isRoleDrawerOpen.set(true);
+    }
+
+    async openEditRole(role: Role): Promise<void> {
+        this.selectedRoleId.set(role.id);
+        this.selectedRole.set(role);
+        this.roleForm.reset({
+            name: role.name,
+            code: role.code,
+            description: role.description ?? '',
+            color: role.color ?? this.roleColors[1].value,
+            icon: role.icon ?? this.roleIcons[0],
+            isSystemRole: role.isSystemRole,
+        });
+        // Load currently-assigned permissions for the matrix.
+        try {
+            const res = await firstValueFrom(this.roleSrv.getPermissions(role.id));
+            const ids = new Set<string>(res?.data ?? []);
+            this.rolePermissionsDraft.set(ids);
+        } catch {
+            this.rolePermissionsDraft.set(new Set());
+        }
+        this.isRoleDrawerOpen.set(true);
+    }
+
+    togglePermission(permId: string): void {
+        const next = new Set(this.rolePermissionsDraft());
+        if (next.has(permId)) next.delete(permId);
+        else next.add(permId);
+        this.rolePermissionsDraft.set(next);
+    }
+
+    isPermSelected(permId: string): boolean {
+        return this.rolePermissionsDraft().has(permId);
+    }
+
+    toggleCategoryAll(category: string, on: boolean): void {
+        const next = new Set(this.rolePermissionsDraft());
+        for (const p of this.permissionsData()?.items ?? []) {
+            if (p.category !== category) continue;
+            if (on) next.add(p.id);
+            else next.delete(p.id);
+        }
+        this.rolePermissionsDraft.set(next);
+    }
+
+    categoryAllSelected(category: string): boolean {
+        const items = (this.permissionsData()?.items ?? []).filter(p => p.category === category);
+        if (!items.length) return false;
+        const draft = this.rolePermissionsDraft();
+        return items.every(p => draft.has(p.id));
+    }
+
+    async saveRole(): Promise<void> {
+        if (this.roleForm.invalid) {
+            this.roleForm.markAllAsTouched();
+            this.toastSrv.error('Please complete required fields');
+            return;
+        }
+        const v = this.roleForm.getRawValue();
+        try {
+            let roleId = this.selectedRoleId();
+            if (roleId) {
+                await firstValueFrom(this.roleSrv.update(roleId, v));
+            } else {
+                roleId = this.genId();
+                await firstValueFrom(this.roleSrv.create({ id: roleId, ...v }));
+            }
+
+            const currentIds = await this.fetchRolePermissionIds(roleId);
+            const draft = this.rolePermissionsDraft();
+            const toAdd = [...draft].filter(id => !currentIds.has(id));
+            const toRemove = [...currentIds].filter(id => !draft.has(id));
+            await Promise.all([
+                ...toAdd.map(permissionId => firstValueFrom(this.roleSrv.assignPermission({ roleId: roleId!, permissionId }))),
+                ...toRemove.map(permissionId => firstValueFrom(this.roleSrv.removePermission({ roleId: roleId!, permissionId }))),
+            ]);
+
+            this.toastSrv.success(this.selectedRoleId() ? 'Role updated' : 'Role created');
+            this.closeRoleDrawer();
+            this.loadRoles();
+        } catch {
+            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
         }
     }
 
-    editUserPermissions(user: User): void {
-        this.selectedUser = user;
-        // this.tempPermissions = [...user.permissions];
-        this.showPermissionModal = true;
-    }
-
-    isPermissionAssigned(permissionId: string): boolean {
-        return this.tempPermissions.includes(permissionId);
-    }
-
-    togglePermission(permissionId: string): void {
-        const index = this.tempPermissions.indexOf(permissionId);
-        if (index > -1) {
-            this.tempPermissions.splice(index, 1);
-        } else {
-            this.tempPermissions.push(permissionId);
+    private async fetchRolePermissionIds(roleId: string): Promise<Set<string>> {
+        if (!this.selectedRoleId()) return new Set();
+        try {
+            const res = await firstValueFrom(this.roleSrv.getPermissions(roleId));
+            return new Set(res?.data ?? []);
+        } catch {
+            return new Set();
         }
     }
 
-    savePermissions(): void {
-        if (this.selectedUser) {
-            // this.selectedUser.permissions = [...this.tempPermissions];
-        }
-        this.showPermissionModal = false;
-        this.selectedUser = null;
+    closeRoleDrawer(): void {
+        this.isRoleDrawerOpen.set(false);
+        this.selectedRoleId.set(null);
+        this.selectedRole.set(null);
     }
-    // #endregion
+
+    deleteRole(role: Role): void {
+        if (role.isSystemRole) {
+            this.toastSrv.error('System roles cannot be deleted');
+            return;
+        }
+        this.dialogSrv.confirmDelete(() => {
+            this.roleSrv.delete(role.id).subscribe({
+                next: () => { this.toastSrv.success('Role deleted'); this.loadRoles(); },
+                error: () => this.toastSrv.error('Failed to delete role'),
+            });
+        });
+    }
+
+    selectRoleIcon(icon: string): void { this.roleForm.patchValue({ icon }); }
+    selectRoleColor(color: string): void { this.roleForm.patchValue({ color }); }
+
+    // ────────────────────────────────────────────────────────────
+    // Permissions
+    // ────────────────────────────────────────────────────────────
+    loadPermissions(): void {
+        this.permSrv.search({
+            pageNumber: this.permParams.pageNumber,
+            pageSize: this.permParams.pageSize,
+            search: this.permParams.search,
+            sort: this.permParams.sort,
+            filter: { ...this.permParams.filter },
+        }).subscribe(res => {
+            if (res.success) this.permissionsData.set(res.data);
+        });
+    }
+
+    onPermSearch(value: string): void {
+        this.permParams.search = value;
+        // Re-derive groups via signal recomputation
+        this.permissionsData.set(this.permissionsData());
+    }
+
+    openNewPermission(): void {
+        this.selectedPermissionId.set(null);
+        this.permForm.reset({ name: '', code: '', category: '', description: '', isActive: true });
+        this.isPermDrawerOpen.set(true);
+    }
+
+    openEditPermission(p: Permission): void {
+        this.selectedPermissionId.set(p.id);
+        this.permForm.reset({
+            name: p.name,
+            code: p.code,
+            category: p.category,
+            description: p.description ?? '',
+            isActive: p.isActive,
+        });
+        this.isPermDrawerOpen.set(true);
+    }
+
+    async savePermission(): Promise<void> {
+        if (this.permForm.invalid) {
+            this.permForm.markAllAsTouched();
+            this.toastSrv.error('Please complete required fields');
+            return;
+        }
+        const v = this.permForm.getRawValue();
+        try {
+            if (this.selectedPermissionId()) {
+                await firstValueFrom(this.permSrv.update(this.selectedPermissionId()!, v));
+            } else {
+                await firstValueFrom(this.permSrv.create({ id: this.genId(), ...v }));
+            }
+            this.toastSrv.success(this.selectedPermissionId() ? 'Permission updated' : 'Permission created');
+            this.closePermDrawer();
+            this.loadPermissions();
+        } catch {
+            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+        }
+    }
+
+    closePermDrawer(): void {
+        this.isPermDrawerOpen.set(false);
+        this.selectedPermissionId.set(null);
+    }
+
+    deletePermission(p: Permission): void {
+        this.dialogSrv.confirmDelete(() => {
+            this.permSrv.delete(p.id).subscribe({
+                next: () => { this.toastSrv.success('Permission deleted'); this.loadPermissions(); },
+                error: () => this.toastSrv.error('Failed to delete permission'),
+            });
+        });
+    }
+
+    // ────────────────────────────────────────────────────────────
+    // Utils
+    // ────────────────────────────────────────────────────────────
+    private genId(): string {
+        return typeof crypto !== 'undefined' && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    }
 }

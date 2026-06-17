@@ -87,8 +87,8 @@ export interface PatientFilter {
     end: string,
     patientType: number | null,
     riskLevel: number | null,
-    isActive: boolean | null,
     isVip: boolean | null,
+    isChronicPatient: boolean | null,
 }
 
 export interface HospitalGroupFilter {
@@ -113,9 +113,7 @@ export interface DepartmentFilter {
 }
 
 export interface UserFilter {
-    start: string,
-    end: string,
-    isActive: boolean | null,
+    isActive: boolean | null
 }
 
 export interface RoleFilter {
@@ -123,4 +121,11 @@ export interface RoleFilter {
     end: string,
     isActive: boolean | null,
     isSystemRole: boolean | null,
+}
+
+export interface PermissionFilter {
+    start: string,
+    end: string,
+    category: string | null,
+    isActive: boolean | null,
 }

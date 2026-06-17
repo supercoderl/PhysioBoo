@@ -1,0 +1,453 @@
+<admin-content-header>
+  <!-- Page hero -->
+  <div
+    class="flex items-start justify-between pb-4 mb-3 border-b border-gray-200"
+  >
+    <div>
+      <h4 class="text-[22px] text-primary font-semibold mb-1">
+        User & Permission Management
+      </h4>
+      <p class="text-sm text-secondary m-0">
+        Control who can sign in, what they can do, and which permissions roll up
+        into each role.
+      </p>
+    </div>
+    <div class="hidden md:flex items-center gap-2">
+      <div
+        class="px-3 py-2 rounded-lg bg-surface border border-gray-200 flex items-center gap-2"
+      >
+        <boo-icon name="users" iconClass="w-4 h-4 text-primary"></boo-icon>
+        <span class="text-xs text-secondary uppercase tracking-wider"
+          >Users</span
+        >
+        <span class="text-sm font-semibold text-primary">{{
+          statUsers()
+        }}</span>
+      </div>
+      <div
+        class="px-3 py-2 rounded-lg bg-surface border border-gray-200 flex items-center gap-2"
+      >
+        <boo-icon name="shield" iconClass="w-4 h-4 text-primary"></boo-icon>
+        <span class="text-xs text-secondary uppercase tracking-wider"
+          >Roles</span
+        >
+        <span class="text-sm font-semibold text-primary">{{
+          statRoles()
+        }}</span>
+      </div>
+      <div
+        class="px-3 py-2 rounded-lg bg-surface border border-gray-200 flex items-center gap-2"
+      >
+        <boo-icon name="key" iconClass="w-4 h-4 text-primary"></boo-icon>
+        <span class="text-xs text-secondary uppercase tracking-wider"
+          >Permissions</span
+        >
+        <span class="text-sm font-semibold text-primary">{{
+          statPermissions()
+        }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab nav -->
+  <div class="flex items-center gap-1 mb-4 p-1 bg-gray-100 rounded-lg w-fit">
+    <button
+      *ngFor="let t of tabs"
+      type="button"
+      (click)="setTab(t.key)"
+      class="px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 transition-all"
+      [ngClass]="
+        activeTab() === t.key
+          ? 'bg-surface text-primary shadow-sm'
+          : 'text-secondary hover:text-primary'
+      "
+    >
+      <boo-icon [name]="t.icon" iconClass="w-4 h-4"></boo-icon>
+      {{ t.label }}
+    </button>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- Users tab                                                      -->
+  <!-- ============================================================== -->
+  <div *ngIf="activeTab() === 'users'" class="space-y-4">
+    <div
+      class="bg-surface rounded-lg border border-gray-200 p-3 flex flex-col md:flex-row md:items-center gap-3"
+    >
+      <button
+        (click)="openNewUser()"
+        class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 flex items-center gap-2 whitespace-nowrap"
+      >
+        <boo-icon name="user-plus" iconClass="w-4 h-4"></boo-icon>
+        New User
+      </button>
+    </div>
+
+    <admin-user-permission-user-tab 
+      [tableData]="usersData"
+      [params]="userParams"
+      (reloadClick)="loadUsers()"
+    />
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- Roles tab                                                       -->
+  <!-- ============================================================== -->
+  <div *ngIf="activeTab() === 'roles'" class="space-y-4">
+    <div
+      class="bg-surface rounded-lg border border-gray-200 p-3 flex flex-col md:flex-row md:items-center gap-3"
+    >
+      <button
+        (click)="openNewRole()"
+        class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 flex items-center gap-2 whitespace-nowrap"
+      >
+        <boo-icon name="plus" iconClass="w-4 h-4"></boo-icon>
+        New Role
+      </button>
+    </div>
+
+    <admin-user-permission-role-tab 
+      [tableData]="rolesData"
+      (editClick)="openEditRole($event)"
+      (newClick)="openNewRole()"
+     />
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- Permissions tab                                                 -->
+  <!-- ============================================================== -->
+  <div *ngIf="activeTab() === 'permissions'" class="space-y-4">
+    <!-- Toolbar -->
+    <div
+      class="bg-surface rounded-lg border border-gray-200 p-3 flex flex-col md:flex-row md:items-center gap-3"
+    >
+      <button
+        (click)="openNewPermission()"
+        class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 flex items-center gap-2 whitespace-nowrap"
+      >
+        <boo-icon name="plus" iconClass="w-4 h-4"></boo-icon>
+        New Permission
+      </button>
+    </div>
+
+    <admin-user-permission-permission-tab 
+      [permissionGroups]="permissionGroups"
+      (editClick)="openEditPermission($event)"
+      (deleteClick)="deletePermission($event)"
+     />
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- User drawer (create / edit + role assignment)                   -->
+  <!-- ============================================================== -->
+  
+
+  <!-- ============================================================== -->
+  <!-- Role drawer (create / edit + permission matrix)                 -->
+  <!-- ============================================================== -->
+  <drawer
+    [isOpen]="isRoleDrawerOpen()"
+    [isShowDialog]="true"
+    [width]="780"
+    (close)="closeRoleDrawer()"
+  >
+    <div class="flex flex-col h-full bg-surface" [formGroup]="roleForm">
+      <div
+        class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-lg flex items-center justify-center"
+            [style.background-color]="softBg(roleForm.get('color')?.value)"
+            [style.color]="roleForm.get('color')?.value"
+          >
+            <boo-icon
+              [name]="roleForm.get('icon')?.value || 'shield'"
+              iconClass="w-5 h-5"
+            ></boo-icon>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-primary leading-none mb-1">
+              {{ selectedRoleId() ? "Edit Role" : "New Role" }}
+            </h2>
+            <p class="text-sm text-secondary m-0">
+              Bundle the permissions that define this job function
+            </p>
+          </div>
+        </div>
+        <button
+          (click)="closeRoleDrawer()"
+          class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+        >
+          <boo-icon name="x" [size]="20"></boo-icon>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6 space-y-6" custom-scrollbar>
+        <!-- Identity -->
+        <div>
+          <h3
+            class="text-xs font-bold text-secondary uppercase tracking-wider mb-3"
+          >
+            Identity
+          </h3>
+          <div class="grid grid-cols-2 gap-4 mb-3">
+            <boo-input
+              label="Display Name"
+              formControlName="name"
+              placeholder="Ex: Cardiologist"
+              required
+            ></boo-input>
+            <boo-input
+              label="Code"
+              formControlName="code"
+              placeholder="Ex: CARDIO_DOC"
+              required
+            ></boo-input>
+          </div>
+          <boo-textarea
+            label="Description"
+            formControlName="description"
+            [rows]="2"
+            placeholder="Short summary of what this role can do..."
+          ></boo-textarea>
+        </div>
+
+        <!-- Appearance -->
+        <div>
+          <h3
+            class="text-xs font-bold text-secondary uppercase tracking-wider mb-3"
+          >
+            Appearance
+          </h3>
+          <div class="space-y-3">
+            <div>
+              <div class="text-xs text-secondary mb-2">Color</div>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  *ngFor="let c of roleColors"
+                  (click)="selectRoleColor(c.value)"
+                  class="w-8 h-8 rounded-full flex items-center justify-center transition-transform hover:scale-110"
+                  [style.background-color]="c.value"
+                  [title]="c.label"
+                >
+                  <boo-icon
+                    *ngIf="roleForm.get('color')?.value === c.value"
+                    name="check"
+                    iconClass="w-4 h-4 text-white"
+                  ></boo-icon>
+                </button>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-secondary mb-2">Icon</div>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  *ngFor="let i of roleIcons"
+                  (click)="selectRoleIcon(i)"
+                  class="w-9 h-9 rounded-md border flex items-center justify-center transition-all"
+                  [ngClass]="
+                    roleForm.get('icon')?.value === i
+                      ? 'border-primary bg-primary/5 text-primary'
+                      : 'border-gray-200 text-secondary hover:border-gray-300'
+                  "
+                >
+                  <boo-icon [name]="i" iconClass="w-4 h-4"></boo-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Permission matrix -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h3
+              class="text-xs font-bold text-secondary uppercase tracking-wider"
+            >
+              Permissions
+            </h3>
+            <span class="text-xs text-secondary">
+              <span class="font-semibold text-primary">{{
+                rolePermissionsDraft().size
+              }}</span>
+              selected
+            </span>
+          </div>
+
+          <div
+            *ngIf="!permissionsData()?.items?.length"
+            class="text-center py-8 text-xs text-secondary bg-gray-50 rounded-lg"
+          >
+            No permissions defined yet. Add some in the Permissions tab first.
+          </div>
+
+          <div class="space-y-3">
+            <div
+              *ngFor="let cat of permissionCategories()"
+              class="border border-gray-200 rounded-lg overflow-hidden"
+            >
+              <div
+                class="flex items-center justify-between px-4 py-2.5 bg-gray-50 border-b border-gray-200"
+              >
+                <div class="flex items-center gap-2">
+                  <boo-icon
+                    name="folder"
+                    iconClass="w-4 h-4 text-secondary"
+                  ></boo-icon>
+                  <span class="text-sm font-semibold text-primary">{{
+                    cat
+                  }}</span>
+                </div>
+                <label
+                  class="text-xs text-secondary flex items-center gap-2 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    [checked]="categoryAllSelected(cat)"
+                    (change)="
+                      toggleCategoryAll(cat, $any($event.target).checked)
+                    "
+                    class="rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                  Select all
+                </label>
+              </div>
+              <div class="divide-y divide-gray-100">
+                <label
+                  *ngFor="let p of permsByCategory(cat)"
+                  class="px-4 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-50/60"
+                  (click)="togglePermission(p.id)"
+                >
+                  <div class="flex items-start gap-3 min-w-0">
+                    <input
+                      type="checkbox"
+                      [checked]="isPermSelected(p.id)"
+                      (click)="$event.stopPropagation()"
+                      (change)="togglePermission(p.id)"
+                      class="mt-1 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <div class="min-w-0">
+                      <div class="text-sm text-primary">{{ p.name }}</div>
+                      <div class="text-xs text-secondary truncate">
+                        {{ p.description || p.code }}
+                      </div>
+                    </div>
+                  </div>
+                  <code
+                    class="text-[10px] text-gray-400 font-mono shrink-0 ml-3"
+                    >{{ p.code }}</code
+                  >
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-3"
+      >
+        <button
+          *ngIf="selectedRole() && !selectedRole()!.isSystemRole"
+          (click)="deleteRole(selectedRole()!)"
+          class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1.5"
+        >
+          <boo-icon name="trash-2" [size]="16"></boo-icon>
+          Delete Role
+        </button>
+        <div class="flex gap-3 ml-auto">
+          <boo-button-admin background="transparent" (click)="closeRoleDrawer()"
+            >Cancel</boo-button-admin
+          >
+          <boo-button-admin textColor="white" (click)="saveRole()">
+            {{ selectedRoleId() ? "Save Changes" : "Create Role" }}
+          </boo-button-admin>
+        </div>
+      </div>
+    </div>
+  </drawer>
+
+  <!-- ============================================================== -->
+  <!-- Permission drawer (create / edit)                               -->
+  <!-- ============================================================== -->
+  <drawer
+    [isOpen]="isPermDrawerOpen()"
+    [isShowDialog]="true"
+    [width]="540"
+    (close)="closePermDrawer()"
+  >
+    <div class="flex flex-col h-full bg-surface" [formGroup]="permForm">
+      <div
+        class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between"
+      >
+        <div>
+          <h2 class="text-xl font-bold text-primary leading-none mb-1">
+            {{ selectedPermissionId() ? "Edit Permission" : "New Permission" }}
+          </h2>
+          <p class="text-sm text-secondary m-0">
+            An atomic access right that can be attached to roles
+          </p>
+        </div>
+        <button
+          (click)="closePermDrawer()"
+          class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+        >
+          <boo-icon name="x" [size]="20"></boo-icon>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6 space-y-4" custom-scrollbar>
+        <boo-input
+          label="Name"
+          formControlName="name"
+          placeholder="Ex: View Patients"
+          required
+        ></boo-input>
+        <boo-input
+          label="Code"
+          formControlName="code"
+          placeholder="Ex: PATIENTS_VIEW"
+          required
+        ></boo-input>
+        <boo-input
+          label="Category"
+          formControlName="category"
+          placeholder="Ex: Patient Management"
+          required
+        ></boo-input>
+        <boo-textarea
+          label="Description"
+          formControlName="description"
+          [rows]="3"
+          placeholder="What does this permission allow?"
+        ></boo-textarea>
+
+        <div
+          class="flex items-center justify-between p-3 border rounded-lg border-gray-200"
+        >
+          <div>
+            <div class="text-sm font-medium text-primary">Active</div>
+            <div class="text-xs text-secondary">
+              Inactive permissions are hidden from role assignment
+            </div>
+          </div>
+          <boo-checkbox formControlName="isActive"></boo-checkbox>
+        </div>
+      </div>
+
+      <div
+        class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3"
+      >
+        <boo-button-admin background="transparent" (click)="closePermDrawer()"
+          >Cancel</boo-button-admin
+        >
+        <boo-button-admin textColor="white" (click)="savePermission()">
+          {{ selectedPermissionId() ? "Save Changes" : "Create Permission" }}
+        </boo-button-admin>
+      </div>
+    </div>
+  </drawer>
+</admin-content-header>

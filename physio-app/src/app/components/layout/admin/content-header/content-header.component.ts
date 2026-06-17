@@ -5,7 +5,8 @@ import { AdminBreadcrumbComponent } from "../../../breadcrumb/admin-breadcrumb.c
   selector: 'admin-content-header',
   standalone: true,
   imports: [AdminBreadcrumbComponent],
-  templateUrl: './content-header.component.html'
+  templateUrl: './content-header.component.html',
+  host: { class: 'block h-full min-h-0' }
 })
 export class AdminContentHeaderComponent {
 

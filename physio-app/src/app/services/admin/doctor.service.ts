@@ -13,21 +13,19 @@ export class DoctorService {
         return this.http.post<PagedResponse<PaginationData<Doctor>>>(BASE_API.DOCTOR.SEARCH, request);
     }
 
-    search_by_id(params: { id: string }) {
-        return this.http.post<PagedResponse<Doctor | null>>(BASE_API.DOCTOR.SEARCH_BY_ID, params);
+    search_by_id(id: string) {
+        return this.http.get<PagedResponse<Doctor | null>>(`${BASE_API.DOCTOR.BASE}/${id}`);
     }
 
     create(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.DOCTOR.CREATE, params);
+        return this.http.post<PagedResponse<string>>(BASE_API.DOCTOR.BASE, params);
     }
 
-    update(params: any) {
-        return this.http.post<PagedResponse<string>>(BASE_API.DOCTOR.UPDATE, params);
+    update(id: string, params: any) {
+        return this.http.patch<PagedResponse<string>>(`${BASE_API.DOCTOR.BASE}/${id}`, params);
     }
 
-    delete(id: string, isHard: boolean = false) {
-        return this.http.post<PagedResponse<string>>(BASE_API.DOCTOR.DELETE, {
-            id, isHard
-        });
+    delete(id: string) {
+        return this.http.delete<PagedResponse<string>>(`${BASE_API.DOCTOR.BASE}/${id}`);
     }
 }

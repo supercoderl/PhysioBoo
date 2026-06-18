@@ -38,18 +38,18 @@ interface TabDef {
     selector: 'admin-user-permission',
     standalone: true,
     imports: [
-    SharedModule,
-    AdminContentHeaderComponent,
-    DrawerComponent,
-    BooIconComponent,
-    BooInputComponent,
-    BooCheckboxComponent,
-    BooButtonAdminComponent,
-    BooTextareaComponent,
-    AdminUserPermissionUserTabComponent,
-    AdminUserPermissionRoleTabComponent,
-    AdminUserPermissionPermissionTabComponent
-],
+        SharedModule,
+        AdminContentHeaderComponent,
+        DrawerComponent,
+        BooIconComponent,
+        BooInputComponent,
+        BooCheckboxComponent,
+        BooButtonAdminComponent,
+        BooTextareaComponent,
+        AdminUserPermissionUserTabComponent,
+        AdminUserPermissionRoleTabComponent,
+        AdminUserPermissionPermissionTabComponent
+    ],
     templateUrl: './user-permission.component.html',
     host: { class: 'block h-full min-h-0' }
 })

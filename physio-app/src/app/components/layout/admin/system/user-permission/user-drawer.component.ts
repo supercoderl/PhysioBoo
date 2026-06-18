@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, Input, Output } from "@angular/core";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
 
@@ -10,12 +10,7 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
     DrawerComponent
 ],
     template: `
-        <drawer
-            [isOpen]="isUserDrawerOpen()"
-            [isShowDialog]="true"
-            [width]="640"
-            (close)="closeUserDrawer()"
-        >
+        <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="720" (close)="onClose()">
             <div class="flex flex-col h-full bg-surface" [formGroup]="userForm">
                 <div
                     class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between"
@@ -179,5 +174,12 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
 })
 
 export class UserPermissionUserDrawerComponent {
+    // #region Inputs, Outputs, Properties
+    @Input() isOpen = false;
+    @Output() close = new EventEmitter<void>();
+    // #endregion
 
+    // #region Methods
+
+    // #endregion
 }

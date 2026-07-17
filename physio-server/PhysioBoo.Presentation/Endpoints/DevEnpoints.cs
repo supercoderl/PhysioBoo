@@ -63,8 +63,8 @@ namespace PhysioBoo.Presentation.Endpoints
                     Success = true,
                     Data = $"Status: {isAuthenticated}"
                 });
-            }).WithName("Check Is Authenticated")
-            .WithSummary("Check user is authenticated or not")
+            }).WithName("Check Is Authenticated For Developer")
+            .WithSummary("Check user is authenticated or not (used for developer)")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
             #endregion 

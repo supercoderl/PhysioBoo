@@ -31,12 +31,14 @@ namespace PhysioBoo.Presentation.Endpoints
                 CancellationToken cancellationToken
             ) =>
             {
-                await bus.SendCommandAsync(new CreateRoleCommand(newRole));
+                Guid newId = Guid.NewGuid();
 
-                return Results.Created($"/api/roles/{newRole.Id}", new ResponseMessage<Guid>
+                await bus.SendCommandAsync(new CreateRoleCommand(newRole, newId));
+
+                return Results.Created($"/api/roles/{newId}", new ResponseMessage<Guid>
                 {
                     Success = true,
-                    Data = newRole.Id
+                    Data = newId
                 });
             }).WithName("CreateRole")
             .WithSummary("Create new Role")

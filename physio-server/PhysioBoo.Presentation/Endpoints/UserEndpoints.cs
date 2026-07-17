@@ -382,6 +382,25 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status400BadRequest)
             .RequireAuthorization();
             #endregion
+
+            #region Check is authenticated
+            group.MapGet("/check-auth", (
+                HttpContext context,
+                CancellationToken cancellationToken
+            ) =>
+            {
+                bool? isAuthenticated = context.User.Identity?.IsAuthenticated;
+
+                return Results.Ok(new ResponseMessage<bool>
+                {
+                    Success = true,
+                    Data = isAuthenticated ?? false
+                });
+            }).WithName("Check Is Authenticated")
+            .WithSummary("Check user is authenticated or not")
+            .Produces<ResponseMessage<bool>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<bool>>(StatusCodes.Status400BadRequest);
+            #endregion 
         }
     }
 }

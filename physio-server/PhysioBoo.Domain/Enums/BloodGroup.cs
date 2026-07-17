@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PhysioBoo.Domain.Enums
+﻿namespace PhysioBoo.Domain.Enums
 {
     public enum BloodGroup
     {
@@ -15,6 +9,7 @@ namespace PhysioBoo.Domain.Enums
         AB_Positive,
         AB_Negative,
         O_Positive,
-        O_Negative
+        O_Negative,
+        Unknown
     }
 }

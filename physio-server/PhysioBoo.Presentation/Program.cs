@@ -24,7 +24,7 @@ namespace PhysioBoo.Presentation
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             System.Diagnostics.Stopwatch totalTimer = System.Diagnostics.Stopwatch.StartNew();
             System.Diagnostics.Stopwatch stepTimer = System.Diagnostics.Stopwatch.StartNew();
@@ -155,25 +155,7 @@ namespace PhysioBoo.Presentation
             #endregion
 
             #region Cache
-            if (builder.Environment.IsProduction() || !string.IsNullOrWhiteSpace(builder.Configuration["RedisHostName"]))
-            {
-                builder.Services.AddStackExchangeRedisCache(options =>
-                {
-                    options.Configuration = builder.Configuration["RedisHostName"];
-                    options.InstanceName = "PhysioBoo";
-                    options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions
-                    {
-                        ConnectTimeout = 3000,
-                        SyncTimeout = 3000,
-                        AbortOnConnectFail = false,
-                        ConnectRetry = 3
-                    };
-                });
-            }
-            else
-            {
-                builder.Services.AddDistributedMemoryCache();
-            }
+            builder.Services.AddCache(builder.Configuration, builder.Environment);
             #endregion
 
             #region MediatR
@@ -231,6 +213,8 @@ namespace PhysioBoo.Presentation
             }
 
             app.MapDefaultEndpoints();
+
+            await app.RunInitialTasks();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -370,7 +354,7 @@ namespace PhysioBoo.Presentation
                 Console.WriteLine($"────────────────────────────────────────────");
             });
 
-            app.Run();
+            await app.RunAsync();
         }
 
         static void LogStep(string stepName, ref System.Diagnostics.Stopwatch timer)

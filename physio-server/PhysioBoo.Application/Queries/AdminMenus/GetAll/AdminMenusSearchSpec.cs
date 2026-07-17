@@ -45,7 +45,7 @@ namespace PhysioBoo.Application.Queries.AdminMenus.GetAll
             {
                 Query = q.Request.Sort
             };
-            Query.ApplySorting(sortQuery, sortingExpressionProvider);
+            Query.OrderBy(x => x.Order).ApplySorting(sortQuery, sortingExpressionProvider);
         }
     }
 }

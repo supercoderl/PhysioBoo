@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Domain.DomainEvents;
 using PhysioBoo.Domain.Interfaces;
@@ -10,6 +11,7 @@ using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Interfaces.Seeding;
 using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Infrastructure.BackgroundJobs;
+using PhysioBoo.Infrastructure.Caching;
 using PhysioBoo.Infrastructure.Database;
 using PhysioBoo.Infrastructure.Database.Seeding;
 using PhysioBoo.Infrastructure.Email;
@@ -160,6 +162,39 @@ namespace PhysioBoo.Infrastructure.Extensions
         public static IServiceCollection AddSeedingSerivce(this IServiceCollection services)
         {
             services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
+            return services;
+        }
+
+        public static IServiceCollection AddCache(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+        {
+            services.Configure<CacheOptions>(configuration.GetSection(CacheOptions.SectionName));
+
+            if (environment.IsProduction() || !string.IsNullOrWhiteSpace(configuration["RedisHostName"]))
+            {
+                services.AddStackExchangeRedisCache(options =>
+                {
+                    options.InstanceName = "PhysioBoo";
+                    options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions
+                    {
+                        EndPoints = { configuration["RedisHostName"]! },
+                        ConnectTimeout = 3000,
+                        SyncTimeout = 3000,
+                        AbortOnConnectFail = false,
+                        ConnectRetry = 3
+                    };
+                });
+
+                services.AddSingleton<ICacheService, DistributedCacheService>();
+            }
+            else
+            {
+                services.AddDistributedMemoryCache();
+                services.AddSingleton<ICacheService, InMemoryCacheService>();
+            }
+
+            services.AddSingleton<ICacheWarmer, AppCacheWarmer>();
+            services.AddSingleton<ICacheRefreshGate, CacheRefreshGate>();
+
             return services;
         }
     }

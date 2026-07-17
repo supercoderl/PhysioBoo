@@ -1,37 +1,33 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
+using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Application.ViewModels.Configurations;
-using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Entities.System;
-using PhysioBoo.Domain.Interfaces.Repositories;
+using PhysioBoo.Application.ViewModels.Roles;
+using PhysioBoo.Application.ViewModels.Sys_Languages;
+using PhysioBoo.SharedKernel.Common;
 
 namespace PhysioBoo.Application.Queries.Configurations.GetInitData
 {
     public sealed class GetInitDataQueryHandler : IRequestHandler<GetInitDataQuery, InitDataViewModel>
     {
-        private readonly IRoleRepository _roleRepository;
-        private readonly ISys_LanguageRepository _languageRepository;
+        private readonly ICacheService _cacheService;
 
         public GetInitDataQueryHandler(
-            IRoleRepository roleRepository,
-            ISys_LanguageRepository languageRepository
+            ICacheService cacheService
         )
         {
-            _roleRepository = roleRepository;
-            _languageRepository = languageRepository;
+            _cacheService = cacheService;
         }
 
         public async Task<InitDataViewModel> Handle(GetInitDataQuery req, CancellationToken cancellationToken)
         {
-            List<Role> roles = await _roleRepository.GetAllNoTracking(
-                filter: role => role.IsPublicForRegistration
-            ).ToListAsync();
+            Task<List<RoleCacheViewModel>?> rolesTask = _cacheService.GetAsync<List<RoleCacheViewModel>>(CacheKeys.Roles, cancellationToken);
+            Task<List<LanguageCacheViewModel>?> languagesTask = _cacheService.GetAsync<List<LanguageCacheViewModel>>(CacheKeys.Languages, cancellationToken);
 
-            List<Sys_Language> languages = await _languageRepository.GetAllNoTracking(
-                filter: language => language.IsActive
-            ).ToListAsync();
+            await Task.WhenAll(rolesTask, languagesTask);
 
-            // Map to view model
+            List<RoleCacheViewModel> roles = await rolesTask ?? throw new InvalidOperationException($"Cache key '{CacheKeys.Roles}' is empty.");
+            List<LanguageCacheViewModel> languages = await languagesTask ?? throw new InvalidOperationException($"Cache key '{CacheKeys.Languages}' is empty.");
+
             return InitDataViewModel.FromConfig(roles, languages);
         }
     }

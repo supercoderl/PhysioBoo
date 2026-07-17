@@ -8,11 +8,13 @@ namespace PhysioBoo.Application.Commands.Roles.CreateRole
     {
         private static readonly CreateRoleCommandValidation s_validation = new();
 
+        public Guid NewId { get; }
         public CreateRoleViewModel NewRole { get; }
 
-        public CreateRoleCommand(CreateRoleViewModel newRole) : base(Guid.NewGuid())
+        public CreateRoleCommand(CreateRoleViewModel newRole, Guid newId) : base(Guid.NewGuid())
         {
             NewRole = newRole;
+            NewId = newId;
         }
 
         public override bool IsValid()

@@ -5,9 +5,10 @@ namespace PhysioBoo.Domain.Extensions
 {
     public static class DistributedCacheExtension
     {
-        private static readonly JsonSerializerSettings s_jsonSerializerSettings = new()
+        public static readonly JsonSerializerSettings JsonSettings = new()
         {
-            TypeNameHandling = TypeNameHandling.All
+            TypeNameHandling = TypeNameHandling.None,
+            NullValueHandling = NullValueHandling.Ignore
         };
 
         public static async Task<T?> GetOrCreateJsonAsync<T>(
@@ -15,23 +16,21 @@ namespace PhysioBoo.Domain.Extensions
             string key,
             Func<Task<T?>> factory,
             DistributedCacheEntryOptions options,
-            CancellationToken cancellationToken = default) where T : class
+            CancellationToken cancellationToken = default)
         {
-            var json = await cache.GetStringAsync(key, cancellationToken);
+            string? json = await cache.GetStringAsync(key, cancellationToken);
 
             if (!string.IsNullOrWhiteSpace(json))
-            {
-                return JsonConvert.DeserializeObject<T>(json, s_jsonSerializerSettings)!;
-            }
+                return JsonConvert.DeserializeObject<T>(json, JsonSettings)!;
 
-            var value = await factory();
+            T? value = await factory();
 
-            if (value == default)
+            if (value is null)
             {
                 return value;
             }
 
-            json = JsonConvert.SerializeObject(value, s_jsonSerializerSettings);
+            json = JsonConvert.SerializeObject(value, JsonSettings);
 
             await cache.SetStringAsync(key, json, options, cancellationToken);
 

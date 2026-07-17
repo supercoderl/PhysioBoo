@@ -4,6 +4,7 @@ using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
+using PhysioBoo.Shared.Events.Roles;
 
 namespace PhysioBoo.Application.Commands.Roles.CreateRole
 {
@@ -26,7 +27,7 @@ namespace PhysioBoo.Application.Commands.Roles.CreateRole
             if (!await TestValidityAsync(request)) return;
 
             SharedKernel.Results.DbResult<Guid> result = await _RoleRepository.InsertAsync<Role, Guid>(new Role(
-                request.NewRole.Id,
+                request.NewId,
                 request.NewRole.Name,
                 request.NewRole.Code,
                 request.NewRole.Description,
@@ -46,6 +47,8 @@ namespace PhysioBoo.Application.Commands.Roles.CreateRole
 
                 return;
             }
+
+            await Bus.RaiseEventAsync(new RoleCreatedEvent(request.NewId));
         }
     }
 }

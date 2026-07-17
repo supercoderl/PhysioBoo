@@ -40,7 +40,7 @@ namespace PhysioBoo.ServiceDefaults
 
         private static void ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
         {
-            var enableHttpTraces = builder.Configuration.GetValue<bool?>("APP_ENABLE_HTTP_TRACES") ?? false;
+            bool enableHttpTraces = builder.Configuration.GetValue<bool?>("APP_ENABLE_HTTP_TRACES") ?? false;
 
             builder.Logging.AddOpenTelemetry(logging =>
             {
@@ -97,7 +97,7 @@ namespace PhysioBoo.ServiceDefaults
         private static void AddOpenTelemetryExporters<TBuilder>(this TBuilder builder)
             where TBuilder : IHostApplicationBuilder
         {
-            var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
+            bool useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
 
             if (useOtlpExporter)
             {

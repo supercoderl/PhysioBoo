@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Domain.Settings;
 using PhysioBoo.Presentation.Swagger;
 using System.Text;
@@ -131,6 +132,14 @@ namespace PhysioBoo.Presentation.Extensions
             };
 
             return result;
+        }
+
+        public static async Task<WebApplication> RunInitialTasks(this WebApplication app)
+        {
+            ICacheWarmer warmer = app.Services.GetRequiredService<ICacheWarmer>();
+            await warmer.WarmAsync();
+
+            return app;
         }
     }
 }

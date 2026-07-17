@@ -114,6 +114,7 @@ using PhysioBoo.Application.Commands.Users.ResetPassword;
 using PhysioBoo.Application.Commands.Users.UpdateUser;
 using PhysioBoo.Application.Commands.Users.VerifyUser;
 using PhysioBoo.Application.EventHandlers.Fanout;
+using PhysioBoo.Application.EventHandlers.Role;
 using PhysioBoo.Application.EventHandlers.User;
 using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Application.Queries.Addresses.GetAll;
@@ -142,6 +143,18 @@ using PhysioBoo.Application.Queries.LabTests.GetAll;
 using PhysioBoo.Application.Queries.LabTests.GetById;
 using PhysioBoo.Application.Queries.Manufacturers.GetAll;
 using PhysioBoo.Application.Queries.Manufacturers.GetById;
+using PhysioBoo.Application.Queries.MedicalRecords.GetBillingSummary;
+using PhysioBoo.Application.Queries.MedicalRecords.GetClinicalNotes;
+using PhysioBoo.Application.Queries.MedicalRecords.GetClinicalSnapshot;
+using PhysioBoo.Application.Queries.MedicalRecords.GetContext;
+using PhysioBoo.Application.Queries.MedicalRecords.GetDiagnoses;
+using PhysioBoo.Application.Queries.MedicalRecords.GetEncounters;
+using PhysioBoo.Application.Queries.MedicalRecords.GetHistory;
+using PhysioBoo.Application.Queries.MedicalRecords.GetImagings;
+using PhysioBoo.Application.Queries.MedicalRecords.GetLab;
+using PhysioBoo.Application.Queries.MedicalRecords.GetPatientAllergies;
+using PhysioBoo.Application.Queries.MedicalRecords.GetPatientDemoGraphics;
+using PhysioBoo.Application.Queries.MedicalRecords.GetPrescriptions;
 using PhysioBoo.Application.Queries.MedicalSpecialties.GetAll;
 using PhysioBoo.Application.Queries.MedicalSpecialties.GetById;
 using PhysioBoo.Application.Queries.MedicineCategories.GetAll;
@@ -185,6 +198,7 @@ using PhysioBoo.Application.ViewModels.InsuranceCompanies;
 using PhysioBoo.Application.ViewModels.LabTestCategories;
 using PhysioBoo.Application.ViewModels.LabTests;
 using PhysioBoo.Application.ViewModels.Manufacturers;
+using PhysioBoo.Application.ViewModels.MedicalRecords;
 using PhysioBoo.Application.ViewModels.MedicalSpecialties;
 using PhysioBoo.Application.ViewModels.MedicineCategories;
 using PhysioBoo.Application.ViewModels.Patients;
@@ -207,6 +221,7 @@ using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
 using PhysioBoo.Domain.Entities.System;
 using PhysioBoo.Domain.Interfaces.EventHandlers;
+using PhysioBoo.Shared.Events.Roles;
 using PhysioBoo.Shared.Events.Users;
 using PhysioBoo.SharedKernel.Common;
 
@@ -224,6 +239,11 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<INotificationHandler<UserLoggedEvent>, UserCacheEventHandler>();
             services.AddScoped<INotificationHandler<UserLoggedOutEvent>, UserCacheEventHandler>();
             services.AddScoped<INotificationHandler<UserVerifiedEvent>, UserCacheEventHandler>();
+
+            // Role
+            services.AddScoped<INotificationHandler<RoleCreatedEvent>, RoleEventHandler>();
+            services.AddScoped<INotificationHandler<RoleUpdatedEvent>, RoleEventHandler>();
+            services.AddScoped<INotificationHandler<RoleDeletedEvent>, RoleEventHandler>();
 
             return services;
         }
@@ -356,6 +376,20 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<GetAllPrintTemplatesQuery, PagedResult<PrintTemplateViewModel>>, GetAllPrintTemplatesQueryHandler>();
             services.AddScoped<IRequestHandler<GetPrintTemplateByIdQuery, PrintTemplateViewModel?>, GetPrintTemplateByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetPrintTemplateByCodeQuery, PrintTemplateViewModel?>, GetPrintTemplateByCodeQueryHandler>();
+
+            // Medical Record
+            services.AddScoped<IRequestHandler<GetMedicalRecordBillingQuery, BillingSummaryViewModel?>, GetMedicalRecordBillingQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMedicalRecordClinicalNotesQuery, PagedResult<ClinicalNoteViewModel>>, GetMedicalRecordClinicalNotesQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMedicalRecordImagingsQuery, PagedResult<ImagingStudyViewModel>>, GetMedicalRecordImagingsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMedicalRecordPrescriptionsQuery, PagedResult<PrescriptionViewModel>>, GetMedicalRecordPrescriptionsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMedicalRecordDiagnosesQuery, PagedResult<DiagnosisViewModel>>, GetMedicalRecordDiagnosesQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMedicalRecordEncountersQuery, PagedResult<EncounterViewModel>>, GetMedicalRecordEncountersQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMedicalRecordPatientAllergiesQuery, PagedResult<PatientAllergyViewModel>>, GetMedicalRecordPatientAllergiesQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMedicalRecordHistoryQuery, HistoricalSummaryViewModel?>, GetMedicalRecordHistoryQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMedicalRecordPatientDemoGraphicsQuery, PatientDemographicsViewModel?>, GetMedicalRecordPatientDemoGraphicsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMedicalRecordClinicalSnapshotQuery, ClinicalSnapshotViewModel?>, GetMedicalRecordClinicalSnapshotQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMedicalRecordContextQuery, PatientContextViewModel?>, GetMedicalRecordContextQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMedicalRecordLabQuery, LabViewModel?>, GetMedicalRecordLabQueryHandler>();
 
             return services;
         }

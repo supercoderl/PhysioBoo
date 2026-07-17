@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output, WritableSignal } from "@angular
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { PaginationData } from "../../../../shared/types/common";
-import { Role } from "../../../../shared/types/role";
+import { Role } from "../../../../shared/types/role.types";
 import { ColorUtils } from "../../../../shared/utils/color.utils";
 
 @Component({

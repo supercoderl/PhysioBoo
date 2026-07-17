@@ -4,7 +4,7 @@ import { PrintPreviewComponent } from '../../components/print/print-preview/prin
 import { PrintTemplatePickerComponent } from '../../components/print/print-template-picker/print-template-picker.component';
 import { Orientation } from '../../shared/enums/print-orientation';
 import { PaperSize } from '../../shared/enums/print-paper-size';
-import { PrintRenderResult, PrintTemplate } from '../../shared/types/print-template';
+import { PrintRenderResult, PrintTemplate } from '../../shared/types/print-template.types';
 import { PrintTemplateService } from '../admin/print-template.service';
 import { ToastService } from './toast.service';
 

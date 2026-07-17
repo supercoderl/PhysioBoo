@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Toast, ToastAction, ToastType } from '../../shared/types/toast';
+import { Toast, ToastAction, ToastType } from '../../shared/types/toast.types';
 
 @Injectable({
     providedIn: 'root'

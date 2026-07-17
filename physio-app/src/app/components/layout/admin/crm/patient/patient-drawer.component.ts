@@ -7,7 +7,7 @@ import { ToastService } from "../../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../shared/constants/error.constant";
 import { PatientType, RiskLevel } from "../../../../../shared/enums/patient";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { CreatePatientRequest, Patient, UpdatePatientRequest } from "../../../../../shared/types/patient";
+import { CreatePatientRequest, Patient, UpdatePatientRequest } from "../../../../../shared/types/patient.types";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
@@ -418,11 +418,7 @@ export class CrmPatientDrawerComponent implements OnChanges {
         try {
             let id: string;
             if (this.currentId) {
-                const updateRes = await firstValueFrom(this.patientSrv.update(this.currentId, this.buildUpdate()));
-                if (!updateRes.success) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
+                await firstValueFrom(this.patientSrv.update(this.currentId, this.buildUpdate()));
                 id = this.currentId;
             } else {
                 const createRes = await firstValueFrom(this.patientSrv.create(this.buildCreate()));

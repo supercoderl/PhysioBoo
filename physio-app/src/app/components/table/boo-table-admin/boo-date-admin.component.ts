@@ -1,7 +1,7 @@
+import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SharedModule } from '../../../shared/shared-imports';
-import { DatePipe } from '@angular/common';
-import { DateRange, RangeType } from '../../../shared/types/date';
+import { DateRange, RangeType } from '../../../shared/types/date.types';
 import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-button-admin.component';
 
 @Component({

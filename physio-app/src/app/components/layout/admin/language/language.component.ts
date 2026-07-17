@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { Language } from '../../../../shared/types/sys-language';
-import { LocalStorage } from '../../../../shared/utils/storage';
 import { CONFIG_CACHE_KEY } from '../../../../shared/data/cache';
-import { AppConfig } from '../../../../shared/types/common';
 import { SharedModule } from '../../../../shared/shared-imports';
+import { AppConfig } from '../../../../shared/types/common';
+import { Language } from '../../../../shared/types/sys-language.types';
+import { LocalStorage } from '../../../../shared/utils/storage';
 
 @Component({
   selector: 'admin-language',

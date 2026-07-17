@@ -2,9 +2,9 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
-import { User } from "../../shared/types/core";
-import { UserFilter } from "../../shared/types/filter";
-import { AssignRoleRequest } from "../../shared/types/permission";
+import { User } from "../../shared/types/core.types";
+import { UserFilter } from "../../shared/types/filter.types";
+import { AssignRoleRequest } from "../../shared/types/permission.types";
 
 @Injectable({ providedIn: 'root' })
 export class UserService {

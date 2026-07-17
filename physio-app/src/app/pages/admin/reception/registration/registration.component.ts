@@ -15,7 +15,7 @@ import { ToastService } from "../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING } from "../../../../shared/constants/error.constant";
 import { DEFAULT_DOCTOR_ID } from "../../../../shared/constants/value.constant";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { CreatePatientRequest } from "../../../../shared/types/patient";
+import { CreatePatientRequest } from "../../../../shared/types/patient.types";
 
 type StepId = 'personal' | 'contact' | 'medical' | 'review';
 

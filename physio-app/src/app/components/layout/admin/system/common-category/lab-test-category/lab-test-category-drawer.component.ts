@@ -6,7 +6,7 @@ import { LocalLoadingService } from "../../../../../../services/common/local-loa
 import { ToastService } from "../../../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../../shared/shared-imports";
-import { LabTestCategory } from "../../../../../../shared/types/laboratory-imaging";
+import { LabTestCategory } from "../../../../../../shared/types/laboratory-imaging.types";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
 import { BooIconComponent } from "../../../../../icon/boo-icon/boo-icon.component";

@@ -3,8 +3,8 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ColumnDefDirective } from "../../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ActionItem, PaginationData } from "../../../../../shared/types/common";
-import { User } from "../../../../../shared/types/core";
-import { BulkAction, GroupableColumn, SavedView, SortOption, TableComment } from "../../../../../shared/types/table";
+import { User } from "../../../../../shared/types/core.types";
+import { BulkAction, GroupableColumn, SavedView, SortOption, TableComment } from "../../../../../shared/types/table.types";
 import { ColorUtils } from "../../../../../shared/utils/color.utils";
 import { BooActionAdminComponent } from "../../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent, FilterConfig } from "../../../../table/boo-table-admin/boo-table-admin.component";
@@ -63,7 +63,7 @@ import { BooTableAdminComponent, FilterConfig } from "../../../../table/boo-tabl
                     *ngIf="!item.profilePicture"
                     class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-primary text-sm"
                 >
-                  {{ userInitial(item) }}
+                  {{ onInit(item) }}
                 </div>
                 <img
                   *ngIf="item.profilePicture"
@@ -178,6 +178,7 @@ export class UserPermissionUserTableCardComponent {
   @Output() commentAdd = new EventEmitter<string>();
   @Output() commentDelete = new EventEmitter<TableComment>();
   @Output() resetView = new EventEmitter<void>();
+  @Output() init = new EventEmitter<User>();
 
   readonly groupableColumns: GroupableColumn[] = [
 
@@ -196,17 +197,16 @@ export class UserPermissionUserTableCardComponent {
       onClick: (item: any) => this.onDeleteClick(item.id)
     }
   ];
-
-  userInitial(user: User): string {
-    const e = user.email || '';
-    return (e[0] || '?').toUpperCase();
-  }
   // #endregion
 
   // #region Init (Lifecycle + Setup)
   constructor(
     protected loadingSrv: LocalLoadingService
   ) { }
+
+  onInit(user: User) {
+    this.init.emit(user);
+  }
   // #endregion
 
   // #region Methods

@@ -4,12 +4,12 @@ import { finalize, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AdminBreadcrumbComponent } from "../../../../../components/breadcrumb/admin-breadcrumb.component";
 import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
+import { UserService } from '../../../../../services/admin/user.service';
 import { AuthService } from '../../../../../services/auth/auth.service';
 import { ToastService } from '../../../../../services/common/toast.service';
-import { UserService } from '../../../../../services/admin/user.service';
 import { SharedModule } from '../../../../../shared/shared-imports';
-import { User } from '../../../../../shared/types/core';
-import { Role } from '../../../../../shared/types/role';
+import { User } from '../../../../../shared/types/core.types';
+import { Role } from '../../../../../shared/types/role.types';
 
 interface PendingInvite {
   id: string;
@@ -72,7 +72,7 @@ export class TeamComponent implements OnInit {
       pageSize: 100,
       search: '',
       sort: '+email',
-      filter: { start: '', end: '', isActive: null }
+      filter: { isActive: null }
     }).pipe(
       finalize(() => this.loading.set(false)),
       catchError(() => { this.toastSrv.error('Failed to load members'); return of(null); })

@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { USER_PROFILE } from '../data/dummy';
-import { UserProfile } from '../types/core';
+import { UserProfile } from '../types/core.types';
 
 @Pipe({
     name: 'defaultUser',

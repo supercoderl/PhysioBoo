@@ -1,8 +1,8 @@
 // src/app/shared/pipes/format-date.pipe.ts
 
 import { Pipe, PipeTransform } from '@angular/core';
-import { DATE_FORMATS } from '../types/date';
 import { DateService } from '../../services/common/date.service';
+import { DATE_FORMATS } from '../types/date.types';
 
 @Pipe({
     name: 'formatDate',

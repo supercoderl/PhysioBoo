@@ -2,8 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
-import { DepartmentFilter } from "../../shared/types/filter";
-import { Department } from "../../shared/types/operation";
+import { DepartmentFilter } from "../../shared/types/filter.types";
+import { Department } from "../../shared/types/operation.types";
 
 @Injectable({ providedIn: 'root' })
 export class DepartmentService {

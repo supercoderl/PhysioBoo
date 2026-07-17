@@ -6,7 +6,8 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ToastService } from "../../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { MenuItem } from "../../../../../shared/types/menu";
+import { LoadingKeys } from "../../../../../shared/types/loading";
+import { MenuItem } from "../../../../../shared/types/menu.types";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
 import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
@@ -148,7 +149,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                             buttonClass="hover:!bg-gray-200"
                             background="transparent"
                             (click)="onClose()"
-                            [disabled]="loadingSrv.isLoading('search-by-id')"
+                            [disabled]="loadingSrv.isLoading(LoadingKeys.ADMIN_MENU.SEARCH_BY_ID)"
                         >
                             Cancel
                         </boo-button-admin>
@@ -156,7 +157,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                             textColor="white"
                             (click)="onSave()"
                             [disabled]="loadingSrv.isLoading('search-by-id')"
-                            [loading]="loadingSrv.isLoading('create') || loadingSrv.isLoading('update')"
+                            [loading]="loadingSrv.isLoading(LoadingKeys.ADMIN_MENU.CREATE) || loadingSrv.isLoading(LoadingKeys.ADMIN_MENU.UPDATE)"
                         >
                             Save Changes
                         </boo-button-admin>
@@ -179,6 +180,7 @@ export class SettingAdminMenuDrawerComponent implements OnChanges {
 
     form: FormGroup;
     parentLabel = '';
+    LoadingKeys = LoadingKeys;
     // #endregion
 
     // #region Init (Lifecycle + Setup)
@@ -272,11 +274,7 @@ export class SettingAdminMenuDrawerComponent implements OnChanges {
         try {
             let id: string;
             if (this.currentItem) {
-                const updateRes = await firstValueFrom(this.menuSrv.update(this.currentItem.id, payload));
-                if (!updateRes.success) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
+                await firstValueFrom(this.menuSrv.update(this.currentItem.id, payload));
                 id = this.currentItem.id;
             } else {
                 const createRes = await firstValueFrom(this.menuSrv.create(payload));

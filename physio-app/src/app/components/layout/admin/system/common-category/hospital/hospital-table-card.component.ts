@@ -3,7 +3,7 @@ import { LocalLoadingService } from "../../../../../../services/common/local-loa
 import { ColumnDefDirective } from "../../../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { ActionItem, PaginationData } from "../../../../../../shared/types/common";
-import { Hospital } from "../../../../../../shared/types/support";
+import { Hospital } from "../../../../../../shared/types/support.types";
 import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo-table-admin.component";
 

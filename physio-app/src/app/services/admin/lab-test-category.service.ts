@@ -3,8 +3,8 @@ import { Injectable } from "@angular/core";
 import { map, Observable, shareReplay } from "rxjs";
 import { BASE_API } from "../../shared/api/base";
 import { Lookup, PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
-import { LabTestCategoryFilter } from "../../shared/types/filter";
-import { LabTestCategory } from "../../shared/types/laboratory-imaging";
+import { LabTestCategoryFilter } from "../../shared/types/filter.types";
+import { LabTestCategory } from "../../shared/types/laboratory-imaging.types";
 
 @Injectable({ providedIn: 'root' })
 export class LabTestCategoryService {

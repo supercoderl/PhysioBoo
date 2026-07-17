@@ -1,5 +1,5 @@
-import { Role } from "./role";
-import { Language } from "./sys-language";
+import { Role } from "./role.types";
+import { Language } from "./sys-language.types";
 
 export interface DrawerProperty {
     isOpen: boolean;
@@ -35,6 +35,18 @@ export interface PaginationData<T> {
     pageSize: number;
     totalCount: number;
     totalPages: number;
+}
+
+export function PaginationDataWithInit<T>(): PaginationData<T> {
+    return {
+        hasNext: false,
+        hasPrevious: false,
+        items: [],
+        pageNumber: 0,
+        pageSize: 0,
+        totalCount: 0,
+        totalPages: 0,
+    };
 }
 
 export type PopupPosition = 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right' | 'bottom-center' | 'top-center';

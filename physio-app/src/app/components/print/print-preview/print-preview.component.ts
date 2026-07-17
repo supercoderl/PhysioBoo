@@ -3,7 +3,7 @@ import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleCh
 import { Orientation } from '../../../shared/enums/print-orientation';
 import { PaperSize } from '../../../shared/enums/print-paper-size';
 import { SharedModule } from '../../../shared/shared-imports';
-import { PrintRenderResult } from '../../../shared/types/print-template';
+import { PrintRenderResult } from '../../../shared/types/print-template.types';
 import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
 
 @Component({

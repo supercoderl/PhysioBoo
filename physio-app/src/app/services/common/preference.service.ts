@@ -3,7 +3,7 @@ import { Injectable, computed, signal } from '@angular/core';
 import { Observable, map, of, tap } from 'rxjs';
 import { BASE_API } from '../../shared/api/base';
 import { PagedResponse } from '../../shared/types/common';
-import { PreferenceItem } from '../../shared/types/core';
+import { PreferenceItem } from '../../shared/types/core.types';
 
 @Injectable({ providedIn: 'root' })
 export class PreferenceService {

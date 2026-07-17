@@ -1,50 +1,88 @@
-<div class="p-6 min-h-screen">
-  <!-- Page Header -->
-  <div class="flex items-center justify-between gap-2 mb-4 flex-wrap">
+<admin-dashboard-status-strip [status]="snapshot?.status ?? null" class="block" />
+
+<div class="p-6 min-h-screen flex flex-col gap-3.5">
+
+  <!-- Page title row -->
+  <div class="flex items-center justify-between gap-3 flex-wrap">
     <div>
-      <h4 class="mb-1 text-2xl font-semibold">Welcome, Admin</h4>
-      <p class="mb-0">
-        Today you have 10 visits,
-        <a href="visits.php" class="underline text-black">View Details</a>
-      </p>
+      <h1 class="text-[19px] font-extrabold text-regular m-0 tracking-tight">Executive Dashboard</h1>
+      <p class="text-[12.5px] text-neutral m-0 mt-0.5">Hospital Intelligence Center · Live operational overview</p>
     </div>
-    <div
-      class="p-2 gap-2 rounded-[5px] border border-solid border-[#E2E8F0] text-[#0F172A] bg-surface flex items-center"
-    >
-      <boo-icon name="calendar-days"></boo-icon>
-      <span>3 Dec 25 - 3 Dec 25</span>
-    </div>
-  </div>
-  <!-- End Page Header -->
-
-  <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4">
-    <ng-container *ngFor="let title of analyticTitles">
-      <admin-analytic-card
-        [title]="title"
-        [analyticItem]="analyticsProperties(title)"
-      />
-    </ng-container>
-  </div>
-
-  <div class="grid xl:grid-cols-2 gap-4 mt-4">
-    <admin-appointment-table-card class="h-full block" />
-    <admin-statistic-card class="h-full block" />
-  </div>
-
-  <div class="grid xl:grid-cols-6 md:grid-cols-3 gap-4 mt-4">
-    <ng-container *ngFor="let category of medicalCategories">
-      <admin-category-card 
-        [backgroundColor]="category.background"
-        [title]="category.name"
+    <div class="flex items-center gap-1.5">
+      <boo-button-admin
+        background="transparent"
+        [border]="{ width: 1, color: 'rgb(var(--twc-border))' }"
+        textColor="rgb(var(--twc-regular))"
+        [icon]="{ name: 'refresh-cw', size: 12 }"
+        [loading]="loading"
+        padding="6px 11px"
+        buttonClass="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        (click)="loadOverview()"
       >
-        <boo-icon [name]="category.icon" [size]="24" [color]="category.color"></boo-icon>
-      </admin-category-card>
-    </ng-container>
+        Refresh
+      </boo-button-admin>
+      <boo-button-admin
+        background="transparent"
+        [border]="{ width: 1, color: 'rgb(var(--twc-border))' }"
+        textColor="rgb(var(--twc-regular))"
+        [icon]="{ name: 'calendar-days', size: 12 }"
+        padding="6px 11px"
+        buttonClass="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      >
+        {{ today | date: 'MMM d, y' }}
+      </boo-button-admin>
+      <boo-button-admin
+        [icon]="{ name: 'download', size: 12, color: '#fff' }"
+        textColor="#ffffff"
+        [fontWeight]="'600'"
+        padding="6px 13px"
+        buttonClass="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        (click)="onExport()"
+      >
+        Export Report
+      </boo-button-admin>
+    </div>
   </div>
 
-  <div class="grid xl:grid-cols-3 md:grid-cols-2 gap-4 mt-4">
-    <admin-patient-report-table-card />
-    <admin-patient-visit-card />
-    <admin-doctor-table-card />
+  <!-- Error state -->
+  <div *ngIf="error" class="flex items-center justify-between gap-3 p-3.5 bg-red-50 border border-red-200 rounded-lg">
+    <span class="text-sm text-red-700">Couldn't load the dashboard overview. Showing last known data if available.</span>
+    <boo-button-admin
+      background="transparent"
+      [border]="{ width: 1, color: '#fecaca' }"
+      textColor="#b91c1c"
+      padding="4px 10px"
+      buttonClass="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      (click)="loadOverview()"
+    >
+      Retry
+    </boo-button-admin>
   </div>
+
+  <!-- Main operational grid -->
+  <div class="grid xl:grid-cols-[4fr_2fr_2.5fr] xl:grid-rows-[auto_auto] grid-cols-1 gap-3 items-start">
+    <admin-patient-flow-card [flow]="snapshot?.patientFlow ?? null" class="block xl:col-start-1 xl:row-start-1" />
+    <admin-dept-load-card [depts]="snapshot?.departmentLoad ?? null" class="block xl:col-start-2 xl:row-start-1" />
+    <admin-alerts-card
+      [alerts]="snapshot?.alerts ?? null"
+      class="block xl:col-start-3 xl:row-start-1 xl:row-span-2"
+      (respondAlert)="onDismissAlert($event)"
+      (dismissAlert)="onDismissAlert($event)"
+    />
+    <admin-bed-capacity-card [wards]="snapshot?.bedCapacity ?? null" class="block xl:col-start-1 xl:row-start-2" />
+    <admin-active-operations-card [ops]="snapshot?.activeOperations ?? null" class="block xl:col-start-2 xl:row-start-2" />
+  </div>
+
+  <!-- Financial + clinical strip -->
+  <admin-financial-clinical-strip [financial]="snapshot?.financial ?? null" class="block" />
+
+  <!-- Bottom row -->
+  <div class="grid xl:grid-cols-[3fr_2fr] grid-cols-1 gap-3">
+    <admin-appointment-flow-card [flow]="snapshot?.appointmentFlow ?? null" class="block" />
+    <div class="flex flex-col gap-3">
+      <admin-staff-duty-card [staff]="snapshot?.staffDuty ?? null" class="block" />
+      <admin-recent-events-card [events]="snapshot?.recentEvents ?? null" class="block flex-1" />
+    </div>
+  </div>
+
 </div>

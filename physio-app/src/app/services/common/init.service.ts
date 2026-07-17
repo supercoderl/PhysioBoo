@@ -1,11 +1,10 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { catchError, firstValueFrom, lastValueFrom, of, throwError } from 'rxjs';
+import { catchError, firstValueFrom, of, throwError } from 'rxjs';
 import { BASE_API } from '../../shared/api/base';
 import { SERVER_HAS_NOT_RESPONSED } from '../../shared/constants/error.constant';
-import { CONFIG_CACHE_KEY, MENU_CACHE_KEY } from '../../shared/data/cache';
+import { CONFIG_CACHE_KEY } from '../../shared/data/cache';
 import { AppConfig, PagedResponse } from '../../shared/types/common';
-import { MenuCache, MenuItem } from '../../shared/types/menu';
 import { LocalStorage } from '../../shared/utils/storage';
 import { AuthService } from '../auth/auth.service';
 import { LoggerService } from './logger.service';
@@ -17,7 +16,6 @@ export class InitService {
     private loggerSrv = inject(LoggerService);
 
     private config: AppConfig | null = null;
-    private menus: MenuItem[] = [];
 
     /**
      * This main function will be called at APP_INITIALIZER
@@ -26,9 +24,8 @@ export class InitService {
     async load(): Promise<void> {
         try {
             await Promise.all([
+                this.authSrv.checkSession(),
                 this.loadConfig(),
-                this.loadMenu(),
-                lastValueFrom(this.authSrv.getProfile()),
             ]);
         } catch (err) {
             console.log(this.loggerSrv.error(SERVER_HAS_NOT_RESPONSED, err));
@@ -83,48 +80,6 @@ export class InitService {
         }
     }
 
-    private async loadMenu(): Promise<void> {
-        try {
-            const cache = LocalStorage.load<MenuCache>(MENU_CACHE_KEY);
-            const cachedVersion = cache?.version;
-
-            let headers = new HttpHeaders();
-            if (cachedVersion) {
-                headers = headers.set('If-None-Match', `"${cachedVersion}"`);
-            }
-
-            const request$ = this.http.post<PagedResponse<MenuCache>>(BASE_API.MENU, {
-                pageSize: 6783,
-                pageNumber: 1
-            }).pipe(
-                catchError(err => {
-                    if (err.status === 304) {
-                        return of(err);
-                    }
-                    return throwError(() => err);
-                })
-            );
-
-            const res = await firstValueFrom(request$);
-            if (res.success) {
-                const newMenuData = res.data;
-                this.menus = newMenuData.items;
-                LocalStorage.save(MENU_CACHE_KEY, newMenuData);
-            } else {
-                this.menus = [];
-            }
-
-        } catch (err) {
-            const cache = LocalStorage.load<MenuCache>(MENU_CACHE_KEY);
-            if (cache) {
-                this.menus = cache.items;
-            } else {
-                this.menus = [];
-            }
-            throwError;
-        }
-    }
-
     private getDefaultConfig(): AppConfig {
         return {
             version: '1.0.0',
@@ -136,9 +91,5 @@ export class InitService {
 
     getConfig(): AppConfig | null {
         return this.config;
-    }
-
-    getMenus(): MenuItem[] {
-        return this.menus;
     }
 }

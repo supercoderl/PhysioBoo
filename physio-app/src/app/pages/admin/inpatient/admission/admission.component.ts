@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { AdmissionForm } from "../../../../shared/types/admission";
+import { AdmissionForm } from "../../../../shared/types/admission.types";
 
 @Component({
     selector: 'admin-admission',

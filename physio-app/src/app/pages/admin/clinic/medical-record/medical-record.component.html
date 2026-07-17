@@ -1,0 +1,50 @@
+<div class="flex flex-col h-full min-h-0">
+  <!-- Loading skeleton -->
+  <div *ngIf="isLoading()" class="flex-1 flex items-center justify-center">
+    <div class="text-center">
+      <boo-icon name="loader" iconClass="w-8 h-8 text-primary animate-spin mx-auto mb-3"></boo-icon>
+      <div class="text-sm text-secondary">Loading medical record…</div>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!isLoading()">
+    <!-- Sticky patient context + snapshot + tab nav -->
+    <div class="sticky top-0 z-20 bg-surface shadow-sm">
+      <mr-patient-context-header [patient]="patient()" (action)="onQuickAction($event)"></mr-patient-context-header>
+      <mr-clinical-snapshot [snapshot]="snapshot()"></mr-clinical-snapshot>
+
+      <!-- Tab nav -->
+      <nav class="px-6 border-b border-gray-200 flex items-center gap-1 overflow-y-hidden overflow-x-auto"
+        role="tablist">
+        <button *ngFor="let t of tabs" type="button" (click)="setTab(t.key)"
+          [attr.aria-selected]="activeTab() === t.key" role="tab"
+          class="px-4 py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 -mb-px whitespace-nowrap"
+          [ngClass]="activeTab() === t.key
+            ? 'border-primary text-primary'
+            : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
+          <boo-icon [name]="t.icon" iconClass="w-4 h-4"></boo-icon>
+          {{ t.label }}
+          <span *ngIf="t.badge && t.badge() as n"
+            class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold leading-none"
+            [ngClass]="activeTab() === t.key ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-secondary'">
+            {{ n }}
+          </span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Tab content -->
+    <main class="flex-1 min-h-0 overflow-y-auto p-6" custom-scrollbar>
+      <mr-overview-tab *ngIf="activeTab() === 'overview'" [patient]="patient()" [demographics]="demographics()"
+        [history]="history()" [allergies]="allergies()" />
+
+      <mr-encounters-tab *ngIf="activeTab() === 'encounters'" [data]="encounters()" />
+      <mr-diagnoses-tab *ngIf="activeTab() === 'diagnoses'" [data]="diagnoses()" />
+      <mr-prescriptions-tab *ngIf="activeTab() === 'prescriptions'" [data]="prescriptions()" />
+      <mr-laboratory-tab *ngIf="activeTab() === 'lab'" [results]="labResults()" [reports]="labReports()" />
+      <mr-imaging-tab *ngIf="activeTab() === 'imaging'" [data]="imaging()" />
+      <mr-clinical-notes-tab *ngIf="activeTab() === 'notes'" [data]="notes()" />
+      <mr-billing-tab *ngIf="activeTab() === 'billing'" [summary]="billing()" />
+    </main>
+  </ng-container>
+</div>

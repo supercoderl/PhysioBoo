@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
-import { MedicineCategory } from "../../shared/types/clinical";
+import { MedicineCategory } from "../../shared/types/clinical.types";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
-import { MedicineCategoryFilter } from "../../shared/types/filter";
+import { MedicineCategoryFilter } from "../../shared/types/filter.types";
 
 @Injectable({ providedIn: 'root' })
 export class MedicineCategoryService {

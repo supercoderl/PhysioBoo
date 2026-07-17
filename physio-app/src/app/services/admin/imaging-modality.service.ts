@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
-import { ImagingModality } from "../../shared/types/laboratory-imaging";
 import { BASE_API } from "../../shared/api/base";
-import { ImagingModalityFilter } from "../../shared/types/filter";
+import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
+import { ImagingModalityFilter } from "../../shared/types/filter.types";
+import { ImagingModality } from "../../shared/types/laboratory-imaging.types";
 
 @Injectable({ providedIn: 'root' })
 export class ImagingModalityService {

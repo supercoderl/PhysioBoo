@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p ~/.claude/skills/design-taste-frontend)",
+      "Bash(cp ~/.agents/skills/design-taste-frontend/SKILL.md ~/.claude/skills/design-taste-frontend/SKILL.md)",
+      "Bash(xargs -I{} echo {})",
+      "Bash(sed -n '1,50p' src/app/shared/types/common.ts)",
+      "Bash(sed -n '1,80p' src/app/shared/types/table.types.ts)",
+      "Bash(python \"C:\\\\Users\\\\ACER\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.6.2\\\\.claude\\\\skills\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"healthcare admin CMS dashboard content management enterprise\" --design-system --density 8 -p \"Home Configuration\")"
+    ]
+  }
+}

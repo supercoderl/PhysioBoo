@@ -200,18 +200,18 @@ export class DoctorHomeComponent {
     }
 
     slickInit(e: any) {
-        console.log('slick initialized');
+      
     }
 
     breakpoint(e: any) {
-        console.log('breakpoint');
+        
     }
 
     afterChange(e: any) {
-        console.log('afterChange');
+        
     }
 
     beforeChange(e: any) {
-        console.log('beforeChange');
+        
     }
 }

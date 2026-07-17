@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, injec
 import { catchError, of } from 'rxjs';
 import { PrintTemplateService } from '../../../services/admin/print-template.service';
 import { SharedModule } from '../../../shared/shared-imports';
-import { PrintTemplate } from '../../../shared/types/print-template';
+import { PrintTemplate } from '../../../shared/types/print-template.types';
 import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
 
 @Component({

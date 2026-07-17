@@ -1,6 +1,19 @@
-import { Role } from "../types/role";
+import { Role } from "../types/role.types";
 
 export class ColorUtils {
+  static readonly roleColors = [
+    { label: 'Slate', value: '#64748b' },
+    { label: 'Blue', value: '#3b82f6' },
+    { label: 'Indigo', value: '#6366f1' },
+    { label: 'Purple', value: '#a855f7' },
+    { label: 'Pink', value: '#ec4899' },
+    { label: 'Red', value: '#ef4444' },
+    { label: 'Orange', value: '#f97316' },
+    { label: 'Amber', value: '#f59e0b' },
+    { label: 'Emerald', value: '#10b981' },
+    { label: 'Teal', value: '#14b8a6' },
+  ];
+
   static generateFromText(text: string): string {
     if (!text) return '#6c757d';
     let hash = 0;

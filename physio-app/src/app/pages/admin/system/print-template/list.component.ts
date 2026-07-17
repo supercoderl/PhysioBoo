@@ -12,7 +12,7 @@ import { ToastService } from '../../../../services/common/toast.service';
 import { ColumnDefDirective } from '../../../../shared/directives/column-def.directive';
 import { SharedModule } from '../../../../shared/shared-imports';
 import { ActionItem, PaginationData } from '../../../../shared/types/common';
-import { PrintTemplate } from '../../../../shared/types/print-template';
+import { PrintTemplate } from '../../../../shared/types/print-template.types';
 
 @Component({
   selector: 'admin-print-template-list',

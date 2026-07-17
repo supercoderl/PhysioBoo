@@ -28,23 +28,26 @@ interface PatientReport {
         ButtonIconComponent
     ],
     template: `
-    <div class="md:col-span-2 bg-surface rounded-lg border border-gray-200 h-full">
-      <div class="flex items-center justify-between py-3 px-5 border-b border-gray-200">
-        <h5 class="font-bold text-lg mb-0">Patient Reports</h5> 
+    <div class="md:col-span-2 bg-surface rounded-lg border border-borderGray h-full">
+      <div class="flex items-center justify-between py-3 px-5 border-b border-borderGray">
+        <h5 class="font-bold text-lg mb-0 text-regular">Patient Reports</h5>
         <boo-button-admin
             background="transparent"
             [border]="{ width: 1, color: '#e3e3e3' }"
             textColor="#000000"
             padding="4px 8px"
+            buttonClass="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
             View All
         </boo-button-admin>
       </div>
       
-      <boo-table-admin 
-        [data]="patientReports" 
+      <boo-table-admin
+        [data]="patientReports"
         [showHeader]="false"
         [showBorder]="false"
+        [showFooter]="false"
+        [availableTools]="[]"
         tdClass="px-4 py-3"
       >
         <ng-template appColumnDef="patient" let-item>
@@ -68,9 +71,10 @@ interface PatientReport {
 
         <ng-template appColumnDef="actions" let-item cellClass="text-right">
           <div class="flex items-center justify-end gap-2">
-            <button-icon 
+            <button-icon
               [icon]="{ name: 'download' }"
               buttonClass="!bg-[#EEF2F7] !border-0 !px-2"
+              [ariaLabel]="'Download ' + item.reportType + ' report for ' + item.name"
             >
             </button-icon>
           </div>

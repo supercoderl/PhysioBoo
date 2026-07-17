@@ -1,226 +1,334 @@
-import { Component } from "@angular/core";
+import { Component, HostListener, OnInit, signal } from "@angular/core";
+import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
+import { DispensingService } from "../../../../services/admin/dispensing.service";
+import { DialogService } from "../../../../services/common/dialog.service";
+import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { Prescription } from "../../../../shared/types/prescription";
+import {
+    BatchOption,
+    DispenseMedicationItem,
+    DispenseMedicineAlternative,
+    DispenseMedicineDetail,
+    DispenseQueueItem,
+    DispenseQueueStatus,
+    DispenseWorkspace,
+} from "../../../../shared/types/dispensing.types";
+import { DispenseMedicationDrawerComponent } from "./dispense-medication-drawer.component";
+import { DispensePickingPanelComponent } from "./dispense-picking-panel.component";
+import { DispenseQueuePanelComponent } from "./dispense-queue-panel.component";
+import { DispenseSummaryPanelComponent } from "./dispense-summary-panel.component";
 
 @Component({
     selector: 'admin-prescription-dispense',
     standalone: true,
     imports: [
-        SharedModule
+        SharedModule,
+        BooIconComponent,
+        DispenseQueuePanelComponent,
+        DispensePickingPanelComponent,
+        DispenseSummaryPanelComponent,
+        DispenseMedicationDrawerComponent,
     ],
+    host: { class: 'block min-h-screen bg-gray-50' },
     template: `
-    <div class="min-h-screen bg-gray-50 p-6">
-      <!-- Search Section -->
-      <div class="bg-surface rounded-lg shadow-sm p-6 mb-6">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Prescription Dispense</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Prescription ID</label>
-            <input 
-              type="text" 
-              [(ngModel)]="searchPrescriptionId"
-              placeholder="Enter prescription ID"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Patient ID</label>
-            <input 
-              type="text" 
-              [(ngModel)]="searchPatientId"
-              placeholder="Enter patient ID"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          
-          <div class="flex items-end">
-            <button 
-              (click)="searchPrescription()"
-              class="w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
-              Search Prescription
-            </button>
-          </div>
-        </div>
+    <div class="sticky top-0 z-20 bg-surface shadow-sm px-4 sm:px-6 py-3 flex items-center justify-between">
+      <div>
+        <h1 class="text-lg font-semibold text-gray-800">Prescription Dispense</h1>
+        <p class="text-xs text-secondary">Clinical dispensing workspace · Pharmacist: Current Pharmacist</p>
       </div>
-
-      <!-- Prescription Details -->
-      <div *ngIf="currentPrescription" class="bg-surface rounded-lg shadow-sm mb-6">
-        <!-- Patient Info Header -->
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-lg">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <p class="text-blue-100 text-sm">Patient Name</p>
-              <p class="font-semibold text-lg">Da</p>
-            </div>
-            <div>
-              <p class="text-blue-100 text-sm">Patient ID</p>
-              <p class="font-semibold text-lg">12</p>
-            </div>
-            <div>
-              <p class="text-blue-100 text-sm">Doctor</p>
-              <p class="font-semibold text-lg">Da</p>
-            </div>
-            <div>
-              <p class="text-blue-100 text-sm">Prescription Date</p>
-              <p class="font-semibold text-lg">15-12-2025</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Medications Table -->
-        <div class="p-6">
-          <h3 class="text-lg font-semibold text-gray-800 mb-4">Medications to Dispense</h3>
-          
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead>
-                <tr class="bg-gray-50 border-b border-gray-200">
-                  <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Medication</th>
-                  <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Dosage</th>
-                  <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Frequency</th>
-                  <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Duration</th>
-                  <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Prescribed Qty</th>
-                  <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Dispense Qty</th>
-                  <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Pharmacist Notes -->
-          <div class="mt-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Pharmacist Notes</label>
-            <textarea 
-              [(ngModel)]="pharmacistNotes"
-              rows="3"
-              placeholder="Enter any notes or special instructions..."
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            ></textarea>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="flex gap-4 mt-6">
-            <button 
-              (click)="dispensePartial()"
-              class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
-              Dispense Selected
-            </button>
-            <button 
-              (click)="dispenseAll()"
-              class="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-            >
-              Dispense All
-            </button>
-            <button 
-              (click)="printLabel()"
-              class="px-6 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
-            >
-              Print Labels
-            </button>
-            <button 
-              (click)="cancelDispense()"
-              class="px-6 py-2.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors font-medium"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Recent Dispenses -->
-      <div class="bg-surface rounded-lg shadow-sm p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Dispenses</h3>
-        
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead>
-              <tr class="bg-gray-50 border-b border-gray-200">
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Prescription ID</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Patient Name</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Dispensed By</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Date & Time</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let record of recentDispenses" 
-                  class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                <td class="px-4 py-4 font-medium text-gray-900">{{ record.prescriptionId }}</td>
-                <td class="px-4 py-4 text-gray-700">{{ record.patientName }}</td>
-                <td class="px-4 py-4 text-gray-700">{{ record.dispensedBy }}</td>
-                <td class="px-4 py-4 text-gray-700">{{ record.dateTime }}</td>
-                <td class="px-4 py-4">
-                  <span [ngClass]="{
-                    'bg-green-100 text-green-800': record.status === 'completed',
-                    'bg-blue-100 text-blue-800': record.status === 'partial'
-                  }" class="px-3 py-1 rounded-full text-xs font-medium">
-                    {{ record.status | titlecase }}
-                  </span>
-                </td>
-                <td class="px-4 py-4">
-                  <button class="text-blue-600 hover:text-blue-800 font-medium text-sm">
-                    View Details
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="flex items-center gap-2 text-xs text-secondary">
+        <boo-icon name="clock" [size]="14"></boo-icon>
+        <span>{{ now | date:'mediumTime' }}</span>
       </div>
     </div>
-    `
+
+    <main class="px-4 sm:px-6 py-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.1fr_2fr_1fr] gap-4">
+        <div class="h-[calc(100vh-220px)] min-h-[480px]">
+          <dispense-queue-panel
+            [items]="queue()"
+            [selectedQueueId]="selectedQueueId()"
+            [search]="search()"
+            [statusFilter]="statusFilter()"
+            [autoRefresh]="autoRefresh()"
+            (select)="onSelectQueueItem($event)"
+            (searchChange)="onSearchChange($event)"
+            (statusFilterChange)="statusFilter.set($event)"
+            (autoRefreshChange)="autoRefresh.set($event)"
+          ></dispense-queue-panel>
+        </div>
+
+        <div class="h-[calc(100vh-220px)] min-h-[480px] md:col-span-2 lg:col-span-1">
+          <dispense-picking-panel
+            [workspace]="workspace()"
+            (openDrawer)="openMedicationDrawer($event)"
+            (qtyChange)="onQtyChange($event)"
+            (pickItem)="onTogglePick($event)"
+            (acknowledgeAlert)="onAcknowledgeAlert($event)"
+            (replaceItem)="openMedicationDrawer($event)"
+            (reserveItem)="onReserveItem($event)"
+            (cancelItem)="onCancelItem($event)"
+            (notesChange)="onNotesChange($event)"
+            (barcodeScan)="onBarcodeScan($event)"
+          ></dispense-picking-panel>
+        </div>
+
+        <div class="h-[calc(100vh-220px)] min-h-[480px]">
+          <dispense-summary-panel
+            [workspace]="workspace()"
+            (complete)="onCompleteDispensing()"
+            (hold)="onHoldPrescription()"
+            (cancel)="onCancelPrescription()"
+            (printLabels)="onPrintLabels()"
+          ></dispense-summary-panel>
+        </div>
+      </div>
+    </main>
+
+    <dispense-medication-drawer
+      [isOpen]="drawerOpen()"
+      [item]="drawerItem()"
+      [detail]="drawerDetail()"
+      (close)="drawerOpen.set(false)"
+      (selectBatch)="onSelectBatch($event)"
+      (selectAlternative)="onSelectAlternative($event)"
+    ></dispense-medication-drawer>
+  `,
 })
+export class AdminPrescriptionDispenseComponent implements OnInit {
+    now = new Date();
 
-export class AdminPrescriptionDispenseComponent {
-    // #region Inputs, Outputs, Properties
-    searchPrescriptionId = '';
-    searchPatientId = '';
-    pharmacistNotes = '';
-    currentPrescription: Prescription | null = null;
+    queue = signal<DispenseQueueItem[]>([]);
+    selectedQueueId = signal<string | null>(null);
+    workspace = signal<DispenseWorkspace | null>(null);
+    search = signal('');
+    statusFilter = signal<DispenseQueueStatus | null>(null);
+    autoRefresh = signal(true);
 
-    recentDispenses = [
-        { prescriptionId: 'RX-2024-001', patientName: 'John Smith', dispensedBy: 'Sarah Johnson', dateTime: '2024-12-21 14:30', status: 'completed' },
-        { prescriptionId: 'RX-2024-002', patientName: 'Emily Davis', dispensedBy: 'Sarah Johnson', dateTime: '2024-12-21 13:15', status: 'partial' },
-        { prescriptionId: 'RX-2024-003', patientName: 'Michael Brown', dispensedBy: 'Sarah Johnson', dateTime: '2024-12-21 12:00', status: 'completed' }
-    ];
-    // #endregion
+    drawerOpen = signal(false);
+    drawerItem = signal<DispenseMedicationItem | null>(null);
+    drawerDetail = signal<DispenseMedicineDetail | null>(null);
 
-    // #region Methods
-    searchPrescription() {
-        // Mock data for demonstration
+    private searchDebounce: ReturnType<typeof setTimeout> | undefined;
+
+    constructor(
+        private srv: DispensingService,
+        private toastSrv: ToastService,
+        private dialogSrv: DialogService,
+    ) { }
+
+    ngOnInit(): void {
+        this.loadQueue();
     }
 
-    dispensePartial() {
-        if (this.currentPrescription) {
-
-            alert('Partial dispense recorded successfully!');
+    @HostListener('window:keydown', ['$event'])
+    onKeydown(event: KeyboardEvent): void {
+        if (event.ctrlKey && event.key.toLowerCase() === 'b') {
+            event.preventDefault();
+            const barcodeInput = document.querySelector<HTMLInputElement>('input.allow-shortcut');
+            barcodeInput?.focus();
         }
+        if (event.key === 'Escape') this.drawerOpen.set(false);
     }
 
-    dispenseAll() {
-        if (this.currentPrescription) {
+    loadQueue(): void {
+        this.srv.getQueue(this.search(), this.statusFilter()).subscribe(res => {
+            if (res.success) this.queue.set(res.data.items);
+        });
+    }
 
-            alert('All medications dispensed successfully!');
+    onSearchChange(value: string): void {
+        this.search.set(value);
+        if (this.searchDebounce) clearTimeout(this.searchDebounce);
+        this.searchDebounce = setTimeout(() => this.loadQueue(), 300);
+    }
+
+    onSelectQueueItem(item: DispenseQueueItem): void {
+        this.selectedQueueId.set(item.queueId);
+        this.srv.getWorkspace(item.queueId).subscribe(res => {
+            if (res.success) {
+                this.workspace.set({ ...res.data, dispensingStartedAt: res.data.dispensingStartedAt ?? new Date().toISOString() });
+            }
+        });
+    }
+
+    private updateItem(itemId: string, updater: (item: DispenseMedicationItem) => DispenseMedicationItem): void {
+        const ws = this.workspace();
+        if (!ws) return;
+        this.workspace.set({ ...ws, items: ws.items.map(i => i.id === itemId ? updater(i) : i) });
+    }
+
+    onQtyChange(payload: { itemId: string; qty: number }): void {
+        const ws = this.workspace();
+        if (!ws) return;
+        this.updateItem(payload.itemId, i => ({ ...i, qtyToDispense: payload.qty }));
+        this.srv.updateItem(ws.workspaceId, payload.itemId, { qtyToDispense: payload.qty }).subscribe();
+    }
+
+    onTogglePick(item: DispenseMedicationItem): void {
+        const ws = this.workspace();
+        if (!ws) return;
+        const nextStatus = item.status === 'NotPicked' ? 'Picked' : 'NotPicked';
+        this.updateItem(item.id, i => ({ ...i, status: nextStatus }));
+        this.srv.updateItem(ws.workspaceId, item.id, { status: nextStatus }).subscribe();
+        if (nextStatus === 'Picked') this.toastSrv.success(`${item.name} picked`);
+    }
+
+    onAcknowledgeAlert(payload: { itemId: string; alertId: string }): void {
+        const ws = this.workspace();
+        if (!ws) return;
+        this.updateItem(payload.itemId, i => ({
+            ...i,
+            warnings: i.warnings.map(w => w.id === payload.alertId ? { ...w, acknowledged: true } : w),
+        }));
+        this.srv.acknowledgeAlert(ws.workspaceId, payload.alertId).subscribe();
+        this.toastSrv.success('Clinical alert acknowledged');
+    }
+
+    onReserveItem(item: DispenseMedicationItem): void {
+        const ws = this.workspace();
+        if (!ws) return;
+        this.updateItem(item.id, i => ({ ...i, status: 'Reserved' }));
+        this.srv.reserveItem(ws.workspaceId, item.id).subscribe();
+        this.toastSrv.info(`${item.name} reserved for back-order`);
+    }
+
+    onCancelItem(item: DispenseMedicationItem): void {
+        this.dialogSrv.confirm(
+            `Cancel ${item.name} from this prescription? This cannot be undone.`,
+            () => {
+                this.updateItem(item.id, i => ({ ...i, status: 'OnHold' }));
+                this.toastSrv.info(`${item.name} cancelled from dispensing`);
+            },
+            'Cancel Item',
+            'danger',
+            'Cancel Item',
+            'Keep Item',
+        );
+    }
+
+    onNotesChange(notes: string): void {
+        const ws = this.workspace();
+        if (!ws) return;
+        this.workspace.set({ ...ws, pharmacistNotes: notes });
+    }
+
+    onBarcodeScan(code: string): void {
+        const ws = this.workspace();
+        if (!ws) return;
+        const match = ws.items.find(i => i.batchNo === code || i.medicineId === code);
+        if (!match) {
+            this.toastSrv.error(`Barcode "${code}" did not match any line in this prescription`);
+            return;
         }
+        this.srv.scanItem(ws.workspaceId, match.id, code).subscribe(res => {
+            if (res.success && res.data.matched) {
+                this.onTogglePick(match);
+            } else {
+                this.toastSrv.error(`Barcode mismatch for ${match.name}`);
+            }
+        });
     }
 
-    printLabel() {
-        alert('Printing medication labels...');
+    openMedicationDrawer(item: DispenseMedicationItem): void {
+        this.drawerItem.set(item);
+        this.drawerOpen.set(true);
+        this.drawerDetail.set(null);
+        this.srv.getMedicineDetail(item.medicineId).subscribe(res => {
+            if (res.success) this.drawerDetail.set(res.data);
+        });
     }
 
-    cancelDispense() {
-        this.currentPrescription = null;
-        this.pharmacistNotes = '';
-        this.searchPrescriptionId = '';
-        this.searchPatientId = '';
+    onSelectBatch(batch: BatchOption): void {
+        const item = this.drawerItem();
+        const ws = this.workspace();
+        if (!item || !ws) return;
+        this.updateItem(item.id, i => ({ ...i, batchNo: batch.batchNo, expiryDate: batch.expiryDate, shelfLocation: batch.location }));
+        this.drawerItem.set({ ...item, batchNo: batch.batchNo, expiryDate: batch.expiryDate, shelfLocation: batch.location });
+        this.srv.updateItem(ws.workspaceId, item.id, { batchNo: batch.batchNo }).subscribe();
+        this.toastSrv.success(`Batch ${batch.batchNo} selected`);
     }
-    // #endregion
+
+    onSelectAlternative(alt: DispenseMedicineAlternative): void {
+        const item = this.drawerItem();
+        const ws = this.workspace();
+        if (!item || !ws) return;
+        this.dialogSrv.confirm(
+            `Replace ${item.name} with ${alt.name}?`,
+            () => {
+                this.updateItem(item.id, i => ({ ...i, name: alt.name, medicineId: alt.id, status: 'Replaced' }));
+                this.srv.replaceItem(ws.workspaceId, item.id, alt.id, 'Pharmacist substitution').subscribe();
+                this.drawerOpen.set(false);
+                this.toastSrv.success(`Replaced with ${alt.name}`);
+            },
+            'Replace Medicine',
+            'warning',
+            'Replace',
+            'Keep Original',
+        );
+    }
+
+    onCompleteDispensing(): void {
+        const ws = this.workspace();
+        if (!ws) return;
+        this.dialogSrv.confirm(
+            `Complete dispensing for ${ws.prescriptionNumber}? Inventory will be deducted and this cannot be undone.`,
+            () => {
+                this.srv.completeDispensing(ws.workspaceId, ws.pharmacistNotes).subscribe(res => {
+                    if (res.success) {
+                        this.workspace.set({ ...ws, status: 'Completed', currentStage: 'Completed' });
+                        this.queue.update(list => list.map(q => q.queueId === ws.queueId ? { ...q, status: 'Completed' } : q));
+                        this.toastSrv.success(`Prescription ${ws.prescriptionNumber} dispensed successfully`, 'Dispensing Complete');
+                    }
+                });
+            },
+            'Complete Dispensing',
+            'success',
+            'Complete',
+            'Review Again',
+        );
+    }
+
+    onHoldPrescription(): void {
+        const ws = this.workspace();
+        if (!ws) return;
+        this.dialogSrv.confirm(
+            `Put ${ws.prescriptionNumber} on hold and return it to the queue?`,
+            () => {
+                this.srv.holdPrescription(ws.workspaceId, 'Pharmacist hold').subscribe();
+                this.queue.update(list => list.map(q => q.queueId === ws.queueId ? { ...q, status: 'OnHold' } : q));
+                this.workspace.set(null);
+                this.selectedQueueId.set(null);
+                this.toastSrv.info(`${ws.prescriptionNumber} put on hold`);
+            },
+            'Hold Prescription',
+            'warning',
+            'Put on Hold',
+            'Keep Working',
+        );
+    }
+
+    onCancelPrescription(): void {
+        const ws = this.workspace();
+        if (!ws) return;
+        this.dialogSrv.confirm(
+            `Cancel dispensing for ${ws.prescriptionNumber}? This cannot be undone.`,
+            () => {
+                this.srv.cancelPrescription(ws.workspaceId, 'Pharmacist cancellation').subscribe();
+                this.queue.update(list => list.map(q => q.queueId === ws.queueId ? { ...q, status: 'Cancelled' } : q));
+                this.workspace.set(null);
+                this.selectedQueueId.set(null);
+                this.toastSrv.info(`${ws.prescriptionNumber} cancelled`);
+            },
+            'Cancel Prescription',
+            'danger',
+            'Cancel Prescription',
+            'Keep Working',
+        );
+    }
+
+    onPrintLabels(): void {
+        if (!this.workspace()) return;
+        this.toastSrv.success('Medication labels sent to printer');
+    }
 }

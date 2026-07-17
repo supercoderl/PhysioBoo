@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
 import { BASE_API } from "../../shared/api/base";
-import { InsuranceCompany } from "../../shared/types/support";
-import { InsuranceCompanyFilter } from "../../shared/types/filter";
+import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
+import { InsuranceCompanyFilter } from "../../shared/types/filter.types";
+import { InsuranceCompany } from "../../shared/types/support.types";
 
 @Injectable({ providedIn: 'root' })
 export class InsuranceCompanyService {

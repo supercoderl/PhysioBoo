@@ -12,11 +12,11 @@ import { TablePageSizeService } from "../../../../../services/common/table-page-
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PaginationData } from "../../../../../shared/types/common";
-import { DateRange } from "../../../../../shared/types/date";
-import { FilterConfig } from "../../../../../shared/types/filter";
-import { MedicalSpecialty } from "../../../../../shared/types/medical-staff";
+import { DateRange } from "../../../../../shared/types/date.types";
+import { FilterConfig } from "../../../../../shared/types/filter.types";
+import { MedicalSpecialty } from "../../../../../shared/types/medical-staff.types";
 import { SortOption } from "../../../../../shared/types/sort";
-import { BulkAction, SavedView, TableComment } from "../../../../../shared/types/table";
+import { BulkAction, SavedView, TableComment } from "../../../../../shared/types/table.types";
 
 @Component({
     selector: 'common-category-medical-specialty-list',

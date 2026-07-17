@@ -4,8 +4,8 @@ import { ColumnDefDirective } from "../../../../../shared/directives/column-def.
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ActionItem, PaginationData } from "../../../../../shared/types/common";
 import { SortOption } from "../../../../../shared/types/sort";
-import { SequenceTracker } from "../../../../../shared/types/system";
-import { BulkAction, GroupableColumn, SavedView, TableComment } from "../../../../../shared/types/table";
+import { SequenceTracker } from "../../../../../shared/types/system.types";
+import { BulkAction, GroupableColumn, SavedView, TableComment } from "../../../../../shared/types/table.types";
 import { ColorUtils } from "../../../../../shared/utils/color.utils";
 import { BooActionAdminComponent } from "../../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent, FilterConfig } from "../../../../table/boo-table-admin/boo-table-admin.component";

@@ -4,7 +4,7 @@ import { ColumnDefDirective } from "../../../../../shared/directives/column-def.
 import { PatientType, RiskLevel } from "../../../../../shared/enums/patient";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ActionItem, PaginationData } from "../../../../../shared/types/common";
-import { Patient } from "../../../../../shared/types/patient";
+import { Patient } from "../../../../../shared/types/patient.types";
 import { BooActionAdminComponent } from "../../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-table-admin.component";
 

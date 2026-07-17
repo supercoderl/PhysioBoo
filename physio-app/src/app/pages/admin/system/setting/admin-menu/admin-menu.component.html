@@ -4,11 +4,10 @@
     <div class="flex items-start justify-between mt-2 gap-4 flex-wrap">
       <div>
         <p class="tracking-tight font-bold leading-none text-[22px] m-0 text-primary">Menu Management</p>
-        <p class="text-sm text-gray-500 mt-1">Organize the sidebar and top-nav items that appear across the admin app.</p>
+        <p class="text-sm text-gray-500 mt-1">Organize the sidebar and top-nav items that appear across the admin app.
+        </p>
       </div>
-      <button-icon
-        buttonClass="!bg-primary text-white"
-        (onClick)="onOpenDrawer(null)">
+      <button-icon buttonClass="!bg-primary text-white" (onClick)="onOpenDrawer(null)">
         + New Item
       </button-icon>
     </div>
@@ -66,46 +65,31 @@
     <div class="p-5 border-b border-gray-100 flex items-center justify-between gap-4 flex-wrap">
       <div class="min-w-0">
         <h2 class="text-base font-semibold text-gray-900 mb-1">Menu tree</h2>
-        <p class="text-sm text-gray-500">Drag items to re-order. Use the kebab menu on any row to edit, add a child, or delete.</p>
+        <p class="text-sm text-gray-500">Drag items to re-order. Use the kebab menu on any row to edit, add a child, or
+          delete.</p>
       </div>
       <div class="flex items-center gap-2 shrink-0">
-        <div class="inline-flex items-center gap-2 h-9 px-3 border border-gray-200 rounded-md bg-surface focus-within:border-primary w-56">
-          <boo-icon
-            [class.animate-spin]="loadingSrv.isLoading('search')"
-            [name]="loadingSrv.isLoading('search') ? 'loader-circle' : 'search'"
-            iconClass="w-4 h-4 text-gray-400" />
-          <boo-input
-            label="Search menus..."
-            size="small"
-            wrapperClass="!border-0 !p-0 !h-auto"
+        <div
+          class="inline-flex items-center gap-2 h-9 px-3 border border-gray-200 rounded-md bg-surface focus-within:border-primary w-56">
+          <boo-icon name="search" iconClass="w-4 h-4 text-gray-400" />
+          <boo-input label="Search menus..." size="small" wrapperClass="!border-0 !p-0 !h-auto"
             (search)="onSearch($event)" />
         </div>
-        <button type="button"
-          (click)="loadMenus()"
-          class="inline-flex items-center gap-1.5 h-9 px-3 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
-          <boo-icon name="refresh-cw" iconClass="w-3.5 h-3.5" />
+        <button-icon [icon]="{ name:'refresh-cw', class:'w-3.5 h-3.5' }" (onClick)="loadMenus()"
+          buttonClass="inline-flex items-center gap-1.5 h-9 px-3 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
           Reload
-        </button>
+        </button-icon>
       </div>
     </div>
 
     <div class="p-5">
-      <setting-admin-menu-tree-card
-        [data]="filteredMenus()"
-        (editClick)="onOpenDrawer($event)"
-        (deleteClick)="onDelete($event)"
-        (addChildClick)="onOpenDrawer(null, $event)" />
+      <setting-admin-menu-tree-card [data]="filteredMenus()" (editClick)="onOpenDrawer($event)"
+        (deleteClick)="onDelete($event)" (addChildClick)="onOpenDrawer(null, $event)" />
     </div>
   </section>
 
   <!-- Drawer -->
-  <setting-admin-menu-drawer
-    [isOpen]="isDrawerOpen"
-    [currentItem]="selectedItem"
-    [parentId]="pendingParentId"
-    [allMenus]="menus()"
-    (close)="onCloseDrawer()"
-    (saveSuccess)="onSaveSuccess($event)"
-    (delete)="onDelete($event)" />
+  <setting-admin-menu-drawer [isOpen]="isDrawerOpen" [currentItem]="selectedItem" [parentId]="pendingParentId"
+    [allMenus]="menus()" (close)="onCloseDrawer()" (saveSuccess)="onSaveSuccess($event)" (delete)="onDelete($event)" />
 
 </admin-content-header>

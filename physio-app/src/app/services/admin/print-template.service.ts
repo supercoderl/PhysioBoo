@@ -3,14 +3,14 @@ import { Injectable } from '@angular/core';
 import { BASE_API } from '../../shared/api/base';
 import { PagedRequest, PagedResponse, PaginationData } from '../../shared/types/common';
 import {
-  PlaceholderGroup,
-  PrintRenderRequest,
-  PrintRenderResult,
-  PrintTemplate,
-  PrintTemplateDetail,
-  PrintTemplateFilter,
-  PrintTemplateVersion
-} from '../../shared/types/print-template';
+    PlaceholderGroup,
+    PrintRenderRequest,
+    PrintRenderResult,
+    PrintTemplate,
+    PrintTemplateDetail,
+    PrintTemplateFilter,
+    PrintTemplateVersion
+} from '../../shared/types/print-template.types';
 
 @Injectable({ providedIn: 'root' })
 export class PrintTemplateService {

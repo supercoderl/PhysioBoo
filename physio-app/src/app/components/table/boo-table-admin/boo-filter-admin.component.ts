@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SharedModule } from '../../../shared/shared-imports';
+import { FilterConfig } from '../../../shared/types/filter.types';
 import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-button-admin.component';
-import { FilterConfig } from '../../../shared/types/filter';
 
 @Component({
     selector: 'boo-filter-admin',

@@ -19,11 +19,11 @@ import { TablePageSizeService } from "../../../../../services/common/table-page-
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PaginationData } from "../../../../../shared/types/common";
-import { DateRange } from "../../../../../shared/types/date";
-import { FilterConfig } from "../../../../../shared/types/filter";
-import { LabTest } from "../../../../../shared/types/laboratory-imaging";
+import { DateRange } from "../../../../../shared/types/date.types";
+import { FilterConfig } from "../../../../../shared/types/filter.types";
+import { LabTest } from "../../../../../shared/types/laboratory-imaging.types";
 import { SortOption } from "../../../../../shared/types/sort";
-import { BulkAction, SavedView, TableComment } from "../../../../../shared/types/table";
+import { BulkAction, SavedView, TableComment } from "../../../../../shared/types/table.types";
 
 @Component({
     selector: 'common-category-lab-test-list',

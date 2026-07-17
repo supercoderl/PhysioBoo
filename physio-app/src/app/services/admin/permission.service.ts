@@ -2,8 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
-import { PermissionFilter } from "../../shared/types/filter";
-import { CreatePermissionRequest, Permission } from "../../shared/types/permission";
+import { PermissionFilter } from "../../shared/types/filter.types";
+import { CreatePermissionRequest, Permission } from "../../shared/types/permission.types";
 
 @Injectable({ providedIn: 'root' })
 export class PermissionService {

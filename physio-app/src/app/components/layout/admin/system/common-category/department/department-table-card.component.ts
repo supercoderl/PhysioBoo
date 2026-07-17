@@ -3,9 +3,9 @@ import { LocalLoadingService } from "../../../../../../services/common/local-loa
 import { ColumnDefDirective } from "../../../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { ActionItem, PaginationData } from "../../../../../../shared/types/common";
-import { Department } from "../../../../../../shared/types/operation";
+import { Department } from "../../../../../../shared/types/operation.types";
 import { SortOption } from "../../../../../../shared/types/sort";
-import { BulkAction, GroupableColumn, SavedView, TableComment } from "../../../../../../shared/types/table";
+import { BulkAction, GroupableColumn, SavedView, TableComment } from "../../../../../../shared/types/table.types";
 import { ColorUtils } from "../../../../../../shared/utils/color.utils";
 import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent, FilterConfig } from "../../../../../table/boo-table-admin/boo-table-admin.component";

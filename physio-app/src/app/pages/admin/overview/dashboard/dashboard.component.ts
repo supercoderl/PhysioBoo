@@ -1,74 +1,73 @@
-import { Component } from '@angular/core';
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
-import { AdminAnalyticCardComponent } from "../../../../components/layout/admin/dashboard/analytic-card.component";
-import { AdminAppointmentTableCardComponent } from "../../../../components/layout/admin/dashboard/appointment-table-card.component";
-import { AdminCategoryCardComponent } from "../../../../components/layout/admin/dashboard/category-card.component";
-import { AdminDoctorTableCardComponent } from '../../../../components/layout/admin/dashboard/doctor-card.component';
-import { AdminPatientReportTableCardComponent } from "../../../../components/layout/admin/dashboard/patient-report-card.component";
-import { AdminPatientVisitTableCardComponent } from "../../../../components/layout/admin/dashboard/patient-visit-card.component";
-import { AdminStatisticCardComponent } from "../../../../components/layout/admin/dashboard/statistic-card.component";
-import { MEDICAL_CATEGORIES } from '../../../../shared/data/dummy';
+import { Component, OnInit } from '@angular/core';
+import { finalize } from 'rxjs/operators';
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { AdminDashboardStatusStripComponent } from "../../../../components/layout/admin/dashboard/status-strip.component";
+import { AdminPatientFlowCardComponent } from "../../../../components/layout/admin/dashboard/patient-flow-card.component";
+import { AdminDeptLoadCardComponent } from "../../../../components/layout/admin/dashboard/dept-load-card.component";
+import { AdminAlertsCardComponent } from "../../../../components/layout/admin/dashboard/alerts-card.component";
+import { AdminBedCapacityCardComponent } from "../../../../components/layout/admin/dashboard/bed-capacity-card.component";
+import { AdminActiveOperationsCardComponent } from "../../../../components/layout/admin/dashboard/active-operations-card.component";
+import { AdminFinancialClinicalStripComponent } from "../../../../components/layout/admin/dashboard/financial-clinical-strip.component";
+import { AdminAppointmentFlowCardComponent } from "../../../../components/layout/admin/dashboard/appointment-flow-card.component";
+import { AdminStaffDutyCardComponent } from "../../../../components/layout/admin/dashboard/staff-duty-card.component";
+import { AdminRecentEventsCardComponent } from "../../../../components/layout/admin/dashboard/recent-events-card.component";
+import { DashboardOverviewService } from '../../../../services/admin/dashboard-overview.service';
+import { AlertSeverity, DashboardOverviewSnapshot } from '../../../../shared/types/dashboard-overview.types';
 import { SharedModule } from '../../../../shared/shared-imports';
-import { AnalyticItem, AnalyticKey } from '../../../../shared/types/dashboard';
-
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     SharedModule,
-    BooIconComponent,
-    AdminAnalyticCardComponent,
-    AdminAppointmentTableCardComponent,
-    AdminStatisticCardComponent,
-    AdminCategoryCardComponent,
-    AdminPatientReportTableCardComponent,
-    AdminPatientVisitTableCardComponent,
-    AdminDoctorTableCardComponent
-],
+    BooButtonAdminComponent,
+    AdminDashboardStatusStripComponent,
+    AdminPatientFlowCardComponent,
+    AdminDeptLoadCardComponent,
+    AdminAlertsCardComponent,
+    AdminBedCapacityCardComponent,
+    AdminActiveOperationsCardComponent,
+    AdminFinancialClinicalStripComponent,
+    AdminAppointmentFlowCardComponent,
+    AdminStaffDutyCardComponent,
+    AdminRecentEventsCardComponent
+  ],
   templateUrl: './dashboard.component.html'
 })
-
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   // #region Inputs, Outputs, Properties
-  medicalCategories = MEDICAL_CATEGORIES;
-  analyticObjects = {
-    "patients": {
-      icon: "user",
-      color: "rgb(31, 109, 178)",
-      current: 108,
-      percent: "+20%",
-      trend: [3, 5, 6, 8, 7, 10, 12, 15]
-    },
-    "appointments": {
-      icon: "calendar",
-      color: "rgb(230, 81, 0)",
-      current: 658,
-      percent: "-15%",
-      trend: [50, 58, 55, 60, 48, 70, 65]
-    },
-    "doctors": {
-      icon: "stethoscope",
-      color: "rgb(106, 27, 154)",
-      current: 565,
-      percent: "+18%",
-      trend: [20, 25, 28, 29, 35, 30, 32]
-    },
-    "transactions": {
-      icon: "handbag",
-      color: "rgb(204, 37, 176)",
-      current: 5523.56,
-      percent: "+12%",
-      trend: [100, 110, 105, 140, 135, 160, 155]
-    }
-  }
-
-  get analyticTitles() {
-    return Object.keys(this.analyticObjects);
-  }
-
-  analyticsProperties(title: string): AnalyticItem {
-    return this.analyticObjects[title as AnalyticKey];
-  }
+  snapshot: DashboardOverviewSnapshot | null = null;
+  loading = false;
+  error = false;
+  today = new Date();
   // #endregion
+
+  constructor(private readonly dashboardOverviewService: DashboardOverviewService) { }
+
+  ngOnInit(): void {
+    this.loadOverview();
+  }
+
+  loadOverview(): void {
+    this.loading = true;
+    this.error = false;
+
+    this.dashboardOverviewService.getOverview()
+      .pipe(finalize(() => this.loading = false))
+      .subscribe({
+        next: (res) => this.snapshot = res.data,
+        error: () => this.error = true
+      });
+  }
+
+  onDismissAlert(event: { alertId: string; severity: AlertSeverity }): void {
+    this.dashboardOverviewService.dismissAlert(event.alertId).subscribe();
+  }
+
+  onExport(): void {
+    this.dashboardOverviewService.exportReport({
+      date: this.today.toISOString().slice(0, 10),
+      format: 'pdf'
+    }).subscribe();
+  }
 }

@@ -2,7 +2,7 @@ import { animate, keyframes, style, transition, trigger } from '@angular/animati
 import { Component, inject } from '@angular/core';
 import { ToastService } from '../../services/common/toast.service';
 import { SharedModule } from '../../shared/shared-imports';
-import { Toast, ToastType } from '../../shared/types/toast';
+import { Toast, ToastType } from '../../shared/types/toast.types';
 
 @Component({
     selector: 'toast',

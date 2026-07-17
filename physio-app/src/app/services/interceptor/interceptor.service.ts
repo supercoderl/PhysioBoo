@@ -4,8 +4,8 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, catchError, delay, filter, switchMap, take, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { BASE_API } from '../../shared/api/base';
+import { SKIP_ERROR_TOAST } from '../../shared/contexts/option.context';
 import { USER_ERROR_CODES } from '../../shared/errors/code.component';
-import { SKIP_ERROR_TOAST } from '../../shared/tokens/http-context.tokens';
 import { AuthService } from '../auth/auth.service';
 import { ToastService } from '../common/toast.service';
 

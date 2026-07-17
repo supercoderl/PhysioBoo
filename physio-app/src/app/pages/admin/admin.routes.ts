@@ -59,11 +59,6 @@ export const routes: Routes = [
                         loadComponent: () => import('./reception/queue/queue.component').then(m => m.AdminQueueComponent),
                     },
                     {
-                        path: 'patient-lookup',
-                        data: { breadcrumb: ['patient-lookup'] },
-                        loadComponent: () => import('./reception/patient-lookup/patient-lookup.component').then(m => m.AdminPatientLookupComponent),
-                    },
-                    {
                         path: 'registration',
                         data: { breadcrumb: ['registration'] },
                         loadComponent: () => import('./reception/registration/registration.component').then(m => m.AdminRegistrationComponent),
@@ -114,6 +109,32 @@ export const routes: Routes = [
                         path: 'admission',
                         data: { breadcrumb: ['admission'] },
                         loadComponent: () => import('./inpatient/admission/admission.component').then(m => m.AdminAdmissionComponent),
+                    },
+                    {
+                        path: 'nursing',
+                        data: { breadcrumb: ['nursing'] },
+                        children: [
+                            {
+                                path: '',
+                                redirectTo: 'dashboard',
+                                pathMatch: 'full'
+                            },
+                            {
+                                path: 'dashboard',
+                                data: { breadcrumb: ['dashboard'] },
+                                loadComponent: () => import('./nursing/dashboard/nursing-dashboard.component').then(m => m.AdminNursingDashboardComponent),
+                            },
+                            {
+                                path: 'patient/:patientId',
+                                data: { breadcrumb: ['patient'] },
+                                loadComponent: () => import('./nursing/patient/nursing-patient.component').then(m => m.AdminNursingPatientComponent),
+                            },
+                            {
+                                path: 'handover',
+                                data: { breadcrumb: ['handover'] },
+                                loadComponent: () => import('./nursing/handover/nursing-handover.component').then(m => m.AdminNursingHandoverComponent),
+                            }
+                        ]
                     },
                     {
                         path: 'treatment-sheet',
@@ -175,7 +196,18 @@ export const routes: Routes = [
                     {
                         path: 'stock-take',
                         data: { breadcrumb: ['stock-take'] },
-                        loadComponent: () => import('./pharmacy/stock-take/stock-take.component').then(m => m.AdminStockTakeComponent),
+                        children: [
+                            {
+                                path: '',
+                                pathMatch: 'full',
+                                loadComponent: () => import('./pharmacy/stock-take/stock-take.component').then(m => m.AdminStockTakeComponent),
+                            },
+                            {
+                                path: ':id/count',
+                                data: { breadcrumb: ['counting'] },
+                                loadComponent: () => import('./pharmacy/stock-take/stock-take-counting.component').then(m => m.AdminStockTakeCountingComponent),
+                            }
+                        ]
                     }
                 ]
             },
@@ -220,14 +252,9 @@ export const routes: Routes = [
                         data: { breadcrumb: ['patient'] },
                     },
                     {
-                        path: 'customer',
-                        loadComponent: () => import('./crm/customer/customer.component').then(m => m.AdminCustomer360Component),
-                        data: { breadcrumb: ['customer'] },
-                    },
-                    {
                         path: 'marketing-campaign',
                         data: { breadcrumb: ['marketing-campaign'] },
-                        loadComponent: () => import('./crm/marketing-campaign/marketing-campaign.component').then(m => m.AdminMarketingCampaignComponent),
+                        loadComponent: () => import('./crm/marketing-campaign/list.component').then(m => m.CrmMarketingCampaignListComponent),
                     },
                     {
                         path: 'lead-management',
@@ -263,7 +290,7 @@ export const routes: Routes = [
                     {
                         path: 'article-news',
                         data: { breadcrumb: ['article-news'] },
-                        loadComponent: () => import('./cms/article-news/article-news.component').then(m => m.AdminArticleNewsComponent),
+                        loadComponent: () => import('./cms/article-news/list/list.component').then(m => m.CmsArticleNewsListComponent),
                     },
                     {
                         path: 'service',

@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
 import { BASE_API } from "../../shared/api/base";
-import { ManufacturerFilter } from "../../shared/types/filter";
-import { Manufacturer } from "../../shared/types/support";
+import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
+import { ManufacturerFilter } from "../../shared/types/filter.types";
+import { Manufacturer } from "../../shared/types/support.types";
 
 @Injectable({ providedIn: 'root' })
 export class ManufacturerService {

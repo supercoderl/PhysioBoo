@@ -1,8 +1,8 @@
 import { Component } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { Member } from "../../../../shared/types/member";
-import { Reward } from "../../../../shared/types/reward";
-import { Transaction } from "../../../../shared/types/transaction";
+import { Member } from "../../../../shared/types/member.types";
+import { Reward } from "../../../../shared/types/reward.types";
+import { Transaction } from "../../../../shared/types/transaction.types";
 
 @Component({
     selector: 'admin-member-point',

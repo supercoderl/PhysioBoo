@@ -1,17 +1,30 @@
-import { Component, Input, Output } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, WritableSignal } from "@angular/core";
+import { FormGroup } from "@angular/forms";
 import { SharedModule } from "../../../../../shared/shared-imports";
+import { PaginationData } from "../../../../../shared/types/common";
+import { User } from "../../../../../shared/types/core.types";
+import { Role } from "../../../../../shared/types/role.types";
+import { ColorUtils } from "../../../../../shared/utils/color.utils";
+import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
+import { BooCheckboxComponent } from "../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
+import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
+import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 
 @Component({
     selector: 'user-permission-user-drawer',
     standalone: true,
     imports: [
-    SharedModule,
-    DrawerComponent
-],
+        SharedModule,
+        DrawerComponent,
+        BooIconComponent,
+        BooButtonAdminComponent,
+        BooInputComponent,
+        BooCheckboxComponent
+    ],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="720" (close)="onClose()">
-            <div class="flex flex-col h-full bg-surface" [formGroup]="userForm">
+            <div class="flex flex-col h-full bg-surface" [formGroup]="form">
                 <div
                     class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between"
                 >
@@ -24,7 +37,7 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
                     </p>
                     </div>
                     <button
-                        (click)="closeUserDrawer()"
+                        (click)="onClose()"
                         class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
                     >
                         <boo-icon name="x" [size]="20"></boo-icon>
@@ -41,7 +54,7 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
                             *ngIf="!su.profilePicture"
                             class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-primary"
                         >
-                            {{ userInitial(su) }}
+                            {{ onInit(su) }}
                         </div>
                         <img
                             *ngIf="su.profilePicture"
@@ -51,31 +64,29 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
                         <div class="min-w-0 flex-1">
                             <div class="font-medium text-primary truncate">{{ su.email }}</div>
                             <div class="text-xs text-secondary">
-                            <span
-                                *ngIf="su.isVerified"
-                                class="inline-flex items-center gap-1 mr-2"
-                            >
-                                <boo-icon
-                                name="badge-check"
-                                iconClass="w-3 h-3 text-emerald-500"
-                                ></boo-icon>
-                                Verified
-                            </span>
-                            <span
-                                *ngIf="su.twoFactorEnabled"
-                                class="inline-flex items-center gap-1"
-                            >
-                                <boo-icon
-                                name="shield-check"
-                                iconClass="w-3 h-3 text-indigo-500"
-                                ></boo-icon>
-                                2FA on
-                            </span>
+                                <span
+                                    *ngIf="su.isVerified"
+                                    class="inline-flex items-center gap-1 mr-2"
+                                >
+                                    <boo-icon
+                                        name="badge-check"
+                                        iconClass="w-3 h-3 text-emerald-500"
+                                    ></boo-icon>
+                                    Verified
+                                </span>
+                                <span
+                                    *ngIf="su.twoFactorEnabled"
+                                    class="inline-flex items-center gap-1"
+                                >
+                                    <boo-icon
+                                        name="shield-check"
+                                        iconClass="w-3 h-3 text-indigo-500"
+                                    ></boo-icon>
+                                    2FA on
+                                </span>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Credentials -->
                     <div>
                         <h3
                             class="text-xs font-bold text-secondary uppercase tracking-wider mb-3"
@@ -103,8 +114,6 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
                             ></boo-input>
                         </div>
                     </div>
-
-                    <!-- Role assignment -->
                     <div>
                     <h3
                         class="text-xs font-bold text-secondary uppercase tracking-wider mb-3"
@@ -124,7 +133,7 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
                                 ? 'border-primary bg-primary/5'
                                 : 'border-gray-200 hover:border-gray-300'
                             "
-                            (click)="toggleUserRole(r.id)"
+                            (click)="onToggle(r.id)"
                         >
                             <boo-checkbox
                                 [ngModel]="isUserRoleSelected(r.id)"
@@ -132,8 +141,8 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
                             ></boo-checkbox>
                             <div
                                 class="w-8 h-8 rounded-md flex items-center justify-center"
-                                    [style.background-color]="softBg(roleColorFor(r))"
-                                    [style.color]="roleColorFor(r)"
+                                    [style.background-color]="ColorUtils.softBg(ColorUtils.roleColorFor(r))"
+                                    [style.color]="ColorUtils.roleColorFor(r)"
                             >
                                 <boo-icon
                                     [name]="r.icon || 'shield'"
@@ -161,10 +170,10 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
                 <div
                     class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3"
                 >
-                    <boo-button-admin background="transparent" (click)="closeUserDrawer()">
+                    <boo-button-admin background="transparent" (click)="onClose()">
                         Cancel
                     </boo-button-admin>
-                    <boo-button-admin textColor="white" (click)="saveUser()">
+                    <boo-button-admin textColor="white" (click)="onSave()">
                         {{ selectedUserId() ? "Save Changes" : "Create User" }}
                     </boo-button-admin>
                 </div>
@@ -175,11 +184,46 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
 
 export class UserPermissionUserDrawerComponent {
     // #region Inputs, Outputs, Properties
-    @Input() isOpen = false;
+    @Input({ required: true }) isOpen: boolean = false;
+    @Input({ required: true }) form!: FormGroup;
+    @Input({ required: true }) rolesData!: WritableSignal<PaginationData<Role> | null>;
+    @Input({ required: true }) selectedUserId!: WritableSignal<string | null>;
+    @Input({ required: true }) selectedUser!: WritableSignal<User | null>;
+    @Input({ required: true }) isUserRoleSelected!: (roleId: string) => boolean;
     @Output() close = new EventEmitter<void>();
+    @Output() init = new EventEmitter<User>();
+    @Output() save = new EventEmitter<void>();
+    @Output() toggle = new EventEmitter<string>();
+    @ViewChild('scrollContainer') scrollContainer!: ElementRef;
+    ColorUtils = ColorUtils;
+    // #endregion
+
+    // #region Init (Lifecycle + Setup)
+    constructor() {
+
+    }
+
+    onInit(user: User) {
+        this.init.emit(user);
+    }
     // #endregion
 
     // #region Methods
+    onClose() {
+        if (this.scrollContainer) {
+            this.scrollContainer.nativeElement.scrollTop = 0;
+        }
 
+        this.close.emit();
+    }
+
+    onSave() {
+        this.save.emit();
+        this.onClose();
+    }
+
+    onToggle(roleId: string) {
+        this.toggle.emit(roleId);
+    }
     // #endregion
 }

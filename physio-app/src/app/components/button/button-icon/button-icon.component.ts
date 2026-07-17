@@ -15,11 +15,12 @@ import { LoadingSpinnerComponent } from "../../loading/spinner/spinner.component
       type="button"
       [ngClass]="{
         'border border-solid inlineFlex-center-center relative bg-transparent cursor-pointer align-middle text-center text-[#4B5563] outline-none rounded-md hover:bg-gray-200 transition-background duration-300 ease-in-out': true,
-        'w-8 h-8 p-2': !hasContent,   
-        'px-3 py-2 gap-2': hasContent      
+        'w-8 h-8 p-2': !hasContent,
+        'px-3 py-2 gap-2': hasContent
       }"
       [class]="buttonClass"
       [disabled]="disabled"
+      [attr.aria-label]="ariaLabel"
       (click)="onClick.emit()"
     >
       <lucide-icon 
@@ -49,6 +50,7 @@ export class ButtonIconComponent implements AfterContentInit {
   @Input() buttonClass: string = '';
   @Input() loading?: boolean = false;
   @Input() disabled?: boolean = false;
+  @Input() ariaLabel?: string;
   @Output() onClick: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('contentWrapper', { static: true }) content!: ElementRef;
   @Input()

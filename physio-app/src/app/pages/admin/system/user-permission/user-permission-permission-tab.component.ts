@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, Signal } from "@angular/core";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { Permission } from "../../../../shared/types/permission";
+import { Permission } from "../../../../shared/types/permission.types";
 import { ColorUtils } from "../../../../shared/utils/color.utils";
 
 @Component({

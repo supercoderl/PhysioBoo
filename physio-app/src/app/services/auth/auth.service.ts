@@ -1,10 +1,13 @@
 import { SocialAuthService } from '@abacritt/angularx-social-login';
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, finalize, map, Observable, switchMap, tap, throwError } from 'rxjs';
+import { inject, Injectable, signal } from '@angular/core';
+import { BehaviorSubject, catchError, finalize, firstValueFrom, forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { BASE_API } from '../../shared/api/base';
+import { createHttpContext } from '../../shared/contexts/option.context';
+import { USER_DATA } from '../../shared/data/cache';
 import { PagedResponse } from '../../shared/types/common';
-import { UserProfile } from '../../shared/types/core';
+import { UserProfile } from '../../shared/types/core.types';
+import { LoadingKeys } from '../../shared/types/loading';
 import { LocalStorage } from '../../shared/utils/storage';
 import { PreferenceService } from '../common/preference.service';
 import { ThemeConfigService } from '../common/theme-config.service';
@@ -20,6 +23,7 @@ export class AuthService {
     private prefSrv = inject(PreferenceService);
     private themeSrv = inject(ThemeConfigService);
 
+    isAuthenticated = signal(false);
     permissions$ = this.permissionsSubject.asObservable();
     public userInfo$ = this.userInfoSubject.asObservable();
     // #endregion
@@ -28,13 +32,21 @@ export class AuthService {
         private http: HttpClient,
     ) { }
 
-    public isAuthenticated(): boolean {
-        const status = LocalStorage.load('is_logged_in');
-        return status === true || status === 'true';
+    async checkSession(): Promise<void> {
+        try {
+            const res = await firstValueFrom(this.http.get<PagedResponse<boolean>>(BASE_API.USER.CHECK_AUTH));
+            this.isAuthenticated.set(!!res.data);
+        } catch {
+            this.isAuthenticated.set(false);
+        }
     }
 
     login<T>(body: { identifier: string, password: string, otp: string }): Observable<PagedResponse<UserProfile>> {
-        return this.http.post(BASE_API.LOGIN, body).pipe(
+        return this.http.post(BASE_API.LOGIN, body, {
+            context: createHttpContext({
+                loadingKey: LoadingKeys.USER.LOGIN.CREDENTIAL
+            })
+        }).pipe(
             switchMap(() => this.getProfile()),
             catchError(err => {
                 console.error('Login failed:', err);
@@ -69,7 +81,7 @@ export class AuthService {
     clearSession(): void {
         this.userInfoSubject.next(null);
         this.permissionsSubject.next([]);
-        LocalStorage.remove('is_logged_in');
+        this.isAuthenticated.set(false);
     }
 
     getProfile() {
@@ -77,14 +89,17 @@ export class AuthService {
             tap((res) => {
                 if (res.success && res.data) {
                     this.userInfoSubject.next(res.data);
-                    LocalStorage.save('is_logged_in', 'true');
+                    this.isAuthenticated.set(true);
                 } else {
-                    LocalStorage.remove('is_logged_in');
+                    this.checkSession();
                 }
             }),
             switchMap((res) => {
                 if (!res.success || !res.data) return [res];
-                return this.prefSrv.loadAll().pipe(
+                return forkJoin([
+                    this.prefSrv.loadAll(),
+                    // this.fetchPermissions(),
+                ]).pipe(
                     tap(() => this.themeSrv.hydrateFromCache()),
                     map(() => res),
                     catchError(() => {
@@ -94,16 +109,33 @@ export class AuthService {
                 );
             }),
             catchError((err) => {
-                LocalStorage.remove('is_logged_in');
+                this.clearSession();
                 return throwError(() => err);
             })
         );
     }
 
+    getUserData() {
+        this.http.get(BASE_API.USER.GET_USER_DATA).subscribe({
+            next: res => {
+                LocalStorage.save(USER_DATA, res);
+            }
+        })
+    }
+
+    /** Fetches permission codes and caches them in permissionsSubject; used both standalone and as part of getProfile(). */
+    private fetchPermissions() {
+        return this.http.get<any>(`/api/users/user-permission`).pipe(
+            tap((permissions) => this.permissionsSubject.next(permissions.value.permission_code)),
+            catchError(() => {
+                this.permissionsSubject.next([]);
+                return of(null);
+            })
+        );
+    }
+
     loadPermissions() {
-        this.http.get<any>(`/api/users/user-permission`).subscribe((permissions) => {
-            this.permissionsSubject.next(permissions.value.permission_code);
-        });
+        this.fetchPermissions().subscribe();
     }
 
     getPermissions() {

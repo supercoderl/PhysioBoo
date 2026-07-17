@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { ConfirmDialogData, DialogType } from '../../shared/types/dialog';
+import { ConfirmDialogData, DialogType } from '../../shared/types/dialog.types';
 
 @Injectable({
     providedIn: 'root'

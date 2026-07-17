@@ -7,7 +7,7 @@ import { ToastService } from "../../../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SupplierType } from "../../../../../../shared/enums/supplier-type";
 import { SharedModule } from "../../../../../../shared/shared-imports";
-import { Supplier } from "../../../../../../shared/types/support";
+import { Supplier } from "../../../../../../shared/types/support.types";
 import { convertEnumToSelection } from "../../../../../../shared/utils/common";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../../checkbox/boo-checkbox/boo-checkbox.component";
@@ -364,11 +364,7 @@ export class CommonCategorySupplierDrawerComponent implements OnChanges {
             let id: string;
 
             if (this.currentId) {
-                const updateRes = await firstValueFrom(this.supplierSrv.update(this.currentId, formData));
-                if (!updateRes.success) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
+                await firstValueFrom(this.supplierSrv.update(this.currentId, formData));
                 id = this.currentId;
             } else {
                 const createRes = await firstValueFrom(this.supplierSrv.create(formData));

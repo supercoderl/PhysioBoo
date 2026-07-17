@@ -7,7 +7,7 @@ import { ToastService } from "../../../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { InsuranceType } from "../../../../../../shared/enums/insurance-type";
 import { SharedModule } from "../../../../../../shared/shared-imports";
-import { InsuranceCompany } from "../../../../../../shared/types/support";
+import { InsuranceCompany } from "../../../../../../shared/types/support.types";
 import { convertEnumToSelection } from "../../../../../../shared/utils/common";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../../checkbox/boo-checkbox/boo-checkbox.component";
@@ -325,11 +325,7 @@ export class CommonCategoryInsuranceCompanyDrawerComponent implements OnChanges 
         try {
             let id: string;
             if (this.currentId) {
-                const updateRes = await firstValueFrom(this.insuranceCompanySrv.update(this.currentId, payload));
-                if (!updateRes.success) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
+                await firstValueFrom(this.insuranceCompanySrv.update(this.currentId, payload));
                 id = this.currentId;
             } else {
                 const createRes = await firstValueFrom(this.insuranceCompanySrv.create(payload));

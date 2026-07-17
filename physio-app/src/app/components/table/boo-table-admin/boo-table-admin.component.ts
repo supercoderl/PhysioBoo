@@ -4,14 +4,14 @@ import { AfterContentInit, AfterViewInit, ChangeDetectorRef, Component, ContentC
 import { ColumnDefDirective } from '../../../shared/directives/column-def.directive';
 import { SharedModule } from '../../../shared/shared-imports';
 import { Size } from '../../../shared/types/common';
-import { FilterConfig } from '../../../shared/types/filter';
+import { FilterConfig } from '../../../shared/types/filter.types';
 import { SortOption } from '../../../shared/types/sort';
-import { BulkAction, GroupableColumn, SavedView, TableComment } from '../../../shared/types/table';
+import { BulkAction, GroupableColumn, SavedView, TableComment } from '../../../shared/types/table.types';
 import { PHYSIO_BOO_ANIMATION } from '../../../shared/utils/animation.utils';
 import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../input/boo-input/boo-input.component";
 import { PaginationComponent } from "./boo-pagination-admin.component";
-export { FilterConfig, FilterOption } from '../../../shared/types/filter';
+export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
 
 @Component({
   selector: 'boo-table-admin',
@@ -737,7 +737,7 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
   private resizeObserver?: ResizeObserver;
   visibleRowCount = 0;
 
-  constructor(private cdr: ChangeDetectorRef, private zone: NgZone) {}
+  constructor(private cdr: ChangeDetectorRef, private zone: NgZone) { }
 
   ngAfterViewInit(): void {
     this.measureVisibleRows();
@@ -770,10 +770,10 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
     const el = this.scrollArea.nativeElement;
     const fallback = this.size === 'small' ? 36 : this.size === 'large' ? 80 : 48;
     const firstRow = el.querySelector('tbody tr.data-row') as HTMLElement | null;
-    const rowH = firstRow?.offsetHeight || fallback;
+    const rowH = (firstRow?.offsetHeight || fallback) || 1;
     const headerEl = el.querySelector('thead') as HTMLElement | null;
     const headerH = headerEl?.offsetHeight ?? (this.showHeader ? 48 : 0);
-    const available = el.clientHeight - headerH;
+    const available = (el.clientHeight - headerH) || 0;
     this.visibleRowCount = Math.max(0, Math.floor(available / rowH));
   }
 

@@ -1,655 +1,300 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
-import { PatientType, RiskLevel } from "../../../../shared/enums/patient";
+import { Component, OnInit, signal } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { finalize, forkJoin } from "rxjs";
+import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
+import { StatCardComponent } from "../../../../components/ui/stat-card.component";
+import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { TreatmentSheetService } from "../../../../services/admin/treatment-sheet.service";
+import { LocalLoadingService } from "../../../../services/common/local-loading.service";
+import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { FluidBalance } from "../../../../shared/types/fluid-balance";
-import { Medication } from "../../../../shared/types/medication";
-import { Note } from "../../../../shared/types/note";
-import { Patient } from "../../../../shared/types/patient";
-import { Procedure } from "../../../../shared/types/procedure";
-import { Vitals } from "../../../../shared/types/vital";
+import { AlertSeverityLevel, ClinicalAlert, TreatmentPatientSummary, TreatmentStats } from "../../../../shared/types/treatment-sheet.types";
+import { TreatmentImagingTabComponent } from "./tabs/treatment-imaging-tab.component";
+import { TreatmentLaboratoryTabComponent } from "./tabs/treatment-laboratory-tab.component";
+import { TreatmentMedicationsTabComponent } from "./tabs/treatment-medications-tab.component";
+import { TreatmentNotesTabComponent } from "./tabs/treatment-notes-tab.component";
+import { TreatmentOrdersTabComponent } from "./tabs/treatment-orders-tab.component";
+import { TreatmentOverviewTabComponent } from "./tabs/treatment-overview-tab.component";
+import { TreatmentProceduresTabComponent } from "./tabs/treatment-procedures-tab.component";
+import { TreatmentTimelineTabComponent } from "./tabs/treatment-timeline-tab.component";
+
+type TabKey = 'overview' | 'timeline' | 'orders' | 'medications' | 'procedures' | 'laboratory' | 'imaging' | 'notes';
+
+const LOADING_KEY = 'treatment-sheet';
 
 @Component({
   selector: 'admin-treatment-sheet',
   standalone: true,
   imports: [
-    SharedModule
+    SharedModule,
+    BooIconComponent,
+    StatusBadgeComponent,
+    StatCardComponent,
+    TreatmentOverviewTabComponent,
+    TreatmentTimelineTabComponent,
+    TreatmentOrdersTabComponent,
+    TreatmentMedicationsTabComponent,
+    TreatmentProceduresTabComponent,
+    TreatmentLaboratoryTabComponent,
+    TreatmentImagingTabComponent,
+    TreatmentNotesTabComponent,
   ],
+  host: { class: 'block min-h-screen bg-gray-50' },
   template: `
-    <div class="min-h-screen bg-gray-50 p-6">
-      <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <h1 class="text-3xl font-bold text-gray-800">Treatment Sheet</h1>
-              <p class="text-gray-600 mt-1">Ward: {{ ward }} - Bed: 101</p>
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="text-sm text-gray-600">{{ currentDate }}</span>
-              <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
-                Print Sheet
-              </button>
-            </div>
-          </div>
+    <!-- Loading -->
+    <div *ngIf="loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3">
+      <boo-icon name="loader" [size]="32" iconClass="animate-spin text-primary"></boo-icon>
+      <span class="text-gray-500 text-sm">Loading treatment sheet...</span>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="hasError && !loadingSrv.isLoading(LOADING_KEY)" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div class="bg-red-50 border border-red-200 rounded-lg p-6 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <boo-icon name="alert-circle" [size]="20" iconClass="text-red-500"></boo-icon>
+          <span class="text-red-700 text-sm">Unable to load the treatment sheet for this patient.</span>
         </div>
-
-        <!-- Patient Info Card -->
-        <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <p class="text-sm text-gray-600">Patient Name</p>
-              <p class="text-lg font-bold text-gray-800">asd</p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-600">Age / Gender</p>
-              <p class="text-lg font-semibold text-gray-800">asdy / asd</p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-600">Admission Date</p>
-              <p class="text-lg font-semibold text-gray-800">15-12-2025</p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-600">Diagnosis</p>
-              <p class="text-lg font-semibold text-gray-800"></p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <button (click)="activeTab = 'vitals'" 
-                  class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            Record Vitals
-          </button>
-          <button (click)="activeTab = 'medications'" 
-                  class="bg-green-500 hover:bg-green-600 text-white font-semibold py-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-            </svg>
-            Give Medication
-          </button>
-          <button (click)="activeTab = 'procedures'" 
-                  class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Add Procedure
-          </button>
-          <button (click)="activeTab = 'notes'" 
-                  class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            Add Note
-          </button>
-        </div>
-
-        <!-- Tab Content -->
-        <div [ngSwitch]="activeTab">
-          <!-- Vital Signs Tab -->
-          <div *ngSwitchCase="'vitals'">
-            <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
-              <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-gray-800">Record Vital Signs</h2>
-                <span class="text-sm text-gray-600">{{ currentTime }}</span>
-              </div>
-              
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Temperature (°C)</label>
-                  <input [(ngModel)]="newVital.temperature" 
-                         type="number" 
-                         step="0.1"
-                         placeholder="36.5"
-                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Blood Pressure</label>
-                  <input [(ngModel)]="newVital.bloodPressure" 
-                         type="text" 
-                         placeholder="120/80"
-                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Heart Rate (bpm)</label>
-                  <input [(ngModel)]="newVital.heartRate" 
-                         type="number" 
-                         placeholder="72"
-                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Respiratory Rate</label>
-                  <input [(ngModel)]="newVital.respiratoryRate" 
-                         type="number" 
-                         placeholder="16"
-                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">O2 Saturation (%)</label>
-                  <input [(ngModel)]="newVital.oxygenSaturation" 
-                         type="number" 
-                         placeholder="98"
-                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Pain Score (0-10)</label>
-                  <input [(ngModel)]="newVital.painScore" 
-                         type="number" 
-                         min="0"
-                         max="10"
-                         placeholder="0"
-                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Recorded By</label>
-                  <input [(ngModel)]="newVital.recordedBy" 
-                         type="text" 
-                         placeholder="Nurse Name"
-                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="flex items-end">
-                  <button (click)="addVitalSigns()" 
-                          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-colors">
-                    Record
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Vital Signs History -->
-            <div class="bg-surface rounded-lg shadow-md p-6">
-              <h2 class="text-xl font-bold text-gray-800 mb-4">Vital Signs History (Today)</h2>
-              <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Temp (°C)</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">BP</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">HR</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">RR</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">SpO2</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pain</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">By</th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-surface divide-y divide-gray-200">
-                    <tr *ngFor="let vital of vitalSigns" class="hover:bg-gray-50">
-                      <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">12:00</td>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ vital.temperature }}</td>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ vital.bloodPressure }}</td>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ vital.heartRate }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Medications Tab -->
-          <div *ngSwitchCase="'medications'" class="space-y-6">
-            <div *ngFor="let med of medications" class="bg-surface rounded-lg shadow-md p-6">
-              <div class="flex items-start justify-between mb-4">
-                <div>
-                  <h3 class="text-xl font-bold text-gray-800">{{ med.name }}</h3>
-                  <p class="text-gray-600">{{ med.dosage }} - {{ med.frequency }}</p>
-                  <p class="text-sm text-gray-500 mt-1">09:00 to 12:00</p>
-                </div>
-                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Active</span>
-              </div>
-
-              <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Scheduled Time</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Given Time</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Given By</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-surface divide-y divide-gray-200">
-                    
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Procedures Tab -->
-          <div *ngSwitchCase="'procedures'">
-            <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
-              <h2 class="text-xl font-bold text-gray-800 mb-4">Add New Procedure</h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Procedure Name</label>
-                  <input [(ngModel)]="newProcedure.name" 
-                         type="text" 
-                         placeholder="e.g., Wound dressing"
-                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Performed By</label>
-                  <input [(ngModel)]="newProcedure.performedBy" 
-                         type="text" 
-                         placeholder="Staff name"
-                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="md:col-span-2">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-                  <textarea [(ngModel)]="newProcedure.notes" 
-                            rows="3" 
-                            placeholder="Procedure details and observations"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                </div>
-                <div class="md:col-span-2">
-                  <button (click)="addProcedure()" 
-                          class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-lg transition-colors">
-                    Add Procedure
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-surface rounded-lg shadow-md p-6">
-              <h2 class="text-xl font-bold text-gray-800 mb-4">Procedures Today</h2>
-              <div class="space-y-3">
-                <div *ngFor="let proc of procedures" 
-                     class="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
-                  <div class="flex items-start justify-between mb-2">
-                    <div class="flex-1">
-                      <h3 class="text-lg font-bold text-gray-800">{{ proc.name }}</h3>
-                      <p class="text-sm text-gray-600">{{ proc.time }} - Performed by {{ proc.performedBy }}</p>
-                    </div>
-                    <span [class]="getProcedureStatusClass(proc.status)" 
-                          class="px-3 py-1 text-xs font-semibold rounded-full">
-                      {{ proc.status }}
-                    </span>
-                  </div>
-                  <p class="text-gray-700">{{ proc.notes }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Notes Tab -->
-          <div *ngSwitchCase="'notes'">
-            <div class="bg-surface rounded-lg shadow-md p-6 mb-6">
-              <h2 class="text-xl font-bold text-gray-800 mb-4">Add New Note</h2>
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Note Type</label>
-                  <select [(ngModel)]="newNote.type" 
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="nursing">Nursing Note</option>
-                    <option value="doctor">Doctor's Note</option>
-                    <option value="general">General Note</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Note Content</label>
-                  <textarea [(ngModel)]="newNote.content" 
-                            rows="4" 
-                            placeholder="Enter your note here..."
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Written By</label>
-                  <input [(ngModel)]="newNote.writtenBy" 
-                         type="text" 
-                         placeholder="Your name"
-                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <button (click)="addNote()" 
-                        class="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 rounded-lg transition-colors">
-                  Add Note
-                </button>
-              </div>
-            </div>
-
-            <div class="bg-surface rounded-lg shadow-md p-6">
-              <h2 class="text-xl font-bold text-gray-800 mb-4">Progress Notes</h2>
-              <div class="space-y-4">
-                <div *ngFor="let note of notes" 
-                     class="border-l-4 pl-4 py-3"
-                     [class.border-blue-500]="note.type === 'nursing'"
-                     [class.border-green-500]="note.type === 'doctor'"
-                     [class.border-gray-500]="note.type === 'general'">
-                  <div class="flex items-start justify-between mb-2">
-                    <div>
-                      <span [class]="getNoteTypeClass(note.type)" 
-                            class="px-2 py-1 text-xs font-semibold rounded">
-                        {{ note.type === 'nursing' ? 'Nursing' : note.type === 'doctor' ? 'Doctor' : 'General' }}
-                      </span>
-                      <span class="text-sm text-gray-600 ml-3">{{ note.time }}</span>
-                    </div>
-                    <span class="text-sm text-gray-600">{{ note.writtenBy }}</span>
-                  </div>
-                  <p class="text-gray-800">{{ note.content }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Fluid Balance Tab -->
-          <div *ngSwitchCase="'fluid'">
-            <div class="bg-surface rounded-lg shadow-md p-6">
-              <h2 class="text-xl font-bold text-gray-800 mb-6">Fluid Balance Chart</h2>
-              <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Oral (ml)</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">IV (ml)</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total In</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Urine (ml)</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Drain (ml)</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Out</th>
-                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance</th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-surface divide-y divide-gray-200">
-                    <tr *ngFor="let fluid of fluidBalance" class="hover:bg-gray-50">
-                      <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">{{ fluid.time }}</td>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ fluid.intake.oral }}</td>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ fluid.intake.iv }}</td>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-blue-600">{{ fluid.intake.total }}</td>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ fluid.output.urine }}</td>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ fluid.output.drain }}</td>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-red-600">{{ fluid.output.total }}</td>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm font-bold" 
-                          [class.text-green-600]="fluid.balance > 0"
-                          [class.text-red-600]="fluid.balance < 0">
-                        {{ fluid.balance > 0 ? '+' : '' }}{{ fluid.balance }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
+        <button (click)="load()" class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors">Retry</button>
       </div>
     </div>
-    `
+
+    <ng-container *ngIf="!hasError && hasLoadedOnce">
+      <!-- Sticky patient summary header -->
+      <div class="sticky top-0 z-20 bg-surface shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-start justify-between gap-4">
+          <div class="flex items-start gap-3 min-w-0">
+            <div class="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
+              {{ initials(summary()?.fullName ?? '') }}
+            </div>
+            <div class="min-w-0">
+              <div class="text-lg font-semibold text-gray-800 truncate">{{ summary()?.fullName }}</div>
+              <div class="text-xs text-secondary">
+                MRN {{ summary()?.mrn }} · Visit {{ summary()?.visitNumber }} · Bed {{ summary()?.bedNumber }} · {{ summary()?.wardName }} · {{ summary()?.departmentName }}
+              </div>
+              <div class="text-xs text-secondary mt-0.5">
+                Admitted {{ summary()?.admissionDate | date:'mediumDate' }} · LOS {{ lengthOfStayDays() }} day(s) · Attending: {{ summary()?.attendingDoctorName }}
+              </div>
+              <div class="flex flex-wrap gap-1.5 mt-2">
+                <boo-status-badge *ngIf="summary()?.primaryDiagnosis" [label]="summary()!.primaryDiagnosis!" tone="primary"></boo-status-badge>
+                <boo-status-badge *ngIf="summary()?.isolationStatus" [label]="'Isolation: ' + summary()!.isolationStatus" tone="warning" [dotted]="true"></boo-status-badge>
+                <boo-status-badge *ngFor="let a of summary()?.allergies" [label]="'Allergy: ' + a" tone="danger" [dotted]="true"></boo-status-badge>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button (click)="printSheet()" class="px-3 py-2 bg-surface border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2 text-sm">
+              <boo-icon name="printer" [size]="16"></boo-icon> Print Sheet
+            </button>
+            <button (click)="exportPdf()" class="px-3 py-2 bg-surface border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2 text-sm">
+              <boo-icon name="file-down" [size]="16"></boo-icon> Export PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab nav -->
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-gray-200 flex items-center gap-1 overflow-x-auto" role="tablist">
+          <button *ngFor="let t of tabs" type="button" (click)="setTab(t.key)" [attr.aria-selected]="activeTab() === t.key" role="tab"
+            class="px-4 py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 -mb-px whitespace-nowrap"
+            [ngClass]="activeTab() === t.key ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
+            <boo-icon [name]="t.icon" iconClass="w-4 h-4"></boo-icon>
+            {{ t.label }}
+          </button>
+        </nav>
+      </div>
+
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Clinical alerts banner -->
+        <div *ngIf="alerts().length > 0" class="mb-6 flex gap-3 overflow-x-auto pb-1" aria-live="polite">
+          <div *ngFor="let a of alertsBySeverity()" class="shrink-0 min-w-[280px] bg-surface border rounded-lg p-3 flex items-start gap-2"
+            [ngClass]="alertBorderClass(a.severity)">
+            <boo-icon [name]="alertIcon(a.type)" [size]="18" [ngClass]="alertIconClass(a.severity)"></boo-icon>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <boo-status-badge [label]="a.severity" [tone]="alertTone(a.severity)"></boo-status-badge>
+              </div>
+              <p class="text-xs text-gray-700 mt-1">{{ a.message }}</p>
+            </div>
+            <button (click)="acknowledgeAlert(a)" class="text-gray-400 hover:text-gray-600" aria-label="Acknowledge alert">
+              <boo-icon name="x" [size]="16"></boo-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats strip -->
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
+          <boo-stat-card label="Active Orders" [value]="stats()?.activeOrders ?? 0" icon="clipboard-list" tone="primary"></boo-stat-card>
+          <boo-stat-card label="Completed Orders" [value]="stats()?.completedOrders ?? 0" icon="circle-check" tone="success"></boo-stat-card>
+          <boo-stat-card label="Pending Orders" [value]="stats()?.pendingOrders ?? 0" icon="clock" tone="neutral"></boo-stat-card>
+          <boo-stat-card label="Medication Due" [value]="stats()?.medicationDue ?? 0" icon="pill" tone="warning"></boo-stat-card>
+          <boo-stat-card label="Critical Alerts" [value]="stats()?.criticalAlerts ?? 0" icon="alert-triangle" tone="danger"></boo-stat-card>
+          <boo-stat-card label="Pending Labs" [value]="stats()?.pendingLabs ?? 0" icon="flask-conical" tone="primary"></boo-stat-card>
+          <boo-stat-card label="Pending Imaging" [value]="stats()?.pendingImaging ?? 0" icon="scan" tone="primary"></boo-stat-card>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <button (click)="setTab('orders')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
+            <boo-icon name="plus-circle" [size]="18" iconClass="text-primary"></boo-icon> Add Order
+          </button>
+          <button (click)="setTab('notes')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
+            <boo-icon name="file-plus" [size]="18" iconClass="text-primary"></boo-icon> Add Progress Note
+          </button>
+          <button (click)="setTab('laboratory')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
+            <boo-icon name="flask-conical" [size]="18" iconClass="text-primary"></boo-icon> View Laboratory
+          </button>
+          <button (click)="setTab('imaging')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
+            <boo-icon name="scan" [size]="18" iconClass="text-primary"></boo-icon> View Imaging
+          </button>
+        </div>
+
+        <!-- Tab content -->
+        <treatment-overview-tab *ngIf="activeTab() === 'overview'" [patientId]="patientId" />
+        <treatment-timeline-tab *ngIf="activeTab() === 'timeline'" [patientId]="patientId" />
+        <treatment-orders-tab *ngIf="activeTab() === 'orders'" [patientId]="patientId" />
+        <treatment-medications-tab *ngIf="activeTab() === 'medications'" [patientId]="patientId" />
+        <treatment-procedures-tab *ngIf="activeTab() === 'procedures'" [patientId]="patientId" />
+        <treatment-laboratory-tab *ngIf="activeTab() === 'laboratory'" [patientId]="patientId" />
+        <treatment-imaging-tab *ngIf="activeTab() === 'imaging'" [patientId]="patientId" />
+        <treatment-notes-tab *ngIf="activeTab() === 'notes'" [patientId]="patientId" />
+      </main>
+    </ng-container>
+  `,
 })
+export class AdminTreatmentSheetComponent implements OnInit {
+  readonly LOADING_KEY = LOADING_KEY;
 
-export class AdminTreatmentSheetComponent implements OnInit, OnDestroy {
-  // #region Inputs, Outputs, Properties
-  ward: string = 'Ward A - General Medicine';
-  currentDate: string = '';
-  currentTime: string = '';
-  activeTab: string = 'vitals';
+  patientId!: string;
+  summary = signal<TreatmentPatientSummary | null>(null);
+  stats = signal<TreatmentStats | null>(null);
+  alerts = signal<ClinicalAlert[]>([]);
+  activeTab = signal<TabKey>('overview');
 
-  patient: Patient = {
-    id: "",
-    patientNumber: "",
-    patientType: PatientType.Outpatient,
-    riskLevel: RiskLevel.Low,
-    primaryDoctorId: "",
-    preferredDoctorId: null,
-    preferredHospitalId: null,
-    preferredAppointmentTime: null,
-    referredBy: null,
-    referralHospitalId: null,
-    inssuranceProvider: null,
-    inssurancePolicyNumber: null,
-    inssuranceExpiryDate: null,
-    inssuranceCoverageAmount: null,
-    isVip: false,
-    isSeniorCitizen: false,
-    isChronicPatient: false,
-    medicalHistory: null,
-    familyHistory: null,
-    surgicalHistory: null,
-    allergyInformation: null,
-    currentMedications: null,
-    lifestyleNotes: null,
-    occupation: null,
-    annualIncomeRange: null,
-    communicationPreferences: null,
-    consentForResearch: false,
-    consentForMarketing: false,
-    dataSharingConsent: true,
-    registrationDate: null,
-    lastVisitDate: null,
-    nextFollowUpDate: null,
-    totalVisits: 0,
-    totalAmountSpent: 0,
-    outstandingBalance: 0,
-    loyaltyPoints: 0,
-  };
+  hasError = false;
+  hasLoadedOnce = false;
 
-  vitalSigns: Vitals[] = [
-    {
-      temperature: 37.2, bloodPressure: '120/80', heartRate: 78,
-      weight: 0,
-      height: 0,
-      bmi: 0
-    },
-    {
-      temperature: 37.5, bloodPressure: '125/82', heartRate: 82,
-      weight: 0,
-      height: 0,
-      bmi: 0
-    },
-    {
-      temperature: 37.8, bloodPressure: '130/85', heartRate: 85,
-      weight: 0,
-      height: 0,
-      bmi: 0
-    }
+  readonly tabs: { key: TabKey; label: string; icon: string }[] = [
+    { key: 'overview', label: 'Overview', icon: 'layout-dashboard' },
+    { key: 'timeline', label: 'Timeline', icon: 'history' },
+    { key: 'orders', label: 'Orders', icon: 'clipboard-list' },
+    { key: 'medications', label: 'Medications', icon: 'pill' },
+    { key: 'procedures', label: 'Procedures', icon: 'stethoscope' },
+    { key: 'laboratory', label: 'Laboratory', icon: 'flask-conical' },
+    { key: 'imaging', label: 'Imaging', icon: 'scan' },
+    { key: 'notes', label: 'Notes', icon: 'file-text' },
   ];
 
-  newVital: any = {
-    temperature: null,
-    bloodPressure: '',
-    heartRate: null,
-    respiratoryRate: null,
-    oxygenSaturation: null,
-    painScore: null,
-    recordedBy: ''
-  };
+  constructor(
+    private srv: TreatmentSheetService,
+    private route: ActivatedRoute,
+    private toastSrv: ToastService,
+    protected loadingSrv: LocalLoadingService,
+  ) { }
 
-  medications: Medication[] = [
-    {
-      id: '1',
-      name: 'Amoxicillin',
-      dosage: '500mg',
-      frequency: '3 times daily',
-      duration: "",
-      instructions: "",
-      quantity: 0
-    },
-    {
-      id: '2',
-      name: 'Paracetamol',
-      dosage: '500mg',
-      frequency: "",
-      duration: "",
-      instructions: "",
-      quantity: 0
-    }
-  ];
-
-  procedures: Procedure[] = [
-    { id: '1', time: '09:00', name: 'Wound Dressing Change', performedBy: 'Nurse Sarah', notes: 'Wound healing well, no signs of infection', status: 'completed' },
-    { id: '2', time: '15:30', name: 'Blood Sample Collection', performedBy: 'Lab Tech Mike', notes: 'Sample sent to laboratory for analysis', status: 'completed' }
-  ];
-
-  newProcedure: any = {
-    name: '',
-    performedBy: '',
-    notes: ''
-  };
-
-  notes: Note[] = [
-    { id: '1', time: '08:30', type: 'nursing', content: 'Patient alert and oriented. Complaining of mild chest discomfort. Vital signs stable.', writtenBy: 'Nurse Mary Johnson' },
-    { id: '2', time: '10:00', type: 'doctor', content: 'Chest X-ray shows improvement. Continue current antibiotic regimen. Patient responding well to treatment.', writtenBy: 'Dr. Sarah Wilson' },
-    { id: '3', time: '14:00', type: 'nursing', content: 'Patient had lunch, appetite improving. Ambulated to bathroom without assistance.', writtenBy: 'Nurse John Davis' }
-  ];
-
-  newNote: any = {
-    type: 'nursing',
-    content: '',
-    writtenBy: ''
-  };
-
-  fluidBalance: FluidBalance[] = [
-    { time: '08:00', intake: { oral: 200, iv: 500, total: 700 }, output: { urine: 300, drain: 0, total: 300 }, balance: 400 },
-    { time: '12:00', intake: { oral: 300, iv: 500, total: 800 }, output: { urine: 400, drain: 0, total: 400 }, balance: 400 },
-    { time: '16:00', intake: { oral: 250, iv: 500, total: 750 }, output: { urine: 350, drain: 0, total: 350 }, balance: 400 }
-  ];
-
-  private timeInterval: any;
-  // #endregion
-
-  // #region Init (Lifecycle + Setup)
-  ngOnInit() {
-    this.updateTime();
-    this.timeInterval = setInterval(() => {
-      this.updateTime();
-    }, 1000);
+  ngOnInit(): void {
+    this.patientId = this.route.snapshot.paramMap.get('patientId')
+      ?? this.route.snapshot.queryParamMap.get('patientId')
+      ?? 'pat-1001';
+    this.load();
   }
 
-  ngOnDestroy() {
-    if (this.timeInterval) {
-      clearInterval(this.timeInterval);
+  load(): void {
+    this.hasError = false;
+    this.loadingSrv.setLoading(LOADING_KEY, true);
+
+    forkJoin({
+      summary: this.srv.getSummary(this.patientId),
+      stats: this.srv.getStats(this.patientId),
+      alerts: this.srv.getAlerts(this.patientId),
+    })
+      .pipe(finalize(() => this.loadingSrv.setLoading(LOADING_KEY, false)))
+      .subscribe({
+        next: ({ summary, stats, alerts }) => {
+          if (summary.success) this.summary.set(summary.data);
+          if (stats.success) this.stats.set(stats.data);
+          if (alerts.success) this.alerts.set(alerts.data.filter(a => !a.acknowledged));
+          this.hasLoadedOnce = true;
+        },
+        error: () => {
+          this.hasError = true;
+          this.hasLoadedOnce = true;
+        },
+      });
+  }
+
+  setTab(key: TabKey): void { this.activeTab.set(key); }
+
+  lengthOfStayDays(): number {
+    const admitted = this.summary()?.admissionDate;
+    if (!admitted) return 0;
+    return Math.max(0, Math.floor((Date.now() - new Date(admitted).getTime()) / 86_400_000));
+  }
+
+  initials(name: string): string {
+    const p = name.trim().split(/\s+/);
+    return ((p[0]?.[0] ?? '') + (p.at(-1)?.[0] ?? '')).toUpperCase();
+  }
+
+  alertsBySeverity(): ClinicalAlert[] {
+    const order: Record<AlertSeverityLevel, number> = { Critical: 0, High: 1, Warning: 2, Information: 3 };
+    return [...this.alerts()].sort((a, b) => order[a.severity] - order[b.severity]);
+  }
+
+  alertTone(severity: AlertSeverityLevel): BadgeTone {
+    switch (severity) {
+      case 'Critical': return 'danger';
+      case 'High': return 'danger';
+      case 'Warning': return 'warning';
+      default: return 'primary';
     }
   }
-  // #endregion
 
-  // #region Methods
-  updateTime() {
-    const now = new Date();
-    this.currentTime = now.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-    this.currentDate = now.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+  alertIcon(type: ClinicalAlert['type']): string {
+    switch (type) {
+      case 'Allergy': return 'alert-triangle';
+      case 'DrugInteraction': return 'pill';
+      case 'AbnormalLab': return 'flask-conical';
+      case 'CriticalVitals': return 'activity';
+      case 'InfectionControl': return 'biohazard';
+      case 'Isolation': return 'shield-alert';
+      default: return 'bell';
+    }
+  }
+
+  alertBorderClass(severity: AlertSeverityLevel): string {
+    switch (severity) {
+      case 'Critical': return 'border-red-300';
+      case 'High': return 'border-red-200';
+      case 'Warning': return 'border-amber-300';
+      default: return 'border-gray-200';
+    }
+  }
+
+  alertIconClass(severity: AlertSeverityLevel): string {
+    switch (severity) {
+      case 'Critical': return 'text-red-600';
+      case 'High': return 'text-red-500';
+      case 'Warning': return 'text-amber-600';
+      default: return 'text-gray-500';
+    }
+  }
+
+  acknowledgeAlert(alert: ClinicalAlert): void {
+    this.srv.acknowledgeAlert(alert.id).subscribe(res => {
+      if (res.success) {
+        this.alerts.set(this.alerts().filter(a => a.id !== alert.id));
+        if (this.stats()) this.stats.update(s => s ? { ...s, criticalAlerts: Math.max(0, s.criticalAlerts - (alert.severity === 'Critical' ? 1 : 0)) } : s);
+        this.toastSrv.success('Alert acknowledged');
+      } else {
+        this.toastSrv.error('Unable to acknowledge alert');
+      }
     });
   }
 
-  addVitalSigns() {
-    if (!this.newVital.temperature || !this.newVital.bloodPressure || !this.newVital.heartRate) {
-      alert('Please fill in all required fields');
-      return;
-    }
-
-    const now = new Date();
-    const vital: Vitals = {
-      temperature: this.newVital.temperature,
-      bloodPressure: this.newVital.bloodPressure,
-      heartRate: this.newVital.heartRate,
-      weight: 0,
-      height: 0,
-      bmi: 0
-    };
-
-    this.vitalSigns.push(vital);
-    this.newVital = {
-      temperature: null,
-      bloodPressure: '',
-      heartRate: null,
-      respiratoryRate: null,
-      oxygenSaturation: null,
-      painScore: null,
-      recordedBy: ''
-    };
-    alert('Vital signs recorded successfully!');
+  printSheet(): void {
+    window.print();
   }
 
-  giveMedication(medId: string, scheduledTime: string) {
-    const med = this.medications.find(m => m.id === medId);
-    if (med) {
-
-    }
+  exportPdf(): void {
+    this.toastSrv.info('Export PDF — not wired yet');
   }
-
-  missedMedication(medId: string, scheduledTime: string) {
-    const med = this.medications.find(m => m.id === medId);
-    if (med) {
-
-    }
-  }
-
-  addProcedure() {
-    if (!this.newProcedure.name || !this.newProcedure.performedBy) {
-      alert('Please fill in required fields');
-      return;
-    }
-
-    const now = new Date();
-    const procedure: Procedure = {
-      id: Date.now().toString(),
-      time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
-      name: this.newProcedure.name,
-      performedBy: this.newProcedure.performedBy,
-      notes: this.newProcedure.notes,
-      status: 'completed'
-    };
-
-    this.procedures.push(procedure);
-    this.newProcedure = { name: '', performedBy: '', notes: '' };
-    alert('Procedure recorded successfully!');
-  }
-
-  addNote() {
-    if (!this.newNote.content || !this.newNote.writtenBy) {
-      alert('Please fill in all fields');
-      return;
-    }
-
-    const now = new Date();
-    const note: Note = {
-      id: Date.now().toString(),
-      time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
-      type: this.newNote.type,
-      content: this.newNote.content,
-      writtenBy: this.newNote.writtenBy
-    };
-
-    this.notes.unshift(note);
-    this.newNote = { type: 'nursing', content: '', writtenBy: '' };
-    alert('Note added successfully!');
-  }
-
-  getMedicationStatusClass(status: string): string {
-    const classes = {
-      'pending': 'bg-yellow-100 text-yellow-800',
-      'given': 'bg-green-100 text-green-800',
-      'missed': 'bg-red-100 text-red-800',
-      'refused': 'bg-orange-100 text-orange-800'
-    };
-    return classes[status as keyof typeof classes] || '';
-  }
-
-  getProcedureStatusClass(status: string): string {
-    const classes = {
-      'completed': 'bg-green-100 text-green-800',
-      'scheduled': 'bg-blue-100 text-blue-800',
-      'cancelled': 'bg-red-100 text-red-800'
-    };
-    return classes[status as keyof typeof classes] || '';
-  }
-
-  getNoteTypeClass(type: string): string {
-    const classes = {
-      'nursing': 'bg-blue-100 text-blue-800',
-      'doctor': 'bg-green-100 text-green-800',
-      'general': 'bg-gray-100 text-gray-800'
-    };
-    return classes[type as keyof typeof classes] || '';
-  }
-  // #endregion
 }

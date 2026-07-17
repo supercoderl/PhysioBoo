@@ -2,7 +2,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component } from '@angular/core';
 import { ArrowDownUp, Columns3Cog, EllipsisVertical, GripVertical, ListFilter, Rows4, Search } from "lucide-angular";
 import { SharedModule } from '../../../shared/shared-imports';
-import { Column, TableRow } from '../../../shared/types/table';
+import { Column, TableRow } from '../../../shared/types/table.types';
 
 @Component({
   selector: 'boo-table',

@@ -12,11 +12,11 @@ import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
 import { provideLottieOptions } from 'ngx-lottie';
 import { routes } from './app.routes';
 import { provideIcons } from './icon.config';
+import { provideOAuth } from './oauth.config';
 import { InitService } from './services/common/init.service';
 import { InterceptorService } from './services/interceptor/interceptor.service';
 import { HttpLoadingInterceptor } from './services/interceptor/loading-interceptor.service';
 import { SHARED_LUCIDE_ICONS } from './shared/shared-providers';
-import { provideOAuth } from './oauth.config';
 
 registerLocaleData(en);
 
@@ -31,7 +31,7 @@ export const appConfig: ApplicationConfig = {
     provideNzI18n(en_US),
     importProvidersFrom([FormsModule, LucideAngularModule.pick(SHARED_LUCIDE_ICONS)]),
     provideAnimationsAsync(),
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withInterceptorsFromDi(), withFetch()),
     provideIcons(),
     provideOAuth(),
     { provide: HTTP_INTERCEPTORS, useClass: HttpLoadingInterceptor, multi: true },

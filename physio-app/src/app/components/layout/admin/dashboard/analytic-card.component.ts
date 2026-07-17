@@ -3,7 +3,7 @@ import { Color, ScaleType } from '@swimlane/ngx-charts';
 import { curveCatmullRom } from 'd3-shape';
 
 import { SharedModule } from "../../../../shared/shared-imports";
-import { AnalyticItem } from "../../../../shared/types/dashboard";
+import { AnalyticItem } from "../../../../shared/types/dashboard.types";
 import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 
 @Component({
@@ -15,23 +15,29 @@ import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
     ],
     encapsulation: ViewEncapsulation.None,
     template: `
-        <div class="flex border border-borderGray rounded-md bg-surface">
+        <div class="flex border border-borderGray rounded-lg bg-surface transition-shadow hover:shadow-card">
             <div class="pb-2 flex-1 w-full">
-                <div class="flex items-center justify-between gap-1 p-5 pb-0 mb-1">
+                <div class="flex items-center justify-between gap-1 p-4 pb-0 mb-1">
                     <div class="flex items-center overflow-hidden">
-                        <span 
-                            class="rounded-full shrink-0 p-3 leading-none"
-                            [style.background]="analyticItem.color"
+                        <span
+                            class="rounded-lg shrink-0 p-3 leading-none inlineFlex-center-center"
+                            [style.background-color]="iconTint"
                         >
-                            <boo-icon [name]="analyticItem.icon" color="white"></boo-icon>
+                            <boo-icon [name]="analyticItem.icon" [color]="analyticItem.color"></boo-icon>
                         </span>
-                        <div class="ms-2 overflow-hidden">
-                            <p class="mb-0 text-truncate capitalize">{{title}}</p>
-                            <h5 class="mb-0 font-semibold text-lg">{{analyticItem.current}}</h5>
+                        <div class="ms-3 overflow-hidden">
+                            <p class="mb-0 text-truncate capitalize text-neutral">{{title}}</p>
+                            <h5 class="mb-0 font-semibold text-lg text-regular">{{ formattedCurrent }}</h5>
                         </div>
                     </div>
                     <div class="text-end">
-                        <span class="align-middle text-[12px] font-medium py-1 px-2 rounded-[5px] text-[#B71C1C] bg-[rgb(251,_236,_234)]">
+                        <span
+                            class="inline-flex items-center gap-1 align-middle text-[12px] font-medium py-1 px-2 rounded-[5px]"
+                            [ngClass]="isPositiveTrend
+                                ? 'text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-500/10'
+                                : 'text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-500/10'"
+                        >
+                            <boo-icon [name]="isPositiveTrend ? 'trending-up' : 'trending-down'" [size]="12"></boo-icon>
                             {{analyticItem.percent}}
                         </span>
                     </div>
@@ -87,5 +93,24 @@ export class AdminAnalyticCardComponent implements OnInit {
                 }
             ];
         }
+    }
+
+    get isPositiveTrend(): boolean {
+        return !this.analyticItem.percent?.trim().startsWith('-');
+    }
+
+    get iconTint(): string {
+        const match = this.analyticItem.color?.match(/\d+/g);
+        if (!match || match.length < 3) return 'rgba(0, 0, 0, 0.08)';
+        const [r, g, b] = match;
+        return `rgba(${r}, ${g}, ${b}, 0.12)`;
+    }
+
+    get formattedCurrent(): string {
+        const value = this.analyticItem.current;
+        if (this.title === 'transactions') {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+        }
+        return new Intl.NumberFormat('en-US').format(value);
     }
 }

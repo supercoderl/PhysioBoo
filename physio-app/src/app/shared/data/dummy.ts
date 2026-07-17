@@ -1,5 +1,5 @@
-import { User, UserProfile } from "../types/core"
-import { MenuItem } from "../types/menu"
+import { User, UserProfile } from "../types/core.types"
+import { MenuItem } from "../types/menu.types"
 import { generateUUID } from "../utils/common"
 
 // #region Categories

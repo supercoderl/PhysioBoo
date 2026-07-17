@@ -1,13 +1,11 @@
 import { Component, OnInit, computed, signal } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { firstValueFrom } from "rxjs";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent } from "../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
-import { DrawerComponent } from "../../../../components/drawer/drawer.component";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
-import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
 import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
-import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
+import { UserPermissionPermissionDrawerComponent } from "../../../../components/layout/admin/system/user-permission/permission-drawer.component";
+import { UserPermissionRoleDrawerComponent } from "../../../../components/layout/admin/system/user-permission/role-drawer.component";
+import { UserPermissionUserDrawerComponent } from "../../../../components/layout/admin/system/user-permission/user-drawer.component";
 import { PermissionService } from "../../../../services/admin/permission.service";
 import { RoleService } from "../../../../services/admin/role.service";
 import { UserService } from "../../../../services/admin/user.service";
@@ -17,10 +15,12 @@ import { ToastService } from "../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING } from "../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { PagedRequest, PaginationData } from "../../../../shared/types/common";
-import { User } from "../../../../shared/types/core";
-import { UserFilter } from "../../../../shared/types/filter";
-import { Permission } from "../../../../shared/types/permission";
-import { Role } from "../../../../shared/types/role";
+import { User } from "../../../../shared/types/core.types";
+import { UserFilter } from "../../../../shared/types/filter.types";
+import { Permission } from "../../../../shared/types/permission.types";
+import { Role } from "../../../../shared/types/role.types";
+import { ColorUtils } from "../../../../shared/utils/color.utils";
+import { IconUtils } from "../../../../shared/utils/icon.utils";
 import { AdminUserPermissionPermissionTabComponent } from "./user-permission-permission-tab.component";
 import { AdminUserPermissionRoleTabComponent } from "./user-permission-role-tab.component";
 import { AdminUserPermissionUserTabComponent } from "./user-permission-user-tab.component";
@@ -38,18 +38,16 @@ interface TabDef {
     selector: 'admin-user-permission',
     standalone: true,
     imports: [
-        SharedModule,
-        AdminContentHeaderComponent,
-        DrawerComponent,
-        BooIconComponent,
-        BooInputComponent,
-        BooCheckboxComponent,
-        BooButtonAdminComponent,
-        BooTextareaComponent,
-        AdminUserPermissionUserTabComponent,
-        AdminUserPermissionRoleTabComponent,
-        AdminUserPermissionPermissionTabComponent
-    ],
+    SharedModule,
+    AdminContentHeaderComponent,
+    AdminUserPermissionUserTabComponent,
+    AdminUserPermissionRoleTabComponent,
+    AdminUserPermissionPermissionTabComponent,
+    UserPermissionUserDrawerComponent,
+    UserPermissionRoleDrawerComponent,
+    UserPermissionPermissionDrawerComponent,
+    BooIconComponent
+],
     templateUrl: './user-permission.component.html',
     host: { class: 'block h-full min-h-0' }
 })
@@ -65,6 +63,9 @@ export class AdminUserPermissionComponent implements OnInit {
     statUsers = computed(() => this.usersData()?.totalCount ?? 0);
     statRoles = computed(() => this.rolesData()?.totalCount ?? 0);
     statPermissions = computed(() => this.permissionsData()?.totalCount ?? 0);
+
+    ColorUtils = ColorUtils;
+    IconUtils = IconUtils;
     // #endregion
 
     // #region Users tab
@@ -78,10 +79,10 @@ export class AdminUserPermissionComponent implements OnInit {
             isActive: null,
         }
     });
-    userForm: FormGroup;
-    userRolesDraft = signal<Set<string>>(new Set());
 
     isUserDrawerOpen = signal(false);
+    userForm: FormGroup;
+    userRolesDraft = signal<Set<string>>(new Set());
     selectedUserId = signal<string | null>(null);
     selectedUser = signal<User | null>(null);
     // #endregion
@@ -101,31 +102,13 @@ export class AdminUserPermissionComponent implements OnInit {
     selectedRole = signal<Role | null>(null);
     roleForm: FormGroup;
     rolePermissionsDraft = signal<Set<string>>(new Set());
-
-    readonly roleColors = [
-        { label: 'Slate', value: '#64748b' },
-        { label: 'Blue', value: '#3b82f6' },
-        { label: 'Indigo', value: '#6366f1' },
-        { label: 'Purple', value: '#a855f7' },
-        { label: 'Pink', value: '#ec4899' },
-        { label: 'Red', value: '#ef4444' },
-        { label: 'Orange', value: '#f97316' },
-        { label: 'Amber', value: '#f59e0b' },
-        { label: 'Emerald', value: '#10b981' },
-        { label: 'Teal', value: '#14b8a6' },
-    ];
-
-    readonly roleIcons = [
-        'shield', 'shield-check', 'crown', 'briefcase', 'stethoscope',
-        'heart-pulse', 'user-cog', 'wrench', 'lock', 'key'
-    ];
     // #endregion
 
     // #region Permissions tab
     permissionsData = signal<PaginationData<Permission> | null>(null);
     permParams = {
         pageNumber: 1,
-        pageSize: 200,                       
+        pageSize: 200,
         search: '',
         sort: '+category',
         filter: { start: '', end: '', category: null as string | null, isActive: null as boolean | null }
@@ -178,15 +161,15 @@ export class AdminUserPermissionComponent implements OnInit {
         this.userForm = this.fb.group({
             email: ['', [Validators.required, Validators.email]],
             phone: [''],
-            password: [''],                            // shown only for new users
+            password: [''],
         });
 
         this.roleForm = this.fb.group({
             name: ['', [Validators.required]],
             code: ['', [Validators.required]],
             description: [''],
-            color: [this.roleColors[1].value],
-            icon: [this.roleIcons[0]],
+            color: [ColorUtils.roleColors[1].value],
+            icon: [IconUtils.roleIcons[0]],
             isSystemRole: [false],
         });
 
@@ -296,17 +279,10 @@ export class AdminUserPermissionComponent implements OnInit {
             ]);
 
             this.toastSrv.success(this.selectedUserId() ? 'User updated' : 'User created');
-            this.closeUserDrawer();
             this.loadUsers();
         } catch {
             this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
         }
-    }
-
-    closeUserDrawer(): void {
-        this.isUserDrawerOpen.set(false);
-        this.selectedUserId.set(null);
-        this.selectedUser.set(null);
     }
 
     deleteUser(user: User): void {
@@ -316,6 +292,17 @@ export class AdminUserPermissionComponent implements OnInit {
                 error: () => this.toastSrv.error('Failed to delete user'),
             });
         });
+    }
+
+    userInitial(user: User): string {
+        const e = user.email || '';
+        return (e[0] || '?').toUpperCase();
+    }
+
+    closeUserDrawer(): void {
+        this.isUserDrawerOpen.set(false);
+        this.selectedUserId.set(null);
+        this.selectedUser.set(null);
     }
 
     // ────────────────────────────────────────────────────────────
@@ -344,8 +331,8 @@ export class AdminUserPermissionComponent implements OnInit {
         this.rolePermissionsDraft.set(new Set());
         this.roleForm.reset({
             name: '', code: '', description: '',
-            color: this.roleColors[1].value,
-            icon: this.roleIcons[0],
+            color: ColorUtils.roleColors[1].value,
+            icon: IconUtils.roleIcons[0],
             isSystemRole: false
         });
         this.isRoleDrawerOpen.set(true);
@@ -358,8 +345,8 @@ export class AdminUserPermissionComponent implements OnInit {
             name: role.name,
             code: role.code,
             description: role.description ?? '',
-            color: role.color ?? this.roleColors[1].value,
-            icon: role.icon ?? this.roleIcons[0],
+            color: role.color ?? ColorUtils.roleColors[1].value,
+            icon: role.icon ?? IconUtils.roleIcons[0],
             isSystemRole: role.isSystemRole,
         });
         // Load currently-assigned permissions for the matrix.

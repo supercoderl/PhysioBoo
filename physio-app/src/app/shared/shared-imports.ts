@@ -11,13 +11,14 @@ import { NzIconModule } from "ng-zorro-antd/icon";
 import { NzLayoutModule } from "ng-zorro-antd/layout";
 import { NzMenuModule } from "ng-zorro-antd/menu";
 import { LottieComponent } from "ngx-lottie";
+import { IconComponent } from "physioboo-icons";
+import { AutoAnimateDirective } from "./directives/auto-animate.directive";
 import { DropdownDirective } from "./directives/dropdown.directive";
 import { BooErrorDirective } from "./directives/error.directive";
+import { ImageFallbackDirective } from "./directives/image-fallback.directive";
 import { ParticlesDirective } from "./directives/particles.directive";
 import { CustomScrollbarDirective } from "./directives/scrollbar.directive";
 import { SHARED_PIPES, SHARED_ZORRO_MODULES } from "./shared-providers";
-import { ImageFallbackDirective } from "./directives/image-fallback.directive";
-import { AutoAnimateDirective } from "./directives/auto-animate.directive";
 
 export const SharedModule = [
     FormsModule,
@@ -38,6 +39,7 @@ export const SharedModule = [
     ...SHARED_ZORRO_MODULES,
     ...SHARED_PIPES,
     LottieComponent,
+    IconComponent,
 
     // #region Directives
     ParticlesDirective,

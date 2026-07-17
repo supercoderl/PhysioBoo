@@ -3,7 +3,7 @@ import { BloodGroup } from "../../../../../shared/enums/blood-group";
 import { Gender } from "../../../../../shared/enums/gender";
 import { MaritalStatus } from "../../../../../shared/enums/marital-status";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { UserProfile } from "../../../../../shared/types/core";
+import { UserProfile } from "../../../../../shared/types/core.types";
 import { BooDatepickerComponent } from "../../../../date-picker/boo-date-picker.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";

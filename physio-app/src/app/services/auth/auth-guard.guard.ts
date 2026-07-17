@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { map, of, switchMap, take } from 'rxjs';
+import { catchError, map, of, switchMap, take } from 'rxjs';
 import { Role } from '../../shared/enums/role';
 import { AuthService } from './auth.service';
 
@@ -20,6 +20,7 @@ const STAFF_ROLES = [
     Role[Role.IT_SUPPORT],
 ];
 
+
 export const authGuardFn: CanActivateFn = () => {
     const authService = inject(AuthService);
     const router = inject(Router);
@@ -27,10 +28,6 @@ export const authGuardFn: CanActivateFn = () => {
 
     if (!isPlatformBrowser(platformId)) {
         return true;
-    }
-
-    if (!authService.isAuthenticated()) {
-        return router.createUrlTree(['/auth/login']);
     }
 
     return authService.userInfo$.pipe(
@@ -43,6 +40,7 @@ export const authGuardFn: CanActivateFn = () => {
             if (!user) return router.createUrlTree(['/auth/login']);
             const isStaff = user.roles?.some(r => STAFF_ROLES.includes(r));
             return isStaff ? true : router.createUrlTree(['/exception/403']);
-        })
+        }),
+        catchError(() => of(router.createUrlTree(['/auth/login'])))
     );
 };

@@ -6,7 +6,7 @@ import { LocalLoadingService } from "../../../../../../services/common/local-loa
 import { ToastService } from "../../../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../../shared/shared-imports";
-import { Manufacturer } from "../../../../../../shared/types/support";
+import { Manufacturer } from "../../../../../../shared/types/support.types";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
@@ -268,11 +268,7 @@ export class CommonCategoryManufacturerDrawerComponent implements OnChanges {
         try {
             let id: string;
             if (this.currentId) {
-                const updateRes = await firstValueFrom(this.manufacturerSrv.update(this.currentId, formData));
-                if (!updateRes.success) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
+                await firstValueFrom(this.manufacturerSrv.update(this.currentId, formData));
                 id = this.currentId;
             } else {
                 const createRes = await firstValueFrom(this.manufacturerSrv.create(formData));

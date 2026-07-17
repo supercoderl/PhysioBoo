@@ -2,8 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
-import { SupplierFilter } from "../../shared/types/filter";
-import { Supplier } from "../../shared/types/support";
+import { SupplierFilter } from "../../shared/types/filter.types";
+import { Supplier } from "../../shared/types/support.types";
 
 @Injectable({ providedIn: 'root' })
 export class SupplierService {

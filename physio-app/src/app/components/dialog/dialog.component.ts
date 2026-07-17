@@ -1,8 +1,8 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, HostListener, inject } from '@angular/core';
-import { SharedModule } from '../../shared/shared-imports'; // Nơi chứa CommonModule, Icons...
 import { DialogService } from '../../services/common/dialog.service';
-import { DialogType } from '../../shared/types/dialog';
+import { SharedModule } from '../../shared/shared-imports'; // Nơi chứa CommonModule, Icons...
+import { DialogType } from '../../shared/types/dialog.types';
 
 @Component({
     selector: 'global-dialog',

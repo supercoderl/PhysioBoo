@@ -6,10 +6,10 @@ import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { PagedRequest, PaginationData } from "../../../../shared/types/common";
-import { User } from "../../../../shared/types/core";
-import { FilterConfig, UserFilter } from "../../../../shared/types/filter";
+import { User } from "../../../../shared/types/core.types";
+import { FilterConfig, UserFilter } from "../../../../shared/types/filter.types";
 import { SortOption } from "../../../../shared/types/sort";
-import { BulkAction, SavedView, TableComment } from "../../../../shared/types/table";
+import { BulkAction, SavedView, TableComment } from "../../../../shared/types/table.types";
 
 @Component({
     selector: 'admin-user-permission-user-tab',

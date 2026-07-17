@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
-import { SharedModule } from "../../../../shared/shared-imports";
 import { CalendarPlus, CircleCheck } from "lucide-angular";
-import { DateItem } from "../../../../shared/types/date";
+import { SharedModule } from "../../../../shared/shared-imports";
+import { DateItem } from "../../../../shared/types/date.types";
 
 @Component({
     selector: 'doctor-card',

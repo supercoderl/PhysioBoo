@@ -10,14 +10,15 @@ import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-bu
         BooButtonAdminComponent,
     ],
     template: `
-    <div class="bg-surface rounded-lg border border-gray-200 h-full flex flex-col">
-        <div class="flex items-center justify-between py-3 px-5 border-b border-gray-200">
-            <h5 class="font-bold text-lg mb-0">Patients Statistics</h5> 
+    <div class="bg-surface rounded-lg border border-borderGray h-full flex flex-col">
+        <div class="flex items-center justify-between py-3 px-5 border-b border-borderGray">
+            <h5 class="font-bold text-lg mb-0 text-regular">Patients Statistics</h5>
             <boo-button-admin
                 background="transparent"
                 [border]="{ width: 1, color: '#e3e3e3' }"
                 textColor="#000000"
                 padding="4px 8px"
+                buttonClass="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
                 View All
             </boo-button-admin>

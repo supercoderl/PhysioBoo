@@ -11,9 +11,9 @@ import { LocalLoadingService } from "../../../../services/common/local-loading.s
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { PaginationData } from "../../../../shared/types/common";
-import { DateRange } from "../../../../shared/types/date";
-import { FilterConfig } from "../../../../shared/types/filter";
-import { Patient } from "../../../../shared/types/patient";
+import { DateRange } from "../../../../shared/types/date.types";
+import { FilterConfig } from "../../../../shared/types/filter.types";
+import { Patient } from "../../../../shared/types/patient.types";
 import { SortOption } from "../../../../shared/types/sort";
 
 @Component({

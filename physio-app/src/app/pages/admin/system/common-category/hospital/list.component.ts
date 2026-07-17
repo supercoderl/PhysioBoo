@@ -18,10 +18,10 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PaginationData } from "../../../../../shared/types/common";
-import { DateRange } from "../../../../../shared/types/date";
-import { FilterConfig } from "../../../../../shared/types/filter";
+import { DateRange } from "../../../../../shared/types/date.types";
+import { FilterConfig } from "../../../../../shared/types/filter.types";
 import { SortOption } from "../../../../../shared/types/sort";
-import { Hospital } from "../../../../../shared/types/support";
+import { Hospital } from "../../../../../shared/types/support.types";
 
 @Component({
     selector: 'common-category-hospital-list',
@@ -47,19 +47,6 @@ import { Hospital } from "../../../../../shared/types/support";
                     <h4 class="text-[22px] text-primary font-semibold mb-0">Hospital</h4>
                 </div>
                 <div class="text-right flex">
-                    <div class="relative me-1">
-                        <boo-select
-                            label="Export"
-                            size="large"
-                            [fitLabel]="true"
-                            [height]="40"
-                            [options]="[
-                                { label: 'Xlsx', value: 'xlsx' },
-                                { label: 'Pdf', value: 'pdf' },
-                                { label: 'Csv', value: 'csv' }
-                            ]"
-                        />
-                    </div>
                     <button-icon
                         buttonClass="!bg-primary ms-2 text-white"
                         (onClick)="onOpenDrawer(null)"
@@ -69,51 +56,13 @@ import { Hospital } from "../../../../../shared/types/support";
                 </div>
             </div>
 
-            <div class="flex items-center justify-between flex-wrap">
-                <div class="flex items-center gap-2">
-                    <div class="flex items-center flex-wrap gap-2">
-                        <div class="table-search flex items-center mb-0">
-                            <div class="search-input">
-                                <boo-input label="Search..." size="small" (search)="onSearch($event)">
-                                    <boo-icon
-                                        [class.animate-spin]="loadingSrv.isLoading('search')"
-                                        [name]="loadingSrv.isLoading('search') ? 'loader-circle' : 'search'"
-                                        color="#64748B"
-                                        endfix
-                                    />
-                                </boo-input>
-                            </div>
-                        </div>
-                    </div>
-                    <boo-date-admin
-                        [startDate]="params.filter.start"
-                        [endDate]="params.filter.end"
-                        (rangeChange)="onDateChange($event)"
-                    />
-                </div>
-                <div class="flex table-dropdown right-content items-center flex-wrap gap-3">
-                    <boo-button-admin
-                        [icon]="{ name: 'refresh-cw', size: 14, color: '#6C7688' }"
-                        buttonClass="!bg-surface h-full"
-                        [border]="{ width: 1, color: '#e3e3e3' }"
-                        (click)="loadHospitals()"
-                    >
-                        <span class="text-placeholder">Reload</span>
-                    </boo-button-admin>
-                    <boo-filter-admin [filters]="filter_configs" (apply)="onFilterApply($event)" />
-                    <boo-sort-admin [(value)]="params.sort" (change)="onSortChange($event)" [options]="sort_options" />
-                </div>
-            </div>
-
-            <div class="mt-2">
-                <common-category-hospital-table-card
-                    [data]="tableData()"
-                    (pageChange)="onPageChanged($event)"
-                    (editClick)="onOpenDrawer($event)"
-                    (deleteClick)="onDelete($event)"
-                    [filter]="params"
-                />
-            </div>
+            <common-category-hospital-table-card
+                [data]="tableData()"
+                (pageChange)="onPageChanged($event)"
+                (editClick)="onOpenDrawer($event)"
+                (deleteClick)="onDelete($event)"
+                [filter]="params"
+            />
 
             <common-category-hospital-drawer
                 [isOpen]="isDrawerOpen"

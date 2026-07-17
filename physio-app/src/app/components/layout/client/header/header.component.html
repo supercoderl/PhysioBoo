@@ -4,32 +4,19 @@
       <div class="flex-center-between">
         <div class="flex items-center gap-4">
           <p class="text-primary text-xs14 m-0 inline-flex items-center">
-            <lucide-angular
-              [img]="MessageSquareText"
-              class="text-secondary w-3.5 mr-1 inline"
-            ></lucide-angular>
+            <physio-icon name="email" class="text-secondary me-1" />
             info&#64;example.com
           </p>
           <p class="text-primary text-xs14 m-0 inline-flex items-center">
-            <lucide-angular
-              [img]="Phone"
-              class="text-secondary w-3.5 mr-1 inline"
-            ></lucide-angular>
+            <physio-icon name="phone" class="text-secondary me-1" />
             +1 66589 14556
           </p>
         </div>
         <ul class="m-0 p-0 flex items-center">
           <li
-            class="inline-block mr-2 pr-2 border-r border-solid border-borderGray text-xs15"
+            class="mr-2 pr-2 border-r border-solid border-borderGray flex-center-center"
           >
-            <a
-              id="dark-mode-toggle"
-              class="block text-[#0e9384] transition-smooth"
-              href="/react/template/index"
-              data-discover="true"
-            >
-              <lucide-angular [img]="Sun" class="w-3.5 inline"></lucide-angular>
-            </a>
+            <physio-icon name="sun" />
           </li>
           <li
             class="inline-flex items-center mr-2 pr-2 border-r border-solid border-borderGray"
@@ -42,11 +29,7 @@
                 href="/react/template/index"
                 data-discover="true"
               >
-                <img
-                  class="mr-2"
-                  alt="flag"
-                  src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/flags/us-flag.svg"
-                />
+                <physio-icon name="us-flag" [size]="24"></physio-icon>
               </a>
               <ul
                 class="bg-surface border border-solid border-[rgba(0,_0,_0,_0.1)] text-xs14 rounded-xs p-2 mt-2 hidden flex items-center"
@@ -140,42 +123,30 @@
           </li>
           <li class="m-0 p-0 border-0 inline-block text-xs15">
             <div class="border-0 flex items-center">
-              <a
+              <!-- <a
                 href="/react/template/index"
                 class="w-5.5 h-5.5 bg-transparent rounded-full text-brandDark text-xs14 mr-2 inlineFlex-center-center cursor-pointer transition-smooth hover:bg-gray-200"
               >
-                <lucide-angular
-                  [img]="Facebook"
-                  class="w-3.5 inline"
-                ></lucide-angular>
+                <physio-icon name="facebook-outline" />
               </a>
               <a
                 href="/react/template/index"
                 class="w-5.5 h-5.5 bg-transparent rounded-full text-brandDark text-xs14 mr-2 inlineFlex-center-center cursor-pointer transition-smooth hover:bg-gray-200"
               >
-                <lucide-angular
-                  [img]="Twitter"
-                  class="w-3.5 inline"
-                ></lucide-angular>
+                <physio-icon name="twitter-outline" />
               </a>
               <a
                 href="/react/template/index"
                 class="w-5.5 h-5.5 bg-transparent rounded-full text-brandDark text-xs14 mr-2 inlineFlex-center-center cursor-pointer transition-smooth hover:bg-gray-200"
               >
-                <lucide-angular
-                  [img]="Instagram"
-                  class="w-3.5 inline"
-                ></lucide-angular>
+                <physio-icon name="instagram-outline" />
               </a>
               <a
                 href="/react/template/index"
                 class="w-5.5 h-5.5 bg-transparent rounded-full text-brandDark text-xs14 mr-2 inlineFlex-center-center cursor-pointer transition-smooth hover:bg-gray-200"
               >
-                <lucide-angular
-                  [img]="LinkedIn"
-                  class="w-3.5 inline"
-                ></lucide-angular>
-              </a>
+                <physio-icon name="linkedin-outline" />
+              </a> -->
             </div>
           </li>
         </ul>
@@ -186,7 +157,7 @@
     [ngClass]="{
       'fixed w-full z-[999] bg-surface border-b border-[#f0f0f0] transition-all duration-300 top-0': true,
       'shadow-md': isSticky,
-      'md:top-10': !isSticky
+      'md:top-10': !isSticky,
     }"
   >
     <div class="container mx-auto">
@@ -224,25 +195,22 @@
           </a>
         </div>
         <div class="inline-flex items-center">
-          <div 
+          <div
             [ngClass]="{
               'order-3 md:order-none w-[260px] md:w-auto overflow-x-hidden md:overflow-auto z-[1060] md:z-[0] md:translate-x-[none] transition-all duration-500 bg-[#15558d] md:bg-[unset] fixed md:relative inset-0': true,
               '-translate-x-[260px]': !isOpen,
-              'translate-x-0': isOpen
+              'translate-x-0': isOpen,
             }"
           >
             <div
               class="bg-surface h-15 border-b border-solid border-[#f0f0f0] flex items-center justify-between md:hidden px-5"
             >
-              <a
-                class="text-[#2e3842]"
-                href=""
-                data-discover="true"
-              >
+              <a class="text-[#2e3842]" href="" data-discover="true">
                 <img
                   class="h-8 max-w-full"
                   alt="Logo"
-                  src="../../../../../assets/logo/logo.webp" />
+                  src="../../../../../assets/logo/logo.webp"
+                />
               </a>
               <a
                 id="menu_close"
@@ -254,12 +222,16 @@
               </a>
             </div>
             <ul class="flex flex-col md:flex-row m-0">
-              <li class="block m-0 md:mr-6.25 text-xs15 border-b md:border-0 border-solid border-[#1663a6]" *ngFor="let item of headers">
+              <li
+                class="block m-0 md:mr-6.25 text-xs15 border-b md:border-0 border-solid border-[#1663a6]"
+                *ngFor="let item of headers"
+              >
                 <a
                   [ngClass]="{
                     'leading-17 block text-xs14 font-medium md:p-0 py-3.75 px-5  transition-smooth hover:text-secondary': true,
-                    'text-white md:text-primary': getHeaderByCurrentPath() !== item.id,
-                    'text-secondary': getHeaderByCurrentPath() === item.id
+                    'text-white md:text-primary':
+                      getHeaderByCurrentPath() !== item.id,
+                    'text-secondary': getHeaderByCurrentPath() === item.id,
                   }"
                   [routerLink]="item.href"
                 >

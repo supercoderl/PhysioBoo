@@ -1,9 +1,9 @@
 import { Component } from "@angular/core";
 import { ColumnDefDirective } from "../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../shared/shared-imports";
+import { Patient } from "../../../../shared/types/patient.types";
 import { ButtonIconComponent } from "../../../button/button-icon/button-icon.component";
 import { BooTableAdminComponent } from "../../../table/boo-table-admin/boo-table-admin.component";
-import { Patient } from "../../../../shared/types/patient";
 
 @Component({
     selector: 'admin-patient-lookup-table-card',

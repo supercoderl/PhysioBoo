@@ -2,8 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
-import { SequenceTrackerFilter } from "../../shared/types/filter";
-import { SequenceTracker } from "../../shared/types/system";
+import { SequenceTrackerFilter } from "../../shared/types/filter.types";
+import { SequenceTracker } from "../../shared/types/system.types";
 
 @Injectable({ providedIn: 'root' })
 export class SequenceTrackerService {

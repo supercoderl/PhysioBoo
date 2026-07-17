@@ -2,8 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
-import { LabTestFilter } from "../../shared/types/filter";
-import { LabTest } from "../../shared/types/laboratory-imaging";
+import { LabTestFilter } from "../../shared/types/filter.types";
+import { LabTest } from "../../shared/types/laboratory-imaging.types";
 
 @Injectable({ providedIn: 'root' })
 export class LabTestService {

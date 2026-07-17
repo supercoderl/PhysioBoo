@@ -38,21 +38,13 @@
             class="px-3 flex-1 max-h-[calc(100%_-_80px)] overflow-y-auto"
             custom-scrollbar
           >
-            <div *ngFor="let menu of menus">
+            <div *ngFor="let menu of menus" class="mb-1">
               <!-- Section Header -->
-              <div
-                class="mb-1 flex w-full items-center justify-start gap-2 rounded-md p-2 items-start relative cursor-pointer text-[13px] font-medium min-h-8 min-w-8 outline-none"
-                tabindex="0"
-                role="button"
+              <p
+                class="px-2.5 mb-1.5 leading-none truncate max-w-full font-semibold text-[11px] uppercase tracking-wide text-secondary/70"
               >
-                <div class="flex min-w-0 flex-auto flex-col items-start gap-1">
-                  <p
-                    class="leading-none truncate max-w-full m-0 font-medium m-0 text-[13px] text-secondary"
-                  >
-                    {{ menu.label }}
-                  </p>
-                </div>
-              </div>
+                {{ menu.label }}
+              </p>
 
               <!-- Section Items -->
               <ng-container *ngIf="menu.children">
@@ -63,7 +55,7 @@
               </ng-container>
 
               <div
-                class="h-3"
+                class="h-4"
                 *ngIf="menus.indexOf(menu) < menus.length - 1"
               ></div>
             </div>
@@ -82,13 +74,12 @@
                 [src]="(userInfo$ | async)?.profilePicture"
                 [allowBorder]="true"
               />
-              <div class="flex flex-auto flex-col gap-2">
-                <span class="flex truncate leading-none font-semibold tracking-tight capitalize text-base text-regular m-0">
-                  asdasdsa
-                </span
-                >
+              <div class="flex flex-auto flex-col gap-1 min-w-0">
+                <span class="flex truncate leading-none font-semibold text-sm text-regular m-0">
+                  {{ (userInfo$ | async)?.profile?.fullName || 'Guest' }}
+                </span>
                 <p
-                  class="flex leading-none font-medium tracking-tighter text-md m-0 text-regular"
+                  class="flex truncate leading-none font-normal text-xs text-secondary m-0"
                 >
                   {{ (userInfo$ | async)?.email }}
                 </p>

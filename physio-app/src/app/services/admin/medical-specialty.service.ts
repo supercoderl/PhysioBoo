@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
-import { MedicalSpecialty } from "../../shared/types/medical-staff";
 import { BASE_API } from "../../shared/api/base";
-import { MedicalSpecialtyFilter } from "../../shared/types/filter";
+import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
+import { MedicalSpecialtyFilter } from "../../shared/types/filter.types";
+import { MedicalSpecialty } from "../../shared/types/medical-staff.types";
 
 @Injectable({ providedIn: 'root' })
 export class MedicalSpecialtyService {

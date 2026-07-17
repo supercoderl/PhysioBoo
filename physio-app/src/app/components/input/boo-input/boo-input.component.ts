@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
 import { SharedModule } from '../../../shared/shared-imports';
@@ -64,7 +64,7 @@ import { Size } from '../../../shared/types/common';
     'class': 'block w-full relative group mb-0',
   },
 })
-export class BooInputComponent implements OnInit, OnDestroy {
+export class BooInputComponent implements OnInit, OnDestroy, ControlValueAccessor {
   // #region Inputs, Outputs, Properties
   @Input() label: string = '';
   @Input({ transform: (v: unknown) => v === '' || v === true || v === 'true' }) required: boolean = false;

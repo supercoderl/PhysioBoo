@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { CATEGORIES_MANAGEMENT } from "../../../../shared/data/dummy";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { Category } from "../../../../shared/types/category";
+import { Category } from "../../../../shared/types/category.types";
 
 @Component({
   selector: 'admin-common-category',

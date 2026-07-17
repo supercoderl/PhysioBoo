@@ -4,7 +4,9 @@
   >
     <div
       class="bg-center bg-cover absolute top-0 left-0 right-0 w-full h-[380px]"
-      style="background-image: url(../../../../assets/images/background/login-background.webp)"
+      style="
+        background-image: url(../../../../assets/images/background/login-background.webp);
+      "
     >
       <div
         class="opacity-90 absolute inset-0 w-full h-full"
@@ -55,7 +57,7 @@
             <div class="relative z-[1]">
               <div class="mb-5">
                 <h3
-                  class="text-[32px] mb-2 font-semibold text-primary leading-[1.2] text-center"
+                  class="text-[32px] mb-2 font-semibold text-brandDark leading-[1.2] text-center"
                 >
                   Welcome Back!
                 </h3>
@@ -64,7 +66,7 @@
                 </p>
               </div>
               <form boo-form [formGroup]="form" (validSubmit)="login($event)">
-                <span class="text-primary inline-block mb-3">
+                <span class="text-brandDark inline-block mb-3">
                   Log in with
                   <a
                     class="text-secondary font-medium cursor-pointer transition-smooth"
@@ -77,8 +79,13 @@
                 </span>
                 <div class="mb-4">
                   <label
-                    class="text-xs14 font-medium text-primary mb-1 inline-block"
-                    >{{ state === "phone" ? "Phone number" : "E-mail" }}</label
+                    class="text-xs14 font-medium text-brandDark mb-1 inline-block"
+                    >{{
+                      state === "phone"
+                        ? "Phone
+                    number"
+                        : "E-mail"
+                    }}</label
                   >
                   <boo-input
                     [label]="
@@ -93,7 +100,7 @@
                 <div class="mb-4" *ngIf="state === 'email'">
                   <div class="flex-center-between">
                     <label
-                      class="text-xs14 font-medium text-primary mb-1 inline-block"
+                      class="text-xs14 font-medium text-brandDark mb-1 inline-block"
                       >Password</label
                     >
                     <a
@@ -111,19 +118,19 @@
                       [type]="type"
                       booError
                     >
-                      <boo-icon
-                        [name]="type === 'text' ? 'eye' : 'eye-off'"
-                        class="leading-none absolute top-1/2 -translate-y-1/2 right-2.5 stroke-brandDark cursor-pointer"
+                      <physio-icon
+                        [name]="type === 'text' ? 'eye' : 'eye-crossed'"
+                        class="absolute top-1/2 -translate-y-1/2 right-2.5 cursor-pointer text-regular"
                         endfix
                         (click)="onChangeType()"
-                      ></boo-icon>
+                      />
                     </boo-input>
                   </div>
                 </div>
                 <div class="mb-4" *ngIf="state === 'phone'">
                   <div class="flex-center-between">
                     <label
-                      class="text-xs14 font-medium text-primary mb-1 inline-block"
+                      class="text-xs14 font-medium text-brandDark mb-1 inline-block"
                     >
                       OTP Code
                     </label>
@@ -157,18 +164,11 @@
                   </div>
                 </div>
                 <div class="mb-4">
-                  <div class="flex-center-between">
-                    <div class="block pl-6">
-                      <input
-                        class="bg-secondary border-secondary border border-solid rounded-[0.25rem] float-left -ml-6 mt-1 w-3.6 h-3.6"
-                        id="remember"
-                        type="checkbox"
-                        checked=""
-                      />
-                      <label class="text-xs14 inline-block" for="remember">
-                        Remember Me
-                      </label>
-                    </div>
+                  <div class="flex items-baseline">
+                    <boo-checkbox size="large" />
+                    <label class="text-xs14 inline-block" for="remember">
+                      Remember Me
+                    </label>
                   </div>
                 </div>
                 <div class="mb-4">
@@ -177,7 +177,9 @@
                     label="Login"
                     classname="!w-full !py-3 font-bold uppercase"
                     [radius]="5"
-                    [loading]="loadingSrv.isLoading('login')"
+                    [loading]="
+                      loadingSrv.isLoading(LoadingKeys.USER.LOGIN.CREDENTIAL)
+                    "
                   ></button>
                 </div>
                 <div class="text-base my-4 py-2.5 relative">
@@ -192,14 +194,10 @@
                     <a
                       boo-button
                       background="white"
-                      classname="!w-full !py-3 font-bold uppercase !border border-borderGray !text-primary"
+                      classname="!w-full !py-3 font-bold uppercase !border border-borderGray !text-brandDark"
                       [radius]="5"
                     >
-                      <img
-                        alt="google-icon"
-                        src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/google-icon.svg"
-                        class="mr-2"
-                      />
+                      <physio-icon name="google" class="mr-2" />
                       Log in With Google
                     </a>
                     <div
@@ -212,14 +210,10 @@
                   <a
                     boo-button
                     background="white"
-                    classname="!w-full !py-3 font-bold mt-3 uppercase !border border-borderGray !text-primary"
+                    classname="!w-full !py-3 font-bold mt-3 uppercase !border border-borderGray !text-brandDark"
                     [radius]="5"
                   >
-                    <img
-                      alt="fb-icon"
-                      src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/facebook-icon.svg"
-                      class="mr-2"
-                    />
+                    <physio-icon name="facebook" class="mr-2" />
                     Log in With Facebook
                   </a>
                 </div>

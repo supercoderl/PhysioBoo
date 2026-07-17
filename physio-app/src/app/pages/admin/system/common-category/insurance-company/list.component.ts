@@ -12,11 +12,11 @@ import { TablePageSizeService } from "../../../../../services/common/table-page-
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PaginationData } from "../../../../../shared/types/common";
-import { DateRange } from "../../../../../shared/types/date";
-import { FilterConfig } from "../../../../../shared/types/filter";
+import { DateRange } from "../../../../../shared/types/date.types";
+import { FilterConfig } from "../../../../../shared/types/filter.types";
 import { SortOption } from "../../../../../shared/types/sort";
-import { InsuranceCompany } from "../../../../../shared/types/support";
-import { BulkAction, SavedView, TableComment } from "../../../../../shared/types/table";
+import { InsuranceCompany } from "../../../../../shared/types/support.types";
+import { BulkAction, SavedView, TableComment } from "../../../../../shared/types/table.types";
 
 @Component({
     selector: 'common-category-insurance-company-list',

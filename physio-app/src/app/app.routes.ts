@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuardFn } from './services/auth/auth-guard.guard';
 import { superadminGuardFn } from './services/auth/superadmin-guard.guard';
+import { userResolverFn } from './shared/resolvers/user.resolver';
 
 export const routes: Routes = [
     {
@@ -14,16 +15,18 @@ export const routes: Routes = [
     {
         path: 'admin',
         loadChildren: () => import('./pages/admin/admin.routes').then(m => m.routes),
-        canActivate: [authGuardFn]
+        canActivate: [authGuardFn],
+        resolve: { user: userResolverFn }
     },
     {
         path: 'superadmin',
         loadChildren: () => import('./pages/superadmin/superadmin.routes').then(m => m.routes),
-        canActivate: [superadminGuardFn]
+        canActivate: [superadminGuardFn],
+        resolve: { user: userResolverFn }
     },
-    {
-        path: 'exception',
-        loadChildren: () => import('./pages/exception/exception.routes').then(m => m.routes)
-    },
-    { path: '**', redirectTo: 'exception' }
+    // {
+    //     path: 'exception',
+    //     loadChildren: () => import('./pages/exception/exception.routes').then(m => m.routes)
+    // },
+    // { path: '**', redirectTo: 'exception' }
 ];

@@ -3,6 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { take } from 'rxjs';
+import { BooCheckboxComponent } from 'src/app/components/checkbox/boo-checkbox/boo-checkbox.component';
 import { BooButtonComponent } from "../../../components/button/boo-button/boo-button.component";
 import { FormWrapperComponent } from '../../../components/form/boo-form/boo-form.component';
 import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
@@ -12,6 +13,7 @@ import { LocalLoadingService } from '../../../services/common/local-loading.serv
 import { ToastService } from '../../../services/common/toast.service';
 import { Role } from '../../../shared/enums/role';
 import { SharedModule } from '../../../shared/shared-imports';
+import { LoadingKeys } from '../../../shared/types/loading';
 import { AppValidators } from '../../../shared/validator/validator-config.validator';
 
 @Component({
@@ -22,6 +24,7 @@ import { AppValidators } from '../../../shared/validator/validator-config.valida
     BooInputComponent,
     BooIconComponent,
     BooButtonComponent,
+    BooCheckboxComponent,
     FormWrapperComponent,
     GoogleSigninButtonDirective
   ],
@@ -35,6 +38,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   isFirstTime: boolean = true;
   countdown: number = 0;
   private timer: any;
+  LoadingKeys = LoadingKeys;
   // #endregion
 
   // #region Init (Lifecycle + Setup)
@@ -61,7 +65,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           user.provider.toLocaleLowerCase()
         ).subscribe({
           next: _ => {
-            this.loadingSrv.clear('login');
+            this.loadingSrv.clear(LoadingKeys.USER.LOGIN.OAUTH.GOOGLE);
             this.redirectByRole();
           }
         });
@@ -76,14 +80,14 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   // #region Methods
   login = (data: { identifier: string, password: string, otp: string }) => {
-    if(this.state == 'phone' && data.otp != '123456') {
+    if (this.state == 'phone' && data.otp != '123456') {
       this.toastSrv.error("OTP does not correct.");
       return;
     }
 
     this.authSrv.login(data).subscribe({
       next: _ => {
-        this.loadingSrv.clear('login');
+        this.loadingSrv.clear(LoadingKeys.USER.LOGIN.CREDENTIAL);
         this.redirectByRole();
       },
     })

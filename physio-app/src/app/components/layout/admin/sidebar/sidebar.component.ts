@@ -8,7 +8,7 @@ import { ToastService } from "../../../../services/common/toast.service";
 import { AVATAR } from "../../../../shared/data/dummy";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { PaginationData } from "../../../../shared/types/common";
-import { MenuItem } from "../../../../shared/types/menu";
+import { MenuItem } from "../../../../shared/types/menu.types";
 import { LocalStorage } from "../../../../shared/utils/storage";
 import { ButtonIconComponent } from "../../../button/button-icon/button-icon.component";
 import { BooAvatarComponent } from "../../../image/avatar/boo-avatar.component";

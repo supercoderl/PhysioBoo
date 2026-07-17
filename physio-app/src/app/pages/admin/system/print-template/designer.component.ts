@@ -12,10 +12,10 @@ import { Orientation } from '../../../../shared/enums/print-orientation';
 import { PaperSize } from '../../../../shared/enums/print-paper-size';
 import { SharedModule } from '../../../../shared/shared-imports';
 import {
-  PlaceholderGroup,
-  PrintTemplateDetail,
-  PrintTemplateVersion
-} from '../../../../shared/types/print-template';
+    PlaceholderGroup,
+    PrintTemplateDetail,
+    PrintTemplateVersion
+} from '../../../../shared/types/print-template.types';
 import { convertEnumToSelection } from '../../../../shared/utils/common';
 
 type EditField = 'header' | 'body' | 'footer' | 'css';

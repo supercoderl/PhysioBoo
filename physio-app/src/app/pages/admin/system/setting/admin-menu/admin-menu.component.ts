@@ -1,6 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { catchError, of } from "rxjs";
-import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
 import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
@@ -12,7 +11,8 @@ import { DialogService } from "../../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { MenuItem } from "../../../../../shared/types/menu";
+import { LoadingKeys } from "../../../../../shared/types/loading";
+import { MenuItem } from "../../../../../shared/types/menu.types";
 
 @Component({
     selector: 'setting-admin-menu',
@@ -21,7 +21,6 @@ import { MenuItem } from "../../../../../shared/types/menu";
         SharedModule,
         AdminContentHeaderComponent,
         ButtonIconComponent,
-        BooButtonAdminComponent,
         BooInputComponent,
         BooIconComponent,
         SettingAdminMenuTreeCardComponent,
@@ -38,6 +37,7 @@ export class SettingAdminMenuComponent implements OnInit {
     selectedItem: MenuItem | null = null;
     pendingParentId: string | null = null;
     searchTerm = '';
+    LoadingKeys = LoadingKeys;
     // #endregion
 
     // #region Init (Lifecycle + Setup)

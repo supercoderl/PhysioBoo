@@ -1,10 +1,10 @@
 import { Component, Input } from "@angular/core";
 import { EmploymentStatus } from "../../../../shared/enums/employment-status";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { LabTest } from "../../../../shared/types/laboratory-imaging";
-import { Doctor } from "../../../../shared/types/medical-staff";
-import { Medication } from "../../../../shared/types/medication";
-import { PatientInfo } from "../../../../shared/types/patient";
+import { LabTest } from "../../../../shared/types/laboratory-imaging.types";
+import { Doctor } from "../../../../shared/types/medical-staff.types";
+import { Medication } from "../../../../shared/types/medication.types";
+import { PatientInfo } from "../../../../shared/types/patient.types";
 
 @Component({
   selector: 'admin-print-template',

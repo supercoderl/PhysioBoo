@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { map, take } from 'rxjs';
+import { catchError, map, of, switchMap, take } from 'rxjs';
 import { Role } from '../../shared/enums/role';
 import { AuthService } from './auth.service';
 
@@ -14,15 +14,16 @@ export const superadminGuardFn: CanActivateFn = () => {
         return true;
     }
 
-    if (!authService.isAuthenticated()) {
-        return router.createUrlTree(['/auth/login']);
-    }
-    
     return authService.userInfo$.pipe(
         take(1),
+        switchMap(user => user ? of(user) : authService.getProfile().pipe(
+            switchMap(() => authService.userInfo$),
+            take(1)
+        )),
         map(user => {
             if (!user) return router.createUrlTree(['/auth/login']);
             return user.roles?.some(code => code === Role[Role.SUPER_ADMIN]) ? true : router.createUrlTree(['/exception/403']);
-        })
+        }),
+        catchError(() => of(router.createUrlTree(['/auth/login'])))
     );
 };

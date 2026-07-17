@@ -11,7 +11,7 @@ import { Gender } from "../../../../../shared/enums/gender";
 import { MaritalStatus } from "../../../../../shared/enums/marital-status";
 import { PreferredCommunication } from "../../../../../shared/enums/preferred-communication";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { Doctor } from "../../../../../shared/types/medical-staff";
+import { Doctor } from "../../../../../shared/types/medical-staff.types";
 import { convertEnumToSelection, generateUUID } from "../../../../../shared/utils/common";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";

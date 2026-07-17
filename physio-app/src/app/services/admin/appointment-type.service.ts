@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
 import { BASE_API } from "../../shared/api/base";
-import { AppointmentTypeFilter } from "../../shared/types/filter";
-import { AppointmentType } from "../../shared/types/operation";
+import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
+import { AppointmentTypeFilter } from "../../shared/types/filter.types";
+import { AppointmentType } from "../../shared/types/operation.types";
 
 @Injectable({ providedIn: 'root' })
 export class AppointmentTypeService {

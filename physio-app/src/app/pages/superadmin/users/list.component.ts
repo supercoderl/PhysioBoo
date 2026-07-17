@@ -1,21 +1,28 @@
 import { Component, OnInit, signal } from "@angular/core";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { firstValueFrom } from "rxjs";
 import { BooButtonAdminComponent } from "../../../components/button/boo-button-admin/boo-button-admin.component";
 import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
+import { UserPermissionUserDrawerComponent } from "../../../components/layout/admin/system/user-permission/user-drawer.component";
+import { SuperadminUserTableCardComponent } from "../../../components/layout/superadmin/users/user-table-card.component";
 import { BooActionAdminComponent } from "../../../components/table/boo-table-admin/boo-action-admin.component";
 import { BooDateAdminComponent } from "../../../components/table/boo-table-admin/boo-date-admin.component";
 import { BooFilterAdminComponent } from "../../../components/table/boo-table-admin/boo-filter-admin.component";
 import { BooSortAdminComponent } from "../../../components/table/boo-table-admin/boo-sort-admin.component";
+import { RoleService } from "../../../services/admin/role.service";
 import { UserService } from "../../../services/admin/user.service";
 import { DateService } from "../../../services/common/date.service";
 import { DialogService } from "../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../services/common/local-loading.service";
 import { ToastService } from "../../../services/common/toast.service";
+import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING } from "../../../shared/constants/error.constant";
 import { SharedModule } from "../../../shared/shared-imports";
-import { ActionItem, PaginationData } from "../../../shared/types/common";
-import { User } from "../../../shared/types/core";
-import { DateRange } from "../../../shared/types/date";
-import { FilterConfig } from "../../../shared/types/filter";
+import { PaginationData } from "../../../shared/types/common";
+import { User } from "../../../shared/types/core.types";
+import { DateRange } from "../../../shared/types/date.types";
+import { FilterConfig } from "../../../shared/types/filter.types";
+import { Role } from "../../../shared/types/role.types";
 import { SortOption } from "../../../shared/types/sort";
 
 @Component({
@@ -29,7 +36,9 @@ import { SortOption } from "../../../shared/types/sort";
         BooSortAdminComponent,
         BooFilterAdminComponent,
         BooDateAdminComponent,
-        BooActionAdminComponent
+        BooActionAdminComponent,
+        SuperadminUserTableCardComponent,
+        UserPermissionUserDrawerComponent
     ],
     templateUrl: './list.component.html'
 })
@@ -66,10 +75,6 @@ export class SuperadminUserListComponent implements OnInit {
         }
     ];
 
-    readonly tableActions: ActionItem[] = [
-        { label: 'View', onClick: (item: any) => this.onViewUser(item) }
-    ];
-
     get totalActive(): number {
         return this.tableData()?.items.filter(u => u.isActive).length ?? 0;
     }
@@ -77,19 +82,34 @@ export class SuperadminUserListComponent implements OnInit {
     get totalVerified(): number {
         return this.tableData()?.items.filter(u => u.isVerified).length ?? 0;
     }
+
+    rolesData = signal<PaginationData<Role> | null>(null);
+    isDrawerOpen = signal(false);
+    selectedUserId = signal<string | null>(null);
+    selectedUser = signal<User | null>(null);
+    userRolesDraft = signal<Set<string>>(new Set());
+    userForm: FormGroup;
     // #endregion
 
     // #region Init
     constructor(
+        private fb: FormBuilder,
         private userSrv: UserService,
+        private roleSrv: RoleService,
         private dialogSrv: DialogService,
         private toastSrv: ToastService,
         protected loadingSrv: LocalLoadingService,
         private dateSrv: DateService
-    ) { }
+    ) {
+        this.userForm = this.fb.group({
+            email: ['', [Validators.required, Validators.email]],
+            phone: [''],
+        });
+    }
 
     ngOnInit() {
         this.loadUsers();
+        this.loadRoles();
     }
     // #endregion
 
@@ -101,9 +121,7 @@ export class SuperadminUserListComponent implements OnInit {
             search: this.params.search,
             sort: this.params.sort,
             filter: {
-                ...this.params.filter,
-                start: this.dateSrv.format(this.params.filter.start, "YYYY-MM-DD"),
-                end: this.dateSrv.format(this.params.filter.end, "YYYY-MM-DD")
+                ...this.params.filter
             }
         }).subscribe(res => {
             if (res.success) this.tableData.set(res.data);
@@ -120,8 +138,8 @@ export class SuperadminUserListComponent implements OnInit {
         this.loadUsers();
     }
 
-    onFilterApply(event: any) {
-        this.params = { ...this.params, pageNumber: 1, filter: { ...this.params.filter, ...event } };
+    onFilterApply(event: { key: string; value: any }) {
+        this.params = { ...this.params, pageNumber: 1, filter: { ...this.params.filter, [event.key]: event.value } };
         this.loadUsers();
     }
 
@@ -144,8 +162,90 @@ export class SuperadminUserListComponent implements OnInit {
         return pages;
     }
 
-    onViewUser(user: User) {
-        this.toastSrv.info(`User: ${user.email}`);
+    loadRoles() {
+        this.roleSrv.search({
+            pageNumber: 1,
+            pageSize: 100,
+            search: '',
+            sort: '+name',
+            filter: {
+                isActive: null, 
+                isSystemRole: null,
+                start: "",
+                end: ""
+            }
+        }).subscribe(res => {
+            if (res.success) this.rolesData.set(res.data);
+        });
+    }
+
+    onEditUser(id: string) {
+        const user = this.tableData()?.items.find(u => u.id === id);
+        if (!user) return;
+
+        this.selectedUserId.set(user.id);
+        this.selectedUser.set(user);
+        this.userRolesDraft.set(new Set((user.roles ?? []).map(r => r.id)));
+        this.userForm.reset({ email: user.email, phone: user.phone ?? '' });
+        this.isDrawerOpen.set(true);
+    }
+
+    closeDrawer() {
+        this.isDrawerOpen.set(false);
+        this.selectedUserId.set(null);
+        this.selectedUser.set(null);
+    }
+
+    toggleUserRole(roleId: string) {
+        const next = new Set(this.userRolesDraft());
+        if (next.has(roleId)) next.delete(roleId);
+        else next.add(roleId);
+        this.userRolesDraft.set(next);
+    }
+
+    isUserRoleSelected(roleId: string): boolean {
+        return this.userRolesDraft().has(roleId);
+    }
+
+    async saveUser() {
+        const userId = this.selectedUserId();
+        if (!userId || this.userForm.invalid) {
+            this.userForm.markAllAsTouched();
+            this.toastSrv.error('Please complete required fields');
+            return;
+        }
+
+        const v = this.userForm.getRawValue();
+        try {
+            await firstValueFrom(this.userSrv.update(userId, { email: v.email, phone: v.phone }));
+
+            const currentRoleIds = new Set((this.selectedUser()?.roles ?? []).map(r => r.id));
+            const draft = this.userRolesDraft();
+            const toAdd = [...draft].filter(id => !currentRoleIds.has(id));
+            const toRemove = [...currentRoleIds].filter(id => !draft.has(id));
+            await Promise.all([
+                ...toAdd.map(roleId => firstValueFrom(this.userSrv.assignRole({ userId, roleId }))),
+                ...toRemove.map(roleId => firstValueFrom(this.userSrv.removeRole({ userId, roleId }))),
+            ]);
+
+            this.toastSrv.success('User updated');
+            this.loadUsers();
+        } catch {
+            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+        }
+    }
+
+    onDeleteUser(id: string) {
+        this.dialogSrv.confirmDelete(() => {
+            this.userSrv.delete(id).subscribe({
+                next: () => {
+                    this.toastSrv.success('User deleted');
+                    if (this.selectedUserId() === id) this.closeDrawer();
+                    this.loadUsers();
+                },
+                error: () => this.toastSrv.error('Failed to delete user')
+            });
+        });
     }
     // #endregion
 }

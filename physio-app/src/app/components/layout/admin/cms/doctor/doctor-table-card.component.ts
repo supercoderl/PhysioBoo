@@ -3,7 +3,7 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ColumnDefDirective } from "../../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ActionItem, PaginationData } from "../../../../../shared/types/common";
-import { Doctor } from "../../../../../shared/types/medical-staff";
+import { Doctor } from "../../../../../shared/types/medical-staff.types";
 import { ColorUtils } from "../../../../../shared/utils/color.utils";
 import { BooAvatarComponent } from "../../../../image/avatar/boo-avatar.component";
 import { BooActionAdminComponent } from "../../../../table/boo-table-admin/boo-action-admin.component";

@@ -3,9 +3,16 @@
   <!-- Page header -->
   <div class="flex items-center justify-between flex-wrap gap-3">
     <div>
-      <h2 class="text-xl font-bold text-primary mb-0.5">Roles</h2>
+      <h2 class="text-xl font-bold text-brandDark mb-0.5">Roles</h2>
       <p class="text-sm text-secondary m-0">System and custom roles for access control</p>
     </div>
+    <boo-button-admin
+      [icon]="{ name: 'plus', size: 14, color: '#fff' }"
+      textColor="white"
+      (click)="openNewRole()"
+    >
+      Create Role
+    </boo-button-admin>
   </div>
 
   <!-- Stats -->
@@ -166,3 +173,23 @@
   </div>
 
 </div>
+
+<user-permission-role-drawer
+  [isOpen]="isRoleDrawerOpen()"
+  [form]="roleForm"
+  [selectedRoleId]="selectedRoleId"
+  [selectedRole]="selectedRole"
+  [rolePermissionsDraft]="rolePermissionsDraft"
+  [permissionsData]="permissionsData"
+  [permissionCategories]="permissionCategories"
+  [permsByCategory]="permsByCategory.bind(this)"
+  [isPermSelected]="isPermSelected.bind(this)"
+  [categoryAllSelected]="categoryAllSelected.bind(this)"
+  (close)="closeRoleDrawer()"
+  (selectRoleColor)="selectRoleColor($event)"
+  (selectRoleIcon)="selectRoleIcon($event)"
+  (toggleCategoryAll)="toggleCategoryAll($event)"
+  (togglePermission)="togglePermission($event)"
+  (deleteRole)="deleteRole($event)"
+  (saveRole)="saveRole()"
+/>

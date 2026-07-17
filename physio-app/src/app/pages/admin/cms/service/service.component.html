@@ -1,0 +1,110 @@
+<admin-content-header>
+  <!-- ──────────────────────────────────────────────────────────── -->
+  <!-- Page header                                                  -->
+  <!-- ──────────────────────────────────────────────────────────── -->
+  <div class="flex items-start justify-between pb-4 mb-4 border-b border-gray-200 gap-4">
+    <div class="min-w-0">
+      <h4 class="text-[22px] text-primary font-semibold mb-1">Medical Services</h4>
+      <p class="text-sm text-secondary m-0">
+        Manage hospital services and pricing
+        <span *ngIf="data() as d" class="text-gray-400">·</span>
+        <span *ngIf="data() as d">{{ d.totalCount }} services</span>
+      </p>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <button
+        (click)="bulkExport()"
+        class="px-3 py-2 text-sm font-medium border border-gray-200 text-primary hover:bg-gray-50 rounded-md flex items-center gap-2">
+        <boo-icon name="download" iconClass="w-4 h-4"></boo-icon>
+        Export
+      </button>
+      <button
+        (click)="openNewForm()"
+        class="px-4 py-2 text-sm font-medium bg-primary text-white hover:opacity-90 rounded-md flex items-center gap-2">
+        <boo-icon name="plus" iconClass="w-4 h-4"></boo-icon>
+        New Service
+      </button>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────────── -->
+  <!-- KPI strip                                                    -->
+  <!-- ──────────────────────────────────────────────────────────── -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+    <div class="bg-surface rounded-lg border border-gray-200 p-4">
+      <div class="text-xs text-secondary uppercase tracking-wider mb-1">Total services</div>
+      <div class="text-2xl font-semibold text-primary">{{ stats()?.totalServices ?? data()?.totalCount ?? '—' }}</div>
+    </div>
+    <div class="bg-surface rounded-lg border border-gray-200 p-4">
+      <div class="text-xs text-secondary uppercase tracking-wider mb-1">Active</div>
+      <div class="text-2xl font-semibold text-emerald-600">{{ stats()?.activeServices ?? '—' }}</div>
+    </div>
+    <div class="bg-surface rounded-lg border border-gray-200 p-4">
+      <div class="text-xs text-secondary uppercase tracking-wider mb-1">Average price</div>
+      <div class="text-2xl font-semibold text-primary">
+        {{ stats() ? formatMoney(stats()!.averagePrice, stats()!.averagePriceCurrency) : '—' }}
+      </div>
+    </div>
+    <div class="bg-surface rounded-lg border border-gray-200 p-4">
+      <div class="text-xs text-secondary uppercase tracking-wider mb-1">Most used dept.</div>
+      <div class="text-base font-semibold text-primary truncate" [title]="stats()?.mostUsedDepartment?.name">
+        {{ stats()?.mostUsedDepartment?.name ?? '—' }}
+      </div>
+      <div class="text-xs text-secondary">
+        <ng-container *ngIf="stats()?.mostUsedDepartment as d">{{ d.serviceCount }} services</ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────────── -->
+  <!-- Table                                                        -->
+  <!-- ──────────────────────────────────────────────────────────── -->
+  <div class="flex-1 min-h-0">
+    <cms-service-table-card
+      [data]="data()"
+      [filter]="{ pageNumber: params.pageNumber, pageSize: params.pageSize }"
+      [sortOptions]="sortOptions"
+      [currentSort]="params.sort"
+      [filterConfigs]="filterConfigs"
+      [currentFilter]="currentFilter"
+      (pageChange)="onPageChange($event)"
+      (searchChange)="onSearchChange($event)"
+      (sortApply)="onSortApply($event)"
+      (filterApply)="onFilterApply($event)"
+      (resetView)="onResetView()"
+      (reloadClick)="load()"
+      (bulkAction)="onBulkAction($event)"
+      (viewClick)="openDetail($event)"
+      (editClick)="openEditForm($event)"
+      (duplicateClick)="duplicate($event)"
+      (archiveClick)="archive($event)"
+      (deleteClick)="deleteOne($event)"
+    />
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────────── -->
+  <!-- Detail drawer                                                -->
+  <!-- ──────────────────────────────────────────────────────────── -->
+  <cms-service-detail-drawer
+    [isOpen]="isDetailOpen()"
+    [serviceId]="detailId()"
+    (close)="closeDetail()"
+    (editClick)="openEditForm($event); closeDetail()"
+    (duplicateClick)="duplicate($event)"
+    (archiveClick)="archive($event)"
+    (publishClick)="publish($event)"
+    (deleteClick)="deleteOne($event)"
+  />
+
+  <!-- ──────────────────────────────────────────────────────────── -->
+  <!-- Create / edit form drawer                                    -->
+  <!-- ──────────────────────────────────────────────────────────── -->
+  <cms-service-drawer
+    [isOpen]="isFormOpen()"
+    [currentId]="editingId()"
+    [departmentOptions]="departmentOptions()"
+    [doctorOptions]="doctorOptions()"
+    (close)="closeForm()"
+    (saveSuccess)="onSaveSuccess()"
+  />
+</admin-content-header>

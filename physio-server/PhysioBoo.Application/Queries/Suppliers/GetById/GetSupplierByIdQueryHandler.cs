@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.Suppliers.GetById
             _supplierRepository = supplierRepository;
         }
 
-        public async Task<SupplierViewModel?> Handle(GetSupplierByIdQuery request, CancellationToken cancellationToken)
+        public async Task<SupplierViewModel?> Handle(GetSupplierByIdQuery request, CancellationToken ct)
         {
-            Supplier? supplier = await _supplierRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            Supplier? supplier = await _supplierRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (supplier == null)
             {

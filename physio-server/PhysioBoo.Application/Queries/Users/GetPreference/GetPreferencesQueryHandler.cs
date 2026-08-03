@@ -19,7 +19,7 @@ namespace PhysioBoo.Application.Queries.Users.GetPreferences
             _user = user;
         }
 
-        public async Task<IReadOnlyDictionary<string, string>> Handle(GetPreferencesQuery request, CancellationToken cancellationToken)
+        public async Task<IReadOnlyDictionary<string, string>> Handle(GetPreferencesQuery request, CancellationToken ct)
         {
             if (!_user.IsAuthenticated)
             {

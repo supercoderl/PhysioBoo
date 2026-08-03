@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.UserPreferences.UpsertUserPreference
             _user = user;
         }
 
-        public async Task Handle(UpsertUserPreferenceCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpsertUserPreferenceCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

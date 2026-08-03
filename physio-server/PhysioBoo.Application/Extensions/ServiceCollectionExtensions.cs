@@ -69,6 +69,7 @@ using PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy;
 using PhysioBoo.Application.Commands.PatientMedicalHistories.CreatePatientMedicalHistory;
 using PhysioBoo.Application.Commands.Patients.CreatePatient;
 using PhysioBoo.Application.Commands.Patients.DeletePatient;
+using PhysioBoo.Application.Commands.Patients.InvitePatient;
 using PhysioBoo.Application.Commands.Payments.CreatePayment;
 using PhysioBoo.Application.Commands.Permissions.CreatePermission;
 using PhysioBoo.Application.Commands.Permissions.DeletePermission;
@@ -121,6 +122,7 @@ using PhysioBoo.Application.Queries.Addresses.GetAll;
 using PhysioBoo.Application.Queries.Addresses.GetById;
 using PhysioBoo.Application.Queries.AdminMenus.GetAll;
 using PhysioBoo.Application.Queries.AdminMenus.GetById;
+using PhysioBoo.Application.Queries.AdminMenus.GetMine;
 using PhysioBoo.Application.Queries.AppointmentTypes.GetAll;
 using PhysioBoo.Application.Queries.AppointmentTypes.GetById;
 using PhysioBoo.Application.Queries.Configurations.GetInitData;
@@ -276,7 +278,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<GetUserByIdQuery, UserViewModel?>, GetUserByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetUserByEmailQuery, User?>, GetUserByEmailQueryHandler>();
             services.AddScoped<IRequestHandler<GetAllUsersQuery, PagedResult<UserViewModel>>, GetAllUsersQueryHandler>();
-            services.AddScoped<IRequestHandler<GetUserProfileQuery, UserProfileViewModel?>, GetUserProfileQueryHandler>();
+            services.AddScoped<IRequestHandler<GetUserProfileQuery, UserProfileSummaryViewModel?>, GetUserProfileQueryHandler>();
             services.AddScoped<IRequestHandler<GetPreferencesQuery, IReadOnlyDictionary<string, string>>, GetPreferencesQueryHandler>();
 
             // Verification Token
@@ -297,6 +299,7 @@ namespace PhysioBoo.Application.Extensions
             // Admin Menu
             services.AddScoped<IRequestHandler<GetAllAdminMenusQuery, PagedResult<AdminMenuViewModel>>, GetAllAdminMenusQueryHandler>();
             services.AddScoped<IRequestHandler<GetAdminMenuByIdQuery, AdminMenuViewModel?>, GetAdminMenuByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<GetMyMenusQuery, List<UserMenuViewModel>>, GetMyMenusQueryHandler>();
 
             // MedicalSpecialty
             services.AddScoped<IRequestHandler<GetAllMedicalSpecialtiesQuery, PagedResult<MedicalSpecialtyViewModel>>, GetAllMedicalSpecialtiesQueryHandler>();
@@ -454,6 +457,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<CreatePatientAllergyCommand>, CreatePatientAllergyCommandHandler>();
             services.AddScoped<IRequestHandler<CreatePatientMedicalHistoryCommand>, CreatePatientMedicalHistoryCommandHandler>();
             services.AddScoped<IRequestHandler<DeletePatientCommand>, DeletePatientCommandHandler>();
+            services.AddScoped<IRequestHandler<InvitePatientToPortalCommand>, InvitePatientToPortalCommandHandler>();
             #endregion
 
             #region Operation Flow

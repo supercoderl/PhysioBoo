@@ -18,7 +18,7 @@ namespace PhysioBoo.Application.Queries.Users.GetByEmail
             _bus = bus;
         }
 
-        public async Task<User?> Handle(GetUserByEmailQuery request, CancellationToken cancellationToken)
+        public async Task<User?> Handle(GetUserByEmailQuery request, CancellationToken ct)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>
             {

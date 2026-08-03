@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.DoctorAwards.CreateDoctorAward;
 using PhysioBoo.Application.ViewModels.DoctorAwards;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -20,7 +21,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] CreateDoctorAwardViewModel newDoctorAward,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -40,7 +41,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new doctor award")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Hr.DoctorAwardCreate);
             #endregion
         }
     }

@@ -25,7 +25,7 @@ namespace PhysioBoo.Application.Commands.LabReports.CreateLabReport
             _user = user;
         }
 
-        public async Task Handle(CreateLabReportCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateLabReportCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

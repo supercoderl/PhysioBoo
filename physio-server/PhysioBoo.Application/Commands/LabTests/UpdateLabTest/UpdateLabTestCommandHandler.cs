@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.LabTests.UpdateLabTest.Commands.UpdateL
             _labTestRepository = labTestRepository;
         }
 
-        public async Task Handle(UpdateLabTestCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateLabTestCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -63,7 +63,7 @@ namespace PhysioBoo.Application.Commands.LabTests.UpdateLabTest.Commands.UpdateL
             labTest.SetRequiresAppoinment(request.LabTest.RequiresAppoinment);
             labTest.SetIsActive(request.LabTest.IsActive);
 
-            await _labTestRepository.UpdateTrackedAsync(labTest, cancellationToken);
+            await _labTestRepository.UpdateTrackedAsync(labTest, ct);
         }
     }
 }

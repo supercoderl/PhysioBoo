@@ -18,6 +18,7 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.HasIndex(u => u.Email).IsUnique();
             builder.HasIndex(u => u.Phone).IsUnique();
             builder.HasIndex(u => u.IsActive);
+            builder.HasIndex(u => u.ProfileId).IsUnique();
 
             // Self-relationships
             builder.HasOne(u => u.Creator)
@@ -34,6 +35,12 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(h => h.Users)
                    .HasForeignKey(u => u.TenantId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(u => u.Profile)
+                   .WithOne(p => p.User)
+                   .HasForeignKey<User>(u => u.ProfileId)
+                   .IsRequired(false)
+                   .OnDelete(DeleteBehavior.SetNull);
 
             // Properties
             builder.Property(u => u.Email)

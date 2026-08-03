@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.PatientMedicalHistories.CreatePatientMedicalHistory;
+using PhysioBoo.Application.Commands.PatientMedicalHistories.CreatePatientMedicalHistory;
 using PhysioBoo.Application.ViewModels.PatientMedicalHistories;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreatePatientMedicalHistoryViewModel newPatientMedicalHistory,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreatePatientMedicalHistoryCommand(newPatientMedicalHistory));
@@ -32,7 +33,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreatePatientMedicalHistory")
             .WithSummary("Create new patient medical history")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Clinical.MedicalHistoryCreate);
         }
     }
 }

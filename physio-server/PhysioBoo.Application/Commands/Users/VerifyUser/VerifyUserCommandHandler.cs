@@ -22,7 +22,7 @@ namespace PhysioBoo.Application.Commands.Users.VerifyUser
             _verificationTokenRepository = verificationTokenRepository;
         }
 
-        public async Task Handle(VerifyUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(VerifyUserCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -33,7 +33,7 @@ namespace PhysioBoo.Application.Commands.Users.VerifyUser
                 result = await _verificationTokenRepository.BatchUpdateAsync(
                     predicate: p => p.Token == request.Token && !p.IsUsed && p.ExpiresAt > TimeZoneHelper.GetLocalTimeNow(),
                     updateDto: new { IsUsed = true },
-                    cancellationToken
+                    ct
                 );
             }
 

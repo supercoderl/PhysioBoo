@@ -16,7 +16,7 @@ namespace PhysioBoo.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<PrintTemplateVersion?> GetByTemplateIdAsync(Guid templateId, CancellationToken cancellationToken)
+        public async Task<PrintTemplateVersion?> GetByTemplateIdAsync(Guid templateId, CancellationToken ct)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>
             {
@@ -27,7 +27,7 @@ namespace PhysioBoo.Infrastructure.Repositories
                 "get_print_template_version_by_template_id",
                 parameters,
                 reader => MapPrintTemplateVersion(reader),
-                cancellationToken
+                ct
             );
 
             return result.FirstOrDefault();

@@ -25,7 +25,7 @@ namespace PhysioBoo.Application.Commands.DoctorPublications.CreateDoctorPublicat
             _user = user;
         }
 
-        public async Task Handle(CreateDoctorPublicationCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateDoctorPublicationCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

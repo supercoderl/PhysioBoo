@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.HospitalGroups.GetById
             _hospitalGroupRepository = hospitalGroupRepository;
         }
 
-        public async Task<HospitalGroupViewModel?> Handle(GetHospitalGroupByIdQuery request, CancellationToken cancellationToken)
+        public async Task<HospitalGroupViewModel?> Handle(GetHospitalGroupByIdQuery request, CancellationToken ct)
         {
-            HospitalGroup? hospitalGroup = await _hospitalGroupRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            HospitalGroup? hospitalGroup = await _hospitalGroupRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (hospitalGroup == null)
             {

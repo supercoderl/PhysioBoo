@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetPatientDemoGraphics
             _bus = bus;
         }
 
-        public async Task<PatientDemographicsViewModel?> Handle(GetMedicalRecordPatientDemoGraphicsQuery request, CancellationToken cancellationToken)
+        public async Task<PatientDemographicsViewModel?> Handle(GetMedicalRecordPatientDemoGraphicsQuery request, CancellationToken ct)
         {
             Domain.Entities.PatientInformation.Patient? patient = await _patientRepository.GetByIdAsync(request.PatientId);
 

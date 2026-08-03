@@ -25,7 +25,7 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup
             _user = user;
         }
 
-        public async Task Handle(CreateHospitalGroupCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateHospitalGroupCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

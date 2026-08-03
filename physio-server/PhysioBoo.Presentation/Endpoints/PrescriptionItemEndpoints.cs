@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.PrescriptionItems.CreatePrescriptionItem;
+using PhysioBoo.Application.Commands.PrescriptionItems.CreatePrescriptionItem;
 using PhysioBoo.Application.ViewModels.PrescriptionItems;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreatePrescriptionItemViewModel newPrescriptionItem,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreatePrescriptionItemCommand(newPrescriptionItem));
@@ -32,7 +33,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreatePrescriptionItem")
             .WithSummary("Create new prescription item")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Pharmacy.PrescriptionItemCreate);
         }
     }
 }

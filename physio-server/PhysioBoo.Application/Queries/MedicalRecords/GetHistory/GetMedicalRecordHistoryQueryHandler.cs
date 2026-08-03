@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetHistory
             _bus = bus;
         }
 
-        public async Task<HistoricalSummaryViewModel?> Handle(GetMedicalRecordHistoryQuery request, CancellationToken cancellationToken)
+        public async Task<HistoricalSummaryViewModel?> Handle(GetMedicalRecordHistoryQuery request, CancellationToken ct)
         {
             Domain.Entities.Clinical.MedicalRecord? latestHistory = await _medicalRecordRepository.FirstOrDefaultAsync(new PastHistoryByPatientSpec(request.PatientId));
 

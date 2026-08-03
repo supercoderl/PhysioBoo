@@ -39,17 +39,17 @@ namespace PhysioBoo.Application.Queries.PrintTemplates.Render
             _printTemplateRenderer = printTemplateRenderer;
         }
 
-        public async Task<PrintTemplateRender?> Handle(RenderPrintTemplateQuery request, CancellationToken cancellationToken)
+        public async Task<PrintTemplateRender?> Handle(RenderPrintTemplateQuery request, CancellationToken ct)
         {
             PrintTemplate? template = null;
             PrintTemplateVersion? version = null;
             if (request.TemplateId.HasValue)
             {
-                template = await _printTemplateRepository.GetByIdAsync(request.TemplateId.Value, cancellationToken: cancellationToken);
+                template = await _printTemplateRepository.GetByIdAsync(request.TemplateId.Value, ct: ct);
             }
             else if (request.TemplateCode != null)
             {
-                template = await _printTemplateRepository.GetByCodeAsync(request.TemplateCode, cancellationToken);
+                template = await _printTemplateRepository.GetByCodeAsync(request.TemplateCode, ct);
             }
 
             if (template == null)
@@ -63,7 +63,7 @@ namespace PhysioBoo.Application.Queries.PrintTemplates.Render
                 return null;
             }
 
-            version = await _printTemplateVersionRepository.GetByIdAsync(template.CurrentVersionId ?? Guid.Empty, cancellationToken: cancellationToken);
+            version = await _printTemplateVersionRepository.GetByIdAsync(template.CurrentVersionId ?? Guid.Empty, ct: ct);
 
             if (version == null)
             {
@@ -76,7 +76,7 @@ namespace PhysioBoo.Application.Queries.PrintTemplates.Render
                 return null;
             }
 
-            IReadOnlyDictionary<string, object?> data = await _printContextEnricher.EnrichAsync(request.Data, cancellationToken);
+            IReadOnlyDictionary<string, object?> data = await _printContextEnricher.EnrichAsync(request.Data, ct);
 
             string header = _printTemplateRenderer.Render(version.HeaderHtml ?? string.Empty, data);
             string body = _printTemplateRenderer.Render(version.BodyHtml ?? string.Empty, data);

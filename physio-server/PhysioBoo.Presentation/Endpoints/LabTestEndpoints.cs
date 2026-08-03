@@ -5,6 +5,7 @@ using PhysioBoo.Application.Commands.LabTests.UpdateLabTest.Commands.UpdateLabTe
 using PhysioBoo.Application.Queries.LabTests.GetAll;
 using PhysioBoo.Application.Queries.LabTests.GetById;
 using PhysioBoo.Application.ViewModels.LabTests;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -25,7 +26,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] CreateLabTestViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -44,14 +45,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new lab test")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Lab.LabTestCreate);
             #endregion
 
             #region Get All Lab Tests
             group.MapPost("search", async (
                 [FromBody] PagedRequest<LabTestFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<LabTestViewModel> result = await bus.QueryAsync(new GetAllLabTestsQuery(request));
@@ -65,14 +66,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a paginated list of lab tests with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<LabTestViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<LabTestViewModel>>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Lab.LabTestRead);
             #endregion
 
             #region Delete Lab Test
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeleteLabTestCommand(id));
@@ -82,7 +83,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a specific lab test by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Lab.LabTestDelete);
             #endregion
 
             #region Update Lab Test
@@ -90,7 +91,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdateLabTestViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdateLabTestCommand(request, id));
@@ -101,14 +102,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Lab.LabTestUpdate);
             #endregion
 
             #region Get Lab Test By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 LabTestViewModel? result = await bus.QueryAsync(new GetLabTestByIdQuery(id));
@@ -122,7 +123,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a lab test record.")
             .Produces<ResponseMessage<LabTestViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<LabTestViewModel?>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Lab.LabTestRead);
             #endregion
         }
     }

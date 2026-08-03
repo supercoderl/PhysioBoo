@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Commands.AdminMenus.CreateAdminMenu
             _adminMenuRepository = AdminMenuRepository;
         }
 
-        public async Task Handle(CreateAdminMenuCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateAdminMenuCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

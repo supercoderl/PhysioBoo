@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.DoctorSpecialties.CreateDoctorSpecialty
             _user = user;
         }
 
-        public async Task Handle(CreateDoctorSpecialtyCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateDoctorSpecialtyCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

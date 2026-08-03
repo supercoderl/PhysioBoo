@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.PrintTemplates.GetByCode
             _printTemplateRepository = printTemplateRepository;
         }
 
-        public async Task<PrintTemplateViewModel?> Handle(GetPrintTemplateByCodeQuery request, CancellationToken cancellationToken)
+        public async Task<PrintTemplateViewModel?> Handle(GetPrintTemplateByCodeQuery request, CancellationToken ct)
         {
-            PrintTemplate? printTemplate = await _printTemplateRepository.GetByCodeAsync(request.Code, cancellationToken: cancellationToken);
+            PrintTemplate? printTemplate = await _printTemplateRepository.GetByCodeAsync(request.Code, ct: ct);
 
             if (printTemplate == null)
             {

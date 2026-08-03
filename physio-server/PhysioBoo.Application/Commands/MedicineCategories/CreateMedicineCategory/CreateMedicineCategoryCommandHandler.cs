@@ -27,11 +27,11 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCatego
             _user = user;
         }
 
-        public async Task Handle(CreateMedicineCategoryCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateMedicineCategoryCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
-            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(MedicineCategory), cancellationToken);
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(MedicineCategory), ct);
 
             MedicineCategory newMedicineCategory = new MedicineCategory(
                 request.NewId,

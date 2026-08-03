@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.Addresses.GetById
             _addressRepository = addressRepository;
         }
 
-        public async Task<AddressViewModel?> Handle(GetAddressByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AddressViewModel?> Handle(GetAddressByIdQuery request, CancellationToken ct)
         {
-            Address? address = await _addressRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            Address? address = await _addressRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (address == null)
             {

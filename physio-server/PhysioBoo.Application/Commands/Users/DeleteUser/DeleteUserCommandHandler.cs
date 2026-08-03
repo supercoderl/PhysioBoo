@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Users.DeleteUser
             _userRepository = userRepository;
         }
 
-        public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteUserCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.Users.DeleteUser
             _userRepository.SoftDeleteSingle(
                 user,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

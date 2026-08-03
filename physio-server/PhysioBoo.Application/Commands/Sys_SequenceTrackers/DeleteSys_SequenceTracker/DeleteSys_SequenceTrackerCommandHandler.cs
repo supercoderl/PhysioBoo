@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Sys_SequenceTrackers.DeleteSys_Sequence
             _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
-        public async Task Handle(DeleteSys_SequenceTrackerCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteSys_SequenceTrackerCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.Sys_SequenceTrackers.DeleteSys_Sequence
             _sys_SequenceTrackerRepository.SoftDeleteSingle(
                 sys_SequenceTracker,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetClinicalNotes
             _medicalRecordRepository = medicalRecordRepository;
         }
 
-        public async Task<PagedResult<ClinicalNoteViewModel>> Handle(GetMedicalRecordClinicalNotesQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<ClinicalNoteViewModel>> Handle(GetMedicalRecordClinicalNotesQuery q, CancellationToken ct)
         {
             List<Domain.Entities.Clinical.MedicalRecord> medicalRecords = await _medicalRecordRepository.GetAllNoTracking(
                 filter: x => x.PatientId == q.PatientId

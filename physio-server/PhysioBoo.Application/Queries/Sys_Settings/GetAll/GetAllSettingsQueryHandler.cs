@@ -18,7 +18,7 @@ namespace PhysioBoo.Application.Queries.Sys_Settings.GetAll
             _settingRepository = settingRepository;
         }
 
-        public async Task<PagedResult<SettingViewModel>> Handle(GetAllSettingsQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<SettingViewModel>> Handle(GetAllSettingsQuery q, CancellationToken ct)
         {
             PagedRequest<SettingFilter> req = q.Request;
             Expression<Func<Sys_Setting, bool>>? predicate = null;
@@ -41,7 +41,7 @@ namespace PhysioBoo.Application.Queries.Sys_Settings.GetAll
                 pageSize: req.PageSize,
                 filter: predicate,
                 orderBy: orderBy,
-                cancellationToken: cancellationToken
+                ct: ct
             );
 
             // Map to view model

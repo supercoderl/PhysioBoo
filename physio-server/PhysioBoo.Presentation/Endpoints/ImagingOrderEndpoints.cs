@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.ImagingOrders.CreateImagingOrder;
+using PhysioBoo.Application.Commands.ImagingOrders.CreateImagingOrder;
 using PhysioBoo.Application.ViewModels.ImagingOrders;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreateImagingOrderViewModel newImagingOrder,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreateImagingOrderCommand(newImagingOrder));
@@ -33,7 +34,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new imaging order")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Imaging.ImagingOrderCreate);
         }
     }
 }

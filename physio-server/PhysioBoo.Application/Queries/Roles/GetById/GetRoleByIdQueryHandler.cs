@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.Roles.GetById
             _roleRepository = roleRepository;
         }
 
-        public async Task<RoleViewModel?> Handle(GetRoleByIdQuery request, CancellationToken cancellationToken)
+        public async Task<RoleViewModel?> Handle(GetRoleByIdQuery request, CancellationToken ct)
         {
-            Role? role = await _roleRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            Role? role = await _roleRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (role == null)
             {

@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Suppliers.UpdateSupplier
             _supplierRepository = supplierRepository;
         }
 
-        public async Task Handle(UpdateSupplierCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateSupplierCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -70,7 +70,7 @@ namespace PhysioBoo.Application.Commands.Suppliers.UpdateSupplier
             supplier.SetTotalOrders(request.Supplier.TotalOrders);
             supplier.SetTotalPurchaseValue(request.Supplier.TotalPurchaseValue);
 
-            await _supplierRepository.UpdateTrackedAsync(supplier, cancellationToken);
+            await _supplierRepository.UpdateTrackedAsync(supplier, ct);
         }
     }
 }

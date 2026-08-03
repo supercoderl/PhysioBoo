@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Queries.Departments.GetAll
             _sortingExpressionProvider = sortingExpressionProvider;
         }
 
-        public async Task<PagedResult<DepartmentViewModel>> Handle(GetAllDepartmentsQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<DepartmentViewModel>> Handle(GetAllDepartmentsQuery q, CancellationToken ct)
         {
             DepartmentsSearchSpec spec = new DepartmentsSearchSpec(q, _sortingExpressionProvider);
 
@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Queries.Departments.GetAll
                 spec,
                 q.Request.PageNumber,
                 q.Request.PageSize,
-                cancellationToken
+                ct
             );
 
             // Map to view model

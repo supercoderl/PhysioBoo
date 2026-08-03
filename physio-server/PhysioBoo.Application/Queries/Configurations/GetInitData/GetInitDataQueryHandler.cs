@@ -18,10 +18,10 @@ namespace PhysioBoo.Application.Queries.Configurations.GetInitData
             _cacheService = cacheService;
         }
 
-        public async Task<InitDataViewModel> Handle(GetInitDataQuery req, CancellationToken cancellationToken)
+        public async Task<InitDataViewModel> Handle(GetInitDataQuery req, CancellationToken ct)
         {
-            Task<List<RoleCacheViewModel>?> rolesTask = _cacheService.GetAsync<List<RoleCacheViewModel>>(CacheKeys.Roles, cancellationToken);
-            Task<List<LanguageCacheViewModel>?> languagesTask = _cacheService.GetAsync<List<LanguageCacheViewModel>>(CacheKeys.Languages, cancellationToken);
+            Task<List<RoleCacheViewModel>?> rolesTask = _cacheService.GetAsync<List<RoleCacheViewModel>>(CacheKeys.Roles, ct);
+            Task<List<LanguageCacheViewModel>?> languagesTask = _cacheService.GetAsync<List<LanguageCacheViewModel>>(CacheKeys.Languages, ct);
 
             await Task.WhenAll(rolesTask, languagesTask);
 

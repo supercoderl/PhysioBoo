@@ -4,7 +4,10 @@ using PhysioBoo.Application.Commands.AdminMenus.DeleteAdminMenu;
 using PhysioBoo.Application.Commands.AdminMenus.UpdateAdminMenu;
 using PhysioBoo.Application.Queries.AdminMenus.GetAll;
 using PhysioBoo.Application.Queries.AdminMenus.GetById;
+using PhysioBoo.Application.Queries.AdminMenus.GetMine;
 using PhysioBoo.Application.ViewModels.AdminMenus;
+using PhysioBoo.Application.ViewModels.Users;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -25,7 +28,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/search", async (
                 [FromBody] PagedRequest<AdminMenuFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<AdminMenuViewModel> result = await bus.QueryAsync(new GetAllAdminMenusQuery(request));
@@ -39,14 +42,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a paginated list of menus with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<AdminMenuViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<AdminMenuViewModel>>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.AdminMenuRead);
             #endregion
 
             #region Create New Admin Menu
             group.MapPost("", async (
                 [FromBody] CreateAdminMenuViewModel newAdminMenu,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -66,14 +69,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new admin menu")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.AdminMenuCreate);
             #endregion
 
             #region Delete Admin Menu
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeleteAdminMenuCommand(id));
@@ -84,7 +87,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.AdminMenuDelete);
             #endregion
 
             #region Update Admin Menu
@@ -92,7 +95,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdateAdminMenuViewModel adminMenu,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdateAdminMenuCommand(adminMenu, id));
@@ -103,6 +106,25 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Admin.AdminMenuUpdate);
+            #endregion
+
+            #region Get My Menus
+            group.MapGet("/mine", async (
+                IMediatorHandler bus,
+                CancellationToken ct
+            ) =>
+            {
+                List<UserMenuViewModel> result = await bus.QueryAsync(new GetMyMenusQuery());
+
+                return Results.Ok(new ResponseMessage<List<UserMenuViewModel>>
+                {
+                    Success = true,
+                    Data = result
+                });
+            }).WithName("GetMyMenus")
+            .WithSummary("Retrieve the current user's permission-filtered menu tree.")
+            .Produces<ResponseMessage<List<UserMenuViewModel>>>(StatusCodes.Status200OK)
             .RequireAuthorization();
             #endregion
 
@@ -110,7 +132,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 AdminMenuViewModel? result = await bus.QueryAsync(new GetAdminMenuByIdQuery(id));
@@ -125,7 +147,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces<ResponseMessage<AdminMenuViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<AdminMenuViewModel?>>(StatusCodes.Status400BadRequest)
             .Produces<ResponseMessage<AdminMenuViewModel?>>(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.AdminMenuRead);
             #endregion
         }
     }

@@ -15,7 +15,7 @@ namespace PhysioBoo.Application.Commands.Media.UploadFile
 
         }
 
-        public async Task Handle(UploadFileCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UploadFileCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

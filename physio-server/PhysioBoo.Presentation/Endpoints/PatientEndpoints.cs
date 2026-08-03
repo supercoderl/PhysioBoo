@@ -5,6 +5,7 @@ using PhysioBoo.Application.Commands.Patients.UpdatePatient;
 using PhysioBoo.Application.Queries.Patients.GetAll;
 using PhysioBoo.Application.Queries.Patients.GetById;
 using PhysioBoo.Application.ViewModels.Patients;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -25,7 +26,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("search", async (
                 [FromBody] PagedRequest<PatientFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<PatientViewModel> result = await bus.QueryAsync(new GetAllPatientsQuery(request));
@@ -39,14 +40,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a paginated list of patients with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<PatientViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<PatientViewModel>>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Reception.PatientRead);
             #endregion
 
             #region Delete Patient
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeletePatientCommand(id));
@@ -56,14 +57,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a specific patient by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Reception.PatientDelete);
             #endregion
 
             #region Create Patient
             group.MapPost("", async (
                 [FromBody] CreatePatientViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -83,7 +84,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Reception.PatientRegister);
             #endregion
 
             #region Update Patient
@@ -91,7 +92,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdatePatientViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdatePatientCommand(id, request));
@@ -102,14 +103,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Reception.PatientUpdate);
             #endregion
 
             #region Get Patient By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PatientViewModel? result = await bus.QueryAsync(new GetPatientByIdQuery(id));
@@ -123,7 +124,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a patient record.")
             .Produces<ResponseMessage<PatientViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PatientViewModel?>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Reception.PatientRead);
             #endregion
         }
     }

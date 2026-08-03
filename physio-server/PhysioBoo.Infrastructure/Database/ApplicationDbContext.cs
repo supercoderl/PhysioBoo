@@ -133,7 +133,7 @@ namespace PhysioBoo.Infrastructure.Database
             }
         }
 
-        internal Task<int> SaveSeedChangesAsync(CancellationToken cancellationToken = default) => base.SaveChangesAsync(cancellationToken);
+        internal Task<int> SaveSeedChangesAsync(CancellationToken ct = default) => base.SaveChangesAsync(ct);
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -143,7 +143,7 @@ namespace PhysioBoo.Infrastructure.Database
             base.OnConfiguring(optionsBuilder);
         }
 
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
         {
             Guid? userId = _user.IsAuthenticated ? _user.GetUserId() : null;
             Guid? tenantId = _user.IsAuthenticated ? _user.GetTenantId() : null;
@@ -151,7 +151,7 @@ namespace PhysioBoo.Infrastructure.Database
 
             List<AuditEntry> auditEntries = OnBeforeSaveChanges(userId);
 
-            int result = await base.SaveChangesAsync(cancellationToken);
+            int result = await base.SaveChangesAsync(ct);
 
             await OnAfterSaveChanges(auditEntries);
 

@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.Sys_SequenceTrackers.GetById
             _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
-        public async Task<Sys_SequenceTrackerViewModel?> Handle(GetSys_SequenceTrackerByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Sys_SequenceTrackerViewModel?> Handle(GetSys_SequenceTrackerByIdQuery request, CancellationToken ct)
         {
-            Sys_SequenceTracker? sys_SequenceTracker = await _sys_SequenceTrackerRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            Sys_SequenceTracker? sys_SequenceTracker = await _sys_SequenceTrackerRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (sys_SequenceTracker == null)
             {

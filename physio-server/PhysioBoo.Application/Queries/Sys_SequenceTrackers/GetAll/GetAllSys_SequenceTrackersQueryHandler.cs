@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Queries.Sys_SequenceTrackers.GetAll
             _sortingExpressionProvider = sortingExpressionProvider;
         }
 
-        public async Task<PagedResult<Sys_SequenceTrackerViewModel>> Handle(GetAllSys_SequenceTrackersQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<Sys_SequenceTrackerViewModel>> Handle(GetAllSys_SequenceTrackersQuery q, CancellationToken ct)
         {
             Sys_SequenceTrackersSearchSpec spec = new Sys_SequenceTrackersSearchSpec(q, _sortingExpressionProvider);
 
@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Queries.Sys_SequenceTrackers.GetAll
                 spec,
                 q.Request.PageNumber,
                 q.Request.PageSize,
-                cancellationToken
+                ct
             );
 
             // Map to view model

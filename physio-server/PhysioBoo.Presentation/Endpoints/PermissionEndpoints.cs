@@ -4,6 +4,7 @@ using PhysioBoo.Application.Commands.Permissions.DeletePermission;
 using PhysioBoo.Application.Commands.Permissions.UpdatePermission;
 using PhysioBoo.Application.Queries.Permissions.GetAll;
 using PhysioBoo.Application.ViewModels.Permissions;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -24,7 +25,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] CreatePermissionViewModel newPermission,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -44,14 +45,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new Permission")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Iam.PermissionCreate);
             #endregion
 
             #region Get All Permissions
             group.MapPost("/search", async (
                 [FromBody] PagedRequest<PermissionFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<PermissionViewModel> result = await bus.QueryAsync(new GetAllPermissionsQuery(request));
@@ -64,14 +65,15 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("SearchPermissions")
             .WithSummary("Retrieve a paginated list of Permissions with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<PermissionViewModel>>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<PagedResult<PermissionViewModel>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<PagedResult<PermissionViewModel>>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Iam.PermissionRead);
             #endregion
 
             #region Delete Permission
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeletePermissionCommand(id));
@@ -81,7 +83,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a permission by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Iam.PermissionDelete);
             #endregion
 
             #region Update Permission
@@ -89,7 +91,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdatePermissionViewModel permission,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdatePermissionCommand(id, permission));
@@ -100,7 +102,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Iam.PermissionUpdate);
             #endregion
         }
     }

@@ -27,11 +27,11 @@ namespace PhysioBoo.Application.Commands.Appointments.CreateAppointment
             _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
-        public async Task Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateAppointmentCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
-            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Appointment), cancellationToken);
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Appointment), ct);
 
             Appointment newAppointment = new Appointment(
                 request.NewId,

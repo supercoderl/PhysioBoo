@@ -20,11 +20,11 @@ namespace PhysioBoo.Application.Commands.PrintTemplates.SaveVersionPrintTemplate
             _printTemplateVersionRepository = printTemplateVersionRepository;
         }
 
-        public async Task Handle(SaveVersionPrintTemplateCommand request, CancellationToken cancellationToken)
+        public async Task Handle(SaveVersionPrintTemplateCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.System.PrintTemplateVersion? printTemplateVersion = await _printTemplateVersionRepository.GetByTemplateIdAsync(request.Id, cancellationToken);
+            Domain.Entities.System.PrintTemplateVersion? printTemplateVersion = await _printTemplateVersionRepository.GetByTemplateIdAsync(request.Id, ct);
 
             if (printTemplateVersion == null)
             {
@@ -45,7 +45,7 @@ namespace PhysioBoo.Application.Commands.PrintTemplates.SaveVersionPrintTemplate
             printTemplateVersion.SetOrientation(request.PrintTemplateVersion.Orientation);
             printTemplateVersion.SetVersionNumber(request.PrintTemplateVersion.VersionNumber);
 
-            await _printTemplateVersionRepository.UpdateTrackedAsync(printTemplateVersion, cancellationToken);
+            await _printTemplateVersionRepository.UpdateTrackedAsync(printTemplateVersion, ct);
         }
     }
 }

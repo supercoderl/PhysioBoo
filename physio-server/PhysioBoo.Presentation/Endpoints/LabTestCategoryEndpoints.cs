@@ -6,6 +6,7 @@ using PhysioBoo.Application.Queries.LabTestCategories.GetAll;
 using PhysioBoo.Application.Queries.LabTestCategories.GetById;
 using PhysioBoo.Application.Queries.LabTestCategories.GetLookup;
 using PhysioBoo.Application.ViewModels.LabTestCategories;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -26,7 +27,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] CreateLabTestCategoryViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -45,14 +46,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new lab test category")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Lab.LabTestCategoryCreate);
             #endregion
 
             #region Get All Lab Test Categories
             group.MapPost("search", async (
                 [FromBody] PagedRequest<LabTestCategoryFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<LabTestCategoryViewModel> result = await bus.QueryAsync(new GetAllLabTestCategoriesQuery(request));
@@ -66,13 +67,13 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a paginated list of lab test categories with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<LabTestCategoryViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<LabTestCategoryViewModel>>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Lab.LabTestCategoryRead);
             #endregion
 
             #region Get Lab Test Category Lookups
             group.MapPost("lookup", async (
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<LabTestCategoryLookupViewModel> result = await bus.QueryAsync(new GetLabTestCategoryLookupsQuery());
@@ -86,14 +87,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a list of lab test categories for selection.")
             .Produces<ResponseMessage<PagedResult<LabTestCategoryLookupViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<LabTestCategoryLookupViewModel>>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Lab.LabTestCategoryLookup);
             #endregion
 
             #region Delete Lab Test Category
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeleteLabTestCategoryCommand(id));
@@ -103,7 +104,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a specific lab test category by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Lab.LabTestCategoryDelete);
             #endregion
 
             #region Update Lab Test Category
@@ -111,7 +112,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdateLabTestCategoryViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdateLabTestCategoryCommand(request, id));
@@ -122,14 +123,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Lab.LabTestCategoryUpdate);
             #endregion
 
             #region Get Lab Test Category By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 LabTestCategoryViewModel? result = await bus.QueryAsync(new GetLabTestCategoryByIdQuery(id));
@@ -143,7 +144,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a lab test category record.")
             .Produces<ResponseMessage<LabTestCategoryViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<LabTestCategoryViewModel?>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Lab.LabTestCategoryRead);
             #endregion
         }
     }

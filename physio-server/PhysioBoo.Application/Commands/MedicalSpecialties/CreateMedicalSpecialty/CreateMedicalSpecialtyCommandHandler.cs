@@ -22,7 +22,7 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecial
             _medicalSpecialtyRepository = medicalSpecialtyRepository;
         }
 
-        public async Task Handle(CreateMedicalSpecialtyCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateMedicalSpecialtyCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

@@ -44,7 +44,7 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = "",
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         );
         #endregion
 
@@ -53,23 +53,23 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
             ISpecification<TEntity> spec,
             int pageNumber,
             int pageSize,
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         );
         #endregion
 
         #region First or Default Async
-        Task<TEntity?> FirstOrDefaultAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default);
+        Task<TEntity?> FirstOrDefaultAsync(ISpecification<TEntity> spec, CancellationToken ct = default);
         #endregion
 
         #region Count Async
-        Task<int> CountAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default);
+        Task<int> CountAsync(ISpecification<TEntity> spec, CancellationToken ct = default);
         #endregion
 
         #region Get By Id
         Task<TEntity?> GetByIdAsync(
             Guid id,
             string includeProperties = "",
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         );
 
         Task<TEntity?> GetByIdCompiledAsync(Guid id);
@@ -78,7 +78,7 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
             Guid id,
             IMemoryCache cache,
             TimeSpan? expiration = null,
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         );
         #endregion
 
@@ -86,46 +86,46 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
         Task<int> BatchUpdateAsync<TUpdateDto>(
             Expression<Func<TEntity, bool>> predicate,
             TUpdateDto updateDto,
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         );
 
         Task<int> UpdateTrackedAsync(
             TEntity entity,
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         );
 
         Task<int> BatchUpdateMultipleAsync(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setterExpression,
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         );
         #endregion
 
         #region Check Methods
         Task<bool> ExistsAsync(
             Expression<Func<TEntity, bool>> predicate,
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         );
 
-        Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<bool> ExistsAsync(Guid id, CancellationToken ct = default);
         #endregion
 
         #region Delete Methods
         Task BulkSoftDeleteAsync(
             Expression<Func<TEntity, bool>> predicate,
             bool hardDelete = false,
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         );
 
         void SoftDeleteSingle(
             TEntity entity,
             bool hardDelete = false,
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         );
 
         Task<int> BatchDeleteAsync(
             Expression<Func<TEntity, bool>> predicate,
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         );
         #endregion
 
@@ -139,7 +139,7 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
             string functionName,
             Dictionary<string, object> parameters,
             Func<NpgsqlDataReader, T> mapFunction,
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         ) where T : class;
 
         Task<int> ExecuteNonQueryAsync(string sql, NpgsqlParameter[] parameters);

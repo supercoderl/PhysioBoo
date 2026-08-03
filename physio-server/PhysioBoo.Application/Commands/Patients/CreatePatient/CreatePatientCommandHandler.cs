@@ -1,5 +1,7 @@
 ﻿using MediatR;
+using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.PatientInformation;
+using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
@@ -29,16 +31,35 @@ namespace PhysioBoo.Application.Commands.Patients.CreatePatient
             _sequenceTrackerRepository = sequenceTrackerRepository;
         }
 
-        public async Task Handle(CreatePatientCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreatePatientCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
-            string newCode = await _sequenceTrackerRepository.GenerateNextCodeAsync("Patient", cancellationToken);
+            string newCode = await _sequenceTrackerRepository.GenerateNextCodeAsync("Patient", ct);
+
+            Profile newProfile = new Profile(
+                Guid.NewGuid(),
+                request.NewPatient.Profile.FirstName,
+                request.NewPatient.Profile.LastName,
+                string.Empty,
+                DateOnly.Parse(request.NewPatient.Profile.DateOfBirth.ToString()),
+                request.NewPatient.Profile.Gender,
+                request.NewPatient.Profile.BloodGroup,
+                request.NewPatient.Profile.MaritalStatus,
+                null, null, null, null,
+                request.NewPatient.Profile.EmergencyContactName,
+                request.NewPatient.Profile.EmergencyContactPhone,
+                null,
+                PreferredCommunication.Email
+            );
+            newProfile.SetCreatedBy(_user.GetUserId());
+            newProfile.SetTenantId(_user.GetTenantId());
 
             Patient newPatient = new Patient(
                 request.NewId,
                 newCode,
-                _user.GetUserId(),
+                request.NewPatient.UserId,
+                newProfile.Id,
                 request.NewPatient.PrimaryDoctorId,
                 request.NewPatient.ReferredBy,
                 request.NewPatient.ReferralHospitalId,
@@ -65,7 +86,7 @@ namespace PhysioBoo.Application.Commands.Patients.CreatePatient
             newPatient.SetTenantId(_user.GetTenantId());
             newPatient.SetCreatedBy(_user.GetUserId());
 
-            SharedKernel.Results.DbResult<Guid> result = await _patientRepository.InsertAsync<Patient, Guid>(newPatient);
+            SharedKernel.Results.DbResult<Guid> result = await _patientRepository.InsertPatientFullInfo(newProfile, newPatient, ct);
 
             if (!result.Success)
             {

@@ -23,7 +23,7 @@ namespace PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken
             _verificationTokenRepository = verificationTokenRepository;
         }
 
-        public async Task Handle(GenerateEmailVerificationTokenCommand request, CancellationToken cancellationToken)
+        public async Task Handle(GenerateEmailVerificationTokenCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

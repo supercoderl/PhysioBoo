@@ -21,12 +21,19 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.HasIndex(p => p.ReferralHospitalId);
             builder.HasIndex(p => p.PreferredHospitalId);
             builder.HasIndex(p => p.PreferredDoctorId);
+            builder.HasIndex(p => p.ProfileId).IsUnique();
 
             // Relationships
             builder.HasOne(p => p.User)
                    .WithOne(u => u.Patient)
                    .HasForeignKey<Patient>(p => p.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(p => p.Profile)
+                   .WithOne()
+                   .HasForeignKey<Patient>(p => p.ProfileId)
+                   .IsRequired()
+                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(p => p.PrimaryDoctor)
                    .WithMany(d => d.Patients)
@@ -70,6 +77,10 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasMaxLength(50);
 
             builder.Property(p => p.UserId)
+                   .HasColumnType("uuid");
+
+            builder.Property(p => p.ProfileId)
+                   .IsRequired()
                    .HasColumnType("uuid");
 
             builder.Property(p => p.RegistrationDate);

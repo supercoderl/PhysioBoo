@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Commands.Doctors.UpdateDoctor
             _doctorRepository = doctorRepository;
         }
 
-        public async Task Handle(UpdateDoctorCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateDoctorCommand request, CancellationToken ct)
         {
             if (!request.IsValid())
                 return;
@@ -70,7 +70,7 @@ namespace PhysioBoo.Application.Commands.Doctors.UpdateDoctor
             }
             doctor.SetUpdatedAt(TimeZoneHelper.GetLocalTimeNow());
 
-            await _doctorRepository.UpdateTrackedAsync(doctor, cancellationToken);
+            await _doctorRepository.UpdateTrackedAsync(doctor, ct);
         }
     }
 }

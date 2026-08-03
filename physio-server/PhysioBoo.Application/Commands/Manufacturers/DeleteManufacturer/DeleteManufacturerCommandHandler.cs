@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Manufacturers.DeleteManufacturer
             _manufacturerRepository = manufacturerRepository;
         }
 
-        public async Task Handle(DeleteManufacturerCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteManufacturerCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.Manufacturers.DeleteManufacturer
             _manufacturerRepository.SoftDeleteSingle(
                 manufacturer,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

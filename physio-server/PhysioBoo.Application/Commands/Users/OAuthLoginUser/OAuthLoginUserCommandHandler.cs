@@ -38,7 +38,7 @@ namespace PhysioBoo.Application.Commands.Users.OAuthLoginUser
             _google = googleOptions.Value;
         }
 
-        public async Task Handle(OAuthLoginUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(OAuthLoginUserCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -55,12 +55,12 @@ namespace PhysioBoo.Application.Commands.Users.OAuthLoginUser
                 UserLogin? userLogin = await _userLoginRepository.GetAllNoTracking(
                     filter: x => x.LoginProvider == request.Provider && x.ProviderKey == providerKey,
                     includeProperties: "User"
-                ).FirstOrDefaultAsync(cancellationToken);
+                ).FirstOrDefaultAsync(ct);
 
                 if (userLogin != null && userLogin.User != null) user = userLogin.User;
                 else
                 {
-                    user = await _userRepository.GetByEmailAsync(email);
+                    user = await _userRepository.GetByIdentifierAsync(email);
 
                     if (user == null)
                     {
@@ -91,7 +91,7 @@ namespace PhysioBoo.Application.Commands.Users.OAuthLoginUser
                 }
 
                 (string accessToken, string refreshToken) = TokenHelper.BuildAuthToken(
-                    new Dictionary<string, string>
+                    new Dictionary<string, object>
                     {
                         ["Email"] = user.Email,
                         ["Id"] = user.Id.ToString(),

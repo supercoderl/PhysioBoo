@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.DoctorWorkExperiences.CreateDoctorWorkE
             _user = user;
         }
 
-        public async Task Handle(CreateDoctorWorkExperienceCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateDoctorWorkExperienceCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

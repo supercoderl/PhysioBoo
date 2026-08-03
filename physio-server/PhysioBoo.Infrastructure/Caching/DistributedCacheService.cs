@@ -17,33 +17,33 @@ namespace PhysioBoo.Infrastructure.Caching
             _options = options.Value;
         }
 
-        public Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
+        public Task<T?> GetAsync<T>(string key, CancellationToken ct = default)
         {
             return _cache.GetOrCreateJsonAsync<T>(
                 key,
                 () => Task.FromResult<T?>(default),
                 new DistributedCacheEntryOptions(),
-                cancellationToken
+                ct
             );
         }
 
-        public Task<T> GetOrCreateAsync<T>(string key, Func<Task<T>> factory, TimeSpan? expiry = null, CancellationToken cancellationToken = default)
+        public Task<T> GetOrCreateAsync<T>(string key, Func<Task<T>> factory, TimeSpan? expiry = null, CancellationToken ct = default)
         {
             // Delegates entirely to your existing extension
             return _cache.GetOrCreateJsonAsync(
                 key,
                 () => factory()!,
                 BuildOptions(expiry),
-                cancellationToken
+                ct
             )!;
         }
 
-        public Task RemoveAsync(string key, CancellationToken cancellationToken = default) => _cache.RemoveAsync(key, cancellationToken);
+        public Task RemoveAsync(string key, CancellationToken ct = default) => _cache.RemoveAsync(key, ct);
 
-        public Task SetAsync<T>(string key, T value, TimeSpan? expiry = null, CancellationToken cancellationToken = default)
+        public Task SetAsync<T>(string key, T value, TimeSpan? expiry = null, CancellationToken ct = default)
         {
             string json = JsonConvert.SerializeObject(value, DistributedCacheExtension.JsonSettings);
-            return _cache.SetStringAsync(key, json, BuildOptions(expiry), cancellationToken);
+            return _cache.SetStringAsync(key, json, BuildOptions(expiry), ct);
         }
 
         private DistributedCacheEntryOptions BuildOptions(TimeSpan? expiry)

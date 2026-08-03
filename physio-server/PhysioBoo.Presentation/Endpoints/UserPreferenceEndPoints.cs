@@ -20,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] UpsertUserPreferenceViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpsertUserPreferenceCommand(request));
@@ -29,7 +29,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("InsertKey")
             .WithSummary("Insert user preference")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
             #endregion
         }
     }

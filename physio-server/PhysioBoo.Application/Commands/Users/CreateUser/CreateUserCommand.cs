@@ -10,11 +10,13 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
 
         public CreateUserViewModel NewUser { get; }
         public Guid NewId { get; }
+        public Guid? AssignedBy { get; }
 
-        public CreateUserCommand(CreateUserViewModel newUser, Guid newId) : base(Guid.NewGuid())
+        public CreateUserCommand(CreateUserViewModel newUser, Guid newId, Guid? assignedBy = null) : base(Guid.NewGuid())
         {
             NewUser = newUser;
             NewId = newId;
+            AssignedBy = assignedBy;
         }
 
         public override bool IsValid()

@@ -3,6 +3,7 @@ using PhysioBoo.Application.Commands.Sys_Resources.ImportLocalResource;
 using PhysioBoo.Application.Commands.Sys_Resources.ImportRemoteResource;
 using PhysioBoo.Application.Queries.Sys_Resources.GetAllResources;
 using PhysioBoo.Application.ViewModels.Sys_Resources;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -22,7 +23,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/import-local", async (
                 [FromForm] ImportLocalResourceViewModel newResource,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 ImportLocalResourceCommand requestCmd = new ImportLocalResourceCommand(newResource.File);
@@ -42,14 +43,15 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Import local resources")
             .Produces<ResponseMessage<object>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<object>>(StatusCodes.Status400BadRequest)
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            .RequireAuthorization(Permissions.System.ResourceImport);
             #endregion
 
             #region Import Remote Resources
             group.MapPost("/import-remote", async (
                 ImportRemoteResourceViewModel newResource,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 ImportRemoteResourceCommand requestCmd = new ImportRemoteResourceCommand(newResource.Url);
@@ -68,14 +70,15 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("ImportRemoteResources")
             .WithSummary("Import remote resources")
             .Produces<ResponseMessage<object>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<object>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<object>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.System.ResourceImport);
             #endregion
 
             #region Get All Resources
             group.MapPost("/search", async (
                 [FromQuery] string code,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 string result = await bus.QueryAsync(new GetAllResourceQuery(code));
@@ -88,7 +91,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("SearchResources")
             .WithSummary("Retrieve a list of Resources with language code.")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.System.ResourceRead);
             #endregion
         }
     }

@@ -33,6 +33,7 @@ namespace PhysioBoo.Domain.Entities.Core
         public string? ProfilePicture { get; private set; }
         public string PreferredLanguage { get; private set; }
         public string TimeZone { get; private set; }
+        public Guid? ProfileId { get; private set; }
 
         public virtual User? Creator { get; private set; }
         public virtual User? Updater { get; private set; }
@@ -194,6 +195,7 @@ namespace PhysioBoo.Domain.Entities.Core
         public void SetProfilePicture(string? profilePicture) { ProfilePicture = profilePicture; }
         public void SetPreferredLanguage(string preferredLanguage) { PreferredLanguage = preferredLanguage; }
         public void SetTimeZone(string timezone) { TimeZone = timezone; }
+        public void SetProfileId(Guid? profileId) { ProfileId = profileId; }
         public void RegisterFailedLogin(int maxFailedAttempts, int lockoutMinutes)
         {
             if (FailedLoginAttempts >= maxFailedAttempts)
@@ -209,6 +211,11 @@ namespace PhysioBoo.Domain.Entities.Core
             }
         }
 
+        public void SetProfile(Profile? profile)
+        {
+            Profile = profile;
+        }
+
         public void CreateDoctor(Profile profile, Doctor doctor)
         {
             Profile = profile;
@@ -219,6 +226,11 @@ namespace PhysioBoo.Domain.Entities.Core
         {
             Profile = profile;
             Patient = patient;
+        }
+
+        public void SetUserRole(UserRole userRole)
+        {
+            UserRoles.Add(userRole);
         }
         #endregion
     }

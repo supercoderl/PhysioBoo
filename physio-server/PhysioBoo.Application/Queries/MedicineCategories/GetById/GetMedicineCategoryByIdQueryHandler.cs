@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.MedicineCategories.GetById
             _medicineCategoryRepository = medicineCategoryRepository;
         }
 
-        public async Task<MedicineCategoryViewModel?> Handle(GetMedicineCategoryByIdQuery request, CancellationToken cancellationToken)
+        public async Task<MedicineCategoryViewModel?> Handle(GetMedicineCategoryByIdQuery request, CancellationToken ct)
         {
-            MedicineCategory? medicineCategory = await _medicineCategoryRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            MedicineCategory? medicineCategory = await _medicineCategoryRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (medicineCategory == null)
             {

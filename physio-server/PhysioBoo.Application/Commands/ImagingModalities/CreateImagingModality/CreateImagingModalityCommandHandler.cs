@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Commands.ImagingModalities.CreateImagingModality
             _imagingModalityRepository = imagingModalityRepository;
         }
 
-        public async Task Handle(CreateImagingModalityCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateImagingModalityCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

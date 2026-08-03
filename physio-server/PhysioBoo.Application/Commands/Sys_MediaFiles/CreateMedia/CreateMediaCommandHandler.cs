@@ -31,7 +31,7 @@ namespace PhysioBoo.Application.Commands.Sys_Media.CreateMedia
             _publishEndpoint = publishEndpoint;
         }
 
-        public async Task Handle(CreateMediaCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateMediaCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

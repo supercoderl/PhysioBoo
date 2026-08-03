@@ -31,11 +31,11 @@ namespace PhysioBoo.Application.Commands.Doctors.CreateDoctor
             _user = user;
         }
 
-        public async Task Handle(CreateDoctorCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateDoctorCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
-            string newEmployeeId = await _sequenceTrackerRepository.GenerateNextCodeAsync(nameof(Doctor), cancellationToken);
+            string newEmployeeId = await _sequenceTrackerRepository.GenerateNextCodeAsync(nameof(Doctor), ct);
 
             User newUser = new User(
                 request.NewId,
@@ -88,7 +88,7 @@ namespace PhysioBoo.Application.Commands.Doctors.CreateDoctor
             newDoctor.SetPublicationsCount(request.NewDoctor.PublicationsCount);
             newDoctor.SetConferencePresentations(request.NewDoctor.ConferencePresentations);
 
-            DbResult<Guid> result = await _doctorRepository.RegisterDoctor(newUser, newProfile, newDoctor, cancellationToken);
+            DbResult<Guid> result = await _doctorRepository.RegisterDoctor(newUser, newProfile, newDoctor, ct);
 
             if (!result.Success)
             {

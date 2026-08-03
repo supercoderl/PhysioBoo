@@ -18,7 +18,7 @@ namespace PhysioBoo.Application.Queries.Permissions.GetAll
             _permissionRepository = permissionRepository;
         }
 
-        public async Task<PagedResult<PermissionViewModel>> Handle(GetAllPermissionsQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<PermissionViewModel>> Handle(GetAllPermissionsQuery q, CancellationToken ct)
         {
             PagedRequest<PermissionFilter> req = q.Request;
             Expression<Func<Permission, bool>>? predicate = null;
@@ -39,7 +39,7 @@ namespace PhysioBoo.Application.Queries.Permissions.GetAll
                 pageSize: req.PageSize,
                 filter: predicate,
                 orderBy: orderBy,
-                cancellationToken: cancellationToken
+                ct: ct
             );
 
             // Map to view model

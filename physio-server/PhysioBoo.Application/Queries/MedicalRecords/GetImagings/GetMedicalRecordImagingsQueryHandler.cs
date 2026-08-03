@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetImagings
             _imagingReportRepository = imagingReportRepository;
         }
 
-        public async Task<PagedResult<ImagingStudyViewModel>> Handle(GetMedicalRecordImagingsQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<ImagingStudyViewModel>> Handle(GetMedicalRecordImagingsQuery q, CancellationToken ct)
         {
             List<Domain.Entities.LaboratoryImaging.ImagingReport> imagingReports = await _imagingReportRepository.GetAllNoTracking(
                 filter: x => x.PatientId == q.PatientId,

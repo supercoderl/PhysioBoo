@@ -2,6 +2,6 @@
 {
     public interface ISequenceService
     {
-        public Task GenerateNextCodeAsync(string entityType, CancellationToken cancellationToken);
+        public Task GenerateNextCodeAsync(string entityType, CancellationToken ct);
     }
 }

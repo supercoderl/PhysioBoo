@@ -22,7 +22,7 @@ namespace PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken
             _refreshTokenRepository = refreshTokenRepository;
         }
 
-        public async Task Handle(CreateRefreshTokenCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateRefreshTokenCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

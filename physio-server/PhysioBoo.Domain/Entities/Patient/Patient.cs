@@ -22,6 +22,9 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         [Placeholder(Label = "User ID", Example = "3f2504e0-4f89-41d3-9a0c-0305e82c3301")]
         public Guid? UserId { get; private set; }
 
+        [Placeholder(Label = "Profile ID", Example = "3f2504e0-4f89-41d3-9a0c-0305e82c3301")]
+        public Guid ProfileId { get; private set; }
+
         [Placeholder(Label = "Registration Date", Example = "2026-05-24")]
         public DateOnly? RegistrationDate { get; private set; }
 
@@ -136,6 +139,7 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         public virtual Hospital? PreferredHospital { get; private set; }
         public virtual Doctor? PreferredDoctor { get; private set; }
         public virtual User? User { get; private set; }
+        public virtual Profile? Profile { get; private set; }
         public virtual HospitalGroup? HospitalGroup { get; private set; }
 
         public virtual ICollection<Appointment> Appointments { get; private set; } = new List<Appointment>();
@@ -156,6 +160,7 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
             Guid id,
             string patientNumber,
             Guid? userId,
+            Guid profileId,
             Guid primaryDoctorId,
             Guid? referredBy,
             Guid? referralHospitalId,
@@ -181,6 +186,7 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         {
             PatientNumber = patientNumber;
             UserId = userId;
+            ProfileId = profileId;
             RegistrationDate = DateOnly.FromDateTime(TimeZoneHelper.GetLocalTimeNow());
             PatientType = PatientType.Outpatient;
             PrimaryDoctorId = primaryDoctorId;
@@ -221,6 +227,7 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         #region Setter Methods (37)
         public void SetPatientNumber(string patientNumber) { PatientNumber = patientNumber; }
         public void SetUserId(Guid? userId) { UserId = userId; }
+        public void SetProfileId(Guid profileId) { ProfileId = profileId; }
         public void SetRegistrationDate(DateOnly? registrationDate) { RegistrationDate = registrationDate; }
         public void SetPatientType(PatientType patientType) { PatientType = patientType; }
         public void SetPrimaryDoctorId(Guid primaryDoctorId) { PrimaryDoctorId = primaryDoctorId; }
@@ -255,6 +262,8 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         public void SetOutstandingBalance(decimal outstandingBalance) { OutstandingBalance = outstandingBalance; }
         public void SetLoyaltyPoints(int loyaltyPoints) { LoyaltyPoints = loyaltyPoints; }
         public void SetRiskLevel(RiskLevel riskLevel) { RiskLevel = riskLevel; }
+
+        public void SetProfile(Profile profile) { Profile = profile; }
         #endregion
     }
 }

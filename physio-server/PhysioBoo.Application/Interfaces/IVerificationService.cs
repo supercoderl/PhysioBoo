@@ -8,7 +8,7 @@ namespace PhysioBoo.Application.Interfaces
             Guid userId,
             string? email,
             VerificationType? type,
-            CancellationToken cancellationToken
+            CancellationToken ct
         );
     }
 }

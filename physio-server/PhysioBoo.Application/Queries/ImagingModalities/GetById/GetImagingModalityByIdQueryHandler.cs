@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.ImagingModalities.GetById
             _imagingModalityRepository = imagingModalityRepository;
         }
 
-        public async Task<ImagingModalityViewModel?> Handle(GetImagingModalityByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ImagingModalityViewModel?> Handle(GetImagingModalityByIdQuery request, CancellationToken ct)
         {
-            ImagingModality? imagingModality = await _imagingModalityRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            ImagingModality? imagingModality = await _imagingModalityRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (imagingModality == null)
             {

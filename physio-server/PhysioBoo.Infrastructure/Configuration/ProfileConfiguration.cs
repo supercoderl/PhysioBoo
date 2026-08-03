@@ -15,10 +15,6 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.HasKey(p => p.Id);
 
             // Self-relationships
-            builder.HasOne(p => p.User)
-                .WithOne(u => u.Profile)
-                .HasForeignKey<Profile>(p => p.Id);
-
             builder.HasOne(p => p.Creator)
                    .WithMany(u => u.CreatedProfiles)
                    .HasForeignKey(p => p.CreatedBy)

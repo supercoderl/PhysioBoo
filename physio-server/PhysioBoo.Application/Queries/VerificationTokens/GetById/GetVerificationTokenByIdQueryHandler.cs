@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Queries.VerificationTokens.GetById
             _bus = bus;
         }
 
-        public async Task<VerificationTokenViewModel?> Handle(GetVerificationTokenByIdQuery request, CancellationToken cancellationToken)
+        public async Task<VerificationTokenViewModel?> Handle(GetVerificationTokenByIdQuery request, CancellationToken ct)
         {
             var token = await _verificationTokenRepository.GetByIdCompiledAsync(request.Id);
 

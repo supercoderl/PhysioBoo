@@ -5,6 +5,7 @@ using PhysioBoo.Application.Commands.Hospitals.UpdateHospital;
 using PhysioBoo.Application.Queries.Hospitals.GetAll;
 using PhysioBoo.Application.Queries.Hospitals.GetById;
 using PhysioBoo.Application.ViewModels.Hospitals;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -25,7 +26,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] CreateHospitalViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -44,14 +45,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new hospital")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.HospitalCreate);
             #endregion
 
             #region Get All Hospitals
             group.MapPost("search", async (
                 [FromBody] PagedRequest<HospitalFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<HospitalViewModel> result = await bus.QueryAsync(new GetAllHospitalsQuery(request));
@@ -65,14 +66,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a paginated list of hospitals with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<HospitalViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<HospitalViewModel>>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.HospitalRead);
             #endregion
 
             #region Delete Hospital
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeleteHospitalCommand(id));
@@ -82,7 +83,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a specific hospital by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.HospitalDelete);
             #endregion
 
             #region Update Hospital
@@ -90,7 +91,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdateHospitalViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdateHospitalCommand(request, id));
@@ -101,14 +102,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.HospitalUpdate);
             #endregion
 
             #region Get Hospital By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 HospitalViewModel? result = await bus.QueryAsync(new GetHospitalByIdQuery(id));
@@ -122,7 +123,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a hospital record.")
             .Produces<ResponseMessage<HospitalViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<HospitalViewModel?>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.HospitalRead);
             #endregion
         }
     }

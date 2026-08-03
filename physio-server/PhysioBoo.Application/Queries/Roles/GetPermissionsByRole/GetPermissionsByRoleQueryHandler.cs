@@ -18,9 +18,9 @@ namespace PhysioBoo.Application.Queries.Roles.GetPermissionsByRole
             _roleRepository = roleRepository;
         }
 
-        public async Task<IEnumerable<string>> Handle(GetPermissionsByRoleQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<string>> Handle(GetPermissionsByRoleQuery request, CancellationToken ct)
         {
-            return await _roleRepository.GetPermissionIdsByRoleAsync(request.Id, cancellationToken: cancellationToken);
+            return await _roleRepository.GetPermissionIdsByRoleAsync(request.Id, ct: ct);
         }
     }
 }

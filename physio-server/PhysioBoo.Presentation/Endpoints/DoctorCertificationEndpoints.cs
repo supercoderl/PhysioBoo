@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.DoctorCertifications.CreateDoctorCertification;
 using PhysioBoo.Application.ViewModels.DoctorCertifications;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -20,7 +21,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] CreateDoctorCertificationViewModel newDoctorCertification,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -40,7 +41,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new doctor certification")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Hr.DoctorCertificationCreate);
             #endregion
         }
     }

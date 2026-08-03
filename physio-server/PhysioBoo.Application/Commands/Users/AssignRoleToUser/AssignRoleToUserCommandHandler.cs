@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Users.AssignRoleToUser
             _userRoleRepository = userRoleRepository;
         }
 
-        public async Task Handle(AssignRoleToUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(AssignRoleToUserCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

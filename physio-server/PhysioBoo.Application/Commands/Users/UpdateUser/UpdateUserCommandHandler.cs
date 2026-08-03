@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Commands.Users.UpdateUser
             _userRepository = userRepository;
         }
 
-        public async Task Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateUserCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -51,7 +51,7 @@ namespace PhysioBoo.Application.Commands.Users.UpdateUser
             user.SetPreferredLanguage(request.UpdateUserData.PreferredLanguage);
             user.SetTimeZone(request.UpdateUserData.TimeZone);
 
-            int resultCount = await _userRepository.UpdateTrackedAsync(user, cancellationToken);
+            int resultCount = await _userRepository.UpdateTrackedAsync(user, ct);
 
             if (resultCount > 0) await Bus.RaiseEventAsync(new UserUpdatedEvent(request.Id));
         }

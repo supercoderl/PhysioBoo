@@ -1,5 +1,6 @@
 ﻿using PhysioBoo.Application.Queries.Configurations.GetInitData;
 using PhysioBoo.Application.ViewModels.Configurations;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapGet("", async (
                 HttpRequest request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 InitDataViewModel result = await bus.QueryAsync(new GetInitDataQuery());
@@ -32,7 +33,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("GetConfiguration")
             .WithSummary("Get all data for first configuration")
             .Produces<ResponseMessage<InitDataViewModel>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<InitDataViewModel>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<InitDataViewModel>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.System.ConfigRead);
             #endregion
 
             #region Get version

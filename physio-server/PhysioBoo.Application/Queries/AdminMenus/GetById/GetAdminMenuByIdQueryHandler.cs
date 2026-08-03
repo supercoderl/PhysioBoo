@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.AdminMenus.GetById
             _adminMenuRepository = adminMenuRepository;
         }
 
-        public async Task<AdminMenuViewModel?> Handle(GetAdminMenuByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AdminMenuViewModel?> Handle(GetAdminMenuByIdQuery request, CancellationToken ct)
         {
-            AdminMenu? adminMenu = await _adminMenuRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            AdminMenu? adminMenu = await _adminMenuRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (adminMenu == null)
             {

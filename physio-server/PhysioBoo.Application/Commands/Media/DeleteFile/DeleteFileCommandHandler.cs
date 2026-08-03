@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.Media.DeleteFile
             _cloudinary = cloudinary;
         }
 
-        public async Task Handle(DeleteFileCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteFileCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -44,7 +44,7 @@ namespace PhysioBoo.Application.Commands.Media.DeleteFile
                     _sys_MediaFileRepository.SoftDeleteSingle(
                         mediaFile,
                         true,
-                        cancellationToken
+                        ct
                     );
 
                     await CommitAsync();

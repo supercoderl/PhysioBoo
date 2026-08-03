@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Departments.DeleteDepartment
             _departmentRepository = departmentRepository;
         }
 
-        public async Task Handle(DeleteDepartmentCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteDepartmentCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.Departments.DeleteDepartment
             _departmentRepository.SoftDeleteSingle(
                 department,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

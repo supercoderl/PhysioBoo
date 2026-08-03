@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.LabOrderItems.CreateLabOrderItem
             _user = user;
         }
 
-        public async Task Handle(CreateLabOrderItemCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateLabOrderItemCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

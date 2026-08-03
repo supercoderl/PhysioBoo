@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.Payments.CreatePayment;
+using PhysioBoo.Application.Commands.Payments.CreatePayment;
 using PhysioBoo.Application.ViewModels.Payments;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreatePaymentViewModel newPayment,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreatePaymentCommand(newPayment));
@@ -32,7 +33,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreatePayment")
             .WithSummary("Create new payment")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Billing.PaymentCreate);
         }
     }
 }

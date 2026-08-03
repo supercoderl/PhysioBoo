@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy;
+using PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy;
 using PhysioBoo.Application.ViewModels.PatientAllergies;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreatePatientAllergyViewModel newPatientAllergy,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreatePatientAllergyCommand(newPatientAllergy));
@@ -32,7 +33,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreatePatientAllergy")
             .WithSummary("Create new patient allergy")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Clinical.AllergyCreate);
         }
     }
 }

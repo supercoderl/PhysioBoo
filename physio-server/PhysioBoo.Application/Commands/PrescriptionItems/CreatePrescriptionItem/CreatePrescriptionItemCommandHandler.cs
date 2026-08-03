@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.PrescriptionItems.CreatePrescriptionIte
             _user = user;
         }
 
-        public async Task Handle(CreatePrescriptionItemCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreatePrescriptionItemCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

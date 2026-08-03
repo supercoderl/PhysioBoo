@@ -32,5 +32,21 @@ namespace PhysioBoo.Infrastructure.Repositories
 
             return result;
         }
+
+        public async Task<List<string>> GetOwnerPermissionCodes(Guid userId)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>
+            {
+                ["p_user_id"] = userId
+            };
+
+            List<string> result = await ExecutePostgresFunctionAsync<string>(
+                "get_owner_permission_codes",
+                parameters,
+                reader => reader.GetString("Code")
+            );
+
+            return result;
+        }
     }
 }

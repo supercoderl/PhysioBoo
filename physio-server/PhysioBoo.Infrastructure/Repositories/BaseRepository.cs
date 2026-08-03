@@ -77,15 +77,15 @@ namespace PhysioBoo.Infrastructure.Repositories
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = "",
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
             IQueryable<TEntity> query = GetAllNoTracking(filter, orderBy, includeProperties);
 
-            int totalCount = await query.CountAsync(cancellationToken);
+            int totalCount = await query.CountAsync(ct);
             List<TEntity> items = await query
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return new PagedResult<TEntity>(totalCount, items, pageNumber, pageSize);
         }
@@ -94,28 +94,28 @@ namespace PhysioBoo.Infrastructure.Repositories
             ISpecification<TEntity> spec,
             int pageNumber,
             int pageSize,
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         )
         {
             IQueryable<TEntity> specificationResult = ApplySpecification(spec);
-            int totalCount = await specificationResult.CountAsync(cancellationToken);
+            int totalCount = await specificationResult.CountAsync(ct);
             List<TEntity> items = await specificationResult
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
             return new PagedResult<TEntity>(totalCount, items, pageNumber, pageSize);
         }
 
-        public virtual async Task<int> CountAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default)
+        public virtual async Task<int> CountAsync(ISpecification<TEntity> spec, CancellationToken ct = default)
         {
             IQueryable<TEntity> specificationResult = ApplySpecification(spec);
-            return await specificationResult.CountAsync(cancellationToken);
+            return await specificationResult.CountAsync(ct);
         }
 
-        public virtual async Task<TEntity?> FirstOrDefaultAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default)
+        public virtual async Task<TEntity?> FirstOrDefaultAsync(ISpecification<TEntity> spec, CancellationToken ct = default)
         {
             IQueryable<TEntity> specificationResult = ApplySpecification(spec);
-            return await specificationResult.FirstOrDefaultAsync(cancellationToken);
+            return await specificationResult.FirstOrDefaultAsync(ct);
         }
 
         #region Method: Generic Single Insert
@@ -237,21 +237,21 @@ namespace PhysioBoo.Infrastructure.Repositories
         // OPTIMIZED EXISTENCE CHECK
         public virtual async Task<bool> ExistsAsync(
             Expression<Func<TEntity, bool>> predicate,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
-            return await DbSet.AsNoTracking().AnyAsync(predicate, cancellationToken);
+            return await DbSet.AsNoTracking().AnyAsync(predicate, ct);
         }
 
-        public virtual async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
+        public virtual async Task<bool> ExistsAsync(Guid id, CancellationToken ct = default)
         {
-            return await DbSet.AsNoTracking().AnyAsync(entity => entity.Id == id, cancellationToken);
+            return await DbSet.AsNoTracking().AnyAsync(entity => entity.Id == id, ct);
         }
 
         // OPTIMIZED SINGLE ENTITY RETRIEVAL
         public virtual async Task<TEntity?> GetByIdAsync(
             Guid id,
             string includeProperties = "",
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
             IQueryable<TEntity> query = DbSet;
 
@@ -261,7 +261,7 @@ namespace PhysioBoo.Infrastructure.Repositories
                 query = query.Include(includeProperty);
             }
 
-            return await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+            return await query.FirstOrDefaultAsync(e => e.Id == id, ct);
         }
 
         // COMPILED QUERIES FOR FREQUENTLY USED OPERATIONS
@@ -293,12 +293,12 @@ namespace PhysioBoo.Infrastructure.Repositories
             string functionName,
             Dictionary<string, object> parameters,
             Func<NpgsqlDataReader, T> mapFunction,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
             where T : class
         {
             List<T> results = new List<T>();
             using NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync(cancellationToken);
+            await connection.OpenAsync(ct);
 
             // Build parameter list with proper PostgreSQL named parameter syntax
             string parameterList = string.Join(", ", parameters.Keys.Select((k, i) => $"{k} => ${i + 1}"));
@@ -315,8 +315,8 @@ namespace PhysioBoo.Infrastructure.Repositories
                 paramIndex++;
             }
 
-            using NpgsqlDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
-            while (await reader.ReadAsync(cancellationToken))
+            using NpgsqlDataReader reader = await command.ExecuteReaderAsync(ct);
+            while (await reader.ReadAsync(ct))
             {
                 T item = mapFunction(reader);
                 results.Add(item);
@@ -328,9 +328,9 @@ namespace PhysioBoo.Infrastructure.Repositories
         public virtual async Task BulkSoftDeleteAsync(
             Expression<Func<TEntity, bool>> predicate,
             bool hardDelete = false,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
-            List<TEntity> entities = await DbSet.Where(predicate).ToListAsync(cancellationToken);
+            List<TEntity> entities = await DbSet.Where(predicate).ToListAsync(ct);
 
             if (hardDelete)
             {
@@ -348,7 +348,7 @@ namespace PhysioBoo.Infrastructure.Repositories
         public virtual void SoftDeleteSingle(
             TEntity entity,
             bool hardDelete = false,
-            CancellationToken cancellationToken = default
+            CancellationToken ct = default
         )
         {
             if (hardDelete)
@@ -364,44 +364,44 @@ namespace PhysioBoo.Infrastructure.Repositories
 
         public virtual async Task<int> BatchDeleteAsync(
             Expression<Func<TEntity, bool>> predicate,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
             return await DbSet
                 .Where(predicate)
-                .ExecuteDeleteAsync(cancellationToken);
+                .ExecuteDeleteAsync(ct);
         }
 
         public virtual async Task<int> BatchUpdateAsync<TUpdateDto>(
             Expression<Func<TEntity, bool>> predicate,
             TUpdateDto updateDto,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
             Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setPropertiesExpression = EFCoreUpdateHelper
                 .BuildSetPropertiesExpression<TEntity, TUpdateDto>(updateDto);
 
             return await DbSet
                 .Where(predicate)
-                .ExecuteUpdateAsync(setPropertiesExpression, cancellationToken);
+                .ExecuteUpdateAsync(setPropertiesExpression, ct);
         }
 
         // Overload for direct entity updates
         public virtual async Task<int> UpdateTrackedAsync(
             TEntity entity,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
             DbSet.Update(entity);
-            return await _dbContext.SaveChangesAsync(cancellationToken);
+            return await _dbContext.SaveChangesAsync(ct);
         }
 
         // BATCH OPERATIONS
         public virtual async Task<int> BatchUpdateMultipleAsync(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setterExpression,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
             return await DbSet
                 .Where(predicate)
-                .ExecuteUpdateAsync(setterExpression, cancellationToken);
+                .ExecuteUpdateAsync(setterExpression, ct);
         }
 
         // CACHING SUPPORT
@@ -409,7 +409,7 @@ namespace PhysioBoo.Infrastructure.Repositories
             Guid id,
             IMemoryCache cache,
             TimeSpan? expiration = null,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
             string cacheKey = $"{typeof(TEntity).Name}:{id}";
 
@@ -418,7 +418,7 @@ namespace PhysioBoo.Infrastructure.Repositories
                 return cachedEntity;
             }
 
-            TEntity? entity = await GetByIdAsync(id, cancellationToken: cancellationToken);
+            TEntity? entity = await GetByIdAsync(id, ct: ct);
 
             if (entity != null)
             {

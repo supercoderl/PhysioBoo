@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.Reviews;
+using PhysioBoo.Application.Commands.Reviews;
 using PhysioBoo.Application.ViewModels.Reviews;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreateReviewViewModel newReview,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreateReviewCommand(newReview));
@@ -33,7 +34,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new review")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Portal.ReviewCreate);
         }
     }
 }

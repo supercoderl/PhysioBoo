@@ -18,13 +18,13 @@ namespace PhysioBoo.Application.Queries.LabTestCategories.GetLookup
             _labTestCategoryRepository = labTestCategoryRepository;
         }
 
-        public async Task<PagedResult<LabTestCategoryLookupViewModel>> Handle(GetLabTestCategoryLookupsQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<LabTestCategoryLookupViewModel>> Handle(GetLabTestCategoryLookupsQuery q, CancellationToken ct)
         {
             PagedResult<LabTestCategory> paged = await _labTestCategoryRepository.ListAsync(
                 new DefaultSpec<LabTestCategory>(),
                 1,
                 100,
-                cancellationToken
+                ct
             );
 
             // Map to view model

@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Addresses.DeleteAddress
             _addressRepository = addressRepository;
         }
 
-        public async Task Handle(DeleteAddressCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteAddressCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.Addresses.DeleteAddress
             _addressRepository.SoftDeleteSingle(
                 address,
                 true,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

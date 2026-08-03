@@ -5,6 +5,7 @@ using PhysioBoo.Application.Commands.MedicineCategories.UpdateMedicineCategory;
 using PhysioBoo.Application.Queries.MedicineCategories.GetAll;
 using PhysioBoo.Application.Queries.MedicineCategories.GetById;
 using PhysioBoo.Application.ViewModels.MedicineCategories;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -25,7 +26,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] CreateMedicineCategoryViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -44,14 +45,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new medicine category")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.MedicineCategoryCreate);
             #endregion
 
             #region Get All Medicine Categories
             group.MapPost("search", async (
                 [FromBody] PagedRequest<MedicineCategoryFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<MedicineCategoryViewModel> result = await bus.QueryAsync(new GetAllMedicineCategoriesQuery(request));
@@ -65,14 +66,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a paginated list of medicine categories with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<MedicineCategoryViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<MedicineCategoryViewModel>>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.MedicineCategoryRead);
             #endregion
 
             #region Delete Medicine Category
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeleteMedicineCategoryCommand(id));
@@ -82,7 +83,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a specific medicine category by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.MedicineCategoryDelete);
             #endregion
 
             #region Update Medicine Category
@@ -90,7 +91,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdateMedicineCategoryViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdateMedicineCategoryCommand(request, id));
@@ -101,14 +102,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.MedicineCategoryUpdate);
             #endregion
 
             #region Get Medicine Category By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 MedicineCategoryViewModel? result = await bus.QueryAsync(new GetMedicineCategoryByIdQuery(id));
@@ -122,7 +123,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a medicine category record.")
             .Produces<ResponseMessage<MedicineCategoryViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<MedicineCategoryViewModel?>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.MedicineCategoryRead);
             #endregion
         }
     }

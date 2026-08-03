@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.PrintTemplates.CreatePrintTemplate;
 using PhysioBoo.Application.Commands.PrintTemplates.DeletePrintTemplate;
 using PhysioBoo.Application.Commands.PrintTemplates.SaveVersionPrintTemplate;
@@ -10,6 +10,7 @@ using PhysioBoo.Application.Queries.PrintTemplates.GetById;
 using PhysioBoo.Application.Queries.PrintTemplates.Render;
 using PhysioBoo.Application.ViewModels.PrintTemplates;
 using PhysioBoo.Application.ViewModels.PrintTemplateVersions;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -30,7 +31,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapGet("/placeholders", (
                 [FromQuery] string? module,
                 ITemplateDictionaryService dictionaryService,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 IReadOnlyList<PlaceholderGroupViewModel> groups = dictionaryService.GetPlaceholderGroups(module);
@@ -44,13 +45,13 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("List placeholders available to print templates")
             .Produces<ResponseMessage<object?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<object?>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.PrintTemplateManage);
 
             #region Get All Print Templates
             group.MapPost("search", async (
                 [FromBody] PagedRequest<PrintTemplateFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<PrintTemplateViewModel> result = await bus.QueryAsync(new GetAllPrintTemplatesQuery(request));
@@ -64,14 +65,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a paginated list of print templates with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<PrintTemplateViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<PrintTemplateViewModel>>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.PrintTemplateManage);
             #endregion
 
             #region Get Print Template By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PrintTemplateViewModel? result = await bus.QueryAsync(new GetPrintTemplateByIdQuery(id));
@@ -85,14 +86,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a print template record.")
             .Produces<ResponseMessage<PrintTemplateViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PrintTemplateViewModel?>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.PrintTemplateManage);
             #endregion
 
             #region Get Print Template By Code
             group.MapGet("{code}", async (
                 string code,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PrintTemplateViewModel? result = await bus.QueryAsync(new GetPrintTemplateByCodeQuery(code));
@@ -106,14 +107,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a print template record.")
             .Produces<ResponseMessage<PrintTemplateViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PrintTemplateViewModel?>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.PrintTemplateManage);
             #endregion
 
             #region Create New Print Template
             group.MapPost("", async (
                 [FromBody] CreatePrintTemplateViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -132,14 +133,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new print template")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.PrintTemplateManage);
             #endregion
 
             #region Render Print Template
             group.MapPost("render", async (
                 [FromBody] RenderPrintTemplateViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PrintTemplateRender? result = await bus.QueryAsync(new RenderPrintTemplateQuery(request.TemplateCode, request.TemplateId, request.Data));
@@ -153,14 +154,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Render print template")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.PrintTemplateRender);
             #endregion
 
             #region Delete Print Template
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeletePrintTemplateCommand(id));
@@ -170,7 +171,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a specific print template by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.PrintTemplateManage);
             #endregion
 
             #region Update Print Template
@@ -178,7 +179,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdatePrintTemplateViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdatePrintTemplateCommand(id, request));
@@ -189,7 +190,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.PrintTemplateManage);
             #endregion
 
             #region Save Version Print Template
@@ -197,7 +198,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdatePrintTemplateVersionViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new SaveVersionPrintTemplateCommand(id, request));
@@ -208,7 +209,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.PrintTemplateManage);
             #endregion
         }
     }

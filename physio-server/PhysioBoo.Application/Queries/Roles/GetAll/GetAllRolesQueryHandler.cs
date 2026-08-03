@@ -18,7 +18,7 @@ namespace PhysioBoo.Application.Queries.Roles.GetAll
             _roleRepository = roleRepository;
         }
 
-        public async Task<PagedResult<RoleViewModel>> Handle(GetAllRolesQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<RoleViewModel>> Handle(GetAllRolesQuery q, CancellationToken ct)
         {
             PagedRequest<RoleFilter> req = q.Request;
             Expression<Func<Role, bool>>? predicate = null;
@@ -41,7 +41,7 @@ namespace PhysioBoo.Application.Queries.Roles.GetAll
                 pageSize: req.PageSize,
                 filter: predicate,
                 orderBy: orderBy,
-                cancellationToken: cancellationToken
+                ct: ct
             );
 
             // Map to view model

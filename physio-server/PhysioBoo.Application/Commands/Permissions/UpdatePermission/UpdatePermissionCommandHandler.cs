@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Permissions.UpdatePermission
             _permissionRepository = permissionRepository;
         }
 
-        public async Task Handle(UpdatePermissionCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdatePermissionCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -41,7 +41,7 @@ namespace PhysioBoo.Application.Commands.Permissions.UpdatePermission
             permission.SetCode(request.Permission.Code);
             permission.SetDescription(request.Permission.Description);
 
-            await _permissionRepository.UpdateTrackedAsync(permission, cancellationToken);
+            await _permissionRepository.UpdateTrackedAsync(permission, ct);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace PhysioBoo.Application.Commands.Users.ResetPassword
             _userRepository = userRepository;
         }
 
-        public async Task Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ResetPasswordCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -45,7 +45,7 @@ namespace PhysioBoo.Application.Commands.Users.ResetPassword
             int result = await _userRepository.BatchUpdateAsync(
                 predicate: u => u.Id == userId,
                 updateDto: new { PasswordHash = AuthHelper.HashPassword(request.NewPassword) },
-                cancellationToken
+                ct
             );
 
             if (result <= 0)

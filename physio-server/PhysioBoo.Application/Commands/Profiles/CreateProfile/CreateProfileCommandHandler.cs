@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.Profiles.CreateProfile
             _user = user;
         }
 
-        public async Task Handle(CreateProfileCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateProfileCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

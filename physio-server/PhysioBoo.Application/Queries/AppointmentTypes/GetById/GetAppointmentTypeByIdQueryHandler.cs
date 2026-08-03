@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.AppointmentTypes.GetById
             _appointmentTypeRepository = appointmentTypeRepository;
         }
 
-        public async Task<AppointmentTypeViewModel?> Handle(GetAppointmentTypeByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AppointmentTypeViewModel?> Handle(GetAppointmentTypeByIdQuery request, CancellationToken ct)
         {
-            AppointmentType? appointmentType = await _appointmentTypeRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            AppointmentType? appointmentType = await _appointmentTypeRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (appointmentType == null)
             {

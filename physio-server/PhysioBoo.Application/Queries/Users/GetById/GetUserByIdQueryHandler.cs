@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Queries.Users.GetById
             _bus = bus;
         }
 
-        public async Task<UserViewModel?> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
+        public async Task<UserViewModel?> Handle(GetUserByIdQuery request, CancellationToken ct)
         {
             User? user = await _userRepository.GetByIdAsync(
                 request.Id,

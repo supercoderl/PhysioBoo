@@ -28,11 +28,11 @@ namespace PhysioBoo.Application.Commands.Hospitals.CreateHospital
             _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
-        public async Task Handle(CreateHospitalCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateHospitalCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
-            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Hospital), cancellationToken);
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Hospital), ct);
 
             Hospital newHospital = new Hospital(
                 request.NewId,

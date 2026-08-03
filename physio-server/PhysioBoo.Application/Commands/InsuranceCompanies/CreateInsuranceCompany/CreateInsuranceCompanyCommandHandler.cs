@@ -24,11 +24,11 @@ namespace PhysioBoo.Application.Commands.InsuranceCompanies.CreateInsuranceCompa
             _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
-        public async Task Handle(CreateInsuranceCompanyCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateInsuranceCompanyCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
-            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(InsuranceCompany), cancellationToken);
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(InsuranceCompany), ct);
 
             InsuranceCompany newInsuranceCompany = new InsuranceCompany(
                 request.NewId,

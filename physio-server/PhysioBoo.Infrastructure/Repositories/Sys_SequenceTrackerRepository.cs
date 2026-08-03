@@ -15,17 +15,17 @@ namespace PhysioBoo.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<string> GenerateNextCodeAsync(string entityType, CancellationToken cancellationToken = default)
+        public async Task<string> GenerateNextCodeAsync(string entityType, CancellationToken ct = default)
         {
             Microsoft.EntityFrameworkCore.Storage.IExecutionStrategy strategy = _context.Database.CreateExecutionStrategy();
 
             return await strategy.ExecuteAsync(async () =>
             {
-                using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+                using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync(ct);
 
                 try
                 {
-                    Sys_SequenceTracker? rule = await DbSet.FirstOrDefaultAsync(ss => ss.EntityType == entityType, cancellationToken);
+                    Sys_SequenceTracker? rule = await DbSet.FirstOrDefaultAsync(ss => ss.EntityType == entityType, ct);
 
                     if (rule == null)
                         throw new Exception("No sequence rule found for the specified entity type.");
@@ -44,14 +44,14 @@ namespace PhysioBoo.Infrastructure.Repositories
                     string finalCode = $"{rule.Prefix}{datePart}{sequencePart}{rule.Suffix}";
 
                     DbSet.Update(rule);
-                    await _context.SaveChangesAsync(cancellationToken);
-                    await transaction.CommitAsync(cancellationToken);
+                    await _context.SaveChangesAsync(ct);
+                    await transaction.CommitAsync(ct);
 
                     return finalCode;
                 }
                 catch (Exception)
                 {
-                    await transaction.RollbackAsync(cancellationToken);
+                    await transaction.RollbackAsync(ct);
                     throw;
                 }
             });

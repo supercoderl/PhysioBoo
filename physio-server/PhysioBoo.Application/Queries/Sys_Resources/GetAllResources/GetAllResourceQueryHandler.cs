@@ -30,7 +30,7 @@ namespace PhysioBoo.Application.Queries.Sys_Resources.GetAllResources
             _bus = bus;
         }
 
-        public async Task<string> Handle(GetAllResourceQuery request, CancellationToken cancellationToken)
+        public async Task<string> Handle(GetAllResourceQuery request, CancellationToken ct)
         {
             string cacheKey = $"i18n_{request.LangCode}";
 

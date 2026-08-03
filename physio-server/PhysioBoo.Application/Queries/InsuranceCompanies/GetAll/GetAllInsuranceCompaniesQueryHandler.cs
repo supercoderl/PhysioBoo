@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Queries.InsuranceCompanies.GetAll
             _sortingExpressionProvider = sortingExpressionProvider;
         }
 
-        public async Task<PagedResult<InsuranceCompanyViewModel>> Handle(GetAllInsuranceCompaniesQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<InsuranceCompanyViewModel>> Handle(GetAllInsuranceCompaniesQuery q, CancellationToken ct)
         {
             InsuranceCompaniesSearchSpec spec = new InsuranceCompaniesSearchSpec(q, _sortingExpressionProvider);
 
@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Queries.InsuranceCompanies.GetAll
                 spec,
                 q.Request.PageNumber,
                 q.Request.PageSize,
-                cancellationToken
+                ct
             );
 
             // Map to view model

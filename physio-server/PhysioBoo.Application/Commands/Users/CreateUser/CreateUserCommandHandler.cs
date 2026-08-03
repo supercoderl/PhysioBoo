@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Errors;
@@ -6,7 +7,6 @@ using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Shared.Events.Users;
-using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Application.Commands.Users.CreateUser
 {
@@ -14,32 +14,32 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
     {
         private readonly IUserRepository _userRepository;
         private readonly IUser _user;
+        private readonly IUserProvisioningService _userProvisioningService;
 
         public CreateUserCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
             IUserRepository userRepository,
-            IUser user
+            IUser user,
+            IUserProvisioningService userProvisioningService
         ) : base(bus, unitOfWork, notifications)
         {
             _userRepository = userRepository;
             _user = user;
+            _userProvisioningService = userProvisioningService;
         }
 
-        public async Task Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateUserCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
-            User newUser = new User(
+            User newUser = await _userProvisioningService.BuildAsync(
                 request.NewId,
-                request.NewUser.Email,
-                request.NewUser.Phone,
-                AuthHelper.HashPassword(request.NewUser.Password)
+                request.NewUser,
+                null,
+                request.AssignedBy
             );
-
-            newUser.SetTenantId(_user.GetTenantId());
-            newUser.SetCreatedBy(_user.GetUserId());
 
             SharedKernel.Results.DbResult<Guid> result = await _userRepository.InsertAsync<User, Guid>(newUser);
 

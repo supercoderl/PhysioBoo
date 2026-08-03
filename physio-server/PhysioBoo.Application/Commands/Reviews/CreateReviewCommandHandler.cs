@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.Reviews
             _user = user;
         }
 
-        public async Task Handle(CreateReviewCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateReviewCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

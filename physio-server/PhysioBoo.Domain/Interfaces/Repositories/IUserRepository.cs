@@ -1,4 +1,4 @@
-﻿using PhysioBoo.Domain.Entities.Core;
+using PhysioBoo.Domain.Entities.Core;
 
 namespace PhysioBoo.Domain.Interfaces.Repositories
 {

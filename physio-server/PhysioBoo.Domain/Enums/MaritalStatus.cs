@@ -5,6 +5,7 @@
         Single,
         Married,
         Divorced,
-        Widowed
+        Widowed,
+        Unknown
     }
 }

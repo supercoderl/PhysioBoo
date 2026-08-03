@@ -1,5 +1,6 @@
 ﻿using PhysioBoo.Application.Commands.Systems.Ip;
 using PhysioBoo.Application.ViewModels.Systems;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/block-ip", async (
                 BlockIpViewModel blockIp,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new BlockIpCommand(blockIp.IpAddress, blockIp.Reason, blockIp.DurationMinutes));
@@ -33,14 +34,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Block Ip")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization("AdminPolicy");
+            .RequireAuthorization(Permissions.System.SecurityBlockIp);
             #endregion
 
             #region Unblock Ip
             group.MapPost("/unblock-ip", async (
                 UnblockIpViewModel unblockIp,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UnblockIpCommand(unblockIp.IpAddress));
@@ -54,7 +55,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Unblock Ip")
             .Produces<ResponseMessage<string>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization("AdminPolicy");
+            .RequireAuthorization(Permissions.System.SecurityUnblockIp);
             #endregion
         }
     }

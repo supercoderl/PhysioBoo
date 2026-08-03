@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PhysioBoo.Application.Interfaces;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Settings;
+using PhysioBoo.Presentation.Authorization;
 using PhysioBoo.Presentation.Swagger;
 using System.Text;
 
@@ -79,14 +82,31 @@ namespace PhysioBoo.Presentation.Extensions
         {
             services.AddHttpContextAccessor();
 
-            services.AddAuthentication(
-                    options => { options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; })
-                .AddJwtBearer(
-                    jwtOptions =>
-                    {
-                        jwtOptions.TokenValidationParameters = CreateTokenValidationParameters(configuration);
-                        jwtOptions.Events = CreateBearerEvents(configuration);
-                    });
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(jwtOptions =>
+            {
+                jwtOptions.TokenValidationParameters = CreateTokenValidationParameters(configuration);
+                jwtOptions.Events = CreateBearerEvents(configuration);
+            });
+
+            services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
+            services.AddAuthorization(options =>
+            {
+                IEnumerable<string?> allPermissions = typeof(Permissions)
+                    .GetNestedTypes()
+                    .SelectMany(t => t.GetFields())
+                    .Select(f => f.GetValue(null)?.ToString())
+                    .Where(v => v != null
+                );
+
+                foreach (string? permission in allPermissions)
+                {
+                    options.AddPolicy(permission!, policy => policy.Requirements.Add(new PermissionRequirement(permission!)));
+                }
+            });
 
             services
                 .AddOptions<TokenSettings>()

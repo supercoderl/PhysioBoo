@@ -25,7 +25,7 @@ namespace PhysioBoo.Application.Commands.DoctorLeaves.CreateDoctorLeave
             _user = user;
         }
 
-        public async Task Handle(CreateDoctorLeaveCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateDoctorLeaveCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

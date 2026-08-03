@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.UpdateHospitalGroup
             _user = user;
         }
 
-        public async Task Handle(UpdateHospitalGroupCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateHospitalGroupCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -53,7 +53,7 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.UpdateHospitalGroup
             hospitalGroup.SetUpdatedAt(TimeZoneHelper.GetLocalTimeNow());
             hospitalGroup.SetUpdatedBy(_user.GetUserId());
 
-            await _hospitalGroupRepository.UpdateTrackedAsync(hospitalGroup, cancellationToken);
+            await _hospitalGroupRepository.UpdateTrackedAsync(hospitalGroup, ct);
         }
     }
 }

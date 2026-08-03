@@ -1,6 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using PhysioBoo.Application.Commands.DoctorWorkExperiences.CreateDoctorWorkExperience;
 using PhysioBoo.Application.ViewModels.DoctorWorkExperiences;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Presentation.Filters;
@@ -22,7 +23,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 CreateDoctorWorkExperienceViewModel newDoctorWorkExperience,
                 IMediatorHandler bus,
                 INotificationHandler<DomainNotification> handler,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreateDoctorWorkExperienceCommand(newDoctorWorkExperience));
@@ -35,7 +36,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreateDoctorWorkExperience")
             .WithSummary("Create new doctor work experience")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Hr.DoctorWorkExperienceCreate);
         }
     }
 }

@@ -2,6 +2,6 @@
 {
     public interface ICacheWarmer
     {
-        Task WarmAsync(CancellationToken cancellationToken = default);
+        Task WarmAsync(CancellationToken ct = default);
     }
 }

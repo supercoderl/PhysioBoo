@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.LabTests.DeleteLabTest.Commands.DeleteL
             _labTestRepository = labTestRepository;
         }
 
-        public async Task Handle(DeleteLabTestCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteLabTestCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.LabTests.DeleteLabTest.Commands.DeleteL
             _labTestRepository.SoftDeleteSingle(
                 labTest,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

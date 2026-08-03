@@ -24,11 +24,11 @@ namespace PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer
             _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
-        public async Task Handle(CreateManufacturerCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateManufacturerCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
-            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Manufacturer), cancellationToken);
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Manufacturer), ct);
 
             Manufacturer newManufacturer = new Manufacturer(
                 request.NewId,

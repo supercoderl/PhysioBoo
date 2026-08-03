@@ -24,11 +24,11 @@ namespace PhysioBoo.Application.Commands.LabTests.CreateLabTest
             _sequenceTrackerRepository = sequenceTrackerRepository;
         }
 
-        public async Task Handle(CreateLabTestCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateLabTestCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
-            string newCode = await _sequenceTrackerRepository.GenerateNextCodeAsync(nameof(LabTest), cancellationToken);
+            string newCode = await _sequenceTrackerRepository.GenerateNextCodeAsync(nameof(LabTest), ct);
 
             LabTest newLabTest = new LabTest(
                 request.NewId,

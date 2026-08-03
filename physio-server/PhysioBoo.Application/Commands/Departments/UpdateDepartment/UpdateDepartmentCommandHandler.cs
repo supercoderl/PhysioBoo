@@ -23,7 +23,7 @@ namespace PhysioBoo.Application.Commands.Departments.UpdateDepartment
             _user = user;
         }
 
-        public async Task Handle(UpdateDepartmentCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateDepartmentCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -59,7 +59,7 @@ namespace PhysioBoo.Application.Commands.Departments.UpdateDepartment
             department.SetIsActive(request.Department.IsActive);
             department.SetUpdatedBy(_user.GetUserId());
 
-            await _departmentRepository.UpdateTrackedAsync(department, cancellationToken);
+            await _departmentRepository.UpdateTrackedAsync(department, ct);
         }
     }
 }

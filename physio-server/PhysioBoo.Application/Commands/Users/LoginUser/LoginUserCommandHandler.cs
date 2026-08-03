@@ -30,7 +30,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
             _token = options.Value;
         }
 
-        public async Task Handle(LoginUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(LoginUserCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -62,7 +62,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
             }
 
             (string accessToken, string refreshToken) = TokenHelper.BuildAuthToken(
-                new Dictionary<string, string>
+                new Dictionary<string, object>
                 {
                     ["Email"] = user.Email,
                     ["Id"] = user.Id.ToString(),

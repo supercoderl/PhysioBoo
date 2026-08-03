@@ -5,6 +5,7 @@ using PhysioBoo.Application.Commands.Departments.UpdateDepartment;
 using PhysioBoo.Application.Queries.Departments.GetAll;
 using PhysioBoo.Application.Queries.Departments.GetById;
 using PhysioBoo.Application.ViewModels.Departments;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -25,7 +26,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] CreateDepartmentViewModel newDepartment,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -44,14 +45,15 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreateDepartment")
             .WithSummary("Create new department")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Admin.DepartmentCreate);
             #endregion
 
             #region Get All Departments
             group.MapPost("/search", async (
                 [FromBody] PagedRequest<DepartmentFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<DepartmentViewModel> result = await bus.QueryAsync(new GetAllDepartmentsQuery(request));
@@ -64,14 +66,15 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("SearchDepartments")
             .WithSummary("Retrieve a paginated list of departments with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<DepartmentViewModel>>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<PagedResult<DepartmentViewModel>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<PagedResult<DepartmentViewModel>>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Admin.DepartmentRead);
             #endregion
 
             #region Delete Department
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeleteDepartmentCommand(id));
@@ -82,7 +85,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.DepartmentDelete);
             #endregion
 
             #region Update Department
@@ -90,7 +93,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdateDepartmentViewModel department,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdateDepartmentCommand(department, id));
@@ -101,14 +104,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.DepartmentUpdate);
             #endregion
 
             #region Get Department By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 DepartmentViewModel? result = await bus.QueryAsync(new GetDepartmentByIdQuery(id));
@@ -121,7 +124,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("GetDepartmentById")
             .WithSummary("Retrieve a department record.")
             .Produces<ResponseMessage<DepartmentViewModel?>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<DepartmentViewModel?>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<DepartmentViewModel?>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Admin.DepartmentRead);
             #endregion
         }
     }

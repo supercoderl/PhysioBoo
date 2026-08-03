@@ -4,6 +4,7 @@ using PhysioBoo.Application.Commands.Doctors.UpdateDoctor;
 using PhysioBoo.Application.Queries.Doctors.GetAll;
 using PhysioBoo.Application.Queries.Doctors.GetById;
 using PhysioBoo.Application.ViewModels.Doctors;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -24,7 +25,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("search", async (
                 [FromBody] PagedRequest<DoctorFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<DoctorViewModel> result = await bus.QueryAsync(new GetAllDoctorsQuery(request));
@@ -38,14 +39,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a paginated list of doctors with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<DoctorViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<DoctorViewModel>>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Hr.DoctorRead);
             #endregion
 
             #region Delete Doctor
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeleteDoctorCommand(id));
@@ -55,7 +56,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a specific doctor by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Hr.DoctorDelete);
             #endregion
 
             #region Update Doctor
@@ -63,7 +64,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdateDoctorViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdateDoctorCommand(request, id));
@@ -74,14 +75,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Hr.DoctorUpdate);
             #endregion
 
             #region Get Doctor By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 DoctorViewModel? result = await bus.QueryAsync(new GetDoctorByIdQuery(id));
@@ -95,7 +96,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a doctor record.")
             .Produces<ResponseMessage<DoctorViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<DoctorViewModel?>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Hr.DoctorRead);
             #endregion
         }
     }

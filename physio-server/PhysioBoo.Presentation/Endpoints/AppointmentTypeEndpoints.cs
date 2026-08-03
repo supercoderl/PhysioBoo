@@ -5,6 +5,7 @@ using PhysioBoo.Application.Commands.AppointmentTypes.UpdateAppointmentType;
 using PhysioBoo.Application.Queries.AppointmentTypes.GetAll;
 using PhysioBoo.Application.Queries.AppointmentTypes.GetById;
 using PhysioBoo.Application.ViewModels.AppointmentTypes;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -25,7 +26,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] CreateAppointmentTypeViewModel newAppointmentType,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -45,14 +46,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new appointment type")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Scheduling.AppointmentTypeCreate);
             #endregion
 
             #region Get All Appointment Types
             group.MapPost("/search", async (
                 [FromBody] PagedRequest<AppointmentTypeFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<AppointmentTypeViewModel> result = await bus.QueryAsync(new GetAllAppointmentTypesQuery(request));
@@ -65,14 +66,15 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("SearchAppointmentTypes")
             .WithSummary("Retrieve a paginated list of appointment types with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<AppointmentTypeViewModel>>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<PagedResult<AppointmentTypeViewModel>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<PagedResult<AppointmentTypeViewModel>>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Scheduling.AppointmentTypeRead);
             #endregion
 
             #region Delete AppointmentType
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeleteAppointmentTypeCommand(id));
@@ -83,7 +85,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Scheduling.AppointmentTypeDelete);
             #endregion
 
             #region Update Appointment Type
@@ -91,7 +93,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdateAppointmentTypeViewModel appointmentType,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdateAppointmentTypeCommand(appointmentType, id));
@@ -102,14 +104,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Scheduling.AppointmentTypeUpdate);
             #endregion
 
             #region Get Appointment Type By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 AppointmentTypeViewModel? result = await bus.QueryAsync(new GetAppointmentTypeByIdQuery(id));
@@ -123,7 +125,8 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a appointment type record.")
             .Produces<ResponseMessage<AppointmentTypeViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<AppointmentTypeViewModel?>>(StatusCodes.Status400BadRequest)
-            .Produces<ResponseMessage<AppointmentTypeViewModel?>>(StatusCodes.Status404NotFound);
+            .Produces<ResponseMessage<AppointmentTypeViewModel?>>(StatusCodes.Status404NotFound)
+            .RequireAuthorization(Permissions.Scheduling.AppointmentTypeRead);
             #endregion
         }
     }

@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.ImagingReports.CreateImagingReport;
+using PhysioBoo.Application.Commands.ImagingReports.CreateImagingReport;
 using PhysioBoo.Application.ViewModels.ImagingReports;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreateImagingReportViewModel newImagingReport,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreateImagingReportCommand(newImagingReport));
@@ -32,7 +33,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreateImagingReport")
             .WithSummary("Create new imaging report")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Imaging.ImagingReportCreate);
         }
     }
 }

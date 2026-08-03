@@ -18,7 +18,7 @@ namespace PhysioBoo.Application.Queries.Users.GetAll
             _userRepository = userRepository;
         }
 
-        public async Task<PagedResult<UserViewModel>> Handle(GetAllUsersQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<UserViewModel>> Handle(GetAllUsersQuery q, CancellationToken ct)
         {
             PagedRequest<UserFilter> req = q.Request;
             Expression<Func<User, bool>>? predicate = null;
@@ -43,7 +43,7 @@ namespace PhysioBoo.Application.Queries.Users.GetAll
                 pageSize: req.PageSize,
                 filter: predicate,
                 orderBy: orderBy,
-                cancellationToken: cancellationToken
+                ct: ct
             );
 
             // Map to view model

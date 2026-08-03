@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.LabOrderItems.CreateLabOrderItem;
+using PhysioBoo.Application.Commands.LabOrderItems.CreateLabOrderItem;
 using PhysioBoo.Application.ViewModels.LabOrderItems;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreateLabOrderItemViewModel newLabOrderItem,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreateLabOrderItemCommand(newLabOrderItem));
@@ -32,7 +33,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreateLabOrderItem")
             .WithSummary("Create new lab order item")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Lab.LabOrderItemCreate);
         }
     }
 }

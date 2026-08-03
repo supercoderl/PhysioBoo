@@ -27,7 +27,7 @@ namespace PhysioBoo.Application.Queries.VerificationTokens.GetByToken
             _bus = bus;
         }
 
-        public async Task<VerificationTokenViewModel?> Handle(GetVerificationTokenByTokenQuery request, CancellationToken cancellationToken)
+        public async Task<VerificationTokenViewModel?> Handle(GetVerificationTokenByTokenQuery request, CancellationToken ct)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>
             {

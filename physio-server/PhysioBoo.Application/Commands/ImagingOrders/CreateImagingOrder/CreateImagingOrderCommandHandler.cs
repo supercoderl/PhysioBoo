@@ -25,7 +25,7 @@ namespace PhysioBoo.Application.Commands.ImagingOrders.CreateImagingOrder
             _user = user;
         }
 
-        public async Task Handle(CreateImagingOrderCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateImagingOrderCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

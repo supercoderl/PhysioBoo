@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Options;
 using PhysioBoo.Application.ViewModels.Users;
+using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
@@ -14,6 +15,7 @@ namespace PhysioBoo.Application.Commands.Users.RefreshToken
     public sealed class RefreshTokenCommandHandler : CommandHandlerBase, IRequestHandler<RefreshTokenCommand>
     {
         private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly IUserRepository _userRepository;
         private readonly TokenSettings _token;
 
         public RefreshTokenCommandHandler(
@@ -21,14 +23,16 @@ namespace PhysioBoo.Application.Commands.Users.RefreshToken
            IUnitOfWork unitOfWork,
            INotificationHandler<DomainNotification> notifications,
            IRefreshTokenRepository refreshTokenRepository,
+           IUserRepository userRepository,
            IOptions<TokenSettings> options
         ) : base(bus, unitOfWork, notifications)
         {
             _refreshTokenRepository = refreshTokenRepository;
+            _userRepository = userRepository;
             _token = options.Value;
         }
 
-        public async Task Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+        public async Task Handle(RefreshTokenCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -39,6 +43,19 @@ namespace PhysioBoo.Application.Commands.Users.RefreshToken
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
                     $"Token does not exists or has expired.",
+                    ErrorCodes.ObjectNotFound
+                ));
+
+                return;
+            }
+
+            User? user = await _userRepository.GetByIdentifierAsync(token.User?.Email ?? string.Empty);
+
+            if (user == null)
+            {
+                await NotifyAsync(new DomainNotification(
+                    request.MessageType,
+                    $"User does not exists.",
                     ErrorCodes.ObjectNotFound
                 ));
 
@@ -63,12 +80,12 @@ namespace PhysioBoo.Application.Commands.Users.RefreshToken
             }
 
             (string accessToken, string refreshToken) = TokenHelper.BuildAuthToken(
-                new Dictionary<string, string>
+                new Dictionary<string, object>
                 {
-                    ["Email"] = token.User?.Email ?? string.Empty,
-                    ["Id"] = token.UserId.ToString(),
-                    ["Name"] = (token.User?.Email ?? string.Empty).Split("@")[0],
-                    ["TenantId"] = token.User?.TenantId.ToString() ?? string.Empty
+                    ["Email"] = user.Email,
+                    ["Id"] = user.Id,
+                    ["Name"] = user.Email.Split("@")[0],
+                    ["TenantId"] = user.TenantId.ToString()
                 }, _token.Secret, _token.Issuer, _token.Audience, _token.ExpiryDurationMinutes
             );
 

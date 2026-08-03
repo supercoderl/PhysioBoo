@@ -22,11 +22,11 @@ namespace PhysioBoo.Application.Commands.Users.ResendVerification
             _user = user;
         }
 
-        public async Task Handle(ResendVerificationCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ResendVerificationCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
-            await _verificationService.SendAsync(_user.GetUserId(), null, request.VerificationType, cancellationToken);
+            await _verificationService.SendAsync(_user.GetUserId(), null, request.VerificationType, ct);
         }
     }
 }

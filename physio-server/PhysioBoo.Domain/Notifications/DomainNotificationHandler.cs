@@ -11,7 +11,7 @@ namespace PhysioBoo.Domain.Notifications
             _notifications = new List<DomainNotification>();
         }
 
-        public Task Handle(DomainNotification notification, CancellationToken cancellationToken)
+        public Task Handle(DomainNotification notification, CancellationToken ct)
         {
             _notifications.Add(notification);
 

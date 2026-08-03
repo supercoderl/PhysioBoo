@@ -16,9 +16,9 @@ namespace PhysioBoo.Domain.Extensions
             string key,
             Func<Task<T?>> factory,
             DistributedCacheEntryOptions options,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
-            string? json = await cache.GetStringAsync(key, cancellationToken);
+            string? json = await cache.GetStringAsync(key, ct);
 
             if (!string.IsNullOrWhiteSpace(json))
                 return JsonConvert.DeserializeObject<T>(json, JsonSettings)!;
@@ -32,7 +32,7 @@ namespace PhysioBoo.Domain.Extensions
 
             json = JsonConvert.SerializeObject(value, JsonSettings);
 
-            await cache.SetStringAsync(key, json, options, cancellationToken);
+            await cache.SetStringAsync(key, json, options, ct);
 
             return value;
         }

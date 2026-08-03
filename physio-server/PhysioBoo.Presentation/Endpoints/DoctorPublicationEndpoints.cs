@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.DoctorPublications.CreateDoctorPublication;
+using PhysioBoo.Application.Commands.DoctorPublications.CreateDoctorPublication;
 using PhysioBoo.Application.ViewModels.DoctorPublications;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreateDoctorPublicationViewModel newDoctorPublication,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreateDoctorPublicationCommand(newDoctorPublication));
@@ -32,7 +33,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreateDoctorPublication")
             .WithSummary("Create new doctor publication")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Hr.DoctorPublicationCreate);
         }
     }
 }

@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.Departments.GetById
             _departmentRepository = departmentRepository;
         }
 
-        public async Task<DepartmentViewModel?> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
+        public async Task<DepartmentViewModel?> Handle(GetDepartmentByIdQuery request, CancellationToken ct)
         {
-            Department? department = await _departmentRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            Department? department = await _departmentRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (department == null)
             {

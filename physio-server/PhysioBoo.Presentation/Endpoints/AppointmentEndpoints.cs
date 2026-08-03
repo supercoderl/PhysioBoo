@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhysioBoo.Application.Commands.Appointments.CreateAppointment;
 using PhysioBoo.Application.ViewModels.Appointments;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -21,7 +22,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 [FromBody] CreateAppointmentViewModel newAppointment,
                 IMediatorHandler bus,
                 IUser user,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -41,7 +42,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new appointment")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Scheduling.AppointmentCreate);
             #endregion
         }
     }

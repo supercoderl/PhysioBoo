@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.BillItems.CreateBillItem
             _user = user;
         }
 
-        public async Task Handle(CreateBillItemCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateBillItemCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

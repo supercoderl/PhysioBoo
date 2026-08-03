@@ -5,6 +5,11 @@ namespace PhysioBoo.SharedKernel.Utils
     public static class TimeZoneHelper
     {
         /// <summary>
+        /// Return default date (1990-01-01)
+        /// </summary>
+        public static DateOnly DefaultDate = new DateOnly(1990, 01, 01);
+
+        /// <summary>
         /// Return current system's TimeZoneId (Ex: "SE Asia Standard Time")
         /// </summary>
         public static string GetLocalTimeZoneId()

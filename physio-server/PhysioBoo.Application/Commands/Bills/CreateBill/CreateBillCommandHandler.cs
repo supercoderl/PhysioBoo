@@ -27,11 +27,11 @@ namespace PhysioBoo.Application.Commands.Bills.CreateBill
             _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
-        public async Task Handle(CreateBillCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateBillCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
-            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Bill), cancellationToken);
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Bill), ct);
 
             Bill newBill = new Bill(
                 request.NewId,

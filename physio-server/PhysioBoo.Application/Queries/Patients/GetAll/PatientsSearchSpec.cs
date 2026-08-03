@@ -14,6 +14,8 @@ namespace PhysioBoo.Application.Queries.Patients.GetAll
             ISortingExpressionProvider<PatientViewModel, Patient> sortingExpressionProvider
         )
         {
+            Query.Include(p => p.Profile);
+
             // Apply filters
             if (!string.IsNullOrEmpty(q.Request.Search))
             {

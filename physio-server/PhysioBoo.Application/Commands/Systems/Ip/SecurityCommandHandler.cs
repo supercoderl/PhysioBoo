@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Commands.Systems.Ip
             _cache = cache;
         }
 
-        public async Task Handle(BlockIpCommand request, CancellationToken cancellationToken)
+        public async Task Handle(BlockIpCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -38,15 +38,15 @@ namespace PhysioBoo.Application.Commands.Systems.Ip
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(request.DurationMinutes)
             };
 
-            await _cache.SetStringAsync(key, JsonSerializer.Serialize(data), options, cancellationToken);
+            await _cache.SetStringAsync(key, JsonSerializer.Serialize(data), options, ct);
         }
 
-        public async Task Handle(UnblockIpCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UnblockIpCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
             string key = $"security:blacklist:{request.IpAddress}";
-            await _cache.RemoveAsync(key, cancellationToken);
+            await _cache.RemoveAsync(key, ct);
         }
     }
 }

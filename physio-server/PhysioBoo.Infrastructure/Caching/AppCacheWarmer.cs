@@ -25,15 +25,15 @@ namespace PhysioBoo.Infrastructure.Caching
             _logger = logger;
         }
 
-        public async Task WarmAsync(CancellationToken cancellationToken = default)
+        public async Task WarmAsync(CancellationToken ct = default)
         {
             _logger.LogInformation("Warming application cache...");
 
             try
             {
                 await Task.WhenAll(
-                    WarmRolesAsync(cancellationToken),
-                    WarmLanguagesAsync(cancellationToken)
+                    WarmRolesAsync(ct),
+                    WarmLanguagesAsync(ct)
                 );
 
                 _logger.LogInformation("Cache warming complete.");
@@ -45,27 +45,27 @@ namespace PhysioBoo.Infrastructure.Caching
             }
         }
 
-        private async Task WarmRolesAsync(CancellationToken cancellationToken)
+        private async Task WarmRolesAsync(CancellationToken ct)
         {
             await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
             IRoleRepository repository = scope.ServiceProvider.GetRequiredService<IRoleRepository>();
 
             List<RoleCacheViewModel> roles = await repository.GetAllNoTracking(filter: x => x.IsActive && x.IsPublicForRegistration)
-                .Select(x => new RoleCacheViewModel(x.Id, x.Name)).ToListAsync(cancellationToken);
+                .Select(x => new RoleCacheViewModel(x.Id, x.Name)).ToListAsync(ct);
 
-            await _cache.SetAsync(CacheKeys.Roles, roles, CacheKeys.NoExpiry, cancellationToken);
+            await _cache.SetAsync(CacheKeys.Roles, roles, CacheKeys.NoExpiry, ct);
             _logger.LogInformation("Cached {Count} roles", roles.Count);
         }
 
-        private async Task WarmLanguagesAsync(CancellationToken cancellationToken)
+        private async Task WarmLanguagesAsync(CancellationToken ct)
         {
             await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
             ISys_LanguageRepository repository = scope.ServiceProvider.GetRequiredService<ISys_LanguageRepository>();
 
             List<LanguageCacheViewModel> languages = await repository.GetAllNoTracking(filter: x => x.IsActive)
-                .Select(x => new LanguageCacheViewModel(x.Id, x.Name)).ToListAsync(cancellationToken);
+                .Select(x => new LanguageCacheViewModel(x.Id, x.Name)).ToListAsync(ct);
 
-            await _cache.SetAsync(CacheKeys.Languages, languages, CacheKeys.NoExpiry, cancellationToken);
+            await _cache.SetAsync(CacheKeys.Languages, languages, CacheKeys.NoExpiry, ct);
             _logger.LogInformation("Cached {Count} languages", languages.Count);
         }
     }

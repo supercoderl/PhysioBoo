@@ -19,17 +19,17 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetLab
             _labReportRepository = labReportRepository;
         }
 
-        public async Task<LabViewModel?> Handle(GetMedicalRecordLabQuery request, CancellationToken cancellationToken)
+        public async Task<LabViewModel?> Handle(GetMedicalRecordLabQuery request, CancellationToken ct)
         {
             List<Domain.Entities.LaboratoryImaging.LabOrderItem> results = await _labOrderItemRepository.GetAllNoTracking(
                 filter: x => x.LabOrder != null ? x.LabOrder.PatientId.Equals(request.PatientId) : false,
                 includeProperties: "LabOrder"
-            ).ToListAsync(cancellationToken);
+            ).ToListAsync(ct);
 
             List<Domain.Entities.LaboratoryImaging.LabReport> reports = await _labReportRepository.GetAllNoTracking(
                 filter: x => x.PatientId == request.PatientId,
                 includeProperties: ""
-            ).ToListAsync(cancellationToken);
+            ).ToListAsync(ct);
 
             return LabViewModel.FromEntity(
                 results.Select(x => LabViewModel.LabResultRow.FromEntity(x)).ToList(),

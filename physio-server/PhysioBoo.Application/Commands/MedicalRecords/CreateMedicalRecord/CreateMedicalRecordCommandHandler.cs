@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.MedicalRecords.CreateMedicalRecord
             _user = user;
         }
 
-        public async Task Handle(CreateMedicalRecordCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateMedicalRecordCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

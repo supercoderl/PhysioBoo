@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.Users.LogoutUser
             _user = user;
         }
 
-        public async Task Handle(LogoutUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(LogoutUserCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -43,7 +43,7 @@ namespace PhysioBoo.Application.Commands.Users.LogoutUser
             int result = await _refreshTokenRepository.BatchUpdateMultipleAsync(
                 predicate: rt => rt.UserId == userId && rt.ExpiresAt > TimeZoneHelper.GetLocalTimeNow(),
                 setterExpression: setters => setters.SetProperty(rt => rt.ExpiresAt, _ => TimeZoneHelper.GetLocalTimeNow()),
-                cancellationToken: cancellationToken
+                ct: ct
             );
 
             if (result > 0)

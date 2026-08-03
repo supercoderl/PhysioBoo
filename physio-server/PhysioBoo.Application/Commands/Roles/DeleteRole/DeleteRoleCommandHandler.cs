@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Commands.Roles.DeleteRole
             _roleRepository = roleRepository;
         }
 
-        public async Task Handle(DeleteRoleCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteRoleCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -41,7 +41,7 @@ namespace PhysioBoo.Application.Commands.Roles.DeleteRole
             _roleRepository.SoftDeleteSingle(
                 role,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             if (await CommitAsync())

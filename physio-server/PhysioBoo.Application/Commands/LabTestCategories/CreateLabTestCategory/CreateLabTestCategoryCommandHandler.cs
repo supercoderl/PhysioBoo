@@ -24,11 +24,11 @@ namespace PhysioBoo.Application.Commands.LabTestCategories.CreateLabTestCategory
             _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
         }
 
-        public async Task Handle(CreateLabTestCategoryCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateLabTestCategoryCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
-            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(LabTestCategory), cancellationToken);
+            string newCode = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(LabTestCategory), ct);
 
             SharedKernel.Results.DbResult<Guid> result = await _labTestCategoryRepository.InsertAsync<LabTestCategory, Guid>(new LabTestCategory(
                 request.NewId,

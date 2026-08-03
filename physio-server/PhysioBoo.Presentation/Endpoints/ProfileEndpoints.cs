@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.Profiles.CreateProfile;
+using PhysioBoo.Application.Commands.Profiles.CreateProfile;
 using PhysioBoo.Application.ViewModels.Profiles;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreateProfileViewModel newProfile,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreateProfileCommand(newProfile));
@@ -33,7 +34,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new profile")
             .Produces<ResponseMessage<string>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<string>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Portal.ProfileCreate);
         }
     }
 }

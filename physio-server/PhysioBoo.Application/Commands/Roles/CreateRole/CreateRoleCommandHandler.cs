@@ -22,7 +22,7 @@ namespace PhysioBoo.Application.Commands.Roles.CreateRole
             _RoleRepository = roleRepository;
         }
 
-        public async Task Handle(CreateRoleCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateRoleCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

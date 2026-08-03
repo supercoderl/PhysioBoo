@@ -22,12 +22,12 @@ namespace PhysioBoo.Application.Queries.AdminMenus.GetAll
             _sortingExpressionProvider = sortingExpressionProvider;
         }
 
-        public async Task<PagedResult<AdminMenuViewModel>> Handle(GetAllAdminMenusQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<AdminMenuViewModel>> Handle(GetAllAdminMenusQuery q, CancellationToken ct)
         {
             AdminMenusSearchSpec spec = new AdminMenusSearchSpec(q, _sortingExpressionProvider);
-            PagedResult<AdminMenu> rootsPage = await _adminMenuRepository.ListAsync(spec, q.Request.PageNumber, q.Request.PageSize, cancellationToken);
+            PagedResult<AdminMenu> rootsPage = await _adminMenuRepository.ListAsync(spec, q.Request.PageNumber, q.Request.PageSize, ct);
 
-            List<AdminMenu> all = await _adminMenuRepository.GetAllNoTracking().ToListAsync(cancellationToken);
+            List<AdminMenu> all = await _adminMenuRepository.GetAllNoTracking().ToListAsync(ct);
             ILookup<Guid?, AdminMenu> byParent = all.ToLookup(m => m.ParentId);
 
             // Map to view model

@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Hospitals.UpdateHospital
             _hospitalRepository = hospitalRepository;
         }
 
-        public async Task Handle(UpdateHospitalCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateHospitalCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -73,7 +73,7 @@ namespace PhysioBoo.Application.Commands.Hospitals.UpdateHospital
             hospital.SetMissionStatement(request.Hospital.MissionStatement);
             hospital.SetVisionStatement(request.Hospital.VisionStatement);
 
-            await _hospitalRepository.UpdateTrackedAsync(hospital, cancellationToken);
+            await _hospitalRepository.UpdateTrackedAsync(hospital, ct);
         }
     }
 }

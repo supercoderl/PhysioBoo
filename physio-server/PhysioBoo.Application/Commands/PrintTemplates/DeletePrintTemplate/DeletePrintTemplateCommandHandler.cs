@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.PrintTemplates.DeletePrintTemplate
             _printTemplateRepository = printTemplateRepository;
         }
 
-        public async Task Handle(DeletePrintTemplateCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeletePrintTemplateCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.PrintTemplates.DeletePrintTemplate
             _printTemplateRepository.SoftDeleteSingle(
                 printTemplate,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

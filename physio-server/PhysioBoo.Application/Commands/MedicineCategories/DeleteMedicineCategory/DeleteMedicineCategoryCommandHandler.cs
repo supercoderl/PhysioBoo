@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.DeleteMedicineCatego
             _medicineCategoryRepository = medicineCategoryRepository;
         }
 
-        public async Task Handle(DeleteMedicineCategoryCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteMedicineCategoryCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.DeleteMedicineCatego
             _medicineCategoryRepository.SoftDeleteSingle(
                 medicineCategory,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.Departments.CreateDepartment
             _user = user;
         }
 
-        public async Task Handle(CreateDepartmentCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateDepartmentCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

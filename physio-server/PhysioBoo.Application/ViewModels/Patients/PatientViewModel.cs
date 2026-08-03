@@ -1,10 +1,18 @@
 ﻿using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Enums;
+using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Application.ViewModels.Patients
 {
     public sealed class PatientViewModel
     {
+        public string FullName { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public DateOnly DateOfBirth { get; set; }
+        public string Gender { get; set; } = string.Empty;
         public Guid Id { get; set; }
         public string PatientNumber { get; set; } = string.Empty;
         public PatientType PatientType { get; set; }
@@ -47,6 +55,13 @@ namespace PhysioBoo.Application.ViewModels.Patients
         {
             return new PatientViewModel
             {
+                FullName = patient.User?.Profile?.FullName ?? string.Empty,
+                FirstName = patient.User?.Profile?.FirstName ?? string.Empty,
+                LastName = patient.User?.Profile?.LastName ?? string.Empty,
+                Phone = patient.User?.Phone ?? string.Empty,
+                Email = patient.User?.Email ?? string.Empty,
+                DateOfBirth = patient.User?.Profile?.DateOfBirth ?? TimeZoneHelper.DefaultDate,
+                Gender = patient.User?.Profile?.Gender.ToString() ?? string.Empty,
                 Id = patient.Id,
                 PatientNumber = patient.PatientNumber,
                 PatientType = patient.PatientType,

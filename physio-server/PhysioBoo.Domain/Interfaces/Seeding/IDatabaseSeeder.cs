@@ -2,7 +2,7 @@
 {
     public interface IDatabaseSeeder
     {
-        Task MigrateAsync(CancellationToken cancellationToken = default);
-        Task SeedAsync(CancellationToken cancellationToken = default);
+        Task MigrateAsync(CancellationToken ct = default);
+        Task SeedAsync(CancellationToken ct = default);
     }
 }

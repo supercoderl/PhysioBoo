@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.UpdateMedicalSpecial
             _medicalSpecialtyRepository = medicalSpecialtyRepository;
         }
 
-        public async Task Handle(UpdateMedicalSpecialtyCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateMedicalSpecialtyCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -51,7 +51,7 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.UpdateMedicalSpecial
             medicalSpecialty.SetIsDiagnostic(request.MedicalSpecialty.IsDiagnostic);
             medicalSpecialty.SetAverageConsultationDuration(request.MedicalSpecialty.AverageConsultationDuration);
 
-            int resultCount = await _medicalSpecialtyRepository.UpdateTrackedAsync(medicalSpecialty, cancellationToken);
+            int resultCount = await _medicalSpecialtyRepository.UpdateTrackedAsync(medicalSpecialty, ct);
 
             if (resultCount > 0)
             {

@@ -230,6 +230,8 @@ namespace PhysioBoo.Presentation
 
             //app.UseHttpsRedirection(); use HTTP for development
 
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+
             app.UseCors("CorsPolicy");
 
             app.UseAuthentication();

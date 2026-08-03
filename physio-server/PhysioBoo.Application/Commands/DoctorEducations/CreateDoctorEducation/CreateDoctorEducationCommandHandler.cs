@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.DoctorEducations.CreateDoctorEducation
             _user = user;
         }
 
-        public async Task Handle(CreateDoctorEducationCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateDoctorEducationCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

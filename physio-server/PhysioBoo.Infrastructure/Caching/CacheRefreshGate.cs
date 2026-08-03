@@ -14,11 +14,11 @@ namespace PhysioBoo.Infrastructure.Caching
         public async Task TryRefreshAsync(
             string key,
             Func<Task> refresh,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
             SemaphoreSlim semaphore = _locks.GetOrAdd(key, _ => new SemaphoreSlim(1, 1));
 
-            if (!await semaphore.WaitAsync(TimeSpan.Zero, cancellationToken))
+            if (!await semaphore.WaitAsync(TimeSpan.Zero, ct))
             {
                 _logger.LogDebug("Cache refresh already in progress for key '{Key}', skipping.", key);
                 return;

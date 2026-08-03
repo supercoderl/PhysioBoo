@@ -32,22 +32,22 @@ namespace PhysioBoo.Application.EventHandlers.Role
             _gate = gate;
         }
 
-        public Task Handle(RoleCreatedEvent notification, CancellationToken cancellationToken) => RefreshAsync(cancellationToken);
+        public Task Handle(RoleCreatedEvent notification, CancellationToken ct) => RefreshAsync(ct);
 
-        public Task Handle(RoleDeletedEvent notification, CancellationToken cancellationToken) => RefreshAsync(cancellationToken);
+        public Task Handle(RoleDeletedEvent notification, CancellationToken ct) => RefreshAsync(ct);
 
-        public Task Handle(RoleUpdatedEvent notification, CancellationToken cancellationToken) => RefreshAsync(cancellationToken);
+        public Task Handle(RoleUpdatedEvent notification, CancellationToken ct) => RefreshAsync(ct);
 
-        private Task RefreshAsync(CancellationToken cancellationToken) => _gate.TryRefreshAsync(
+        private Task RefreshAsync(CancellationToken ct) => _gate.TryRefreshAsync(
             key: CacheKeys.Roles,
             refresh: async () =>
             {
                 List<RoleCacheViewModel> roles = await _roleRepository.GetAllNoTracking(filter: x => x.IsActive && x.IsPublicForRegistration)
-                    .Select(x => new RoleCacheViewModel(x.Id, x.Name)).ToListAsync(cancellationToken);
+                    .Select(x => new RoleCacheViewModel(x.Id, x.Name)).ToListAsync(ct);
 
-                await _cacheService.SetAsync(CacheKeys.Roles, roles, TimeSpan.FromHours(1), cancellationToken);
+                await _cacheService.SetAsync(CacheKeys.Roles, roles, TimeSpan.FromHours(1), ct);
             },
-            cancellationToken
+            ct
         );
     }
 }

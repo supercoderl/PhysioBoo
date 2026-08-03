@@ -6,6 +6,6 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
 {
     public interface IDoctorRepository : IRepository<Doctor>
     {
-        Task<DbResult<Guid>> RegisterDoctor(User user, Profile profile, Doctor doctor, CancellationToken cancellationToken);
+        Task<DbResult<Guid>> RegisterDoctor(User user, Profile profile, Doctor doctor, CancellationToken ct);
     }
 }

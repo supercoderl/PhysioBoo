@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.AppointmentTypes.UpdateAppointmentType
             _appointmentTypeRepository = appointmentTypeRepository;
         }
 
-        public async Task Handle(UpdateAppointmentTypeCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateAppointmentTypeCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -49,7 +49,7 @@ namespace PhysioBoo.Application.Commands.AppointmentTypes.UpdateAppointmentType
             appointmentType.SetColorCode(request.AppointmentType.ColorCode);
             appointmentType.SetIsActive(request.AppointmentType.IsActive);
 
-            int resultCount = await _appointmentTypeRepository.UpdateTrackedAsync(appointmentType, cancellationToken);
+            int resultCount = await _appointmentTypeRepository.UpdateTrackedAsync(appointmentType, ct);
         }
     }
 }

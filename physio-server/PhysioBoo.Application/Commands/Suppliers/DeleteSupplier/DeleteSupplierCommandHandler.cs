@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Suppliers.DeleteSupplier
             _supplierRepository = supplierRepository;
         }
 
-        public async Task Handle(DeleteSupplierCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteSupplierCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.Suppliers.DeleteSupplier
             _supplierRepository.SoftDeleteSingle(
                 supplier,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

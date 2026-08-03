@@ -19,13 +19,13 @@ namespace PhysioBoo.Application.Commands.Sys_Resources.ImportLocalResource
             _resourceExcelProcessor = resourceExcelProcessor;
         }
 
-        public async Task Handle(ImportLocalResourceCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ImportLocalResourceCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
             using Stream stream = request.File.OpenReadStream();
 
-            (int Inserted, int Updated) result = await _resourceExcelProcessor.ProcessAsync(stream, cancellationToken);
+            (int Inserted, int Updated) result = await _resourceExcelProcessor.ProcessAsync(stream, ct);
 
             request.Inserted = result.Inserted;
             request.Updated = result.Updated;

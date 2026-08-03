@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.InsuranceCompanies.UpdateInsuranceCompa
             _insuranceCompanyRepository = insuranceCompanyRepository;
         }
 
-        public async Task Handle(UpdateInsuranceCompanyCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateInsuranceCompanyCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -54,7 +54,7 @@ namespace PhysioBoo.Application.Commands.InsuranceCompanies.UpdateInsuranceCompa
             insuranceCompany.SetTermAndConditions(request.InsuranceCompany.TermAndConditions);
             insuranceCompany.SetIsActive(request.InsuranceCompany.IsActive);
 
-            await _insuranceCompanyRepository.UpdateTrackedAsync(insuranceCompany, cancellationToken);
+            await _insuranceCompanyRepository.UpdateTrackedAsync(insuranceCompany, ct);
         }
     }
 }

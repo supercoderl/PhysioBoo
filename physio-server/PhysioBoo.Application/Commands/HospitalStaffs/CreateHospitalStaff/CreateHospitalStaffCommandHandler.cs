@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.HospitalStaffs.CreateHospitalStaff
             _user = user;
         }
 
-        public async Task Handle(CreateHospitalStaffCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateHospitalStaffCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

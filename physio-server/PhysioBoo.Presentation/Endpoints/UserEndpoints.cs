@@ -17,6 +17,7 @@ using PhysioBoo.Application.Queries.Users.GetAll;
 using PhysioBoo.Application.Queries.Users.GetPreferences;
 using PhysioBoo.Application.Queries.Users.GetProfile;
 using PhysioBoo.Application.ViewModels.Users;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Settings;
 using PhysioBoo.Presentation.Filters;
@@ -42,7 +43,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/register", async (
                 [FromBody] CreateUserViewModel newUser,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -68,7 +69,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/resend-verification", async (
                 ResendVerificationViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new ResendVerificationCommand(request.VerificationType));
@@ -87,7 +88,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 string type,
                 IMediatorHandler bus,
                 IOptions<ClientSettings> options,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new VerifyUserCommand(token, type, type != "PasswordReset"));
@@ -113,7 +114,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 [FromBody] LoginUserViewModel request,
                 IMediatorHandler bus,
                 HttpResponse response,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 LoginUserCommand requestCmd = new LoginUserCommand(request.Identifier, request.Password);
@@ -140,7 +141,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 [FromBody] OAuthLoginUserViewModel request,
                 IMediatorHandler bus,
                 HttpResponse response,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 OAuthLoginUserCommand requestCmd = new OAuthLoginUserCommand(request.Token, request.Provider);
@@ -167,7 +168,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 HttpRequest request,
                 HttpResponse response,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new LogoutUserCommand());
@@ -187,14 +188,12 @@ namespace PhysioBoo.Presentation.Endpoints
                 [FromBody] ChangePasswordViewModel request,
                 IMediatorHandler bus,
                 IUser user,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
-                Guid? id = user.GetUserId();
+                Guid id = user.GetUserId();
 
-                if (!id.HasValue) return Results.Unauthorized();
-
-                await bus.SendCommandAsync(new ChangePasswordUserCommand(id.Value, request.OldPassword, request.NewPassword));
+                await bus.SendCommandAsync(new ChangePasswordUserCommand(id, request.OldPassword, request.NewPassword));
 
                 return Results.NoContent();
             }).WithName("Change password")
@@ -209,7 +208,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/forgot-password", async (
                 [FromBody] ForgotPasswordViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new ForgotPasswordCommand(request.Email));
@@ -225,7 +224,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/reset-password", async (
                 [FromBody] ResetPasswordViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new ResetPasswordCommand(request.Token, request.NewPassword));
@@ -244,7 +243,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 IMediatorHandler bus,
                 IUser user,
                 HttpResponse response,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 if (!context.Request.Cookies.TryGetValue("refresh_token", out string? refreshToken) || string.IsNullOrEmpty(refreshToken))
@@ -275,7 +274,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/search", async (
                 [FromBody] PagedRequest<UserFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<UserViewModel> result = await bus.QueryAsync(new GetAllUsersQuery(request));
@@ -288,14 +287,15 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("SearchUsers")
             .WithSummary("Retrieve a paginated list of users with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<UserViewModel>>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<PagedResult<UserViewModel>>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<PagedResult<UserViewModel>>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Iam.UserRead);
             #endregion
 
             #region Assign Role To User
             group.MapPost("/assign-role-to-user", async (
                 [FromBody] RoleForAssigningViewModel roleForAssigning,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new AssignRoleToUserCommand(roleForAssigning));
@@ -305,18 +305,18 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Assign Role To User")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Iam.UserAssignRole);
             #endregion
 
             #region Get Profile
             group.MapGet("/me", async (
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
-                UserProfileViewModel? result = await bus.QueryAsync(new GetUserProfileQuery());
+                UserProfileSummaryViewModel? result = await bus.QueryAsync(new GetUserProfileQuery());
 
-                return Results.Ok(new ResponseMessage<UserProfileViewModel?>
+                return Results.Ok(new ResponseMessage<UserProfileSummaryViewModel?>
                 {
                     Success = true,
                     Data = result
@@ -324,14 +324,14 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("Profile")
             .WithSummary("Retrieve user profile.")
             .RequireAuthorization()
-            .Produces<ResponseMessage<UserProfileViewModel?>>(StatusCodes.Status200OK)
-            .Produces<ResponseMessage<UserProfileViewModel?>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<UserProfileSummaryViewModel?>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<UserProfileSummaryViewModel?>>(StatusCodes.Status400BadRequest);
             #endregion
 
             #region Get Preferences
             group.MapGet("/me/preferences", async (
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 IReadOnlyDictionary<string, string> result = await bus.QueryAsync(new GetPreferencesQuery());
@@ -353,7 +353,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdateUserViewModel user,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdateUserCommand(id, user));
@@ -363,14 +363,15 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Update user")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization(Permissions.Iam.UserUpdate);
             #endregion
 
             #region Delete User
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeleteUserCommand(id));
@@ -380,13 +381,13 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a user by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Iam.UserDelete);
             #endregion
 
             #region Check is authenticated
             group.MapGet("/check-auth", (
                 HttpContext context,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 bool? isAuthenticated = context.User.Identity?.IsAuthenticated;

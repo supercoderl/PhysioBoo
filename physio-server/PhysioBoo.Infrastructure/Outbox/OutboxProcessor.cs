@@ -51,7 +51,7 @@ namespace PhysioBoo.Infrastructure.Outbox
             _logger.LogInformation("Outbox Processor stopped");
         }
 
-        private async Task ProcessOutboxMessages(CancellationToken cancellationToken)
+        private async Task ProcessOutboxMessages(CancellationToken ct)
         {
             using IServiceScope scope = _serviceProvider.CreateScope();
             ApplicationDbContext dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -63,7 +63,7 @@ namespace PhysioBoo.Infrastructure.Outbox
                 .Where(m => m.ProcessedOn == null && m.RetryCount < 5)
                 .OrderBy(m => m.OccurredOn)
                 .Take(20)
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             if (!messages.Any())
                 return;
@@ -94,7 +94,7 @@ namespace PhysioBoo.Infrastructure.Outbox
                         continue;
                     }
 
-                    await publishEndpoint.Publish(integrationEvent, cancellationToken);
+                    await publishEndpoint.Publish(integrationEvent, ct);
 
                     // Mark as processed
                     message.ProcessedOn = TimeZoneHelper.GetLocalTimeNow();
@@ -127,7 +127,7 @@ namespace PhysioBoo.Infrastructure.Outbox
             }
 
             // Save all changes (processed status and retry counts)
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(ct);
         }
 
         private object? ConvertToIntegrationEvent(DomainEvent domainEvent)

@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Interfaces;
@@ -6,7 +6,7 @@ using PhysioBoo.Domain.Interfaces.Repositories;
 
 namespace PhysioBoo.Application.Queries.Users.GetProfile
 {
-    public sealed class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery, UserProfileViewModel?>
+    public sealed class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery, UserProfileSummaryViewModel?>
     {
         private readonly IUserRepository _userRepository;
         private readonly IMediatorHandler _bus;
@@ -23,16 +23,16 @@ namespace PhysioBoo.Application.Queries.Users.GetProfile
             _user = user;
         }
 
-        public async Task<UserProfileViewModel?> Handle(GetUserProfileQuery request, CancellationToken cancellationToken)
+        public async Task<UserProfileSummaryViewModel?> Handle(GetUserProfileQuery request, CancellationToken ct)
         {
             User? user = await _userRepository.GetByIdAsync(
                 _user.GetUserId(),
-                includeProperties: "Doctor,Patient,Profile,UserRoles,UserRoles.Role"
+                includeProperties: "Profile,UserRoles,UserRoles.Role,UserRoles.Role.RolePermissions.Permission"
             );
 
             if (user is null) return null;
 
-            return UserProfileViewModel.FromUser(user);
+            return UserProfileSummaryViewModel.FromEntity(user);
         }
     }
 }

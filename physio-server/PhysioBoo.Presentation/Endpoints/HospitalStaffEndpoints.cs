@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.HospitalStaffs.CreateHospitalStaff;
+using PhysioBoo.Application.Commands.HospitalStaffs.CreateHospitalStaff;
 using PhysioBoo.Application.ViewModels.HospitalStaffs;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreateHospitalStaffViewModel newHospitalStaff,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreateHospitalStaffCommand(newHospitalStaff));
@@ -32,7 +33,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreateHospitalStaff")
             .WithSummary("Create new hospital staff")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Hr.HospitalStaffCreate);
         }
     }
 }

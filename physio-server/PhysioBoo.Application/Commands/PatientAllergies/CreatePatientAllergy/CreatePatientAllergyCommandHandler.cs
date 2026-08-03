@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy
             _user = user;
         }
 
-        public async Task Handle(CreatePatientAllergyCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreatePatientAllergyCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

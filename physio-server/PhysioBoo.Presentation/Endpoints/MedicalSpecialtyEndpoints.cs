@@ -5,6 +5,7 @@ using PhysioBoo.Application.Commands.MedicalSpecialties.UpdateMedicalSpecialty;
 using PhysioBoo.Application.Queries.MedicalSpecialties.GetAll;
 using PhysioBoo.Application.Queries.MedicalSpecialties.GetById;
 using PhysioBoo.Application.ViewModels.MedicalSpecialties;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -25,7 +26,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] CreateMedicalSpecialtyViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -44,14 +45,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new medical specialty")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.MedicalSpecialtyCreate);
             #endregion
 
             #region Get All Medical Specialties
             group.MapPost("search", async (
                 [FromBody] PagedRequest<MedicalSpecialtyFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<MedicalSpecialtyViewModel> result = await bus.QueryAsync(new GetAllMedicalSpecialtiesQuery(request));
@@ -65,14 +66,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a paginated list of medical specialties with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<MedicalSpecialtyViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<MedicalSpecialtyViewModel>>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.MedicalSpecialtyRead);
             #endregion
 
             #region Delete Medical Specialty
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeleteMedicalSpecialtyCommand(id));
@@ -82,7 +83,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a specific medical specialty by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.MedicalSpecialtyDelete);
             #endregion
 
             #region Update Medical Specialty
@@ -90,7 +91,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdateMedicalSpecialtyViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdateMedicalSpecialtyCommand(request, id));
@@ -101,14 +102,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.MedicalSpecialtyUpdate);
             #endregion
 
             #region Get Medical Specialty By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 MedicalSpecialtyViewModel? result = await bus.QueryAsync(new GetMedicalSpecialtyByIdQuery(id));
@@ -122,7 +123,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a medical specialty record.")
             .Produces<ResponseMessage<MedicalSpecialtyViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<MedicalSpecialtyViewModel?>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.MedicalSpecialtyRead);
             #endregion
         }
     }

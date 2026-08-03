@@ -28,7 +28,7 @@ namespace PhysioBoo.Infrastructure.Repositories
             );
         }
 
-        public async Task<RolePermission?> GetByBothIdAsync(Guid roleId, Guid permissionId, CancellationToken cancellationToken)
+        public async Task<RolePermission?> GetByBothIdAsync(Guid roleId, Guid permissionId, CancellationToken ct)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>
             {
@@ -40,7 +40,7 @@ namespace PhysioBoo.Infrastructure.Repositories
                 " get_by_role_and_permission_id",
                 parameters,
                 MapRolePermission,
-                cancellationToken
+                ct
             );
 
             return result.FirstOrDefault();

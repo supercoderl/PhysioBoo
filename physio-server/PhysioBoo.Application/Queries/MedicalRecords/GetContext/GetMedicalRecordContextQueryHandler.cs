@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetContext
             _bus = bus;
         }
 
-        public async Task<PatientContextViewModel?> Handle(GetMedicalRecordContextQuery request, CancellationToken cancellationToken)
+        public async Task<PatientContextViewModel?> Handle(GetMedicalRecordContextQuery request, CancellationToken ct)
         {
             Domain.Entities.PatientInformation.Patient? patient = await _patientRepository.GetByIdAsync(
                 request.PatientId,

@@ -2,6 +2,6 @@
 {
     public interface IResourceExcelProcessor
     {
-        public Task<(int Inserted, int Updated)> ProcessAsync(Stream stream, CancellationToken cancellationToken);
+        public Task<(int Inserted, int Updated)> ProcessAsync(Stream stream, CancellationToken ct);
     }
 }

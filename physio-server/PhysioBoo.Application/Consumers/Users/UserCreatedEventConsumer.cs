@@ -1,8 +1,6 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
-using PhysioBoo.Application.Commands.Patients.CreatePatient;
 using PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken;
-using PhysioBoo.Application.ViewModels.Patients;
 using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Interfaces;
@@ -39,15 +37,10 @@ namespace PhysioBoo.Application.Consumers.Users
                 )
             ));
 
-            await _bus.SendCommandAsync(new CreatePatientCommand(
-                new CreatePatientViewModel(
-                    Guid.NewGuid(),
-                    null, null, null, null, null, null,
-                    null, null, null, null, null, null,
-                    null, null, null, null, null, null
-                ),
-                context.Message.AggregateId
-            ));
+            // Patient creation is no longer implied by self-registration: a User here
+            // only has an email/phone/password, not the demographic data a Patient
+            // requires. The frontend collects that separately via a "complete your
+            // profile" step (CreatePatientCommand with UserId set), after signup.
         }
     }
 }

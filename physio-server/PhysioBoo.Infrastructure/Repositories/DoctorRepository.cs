@@ -16,28 +16,28 @@ namespace PhysioBoo.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<DbResult<Guid>> RegisterDoctor(User user, Profile profile, Doctor doctor, CancellationToken cancellationToken)
+        public async Task<DbResult<Guid>> RegisterDoctor(User user, Profile profile, Doctor doctor, CancellationToken ct)
         {
             DbResult<Guid>? result = null;
 
             Microsoft.EntityFrameworkCore.Storage.IExecutionStrategy strategy = _context.Database.CreateExecutionStrategy();
             await strategy.ExecuteAsync(async () =>
             {
-                using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+                using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync(ct);
 
                 try
                 {
                     user.CreateDoctor(profile, doctor);
                     _context.Users.Add(user);
 
-                    await _context.SaveChangesAsync(cancellationToken);
-                    await transaction.CommitAsync(cancellationToken);
+                    await _context.SaveChangesAsync(ct);
+                    await transaction.CommitAsync(ct);
 
                     result = DbResult<Guid>.Ok(doctor.Id);
                 }
                 catch (Exception)
                 {
-                    await transaction.RollbackAsync(cancellationToken);
+                    await transaction.RollbackAsync(ct);
                     result = DbResult<Guid>.Fail("Failed to create the doctor.");
                 }
             });

@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.BillItems.CreateBillItem;
+using PhysioBoo.Application.Commands.BillItems.CreateBillItem;
 using PhysioBoo.Application.ViewModels.BillItems;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreateBillItemViewModel newBillItem,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreateBillItemCommand(newBillItem));
@@ -32,7 +33,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreateBillItem")
             .WithSummary("Create new bill item")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Billing.BillItemCreate);
         }
     }
 }

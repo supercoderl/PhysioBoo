@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.PrintTemplates.UpdatePrintTemplate
             _printTemplateRepository = printTemplateRepository;
         }
 
-        public async Task Handle(UpdatePrintTemplateCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdatePrintTemplateCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -44,7 +44,7 @@ namespace PhysioBoo.Application.Commands.PrintTemplates.UpdatePrintTemplate
             printTemplate.SetIsActive(request.PrintTemplate.IsActive);
             printTemplate.SetIsDefault(request.PrintTemplate.IsSystemDefault);
 
-            await _printTemplateRepository.UpdateTrackedAsync(printTemplate, cancellationToken);
+            await _printTemplateRepository.UpdateTrackedAsync(printTemplate, ct);
         }
     }
 }

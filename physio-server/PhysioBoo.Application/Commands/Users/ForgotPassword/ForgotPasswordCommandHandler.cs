@@ -26,7 +26,7 @@ namespace PhysioBoo.Application.Commands.Users.ForgotPassword
             _verificationService = verificationService;
         }
 
-        public async Task Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ForgotPasswordCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -34,7 +34,7 @@ namespace PhysioBoo.Application.Commands.Users.ForgotPassword
 
             if (user == null) return;
 
-            await _verificationService.SendAsync(user.Id, request.Email, VerificationType.PasswordReset, cancellationToken);
+            await _verificationService.SendAsync(user.Id, request.Email, VerificationType.PasswordReset, ct);
         }
 
         private async Task<User?> RetriveUserData(ForgotPasswordCommand request)

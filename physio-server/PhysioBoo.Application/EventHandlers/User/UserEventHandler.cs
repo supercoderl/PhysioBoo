@@ -39,11 +39,11 @@ namespace PhysioBoo.Application.EventHandlers.User
             _token = options.Value;
         }
 
-        public async Task Handle(UsersCreatedEvent notification, CancellationToken cancellationToken)
+        public async Task Handle(UsersCreatedEvent notification, CancellationToken ct)
         {
             await _distributedCache.RemoveAsync(
                 CacheKeyGenerator.GetEntityCacheKey<Domain.Entities.Core.User>(notification.AggregateId),
-                cancellationToken
+                ct
             );
 
             //if (notification.RoleId.HasValue)
@@ -52,7 +52,7 @@ namespace PhysioBoo.Application.EventHandlers.User
             //}
         }
 
-        public async Task Handle(UserLoggedEvent notification, CancellationToken cancellationToken)
+        public async Task Handle(UserLoggedEvent notification, CancellationToken ct)
         {
             HttpResponse? response = _httpContextAccessor.HttpContext?.Response;
             AuthHelper.SetTokenCookie(response, "access_token", notification.AccessToken, _user.TimeZoneId);
@@ -61,7 +61,7 @@ namespace PhysioBoo.Application.EventHandlers.User
             await Task.CompletedTask;
         }
 
-        public async Task Handle(UserLoggedOutEvent notification, CancellationToken cancellationToken)
+        public async Task Handle(UserLoggedOutEvent notification, CancellationToken ct)
         {
             HttpResponse? response = _httpContextAccessor.HttpContext?.Response;
             AuthHelper.RemoveTokenCookie(response, "access_token");
@@ -70,7 +70,7 @@ namespace PhysioBoo.Application.EventHandlers.User
             await Task.CompletedTask;
         }
 
-        public async Task Handle(UserVerifiedEvent notification, CancellationToken cancellationToken)
+        public async Task Handle(UserVerifiedEvent notification, CancellationToken ct)
         {
             ViewModels.VerificationTokens.VerificationTokenViewModel? token = await _bus.QueryAsync(new GetVerificationTokenByTokenQuery(notification.Token));
             if (token == null) return;

@@ -15,7 +15,7 @@ namespace PhysioBoo.Infrastructure.Caching
             _options = options.Value;
         }
 
-        public Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
+        public Task<T?> GetAsync<T>(string key, CancellationToken ct = default)
         {
             _cache.TryGetValue(key, out T? value);
             return Task.FromResult(value);
@@ -25,7 +25,7 @@ namespace PhysioBoo.Infrastructure.Caching
             string key,
             Func<Task<T>> factory,
             TimeSpan? expiry = null,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
             return _cache.GetOrCreateAsync(key, async entry =>
             {
@@ -40,7 +40,7 @@ namespace PhysioBoo.Infrastructure.Caching
             string key,
             T value,
             TimeSpan? expiry = null,
-            CancellationToken cancellationToken = default)
+            CancellationToken ct = default)
         {
             MemoryCacheEntryOptions options = new MemoryCacheEntryOptions();
 
@@ -51,7 +51,7 @@ namespace PhysioBoo.Infrastructure.Caching
             return Task.CompletedTask;
         }
 
-        public Task RemoveAsync(string key, CancellationToken cancellationToken = default)
+        public Task RemoveAsync(string key, CancellationToken ct = default)
         {
             _cache.Remove(key);
             return Task.CompletedTask;

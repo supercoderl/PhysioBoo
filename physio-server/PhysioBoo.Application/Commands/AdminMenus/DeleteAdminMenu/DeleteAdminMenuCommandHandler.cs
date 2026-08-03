@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.AdminMenus.DeleteAdminMenu
             _adminMenuRepository = adminMenuRepository;
         }
 
-        public async Task Handle(DeleteAdminMenuCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteAdminMenuCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.AdminMenus.DeleteAdminMenu
             _adminMenuRepository.SoftDeleteSingle(
                 adminMenu,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

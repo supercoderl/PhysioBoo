@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.DeleteHospitalGroup
             _hospitalGroupRepository = hospitalGroupRepository;
         }
 
-        public async Task Handle(DeleteHospitalGroupCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteHospitalGroupCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.DeleteHospitalGroup
             _hospitalGroupRepository.SoftDeleteSingle(
                 hospitalGroup,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

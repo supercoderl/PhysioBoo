@@ -133,19 +133,19 @@ namespace PhysioBoo.SharedKernel.Utils
         /// </summary>
         /// <param name="data">The dictionary with some datas</param>
         public static (string AccessToken, string RefreshToken) BuildAuthToken(
-            Dictionary<string, string> claimDatas,
+            Dictionary<string, object> claimDatas,
             string secret,
             string issuer,
             string audience,
             int expiryDurationMinutes = 15
         )
         {
-            Claim[] claims = new[]
+            List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Email, claimDatas["Email"]),
-                new Claim(ClaimTypes.NameIdentifier, claimDatas["Id"]),
-                new Claim(ClaimTypes.Name, claimDatas["Name"]),
-                new Claim("TenantId", claimDatas["TenantId"])
+                new Claim(ClaimTypes.Email, claimDatas["Email"].ToString() ?? string.Empty),
+                new Claim(ClaimTypes.NameIdentifier, claimDatas["Id"].ToString() ?? string.Empty),
+                new Claim(ClaimTypes.Name, claimDatas["Name"].ToString() ?? string.Empty),
+                new Claim("TenantId", claimDatas["TenantId"].ToString() ?? string.Empty)
             };
 
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));

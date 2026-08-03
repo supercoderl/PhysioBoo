@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.MedicineInventories.CreateMedicineInven
             _user = user;
         }
 
-        public async Task Handle(CreateMedicineInventoryCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateMedicineInventoryCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

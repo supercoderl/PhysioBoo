@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.ImagingModalities.DeleteImagingModality
             _imagingModalityRepository = imagingModalityRepository;
         }
 
-        public async Task Handle(DeleteImagingModalityCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteImagingModalityCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.ImagingModalities.DeleteImagingModality
             _imagingModalityRepository.SoftDeleteSingle(
                 ImagingModality,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

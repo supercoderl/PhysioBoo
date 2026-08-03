@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Doctors.DeleteDoctor
             _doctorRepository = doctorRepository;
         }
 
-        public async Task Handle(DeleteDoctorCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteDoctorCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.Doctors.DeleteDoctor
             _doctorRepository.SoftDeleteSingle(
                 doctor,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

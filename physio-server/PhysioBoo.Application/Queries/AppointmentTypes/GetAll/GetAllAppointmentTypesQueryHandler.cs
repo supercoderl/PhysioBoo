@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Queries.AppointmentTypes.GetAll
             _sortingExpressionProvider = sortingExpressionProvider;
         }
 
-        public async Task<PagedResult<AppointmentTypeViewModel>> Handle(GetAllAppointmentTypesQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<AppointmentTypeViewModel>> Handle(GetAllAppointmentTypesQuery q, CancellationToken ct)
         {
             AppointmentTypesSearchSpec spec = new AppointmentTypesSearchSpec(q, _sortingExpressionProvider);
 
@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Queries.AppointmentTypes.GetAll
                 spec,
                 q.Request.PageNumber,
                 q.Request.PageSize,
-                cancellationToken
+                ct
             );
 
             // Map to view model

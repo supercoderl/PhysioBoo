@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.UpdateMedicineCatego
             _medicineCategoryRepository = medicineCategoryRepository;
         }
 
-        public async Task Handle(UpdateMedicineCategoryCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateMedicineCategoryCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -44,7 +44,7 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.UpdateMedicineCatego
             medicineCategory.SetRequiresPrescription(request.MedicineCategory.RequiresPrescription);
             medicineCategory.SetStorageConditions(request.MedicineCategory.StorageConditions);
 
-            await _medicineCategoryRepository.UpdateTrackedAsync(medicineCategory, cancellationToken);
+            await _medicineCategoryRepository.UpdateTrackedAsync(medicineCategory, ct);
         }
     }
 }

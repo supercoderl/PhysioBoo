@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Commands.Permissions.CreatePermission
             _PermissionRepository = PermissionRepository;
         }
 
-        public async Task Handle(CreatePermissionCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreatePermissionCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

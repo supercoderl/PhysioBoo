@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Patients.UpdatePatient
             _patientRepository = patientRepository;
         }
 
-        public async Task Handle(UpdatePatientCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdatePatientCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -62,7 +62,7 @@ namespace PhysioBoo.Application.Commands.Patients.UpdatePatient
             patient.SetConsentForMarketing(request.Patient.ConsentForMarketing);
             patient.SetDataSharingConsent(request.Patient.DataSharingConsent);
 
-            await _patientRepository.UpdateTrackedAsync(patient, cancellationToken);
+            await _patientRepository.UpdateTrackedAsync(patient, ct);
         }
     }
 }

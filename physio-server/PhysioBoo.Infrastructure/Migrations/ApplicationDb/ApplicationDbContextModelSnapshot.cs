@@ -939,6 +939,7 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Profile", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("BloodGroup")
@@ -1291,6 +1292,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
+                    b.Property<Guid?>("ProfileId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("ProfilePicture")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -1326,6 +1330,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("IsActive");
 
                     b.HasIndex("Phone")
+                        .IsUnique();
+
+                    b.HasIndex("ProfileId")
                         .IsUnique();
 
                     b.HasIndex("TenantId");
@@ -4505,6 +4512,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<Guid>("PrimaryDoctorId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("ProfileId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("ReferralHospitalId")
                         .HasColumnType("uuid");
 
@@ -4556,6 +4566,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("PreferredHospitalId");
 
                     b.HasIndex("PrimaryDoctorId");
+
+                    b.HasIndex("ProfileId")
+                        .IsUnique();
 
                     b.HasIndex("ReferralHospitalId");
 
@@ -6109,12 +6122,6 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "User")
-                        .WithOne("Profile")
-                        .HasForeignKey("PhysioBoo.Domain.Entities.Core.Profile", "Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
                         .WithMany("Profiles")
                         .HasForeignKey("TenantId")
@@ -6131,8 +6138,6 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("HospitalGroup");
 
                     b.Navigation("Updater");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.RefreshToken", b =>
@@ -6211,6 +6216,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.Profile", "Profile")
+                        .WithOne("User")
+                        .HasForeignKey("PhysioBoo.Domain.Entities.Core.User", "ProfileId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PhysioBoo.Domain.Entities.Operation.HospitalGroup", "HospitalGroup")
                         .WithMany("Users")
                         .HasForeignKey("TenantId")
@@ -6225,6 +6235,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("Creator");
 
                     b.Navigation("HospitalGroup");
+
+                    b.Navigation("Profile");
 
                     b.Navigation("Updater");
                 });
@@ -7368,6 +7380,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.Profile", "Profile")
+                        .WithOne()
+                        .HasForeignKey("PhysioBoo.Domain.Entities.PatientInformation.Patient", "ProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("PhysioBoo.Domain.Entities.Operation.Hospital", "ReferralHospital")
                         .WithMany("ReferredPatients")
                         .HasForeignKey("ReferralHospitalId")
@@ -7403,6 +7421,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("PreferredHospital");
 
                     b.Navigation("PrimaryDoctor");
+
+                    b.Navigation("Profile");
 
                     b.Navigation("ReferralHospital");
 
@@ -7680,6 +7700,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("RolePermissions");
                 });
 
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Profile", b =>
+                {
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Role", b =>
                 {
                     b.Navigation("RolePermissions");
@@ -7804,8 +7829,6 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("ProcessedLabTests");
 
                     b.Navigation("ProcessedPayments");
-
-                    b.Navigation("Profile");
 
                     b.Navigation("RadiologistImagingOrders");
 

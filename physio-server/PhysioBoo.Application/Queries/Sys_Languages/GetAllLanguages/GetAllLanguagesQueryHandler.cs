@@ -22,15 +22,15 @@ namespace PhysioBoo.Application.Queries.Sys_Languages.GetAllLanguages
             _cache = cache;
         }
 
-        public async Task<List<LanguageViewModel>> Handle(GetAllLanguagesQuery q, CancellationToken cancellationToken)
+        public async Task<List<LanguageViewModel>> Handle(GetAllLanguagesQuery q, CancellationToken ct)
         {
             string cacheKey = $"config_languages";
-            string? cachedData = await _cache.GetStringAsync(cacheKey, cancellationToken);
+            string? cachedData = await _cache.GetStringAsync(cacheKey, ct);
             List<LanguageViewModel> languages = new List<LanguageViewModel>();
 
             if (string.IsNullOrEmpty(cachedData))
             {
-                List<Sys_Language> eLanguages = await _sys_LanguageRepository.GetAllNoTracking().ToListAsync(cancellationToken);
+                List<Sys_Language> eLanguages = await _sys_LanguageRepository.GetAllNoTracking().ToListAsync(ct);
 
                 // Map to view model
                 languages = eLanguages.Select(l => LanguageViewModel.FromLanguage(l)).ToList();
@@ -39,7 +39,7 @@ namespace PhysioBoo.Application.Queries.Sys_Languages.GetAllLanguages
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24)
                 };
-                await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(languages), cacheOptions, cancellationToken);
+                await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(languages), cacheOptions, ct);
             }
             else
             {

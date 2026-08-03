@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Queries.PrintTemplates.GetAll
             _sortingExpressionProvider = sortingExpressionProvider;
         }
 
-        public async Task<PagedResult<PrintTemplateViewModel>> Handle(GetAllPrintTemplatesQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<PrintTemplateViewModel>> Handle(GetAllPrintTemplatesQuery q, CancellationToken ct)
         {
             PrintTemplatesSearchSpec spec = new PrintTemplatesSearchSpec(q, _sortingExpressionProvider);
 
@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Queries.PrintTemplates.GetAll
                 spec,
                 q.Request.PageNumber,
                 q.Request.PageSize,
-                cancellationToken
+                ct
             );
 
             // Map to view model

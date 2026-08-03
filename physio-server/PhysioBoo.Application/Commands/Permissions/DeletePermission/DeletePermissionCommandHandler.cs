@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Permissions.DeletePermission
             _permissionRepository = permissionRepository;
         }
 
-        public async Task Handle(DeletePermissionCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeletePermissionCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Commands.Permissions.DeletePermission
             _permissionRepository.SoftDeleteSingle(
                 permission,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             await CommitAsync();

@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Queries.LabTests.GetAll
             _sortingExpressionProvider = sortingExpressionProvider;
         }
 
-        public async Task<PagedResult<LabTestViewModel>> Handle(GetAllLabTestsQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<LabTestViewModel>> Handle(GetAllLabTestsQuery q, CancellationToken ct)
         {
             LabTestsSearchSpec spec = new LabTestsSearchSpec(q, _sortingExpressionProvider);
 
@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Queries.LabTests.GetAll
                 spec,
                 q.Request.PageNumber,
                 q.Request.PageSize,
-                cancellationToken
+                ct
             );
 
             // Map to view model

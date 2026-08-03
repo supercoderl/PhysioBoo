@@ -36,16 +36,16 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetClinicalSnapshot
             _patientRepository = patientRepository;
         }
 
-        public async Task<ClinicalSnapshotViewModel?> Handle(GetMedicalRecordClinicalSnapshotQuery request, CancellationToken cancellationToken)
+        public async Task<ClinicalSnapshotViewModel?> Handle(GetMedicalRecordClinicalSnapshotQuery request, CancellationToken ct)
         {
             DateOnly today = DateOnly.FromDateTime(TimeZoneHelper.GetLocalTimeNow());
             TimeOnly now = TimeOnly.FromDateTime(TimeZoneHelper.GetLocalTimeNow());
-            int activeDiagnosesCount = await _patientMedicalHistoryRepository.CountAsync(new ActiveDiagnosisByPatientSpec(request.PatientId), cancellationToken);
+            int activeDiagnosesCount = await _patientMedicalHistoryRepository.CountAsync(new ActiveDiagnosisByPatientSpec(request.PatientId), ct);
             int activeMedicationsCount = 0;
             decimal outstandingBalance = 0;
             string currency = "VND";
-            int knownAllergiesCount = await _patientAllergyRepository.CountAsync(new KnownAllergyByPatientSpec(request.PatientId), cancellationToken);
-            int pendingOrdersCount = await _labOrderRepository.CountAsync(new PendingOrderByPatientSpec(request.PatientId), cancellationToken);
+            int knownAllergiesCount = await _patientAllergyRepository.CountAsync(new KnownAllergyByPatientSpec(request.PatientId), ct);
+            int pendingOrdersCount = await _labOrderRepository.CountAsync(new PendingOrderByPatientSpec(request.PatientId), ct);
             List<Domain.Entities.LaboratoryImaging.LabOrderItem> recentLabAlerts = await _labOrderItemRepository.GetAllNoTracking(
                 filter: x => x.LabOrder != null ? x.LabOrder.PatientId == request.PatientId : false,
                 includeProperties: "LabOrder"

@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.Addresses.CreateAddress
             _user = user;
         }
 
-        public async Task Handle(CreateAddressCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateAddressCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Manufacturers.UpdateManufacturer
             _manufacturerRepository = manufacturerRepository;
         }
 
-        public async Task Handle(UpdateManufacturerCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateManufacturerCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -53,7 +53,7 @@ namespace PhysioBoo.Application.Commands.Manufacturers.UpdateManufacturer
             manufacturer.SetEstablishedYear(request.Manufacturer.EstablishedYear);
             manufacturer.SetIsActive(request.Manufacturer.IsActive);
 
-            await _manufacturerRepository.UpdateTrackedAsync(manufacturer, cancellationToken);
+            await _manufacturerRepository.UpdateTrackedAsync(manufacturer, ct);
         }
     }
 }

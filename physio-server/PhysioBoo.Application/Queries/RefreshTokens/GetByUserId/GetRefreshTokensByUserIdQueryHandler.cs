@@ -15,7 +15,7 @@ namespace PhysioBoo.Application.Queries.RefreshTokens.GetByUserId
             _refreshTokenRepository = refreshTokenRepository;
         }
 
-        public async Task<List<RefreshToken>> Handle(GetRefreshTokensByUserIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<RefreshToken>> Handle(GetRefreshTokensByUserIdQuery request, CancellationToken ct)
         {
             var parameters = new Dictionary<string, object>
             {

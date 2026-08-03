@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Commands.AppointmentTypes.DeleteAppointmentType
             _appointmentTypeRepository = appointmentTypeRepository;
         }
 
-        public async Task Handle(DeleteAppointmentTypeCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteAppointmentTypeCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -41,7 +41,7 @@ namespace PhysioBoo.Application.Commands.AppointmentTypes.DeleteAppointmentType
             _appointmentTypeRepository.SoftDeleteSingle(
                 appointmentType,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             if (await CommitAsync())

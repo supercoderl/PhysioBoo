@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.MedicineInventories.CreateMedicineInventory;
+using PhysioBoo.Application.Commands.MedicineInventories.CreateMedicineInventory;
 using PhysioBoo.Application.ViewModels.MedicineInventories;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreateMedicineInventoryViewModel newMedicineInventory,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreateMedicineInventoryCommand(newMedicineInventory));
@@ -32,7 +33,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreateMedicineInventory")
             .WithSummary("Create new medicine inventory")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryCreate);
         }
     }
 }

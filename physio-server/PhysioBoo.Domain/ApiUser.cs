@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using PhysioBoo.Domain.Exceptions;
 using PhysioBoo.Domain.Interfaces;
 using System.Security.Claims;
 
@@ -30,13 +31,19 @@ namespace PhysioBoo.Domain
             Claim? claim = _httpContextAccessor.HttpContext?.User.Claims
             .FirstOrDefault(x => string.Equals(x.Type, ClaimTypes.NameIdentifier));
 
-            if (Guid.TryParse(claim?.Value, out Guid userId))
+            if (claim is null)
             {
-                _userId = userId;
-                return userId;
+                throw new UnauthenticatedException("The user has not logged in yet.");
             }
 
-            throw new Exception("The user has not logged in yet.");
+            if (!Guid.TryParse(claim.Value, out Guid userId))
+            {
+                _logger.LogWarning("NameIdentifier claim '{ClaimValue}' is not a valid user id.", claim.Value);
+                throw new UnauthenticatedException("The user identity is invalid.");
+            }
+
+            _userId = userId;
+            return userId;
         }
 
         public string GetUserRole()
@@ -49,7 +56,7 @@ namespace PhysioBoo.Domain
                 return claim.Value;
             }
 
-            throw new ArgumentException("Could not parse user role");
+            throw new UnauthenticatedException("The user has not logged in yet.");
         }
 
         public string Name
@@ -122,13 +129,19 @@ namespace PhysioBoo.Domain
             Claim? claim = _httpContextAccessor.HttpContext?.User.Claims
             .FirstOrDefault(x => string.Equals(x.Type, "TenantId"));
 
-            if (Guid.TryParse(claim?.Value, out Guid tenantId))
+            if (claim is null)
             {
-                _tenantId = tenantId;
-                return tenantId;
+                throw new UnauthenticatedException("The user has not logged in yet.");
             }
 
-            throw new Exception("Could not parse tenant id to guid");
+            if (!Guid.TryParse(claim.Value, out Guid tenantId))
+            {
+                _logger.LogWarning("TenantId claim '{ClaimValue}' is not a valid tenant id.", claim.Value);
+                throw new UnauthenticatedException("The user identity is invalid.");
+            }
+
+            _tenantId = tenantId;
+            return tenantId;
         }
     }
 }

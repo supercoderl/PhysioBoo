@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.ImagingModalities.UpdateImagingModality
             _imagingModalityRepository = imagingModalityRepository;
         }
 
-        public async Task Handle(UpdateImagingModalityCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateImagingModalityCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -48,7 +48,7 @@ namespace PhysioBoo.Application.Commands.ImagingModalities.UpdateImagingModality
             imagingModality.SetRadiationDose(request.ImagingModality.RadiationDose);
             imagingModality.SetIsActive(request.ImagingModality.IsActive);
 
-            await _imagingModalityRepository.UpdateTrackedAsync(imagingModality, cancellationToken);
+            await _imagingModalityRepository.UpdateTrackedAsync(imagingModality, ct);
         }
     }
 }

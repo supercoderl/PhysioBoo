@@ -9,9 +9,11 @@ namespace PhysioBoo.Infrastructure.Repositories
 {
     public sealed class UserRepository : BaseRepository<User>, IUserRepository
     {
+        private readonly ApplicationDbContext _context;
+
         public UserRepository(ApplicationDbContext context) : base(context)
         {
-
+            _context = context;
         }
 
         public async Task<User?> GetByEmailAsync(string email)
@@ -24,7 +26,7 @@ namespace PhysioBoo.Infrastructure.Repositories
             List<User> result = await ExecutePostgresFunctionAsync<User>(
                 "get_user_for_login",
                 parameters,
-                reader => MapUserForLogin(reader)
+                MapUserSummary
             );
 
             return result.FirstOrDefault();
@@ -40,10 +42,34 @@ namespace PhysioBoo.Infrastructure.Repositories
             List<User> result = await ExecutePostgresFunctionAsync<User>(
                 "get_identifier_for_login",
                 parameters,
-                reader => MapUserForLogin(reader)
+                MapUserForLogin
             );
 
             return result.FirstOrDefault();
+        }
+
+        private static User MapUserSummary(NpgsqlDataReader reader)
+        {
+            User user = new User(
+                reader.GetFieldValue<Guid>("Id"),
+                reader.GetString("Email"),
+                reader.GetString("Phone"),
+                reader.GetString("PasswordHash")
+            );
+
+            // Only set properties needed for login validation
+            if (!reader.IsDBNull("CreatedBy"))
+            {
+                user.SetCreatedBy(reader.GetGuid("CreatedBy"));
+            }
+            user.SetIsActive(reader.GetBoolean("IsActive"));
+            user.SetIsVerified(reader.GetBoolean("IsVerified"));
+            user.SetEmailVerifiedAt(reader.IsDBNull("EmailVerifiedAt") ? null : reader.GetDateTime("EmailVerifiedAt"));
+            user.SetFailedLoginAttempts(reader.GetInt32("FailedLoginAttempts"));
+            user.SetAccountLockedUntil(reader.IsDBNull("AccountLockedUntil") ? null : reader.GetDateTime("AccountLockedUntil"));
+            user.SetTenantId(reader.GetGuid("TenantId"));
+
+            return (user);
         }
 
         private static User MapUserForLogin(NpgsqlDataReader reader)
@@ -66,6 +92,30 @@ namespace PhysioBoo.Infrastructure.Repositories
             user.SetFailedLoginAttempts(reader.GetInt32("FailedLoginAttempts"));
             user.SetAccountLockedUntil(reader.IsDBNull("AccountLockedUntil") ? null : reader.GetDateTime("AccountLockedUntil"));
             user.SetTenantId(reader.GetGuid("TenantId"));
+
+            string[] roles = reader.GetFieldValue<string[]>("Roles");
+            string[] permissions = reader.GetFieldValue<string[]>("Permissions");
+
+            // Wrap the flat role/permission codes into a single synthetic role
+            // so LoginUserCommandHandler can walk User.UserRoles -> Role.RolePermissions -> Permission.Code
+            Role loginRole = new Role(Guid.NewGuid(), "Login", string.Join(",", roles), null, null, null);
+            foreach (string permissionCode in permissions)
+            {
+                Permission permission = new Permission(Guid.NewGuid(), permissionCode, permissionCode, null);
+                RolePermission rolePermission = new RolePermission(Guid.NewGuid(), loginRole.Id, permission.Id)
+                {
+                    Role = loginRole,
+                    Permission = permission
+                };
+                loginRole.RolePermissions.Add(rolePermission);
+            }
+
+            UserRole userRole = new UserRole(Guid.NewGuid(), user.Id, loginRole.Id, null)
+            {
+                User = user,
+                Role = loginRole
+            };
+            user.UserRoles.Add(userRole);
 
             return user;
         }

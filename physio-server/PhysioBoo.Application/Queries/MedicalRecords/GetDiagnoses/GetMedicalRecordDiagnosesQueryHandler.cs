@@ -17,7 +17,7 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetDiagnoses
             _patientMedicalHistoryRepository = patientMedicalHistoryRepository;
         }
 
-        public async Task<PagedResult<DiagnosisViewModel>> Handle(GetMedicalRecordDiagnosesQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResult<DiagnosisViewModel>> Handle(GetMedicalRecordDiagnosesQuery request, CancellationToken ct)
         {
             List<Domain.Entities.PatientInformation.PatientMedicalHistory> histories = await _patientMedicalHistoryRepository.GetAllNoTracking(
                 filter: x => x.PatientId == request.PatientId,

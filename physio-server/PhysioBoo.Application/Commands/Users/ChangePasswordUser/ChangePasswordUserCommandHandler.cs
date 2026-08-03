@@ -22,7 +22,7 @@ namespace PhysioBoo.Application.Commands.Users.ChangePasswordUser
             _userRepository = userRepository;
         }
 
-        public async Task Handle(ChangePasswordUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ChangePasswordUserCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

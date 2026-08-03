@@ -5,6 +5,7 @@ using PhysioBoo.Application.Commands.Manufacturers.UpdateManufacturer;
 using PhysioBoo.Application.Queries.Manufacturers.GetAll;
 using PhysioBoo.Application.Queries.Manufacturers.GetById;
 using PhysioBoo.Application.ViewModels.Manufacturers;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -25,7 +26,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] CreateManufacturerViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -44,14 +45,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new manufacturer")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.ManufacturerCreate);
             #endregion
 
             #region Get All Manufacturers
             group.MapPost("search", async (
                 [FromBody] PagedRequest<ManufacturerFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<ManufacturerViewModel> result = await bus.QueryAsync(new GetAllManufacturersQuery(request));
@@ -65,14 +66,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a paginated list of manufacturers with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<ManufacturerViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<ManufacturerViewModel>>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.ManufacturerRead);
             #endregion
 
             #region Delete Manufacturer
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeleteManufacturerCommand(id));
@@ -82,7 +83,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a specific manufacturer by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.ManufacturerDelete);
             #endregion
 
             #region Update Manufacturer
@@ -90,7 +91,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdateManufacturerViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdateManufacturerCommand(request, id));
@@ -101,14 +102,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.ManufacturerUpdate);
             #endregion
 
             #region Get Manufacturer By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 ManufacturerViewModel? result = await bus.QueryAsync(new GetManufacturerByIdQuery(id));
@@ -122,7 +123,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a manufacturer record.")
             .Produces<ResponseMessage<ManufacturerViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<ManufacturerViewModel?>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.ManufacturerRead);
             #endregion
         }
     }

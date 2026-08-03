@@ -17,7 +17,7 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetEncounters
             _appointmentRepository = appointmentRepository;
         }
 
-        public async Task<PagedResult<EncounterViewModel>> Handle(GetMedicalRecordEncountersQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResult<EncounterViewModel>> Handle(GetMedicalRecordEncountersQuery request, CancellationToken ct)
         {
             List<Domain.Entities.Operation.Appointment> appointments = await _appointmentRepository.GetAllNoTracking(
                 filter: x => x.PatientId == request.PatientId

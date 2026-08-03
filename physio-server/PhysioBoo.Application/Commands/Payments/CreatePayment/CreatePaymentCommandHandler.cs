@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.Payments.CreatePayment
             _user = user;
         }
 
-        public async Task Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreatePaymentCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

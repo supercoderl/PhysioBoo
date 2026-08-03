@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.AdminMenus.UpdateAdminMenu
             _adminMenuRepository = adminMenuRepository;
         }
 
-        public async Task Handle(UpdateAdminMenuCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateAdminMenuCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -45,7 +45,7 @@ namespace PhysioBoo.Application.Commands.AdminMenus.UpdateAdminMenu
             adminMenu.SetPermissionCode(request.AdminMenu.PermissionCode);
             adminMenu.SetIsActive(request.AdminMenu.IsActive);
 
-            await _adminMenuRepository.UpdateTrackedAsync(adminMenu, cancellationToken);
+            await _adminMenuRepository.UpdateTrackedAsync(adminMenu, ct);
         }
     }
 }

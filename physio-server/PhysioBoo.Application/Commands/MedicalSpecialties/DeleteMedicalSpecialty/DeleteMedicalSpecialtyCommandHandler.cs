@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.DeleteMedicalSpecial
             _medicalSpecialtyRepository = medicalSpecialtyRepository;
         }
 
-        public async Task Handle(DeleteMedicalSpecialtyCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteMedicalSpecialtyCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -41,7 +41,7 @@ namespace PhysioBoo.Application.Commands.MedicalSpecialties.DeleteMedicalSpecial
             _medicalSpecialtyRepository.SoftDeleteSingle(
                 medicalSpecialty,
                 request.IsHard,
-                cancellationToken
+                ct
             );
 
             if (await CommitAsync())

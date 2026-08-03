@@ -17,7 +17,7 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetPatientAllergies
             _patientAllergyRepository = patientAllergyRepository;
         }
 
-        public async Task<PagedResult<PatientAllergyViewModel>> Handle(GetMedicalRecordPatientAllergiesQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResult<PatientAllergyViewModel>> Handle(GetMedicalRecordPatientAllergiesQuery request, CancellationToken ct)
         {
             List<Domain.Entities.PatientInformation.PatientAllergy> allergies = await _patientAllergyRepository.GetAllNoTracking(
                 filter: x => x.PatientId == request.PatientId

@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Queries.ImagingModalities.GetAll
             _sortingExpressionProvider = sortingExpressionProvider;
         }
 
-        public async Task<PagedResult<ImagingModalityViewModel>> Handle(GetAllImagingModalitiesQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<ImagingModalityViewModel>> Handle(GetAllImagingModalitiesQuery q, CancellationToken ct)
         {
             ImagingModalitiesSearchSpec spec = new ImagingModalitiesSearchSpec(q, _sortingExpressionProvider);
 
@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Queries.ImagingModalities.GetAll
                 spec,
                 q.Request.PageNumber,
                 q.Request.PageSize,
-                cancellationToken
+                ct
             );
 
             // Map to view model

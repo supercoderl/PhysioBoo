@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.Addresses.UpdateAddress
             _addressRepository = addressRepository;
         }
 
-        public async Task Handle(UpdateAddressCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateAddressCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -48,7 +48,7 @@ namespace PhysioBoo.Application.Commands.Addresses.UpdateAddress
             address.SetLongitude(request.Address.Longitude);
             address.SetIsPrimary(request.Address.IsPrimary);
 
-            await _addressRepository.UpdateTrackedAsync(address, cancellationToken);
+            await _addressRepository.UpdateTrackedAsync(address, ct);
         }
     }
 }

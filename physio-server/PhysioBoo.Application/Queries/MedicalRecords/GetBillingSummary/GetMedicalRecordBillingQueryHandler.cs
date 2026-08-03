@@ -23,13 +23,13 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetBillingSummary
             _paymentRepository = paymentRepository;
         }
 
-        public async Task<BillingSummaryViewModel?> Handle(GetMedicalRecordBillingQuery request, CancellationToken cancellationToken)
+        public async Task<BillingSummaryViewModel?> Handle(GetMedicalRecordBillingQuery request, CancellationToken ct)
         {
             List<Domain.Entities.Operation.Bill> bills = await _billRepository.GetAllNoTracking(
                 filter: x => x.PatientId == request.PatientId,
                 orderBy: null,
                 includeProperties: "Payments"
-            ).ToListAsync(cancellationToken);
+            ).ToListAsync(ct);
 
             string currency = bills
                 .Select(x => x.Currency)
@@ -40,7 +40,7 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetBillingSummary
                 .GetAllNoTracking(x => billIds.Contains(x.BillId))
                 .OrderByDescending(x => x.PaymentDate)
                 .Take(5)
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
 
             return BillingSummaryViewModel.FromEntity(
                 currency,

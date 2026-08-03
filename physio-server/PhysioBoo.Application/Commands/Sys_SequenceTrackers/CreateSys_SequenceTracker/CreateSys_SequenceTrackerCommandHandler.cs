@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.Sys_SequenceTrackers.CreateSys_Sequence
             _user = user;
         }
 
-        public async Task Handle(CreateSys_SequenceTrackerCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateSys_SequenceTrackerCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

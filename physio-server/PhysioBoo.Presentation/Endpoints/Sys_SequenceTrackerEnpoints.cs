@@ -5,6 +5,7 @@ using PhysioBoo.Application.Commands.Sys_SequenceTrackers.UpdateSys_SequenceTrac
 using PhysioBoo.Application.Queries.Sys_SequenceTrackers.GetAll;
 using PhysioBoo.Application.Queries.Sys_SequenceTrackers.GetById;
 using PhysioBoo.Application.ViewModels.Sys_SequenceTrackers;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -25,7 +26,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] CreateSys_SequenceTrackerViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -44,14 +45,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new sequence tracker")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.SequenceTrackerCreate);
             #endregion
 
             #region Get All Sequence Trackers
             group.MapPost("search", async (
                 [FromBody] PagedRequest<Sys_SequenceTrackerFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<Sys_SequenceTrackerViewModel> result = await bus.QueryAsync(new GetAllSys_SequenceTrackersQuery(request));
@@ -65,14 +66,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a paginated list of sequence trackers with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<Sys_SequenceTrackerViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<Sys_SequenceTrackerViewModel>>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.SequenceTrackerRead);
             #endregion
 
             #region Delete Sequence Tracker
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeleteSys_SequenceTrackerCommand(id));
@@ -82,7 +83,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a specific sequence tracker by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.SequenceTrackerDelete);
             #endregion
 
             #region Update Sequence Tracker
@@ -90,7 +91,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdateSys_SequenceTrackerViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdateSys_SequenceTrackerCommand(request, id));
@@ -101,14 +102,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.SequenceTrackerUpdate);
             #endregion
 
             #region Get Sequence Tracker By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Sys_SequenceTrackerViewModel? result = await bus.QueryAsync(new GetSys_SequenceTrackerByIdQuery(id));
@@ -122,7 +123,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a sequence tracker record.")
             .Produces<ResponseMessage<Sys_SequenceTrackerViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<Sys_SequenceTrackerViewModel?>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Admin.SequenceTrackerRead);
             #endregion
         }
     }

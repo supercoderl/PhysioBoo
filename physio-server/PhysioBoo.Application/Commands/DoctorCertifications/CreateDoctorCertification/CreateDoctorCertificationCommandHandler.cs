@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.DoctorCertifications.CreateDoctorCertif
             _user = user;
         }
 
-        public async Task Handle(CreateDoctorCertificationCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateDoctorCertificationCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

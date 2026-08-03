@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Services
             _verificationTokenRepository = verificationTokenRepository;
         }
 
-        public async Task SendAsync(Guid userId, string? email, VerificationType? type, CancellationToken cancellationToken)
+        public async Task SendAsync(Guid userId, string? email, VerificationType? type, CancellationToken ct)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>
             {
@@ -38,7 +38,7 @@ namespace PhysioBoo.Application.Services
                 "get_tokens_dynamic",
                 parameters,
                 reader => MapToken(reader),
-                cancellationToken
+                ct
             );
 
             if (result.Any())

@@ -1,9 +1,12 @@
-﻿namespace PhysioBoo.Application.ViewModels.Users
+﻿using PhysioBoo.Domain.Enums;
+
+namespace PhysioBoo.Application.ViewModels.Users
 {
     public sealed record CreateUserViewModel
     (
         string Email,
         string Phone,
-        string Password
+        string Password,
+        Role Role
     );
 }

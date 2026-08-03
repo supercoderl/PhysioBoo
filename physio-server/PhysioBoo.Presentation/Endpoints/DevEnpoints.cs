@@ -18,7 +18,7 @@ namespace PhysioBoo.Presentation.Endpoints
             // Get cookies
             group.MapGet("/check", (
                 HttpRequest request,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 return Results.Ok(new ResponseMessage<string>
@@ -35,7 +35,7 @@ namespace PhysioBoo.Presentation.Endpoints
             #region Get cookies
             group.MapGet("/cookies", (
                 HttpRequest request,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 IRequestCookieCollection cookies = request.Cookies;
@@ -53,7 +53,7 @@ namespace PhysioBoo.Presentation.Endpoints
             #region Check is authenticated
             group.MapGet("/is-authenticated", (
                 HttpContext context,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 bool? isAuthenticated = context.User.Identity?.IsAuthenticated;
@@ -75,7 +75,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 HttpRequest request,
                 [FromBody] string To,
                 IEmailSender emailSender,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await emailSender.SendTemplateAsync(To, "Email", new { UserName = "test", VerificationUrl = "test" }, "Test mail");

@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.Patients.GetById
             _patientRepository = patientRepository;
         }
 
-        public async Task<PatientViewModel?> Handle(GetPatientByIdQuery request, CancellationToken cancellationToken)
+        public async Task<PatientViewModel?> Handle(GetPatientByIdQuery request, CancellationToken ct)
         {
-            Patient? patient = await _patientRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            Patient? patient = await _patientRepository.GetByIdAsync(request.Id, includeProperties: "User,User.Profile", ct: ct);
 
             if (patient == null)
             {

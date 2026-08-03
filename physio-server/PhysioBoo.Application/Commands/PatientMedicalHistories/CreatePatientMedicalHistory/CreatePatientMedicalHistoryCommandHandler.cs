@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.PatientMedicalHistories.CreatePatientMe
             _user = user;
         }
 
-        public async Task Handle(CreatePatientMedicalHistoryCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreatePatientMedicalHistoryCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

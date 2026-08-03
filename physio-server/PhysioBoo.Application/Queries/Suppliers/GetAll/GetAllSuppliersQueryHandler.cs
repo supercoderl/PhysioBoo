@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Queries.Suppliers.GetAll
             _sortingExpressionProvider = sortingExpressionProvider;
         }
 
-        public async Task<PagedResult<SupplierViewModel>> Handle(GetAllSuppliersQuery q, CancellationToken cancellationToken)
+        public async Task<PagedResult<SupplierViewModel>> Handle(GetAllSuppliersQuery q, CancellationToken ct)
         {
             SuppliersSearchSpec spec = new SuppliersSearchSpec(q, _sortingExpressionProvider);
 
@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Queries.Suppliers.GetAll
                 spec,
                 q.Request.PageNumber,
                 q.Request.PageSize,
-                cancellationToken
+                ct
             );
 
             // Map to view model

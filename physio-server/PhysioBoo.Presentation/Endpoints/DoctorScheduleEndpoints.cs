@@ -1,5 +1,6 @@
 ﻿using PhysioBoo.Application.Commands.DoctorSchedules.CreateDoctorSchedule;
 using PhysioBoo.Application.ViewModels.DoctorSchedules;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreateDoctorScheduleViewModel newDoctorSchedule,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreateDoctorScheduleCommand(newDoctorSchedule));
@@ -32,7 +33,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreateDoctorSchedule")
             .WithSummary("Create new doctor schedule")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Scheduling.DoctorScheduleCreate);
         }
     }
 }

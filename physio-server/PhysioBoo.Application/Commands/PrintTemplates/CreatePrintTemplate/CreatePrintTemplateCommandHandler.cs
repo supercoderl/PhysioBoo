@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.PrintTemplates.CreatePrintTemplate
             _printTemplateVersionRepository = printTemplateVersionRepository;
         }
 
-        public async Task Handle(CreatePrintTemplateCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreatePrintTemplateCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -51,7 +51,7 @@ namespace PhysioBoo.Application.Commands.PrintTemplates.CreatePrintTemplate
                 request.NewPrintTemplate.Version.CustomCss
             );
 
-            SharedKernel.Results.DbResult<Guid> result = await _printTemplateRepository.InsertTemplateWithVersion(printTemplate, printTemplateVersion, cancellationToken);
+            SharedKernel.Results.DbResult<Guid> result = await _printTemplateRepository.InsertTemplateWithVersion(printTemplate, printTemplateVersion, ct);
 
             if (!result.Success)
             {

@@ -23,7 +23,7 @@ namespace PhysioBoo.Application.Commands.Sys_Resources.ImportRemoteResource
             _resourceExcelProcessor = resourceExcelProcessor;
         }
 
-        public async Task Handle(ImportRemoteResourceCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ImportRemoteResourceCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -39,9 +39,9 @@ namespace PhysioBoo.Application.Commands.Sys_Resources.ImportRemoteResource
             try
             {
                 using HttpClient client = _httpClientFactory.CreateClient();
-                byte[] fileBytes = await client.GetByteArrayAsync(exportUrl, cancellationToken);
+                byte[] fileBytes = await client.GetByteArrayAsync(exportUrl, ct);
                 using MemoryStream stream = new MemoryStream(fileBytes);
-                (int Inserted, int Updated) result = await _resourceExcelProcessor.ProcessAsync(stream, cancellationToken);
+                (int Inserted, int Updated) result = await _resourceExcelProcessor.ProcessAsync(stream, ct);
 
                 request.Inserted = result.Inserted;
                 request.Updated = result.Updated;

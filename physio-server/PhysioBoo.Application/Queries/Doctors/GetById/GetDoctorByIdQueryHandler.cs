@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.Doctors.GetById
             _doctorRepository = doctorRepository;
         }
 
-        public async Task<DoctorViewModel?> Handle(GetDoctorByIdQuery request, CancellationToken cancellationToken)
+        public async Task<DoctorViewModel?> Handle(GetDoctorByIdQuery request, CancellationToken ct)
         {
-            Doctor? doctor = await _doctorRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            Doctor? doctor = await _doctorRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (doctor == null)
             {

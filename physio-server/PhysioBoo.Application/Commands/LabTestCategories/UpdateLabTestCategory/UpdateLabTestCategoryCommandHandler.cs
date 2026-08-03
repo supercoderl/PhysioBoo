@@ -20,7 +20,7 @@ namespace PhysioBoo.Application.Commands.LabTestCategories.UpdateLabTestCategory
             _labTestCategoryRepository = labTestCategoryRepository;
         }
 
-        public async Task Handle(UpdateLabTestCategoryCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateLabTestCategoryCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -42,7 +42,7 @@ namespace PhysioBoo.Application.Commands.LabTestCategories.UpdateLabTestCategory
             labTestCategory.SetDepartment(request.LabTestCategory.Department);
             labTestCategory.SetIsActive(request.LabTestCategory.IsActive);
 
-            await _labTestCategoryRepository.UpdateTrackedAsync(labTestCategory, cancellationToken);
+            await _labTestCategoryRepository.UpdateTrackedAsync(labTestCategory, ct);
         }
     }
 }

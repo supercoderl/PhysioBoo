@@ -23,7 +23,7 @@ namespace PhysioBoo.Application.Commands.Roles.DeletePermissionFromRole
             _rolePermissionRepository = rolePermissionRepository;
         }
 
-        public async Task Handle(DeletePermissionFromRoleCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeletePermissionFromRoleCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -35,7 +35,7 @@ namespace PhysioBoo.Application.Commands.Roles.DeletePermissionFromRole
                 return;
             }
 
-            _rolePermissionRepository.SoftDeleteSingle(rolePermission, true, cancellationToken);
+            _rolePermissionRepository.SoftDeleteSingle(rolePermission, true, ct);
             await CommitAsync();
         }
     }

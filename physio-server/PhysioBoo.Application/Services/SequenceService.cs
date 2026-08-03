@@ -9,7 +9,7 @@ namespace PhysioBoo.Application.Services
 
         }
 
-        public Task GenerateNextCodeAsync(string entityType, CancellationToken cancellationToken)
+        public Task GenerateNextCodeAsync(string entityType, CancellationToken ct)
         {
             throw new NotImplementedException();
         }

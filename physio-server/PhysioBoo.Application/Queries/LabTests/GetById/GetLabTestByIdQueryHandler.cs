@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.LabTests.GetById
             _labTestRepository = labTestRepository;
         }
 
-        public async Task<LabTestViewModel?> Handle(GetLabTestByIdQuery request, CancellationToken cancellationToken)
+        public async Task<LabTestViewModel?> Handle(GetLabTestByIdQuery request, CancellationToken ct)
         {
-            LabTest? labTest = await _labTestRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            LabTest? labTest = await _labTestRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (labTest == null)
             {

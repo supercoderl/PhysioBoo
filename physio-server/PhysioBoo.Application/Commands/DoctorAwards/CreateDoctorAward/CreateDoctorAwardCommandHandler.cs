@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.DoctorAwards.CreateDoctorAward
             _user = user;
         }
 
-        public async Task Handle(CreateDoctorAwardCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateDoctorAwardCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

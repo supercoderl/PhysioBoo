@@ -5,6 +5,7 @@ using PhysioBoo.Application.Commands.Suppliers.UpdateSupplier;
 using PhysioBoo.Application.Queries.Suppliers.GetAll;
 using PhysioBoo.Application.Queries.Suppliers.GetById;
 using PhysioBoo.Application.ViewModels.Suppliers;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -25,7 +26,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("", async (
                 [FromBody] CreateSupplierViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 Guid newId = Guid.NewGuid();
@@ -44,14 +45,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new supplier")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.SupplierCreate);
             #endregion
 
             #region Get All Suppliers
             group.MapPost("search", async (
                 [FromBody] PagedRequest<SupplierFilter> request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 PagedResult<SupplierViewModel> result = await bus.QueryAsync(new GetAllSuppliersQuery(request));
@@ -65,14 +66,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a paginated list of suppliers with filters and sorting.")
             .Produces<ResponseMessage<PagedResult<SupplierViewModel>>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<PagedResult<SupplierViewModel>>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.SupplierRead);
             #endregion
 
             #region Delete Supplier
             group.MapDelete("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new DeleteSupplierCommand(id));
@@ -82,7 +83,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Handles requests to delete a specific supplier by its identifier.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.SupplierDelete);
             #endregion
 
             #region Update Supplier
@@ -90,7 +91,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 Guid id,
                 [FromBody] UpdateSupplierViewModel request,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new UpdateSupplierCommand(request, id));
@@ -101,14 +102,14 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.SupplierUpdate);
             #endregion
 
             #region Get Supplier By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 SupplierViewModel? result = await bus.QueryAsync(new GetSupplierByIdQuery(id));
@@ -122,7 +123,7 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Retrieve a supplier record.")
             .Produces<ResponseMessage<SupplierViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<SupplierViewModel?>>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .RequireAuthorization(Permissions.Pharmacy.SupplierRead);
             #endregion
         }
     }

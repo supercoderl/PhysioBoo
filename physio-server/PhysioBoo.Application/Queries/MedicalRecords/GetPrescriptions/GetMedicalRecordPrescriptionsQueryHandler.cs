@@ -17,12 +17,12 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetPrescriptions
             _prescriptionRepository = prescriptionRepository;
         }
 
-        public async Task<PagedResult<PrescriptionViewModel>> Handle(GetMedicalRecordPrescriptionsQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResult<PrescriptionViewModel>> Handle(GetMedicalRecordPrescriptionsQuery request, CancellationToken ct)
         {
             List<Domain.Entities.Clinical.Prescription> prescriptions = await _prescriptionRepository.GetAllNoTracking(
                 filter: x => x.PatientId.Equals(request.PatientId),
                 includeProperties: "PrescriptionItems"
-            ).ToListAsync(cancellationToken);
+            ).ToListAsync(ct);
 
             return new PagedResult<PrescriptionViewModel>(0, prescriptions.Select(x => PrescriptionViewModel.FromPrescription(x)).ToList(), 1, 1);
         }

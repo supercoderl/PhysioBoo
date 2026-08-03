@@ -1,4 +1,4 @@
-﻿namespace PhysioBoo.Application.ViewModels.Users
+namespace PhysioBoo.Application.ViewModels.Users
 {
     public sealed record LoginUserViewModel
     (

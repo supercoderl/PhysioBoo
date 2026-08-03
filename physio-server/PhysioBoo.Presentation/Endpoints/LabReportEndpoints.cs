@@ -1,5 +1,6 @@
-﻿using PhysioBoo.Application.Commands.LabReports.CreateLabReport;
+using PhysioBoo.Application.Commands.LabReports.CreateLabReport;
 using PhysioBoo.Application.ViewModels.LabReports;
+using PhysioBoo.Domain.Constants;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Presentation.Filters;
 using PhysioBoo.Presentation.Models;
@@ -19,7 +20,7 @@ namespace PhysioBoo.Presentation.Endpoints
             group.MapPost("/create", async (
                 CreateLabReportViewModel newLabReport,
                 IMediatorHandler bus,
-                CancellationToken cancellationToken
+                CancellationToken ct
             ) =>
             {
                 await bus.SendCommandAsync(new CreateLabReportCommand(newLabReport));
@@ -32,7 +33,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("CreateLabReport")
             .WithSummary("Create new lab report")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
-            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Lab.LabReportCreate);
         }
     }
 }

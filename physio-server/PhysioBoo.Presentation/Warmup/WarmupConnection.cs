@@ -52,20 +52,20 @@ namespace PhysioBoo.Presentation.Warmup
             }
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken ct)
         {
             _appLifetime.ApplicationStarted.Register(() =>
             {
                 _ = Task.Run(async () =>
                 {
-                    await Task.Delay(2000, cancellationToken);
+                    await Task.Delay(2000, ct);
                     await PrewarmEntityFramework();
-                }, cancellationToken);
+                }, ct);
             });
 
             return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task StopAsync(CancellationToken ct) => Task.CompletedTask;
     }
 }

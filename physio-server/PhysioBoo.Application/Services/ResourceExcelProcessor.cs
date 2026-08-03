@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Services
             _sys_LanguageRepository = sys_LanguageRepository;
         }
 
-        public async Task<(int Inserted, int Updated)> ProcessAsync(Stream stream, CancellationToken cancellationToken)
+        public async Task<(int Inserted, int Updated)> ProcessAsync(Stream stream, CancellationToken ct)
         {
             int inserted = 0;
             int updated = 0;

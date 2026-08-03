@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.InsuranceCompanies.GetById
             _insuranceCompanyRepository = insuranceCompanyRepository;
         }
 
-        public async Task<InsuranceCompanyViewModel?> Handle(GetInsuranceCompanyByIdQuery request, CancellationToken cancellationToken)
+        public async Task<InsuranceCompanyViewModel?> Handle(GetInsuranceCompanyByIdQuery request, CancellationToken ct)
         {
-            InsuranceCompany? insuranceCompany = await _insuranceCompanyRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            InsuranceCompany? insuranceCompany = await _insuranceCompanyRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (insuranceCompany == null)
             {

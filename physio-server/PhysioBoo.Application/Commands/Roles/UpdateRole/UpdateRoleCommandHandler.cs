@@ -21,7 +21,7 @@ namespace PhysioBoo.Application.Commands.Roles.UpdateRole
             _roleRepository = roleRepository;
         }
 
-        public async Task Handle(UpdateRoleCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateRoleCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -42,7 +42,7 @@ namespace PhysioBoo.Application.Commands.Roles.UpdateRole
             role.SetCode(request.Role.Code);
             role.SetDescription(request.Role.Description);
 
-            int executedNum = await _roleRepository.UpdateTrackedAsync(role, cancellationToken);
+            int executedNum = await _roleRepository.UpdateTrackedAsync(role, ct);
 
             if (executedNum > 0)
             {

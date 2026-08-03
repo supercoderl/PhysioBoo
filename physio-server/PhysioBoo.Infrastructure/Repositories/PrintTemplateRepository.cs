@@ -17,7 +17,7 @@ namespace PhysioBoo.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<PrintTemplate?> GetByCodeAsync(string code, CancellationToken cancellationToken)
+        public async Task<PrintTemplate?> GetByCodeAsync(string code, CancellationToken ct)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>
             {
@@ -28,37 +28,37 @@ namespace PhysioBoo.Infrastructure.Repositories
                 "get_print_template_by_code",
                 parameters,
                 reader => MapPrintTemplate(reader),
-                cancellationToken
+                ct
             );
 
             return result.FirstOrDefault();
         }
 
-        public async Task<DbResult<Guid>> InsertTemplateWithVersion(PrintTemplate printTemplate, PrintTemplateVersion printTemplateVersion, CancellationToken cancellationToken)
+        public async Task<DbResult<Guid>> InsertTemplateWithVersion(PrintTemplate printTemplate, PrintTemplateVersion printTemplateVersion, CancellationToken ct)
         {
             DbResult<Guid>? result = null;
 
             Microsoft.EntityFrameworkCore.Storage.IExecutionStrategy strategy = _context.Database.CreateExecutionStrategy();
             await strategy.ExecuteAsync(async () =>
             {
-                using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+                using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync(ct);
 
                 try
                 {
                     _context.PrintTemplates.Add(printTemplate);
                     _context.PrintTemplateVersions.Add(printTemplateVersion);
 
-                    await _context.SaveChangesAsync(cancellationToken);
+                    await _context.SaveChangesAsync(ct);
 
                     printTemplate.SetCurrentVersionId(printTemplateVersion.Id);
-                    await _context.SaveChangesAsync(cancellationToken);
+                    await _context.SaveChangesAsync(ct);
 
-                    await transaction.CommitAsync(cancellationToken);
+                    await transaction.CommitAsync(ct);
                     result = DbResult<Guid>.Ok(printTemplate.Id);
                 }
                 catch (Exception)
                 {
-                    await transaction.RollbackAsync(cancellationToken);
+                    await transaction.RollbackAsync(ct);
                     result = DbResult<Guid>.Fail("Failed to create template.");
                 }
             });

@@ -22,9 +22,9 @@ namespace PhysioBoo.Application.Queries.LabTestCategories.GetById
             _labTestCategoryRepository = labTestCategoryRepository;
         }
 
-        public async Task<LabTestCategoryViewModel?> Handle(GetLabTestCategoryByIdQuery request, CancellationToken cancellationToken)
+        public async Task<LabTestCategoryViewModel?> Handle(GetLabTestCategoryByIdQuery request, CancellationToken ct)
         {
-            LabTestCategory? labTestCategory = await _labTestCategoryRepository.GetByIdAsync(request.Id, cancellationToken: cancellationToken);
+            LabTestCategory? labTestCategory = await _labTestCategoryRepository.GetByIdAsync(request.Id, ct: ct);
 
             if (labTestCategory == null)
             {

@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.Sys_SequenceTrackers.UpdateSys_Sequence
             _user = user;
         }
 
-        public async Task Handle(UpdateSys_SequenceTrackerCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateSys_SequenceTrackerCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -50,7 +50,7 @@ namespace PhysioBoo.Application.Commands.Sys_SequenceTrackers.UpdateSys_Sequence
             sys_SequenceTracker.SetUpdatedAt(TimeZoneHelper.GetLocalTimeNow());
             sys_SequenceTracker.SetUpdatedBy(_user.GetUserId());
 
-            await _sys_SequenceTrackerRepository.UpdateTrackedAsync(sys_SequenceTracker, cancellationToken);
+            await _sys_SequenceTrackerRepository.UpdateTrackedAsync(sys_SequenceTracker, ct);
         }
     }
 }

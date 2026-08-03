@@ -5,6 +5,7 @@ import { ChevronUp, FileCheck, Info } from "lucide-angular";
 import { AuthService } from "../../../../services/auth/auth.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
+import { MENU_CACHE_KEY } from "../../../../shared/data/cache";
 import { AVATAR } from "../../../../shared/data/dummy";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { PaginationData } from "../../../../shared/types/common";
@@ -54,7 +55,7 @@ export class AdminLayoutSideBarComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        const cache = LocalStorage.load<PaginationData<MenuItem>>("menu_data");
+        const cache = LocalStorage.load<PaginationData<MenuItem>>(MENU_CACHE_KEY);
         if (cache) {
             this.menus = cache.items.sort((a, b) => a.order - b.order);
         }

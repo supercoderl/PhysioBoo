@@ -1,9 +1,10 @@
-import { Component, Input } from "@angular/core";
+import { Component, inject, Input, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
 import { BloodGroup } from "../../../../../shared/enums/blood-group";
 import { Gender } from "../../../../../shared/enums/gender";
 import { MaritalStatus } from "../../../../../shared/enums/marital-status";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { UserProfile } from "../../../../../shared/types/core.types";
+import { UserProfileBase } from "../../../../../shared/types/core.types";
 import { BooDatepickerComponent } from "../../../../date-picker/boo-date-picker.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
@@ -33,7 +34,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                   <img
                     alt="User avatar"
                     class="w-full h-full text-center object-cover"
-                    [appSrc]="userInfo?.profilePicture"
+                    [appSrc]="userInfo?.avatarUrl"
                   />
                 </div>
               </div>
@@ -175,9 +176,13 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
     `
 })
 
-export class AdminAccountProfileComponent {
+export class AdminAccountProfileComponent implements OnInit {
+  // #region Inject Methods
+  router = inject(Router);
+  // #endregion
+
   // #region Inputs, Outputs, Properties
-  @Input() userInfo?: UserProfile | null;
+  @Input() userInfo?: UserProfileBase | null;
   genderOptions = Object.keys(Gender)
     .filter(key => isNaN(Number(key)))
     .map(key => ({
@@ -198,5 +203,11 @@ export class AdminAccountProfileComponent {
       label: key,
       value: BloodGroup[key as keyof typeof BloodGroup]
     }));
+  // #endregion
+
+  // #region Init(Life cycle + Setup)
+  ngOnInit(): void {
+    if(!this.userInfo) this.router.createUrlTree(['/exception/401']);
+  }
   // #endregion
 }

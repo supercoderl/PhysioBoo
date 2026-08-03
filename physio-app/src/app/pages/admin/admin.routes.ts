@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { Role } from '../../shared/enums/role';
+import { permissionGuard } from 'src/app/services/auth/permission-guard.guard';
+import { Permissions } from 'src/app/shared/constants/permission.constant';
 
 export const routes: Routes = [
     {
@@ -49,7 +51,8 @@ export const routes: Routes = [
                             {
                                 path: 'list',
                                 loadComponent: () => import('./reception/booking/admin-booking-list/admin-booking-list.component').then(m => m.AdminBookingListComponent),
-                                data: { breadcrumb: ['list'] }
+                                data: { breadcrumb: ['list'] },
+                                canActivate: [permissionGuard(Permissions.Reception.BookingRead)]
                             }
                         ]
                     },
@@ -57,11 +60,13 @@ export const routes: Routes = [
                         path: 'queue',
                         data: { breadcrumb: ['queue'] },
                         loadComponent: () => import('./reception/queue/queue.component').then(m => m.AdminQueueComponent),
+                        canActivate: [permissionGuard(Permissions.Reception.QueueRead)]
                     },
                     {
                         path: 'registration',
                         data: { breadcrumb: ['registration'] },
                         loadComponent: () => import('./reception/registration/registration.component').then(m => m.AdminRegistrationComponent),
+                        canActivate: [permissionGuard(Permissions.Reception.PatientRegister)]
                     }
                 ]
             },
@@ -77,17 +82,20 @@ export const routes: Routes = [
                     {
                         path: 'doctor-desk',
                         data: { breadcrumb: ['doctor-desk'] },
+                        canActivate: [permissionGuard(Permissions.Clinical.MedicalRecordRead)],
                         loadComponent: () => import('./clinic/doctor-desk/doctor-desk.component').then(m => m.AdminDoctorDeskComponent)
                     },
                     {
                         path: 'prescription',
                         data: { breadcrumb: ['prescription'] },
-                        loadComponent: () => import('./clinic/prescription/prescription.component').then(m => m.AdminPrescriptionComponent)
+                        loadComponent: () => import('./clinic/prescription/prescription.component').then(m => m.AdminPrescriptionComponent),
+                        canActivate: [permissionGuard(Permissions.Pharmacy.PrescriptionRead)]
                     },
                     {
                         path: 'medical-record',
                         data: { breadcrumb: ['medical record'] },
-                        loadComponent: () => import('./clinic/medical-record/medical-record.component').then(m => m.AdminMedicalRecordComponent)
+                        loadComponent: () => import('./clinic/medical-record/medical-record.component').then(m => m.AdminMedicalRecordComponent),
+                        canActivate: [permissionGuard(Permissions.Clinical.MedicalRecordRead)]
                     }
                 ]
             },
@@ -156,11 +164,13 @@ export const routes: Routes = [
                         path: 'laboratory',
                         data: { breadcrumb: ['laboratory'] },
                         loadComponent: () => import('./paraclinical/laboratory/laboratory.component').then(m => m.AdminLaboratoryComponent),
+                        canActivate: [permissionGuard(Permissions.Lab.LabOrderRead)]
                     },
                     {
                         path: 'radiology',
                         data: { breadcrumb: ['radiology'] },
                         loadComponent: () => import('./paraclinical/radiology/radiology.component').then(m => m.AdminRadiologyComponent),
+                        canActivate: [permissionGuard(Permissions.Imaging.ImagingOrderRead)]
                     },
                     {
                         path: 'surgery',
@@ -182,16 +192,19 @@ export const routes: Routes = [
                         path: 'retail',
                         data: { breadcrumb: ['retail'] },
                         loadComponent: () => import('./pharmacy/retail/retail.component').then(m => m.AdminRetailComponent),
+                        canActivate: [permissionGuard(Permissions.Pharmacy.MedicineInventoryRead)]
                     },
                     {
                         path: 'prescription-dispense',
                         data: { breadcrumb: ['prescription-dispense'] },
                         loadComponent: () => import('./pharmacy/prescription-dispense/prescription-dispense.component').then(m => m.AdminPrescriptionDispenseComponent),
+                        canActivate: [permissionGuard(Permissions.Pharmacy.PrescriptionRead)]
                     },
                     {
                         path: 'inventory-management',
                         data: { breadcrumb: ['inventory-management'] },
                         loadComponent: () => import('./pharmacy/inventory-management/inventory-management.component').then(m => m.AdminInventoryManagementComponent),
+                        canActivate: [permissionGuard(Permissions.Pharmacy.MedicineInventoryRead)]
                     },
                     {
                         path: 'stock-take',
@@ -201,11 +214,13 @@ export const routes: Routes = [
                                 path: '',
                                 pathMatch: 'full',
                                 loadComponent: () => import('./pharmacy/stock-take/stock-take.component').then(m => m.AdminStockTakeComponent),
+                                canActivate: [permissionGuard(Permissions.Pharmacy.MedicineInventoryRead)]
                             },
                             {
                                 path: ':id/count',
                                 data: { breadcrumb: ['counting'] },
                                 loadComponent: () => import('./pharmacy/stock-take/stock-take-counting.component').then(m => m.AdminStockTakeCountingComponent),
+                                canActivate: [permissionGuard(Permissions.Pharmacy.MedicineInventoryCreate)]
                             }
                         ]
                     }
@@ -224,16 +239,19 @@ export const routes: Routes = [
                         path: 'cashier',
                         data: { breadcrumb: ['cashier'] },
                         loadComponent: () => import('./finance/cashier/cashier.component').then(m => m.AdminCashierComponent),
+                        canActivate: [permissionGuard(Permissions.Billing.BillRead)]
                     },
                     {
                         path: 'insurance',
                         data: { breadcrumb: ['insurance'] },
                         loadComponent: () => import('./finance/insurance/insurance.component').then(m => m.AdminInsuranceComponent),
+                        canActivate: [permissionGuard(Permissions.Admin.InsuranceCompanyRead)]
                     },
                     {
                         path: 'reports',
                         data: { breadcrumb: ['reports'] },
                         loadComponent: () => import('./finance/report/revenue-report.component').then(m => m.AdminRevenueReportComponent),
+                        canActivate: [permissionGuard(Permissions.Billing.BillRead)]
                     }
                 ]
             },
@@ -386,6 +404,7 @@ export const routes: Routes = [
                         path: 'user-permission',
                         data: { breadcrumb: ['user-permission'], requiredRoles: [Role.ADMIN.toString()] },
                         loadComponent: () => import('./system/user-permission/user-permission.component').then(m => m.AdminUserPermissionComponent),
+                        canActivate: [permissionGuard(Permissions.Iam.UserRead)]
                     },
                     {
                         path: 'common-category',
@@ -400,11 +419,13 @@ export const routes: Routes = [
                                 path: '',
                                 pathMatch: 'full',
                                 loadComponent: () => import('./system/print-template/list.component').then(m => m.AdminPrintTemplateListComponent),
+                                canActivate: [permissionGuard(Permissions.Admin.PrintTemplateManage)]
                             },
                             {
                                 path: ':id',
                                 data: { breadcrumb: ['designer'] },
                                 loadComponent: () => import('./system/print-template/designer.component').then(m => m.AdminPrintTemplateDesignerComponent),
+                                canActivate: [permissionGuard(Permissions.Admin.PrintTemplateManage)]
                             },
                         ]
                     },

@@ -94,11 +94,11 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   private redirectByRole() {
-    this.authSrv.userInfo$.pipe(take(1)).subscribe(user => {
-      const roles = user?.roles ?? [];
-      if (roles.includes(Role[Role.SUPER_ADMIN])) {
+    this.authSrv.role$.pipe(take(1)).subscribe(raw => {
+      const roles = raw ?? [];
+      if (roles.includes(Role.SUPER_ADMIN.toString())) {
         this.router.navigate(['/superadmin']);
-      } else if (roles.some(r => r !== Role[Role.PATIENT])) {
+      } else if (roles.some(r => r !== Role.PATIENT.toString())) {
         this.router.navigate(['/admin']);
       } else {
         this.router.navigate(['/']);

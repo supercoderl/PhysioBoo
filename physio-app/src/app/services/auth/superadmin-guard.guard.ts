@@ -14,15 +14,15 @@ export const superadminGuardFn: CanActivateFn = () => {
         return true;
     }
 
-    return authService.userInfo$.pipe(
+    return authService.role$.pipe(
         take(1),
-        switchMap(user => user ? of(user) : authService.getProfile().pipe(
-            switchMap(() => authService.userInfo$),
+        switchMap(role => role !== null ? of(role) : authService.getProfile().pipe(
+            switchMap(() => authService.role$),
             take(1)
         )),
-        map(user => {
-            if (!user) return router.createUrlTree(['/auth/login']);
-            return user.roles?.some(code => code === Role[Role.SUPER_ADMIN]) ? true : router.createUrlTree(['/exception/403']);
+        map(roles => {
+            if (!roles) return router.createUrlTree(['/auth/login']);
+            return roles.some(code => code === Role[Role.SUPER_ADMIN]) ? true : router.createUrlTree(['/exception/403']);
         }),
         catchError(() => of(router.createUrlTree(['/auth/login'])))
     );

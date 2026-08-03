@@ -71,12 +71,12 @@
               type="button"
             >
               <boo-avatar
-                [src]="(userInfo$ | async)?.profilePicture"
+                [src]="(userInfo$ | async)?.avatarUrl"
                 [allowBorder]="true"
               />
               <div class="flex flex-auto flex-col gap-1 min-w-0">
                 <span class="flex truncate leading-none font-semibold text-sm text-regular m-0">
-                  {{ (userInfo$ | async)?.profile?.fullName || 'Guest' }}
+                  {{ (userInfo$ | async)?.fullName || 'Guest' }}
                 </span>
                 <p
                   class="flex truncate leading-none font-normal text-xs text-secondary m-0"

@@ -4,3 +4,4 @@ export const MONTH_NAMES = [
     'July', 'August', 'September', 'October', 'November', 'December'
 ];
 export const SHORT_WEEKDAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+export const DEFAULT_DATE_OF_BIRTH = "1990-01-01";

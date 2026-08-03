@@ -60,7 +60,8 @@ export const BASE_API = {
   },
   ADMINMENU: {
     BASE: '/api/admin-menus',
-    SEARCH: '/api/admin-menus/search'
+    SEARCH: '/api/admin-menus/search',
+    MINE: '/api/admin-menus/mine'
   },
   HOSPITALGROUP: {
     BASE: '/api/hospital-groups',

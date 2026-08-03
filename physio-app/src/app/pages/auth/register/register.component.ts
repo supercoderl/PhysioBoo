@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Role } from 'src/app/shared/enums/role';
 import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
 import { FormWrapperComponent } from "../../../components/form/boo-form/boo-form.component";
 import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
@@ -51,6 +52,7 @@ export class RegisterComponent {
   register(): void {
     const body = {
       id: generateUUID(),
+      role: Role.DOCTOR,
       ...this.form.value
     }
 

@@ -4,11 +4,13 @@ import { inject, Injectable, signal } from '@angular/core';
 import { BehaviorSubject, catchError, finalize, firstValueFrom, forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { BASE_API } from '../../shared/api/base';
 import { createHttpContext } from '../../shared/contexts/option.context';
-import { USER_DATA } from '../../shared/data/cache';
-import { PagedResponse } from '../../shared/types/common';
-import { UserProfile } from '../../shared/types/core.types';
+import { MENU_CACHE_KEY, USER_DATA } from '../../shared/data/cache';
+import { PagedResponse, PaginationData, PaginationDataWithInit } from '../../shared/types/common';
+import { UserProfileBase, UserProfileSummary } from '../../shared/types/core.types';
 import { LoadingKeys } from '../../shared/types/loading';
+import { MenuItem } from '../../shared/types/menu.types';
 import { LocalStorage } from '../../shared/utils/storage';
+import { MenuService } from '../admin/menu.service';
 import { PreferenceService } from '../common/preference.service';
 import { ThemeConfigService } from '../common/theme-config.service';
 
@@ -17,15 +19,19 @@ import { ThemeConfigService } from '../common/theme-config.service';
 })
 export class AuthService {
     // #region Inputs, Outputs, Properties
-    private permissionsSubject = new BehaviorSubject<string[]>([]);
-    private userInfoSubject = new BehaviorSubject<UserProfile | null>(null);
+    /** null = profile not fetched yet; [] = fetched, user genuinely has none. */
+    private permissionsSubject = new BehaviorSubject<string[] | null>(null);
+    private userInfoSubject = new BehaviorSubject<UserProfileBase | null>(null);
+    private roleSubject = new BehaviorSubject<string[] | null>(null);
     private oauthService = inject(SocialAuthService);
     private prefSrv = inject(PreferenceService);
     private themeSrv = inject(ThemeConfigService);
+    private menuSrv = inject(MenuService);
 
     isAuthenticated = signal(false);
-    permissions$ = this.permissionsSubject.asObservable();
+    public permissions$ = this.permissionsSubject.asObservable();
     public userInfo$ = this.userInfoSubject.asObservable();
+    public role$ = this.roleSubject.asObservable();
     // #endregion
 
     constructor(
@@ -41,7 +47,7 @@ export class AuthService {
         }
     }
 
-    login<T>(body: { identifier: string, password: string, otp: string }): Observable<PagedResponse<UserProfile>> {
+    login<T>(body: { identifier: string, password: string, otp: string }): Observable<PagedResponse<UserProfileSummary>> {
         return this.http.post(BASE_API.LOGIN, body, {
             context: createHttpContext({
                 loadingKey: LoadingKeys.USER.LOGIN.CREDENTIAL
@@ -80,15 +86,20 @@ export class AuthService {
     /** Clear local session state without making an HTTP call. Safe to call from interceptor. */
     clearSession(): void {
         this.userInfoSubject.next(null);
-        this.permissionsSubject.next([]);
+        this.permissionsSubject.next(null);
+        this.roleSubject.next(null);
         this.isAuthenticated.set(false);
+        LocalStorage.remove(MENU_CACHE_KEY);
     }
 
     getProfile() {
-        return this.http.get<PagedResponse<UserProfile>>(BASE_API.PROFILE).pipe(
+        return this.http.get<PagedResponse<UserProfileSummary>>(BASE_API.PROFILE).pipe(
             tap((res) => {
                 if (res.success && res.data) {
-                    this.userInfoSubject.next(res.data);
+                    const { roles, permissions, ...userInfo } = res.data;
+                    this.userInfoSubject.next(userInfo);
+                    this.roleSubject.next(roles);
+                    this.permissionsSubject.next(permissions);
                     this.isAuthenticated.set(true);
                 } else {
                     this.checkSession();
@@ -98,9 +109,12 @@ export class AuthService {
                 if (!res.success || !res.data) return [res];
                 return forkJoin([
                     this.prefSrv.loadAll(),
-                    // this.fetchPermissions(),
+                    this.menuSrv.getMine(),
                 ]).pipe(
-                    tap(() => this.themeSrv.hydrateFromCache()),
+                    tap(([, menuRes]) => {
+                        this.themeSrv.hydrateFromCache();
+                        this.cacheMenus(menuRes.success ? menuRes.data : []);
+                    }),
                     map(() => res),
                     catchError(() => {
                         this.themeSrv.hydrateFromCache();
@@ -113,6 +127,15 @@ export class AuthService {
                 return throwError(() => err);
             })
         );
+    }
+
+    private cacheMenus(items: MenuItem[]): void {
+        const cache: PaginationData<MenuItem> = {
+            ...PaginationDataWithInit<MenuItem>(),
+            items,
+            totalCount: items.length
+        };
+        LocalStorage.save(MENU_CACHE_KEY, cache);
     }
 
     getUserData() {
@@ -148,5 +171,14 @@ export class AuthService {
 
     forgotPassword(body: any): Observable<any> {
         return this.http.post(BASE_API.FORGOTPASSWORD, body);
+    }
+
+    hasPermission(code: string): boolean {
+        return (this.permissionsSubject.getValue() ?? []).includes(code);
+    }
+
+    hasAnyPermission(codes: string[]): boolean {
+        const current = this.permissionsSubject.getValue() ?? [];
+        return codes.some(c => current.includes(c));
     }
 }

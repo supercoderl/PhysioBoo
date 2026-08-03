@@ -251,6 +251,9 @@ export const LoadingKeys = {
     },
     DOCTOR_DESK: {
         SNAPSHOT: 'doctor-desk-snapshot'
+    },
+    PATIENT: {
+        CREATE: 'patient-create'
     }
 } as const;
 

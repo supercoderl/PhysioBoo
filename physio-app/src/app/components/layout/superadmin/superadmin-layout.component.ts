@@ -68,12 +68,12 @@ interface NavItem {
 
                 <div class="border-t border-gray-100 px-4 py-3 flex items-center gap-2.5">
                     <boo-avatar
-                        [src]="(userInfo$ | async)?.profilePicture ?? defaultAvatar"
+                        [src]="(userInfo$ | async)?.avatarUrl"
                         class="shrink-0"
                     />
                     <div class="flex-1 min-w-0">
                         <div class="text-xs font-semibold text-brandDark truncate">
-                            {{ (userInfo$ | async)?.profile?.fullName ?? (userInfo$ | async)?.email }}
+                            {{ (userInfo$ | async)?.fullName ?? (userInfo$ | async)?.email }}
                         </div>
                         <div class="text-[10px] text-brandDark truncate">
                             {{ (userInfo$ | async)?.email }}

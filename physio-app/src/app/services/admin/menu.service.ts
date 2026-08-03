@@ -22,6 +22,15 @@ export class MenuService {
         });
     }
 
+    getMine() {
+        return this.http.get<PagedResponse<MenuItem[]>>(BASE_API.ADMINMENU.MINE, {
+            context: createHttpContext({
+                skipErrorToast: true,
+                loadingKey: LoadingKeys.ADMIN_MENU.SEARCH
+            })
+        });
+    }
+
     search_by_id(id: string) {
         return this.http.get<PagedResponse<MenuItem | null>>(`${BASE_API.ADMINMENU.BASE}/${id}`, {
             context: createHttpContext({

@@ -1,4 +1,6 @@
 import { Routes } from "@angular/router";
+import { permissionGuard } from "src/app/services/auth/permission-guard.guard";
+import { Permissions } from "src/app/shared/constants/permission.constant";
 
 export const routes: Routes = [
     {
@@ -44,12 +46,14 @@ export const routes: Routes = [
             {
                 path: 'sequence-tracker',
                 data: { breadcrumb: ['sequence tracker'] },
-                loadComponent: () => import('./sequence-tracker/list.component').then(m => m.SettingSequenceTrackerListComponent)
+                loadComponent: () => import('./sequence-tracker/list.component').then(m => m.SettingSequenceTrackerListComponent),
+                canActivate: [permissionGuard(Permissions.Admin.SequenceTrackerRead)]
             },
             {
                 path: 'admin-menu',
                 data: { breadcrumb: ['admin menu'] },
-                loadComponent: () => import('./admin-menu/admin-menu.component').then(m => m.SettingAdminMenuComponent)
+                loadComponent: () => import('./admin-menu/admin-menu.component').then(m => m.SettingAdminMenuComponent),
+                canActivate: [permissionGuard(Permissions.Admin.AdminMenuRead)]
             }
         ]
     }

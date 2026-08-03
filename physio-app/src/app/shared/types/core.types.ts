@@ -67,8 +67,24 @@ export interface UserProfile {
     roles: string[];
 }
 
-export interface PreferenceItem{
-  key: string;
-  value: string;
-  group: string;
+export interface UserProfileBase {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    avatarUrl?: string | null;
+    fullName: string;
+    isVerified: boolean;
+}
+
+export interface UserProfileSummary extends UserProfileBase {
+    roles: string[];
+    permissions: string[];
+}
+
+export interface PreferenceItem {
+    key: string;
+    value: string;
+    group: string;
 }

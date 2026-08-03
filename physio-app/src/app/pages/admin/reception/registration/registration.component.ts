@@ -1,8 +1,13 @@
-import { Component, computed, Signal, signal } from "@angular/core";
+import { Component, computed, inject, Signal, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
+import { LocalLoadingService } from "src/app/services/common/local-loading.service";
+import { BloodGroup } from "src/app/shared/enums/blood-group";
+import { Gender } from "src/app/shared/enums/gender";
+import { MaritalStatus } from "src/app/shared/enums/marital-status";
+import { LoadingKeys } from "src/app/shared/types/loading";
 import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
@@ -13,7 +18,7 @@ import { PrintService } from "../../../../services/common/print.service";
 import { randomEmail, randomPhone, randomText } from "../../../../services/common/random.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING } from "../../../../shared/constants/error.constant";
-import { DEFAULT_DOCTOR_ID } from "../../../../shared/constants/value.constant";
+import { DEFAULT_DATE_OF_BIRTH, DEFAULT_DOCTOR_ID } from "../../../../shared/constants/value.constant";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { CreatePatientRequest } from "../../../../shared/types/patient.types";
 
@@ -43,7 +48,17 @@ interface Step {
   templateUrl: './registration.component.html'
 })
 export class AdminRegistrationComponent {
+  // #region Inject Services
+  loadingSrv = inject(LocalLoadingService);
+  fb = inject(FormBuilder);
+  router = inject(Router);
+  toastSrv = inject(ToastService);
+  printSrv = inject(PrintService);
+  patientSrv = inject(PatientService);
+  // #endregion
+
   // #Inputs, Outputs, Properties
+  LoadingKeys = LoadingKeys;
   form: FormGroup;
   formValue: Signal<any>;
 
@@ -67,49 +82,45 @@ export class AdminRegistrationComponent {
   ];
 
   incomeRangeOptions = [
-    { label: 'Under $10,000',       value: 'under-10k' },
-    { label: '$10,000 – $30,000',   value: '10k-30k' },
-    { label: '$30,000 – $60,000',   value: '30k-60k' },
-    { label: '$60,000 – $100,000',  value: '60k-100k' },
-    { label: 'Over $100,000',       value: 'over-100k' },
-    { label: 'Prefer not to say',   value: 'undisclosed' },
+    { label: 'Under $10,000', value: 'under-10k' },
+    { label: '$10,000 - $30,000', value: '10k-30k' },
+    { label: '$30,000 - $60,000', value: '30k-60k' },
+    { label: '$60,000 - $100,000', value: '60k-100k' },
+    { label: 'Over $100,000', value: 'over-100k' },
+    { label: 'Prefer not to say', value: 'undisclosed' },
   ];
 
   appointmentTimeOptions = [
-    { label: 'Morning (8:00–12:00)',   value: 'morning' },
-    { label: 'Afternoon (12:00–17:00)', value: 'afternoon' },
-    { label: 'Evening (17:00–20:00)',   value: 'evening' },
-    { label: 'Any time',                value: 'any' },
+    { label: 'Morning (8:00-12:00)', value: 'morning' },
+    { label: 'Afternoon (12:00-17:00)', value: 'afternoon' },
+    { label: 'Evening (17:00-20:00)', value: 'evening' },
+    { label: 'Any time', value: 'any' },
   ];
 
   communicationOptions = [
-    { label: 'Email',          value: 'email' },
-    { label: 'SMS',            value: 'sms' },
-    { label: 'Phone call',     value: 'phone' },
-    { label: 'In-app',         value: 'in-app' },
+    { label: 'Email', value: 'email' },
+    { label: 'SMS', value: 'sms' },
+    { label: 'Phone call', value: 'phone' },
+    { label: 'In-app', value: 'in-app' },
   ];
 
   currentStepIdx = signal(0);
-  submitting = signal(false);
   registeredPatientId = signal<string | null>(null);
+  registeredPatientNumber = signal<string | null>(null);
 
-  genderOptions = [
-    { label: 'Male', value: 'male' },
-    { label: 'Female', value: 'female' },
-    { label: 'Other', value: 'other' }
-  ];
-  bloodGroupOptions = [
-    { label: 'A+', value: 'A+' }, { label: 'A-', value: 'A-' },
-    { label: 'B+', value: 'B+' }, { label: 'B-', value: 'B-' },
-    { label: 'AB+', value: 'AB+' }, { label: 'AB-', value: 'AB-' },
-    { label: 'O+', value: 'O+' }, { label: 'O-', value: 'O-' }
-  ];
-  maritalOptions = [
-    { label: 'Single', value: 'single' },
-    { label: 'Married', value: 'married' },
-    { label: 'Divorced', value: 'divorced' },
-    { label: 'Widowed', value: 'widowed' }
-  ];
+  genderOptions = Object.keys(Gender).filter(key => isNaN(Number(key))).map(key => ({
+    label: key,
+    value: Gender[key as keyof typeof Gender]
+  }));
+
+  bloodGroupOptions = Object.keys(BloodGroup).filter(key => isNaN(Number(key))).map(key => ({
+    label: key,
+    value: BloodGroup[key as keyof typeof BloodGroup]
+  }));;
+  maritalOptions = Object.keys(MaritalStatus).filter(key => isNaN(Number(key))).map(key => ({
+    label: key,
+    value: MaritalStatus[key as keyof typeof MaritalStatus]
+  }));;
 
   currentStep = computed(() => this.steps[this.currentStepIdx()]);
   progress = computed(() => ((this.currentStepIdx() + 1) / this.steps.length) * 100);
@@ -146,55 +157,49 @@ export class AdminRegistrationComponent {
   // #endregion
 
   // #region Init (Lifecycle + Setups)
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private toastSrv: ToastService,
-    private printSrv: PrintService,
-    private patientSrv: PatientService
-  ) {
+  constructor() {
     this.form = this.fb.group({
       // Personal
-      firstName:     this.fb.nonNullable.control(randomText(6), Validators.required),
-      lastName:      this.fb.nonNullable.control(randomText(6), Validators.required),
-      dateOfBirth:   this.fb.nonNullable.control<string | null>(null, Validators.required),
-      gender:        this.fb.nonNullable.control(0, Validators.required),
-      bloodGroup:    this.fb.nonNullable.control(0),
-      maritalStatus: this.fb.nonNullable.control(0),
+      firstName: this.fb.nonNullable.control(randomText(6), Validators.required),
+      lastName: this.fb.nonNullable.control(randomText(6), Validators.required),
+      dateOfBirth: this.fb.nonNullable.control<string | null>(DEFAULT_DATE_OF_BIRTH, Validators.required),
+      gender: this.fb.nonNullable.control(Gender.Male, Validators.required),
+      bloodGroup: this.fb.nonNullable.control(BloodGroup.A_Positive),
+      maritalStatus: this.fb.nonNullable.control(MaritalStatus.Single),
 
       // Contact
-      email:                 this.fb.nonNullable.control(randomEmail(), [Validators.required, Validators.email]),
-      phone:                 this.fb.nonNullable.control(randomPhone(), [Validators.required, Validators.pattern(/^[+\d][\d\s().-]{6,}$/)]),
-      emergencyContactName:  this.fb.nonNullable.control(randomText(8), Validators.required),
+      email: this.fb.nonNullable.control(randomEmail(), [Validators.required, Validators.email]),
+      phone: this.fb.nonNullable.control(randomPhone(), [Validators.required, Validators.pattern(/^[+\d][\d\s().-]{6,}$/)]),
+      emergencyContactName: this.fb.nonNullable.control(randomText(8), Validators.required),
       emergencyContactPhone: this.fb.nonNullable.control(randomPhone(), [Validators.required, Validators.pattern(/^[+\d][\d\s().-]{6,}$/)]),
-      address:               this.fb.nonNullable.control(randomText(15), Validators.required),
-      city:                  this.fb.nonNullable.control(randomText(6), Validators.required),
-      postalCode:            this.fb.nonNullable.control(randomText(6), Validators.required),
+      address: this.fb.nonNullable.control(randomText(15), Validators.required),
+      city: this.fb.nonNullable.control(randomText(6), Validators.required),
+      postalCode: this.fb.nonNullable.control(randomText(6), Validators.required),
 
       // Medical narratives
-      allergyInformation:  this.fb.nonNullable.control(''),
-      medicalHistory:      this.fb.nonNullable.control(''),
-      familyHistory:       this.fb.nonNullable.control(''),
-      surgicalHistory:     this.fb.nonNullable.control(''),
-      currentMedications:  this.fb.nonNullable.control(''),
-      lifestyleNotes:      this.fb.nonNullable.control(''),
+      allergyInformation: this.fb.nonNullable.control(''),
+      medicalHistory: this.fb.nonNullable.control(''),
+      familyHistory: this.fb.nonNullable.control(''),
+      surgicalHistory: this.fb.nonNullable.control(''),
+      currentMedications: this.fb.nonNullable.control(''),
+      lifestyleNotes: this.fb.nonNullable.control(''),
 
       // Patient profile (server DTO fields)
-      primaryDoctorId:     this.fb.control<string | null>(DEFAULT_DOCTOR_ID, Validators.required),
-      referredBy:          this.fb.control<string | null>(null),
-      referralHospitalId:  this.fb.control<string | null>(null),
+      primaryDoctorId: this.fb.control<string | null>(DEFAULT_DOCTOR_ID, Validators.required),
+      referredBy: this.fb.control<string | null>(null),
+      referralHospitalId: this.fb.control<string | null>(null),
 
       // Insurance (note server typo: "Inssurance")
-      insuranceProvider:        this.fb.nonNullable.control(''),
-      insurancePolicyNumber:    this.fb.nonNullable.control(''),
-      insuranceExpiryDate:      this.fb.control<string | null>(null),
-      insuranceCoverageAmount:  this.fb.control<number | null>(null),
+      insuranceProvider: this.fb.nonNullable.control(''),
+      insurancePolicyNumber: this.fb.nonNullable.control(''),
+      insuranceExpiryDate: this.fb.control<string | null>(null),
+      insuranceCoverageAmount: this.fb.control<number | null>(null),
 
       // Demographics & preferences
-      occupation:               this.fb.nonNullable.control(''),
-      annualIncomeRange:        this.fb.nonNullable.control(''),
-      preferredHospitalId:      this.fb.control<string | null>(null),
-      preferredDoctorId:        this.fb.control<string | null>(null),
+      occupation: this.fb.nonNullable.control(''),
+      annualIncomeRange: this.fb.nonNullable.control(''),
+      preferredHospitalId: this.fb.control<string | null>(null),
+      preferredDoctorId: this.fb.control<string | null>(null),
       preferredAppointmentTime: this.fb.nonNullable.control(''),
       communicationPreferences: this.fb.nonNullable.control(''),
 
@@ -255,7 +260,6 @@ export class AdminRegistrationComponent {
       return;
     }
 
-    this.submitting.set(true);
     try {
       const createRes = await firstValueFrom(this.patientSrv.create(this.buildRequestBody()));
       if (!createRes?.success || !createRes.data) {
@@ -263,30 +267,28 @@ export class AdminRegistrationComponent {
         return;
       }
       const patientId = createRes.data;
+      const detailRes = await firstValueFrom(
+        this.patientSrv.search_by_id(patientId)
+      );
+      const patientNumber = detailRes?.data?.patientNumber ?? patientId;
       this.registeredPatientId.set(patientId);
-      this.toastSrv.success(`Patient ${this.fullName()} registered (${patientId})`);
+      this.registeredPatientNumber.set(patientNumber);
+      this.toastSrv.success(`Patient ${this.fullName()} registered — ${patientNumber}`);
     } catch {
       this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-    } finally {
-      this.submitting.set(false);
     }
   }
 
-  /**
-   * Maps the form value to the server's CreatePatientCommand DTO.
-   * Note: server uses the misspelling "Inssurance*" — frontend property names match.
-   */
   private buildRequestBody(): CreatePatientRequest {
     const v = this.formValue();
     return ({
-      // Profile / contact (sent as a wrapper — backend handles User/Profile creation)
       profile: {
         firstName: v.firstName,
         lastName: v.lastName,
-        dateOfBirth: v.dateOfBirth,           // 'yyyy-MM-dd'
+        dateOfBirth: v.dateOfBirth,
         gender: v.gender,
-        bloodGroup: v.bloodGroup || null,
-        maritalStatus: v.maritalStatus || null,
+        bloodGroup: v.bloodGroup,
+        maritalStatus: v.maritalStatus,
         email: v.email,
         phone: v.phone,
         emergencyContactName: v.emergencyContactName,
@@ -295,33 +297,23 @@ export class AdminRegistrationComponent {
         city: v.city,
         postalCode: v.postalCode,
       },
-
-      // Patient — fields matching the server CreatePatientCommand
       primaryDoctorId: v.primaryDoctorId,
       referredBy: v.referredBy || null,
       referralHospitalId: v.referralHospitalId || null,
-
-      // Insurance (NOTE: server spelling is "Inssurance" — kept consistent)
-      inssuranceProvider:       this.nullIfBlank(v.insuranceProvider),
-      inssurancePolicyNumber:   this.nullIfBlank(v.insurancePolicyNumber),
-      inssuranceExpiryDate:     v.insuranceExpiryDate || null,
+      inssuranceProvider: this.nullIfBlank(v.insuranceProvider),
+      inssurancePolicyNumber: this.nullIfBlank(v.insurancePolicyNumber),
+      inssuranceExpiryDate: v.insuranceExpiryDate || null,
       inssuranceCoverageAmount: v.insuranceCoverageAmount ?? null,
-
-      // Medical narratives
-      medicalHistory:     this.nullIfBlank(v.medicalHistory),
-      familyHistory:      this.nullIfBlank(v.familyHistory),
-      surgicalHistory:    this.nullIfBlank(v.surgicalHistory),
+      medicalHistory: this.nullIfBlank(v.medicalHistory),
+      familyHistory: this.nullIfBlank(v.familyHistory),
+      surgicalHistory: this.nullIfBlank(v.surgicalHistory),
       allergyInformation: this.nullIfBlank(v.allergyInformation),
       currentMedications: this.nullIfBlank(v.currentMedications),
-      lifestyleNotes:     this.nullIfBlank(v.lifestyleNotes),
-
-      // Demographics
-      occupation:        this.nullIfBlank(v.occupation),
+      lifestyleNotes: this.nullIfBlank(v.lifestyleNotes),
+      occupation: this.nullIfBlank(v.occupation),
       annualIncomeRange: this.nullIfBlank(v.annualIncomeRange),
-
-      // Preferences
-      preferredHospitalId:      v.preferredHospitalId || null,
-      preferredDoctorId:        v.preferredDoctorId   || null,
+      preferredHospitalId: v.preferredHospitalId || null,
+      preferredDoctorId: v.preferredDoctorId || null,
       preferredAppointmentTime: this.nullIfBlank(v.preferredAppointmentTime),
       communicationPreferences: this.nullIfBlank(v.communicationPreferences),
     } as unknown as CreatePatientRequest);

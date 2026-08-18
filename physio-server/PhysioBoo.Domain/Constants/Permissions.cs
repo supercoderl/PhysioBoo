@@ -31,6 +31,7 @@
             public const string DoctorScheduleCreate = "scheduling:doctor-schedule:create";
             public const string DoctorLeaveRead = "scheduling:doctor-leave:read";
             public const string DoctorLeaveCreate = "scheduling:doctor-leave:create";
+            public const string EncounterComplete = "scheduling:encounter:complete";
         }
 
         public static class Clinical
@@ -48,6 +49,7 @@
             public const string AllergyCreate = "clinical:allergy:create";
             public const string MedicalHistoryRead = "clinical:medical-history:read";
             public const string MedicalHistoryCreate = "clinical:medical-history:create";
+            public const string DoctorDeskRead = "clinical:doctor-desk:read";
         }
 
         public static class Pharmacy

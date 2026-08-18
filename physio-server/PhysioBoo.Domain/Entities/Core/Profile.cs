@@ -14,6 +14,8 @@ namespace PhysioBoo.Domain.Entities.Core
         public BloodGroup BloodGroup { get; private set; }
         public MaritalStatus MaritalStatus { get; private set; }
         public string? Nationality { get; private set; }
+        public string? Email { get; private set; }
+        public string? Phone { get; private set; }
         public string? IdentificationType { get; private set; }
         public string? IdentificationNumber { get; private set; }
         public DateTime? IdentificationExpiry { get; private set; }
@@ -41,6 +43,8 @@ namespace PhysioBoo.Domain.Entities.Core
             BloodGroup bloodGroup,
             MaritalStatus maritalStatus,
             string? nationality,
+            string? email,
+            string? phone,
             string? identificationType,
             string? identificationNumber,
             DateTime? identificationExpiry,
@@ -58,6 +62,8 @@ namespace PhysioBoo.Domain.Entities.Core
             BloodGroup = bloodGroup;
             MaritalStatus = maritalStatus;
             Nationality = nationality;
+            Email = email;
+            Phone = phone;
             IdentificationType = identificationType;
             IdentificationNumber = identificationNumber;
             IdentificationExpiry = identificationExpiry;
@@ -77,6 +83,8 @@ namespace PhysioBoo.Domain.Entities.Core
         public void SetBloodGroup(BloodGroup bloodGroup) { BloodGroup = bloodGroup; }
         public void SetMaritalStatus(MaritalStatus maritalStatus) { MaritalStatus = maritalStatus; }
         public void SetNationality(string? nationality) { Nationality = nationality; }
+        public void SetEmail(string? email) { Email = email; }
+        public void SetPhone(string? phone) { Phone = phone; }
         public void SetIdentificationType(string? identificationType) { IdentificationType = identificationType; }
         public void SetIdentificationNumber(string? identificationNumber) { IdentificationNumber = identificationNumber; }
         public void SetIdentificationExpiry(DateTime? identificationExpiry) { IdentificationExpiry = identificationExpiry; }

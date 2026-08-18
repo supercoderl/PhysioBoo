@@ -8,6 +8,8 @@ using PhysioBoo.Application.Commands.Addresses.UpdateAddress;
 using PhysioBoo.Application.Commands.AdminMenus.CreateAdminMenu;
 using PhysioBoo.Application.Commands.AdminMenus.DeleteAdminMenu;
 using PhysioBoo.Application.Commands.AdminMenus.UpdateAdminMenu;
+using PhysioBoo.Application.Commands.Appointments.ChangeStatusAppointment;
+using PhysioBoo.Application.Commands.Appointments.CompleteConsultation;
 using PhysioBoo.Application.Commands.Appointments.CreateAppointment;
 using PhysioBoo.Application.Commands.AppointmentTypes.CreateAppointmentType;
 using PhysioBoo.Application.Commands.AppointmentTypes.DeleteAppointmentType;
@@ -123,6 +125,9 @@ using PhysioBoo.Application.Queries.Addresses.GetById;
 using PhysioBoo.Application.Queries.AdminMenus.GetAll;
 using PhysioBoo.Application.Queries.AdminMenus.GetById;
 using PhysioBoo.Application.Queries.AdminMenus.GetMine;
+using PhysioBoo.Application.Queries.Appointments.GetAll;
+using PhysioBoo.Application.Queries.Appointments.GetById;
+using PhysioBoo.Application.Queries.Appointments.GetDaily;
 using PhysioBoo.Application.Queries.AppointmentTypes.GetAll;
 using PhysioBoo.Application.Queries.AppointmentTypes.GetById;
 using PhysioBoo.Application.Queries.Configurations.GetInitData;
@@ -189,6 +194,7 @@ using PhysioBoo.Application.Services;
 using PhysioBoo.Application.SortProviders;
 using PhysioBoo.Application.ViewModels.Addresses;
 using PhysioBoo.Application.ViewModels.AdminMenus;
+using PhysioBoo.Application.ViewModels.Appointments;
 using PhysioBoo.Application.ViewModels.AppointmentTypes;
 using PhysioBoo.Application.ViewModels.Configurations;
 using PhysioBoo.Application.ViewModels.Departments;
@@ -394,6 +400,11 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<GetMedicalRecordContextQuery, PatientContextViewModel?>, GetMedicalRecordContextQueryHandler>();
             services.AddScoped<IRequestHandler<GetMedicalRecordLabQuery, LabViewModel?>, GetMedicalRecordLabQueryHandler>();
 
+            // Appointment
+            services.AddScoped<IRequestHandler<GetAllAppointmentsQuery, PagedResult<AppointmentViewModel>>, GetAllAppointmentsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetAppointmentByIdQuery, AppointmentViewModel?>, GetAppointmentByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<GetDoctorDailyScheduleQuery, List<AppointmentViewModel>>, GetDoctorDailyScheduleQueryHandler>();
+
             return services;
         }
 
@@ -477,6 +488,8 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<DeleteHospitalGroupCommand>, DeleteHospitalGroupCommandHandler>();
             services.AddScoped<IRequestHandler<DeleteDepartmentCommand>, DeleteDepartmentCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateDepartmentCommand>, UpdateDepartmentCommandHandler>();
+            services.AddScoped<IRequestHandler<ChangeStatusAppointmentCommand>, ChangeStatusAppointmentCommandHandler>();
+            services.AddScoped<IRequestHandler<CompleteConsultationCommand>, CompleteConsultationCommandHandler>();
             #endregion
 
             #region Support Flow

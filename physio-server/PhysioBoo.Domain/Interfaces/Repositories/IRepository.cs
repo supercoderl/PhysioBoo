@@ -55,6 +55,11 @@ namespace PhysioBoo.Domain.Interfaces.Repositories
             int pageSize,
             CancellationToken ct = default
         );
+
+        Task<List<TEntity>> ListAsync(
+            ISpecification<TEntity> spec,
+            CancellationToken ct = default
+        );
         #endregion
 
         #region First or Default Async

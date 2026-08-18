@@ -16,6 +16,11 @@ namespace PhysioBoo.Infrastructure.Repositories
             _context = context;
         }
 
+        public Task<Doctor?> GetByUserIdAsync(Guid userId, CancellationToken ct)
+        {
+            return DbSet.Where(d => d.Id == userId).FirstOrDefaultAsync(ct);
+        }
+
         public async Task<DbResult<Guid>> RegisterDoctor(User user, Profile profile, Doctor doctor, CancellationToken ct)
         {
             DbResult<Guid>? result = null;

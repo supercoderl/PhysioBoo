@@ -45,11 +45,20 @@ namespace PhysioBoo.Application.Commands.Patients.InvitePatient
                 return;
             }
 
+            if (string.IsNullOrEmpty(patient.Profile?.Email) || string.IsNullOrEmpty(patient.Profile?.Phone))
+            {
+                await NotifyAsync(request.MessageType,
+                    $"Patient with ID {request.PatientId} has no email/phone on file to invite them to the portal.",
+                    ErrorCodes.InvalidValue
+                );
+                return;
+            }
+
             User newUser = await _userProvisioningService.BuildAsync(
                 Guid.NewGuid(),
                 new ViewModels.Users.CreateUserViewModel(
-                    "",
-                    "",
+                    patient.Profile.Email,
+                    patient.Profile.Phone,
                     Guid.NewGuid().ToString(),
                     Domain.Enums.Role.PATIENT
                 ),

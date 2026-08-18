@@ -63,6 +63,9 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(p => p.Nationality).HasMaxLength(100);
 
+            builder.Property(p => p.Email).HasMaxLength(255);
+            builder.Property(p => p.Phone).HasMaxLength(20);
+
             builder.Property(p => p.IdentificationType).HasMaxLength(50);
             builder.Property(p => p.IdentificationNumber).HasMaxLength(100);
             builder.Property(p => p.IdentificationExpiry);

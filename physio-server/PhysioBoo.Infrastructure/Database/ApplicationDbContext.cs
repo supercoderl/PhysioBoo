@@ -64,6 +64,7 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<PrescriptionItem> PrescriptionItems { get; set; } = null!;
         public DbSet<Profile> Profiles { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
+        public DbSet<Room> Rooms { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<VerificationToken> VerificationTokens { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;

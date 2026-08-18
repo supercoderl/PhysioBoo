@@ -164,6 +164,7 @@ namespace PhysioBoo.Domain.Entities.Operation
         public virtual ICollection<Patient> PreferredPatients { get; private set; } = new List<Patient>();
         public virtual ICollection<PatientMedicalHistory> PatientMedicalHistories { get; private set; } = new List<PatientMedicalHistory>();
         public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();
+        public virtual ICollection<Room> Rooms { get; private set; } = new List<Room>();
         #endregion
 
         #region Constructor (41)

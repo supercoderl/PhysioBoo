@@ -16,6 +16,7 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetClinicalSnapshot
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IBillRepository _billRepository;
         private readonly IPatientRepository _patientRepository;
+        private readonly IPrescriptionRepository _prescriptionRepository;
 
         public GetMedicalRecordClinicalSnapshotQueryHandler(
             IPatientMedicalHistoryRepository patientMedicalHistoryRepository,
@@ -24,7 +25,8 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetClinicalSnapshot
             ILabOrderItemRepository labOrderItemRepository,
             IAppointmentRepository appointmentRepository,
             IBillRepository billRepository,
-            IPatientRepository patientRepository
+            IPatientRepository patientRepository,
+            IPrescriptionRepository prescriptionRepository
         )
         {
             _patientMedicalHistoryRepository = patientMedicalHistoryRepository;
@@ -34,6 +36,7 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetClinicalSnapshot
             _appointmentRepository = appointmentRepository;
             _billRepository = billRepository;
             _patientRepository = patientRepository;
+            _prescriptionRepository = prescriptionRepository;
         }
 
         public async Task<ClinicalSnapshotViewModel?> Handle(GetMedicalRecordClinicalSnapshotQuery request, CancellationToken ct)
@@ -41,7 +44,7 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetClinicalSnapshot
             DateOnly today = DateOnly.FromDateTime(TimeZoneHelper.GetLocalTimeNow());
             TimeOnly now = TimeOnly.FromDateTime(TimeZoneHelper.GetLocalTimeNow());
             int activeDiagnosesCount = await _patientMedicalHistoryRepository.CountAsync(new ActiveDiagnosisByPatientSpec(request.PatientId), ct);
-            int activeMedicationsCount = 0;
+            int activeMedicationsCount = await _prescriptionRepository.CountAsync(new ActiveMedicationByPatientSpec(request.PatientId), ct);
             decimal outstandingBalance = 0;
             string currency = "VND";
             int knownAllergiesCount = await _patientAllergyRepository.CountAsync(new KnownAllergyByPatientSpec(request.PatientId), ct);

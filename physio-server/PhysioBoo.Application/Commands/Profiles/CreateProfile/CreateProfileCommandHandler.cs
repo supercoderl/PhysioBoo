@@ -38,6 +38,8 @@ namespace PhysioBoo.Application.Commands.Profiles.CreateProfile
                 request.NewProfile.BloodGroup,
                 request.NewProfile.MaritalStatus,
                 request.NewProfile.Nationality,
+                null,
+                null,
                 request.NewProfile.IdentificationType,
                 request.NewProfile.IdentificationNumber,
                 request.NewProfile.IdentificationExpiry,

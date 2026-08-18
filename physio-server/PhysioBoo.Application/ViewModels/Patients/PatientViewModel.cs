@@ -55,13 +55,13 @@ namespace PhysioBoo.Application.ViewModels.Patients
         {
             return new PatientViewModel
             {
-                FullName = patient.User?.Profile?.FullName ?? string.Empty,
-                FirstName = patient.User?.Profile?.FirstName ?? string.Empty,
-                LastName = patient.User?.Profile?.LastName ?? string.Empty,
-                Phone = patient.User?.Phone ?? string.Empty,
-                Email = patient.User?.Email ?? string.Empty,
-                DateOfBirth = patient.User?.Profile?.DateOfBirth ?? TimeZoneHelper.DefaultDate,
-                Gender = patient.User?.Profile?.Gender.ToString() ?? string.Empty,
+                FullName = patient.Profile?.FullName ?? string.Empty,
+                FirstName = patient.Profile?.FirstName ?? string.Empty,
+                LastName = patient.Profile?.LastName ?? string.Empty,
+                Phone = patient.Profile?.Phone ?? patient.User?.Phone ?? string.Empty,
+                Email = patient.Profile?.Email ?? patient.User?.Email ?? string.Empty,
+                DateOfBirth = patient.Profile?.DateOfBirth ?? TimeZoneHelper.DefaultDate,
+                Gender = patient.Profile?.Gender.ToString() ?? string.Empty,
                 Id = patient.Id,
                 PatientNumber = patient.PatientNumber,
                 PatientType = patient.PatientType,

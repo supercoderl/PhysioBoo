@@ -134,6 +134,8 @@ namespace PhysioBoo.Domain.Entities.Core
         public virtual ICollection<BillItem> UpdatedBillItems { get; private set; } = new List<BillItem>();
         public virtual ICollection<Department> CreatedDepartments { get; private set; } = new List<Department>();
         public virtual ICollection<Department> UpdatedDepartments { get; private set; } = new List<Department>();
+        public virtual ICollection<Room> CreatedRooms { get; private set; } = new List<Room>();
+        public virtual ICollection<Room> UpdatedRooms { get; private set; } = new List<Room>();
         public virtual ICollection<Hospital> CreatedHospitals { get; private set; } = new List<Hospital>();
         public virtual ICollection<Hospital> UpdatedHospitals { get; private set; } = new List<Hospital>();
         public virtual ICollection<HospitalGroup> CreatedHospitalGroups { get; private set; } = new List<HospitalGroup>();

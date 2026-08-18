@@ -106,6 +106,17 @@ namespace PhysioBoo.Infrastructure.Repositories
             return new PagedResult<TEntity>(totalCount, items, pageNumber, pageSize);
         }
 
+        public virtual async Task<List<TEntity>> ListAsync(
+            ISpecification<TEntity> spec,
+            CancellationToken ct = default
+        )
+        {
+            IQueryable<TEntity> specificationResult = ApplySpecification(spec);
+            int totalCount = await specificationResult.CountAsync(ct);
+            List<TEntity> items = await specificationResult.ToListAsync(ct);
+            return items;
+        }
+
         public virtual async Task<int> CountAsync(ISpecification<TEntity> spec, CancellationToken ct = default)
         {
             IQueryable<TEntity> specificationResult = ApplySpecification(spec);

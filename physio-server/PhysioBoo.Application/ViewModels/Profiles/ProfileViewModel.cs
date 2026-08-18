@@ -14,6 +14,8 @@ namespace PhysioBoo.Application.ViewModels.Profiles
         public BloodGroup BloodGroup { get; set; }
         public MaritalStatus MaritalStatus { get; set; }
         public string? Nationality { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
         public string? IdentificationType { get; set; }
         public string? IdentificationNumber { get; set; }
         public DateTime? IdentificationExpiry { get; set; }
@@ -35,6 +37,8 @@ namespace PhysioBoo.Application.ViewModels.Profiles
                 BloodGroup = profile.BloodGroup,
                 MaritalStatus = profile.MaritalStatus,
                 Nationality = profile.Nationality,
+                Email = profile.Email,
+                Phone = profile.Phone,
                 IdentificationType = profile.IdentificationType,
                 IdentificationNumber = profile.IdentificationNumber,
                 IdentificationExpiry = profile.IdentificationExpiry,

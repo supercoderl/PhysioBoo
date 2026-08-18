@@ -42,8 +42,10 @@ namespace PhysioBoo.Domain.Entities.Operation
 
         public virtual ICollection<Appointment> Appointments { get; private set; } = new List<Appointment>();
         public virtual ICollection<Bill> Bills { get; private set; } = new List<Bill>();
+        public virtual ICollection<Doctor> Doctors { get; private set; } = new List<Doctor>();
         public virtual ICollection<DoctorSchedule> DoctorSchedules { get; private set; } = new List<DoctorSchedule>();
         public virtual ICollection<HospitalStaff> HospitalStaffs { get; private set; } = new List<HospitalStaff>();
+        public virtual ICollection<Room> Rooms { get; private set; } = new List<Room>();
         #endregion
 
         #region Constructor (20)

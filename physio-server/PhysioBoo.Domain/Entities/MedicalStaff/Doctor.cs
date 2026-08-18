@@ -31,6 +31,12 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         [Placeholder(Label = "Primary Specialty ID", Example = "7c9b1d2f-3a9e-4c3f-8d11-2e7f8a9b4561")]
         public Guid? PrimarySpecialtyId { get; private set; }
 
+        [Placeholder(Label = "Department ID", Example = "9f8e7d6c-5b4a-3c2d-1e0f-9a8b7c6d5e4f")]
+        public Guid? DepartmentId { get; private set; }
+
+        [Placeholder(Label = "Room ID", Example = "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d")]
+        public Guid? RoomId { get; private set; }
+
         [Placeholder(Label = "Years Of Experience", Example = "12")]
         public int YearsOfExperience { get; private set; }
 
@@ -155,6 +161,8 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public virtual User? CreatedByUser { get; private set; }
         public virtual User? UpdatedByUser { get; private set; }
         public virtual DoctorSpecialty? PrimarySpecialty { get; private set; }
+        public virtual Department? Department { get; private set; }
+        public virtual Room? Room { get; private set; }
         public virtual User? VerifiedByUser { get; private set; }
         public virtual User? User { get; private set; }
         public virtual HospitalGroup? HospitalGroup { get; private set; }
@@ -247,6 +255,8 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public void SetMedicalLicenseExpiry(DateOnly medicalLicenseExpiry) { MedicalLicenseExpiry = medicalLicenseExpiry; }
         public void SetMedicalLicenseIssuingAuthority(string? medicalLicenseIssuingAuthority) { MedicalLicenseIssuingAuthority = medicalLicenseIssuingAuthority; }
         public void SetPrimarySpecialtyId(Guid? primarySpecialtyId) { PrimarySpecialtyId = primarySpecialtyId; }
+        public void SetDepartmentId(Guid? departmentId) { DepartmentId = departmentId; }
+        public void SetRoomId(Guid? roomId) { RoomId = roomId; }
         public void SetYearsOfExperience(int yearsOfExperience) { YearsOfExperience = yearsOfExperience; }
         public void SetYearsOfPractice(int yearsOfPractice) { YearsOfPractice = yearsOfPractice; }
         public void SetConsultationFeeMin(decimal consultationFeeMin) { ConsultationFeeMin = consultationFeeMin; }

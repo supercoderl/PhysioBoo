@@ -56,6 +56,8 @@ namespace PhysioBoo.Application.Commands.Doctors.CreateDoctor
                 request.NewDoctor.BloodGroup,
                 request.NewDoctor.MaritalStatus,
                 request.NewDoctor.Nationality,
+                request.NewDoctor.Email,
+                request.NewDoctor.Phone,
                 request.NewDoctor.IdentificationType,
                 request.NewDoctor.IdentificationNumber,
                 request.NewDoctor.IdentificationExpiry,

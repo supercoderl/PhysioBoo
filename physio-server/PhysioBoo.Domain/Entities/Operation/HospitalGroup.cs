@@ -62,6 +62,7 @@ namespace PhysioBoo.Domain.Entities.Operation
         public virtual ICollection<Bill> Bills { get; private set; } = new List<Bill>();
         public virtual ICollection<BillItem> BillItems { get; private set; } = new List<BillItem>();
         public virtual ICollection<Department> Departments { get; private set; } = new List<Department>();
+        public virtual ICollection<Room> Rooms { get; private set; } = new List<Room>();
         public virtual ICollection<Payment> Payments { get; private set; } = new List<Payment>();
         public virtual ICollection<Patient> Patients { get; private set; } = new List<Patient>();
         public virtual ICollection<PatientAllergy> PatientAllergies { get; private set; } = new List<PatientAllergy>();

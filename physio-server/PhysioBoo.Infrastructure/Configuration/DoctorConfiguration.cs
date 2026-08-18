@@ -28,6 +28,16 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(s => s.Doctors)
                    .HasForeignKey(d => d.PrimarySpecialtyId);
 
+            builder.HasOne(d => d.Department)
+                   .WithMany(dept => dept.Doctors)
+                   .HasForeignKey(d => d.DepartmentId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(d => d.Room)
+                   .WithMany(r => r.Doctors)
+                   .HasForeignKey(d => d.RoomId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
             builder.HasOne(d => d.VerifiedByUser)
                    .WithMany(u => u.VerifiedDoctors)
                    .HasForeignKey(d => d.VerifiedBy);

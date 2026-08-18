@@ -5,6 +5,7 @@ using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
 using PhysioBoo.Domain.Enums;
+using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Domain.Entities.Operation
 {
@@ -56,6 +57,7 @@ namespace PhysioBoo.Domain.Entities.Operation
         public Guid? CancelledBy { get; private set; }
         public DateTime? CancelledAt { get; private set; }
         public Guid? RescheduledFromAppointmentId { get; private set; }
+        public DateTime? CheckedInAt { get; private set; }
 
         public virtual User? Creator { get; private set; }
         public virtual User? Updater { get; private set; }
@@ -179,7 +181,12 @@ namespace PhysioBoo.Domain.Entities.Operation
         public void SetActualStartTime(TimeOnly? actualStartTime) { ActualStartTime = actualStartTime; }
         public void SetActualEndTime(TimeOnly? actualEndTime) { ActualEndTime = actualEndTime; }
         public void SetDurationMinutes(int durationMinutes) { DurationMinutes = durationMinutes; }
-        public void SetAppointmentStatus(AppointmentStatus appointmentStatus) { AppointmentStatus = appointmentStatus; }
+        public void SetAppointmentStatus(AppointmentStatus appointmentStatus)
+        {
+            if (appointmentStatus == AppointmentStatus.CheckedIn)
+                CheckedInAt = TimeZoneHelper.GetLocalTimeNow();
+            AppointmentStatus = appointmentStatus;
+        }
         public void SetPriority(Priority priority) { Priority = priority; }
         public void SetConsultationType(ConsultationType consultationType) { ConsultationType = consultationType; }
         public void SetChiefComplaint(string? chiefComplaint) { ChiefComplaint = chiefComplaint; }
@@ -212,6 +219,20 @@ namespace PhysioBoo.Domain.Entities.Operation
         public void SetCancelledBy(Guid? cancelledBy) { CancelledBy = cancelledBy; }
         public void SetCancelledAt(DateTime? cancelledAt) { CancelledAt = cancelledAt; }
         public void SetRescheduledFromAppointmentId(Guid? rescheduledFromAppointmentId) { RescheduledFromAppointmentId = rescheduledFromAppointmentId; }
+        public void Complete(
+            string diagnosis,
+            string? treatmentPlan,
+            DateOnly? followUpDate,
+            string? doctorNotes,
+            DateTime completedAt
+        )
+        {
+            Diagnosis = diagnosis;
+            TreatmentPlan = treatmentPlan;
+            FollowUpDate = followUpDate;
+            AppointmentStatus = AppointmentStatus.Completed;
+            ActualEndTime = TimeOnly.FromDateTime(completedAt);
+        }
     }
     #endregion
 }

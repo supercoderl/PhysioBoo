@@ -17,6 +17,12 @@
   </div>
 
   <div class="mt-2">
-    <admin-booking-table-card />
+    <admin-booking-table-card
+      [data]="tableData"
+      [filter]="params"
+      (pageChange)="onPageChanged($event)"
+      (checkInClick)="onCheckIn($event)"
+      (cancelClick)="onCancel($event)"
+    />
   </div>
 </admin-content-header>

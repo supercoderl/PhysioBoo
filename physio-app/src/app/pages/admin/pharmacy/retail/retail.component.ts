@@ -1,5 +1,7 @@
 import { Component, HostListener, OnInit, ViewChild, signal } from "@angular/core";
+import { forkJoin } from "rxjs";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
+import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { RetailPosService, nextLineItemId } from "../../../../services/admin/retail-pos.service";
 import { DialogService } from "../../../../services/common/dialog.service";
@@ -26,6 +28,7 @@ import { RetailProductDetailDrawerComponent } from "./retail-product-detail-draw
   imports: [
     SharedModule,
     BooIconComponent,
+    ErrorStateComponent,
     StatCardComponent,
     RetailCatalogPanelComponent,
     RetailCartPanelComponent,
@@ -70,6 +73,12 @@ import { RetailProductDetailDrawerComponent } from "./retail-product-detail-draw
     </div>
 
     <main class="px-4 sm:px-6 py-4">
+      <!-- Error state -->
+      <div *ngIf="error()" class="h-[calc(100vh-220px)] min-h-[480px] flex items-center justify-center bg-surface rounded-2 border border-borderGray/60">
+        <boo-error-state title="Couldn't load the POS workspace" [description]="error()" (retry)="retryLoad()"></boo-error-state>
+      </div>
+
+      <ng-container *ngIf="!error()">
       <!-- Inventory insight strip -->
       <div *ngIf="showInsight() && insight()" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
         <boo-stat-card label="Low Stock" [value]="insight()!.lowStockCount" icon="trending-down" tone="warning"></boo-stat-card>
@@ -94,6 +103,7 @@ import { RetailProductDetailDrawerComponent } from "./retail-product-detail-draw
             (checkout)="openPaymentDialog()" (holdSale)="suspendActiveCart()" (printBill)="printBill()"></retail-checkout-panel>
         </div>
       </div>
+      </ng-container>
     </main>
 
     <!-- Floating quick actions -->
@@ -143,6 +153,7 @@ export class AdminRetailComponent implements OnInit {
   insight = signal<RetailInventoryInsight | null>(null);
   showInsight = signal(true);
   showHeldQueue = signal(false);
+  error = signal<string | null>(null);
 
   productDrawerOpen = signal(false);
   productDrawerMedicineId = signal<string | null>(null);
@@ -156,13 +167,30 @@ export class AdminRetailComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.srv.getCarts().subscribe(res => {
-      if (res.success && res.data.length) {
-        this.carts.set(res.data);
-        this.activeCartId.set(res.data[0].id);
-      }
+    this.loadAll();
+  }
+
+  retryLoad(): void {
+    this.loadAll();
+  }
+
+  private loadAll(): void {
+    this.error.set(null);
+    forkJoin({
+      carts: this.srv.getCarts(),
+      insight: this.srv.getInsight(),
+    }).subscribe({
+      next: ({ carts, insight }) => {
+        if (carts.success && carts.data.length) {
+          this.carts.set(carts.data);
+          this.activeCartId.set(carts.data[0].id);
+        }
+        if (insight.success) this.insight.set(insight.data);
+      },
+      error: () => {
+        this.error.set('Failed to load the POS workspace. Please try again.');
+      },
     });
-    this.srv.getInsight().subscribe(res => { if (res.success) this.insight.set(res.data); });
   }
 
   @HostListener('window:keydown', ['$event'])

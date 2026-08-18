@@ -252,6 +252,10 @@ export const LoadingKeys = {
     DOCTOR_DESK: {
         SNAPSHOT: 'doctor-desk-snapshot'
     },
+    APPOINTMENT: {
+        SEARCH: 'appointment-search',
+        STATUS_UPDATE: 'appointment-status-update'
+    },
     PATIENT: {
         CREATE: 'patient-create'
     }

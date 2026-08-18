@@ -7,7 +7,12 @@
     </div>
   </div>
 
-  <ng-container *ngIf="!isLoading()">
+  <!-- Error state -->
+  <div *ngIf="!isLoading() && error()" class="flex-1 flex items-center justify-center">
+    <boo-error-state title="Couldn't load medical record" [description]="error()" (retry)="retryLoad()"></boo-error-state>
+  </div>
+
+  <ng-container *ngIf="!isLoading() && !error()">
     <!-- Sticky patient context + snapshot + tab nav -->
     <div class="sticky top-0 z-20 bg-surface shadow-sm">
       <mr-patient-context-header [patient]="patient()" (action)="onQuickAction($event)"></mr-patient-context-header>

@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { Router } from "@angular/router";
+import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { StockTakeService } from "../../../../services/admin/stock-take.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -22,6 +23,7 @@ import { StockTakeTableCardComponent } from "./stock-take-table-card.component";
     standalone: true,
     imports: [
         SharedModule,
+        ErrorStateComponent,
         StockTakeHeroHeaderComponent,
         StockTakeFilterBarComponent,
         StockTakeTableCardComponent,
@@ -40,7 +42,12 @@ import { StockTakeTableCardComponent } from "./stock-take-table-card.component";
 
       <stock-take-filter-bar [filter]="filter" (filterChange)="onFilterChange($event)" (searchChange)="onSearchChange($event)" (reset)="onFilterReset()"></stock-take-filter-bar>
 
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 items-start">
+      <!-- Error state -->
+      <div *ngIf="!loading() && error()" class="h-[320px] flex items-center justify-center">
+        <boo-error-state title="Couldn't load stock takes" [description]="error()" (retry)="retryLoad()"></boo-error-state>
+      </div>
+
+      <div *ngIf="!error()" class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 items-start">
         <div class="h-[640px]">
           <stock-take-table-card
             [data]="data()"
@@ -83,6 +90,7 @@ export class AdminStockTakeComponent implements OnInit {
     data = signal<PaginationData<StockTake> | null>(null);
     kpis = signal<StockTakeKpis | null>(null);
     loading = signal(false);
+    error = signal<string | null>(null);
 
     filter: StockTakeFilter = {};
     search = '';
@@ -115,12 +123,20 @@ export class AdminStockTakeComponent implements OnInit {
         this.srv.getKpis().subscribe(res => { if (res.success) this.kpis.set(res.data); });
     }
 
+    retryLoad(): void {
+        this.loadList();
+    }
+
     loadList(): void {
         this.loading.set(true);
+        this.error.set(null);
         this.srv.search({ pageNumber: this.pageNumber, pageSize: this.pageSize, search: this.search, filter: this.filter })
             .subscribe({
                 next: res => { this.data.set(res.success ? res.data : PaginationDataWithInit<StockTake>()); this.loading.set(false); },
-                error: () => this.loading.set(false),
+                error: () => {
+                    this.loading.set(false);
+                    this.error.set('Failed to load stock takes. Please try again.');
+                },
             });
     }
 

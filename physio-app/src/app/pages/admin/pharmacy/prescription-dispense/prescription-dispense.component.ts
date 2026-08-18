@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit, signal } from "@angular/core";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
+import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { DispensingService } from "../../../../services/admin/dispensing.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -24,6 +25,7 @@ import { DispenseSummaryPanelComponent } from "./dispense-summary-panel.componen
     imports: [
         SharedModule,
         BooIconComponent,
+        ErrorStateComponent,
         DispenseQueuePanelComponent,
         DispensePickingPanelComponent,
         DispenseSummaryPanelComponent,
@@ -45,7 +47,11 @@ import { DispenseSummaryPanelComponent } from "./dispense-summary-panel.componen
     <main class="px-4 sm:px-6 py-4">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.1fr_2fr_1fr] gap-4">
         <div class="h-[calc(100vh-220px)] min-h-[480px]">
+          <div *ngIf="error()" class="h-full flex items-center justify-center bg-surface rounded-2 border border-borderGray/60">
+            <boo-error-state title="Couldn't load the prescription queue" [description]="error()" (retry)="retryLoad()"></boo-error-state>
+          </div>
           <dispense-queue-panel
+            *ngIf="!error()"
             [items]="queue()"
             [selectedQueueId]="selectedQueueId()"
             [search]="search()"
@@ -109,6 +115,8 @@ export class AdminPrescriptionDispenseComponent implements OnInit {
     drawerItem = signal<DispenseMedicationItem | null>(null);
     drawerDetail = signal<DispenseMedicineDetail | null>(null);
 
+    error = signal<string | null>(null);
+
     private searchDebounce: ReturnType<typeof setTimeout> | undefined;
 
     constructor(
@@ -131,9 +139,19 @@ export class AdminPrescriptionDispenseComponent implements OnInit {
         if (event.key === 'Escape') this.drawerOpen.set(false);
     }
 
+    retryLoad(): void {
+        this.loadQueue();
+    }
+
     loadQueue(): void {
-        this.srv.getQueue(this.search(), this.statusFilter()).subscribe(res => {
-            if (res.success) this.queue.set(res.data.items);
+        this.error.set(null);
+        this.srv.getQueue(this.search(), this.statusFilter()).subscribe({
+            next: res => {
+                if (res.success) this.queue.set(res.data.items);
+            },
+            error: () => {
+                this.error.set('Failed to load the prescription queue. Please try again.');
+            },
         });
     }
 

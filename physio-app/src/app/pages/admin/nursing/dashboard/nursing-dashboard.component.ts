@@ -1,9 +1,10 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { finalize, forkJoin } from "rxjs";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
+import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { NursingService } from "../../../../services/admin/nursing.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
@@ -14,7 +15,7 @@ import { AlertSeverity, NursingAlert, NursingAssignmentFilter, NursingPatient, N
 @Component({
     selector: 'admin-nursing-dashboard',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, BooInputComponent, BooSelectComponent, StatusBadgeComponent],
+    imports: [SharedModule, BooIconComponent, BooInputComponent, BooSelectComponent, StatusBadgeComponent, ErrorStateComponent],
     template: `
     <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto">
@@ -37,12 +38,8 @@ import { AlertSeverity, NursingAlert, NursingAssignmentFilter, NursingPatient, N
         </div>
 
         <!-- Error -->
-        <div *ngIf="hasError && !loadingSrv.isLoading('nursing-dashboard')" class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <boo-icon name="alert-circle" [size]="20" class="text-red-500"></boo-icon>
-            <span class="text-red-700 text-sm">Unable to load the nursing dashboard. Please try again.</span>
-          </div>
-          <button (click)="refresh()" class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors">Retry</button>
+        <div *ngIf="error() && !loadingSrv.isLoading('nursing-dashboard')" class="mb-6">
+          <boo-error-state title="Couldn't load nursing dashboard" [description]="error()" (retry)="refresh()"></boo-error-state>
         </div>
 
         <!-- Loading -->
@@ -51,7 +48,7 @@ import { AlertSeverity, NursingAlert, NursingAssignmentFilter, NursingPatient, N
           <span class="text-gray-500 text-sm">Loading nursing dashboard...</span>
         </div>
 
-        <ng-container *ngIf="!hasError && hasLoadedOnce">
+        <ng-container *ngIf="!error() && hasLoadedOnce">
           <!-- Stats strip -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div class="bg-surface rounded-lg shadow-md p-6">
@@ -167,7 +164,7 @@ export class AdminNursingDashboardComponent implements OnInit {
     patients: NursingPatient[] = [];
     stats: NursingStats | null = null;
     alerts: NursingAlert[] = [];
-    hasError = false;
+    error = signal<string | null>(null);
     hasLoadedOnce = false;
 
     shift: ShiftCode = 'Day';
@@ -224,7 +221,7 @@ export class AdminNursingDashboardComponent implements OnInit {
     }
 
     load(): void {
-        this.hasError = false;
+        this.error.set(null);
         this.filter.shift = this.shift;
         this.loadingSrv.setLoading('nursing-dashboard', true);
 
@@ -242,7 +239,7 @@ export class AdminNursingDashboardComponent implements OnInit {
                     this.hasLoadedOnce = true;
                 },
                 error: () => {
-                    this.hasError = true;
+                    this.error.set('Failed to load the nursing dashboard. Please try again.');
                     this.hasLoadedOnce = true;
                 },
             });

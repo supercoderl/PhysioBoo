@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { finalize, forkJoin } from "rxjs";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
+import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { RadiologyService } from "../../../../services/admin/radiology.service";
@@ -27,6 +28,7 @@ const LOADING_KEY = 'radiology';
   imports: [
     SharedModule,
     BooIconComponent,
+    ErrorStateComponent,
     StatusBadgeComponent,
     StatCardComponent,
     RadiologyDashboardTabComponent,
@@ -47,17 +49,11 @@ const LOADING_KEY = 'radiology';
     </div>
 
     <!-- Error -->
-    <div *ngIf="hasError && !loadingSrv.isLoading(LOADING_KEY)" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-      <div class="bg-red-50 border border-red-200 rounded-lg p-6 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <boo-icon name="alert-circle" [size]="20" iconClass="text-red-500"></boo-icon>
-          <span class="text-red-700 text-sm">Unable to load the radiology workspace.</span>
-        </div>
-        <button (click)="load()" class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors">Retry</button>
-      </div>
+    <div *ngIf="error() && !loadingSrv.isLoading(LOADING_KEY)" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <boo-error-state title="Couldn't load radiology workspace" [description]="error()" (retry)="retryLoad()"></boo-error-state>
     </div>
 
-    <ng-container *ngIf="!hasError && hasLoadedOnce">
+    <ng-container *ngIf="!error() && hasLoadedOnce">
       <!-- Sticky module header -->
       <div class="sticky top-0 z-20 bg-surface shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
@@ -133,7 +129,7 @@ export class AdminRadiologyComponent implements OnInit {
   drawerOpen = signal(false);
   drawerPatientId = signal<string | null>(null);
 
-  hasError = false;
+  error = signal<string | null>(null);
   hasLoadedOnce = false;
 
   readonly tabs: { key: TabKey; label: string; icon: string }[] = [
@@ -157,7 +153,7 @@ export class AdminRadiologyComponent implements OnInit {
   }
 
   load(): void {
-    this.hasError = false;
+    this.error.set(null);
     this.loadingSrv.setLoading(LOADING_KEY, true);
 
     forkJoin({
@@ -172,11 +168,13 @@ export class AdminRadiologyComponent implements OnInit {
           this.hasLoadedOnce = true;
         },
         error: () => {
-          this.hasError = true;
+          this.error.set('Failed to load the radiology workspace. Please try again.');
           this.hasLoadedOnce = true;
         },
       });
   }
+
+  retryLoad(): void { this.load(); }
 
   setTab(key: TabKey): void { this.activeTab.set(key); }
 

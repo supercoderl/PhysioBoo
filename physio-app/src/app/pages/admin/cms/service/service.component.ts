@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { catchError, of } from "rxjs";
 import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
 import { CmsServiceDetailDrawerComponent } from "../../../../components/layout/admin/cms/service/service-detail-drawer.component";
 import { CmsServiceDrawerComponent } from "../../../../components/layout/admin/cms/service/service-drawer.component";
@@ -36,6 +35,7 @@ export class AdminServiceComponent implements OnInit {
     // ────────────────────────────────────────────────────────────
     data  = signal<PaginationData<MedicalService> | null>(null);
     stats = signal<ServiceStats | null>(null);
+    loadError = signal(false);
 
     isFormOpen   = signal(false);
     isDetailOpen = signal(false);
@@ -115,21 +115,27 @@ export class AdminServiceComponent implements OnInit {
     // ────────────────────────────────────────────────────────────
     load(): void {
         this.loadingSrv.setLoading('services', true);
+        this.loadError.set(false);
         this.srv.search({ ...this.params, filter: { ...this.params.filter } })
-            .pipe(
-                catchError(() => of(null)),
-            )
-            .subscribe(res => {
-                this.loadingSrv.setLoading('services', false);
-                if (res?.success) this.data.set(res.data);
+            .subscribe({
+                next: (res) => {
+                    this.loadingSrv.setLoading('services', false);
+                    if (res.success) this.data.set(res.data);
+                },
+                // Keep whatever data is already on screen — don't wipe it, and never
+                // fake a success response. The banner + retry button make the failure visible.
+                error: () => {
+                    this.loadingSrv.setLoading('services', false);
+                    this.loadError.set(true);
+                },
             });
     }
 
     loadStats(): void {
         this.srv.stats()
-            .pipe(catchError(() => of(null)))
-            .subscribe(res => {
-                if (res?.success) this.stats.set(res.data);
+            .subscribe({
+                next: (res) => { if (res.success) this.stats.set(res.data); },
+                error: () => { /* KPI strip already falls back to '—'; global toast covers the failure */ },
             });
     }
 

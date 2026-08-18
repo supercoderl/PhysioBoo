@@ -2,6 +2,7 @@ import { Component, OnInit, computed, signal } from "@angular/core";
 import { finalize, forkJoin } from "rxjs";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { InsuranceClaimsService } from "../../../../services/admin/insurance-claims.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -33,6 +34,7 @@ const LOADING_KEY = 'insurance-claims-workspace';
     SharedModule,
     BooIconComponent,
     EmptyStateComponent,
+    ErrorStateComponent,
     InsuranceProvidersTreeComponent,
     InsuranceWorkflowRailComponent,
     InsuranceClaimCardComponent,
@@ -69,15 +71,11 @@ const LOADING_KEY = 'insurance-claims-workspace';
     </div>
 
     <!-- Error -->
-    <div *ngIf="hasError && !loadingSrv.isLoading(LOADING_KEY)" class="h-full flex items-center justify-center px-6">
-      <div class="bg-[var(--ic-rose)]/8 border border-[var(--ic-rose)]/30 rounded-1.5 p-6 flex items-center gap-4">
-        <boo-icon name="alert-circle" [size]="20" iconClass="text-[var(--ic-rose)]"></boo-icon>
-        <span class="text-[var(--ic-rose)] text-sm">Unable to load the insurance claims workspace.</span>
-        <button (click)="load()" class="px-3 py-1.5 bg-[var(--ic-rose)] text-white rounded-1.5 text-xs font-semibold hover:opacity-90">Retry</button>
-      </div>
+    <div *ngIf="error() && !loadingSrv.isLoading(LOADING_KEY)" class="h-full flex items-center justify-center px-6">
+      <boo-error-state title="Couldn't load the insurance claims workspace" [description]="error()" (retry)="retryLoad()"></boo-error-state>
     </div>
 
-    <div class="h-full flex flex-col" *ngIf="!hasError && hasLoadedOnce">
+    <div class="h-full flex flex-col" *ngIf="!error() && hasLoadedOnce">
       <!-- Top toolbar -->
       <header class="h-14 shrink-0 flex items-center gap-3 px-3 border-b border-[var(--ic-warm-gray-200)]">
         <div class="relative w-64 shrink-0">
@@ -269,7 +267,7 @@ export class AdminInsuranceComponent implements OnInit {
   dialogOpen = signal(false);
   dialogMode = signal<ClaimActionMode | null>(null);
 
-  hasError = false;
+  error = signal<string | null>(null);
   hasLoadedOnce = false;
 
   savedSearches: SavedSearch[] = [
@@ -338,8 +336,12 @@ export class AdminInsuranceComponent implements OnInit {
     this.load();
   }
 
+  retryLoad(): void {
+    this.load();
+  }
+
   load(): void {
-    this.hasError = false;
+    this.error.set(null);
     this.loadingSrv.setLoading(LOADING_KEY, true);
 
     forkJoin({
@@ -356,7 +358,7 @@ export class AdminInsuranceComponent implements OnInit {
           this.hasLoadedOnce = true;
         },
         error: () => {
-          this.hasError = true;
+          this.error.set('Failed to load the insurance claims workspace. Please try again.');
           this.hasLoadedOnce = true;
         },
       });

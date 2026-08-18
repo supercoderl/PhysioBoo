@@ -1,7 +1,8 @@
-import { Component, OnInit, signal } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { Component, inject, OnInit, signal } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
 import { forkJoin } from "rxjs";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
+import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { MedicalRecordService } from "../../../../services/admin/medical-record.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -46,6 +47,7 @@ interface TabDef {
     imports: [
         SharedModule,
         BooIconComponent,
+        ErrorStateComponent,
         PatientContextHeaderComponent,
         ClinicalSnapshotComponent,
         OverviewTabComponent,
@@ -77,6 +79,7 @@ export class AdminMedicalRecordComponent implements OnInit {
     billing = signal<BillingSummary | null>(null);
 
     isLoading = signal(true);
+    error = signal<string | null>(null);
     activeTab = signal<TabKey>('overview');
 
     readonly tabs: TabDef[] = [
@@ -90,21 +93,33 @@ export class AdminMedicalRecordComponent implements OnInit {
         { key: 'billing', label: 'Billing', icon: 'wallet', badge: () => this.billing()?.outstandingBalance && this.billing()!.outstandingBalance > 0 ? 1 : null },
     ];
 
-    constructor(
-        private srv: MedicalRecordService,
-        private route: ActivatedRoute,
-        private toastSrv: ToastService,
-    ) { }
+    // #region Inject Services
+    private srv = inject(MedicalRecordService);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private toastSrv = inject(ToastService);
+
+    // #endregion
+
+    private patientId = '';
 
     ngOnInit(): void {
-        const patientId = this.route.snapshot.paramMap.get('patientId')
-            ?? this.route.snapshot.queryParamMap.get('patientId')
-            ?? "d3c76a70-0a7c-4c4f-9177-38f58c1aec56";
+        const patientId = this.route.snapshot.paramMap.get('patientId');
+        if (!patientId) {
+            this.router.navigate(['/admin/reception/patient-lookup']);
+            return;
+        }
+        this.patientId = patientId;
         this.loadAll(patientId);
+    }
+
+    retryLoad(): void {
+        if (this.patientId) this.loadAll(this.patientId);
     }
 
     private loadAll(patientId: string): void {
         this.isLoading.set(true);
+        this.error.set(null);
         forkJoin({
             ctx: this.srv.getContext(patientId),
             snap: this.srv.getSnapshot(patientId),
@@ -124,17 +139,23 @@ export class AdminMedicalRecordComponent implements OnInit {
                 if (r.snap.success) this.snapshot.set(r.snap.data);
                 if (r.demo.success) this.demographics.set(r.demo.data);
                 if (r.hist.success) this.history.set(r.hist.data);
-                if (r.allg.success) this.allergies.set(r.allg.data.items);
-                if (r.enc.success) this.encounters.set(r.enc.data.items);
-                if (r.dx.success) this.diagnoses.set(r.dx.data.items);
-                if (r.rx.success) this.prescriptions.set(r.rx.data.items);
-                if (r.lab.success) { this.labResults.set(r.lab.data.results); this.labReports.set(r.lab.data.reports); }
-                if (r.img.success) this.imaging.set(r.img.data.items);
-                if (r.note.success) this.notes.set(r.note.data.items);
+                if (r.allg.success) this.allergies.set(r.allg.data?.items ?? []);
+                if (r.enc.success) this.encounters.set(r.enc.data?.items ?? []);
+                if (r.dx.success) this.diagnoses.set(r.dx.data?.items ?? []);
+                if (r.rx.success) this.prescriptions.set(r.rx.data?.items ?? []);
+                if (r.lab.success) {
+                    this.labResults.set(r.lab.data?.results ?? []);
+                    this.labReports.set(r.lab.data?.reports ?? []);
+                }
+                if (r.img.success) this.imaging.set(r.img.data?.items ?? []);
+                if (r.note.success) this.notes.set(r.note.data?.items ?? []);
                 if (r.bill.success) this.billing.set(r.bill.data);
                 this.isLoading.set(false);
             },
-            error: () => this.isLoading.set(false),
+            error: () => {
+                this.isLoading.set(false);
+                this.error.set('Failed to load the patient medical record. Please try again.');
+            },
         });
     }
 

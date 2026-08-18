@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
-import { catchError, of } from "rxjs";
 import { MedicalServiceService } from "../../../../../services/admin/medical-service.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { MedicalService, ServiceAvailability, ServiceStatus } from "../../../../../shared/types/service.types";
@@ -12,7 +11,20 @@ import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
     imports: [SharedModule, DrawerComponent, BooIconComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="720" (close)="close.emit()">
-            <div *ngIf="item as s" class="flex flex-col h-full bg-surface">
+            <div *ngIf="loading" class="flex items-center justify-center h-full">
+                <boo-icon name="loader" [size]="24" iconClass="animate-spin text-secondary"></boo-icon>
+            </div>
+
+            <div *ngIf="!loading && loadError" class="flex flex-col items-center justify-center h-full text-center px-6">
+                <boo-icon name="alert-triangle" [size]="28" iconClass="text-red-500 mb-3"></boo-icon>
+                <p class="text-sm font-semibold text-regular mb-1">Couldn't load this service</p>
+                <p class="text-xs15 text-secondary max-w-[280px] mb-4">The request failed. Please try again.</p>
+                <button (click)="reload()" class="px-3 py-1.5 text-sm font-medium text-red-700 border border-red-300 rounded-md hover:bg-red-100">
+                    Retry
+                </button>
+            </div>
+
+            <div *ngIf="!loading && !loadError && item as s" class="flex flex-col h-full bg-surface">
                 <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-start justify-between gap-3">
                     <div class="min-w-0">
                         <div class="flex items-center gap-2 mb-1">
@@ -155,6 +167,8 @@ export class CmsServiceDetailDrawerComponent implements OnChanges {
     @Output() deleteClick = new EventEmitter<MedicalService>();
 
     item: MedicalService | null = null;
+    loading = false;
+    loadError = false;
     // #endregion
 
     // #region Init (Lifecycle + Setup)
@@ -162,14 +176,33 @@ export class CmsServiceDetailDrawerComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['serviceId'] && this.serviceId) {
-            this.srv.search_by_id(this.serviceId)
-                .pipe(catchError(() => of(null)))
-                .subscribe(res => {
-                    if (res?.success && res.data) this.item = res.data;
-                });
+            this.fetch(this.serviceId);
         } else if (!this.serviceId) {
             this.item = null;
+            this.loadError = false;
         }
+    }
+
+    reload(): void {
+        if (this.serviceId) this.fetch(this.serviceId);
+    }
+
+    private fetch(serviceId: string): void {
+        this.loading = true;
+        this.loadError = false;
+        this.srv.search_by_id(serviceId).subscribe({
+            next: (res) => {
+                this.loading = false;
+                this.item = res.success && res.data ? res.data : null;
+                this.loadError = !res.success;
+            },
+            // Never fall back to stale/fake data on failure — show the retry state instead.
+            error: () => {
+                this.loading = false;
+                this.item = null;
+                this.loadError = true;
+            },
+        });
     }
     // #endregion
 

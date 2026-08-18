@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
+import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { CashierService } from "../../../../services/admin/cashier.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
@@ -29,6 +30,7 @@ type LeftTab = 'invoices' | 'activity';
   imports: [
     SharedModule,
     BooIconComponent,
+    ErrorStateComponent,
     CashierSearchPanelComponent,
     CashierInvoiceTableComponent,
     CashierInvoiceDetailPanelComponent,
@@ -103,7 +105,12 @@ type LeftTab = 'invoices' | 'activity';
         (barcodeSubmit)="onBarcodeSubmit($event)">
       </cashier-search-panel>
 
-      <div class="grid grid-cols-1 lg:grid-cols-[1.7fr_1fr] gap-4 mt-4">
+      <!-- Error state -->
+      <div *ngIf="error() && !loadingSrv.isLoading('cashier-invoices-search')" class="mt-4">
+        <boo-error-state title="Couldn't load cashier data" [description]="error()" (retry)="retryLoad()"></boo-error-state>
+      </div>
+
+      <div *ngIf="!error()" class="grid grid-cols-1 lg:grid-cols-[1.7fr_1fr] gap-4 mt-4">
         <!-- Left: outstanding invoices / activity -->
         <div class="h-[calc(100vh-330px)] min-h-[480px] flex flex-col gap-3">
           <div class="flex items-center gap-1 bg-slate-100 rounded-xl p-1 w-fit">
@@ -182,6 +189,8 @@ export class AdminCashierComponent implements OnInit {
   refundDialogOpen = signal(false);
   refundTarget = signal<CashierInvoice | null>(null);
 
+  error = signal<string | null>(null);
+
   filter = { search: '', status: 'All' as CashierInvoiceStatus | 'All', pageNumber: 1, pageSize: 8 };
 
   constructor(
@@ -192,9 +201,14 @@ export class AdminCashierComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.error.set(null);
     this.loadStats();
     this.loadInvoices();
     this.loadTransactions();
+  }
+
+  retryLoad(): void {
+    this.ngOnInit();
   }
 
   avgPaymentTimeLabel(): string {
@@ -204,25 +218,35 @@ export class AdminCashierComponent implements OnInit {
   }
 
   loadStats(): void {
-    this.cashierSrv.getDashboardStats().subscribe(res => { if (res.success) this.stats.set(res.data); });
+    this.cashierSrv.getDashboardStats().subscribe({
+      next: res => { if (res.success) this.stats.set(res.data); },
+      error: () => this.error.set('Failed to load cashier dashboard stats. Please try again.'),
+    });
   }
 
   loadInvoices(): void {
-    this.cashierSrv.searchInvoices(this.filter).subscribe(res => {
-      if (res.success) {
-        this.invoicePage.set(res.data);
-        if (!this.selectedInvoice() && res.data.items.length) {
-          this.selectedInvoice.set(res.data.items[0]);
+    this.cashierSrv.searchInvoices(this.filter).subscribe({
+      next: res => {
+        if (res.success) {
+          this.invoicePage.set(res.data);
+          if (!this.selectedInvoice() && res.data.items.length) {
+            this.selectedInvoice.set(res.data.items[0]);
+          }
         }
-      }
+      },
+      error: () => this.error.set('Failed to load invoices. Please try again.'),
     });
   }
 
   loadTransactions(): void {
-    this.cashierSrv.getPaymentHistory().subscribe(res => { if (res.success) this.transactions.set(res.data); });
+    this.cashierSrv.getPaymentHistory().subscribe({
+      next: res => { if (res.success) this.transactions.set(res.data); },
+      error: () => this.error.set('Failed to load recent transactions. Please try again.'),
+    });
   }
 
   refreshAll(): void {
+    this.error.set(null);
     this.loadStats();
     this.loadInvoices();
     this.loadTransactions();

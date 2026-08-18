@@ -431,4 +431,12 @@ export const BASE_API = {
     ALERT_DISMISS: (alertId: string) => `/api/dashboard/alerts/${alertId}/dismiss`,
     EXPORT: '/api/dashboard/export',
   },
+  DOCTOR_DESK: {
+    SNAPSHOT: '/api/doctor-desk/snapshot',
+  },
+  APPOINTMENT: {
+    BASE: '/api/appointments',
+    SEARCH: '/api/appointments/search',
+    STATUS: (id: string) => `/api/appointments/${id}/status`,
+  }
 };

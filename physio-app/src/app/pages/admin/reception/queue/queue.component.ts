@@ -1,7 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { interval, Subject, takeUntil } from "rxjs";
+import { interval, Subject, switchMap, takeUntil, timer } from "rxjs";
 import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
+import { AppointmentService } from "../../../../services/admin/appointment.service";
+import { DateService } from "../../../../services/common/date.service";
+import { AppointmentRecord } from "../../../../shared/types/appointment.types";
 
 interface QueueDisplay {
   queueNumber: string;
@@ -146,22 +149,13 @@ interface QueueDisplay {
 
 export class AdminQueueComponent implements OnInit, OnDestroy {
   // #region Inputs, Outputs, Properties
+  private readonly POLL_INTERVAL_MS = 10_000;
   private destroy$ = new Subject<void>();
-  currentQueue = { queueNumber: 'A025', counter: 'Counter 3' };
+  currentQueue: { queueNumber: string; counter: string } = { queueNumber: '—', counter: '—' };
 
-  nextQueues: QueueDisplay[] = [
-    { queueNumber: 'A026', counter: 'Counter 3', status: 'next' },
-    { queueNumber: 'B012', counter: 'Counter 1', status: 'next' }
-  ];
+  nextQueues: QueueDisplay[] = [];
 
-  waitingQueues: QueueDisplay[] = [
-    { queueNumber: 'A027', counter: 'Counter 3', status: 'waiting' },
-    { queueNumber: 'A028', counter: 'Counter 3', status: 'waiting' },
-    { queueNumber: 'B013', counter: 'Counter 1', status: 'waiting' },
-    { queueNumber: 'B014', counter: 'Counter 1', status: 'waiting' },
-    { queueNumber: 'C008', counter: 'Counter 5', status: 'waiting' },
-    { queueNumber: 'C009', counter: 'Counter 5', status: 'waiting' }
-  ];
+  waitingQueues: QueueDisplay[] = [];
 
   currentTime: string = '';
   currentDate: string = '';
@@ -170,12 +164,42 @@ export class AdminQueueComponent implements OnInit, OnDestroy {
   private timeInterval: any;
   // #endregion
 
+  // #region Inject Services
+  constructor(
+    private appointmentSrv: AppointmentService,
+    private dateSrv: DateService,
+    private cdr: ChangeDetectorRef,
+  ) { }
+  // #endregion
+
   // #region Init (Lifecycle + Setup)
   ngOnInit() {
     this.updateTime();
     interval(1000)
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.updateTime());
+      .subscribe(() => {
+        this.updateTime();
+        this.cdr.markForCheck();
+      });
+
+    timer(0, this.POLL_INTERVAL_MS)
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap(() => this.appointmentSrv.search({
+          pageNumber: 1,
+          pageSize: 100,
+          filter: {
+            start: this.dateSrv.format(new Date(), 'YYYY-MM-DD'),
+            end: this.dateSrv.format(new Date(), 'YYYY-MM-DD'),
+          }
+        }))
+      )
+      .subscribe(res => {
+        if (res.success) {
+          this.applyQueue(res.data.items);
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   ngOnDestroy() {
@@ -185,6 +209,28 @@ export class AdminQueueComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Methods
+  private applyQueue(appointments: AppointmentRecord[]): void {
+    const items = appointments
+      .filter(a => a.status === 'CheckedIn' || a.status === 'InProgress')
+      .sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
+
+    this.currentQueue = items[0]
+      ? { queueNumber: items[0].appointmentNumber, counter: items[0].doctorName }
+      : { queueNumber: '—', counter: '—' };
+
+    this.nextQueues = items.slice(1, 3).map(a => ({
+      queueNumber: a.appointmentNumber,
+      counter: a.doctorName,
+      status: 'next' as const
+    }));
+
+    this.waitingQueues = items.slice(3).map(a => ({
+      queueNumber: a.appointmentNumber,
+      counter: a.doctorName,
+      status: 'waiting' as const
+    }));
+  }
+
   updateTime() {
     const now = new Date();
     this.currentTime = now.toLocaleTimeString('en-US', {

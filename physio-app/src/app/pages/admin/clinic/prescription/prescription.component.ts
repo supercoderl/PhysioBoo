@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from "@angular/core";
 import { Subject, debounceTime, switchMap } from "rxjs";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
+import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { PrescriptionService } from "../../../../services/admin/prescription.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
@@ -30,6 +31,7 @@ import { hasUnacknowledgedAtOrAbove, severityRank } from "./prescription-rx.util
     imports: [
         SharedModule,
         BooIconComponent,
+        ErrorStateComponent,
         PrescriptionActionBarComponent,
         PrescriptionPatientSummaryComponent,
         PrescriptionDiagnosisSectionComponent,
@@ -46,7 +48,11 @@ import { hasUnacknowledgedAtOrAbove, severityRank } from "./prescription-rx.util
         <div class="h-96 bg-gray-200 rounded-lg animate-pulse"></div>
       </div>
 
-      <ng-container *ngIf="!loadingSrv.isLoading(LoadingKeys.PRESCRIPTION.GET_DRAFT) && draft() as d">
+      <div *ngIf="!loadingSrv.isLoading(LoadingKeys.PRESCRIPTION.GET_DRAFT) && error()" class="p-6 max-w-7xl mx-auto w-full">
+        <boo-error-state title="Couldn't load prescription" [description]="error()" (retry)="retryLoad()"></boo-error-state>
+      </div>
+
+      <ng-container *ngIf="!loadingSrv.isLoading(LoadingKeys.PRESCRIPTION.GET_DRAFT) && !error() && draft() as d">
         <rx-action-bar
           [draft]="d" [editable]="editable()" [saving]="loadingSrv.isLoading(LoadingKeys.PRESCRIPTION.SAVE_DRAFT)" [canIssue]="canIssue()"
           (saveDraft)="saveDraft()" (preview)="openPreview()" (print)="printRx()" (issue)="issueRx()" (cancel)="cancelRx()">
@@ -138,11 +144,13 @@ export class AdminPrescriptionComponent implements OnInit, OnDestroy {
     recent = signal<RecentPrescriptionSummary[]>([]);
     favorites = signal<FavoriteMedication[]>([]);
     templates = signal<PrescriptionTemplate[]>([]);
+    error = signal<string | null>(null);
 
     editable = computed(() => this.draft()?.status === 'Draft');
     canIssue = computed(() => this.editable() && (this.draft()?.items.length ?? 0) > 0);
 
     private autosave$ = new Subject<void>();
+    private prescriptionId = 'new';
 
     LoadingKeys = LoadingKeys;
     // #endregion
@@ -156,14 +164,7 @@ export class AdminPrescriptionComponent implements OnInit, OnDestroy {
 
     // #region Init (Lifecycle + Setup)
     ngOnInit(): void {
-        this.rxSrv.getDraft('new').subscribe(res => {
-            this.draft.set(res.data);
-            const patientId = res.data.patient.patientId;
-            const doctorId = res.data.doctor.doctorId;
-            this.rxSrv.getRecentPrescriptions(patientId).subscribe(r => this.recent.set(r.data ?? []));
-            this.rxSrv.getFavorites(doctorId).subscribe(r => this.favorites.set(r.data ?? []));
-            this.rxSrv.getTemplates(doctorId).subscribe(r => this.templates.set(r.data ?? []));
-        });
+        this.loadDraft();
 
         this.autosave$.pipe(
             debounceTime(1200),
@@ -183,6 +184,27 @@ export class AdminPrescriptionComponent implements OnInit, OnDestroy {
     // #endregion
 
     // #region Methods
+    private loadDraft(): void {
+        this.error.set(null);
+        this.rxSrv.getDraft(this.prescriptionId).subscribe({
+            next: res => {
+                this.draft.set(res.data);
+                const patientId = res.data.patient.patientId;
+                const doctorId = res.data.doctor.doctorId;
+                this.rxSrv.getRecentPrescriptions(patientId).subscribe(r => this.recent.set(r.data ?? []));
+                this.rxSrv.getFavorites(doctorId).subscribe(r => this.favorites.set(r.data ?? []));
+                this.rxSrv.getTemplates(doctorId).subscribe(r => this.templates.set(r.data ?? []));
+            },
+            error: () => {
+                this.error.set('Failed to load the prescription. Please try again.');
+            },
+        });
+    }
+
+    retryLoad(): void {
+        this.loadDraft();
+    }
+
     private patch(fn: (d: PrescriptionDraft) => PrescriptionDraft) {
         const current = this.draft();
         if (!current) return;

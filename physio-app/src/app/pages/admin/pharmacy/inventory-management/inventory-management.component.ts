@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
+import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -29,6 +30,7 @@ import { InventoryTimelinePanelComponent } from "./inventory-timeline-panel.comp
     imports: [
         SharedModule,
         BooIconComponent,
+        ErrorStateComponent,
         InventoryKpiStripComponent,
         InventoryExplorerPanelComponent,
         InventoryIntelligencePanelComponent,
@@ -53,7 +55,10 @@ import { InventoryTimelinePanelComponent } from "./inventory-timeline-panel.comp
     </div>
 
     <main class="px-4 sm:px-6 py-4 space-y-4">
-      <inventory-kpi-strip [kpis]="kpis()" (kpiClick)="onKpiClick($event)"></inventory-kpi-strip>
+      <div *ngIf="error()" class="bg-surface rounded-2 border border-borderGray/60">
+        <boo-error-state title="Couldn't load inventory KPIs" [description]="error()" (retry)="retryLoad()"></boo-error-state>
+      </div>
+      <inventory-kpi-strip *ngIf="!error()" [kpis]="kpis()" (kpiClick)="onKpiClick($event)"></inventory-kpi-strip>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.4fr_1.1fr_1fr] gap-4">
         <div class="h-[560px]">
@@ -102,6 +107,7 @@ export class AdminInventoryManagementComponent implements OnInit {
     lastSync = new Date();
 
     kpis = signal<InventoryKpis | null>(null);
+    error = signal<string | null>(null);
     selectedMedicineId = signal<string | null>(null);
     selectedMedicineName = signal<string | null>(null);
     batches = signal<WarehouseBatch[]>([]);
@@ -119,9 +125,17 @@ export class AdminInventoryManagementComponent implements OnInit {
         this.refresh();
     }
 
+    retryLoad(): void {
+        this.refresh();
+    }
+
     refresh(): void {
         this.lastSync = new Date();
-        this.srv.getKpis().subscribe(res => { if (res.success) this.kpis.set(res.data); });
+        this.error.set(null);
+        this.srv.getKpis().subscribe({
+            next: res => { if (res.success) this.kpis.set(res.data); },
+            error: () => { this.error.set('Failed to load inventory KPIs. Please try again.'); },
+        });
     }
 
     onKpiClick(key: string): void {

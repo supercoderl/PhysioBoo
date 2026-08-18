@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
+import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { NursingService } from "../../../../services/admin/nursing.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -20,6 +21,7 @@ type TabKey = 'overview' | 'vitals' | 'mar' | 'io' | 'tasks' | 'notes';
     imports: [
         SharedModule,
         BooIconComponent,
+        ErrorStateComponent,
         StatusBadgeComponent,
         NursingOverviewTabComponent,
         NursingVitalsTabComponent,
@@ -34,7 +36,11 @@ type TabKey = 'overview' | 'vitals' | 'mar' | 'io' | 'tasks' | 'notes';
       <boo-icon name="loader" iconClass="w-8 h-8 text-primary animate-spin"></boo-icon>
     </div>
 
-    <ng-container *ngIf="!isLoading()">
+    <div *ngIf="!isLoading() && error()" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <boo-error-state title="Couldn't load patient" [description]="error()" (retry)="retryLoad()"></boo-error-state>
+    </div>
+
+    <ng-container *ngIf="!isLoading() && !error()">
       <!-- Sticky patient context header -->
       <div class="sticky top-0 z-20 bg-surface shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-3">
@@ -87,6 +93,7 @@ export class AdminNursingPatientComponent implements OnInit {
     patientId!: string;
     patient = signal<NursingPatient | null>(null);
     isLoading = signal(true);
+    error = signal<string | null>(null);
     activeTab = signal<TabKey>('overview');
 
     readonly tabs: { key: TabKey; label: string; icon: string }[] = [
@@ -106,12 +113,25 @@ export class AdminNursingPatientComponent implements OnInit {
 
     ngOnInit(): void {
         this.patientId = this.route.snapshot.paramMap.get('patientId') ?? '';
+        this.loadPatient();
+    }
+
+    retryLoad(): void {
+        if (this.patientId) this.loadPatient();
+    }
+
+    private loadPatient(): void {
+        this.isLoading.set(true);
+        this.error.set(null);
         this.srv.getPatient(this.patientId).subscribe({
             next: (res) => {
                 if (res.success) this.patient.set(res.data);
                 this.isLoading.set(false);
             },
-            error: () => this.isLoading.set(false),
+            error: () => {
+                this.isLoading.set(false);
+                this.error.set('Failed to load the patient. Please try again.');
+            },
         });
     }
 

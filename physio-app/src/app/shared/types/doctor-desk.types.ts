@@ -1,15 +1,7 @@
-export type QueuePatientStatus = 'waiting' | 'in-consultation' | 'completed';
-export type QueuePriority = 'normal' | 'urgent';
-
-export interface VitalSigns {
-    bloodPressure?: string | null;
-    heartRate?: number | null;
-    temperature?: number | null;
-    spo2?: number | null;
-}
-
 export interface QueuePatient {
     id: string;
+    patientId: string;
+    appointmentId: string;
     queueNumber: string;
     name: string;
     age: number;
@@ -17,11 +9,10 @@ export interface QueuePatient {
     reason: string;
     appointmentTime: string;
     arrivalTime: string;
-    status: QueuePatientStatus;
-    priority: QueuePriority;
+    status: string;
+    priority: string;
     allergies: string[];
-    vitals?: VitalSigns | null;
-    consultationStartedAt?: string | null;
+    consultationStartedAt?: string;
 }
 
 export interface DoctorDeskContext {

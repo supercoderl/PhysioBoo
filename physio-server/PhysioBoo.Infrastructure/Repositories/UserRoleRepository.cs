@@ -1,7 +1,7 @@
 ﻿using Npgsql;
 using NpgsqlTypes;
 using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Interfaces.Repositories;
+
 using PhysioBoo.Infrastructure.Database;
 
 namespace PhysioBoo.Infrastructure.Repositories

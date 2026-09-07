@@ -1,4 +1,4 @@
-﻿using PhysioBoo.SharedKernel.Utils;
+﻿
 
 namespace PhysioBoo.Domain.Entities.System
 {

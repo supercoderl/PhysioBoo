@@ -9,7 +9,7 @@ namespace PhysioBoo.Application.ViewModels.PatientAllergies
         string AllergenName,
         AllergenType AllergenType,
         string? ReactionType,
-        Severity Severity,
+        Domain.Enums.Severity Severity,
         DateOnly? FirstOccurenceDate,
         DateOnly? LastOccurenceDate,
         string? TreatmentGiven,

@@ -1,8 +1,8 @@
 ﻿using NpgsqlTypes;
-using PhysioBoo.Domain.Entities.Operation;
-using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+
+
+
+
 using ColumnAttribute = PhysioBoo.SharedKernel.Attributes.ColumnAttribute;
 
 namespace PhysioBoo.Domain.Entities.Support

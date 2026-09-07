@@ -1,5 +1,5 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Entities.Operation;
+
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
 {

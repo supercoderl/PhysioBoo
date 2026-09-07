@@ -2,12 +2,12 @@
 using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
-using PhysioBoo.Domain.Entities.Operation;
+
 using PhysioBoo.Domain.Entities.PatientInformation;
-using PhysioBoo.Domain.Enums;
+
 using PhysioBoo.SharedKernel.Attributes;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+
+
 using Column = System.ComponentModel.DataAnnotations.Schema.ColumnAttribute;
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
@@ -187,6 +187,8 @@ namespace PhysioBoo.Domain.Entities.MedicalStaff
         public virtual ICollection<Patient> PreferredPatients { get; private set; } = new List<Patient>();
         public virtual ICollection<PatientMedicalHistory> DiagnosedHistories { get; private set; } = new List<PatientMedicalHistory>();
         public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();
+        public virtual ICollection<FavoriteMedication> FavoriteMedications { get; private set; } = new List<FavoriteMedication>();
+        public virtual ICollection<PrescriptionTemplate> PrescriptionTemplates { get; private set; } = new List<PrescriptionTemplate>();
         #endregion
 
         #region Constructor (46)

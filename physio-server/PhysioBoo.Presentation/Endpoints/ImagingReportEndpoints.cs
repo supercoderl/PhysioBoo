@@ -1,9 +1,9 @@
 using PhysioBoo.Application.Commands.ImagingReports.CreateImagingReport;
 using PhysioBoo.Application.ViewModels.ImagingReports;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

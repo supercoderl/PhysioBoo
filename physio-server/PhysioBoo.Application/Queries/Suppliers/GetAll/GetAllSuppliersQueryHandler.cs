@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.Sorting;
 using PhysioBoo.Application.ViewModels.Suppliers;
 using PhysioBoo.Domain.Entities.Support;

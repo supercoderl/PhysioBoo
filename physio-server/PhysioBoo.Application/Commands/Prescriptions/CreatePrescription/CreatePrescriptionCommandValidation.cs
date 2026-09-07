@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+﻿
 using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.Prescriptions.CreatePrescription
@@ -13,6 +13,7 @@ namespace PhysioBoo.Application.Commands.Prescriptions.CreatePrescription
             RuleForAppoinmentId();
             RuleForMedicalRecordId();
             RuleForHospitalId();
+            RuleForItems();
         }
 
         public void RuleForPrescriptionNumber() =>
@@ -44,5 +45,31 @@ namespace PhysioBoo.Application.Commands.Prescriptions.CreatePrescription
             RuleFor(cmd => cmd.NewPrescription.HospitalId).NotEmpty()
                 .WithErrorCode(DomainErrorCodes.Prescription.EmptyHospitalId)
                 .WithMessage("HospitalId may not be empty.");
+
+        public void RuleForItems() =>
+            RuleForEach(cmd => cmd.NewPrescription.Items).ChildRules(item =>
+            {
+                item.RuleFor(i => i.MedicineId).NotEmpty()
+                    .WithErrorCode(DomainErrorCodes.PrescriptionItem.EmptyMedicineId)
+                    .WithMessage("MedicineId may not be empty.");
+
+                item.RuleFor(i => i.MedicineName).NotEmpty()
+                    .WithErrorCode(DomainErrorCodes.PrescriptionItem.EmptyMedicineName)
+                    .WithMessage("MedicineName may not be empty.");
+
+                item.RuleFor(i => i.DosageInstructions).NotEmpty()
+                    .WithErrorCode(DomainErrorCodes.PrescriptionItem.EmptyDosageInstructions)
+                    .WithMessage("DosageInstructions may not be empty.");
+
+                item.RuleFor(i => i.Frequency).NotEmpty()
+                    .WithErrorCode(DomainErrorCodes.PrescriptionItem.EmptyFrequency)
+                    .WithMessage("Frequency may not be empty.");
+
+                item.RuleFor(i => i.QuantityPrescribed).GreaterThan(0)
+                    .WithMessage("QuantityPrescribed must be greater than 0.");
+
+                item.RuleFor(i => i.DurationInDays).GreaterThan(0)
+                    .WithMessage("DurationInDays must be greater than 0.");
+            });
     }
 }

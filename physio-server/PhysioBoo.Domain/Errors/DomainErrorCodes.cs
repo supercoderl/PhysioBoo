@@ -294,6 +294,19 @@
             public const string EmptyIcd10Codes = "MEDICAL_RECORD_EMPTY_ICD10_CODES";
         }
 
+        public static class Article
+        {
+            // Article Validation
+            public const string EmptyId = "ARTICLE_EMPTY_ID";
+            public const string EmptyTitle = "ARTICLE_EMPTY_TITLE";
+            public const string TitleExceedsMaxLength = "ARTICLE_TITLE_EXCEEDS_MAX_LENGTH";
+            public const string EmptySlug = "ARTICLE_EMPTY_SLUG";
+            public const string EmptyAuthor = "ARTICLE_EMPTY_AUTHOR";
+            public const string EmptyExcerpt = "ARTICLE_EMPTY_EXCERPT";
+            public const string ExcerptExceedsMaxLength = "ARTICLE_EXCERPT_EXCEEDS_MAX_LENGTH";
+            public const string EmptyContent = "ARTICLE_EMPTY_CONTENT";
+        }
+
         public static class MedicalSpecialty
         {
             // Medical Specialty Validation
@@ -357,6 +370,21 @@
             public const string EmptyPaymentNumber = "PAYMENT_EMPTY_PAYMENT_NUMBER";
             public const string EmptyBillId = "PAYMENT_EMPTY_BILL_ID";
             public const string EmptyPatientId = "PAYMENT_EMPTY_PATIENT_ID";
+        }
+
+        public static class Transaction
+        {
+            // Transaction Validation
+            public const string EmptyInvoiceNo = "TRANSACTION_EMPTY_INVOICE_NO";
+            public const string EmptyGatewayProvider = "TRANSACTION_EMPTY_GATEWAY_PROVIDER";
+            public const string EmptyGoodsName = "TRANSACTION_EMPTY_GOODS_NAME";
+            public const string InvalidAmount = "TRANSACTION_INVALID_AMOUNT";
+
+            // Transaction Business Rules
+            public const string GatewayNotFound = "TRANSACTION_GATEWAY_NOT_FOUND";
+            public const string DuplicateInvoice = "TRANSACTION_DUPLICATE_INVOICE";
+            public const string NotFound = "TRANSACTION_NOT_FOUND";
+            public const string MissingReference = "TRANSACTION_MISSING_REFERENCE";
         }
 
         public static class PrescriptionItem

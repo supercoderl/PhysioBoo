@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
 using Npgsql;
 using PhysioBoo.Domain.Entities.System;
-using PhysioBoo.Domain.Interfaces.Repositories;
+
 using PhysioBoo.Infrastructure.Database;
 using PhysioBoo.SharedKernel.Results;
 using System.Data;

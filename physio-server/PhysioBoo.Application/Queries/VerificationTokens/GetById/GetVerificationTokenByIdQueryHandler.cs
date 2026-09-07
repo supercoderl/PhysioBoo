@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;

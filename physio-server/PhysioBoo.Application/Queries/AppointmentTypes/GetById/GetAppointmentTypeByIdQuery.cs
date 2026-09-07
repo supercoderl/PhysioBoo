@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.AppointmentTypes;
 
 namespace PhysioBoo.Application.Queries.AppointmentTypes.GetById

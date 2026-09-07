@@ -1,7 +1,7 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Entities.Operation;
+
 using PhysioBoo.Domain.Entities.Support;
-using PhysioBoo.Domain.Enums;
+
 
 namespace PhysioBoo.Domain.Entities.Clinical
 {
@@ -64,6 +64,12 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public virtual ICollection<MedicineInventory> MedicineInventories { get; private set; } = new List<MedicineInventory>();
 
         public virtual ICollection<PrescriptionItem> PrescriptionItems { get; private set; } = new List<PrescriptionItem>();
+        public virtual ICollection<FavoriteMedication> FavoriteMedications { get; private set; } = new List<FavoriteMedication>();
+        public virtual ICollection<PrescriptionTemplateItem> PrescriptionTemplateItems { get; private set; } = new List<PrescriptionTemplateItem>();
+        public virtual ICollection<StockMovement> StockMovements { get; private set; } = new List<StockMovement>();
+        public virtual ICollection<InventoryAlert> InventoryAlerts { get; private set; } = new List<InventoryAlert>();
+        public virtual ICollection<RetailCartLineItem> RetailCartLineItems { get; private set; } = new List<RetailCartLineItem>();
+        public virtual ICollection<RetailTransactionLineItem> RetailTransactionLineItems { get; private set; } = new List<RetailTransactionLineItem>();
         #endregion
 
         #region Constructor (48)

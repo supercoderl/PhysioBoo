@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 
 namespace PhysioBoo.Application.Queries.Sys_Resources.GetAllResources
 {

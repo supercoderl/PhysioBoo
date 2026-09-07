@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using Microsoft.Extensions.Options;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Entities.Core;

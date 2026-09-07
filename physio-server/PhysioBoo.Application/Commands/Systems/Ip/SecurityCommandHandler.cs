@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using Microsoft.Extensions.Caching.Distributed;
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Notifications;

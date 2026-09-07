@@ -13,6 +13,7 @@
         string? Instructions,
         decimal TotalAmount,
         DateOnly? ValidUntil,
-        string? PharmacistNotes
+        string? PharmacistNotes,
+        List<CreatePrescriptionItemInput> Items
     );
 }

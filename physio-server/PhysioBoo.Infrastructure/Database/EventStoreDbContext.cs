@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
 using PhysioBoo.Domain.DomainEvents;
 using PhysioBoo.Infrastructure.Configuration.EventSourcing;
 

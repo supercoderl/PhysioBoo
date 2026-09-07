@@ -1,7 +1,7 @@
 ﻿using NpgsqlTypes;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.MedicalStaff;
-using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace PhysioBoo.Domain.Entities.Operation
 {
@@ -41,6 +41,7 @@ namespace PhysioBoo.Domain.Entities.Operation
         public virtual HospitalGroup? HospitalGroup { get; private set; }
 
         public virtual ICollection<Appointment> Appointments { get; private set; } = new List<Appointment>();
+        public virtual ICollection<PhysioBoo.Domain.Entities.Clinical.StockTake> StockTakes { get; private set; } = new List<PhysioBoo.Domain.Entities.Clinical.StockTake>();
         public virtual ICollection<Bill> Bills { get; private set; } = new List<Bill>();
         public virtual ICollection<Doctor> Doctors { get; private set; } = new List<Doctor>();
         public virtual ICollection<DoctorSchedule> DoctorSchedules { get; private set; } = new List<DoctorSchedule>();

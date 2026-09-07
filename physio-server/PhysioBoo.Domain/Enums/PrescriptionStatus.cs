@@ -2,7 +2,8 @@
 {
     public enum PrescriptionStatus
     {
-        Active,
+        Draft,
+        Issued,
         Dispensed,
         PartiallyDispensed,
         Expired,

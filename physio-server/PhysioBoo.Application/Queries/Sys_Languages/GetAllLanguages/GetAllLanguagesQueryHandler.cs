@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using PhysioBoo.Application.ViewModels.Sys_Languages;

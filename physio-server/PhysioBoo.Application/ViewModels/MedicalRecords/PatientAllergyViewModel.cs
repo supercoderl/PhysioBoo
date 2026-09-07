@@ -10,7 +10,7 @@ namespace PhysioBoo.Application.ViewModels.MedicalRecords
         public string AllergyName { get; set; } = string.Empty;
         public AllergenType AllergenType { get; set; }
         public string? ReactionType { get; set; }
-        public Severity Severity { get; set; }
+        public Domain.Enums.Severity Severity { get; set; }
         public string? FirstOccurenceDate { get; set; }
         public string? LastOccurenceDate { get; set; }
         public string? TreatmentGiven { get; set; }

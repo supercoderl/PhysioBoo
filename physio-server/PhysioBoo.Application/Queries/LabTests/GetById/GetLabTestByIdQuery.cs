@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.LabTests;
 
 namespace PhysioBoo.Application.Queries.LabTests.GetById

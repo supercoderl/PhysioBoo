@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.Addresses;
 using PhysioBoo.Application.ViewModels.Sorting;
 using PhysioBoo.Domain.Entities.Core;

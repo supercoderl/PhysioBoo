@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Interfaces.Repositories;
+
 using PhysioBoo.Infrastructure.Database;
 using PhysioBoo.Infrastructure.Outbox;
 using PhysioBoo.Shared.Events;

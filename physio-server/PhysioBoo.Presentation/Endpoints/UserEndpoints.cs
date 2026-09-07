@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
 using Microsoft.Extensions.Options;
 using PhysioBoo.Application.Commands.Users.AssignRoleToUser;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
@@ -17,12 +17,12 @@ using PhysioBoo.Application.Queries.Users.GetAll;
 using PhysioBoo.Application.Queries.Users.GetPreferences;
 using PhysioBoo.Application.Queries.Users.GetProfile;
 using PhysioBoo.Application.ViewModels.Users;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
+
+
 using PhysioBoo.Domain.Settings;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
 using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Presentation.Endpoints
@@ -50,9 +50,11 @@ namespace PhysioBoo.Presentation.Endpoints
 
                 await bus.SendCommandAsync(new CreateUserCommand(newUser, newId));
 
-                return Results.CreatedAtRoute(
-                    "GetUserById",
-                    new { id = newId },
+                // No "GetUserById" named route exists in this API, so CreatedAtRoute would throw
+                // when generating the Location header (the insert above had already succeeded,
+                // turning every registration into a 500). Created(uri, ...) needs no named route.
+                return Results.Created(
+                    $"/api/users/{newId}",
                     new ResponseMessage<Guid>
                     {
                         Success = true,

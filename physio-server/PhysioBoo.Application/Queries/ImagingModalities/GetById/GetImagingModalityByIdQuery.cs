@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.ImagingModalities;
 
 namespace PhysioBoo.Application.Queries.ImagingModalities.GetById

@@ -1,9 +1,11 @@
 using PhysioBoo.Application.Commands.Medicines.CreateMedicine;
+using PhysioBoo.Application.Commands.Medicines.DeleteMedicine;
+using PhysioBoo.Application.Commands.Medicines.UpdateMedicine;
 using PhysioBoo.Application.ViewModels.Medicines;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {
@@ -35,6 +37,43 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
             .RequireAuthorization(Permissions.Pharmacy.MedicineCreate);
+
+            // Update medicine
+            group.MapPatch("/{id:guid}", async (
+                Guid id,
+                UpdateMedicineViewModel medicine,
+                IMediatorHandler bus,
+                CancellationToken ct
+            ) =>
+            {
+                await bus.SendCommandAsync(new UpdateMedicineCommand(medicine, id));
+
+                return Results.Ok(new ResponseMessage<Guid>
+                {
+                    Success = true,
+                    Data = id
+                });
+            }).WithName("UpdateMedicine")
+            .WithSummary("Update an existing medicine")
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Pharmacy.MedicineUpdate);
+
+            // Delete medicine
+            group.MapDelete("/{id:guid}", async (
+                Guid id,
+                IMediatorHandler bus,
+                CancellationToken ct
+            ) =>
+            {
+                await bus.SendCommandAsync(new DeleteMedicineCommand(id));
+
+                return Results.NoContent();
+            }).WithName("DeleteMedicine")
+            .WithSummary("Delete a medicine")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Pharmacy.MedicineDelete);
         }
     }
 }

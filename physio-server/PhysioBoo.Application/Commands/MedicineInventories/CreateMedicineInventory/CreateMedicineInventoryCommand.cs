@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.MedicineInventories;
 using PhysioBoo.SharedKernel.Commands;
 

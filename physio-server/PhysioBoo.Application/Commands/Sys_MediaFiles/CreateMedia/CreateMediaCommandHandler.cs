@@ -1,5 +1,5 @@
 ﻿using MassTransit;
-using MediatR;
+
 using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Domain.Entities.System;
 using PhysioBoo.Domain.Errors;

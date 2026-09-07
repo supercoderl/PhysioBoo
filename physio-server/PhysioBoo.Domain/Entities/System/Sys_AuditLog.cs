@@ -1,6 +1,6 @@
-﻿using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿
+
+
 
 namespace PhysioBoo.Domain.Entities.System
 {

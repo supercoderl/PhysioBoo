@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using Microsoft.EntityFrameworkCore;
 using PhysioBoo.Application.ViewModels.MedicalRecords;
 using PhysioBoo.Domain.Enums;

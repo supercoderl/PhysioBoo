@@ -1,6 +1,6 @@
 ﻿using Npgsql;
 using PhysioBoo.Domain.Entities.System;
-using PhysioBoo.Domain.Interfaces.Repositories;
+
 using PhysioBoo.Infrastructure.Database;
 using System.Data;
 

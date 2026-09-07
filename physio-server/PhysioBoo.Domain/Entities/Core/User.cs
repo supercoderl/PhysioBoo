@@ -1,12 +1,12 @@
 ﻿using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
-using PhysioBoo.Domain.Entities.Operation;
+
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
 using PhysioBoo.Domain.Entities.System;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+
+
 
 namespace PhysioBoo.Domain.Entities.Core
 {
@@ -110,6 +110,42 @@ namespace PhysioBoo.Domain.Entities.Core
         public virtual ICollection<MedicineInventory> UpdatedMedicineInventories { get; private set; } = new List<MedicineInventory>();
         public virtual ICollection<PrescriptionItem> CreatedPrescriptionItems { get; private set; } = new List<PrescriptionItem>();
         public virtual ICollection<PrescriptionItem> UpdatedPrescriptionItems { get; private set; } = new List<PrescriptionItem>();
+        public virtual ICollection<FavoriteMedication> CreatedFavoriteMedications { get; private set; } = new List<FavoriteMedication>();
+        public virtual ICollection<FavoriteMedication> UpdatedFavoriteMedications { get; private set; } = new List<FavoriteMedication>();
+        public virtual ICollection<PrescriptionTemplate> CreatedPrescriptionTemplates { get; private set; } = new List<PrescriptionTemplate>();
+        public virtual ICollection<PrescriptionTemplate> UpdatedPrescriptionTemplates { get; private set; } = new List<PrescriptionTemplate>();
+        public virtual ICollection<PrescriptionTemplateItem> CreatedPrescriptionTemplateItems { get; private set; } = new List<PrescriptionTemplateItem>();
+        public virtual ICollection<PrescriptionTemplateItem> UpdatedPrescriptionTemplateItems { get; private set; } = new List<PrescriptionTemplateItem>();
+        public virtual ICollection<PrescriptionClinicalWarning> CreatedPrescriptionClinicalWarnings { get; private set; } = new List<PrescriptionClinicalWarning>();
+        public virtual ICollection<PrescriptionClinicalWarning> UpdatedPrescriptionClinicalWarnings { get; private set; } = new List<PrescriptionClinicalWarning>();
+        public virtual ICollection<PrescriptionClinicalWarning> AcknowledgedPrescriptionClinicalWarnings { get; private set; } = new List<PrescriptionClinicalWarning>();
+        public virtual ICollection<PhysioBoo.Domain.Entities.Support.WarehouseZone> CreatedWarehouseZones { get; private set; } = new List<PhysioBoo.Domain.Entities.Support.WarehouseZone>();
+        public virtual ICollection<PhysioBoo.Domain.Entities.Support.WarehouseZone> UpdatedWarehouseZones { get; private set; } = new List<PhysioBoo.Domain.Entities.Support.WarehouseZone>();
+        public virtual ICollection<StockMovement> CreatedStockMovements { get; private set; } = new List<StockMovement>();
+        public virtual ICollection<StockMovement> UpdatedStockMovements { get; private set; } = new List<StockMovement>();
+        public virtual ICollection<StockMovement> PerformedStockMovements { get; private set; } = new List<StockMovement>();
+        public virtual ICollection<InventoryAlert> CreatedInventoryAlerts { get; private set; } = new List<InventoryAlert>();
+        public virtual ICollection<InventoryAlert> UpdatedInventoryAlerts { get; private set; } = new List<InventoryAlert>();
+        public virtual ICollection<InventoryAlert> AcknowledgedInventoryAlerts { get; private set; } = new List<InventoryAlert>();
+        public virtual ICollection<RetailCart> CreatedRetailCarts { get; private set; } = new List<RetailCart>();
+        public virtual ICollection<RetailCart> UpdatedRetailCarts { get; private set; } = new List<RetailCart>();
+        public virtual ICollection<RetailCartLineItem> CreatedRetailCartLineItems { get; private set; } = new List<RetailCartLineItem>();
+        public virtual ICollection<RetailCartLineItem> UpdatedRetailCartLineItems { get; private set; } = new List<RetailCartLineItem>();
+        public virtual ICollection<RetailTransaction> CreatedRetailTransactions { get; private set; } = new List<RetailTransaction>();
+        public virtual ICollection<RetailTransaction> UpdatedRetailTransactions { get; private set; } = new List<RetailTransaction>();
+        public virtual ICollection<RetailTransaction> CashieredRetailTransactions { get; private set; } = new List<RetailTransaction>();
+        public virtual ICollection<RetailTransactionLineItem> CreatedRetailTransactionLineItems { get; private set; } = new List<RetailTransactionLineItem>();
+        public virtual ICollection<RetailTransactionLineItem> UpdatedRetailTransactionLineItems { get; private set; } = new List<RetailTransactionLineItem>();
+        public virtual ICollection<RetailPaymentSplit> CreatedRetailPaymentSplits { get; private set; } = new List<RetailPaymentSplit>();
+        public virtual ICollection<RetailPaymentSplit> UpdatedRetailPaymentSplits { get; private set; } = new List<RetailPaymentSplit>();
+        public virtual ICollection<StockTake> CreatedStockTakes { get; private set; } = new List<StockTake>();
+        public virtual ICollection<StockTake> UpdatedStockTakes { get; private set; } = new List<StockTake>();
+        public virtual ICollection<StockTake> AssignedStockTakes { get; private set; } = new List<StockTake>();
+        public virtual ICollection<StockTakeItem> CreatedStockTakeItems { get; private set; } = new List<StockTakeItem>();
+        public virtual ICollection<StockTakeItem> UpdatedStockTakeItems { get; private set; } = new List<StockTakeItem>();
+        public virtual ICollection<StockTakeActivity> CreatedStockTakeActivities { get; private set; } = new List<StockTakeActivity>();
+        public virtual ICollection<StockTakeActivity> UpdatedStockTakeActivities { get; private set; } = new List<StockTakeActivity>();
+        public virtual ICollection<StockTakeActivity> ActedStockTakeActivities { get; private set; } = new List<StockTakeActivity>();
         public virtual ICollection<Address> CreatedAddresses { get; private set; } = new List<Address>();
         public virtual ICollection<Address> UpdatedAddresses { get; private set; } = new List<Address>();
         public virtual ICollection<Profile> CreatedProfiles { get; private set; } = new List<Profile>();

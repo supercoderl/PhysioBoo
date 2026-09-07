@@ -1,4 +1,4 @@
-﻿using PhysioBoo.Domain.Entities.Operation;
+﻿
 
 namespace PhysioBoo.Domain.Entities.Core
 {

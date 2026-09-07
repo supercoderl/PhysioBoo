@@ -1,15 +1,15 @@
-using Microsoft.AspNetCore.Mvc;
+
 using PhysioBoo.Application.Commands.InsuranceCompanies.CreateInsuranceCompany;
 using PhysioBoo.Application.Commands.InsuranceCompanies.DeleteInsuranceCompany;
 using PhysioBoo.Application.Commands.InsuranceCompanies.UpdateInsuranceCompany;
 using PhysioBoo.Application.Queries.InsuranceCompanies.GetAll;
 using PhysioBoo.Application.Queries.InsuranceCompanies.GetById;
 using PhysioBoo.Application.ViewModels.InsuranceCompanies;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

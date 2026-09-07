@@ -1,4 +1,4 @@
-﻿using Ardalis.Specification;
+﻿
 using PhysioBoo.Domain.Entities.Clinical;
 
 namespace PhysioBoo.Application.Queries.MedicalRecords.GetHistory

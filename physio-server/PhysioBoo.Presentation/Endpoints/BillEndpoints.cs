@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
+
 using PhysioBoo.Application.Commands.Bills.CreateBill;
 using PhysioBoo.Application.ViewModels.Bills;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {
@@ -28,15 +28,15 @@ namespace PhysioBoo.Presentation.Endpoints
 
                 await bus.SendCommandAsync(new CreateBillCommand(newBill, newId));
 
-                return Results.CreatedAtRoute(
-                    "GetBillById",
-                    new { id = newId },
-                    new ResponseMessage<Guid>
-                    {
-                        Success = true,
-                        Data = newBill.Id
-                    }
-                );
+                // Was Results.CreatedAtRoute("GetBillById", ...) — that named route never existed
+                // anywhere in the app, so the Location header generation silently failed. Use a
+                // plain URL instead; the real single-bill read path is
+                // GET /api/cashier/invoices/{id} (CashierEndpoints.cs), not a route on this group.
+                return Results.Created($"/api/bills/{newId}", new ResponseMessage<Guid>
+                {
+                    Success = true,
+                    Data = newBill.Id
+                });
             }).WithName("CreateBill")
             .WithSummary("Create new bill")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)

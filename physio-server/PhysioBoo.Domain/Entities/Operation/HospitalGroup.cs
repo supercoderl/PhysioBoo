@@ -5,7 +5,7 @@ using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
-using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace PhysioBoo.Domain.Entities.Operation
 {
@@ -41,7 +41,22 @@ namespace PhysioBoo.Domain.Entities.Operation
         public virtual ICollection<MedicineInventory> MedicineInventories { get; private set; } = new List<MedicineInventory>();
         public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();
         public virtual ICollection<PrescriptionItem> PrescriptionItems { get; private set; } = new List<PrescriptionItem>();
-        public virtual ICollection<Role> Roles { get; private set; } = new List<Role>();
+        public virtual ICollection<FavoriteMedication> FavoriteMedications { get; private set; } = new List<FavoriteMedication>();
+        public virtual ICollection<PrescriptionTemplate> PrescriptionTemplates { get; private set; } = new List<PrescriptionTemplate>();
+        public virtual ICollection<PrescriptionTemplateItem> PrescriptionTemplateItems { get; private set; } = new List<PrescriptionTemplateItem>();
+        public virtual ICollection<PrescriptionClinicalWarning> PrescriptionClinicalWarnings { get; private set; } = new List<PrescriptionClinicalWarning>();
+        public virtual ICollection<PhysioBoo.Domain.Entities.Support.WarehouseZone> WarehouseZones { get; private set; } = new List<PhysioBoo.Domain.Entities.Support.WarehouseZone>();
+        public virtual ICollection<StockMovement> StockMovements { get; private set; } = new List<StockMovement>();
+        public virtual ICollection<InventoryAlert> InventoryAlerts { get; private set; } = new List<InventoryAlert>();
+        public virtual ICollection<RetailCart> RetailCarts { get; private set; } = new List<RetailCart>();
+        public virtual ICollection<RetailCartLineItem> RetailCartLineItems { get; private set; } = new List<RetailCartLineItem>();
+        public virtual ICollection<RetailTransaction> RetailTransactions { get; private set; } = new List<RetailTransaction>();
+        public virtual ICollection<RetailTransactionLineItem> RetailTransactionLineItems { get; private set; } = new List<RetailTransactionLineItem>();
+        public virtual ICollection<RetailPaymentSplit> RetailPaymentSplits { get; private set; } = new List<RetailPaymentSplit>();
+        public virtual ICollection<StockTake> StockTakes { get; private set; } = new List<StockTake>();
+        public virtual ICollection<StockTakeItem> StockTakeItems { get; private set; } = new List<StockTakeItem>();
+        public virtual ICollection<StockTakeActivity> StockTakeActivities { get; private set; } = new List<StockTakeActivity>();
+        public virtual ICollection<Domain.Entities.Core.Role> Roles { get; private set; } = new List<Domain.Entities.Core.Role>();
         public virtual ICollection<User> Users { get; private set; } = new List<User>();
         public virtual ICollection<ImagingOrder> ImagingOrders { get; private set; } = new List<ImagingOrder>();
         public virtual ICollection<ImagingReport> ImagingReports { get; private set; } = new List<ImagingReport>();

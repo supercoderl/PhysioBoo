@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿
+
 using PhysioBoo.Domain.Entities.Operation;
 
 namespace PhysioBoo.Infrastructure.Configuration
@@ -30,7 +30,7 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.HasOne(b => b.Appointment)
                    .WithMany(a => a.Bills)
                    .HasForeignKey(b => b.AppointmentId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasOne(b => b.Hospital)
                    .WithMany(h => h.Bills)
@@ -67,6 +67,10 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(b => b.Type)
                    .HasConversion<string>()  // store enum as string
+                   .IsRequired();
+
+            builder.Property(b => b.Source)
+                   .HasConversion<string>()
                    .IsRequired();
 
             builder.Property(b => b.BillDate).IsRequired();

@@ -1,9 +1,9 @@
 using PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy;
 using PhysioBoo.Application.ViewModels.PatientAllergies;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

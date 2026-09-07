@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿
+
 using PhysioBoo.Domain.DomainNotifications;
 
 namespace PhysioBoo.Infrastructure.Configuration.EventSourcing

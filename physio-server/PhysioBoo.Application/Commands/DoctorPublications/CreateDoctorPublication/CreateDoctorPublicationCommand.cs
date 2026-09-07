@@ -1,5 +1,5 @@
 ﻿using FluentValidation.Results;
-using MediatR;
+
 using PhysioBoo.Application.ViewModels.DoctorPublications;
 using PhysioBoo.SharedKernel.Commands;
 

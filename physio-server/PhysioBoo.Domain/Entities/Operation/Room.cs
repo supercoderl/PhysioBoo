@@ -1,6 +1,6 @@
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.MedicalStaff;
-using PhysioBoo.Domain.Enums;
+
 
 namespace PhysioBoo.Domain.Entities.Operation
 {

@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.SharedKernel.Commands;
 

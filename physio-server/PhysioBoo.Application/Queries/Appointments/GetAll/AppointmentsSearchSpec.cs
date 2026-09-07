@@ -1,4 +1,4 @@
-﻿using Ardalis.Specification;
+﻿
 using Microsoft.EntityFrameworkCore;
 using PhysioBoo.Application.Extensions;
 using PhysioBoo.Application.ViewModels.Appointments;

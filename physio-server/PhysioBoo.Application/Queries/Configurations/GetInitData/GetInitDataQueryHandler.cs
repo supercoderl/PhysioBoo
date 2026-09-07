@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Application.ViewModels.Configurations;
 using PhysioBoo.Application.ViewModels.Roles;

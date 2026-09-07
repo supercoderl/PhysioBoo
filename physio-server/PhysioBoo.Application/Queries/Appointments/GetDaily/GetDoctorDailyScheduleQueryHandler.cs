@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.Appointments;
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Errors;

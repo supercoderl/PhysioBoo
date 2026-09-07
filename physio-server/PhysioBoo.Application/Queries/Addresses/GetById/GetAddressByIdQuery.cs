@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.Addresses;
 
 namespace PhysioBoo.Application.Queries.Addresses.GetById

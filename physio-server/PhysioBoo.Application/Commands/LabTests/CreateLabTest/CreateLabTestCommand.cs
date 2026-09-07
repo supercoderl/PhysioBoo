@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.LabTests;
 using PhysioBoo.SharedKernel.Commands;
 

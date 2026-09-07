@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
 using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Interfaces.Repositories;
+
 using PhysioBoo.Infrastructure.Database;
 using System.Data;
 
@@ -42,7 +42,11 @@ namespace PhysioBoo.Infrastructure.Repositories
         /// <returns>A collection of role identifiers matching the specified role.</returns>
         public async Task<Guid?> GetIdByEnumAsync(Domain.Enums.Role role)
         {
-            Role? result = await DbSet.FirstOrDefaultAsync(r => r.Code.ToLower().Equals(role.ToString().ToLower(), StringComparison.OrdinalIgnoreCase));
+            // string.Equals(string, StringComparison) has no SQL translation in EF Core/Npgsql and
+            // throws InvalidOperationException at query execution — every caller (including
+            // registration) was hitting the global exception handler and surfacing as a 500.
+            string code = role.ToString().ToLower();
+            Role? result = await DbSet.FirstOrDefaultAsync(r => r.Code.ToLower() == code);
             return result?.Id;
         }
     }

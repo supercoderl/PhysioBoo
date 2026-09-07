@@ -4,9 +4,9 @@ using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.PatientInformation;
-using PhysioBoo.Domain.Enums;
+
 using PhysioBoo.SharedKernel.Attributes;
-using System.ComponentModel.DataAnnotations.Schema;
+
 using Column = System.ComponentModel.DataAnnotations.Schema.ColumnAttribute;
 
 namespace PhysioBoo.Domain.Entities.Operation
@@ -152,6 +152,10 @@ namespace PhysioBoo.Domain.Entities.Operation
         public virtual HospitalGroup? HospitalGroup { get; private set; }
 
         public virtual ICollection<Appointment> Appointments { get; private set; } = new List<Appointment>();
+        public virtual ICollection<PhysioBoo.Domain.Entities.Support.WarehouseZone> WarehouseZones { get; private set; } = new List<PhysioBoo.Domain.Entities.Support.WarehouseZone>();
+        public virtual ICollection<RetailCart> RetailCarts { get; private set; } = new List<RetailCart>();
+        public virtual ICollection<RetailTransaction> RetailTransactions { get; private set; } = new List<RetailTransaction>();
+        public virtual ICollection<StockTake> StockTakes { get; private set; } = new List<StockTake>();
         public virtual ICollection<Bill> Bills { get; private set; } = new List<Bill>();
         public virtual ICollection<Department> Departments { get; private set; } = new List<Department>();
         public virtual ICollection<DoctorSchedule> DoctorSchedules { get; private set; } = new List<DoctorSchedule>();

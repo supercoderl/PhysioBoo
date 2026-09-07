@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.Patients;
 using PhysioBoo.SharedKernel.Commands;
 

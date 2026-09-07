@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.Commands.Users.LogoutUser;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;

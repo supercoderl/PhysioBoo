@@ -1,9 +1,9 @@
 using PhysioBoo.Application.Commands.LabOrders.CreateLabOrder;
 using PhysioBoo.Application.ViewModels.LabOrders;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

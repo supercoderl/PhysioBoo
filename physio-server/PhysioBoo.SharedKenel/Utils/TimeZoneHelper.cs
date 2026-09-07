@@ -36,6 +36,16 @@ namespace PhysioBoo.SharedKernel.Utils
         }
 
         /// <summary>
+        /// Convert a DateTime to Unix timestamp in milliseconds.
+        /// </summary>
+        /// <param name="value">Date and time to convert.</param>
+        /// <returns>Unix timestamp in milliseconds.</returns>
+        public static long ToUnixTimeMilliseconds(DateTime value)
+        {
+            return new DateTimeOffset(value).ToUnixTimeMilliseconds();
+        }
+
+        /// <summary>
         /// Try convert UTC to time by TimeZoneId, if error, return null
         /// </summary>
         public static DateTime? TryGetCurrentTimeByZoneId(string timeZoneId)

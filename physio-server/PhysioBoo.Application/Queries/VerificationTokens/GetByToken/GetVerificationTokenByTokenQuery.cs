@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.VerificationTokens;
 
 namespace PhysioBoo.Application.Queries.VerificationTokens.GetByToken

@@ -1,6 +1,7 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Entities.Operation;
+
 using PhysioBoo.Domain.Entities.Support;
+
 
 namespace PhysioBoo.Domain.Entities.Clinical
 {
@@ -28,6 +29,11 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public bool IsExpired { get; private set; }
         public bool IsNearExpiry { get; private set; }
         public DateTime? LastUpdated { get; private set; }
+        public int ReservedQuantity { get; private set; }
+        public Guid? WarehouseZoneId { get; private set; }
+        public BatchLifecycleStatus Status { get; private set; }
+        public string? LockReason { get; private set; }
+        public string? DisposalReason { get; private set; }
 
         public virtual Medicine? Medicine { get; private set; }
         public virtual Hospital? Hospital { get; private set; }
@@ -35,6 +41,10 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public virtual User? Creator { get; private set; }
         public virtual User? Updater { get; private set; }
         public virtual HospitalGroup? HospitalGroup { get; private set; }
+        public virtual WarehouseZone? WarehouseZone { get; private set; }
+
+        public virtual ICollection<StockMovement> StockMovements { get; private set; } = new List<StockMovement>();
+        public virtual ICollection<StockTakeItem> StockTakeItems { get; private set; } = new List<StockTakeItem>();
         #endregion
 
         #region Constructor (22)
@@ -74,6 +84,7 @@ namespace PhysioBoo.Domain.Entities.Clinical
             IsExpired = false;
             IsNearExpiry = false;
             LastUpdated = lastUpdated;
+            Status = BatchLifecycleStatus.Active;
         }
         #endregion
 
@@ -99,6 +110,37 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public void SetIsExpired(bool isExpired) { IsExpired = isExpired; }
         public void SetIsNearExpiry(bool isNearExpiry) { IsNearExpiry = isNearExpiry; }
         public void SetLastUpdated(DateTime? lastUpdated) { LastUpdated = lastUpdated; }
+        public void SetReservedQuantity(int reservedQuantity) { ReservedQuantity += reservedQuantity; }
+        public void SetWarehouseZoneId(Guid? warehouseZoneId) { WarehouseZoneId = warehouseZoneId; }
+        public void SetStatus(BatchLifecycleStatus status) { Status = status; }
+        public void SetLockReason(string? lockReason) { LockReason = lockReason; }
+        public void SetDisposalReason(string? disposalReason) { DisposalReason = disposalReason; }
+        public void Reserve(int quantity)
+        {
+            int freeQuantity = QuantityAvailable - ReservedQuantity;
+            if (quantity > freeQuantity)
+            {
+                throw new InvalidOperationException("Cannot reserve more than the available quantity.");
+            }
+
+            ReservedQuantity += quantity;
+
+            if (ReservedQuantity == QuantityAvailable)
+            {
+                Status = BatchLifecycleStatus.Reserved;
+            }
+        }
+        public void Lock(string reason)
+        {
+            Status = BatchLifecycleStatus.Locked;
+            LockReason = reason;
+        }
+        public void Dispose(string reason)
+        {
+            QuantityAvailable = 0;
+            Status = BatchLifecycleStatus.Disposed;
+            DisposalReason = reason;
+        }
         #endregion
     }
 }

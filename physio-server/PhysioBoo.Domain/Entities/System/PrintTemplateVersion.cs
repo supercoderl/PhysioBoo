@@ -1,5 +1,5 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Enums;
+
 
 namespace PhysioBoo.Domain.Entities.System
 {

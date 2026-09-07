@@ -1,5 +1,5 @@
-﻿using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿
+
 
 namespace PhysioBoo.Domain.Entities.Core
 {

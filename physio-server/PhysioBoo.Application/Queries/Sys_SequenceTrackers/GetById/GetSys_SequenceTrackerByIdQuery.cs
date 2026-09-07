@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.Sys_SequenceTrackers;
 
 namespace PhysioBoo.Application.Queries.Sys_SequenceTrackers.GetById

@@ -1,14 +1,14 @@
-using Microsoft.AspNetCore.Mvc;
+
 using PhysioBoo.Application.Commands.Doctors.DeleteDoctor;
 using PhysioBoo.Application.Commands.Doctors.UpdateDoctor;
 using PhysioBoo.Application.Queries.Doctors.GetAll;
 using PhysioBoo.Application.Queries.Doctors.GetById;
 using PhysioBoo.Application.ViewModels.Doctors;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

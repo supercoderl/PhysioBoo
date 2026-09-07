@@ -4,8 +4,8 @@ using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
-using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
+
+
 
 namespace PhysioBoo.Domain.Entities.Operation
 {

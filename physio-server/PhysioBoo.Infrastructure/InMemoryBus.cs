@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using PhysioBoo.Domain.DomainEvents;
 using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Interfaces.Repositories;
+
 using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Shared.Events;
 using PhysioBoo.SharedKernel.Commands;

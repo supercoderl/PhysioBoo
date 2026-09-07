@@ -1,9 +1,9 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.MedicalStaff;
-using PhysioBoo.Domain.Entities.Operation;
+
 using PhysioBoo.Domain.Entities.PatientInformation;
-using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
+
+
 
 namespace PhysioBoo.Domain.Entities.Clinical
 {
@@ -27,6 +27,9 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public bool IsDigital { get; private set; }
         public bool IsPrinted { get; private set; }
         public string? PharmacistNotes { get; private set; }
+        public string? ReasonCancel { get; private set; }
+        public DateTime? CancelledAt { get; private set; }
+        public DateTime? IssuedAt { get; private set; }
 
         public virtual User? Creator { get; private set; }
         public virtual User? Updater { get; private set; }
@@ -66,7 +69,7 @@ namespace PhysioBoo.Domain.Entities.Clinical
             Diagnosis = diagnosis;
             Instructions = instructions;
             TotalAmount = totalAmount;
-            Status = PrescriptionStatus.Active;
+            Status = PrescriptionStatus.Draft;
             ValidUntil = validUntil;
             RefillCount = 0;
             MaxRefills = 0;
@@ -94,6 +97,22 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public void SetIsDigital(bool isDigital) { IsDigital = isDigital; }
         public void SetIsPrinted(bool isPrinted) { IsPrinted = isPrinted; }
         public void SetPharmacistNotes(string? pharmacistNotes) { PharmacistNotes = pharmacistNotes; }
+        public void SetReasonCancel(string? reasonCancel) { ReasonCancel = reasonCancel; }
+        public void SetCancelledAt(DateTime? cancelledAt) { CancelledAt = cancelledAt; }
+        public void SetIssuedAt(DateTime? issuedAt) { IssuedAt = issuedAt; }
+
+        public void Issue()
+        {
+            Status = PrescriptionStatus.Issued;
+            IssuedAt = TimeZoneHelper.GetLocalTimeNow();
+        }
+
+        public void Cancel(string reason)
+        {
+            Status = PrescriptionStatus.Cancelled;
+            ReasonCancel = reason;
+            CancelledAt = TimeZoneHelper.GetLocalTimeNow();
+        }
         #endregion
     }
 }

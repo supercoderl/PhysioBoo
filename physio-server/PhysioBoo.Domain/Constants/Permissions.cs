@@ -76,6 +76,29 @@
             public const string PrescriptionCreate = "pharmacy:prescription:create";
             public const string PrescriptionItemRead = "pharmacy:prescription-item:read";
             public const string PrescriptionItemCreate = "pharmacy:prescription-item:create";
+            public const string PrescriptionUpdate = "pharmacy:prescription:update";
+            public const string PrescriptionIssue = "pharmacy:prescription:issue";
+            public const string PrescriptionCancel = "pharmacy:prescription:cancel";
+            public const string MedicineInventoryUpdate = "pharmacy:medicine-inventory:update";
+            public const string MedicineInventoryDelete = "pharmacy:medicine-inventory:delete";
+            public const string WarehouseZoneRead = "pharmacy:warehouse-zone:read";
+            public const string WarehouseZoneCreate = "pharmacy:warehouse-zone:create";
+            public const string WarehouseZoneUpdate = "pharmacy:warehouse-zone:update";
+            public const string WarehouseZoneDelete = "pharmacy:warehouse-zone:delete";
+            public const string InventoryAlertRead = "pharmacy:inventory-alert:read";
+            public const string InventoryAlertAcknowledge = "pharmacy:inventory-alert:acknowledge";
+            public const string RetailCartRead = "pharmacy:retail-cart:read";
+            public const string RetailCartCreate = "pharmacy:retail-cart:create";
+            public const string RetailCartUpdate = "pharmacy:retail-cart:update";
+            public const string RetailTransactionRead = "pharmacy:retail-transaction:read";
+            public const string RetailTransactionCreate = "pharmacy:retail-transaction:create";
+            public const string RetailTransactionRefund = "pharmacy:retail-transaction:refund";
+            public const string StockTakeRead = "pharmacy:stock-take:read";
+            public const string StockTakeCreate = "pharmacy:stock-take:create";
+            public const string StockTakeUpdate = "pharmacy:stock-take:update";
+            public const string StockTakeDelete = "pharmacy:stock-take:delete";
+            public const string StockTakeApprove = "pharmacy:stock-take:approve";
+            public const string StockTakeReject = "pharmacy:stock-take:reject";
         }
 
         public static class Lab
@@ -117,6 +140,11 @@
             public const string BillItemCreate = "billing:bill-item:create";
             public const string PaymentRead = "billing:payment:read";
             public const string PaymentCreate = "billing:payment:create";
+            public const string BillUpdate = "billing:bill:update";
+            public const string BillVoid = "billing:bill:void";
+            public const string BillDiscountApply = "billing:bill:discount-apply";
+            public const string BillInsuranceApply = "billing:bill:insurance-apply";
+            public const string PaymentRefund = "billing:payment:refund";
         }
 
         public static class Hr
@@ -206,6 +234,15 @@
             public const string SecurityBlockIp = "system:security:block-ip";
             public const string SecurityUnblockIp = "system:security:unblock-ip";
             public const string DevAccess = "system:dev:access";
+            public const string AuditLogRead = "system:audit-log:read";
+        }
+
+        public static class Cms
+        {
+            public const string ArticleRead = "cms:article:read";
+            public const string ArticleCreate = "cms:article:create";
+            public const string ArticleUpdate = "cms:article:update";
+            public const string ArticleDelete = "cms:article:delete";
         }
 
         public static class Portal

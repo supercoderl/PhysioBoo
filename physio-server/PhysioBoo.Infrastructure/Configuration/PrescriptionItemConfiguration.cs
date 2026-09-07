@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿
+
 using PhysioBoo.Domain.Entities.Clinical;
 
 namespace PhysioBoo.Infrastructure.Configuration

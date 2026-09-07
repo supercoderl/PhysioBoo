@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
 using PhysioBoo.Application.Commands.Roles.AssignPermissionToRole;
 using PhysioBoo.Application.Commands.Roles.CreateRole;
 using PhysioBoo.Application.Commands.Roles.DeletePermissionFromRole;
@@ -8,11 +8,11 @@ using PhysioBoo.Application.Queries.Roles.GetAll;
 using PhysioBoo.Application.Queries.Roles.GetById;
 using PhysioBoo.Application.Queries.Roles.GetPermissionsByRole;
 using PhysioBoo.Application.ViewModels.Roles;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

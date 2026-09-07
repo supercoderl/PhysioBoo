@@ -1,4 +1,4 @@
-﻿using Ardalis.Specification;
+﻿
 using PhysioBoo.Domain.Entities.Operation;
 
 namespace PhysioBoo.Application.Queries.Appointments.GetDaily

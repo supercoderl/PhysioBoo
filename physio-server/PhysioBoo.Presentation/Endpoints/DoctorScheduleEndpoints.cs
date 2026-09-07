@@ -1,9 +1,9 @@
 ﻿using PhysioBoo.Application.Commands.DoctorSchedules.CreateDoctorSchedule;
 using PhysioBoo.Application.ViewModels.DoctorSchedules;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
 using PhysioBoo.Application.Commands.Appointments.ChangeStatusAppointment;
+using PhysioBoo.Application.Commands.Appointments.CompleteConsultation;
 using PhysioBoo.Application.Commands.Appointments.CreateAppointment;
 using PhysioBoo.Application.Queries.Appointments.GetAll;
 using PhysioBoo.Application.Queries.Appointments.GetById;
 using PhysioBoo.Application.Queries.Appointments.GetDaily;
 using PhysioBoo.Application.ViewModels.Appointments;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

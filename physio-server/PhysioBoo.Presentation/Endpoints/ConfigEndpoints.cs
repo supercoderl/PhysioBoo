@@ -1,9 +1,9 @@
 ﻿using PhysioBoo.Application.Queries.Configurations.GetInitData;
 using PhysioBoo.Application.ViewModels.Configurations;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

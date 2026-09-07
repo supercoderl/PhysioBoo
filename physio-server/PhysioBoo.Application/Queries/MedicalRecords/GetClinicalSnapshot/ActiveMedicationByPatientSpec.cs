@@ -1,4 +1,4 @@
-﻿using Ardalis.Specification;
+﻿
 using PhysioBoo.Domain.Entities.Clinical;
 
 namespace PhysioBoo.Application.Queries.MedicalRecords.GetClinicalSnapshot
@@ -7,7 +7,7 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetClinicalSnapshot
     {
         public ActiveMedicationByPatientSpec(Guid PatientId)
         {
-            Query.Where(x => x.PatientId == PatientId && x.Status == Domain.Enums.PrescriptionStatus.Active);
+            Query.Where(x => x.PatientId == PatientId && x.Status == Domain.Enums.PrescriptionStatus.Draft || x.Status == Domain.Enums.PrescriptionStatus.Issued);
         }
     }
 }

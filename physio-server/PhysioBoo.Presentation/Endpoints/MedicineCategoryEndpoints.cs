@@ -1,15 +1,15 @@
-using Microsoft.AspNetCore.Mvc;
+
 using PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCategory;
 using PhysioBoo.Application.Commands.MedicineCategories.DeleteMedicineCategory;
 using PhysioBoo.Application.Commands.MedicineCategories.UpdateMedicineCategory;
 using PhysioBoo.Application.Queries.MedicineCategories.GetAll;
 using PhysioBoo.Application.Queries.MedicineCategories.GetById;
 using PhysioBoo.Application.ViewModels.MedicineCategories;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

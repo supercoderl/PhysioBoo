@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PhysioBoo.Application.Interfaces;
-using PhysioBoo.Domain.Constants;
+
 using PhysioBoo.Domain.Settings;
 using PhysioBoo.Presentation.Authorization;
 using PhysioBoo.Presentation.Swagger;

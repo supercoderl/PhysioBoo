@@ -13,7 +13,7 @@ namespace PhysioBoo.Application.ViewModels.MedicalRecords
         public string? DiagnosedDate { get; set; }
         public string? DiagnosedByName { get; set; }
         public string? DiagnosisHospitalName { get; set; }
-        public Severity Severity { get; set; }
+        public Domain.Enums.Severity Severity { get; set; }
         public CurrentStatus CurrentStatus { get; set; }
         public string? TreatmentSummary { get; set; }
         public string? MedicationPrescribed { get; set; }

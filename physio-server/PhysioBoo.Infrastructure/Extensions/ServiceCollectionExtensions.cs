@@ -1,13 +1,13 @@
 ﻿using CloudinaryDotNet;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Domain.DomainEvents;
 using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Interfaces.Repositories;
+
 using PhysioBoo.Domain.Interfaces.Seeding;
 using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Infrastructure.BackgroundJobs;
@@ -70,6 +70,7 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IBillRepository, BillRepository>();
             services.AddScoped<IBillItemRepository, BillItemRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IInsuranceCompanyRepository, InsuranceCompanyRepository>();
             services.AddScoped<IManufacturerRepository, ManufacturerRepository>();
             services.AddScoped<ISupplierRepository, SupplierRepository>();
@@ -77,9 +78,22 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IMedicineCategoryRepository, MedicineCategoryRepository>();
             services.AddScoped<IMedicineRepository, MedicineRepository>();
             services.AddScoped<IMedicineInventoryRepository, MedicineInventoryRepository>();
+            services.AddScoped<IStockMovementRepository, StockMovementRepository>();
+            services.AddScoped<IInventoryAlertRepository, InventoryAlertRepository>();
+            services.AddScoped<IWarehouseZoneRepository, WarehouseZoneRepository>();
+            services.AddScoped<IRetailCartRepository, RetailCartRepository>();
+            services.AddScoped<IRetailCartLineItemRepository, RetailCartLineItemRepository>();
+            services.AddScoped<IRetailTransactionRepository, RetailTransactionRepository>();
+            services.AddScoped<IRetailTransactionLineItemRepository, RetailTransactionLineItemRepository>();
+            services.AddScoped<IRetailPaymentSplitRepository, RetailPaymentSplitRepository>();
+            services.AddScoped<IStockTakeRepository, StockTakeRepository>();
+            services.AddScoped<IStockTakeItemRepository, StockTakeItemRepository>();
+            services.AddScoped<IStockTakeActivityRepository, StockTakeActivityRepository>();
+            services.AddScoped<ISys_AuditLogRepository, Sys_AuditLogRepository>();
             services.AddScoped<IMedicalRecordRepository, MedicalRecordRepository>();
             services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
             services.AddScoped<IPrescriptionItemRepository, PrescriptionItemRepository>();
+            services.AddScoped<IPrescriptionClinicalWarningRepository, PrescriptionClinicalWarningRepository>();
             services.AddScoped<IImagingModalityRepository, ImagingModalityRepository>();
             services.AddScoped<IImagingOrderRepository, ImagingOrderRepository>();
             services.AddScoped<IImagingReportRepository, ImagingReportRepository>();
@@ -98,6 +112,7 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IDoctorWorkExperienceRepository, DoctorWorkExperienceRepository>();
             services.AddScoped<IHospitalStaffRepository, HospitalStaffRepository>();
             services.AddScoped<IMedicalSpecialtyRepository, MedicalSpecialtyRepository>();
+            services.AddScoped<IArticleRepository, ArticleRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             services.AddScoped<IPermissionRepository, PermissionRepository>();
@@ -135,6 +150,7 @@ namespace PhysioBoo.Infrastructure.Extensions
         {
             services.AddHostedService<OutboxProcessor>();
             services.AddHostedService<CloudinaryCleanupJob>();
+            services.AddHostedService<InventoryAlertJob>();
 
             return services;
         }
@@ -156,6 +172,36 @@ namespace PhysioBoo.Infrastructure.Extensions
 
             services.AddSingleton(new Cloudinary(account));
             #endregion
+
+            return services;
+        }
+
+        public static IServiceCollection AddPaymentGateways(this IServiceCollection services)
+        {
+            services.AddHttpClient(Domain.Settings.MegaPaySettings.HttpClientName, (provider, client) =>
+            {
+                Domain.Settings.MegaPaySettings settings = provider
+                    .GetRequiredService<Microsoft.Extensions.Options.IOptions<Domain.Settings.MegaPaySettings>>()
+                    .Value;
+
+                client.BaseAddress = new Uri(settings.BaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(settings.HttpTimeoutSeconds);
+            });
+
+            services.AddScoped<Application.Interfaces.Payment.IPaymentGateway, PaymentGateways.MegaPay.MegaPayGateway>();
+
+            services.AddHttpClient(Domain.Settings.TConnectSettings.HttpClientName, (provider, client) =>
+            {
+                Domain.Settings.TConnectSettings settings = provider
+                    .GetRequiredService<Microsoft.Extensions.Options.IOptions<Domain.Settings.TConnectSettings>>()
+                    .Value;
+
+                client.BaseAddress = new Uri(settings.BaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(settings.HttpTimeoutSeconds);
+            });
+
+            services.AddScoped<PaymentGateways.TConnect.TConnectTokenProvider>();
+            services.AddScoped<Application.Interfaces.Payment.IPaymentGateway, PaymentGateways.TConnect.TConnectGateway>();
 
             return services;
         }

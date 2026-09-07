@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;
@@ -42,7 +42,8 @@ namespace PhysioBoo.Application.Commands.PrescriptionItems.CreatePrescriptionIte
                 request.NewPrescriptionItem.DurationInDays,
                 request.NewPrescriptionItem.RouteOfAdministration,
                 request.NewPrescriptionItem.SpecialInstructions,
-                request.NewPrescriptionItem.PricePerUnit
+                request.NewPrescriptionItem.PricePerUnit,
+                request.NewPrescriptionItem.Unit
             );
 
             newPrescriptionItem.SetTenantId(_user.GetTenantId());

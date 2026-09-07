@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Application.ViewModels.Roles;
 using PhysioBoo.Application.ViewModels.Sys_Languages;
-using PhysioBoo.Domain.Interfaces.Repositories;
+
 using PhysioBoo.SharedKernel.Common;
 
 namespace PhysioBoo.Infrastructure.Caching

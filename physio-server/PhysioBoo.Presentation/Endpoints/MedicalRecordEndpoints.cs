@@ -12,11 +12,11 @@ using PhysioBoo.Application.Queries.MedicalRecords.GetPatientAllergies;
 using PhysioBoo.Application.Queries.MedicalRecords.GetPatientDemoGraphics;
 using PhysioBoo.Application.Queries.MedicalRecords.GetPrescriptions;
 using PhysioBoo.Application.ViewModels.MedicalRecords;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

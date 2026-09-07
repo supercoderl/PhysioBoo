@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+﻿
 using PhysioBoo.Domain.Errors;
 using System.Text.RegularExpressions;
 

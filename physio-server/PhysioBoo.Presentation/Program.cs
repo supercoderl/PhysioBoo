@@ -100,6 +100,9 @@ namespace PhysioBoo.Presentation
             builder.Services.AddSettings<ClientSettings>(builder.Configuration, "Client");
             builder.Services.AddSettings<GoogleSettings>(builder.Configuration, "Google");
             builder.Services.AddSettings<CloudinarySettings>(builder.Configuration, "Cloudinary");
+            builder.Services.AddSettings<MegaPaySettings>(builder.Configuration, "PaymentGateway:MegaPay");
+            builder.Services.AddSettings<TConnectSettings>(builder.Configuration, TConnectSettings.SectionName);
+
             builder.Services.AddCSRFProtection(builder.Environment);
             builder.Services.AddEmail();
             builder.Services.AddServices();
@@ -171,6 +174,7 @@ namespace PhysioBoo.Presentation
             #endregion
 
             builder.Services.AddInfrastructure(builder.Configuration, "PhysioBoo.Infrastructure");
+            builder.Services.AddPaymentGateways();
             LogStep("Infrastructure added", ref stepTimer);
 
             #region Mini Profiler & Logging 
@@ -295,6 +299,12 @@ namespace PhysioBoo.Presentation
                 app.MapMedicineEndpoints();
                 app.MapMedicineCategoryEndpoints();
                 app.MapMedicineInventoryEndpoints();
+                app.MapWarehouseZoneEndpoints();
+                app.MapInventoryEndpoints();
+                app.MapRetailEndpoints();
+                app.MapStockTakeEndpoints();
+                app.MapCashierEndpoints();
+                app.MapAuditLogEndpoints();
                 app.MapManufacturerEndpoints();
                 app.MapSupplierEndpoints();
             }
@@ -313,6 +323,7 @@ namespace PhysioBoo.Presentation
                 app.MapProfileEndpoints();
                 app.MapReviewEndpoints();
                 app.MapMedicalSpecialtyEndpoints();
+                app.MapArticleEndpoints();
                 app.MapRoleEndpoints();
                 app.MapConfigEndpoints();
                 app.MapAdminMenuEndpoints();

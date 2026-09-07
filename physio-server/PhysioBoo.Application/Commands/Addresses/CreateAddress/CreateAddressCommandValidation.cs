@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+﻿
 using PhysioBoo.Application.Extensions.Validation;
 using PhysioBoo.Domain.Errors;
 

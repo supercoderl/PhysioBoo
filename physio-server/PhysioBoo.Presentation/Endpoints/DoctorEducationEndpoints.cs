@@ -1,9 +1,9 @@
 using PhysioBoo.Application.Commands.DoctorEducations.CreateDoctorEducation;
 using PhysioBoo.Application.ViewModels.DoctorEducations;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

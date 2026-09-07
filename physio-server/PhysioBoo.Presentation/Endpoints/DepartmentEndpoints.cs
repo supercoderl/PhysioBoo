@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
 using PhysioBoo.Application.Commands.Departments.CreateDepartment;
 using PhysioBoo.Application.Commands.Departments.DeleteDepartment;
 using PhysioBoo.Application.Commands.Departments.UpdateDepartment;
 using PhysioBoo.Application.Queries.Departments.GetAll;
 using PhysioBoo.Application.Queries.Departments.GetById;
 using PhysioBoo.Application.ViewModels.Departments;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

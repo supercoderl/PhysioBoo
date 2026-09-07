@@ -1,7 +1,7 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Entities.Operation;
-using PhysioBoo.Domain.Enums;
-using PhysioBoo.SharedKernel.Utils;
+
+
+
 
 namespace PhysioBoo.Domain.Entities.MedicalStaff
 {

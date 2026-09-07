@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Application.Queries.PrintTemplates.GetById;
 using PhysioBoo.Application.ViewModels.PrintTemplates;

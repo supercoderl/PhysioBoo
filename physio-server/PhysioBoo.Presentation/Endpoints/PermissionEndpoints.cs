@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
 using PhysioBoo.Application.Commands.Permissions.CreatePermission;
 using PhysioBoo.Application.Commands.Permissions.DeletePermission;
 using PhysioBoo.Application.Commands.Permissions.UpdatePermission;
 using PhysioBoo.Application.Queries.Permissions.GetAll;
 using PhysioBoo.Application.ViewModels.Permissions;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

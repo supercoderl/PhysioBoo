@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Domain.Interfaces;
 using PhysioBoo.Domain.Interfaces.Repositories;
 

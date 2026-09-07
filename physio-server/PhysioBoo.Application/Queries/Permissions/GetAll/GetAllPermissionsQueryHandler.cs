@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.Permissions;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Interfaces.Repositories;

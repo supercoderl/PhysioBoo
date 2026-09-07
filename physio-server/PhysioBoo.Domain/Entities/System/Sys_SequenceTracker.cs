@@ -1,6 +1,6 @@
 ﻿using NpgsqlTypes;
 using PhysioBoo.Domain.Entities.Core;
-using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace PhysioBoo.Domain.Entities.System
 {

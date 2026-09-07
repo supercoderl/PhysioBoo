@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.SharedKernel.Commands;
 
 namespace PhysioBoo.Application.Commands.Patients.DeletePatient

@@ -44,6 +44,15 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                   FROM ""Profiles"" p
                   WHERE p.""Id"" = pt.""Id"";");
 
+            // Fallback for the rare row where the Profile/User/Patient triplet wasn't created
+            // with a shared Guid: match the Profile via the patient's UserId instead.
+            migrationBuilder.Sql(
+                @"UPDATE ""Patients"" pt
+                  SET ""ProfileId"" = p.""Id""
+                  FROM ""Profiles"" p
+                  WHERE p.""Id"" = pt.""UserId""
+                    AND pt.""ProfileId"" IS NULL;");
+
             migrationBuilder.AlterColumn<Guid>(
                 name: "ProfileId",
                 table: "Patients",

@@ -1,9 +1,9 @@
 using PhysioBoo.Application.Commands.DoctorPublications.CreateDoctorPublication;
 using PhysioBoo.Application.ViewModels.DoctorPublications;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

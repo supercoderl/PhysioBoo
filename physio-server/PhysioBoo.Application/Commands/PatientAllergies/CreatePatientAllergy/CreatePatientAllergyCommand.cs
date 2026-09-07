@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.PatientAllergies;
 using PhysioBoo.SharedKernel.Commands;
 

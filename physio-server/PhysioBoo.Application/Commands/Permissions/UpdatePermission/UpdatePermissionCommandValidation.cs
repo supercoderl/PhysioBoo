@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+﻿
 
 namespace PhysioBoo.Application.Commands.Permissions.UpdatePermission
 {

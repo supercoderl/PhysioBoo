@@ -12,7 +12,7 @@ namespace PhysioBoo.Application.ViewModels.PatientMedicalHistories
         DateOnly? DiagnosedDate,
         Guid? DiagnosedBy,
         Guid? DiagnosisHospitalId,
-        Severity Severity,
+        Domain.Enums.Severity Severity,
         CurrentStatus CurrentStatus,
         string? TreatmentSummary,
         string? MedicationsPrescribed,

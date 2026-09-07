@@ -1,4 +1,4 @@
-﻿using Ardalis.Specification;
+﻿
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 
 namespace PhysioBoo.Application.Queries.MedicalRecords.GetClinicalSnapshot

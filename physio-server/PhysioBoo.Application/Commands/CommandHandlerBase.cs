@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using PhysioBoo.Domain.Errors;

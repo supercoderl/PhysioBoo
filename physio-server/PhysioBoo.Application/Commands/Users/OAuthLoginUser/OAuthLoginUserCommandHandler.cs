@@ -1,5 +1,5 @@
 ﻿using Google.Apis.Auth;
-using MediatR;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using PhysioBoo.Application.ViewModels.Users;

@@ -1,15 +1,15 @@
-using Microsoft.AspNetCore.Mvc;
+
 using PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecialty;
 using PhysioBoo.Application.Commands.MedicalSpecialties.DeleteMedicalSpecialty;
 using PhysioBoo.Application.Commands.MedicalSpecialties.UpdateMedicalSpecialty;
 using PhysioBoo.Application.Queries.MedicalSpecialties.GetAll;
 using PhysioBoo.Application.Queries.MedicalSpecialties.GetById;
 using PhysioBoo.Application.ViewModels.MedicalSpecialties;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

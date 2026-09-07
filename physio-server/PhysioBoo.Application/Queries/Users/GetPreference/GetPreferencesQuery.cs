@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 
 namespace PhysioBoo.Application.Queries.Users.GetPreferences
 {

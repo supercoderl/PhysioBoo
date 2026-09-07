@@ -15,6 +15,7 @@
         int DurationInDays,
         string? RouteOfAdministration,
         string? SpecialInstructions,
-        decimal PricePerUnit
+        decimal PricePerUnit,
+        string Unit
     );
 }

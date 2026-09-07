@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+﻿
 using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.Doctors.CreateDoctor

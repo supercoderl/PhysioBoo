@@ -1,13 +1,13 @@
 ﻿using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
 using Dapper;
-using Microsoft.EntityFrameworkCore;
+
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Npgsql;
 using NpgsqlTypes;
 using PhysioBoo.Domain.Entities;
-using PhysioBoo.Domain.Interfaces.Repositories;
+
 using PhysioBoo.SharedKernel.Common;
 using PhysioBoo.SharedKernel.Metadata;
 using PhysioBoo.SharedKernel.Results;

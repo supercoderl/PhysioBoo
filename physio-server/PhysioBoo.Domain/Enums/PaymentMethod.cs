@@ -9,6 +9,7 @@
         Cheque,
         DemandDraft,
         Insurance,
-        Wallet
+        Wallet,
+        Qr
     }
 }

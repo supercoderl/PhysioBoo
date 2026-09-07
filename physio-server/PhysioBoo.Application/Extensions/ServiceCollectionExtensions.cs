@@ -1,5 +1,5 @@
 ﻿using MassTransit;
-using MediatR;
+
 using Microsoft.Extensions.DependencyInjection;
 using OfficeOpenXml;
 using PhysioBoo.Application.Commands.Addresses.CreateAddress;
@@ -73,11 +73,19 @@ using PhysioBoo.Application.Commands.Patients.CreatePatient;
 using PhysioBoo.Application.Commands.Patients.DeletePatient;
 using PhysioBoo.Application.Commands.Patients.InvitePatient;
 using PhysioBoo.Application.Commands.Payments.CreatePayment;
+using PhysioBoo.Application.Commands.Transactions.HandleGatewayNotification;
+using PhysioBoo.Application.Commands.Transactions.InitiatePayment;
+using PhysioBoo.Application.Queries.Transactions.GetStatus;
+using PhysioBoo.Application.ViewModels.Transactions;
 using PhysioBoo.Application.Commands.Permissions.CreatePermission;
 using PhysioBoo.Application.Commands.Permissions.DeletePermission;
 using PhysioBoo.Application.Commands.Permissions.UpdatePermission;
 using PhysioBoo.Application.Commands.PrescriptionItems.CreatePrescriptionItem;
+using PhysioBoo.Application.Commands.Prescriptions.AcknowledgeClinicalWarning;
+using PhysioBoo.Application.Commands.Prescriptions.CancelPrescription;
 using PhysioBoo.Application.Commands.Prescriptions.CreatePrescription;
+using PhysioBoo.Application.Commands.Prescriptions.IssuePrescription;
+using PhysioBoo.Application.Commands.Prescriptions.UpdatePrescription;
 using PhysioBoo.Application.Commands.PrintTemplates.CreatePrintTemplate;
 using PhysioBoo.Application.Commands.PrintTemplates.DeletePrintTemplate;
 using PhysioBoo.Application.Commands.PrintTemplates.SaveVersionPrintTemplate;
@@ -169,6 +177,7 @@ using PhysioBoo.Application.Queries.MedicineCategories.GetById;
 using PhysioBoo.Application.Queries.Patients.GetAll;
 using PhysioBoo.Application.Queries.Patients.GetById;
 using PhysioBoo.Application.Queries.Permissions.GetAll;
+using PhysioBoo.Application.Queries.Prescriptions.GetById;
 using PhysioBoo.Application.Queries.PrintTemplates.GetAll;
 using PhysioBoo.Application.Queries.PrintTemplates.GetByCode;
 using PhysioBoo.Application.Queries.PrintTemplates.GetById;
@@ -194,6 +203,7 @@ using PhysioBoo.Application.Services;
 using PhysioBoo.Application.SortProviders;
 using PhysioBoo.Application.ViewModels.Addresses;
 using PhysioBoo.Application.ViewModels.AdminMenus;
+using PhysioBoo.Application.ViewModels.Articles;
 using PhysioBoo.Application.ViewModels.Appointments;
 using PhysioBoo.Application.ViewModels.AppointmentTypes;
 using PhysioBoo.Application.ViewModels.Configurations;
@@ -211,6 +221,7 @@ using PhysioBoo.Application.ViewModels.MedicalSpecialties;
 using PhysioBoo.Application.ViewModels.MedicineCategories;
 using PhysioBoo.Application.ViewModels.Patients;
 using PhysioBoo.Application.ViewModels.Permissions;
+using PhysioBoo.Application.ViewModels.Prescriptions;
 using PhysioBoo.Application.ViewModels.PrintTemplates;
 using PhysioBoo.Application.ViewModels.Roles;
 using PhysioBoo.Application.ViewModels.Sorting;
@@ -221,6 +232,7 @@ using PhysioBoo.Application.ViewModels.Sys_Settings;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Entities.Clinical;
+using PhysioBoo.Domain.Entities.Cms;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
@@ -272,6 +284,9 @@ namespace PhysioBoo.Application.Extensions
 
             // Print Context Enricher
             services.AddScoped<IPrintContextEnricher, PrintContextEnricher>();
+
+            // User Provisioning
+            services.AddScoped<IUserProvisioningService, UserProvisioningService>();
 
             return services;
         }
@@ -380,6 +395,7 @@ namespace PhysioBoo.Application.Extensions
             // Patient
             services.AddScoped<IRequestHandler<GetAllPatientsQuery, PagedResult<PatientViewModel>>, GetAllPatientsQueryHandler>();
             services.AddScoped<IRequestHandler<GetPatientByIdQuery, PatientViewModel?>, GetPatientByIdQueryHandler>();
+            services.AddScoped<IRequestHandler<GetTransactionStatusQuery, TransactionViewModel?>, GetTransactionStatusQueryHandler>();
 
             // Print Template 
             services.AddScoped<IRequestHandler<GetAllPrintTemplatesQuery, PagedResult<PrintTemplateViewModel>>, GetAllPrintTemplatesQueryHandler>();
@@ -399,6 +415,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<GetMedicalRecordClinicalSnapshotQuery, ClinicalSnapshotViewModel?>, GetMedicalRecordClinicalSnapshotQueryHandler>();
             services.AddScoped<IRequestHandler<GetMedicalRecordContextQuery, PatientContextViewModel?>, GetMedicalRecordContextQueryHandler>();
             services.AddScoped<IRequestHandler<GetMedicalRecordLabQuery, LabViewModel?>, GetMedicalRecordLabQueryHandler>();
+            services.AddScoped<IRequestHandler<GetPrescriptionByIdQuery, PrescriptionDraftViewModel?>, GetPrescriptionByIdQueryHandler>();
 
             // Appointment
             services.AddScoped<IRequestHandler<GetAllAppointmentsQuery, PagedResult<AppointmentViewModel>>, GetAllAppointmentsQueryHandler>();
@@ -480,6 +497,8 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<CreateBillCommand>, CreateBillCommandHandler>();
             services.AddScoped<IRequestHandler<CreateBillItemCommand>, CreateBillItemCommandHandler>();
             services.AddScoped<IRequestHandler<CreatePaymentCommand>, CreatePaymentCommandHandler>();
+            services.AddScoped<IRequestHandler<InitiatePaymentCommand>, InitiatePaymentCommandHandler>();
+            services.AddScoped<IRequestHandler<HandleGatewayNotificationCommand>, HandleGatewayNotificationCommandHandler>();
             services.AddScoped<IRequestHandler<DeleteAppointmentTypeCommand>, DeleteAppointmentTypeCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateAppointmentTypeCommand>, UpdateAppointmentTypeCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateHospitalCommand>, UpdateHospitalCommandHandler>();
@@ -514,6 +533,10 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<CreateMedicineInventoryCommand>, CreateMedicineInventoryCommandHandler>();
             services.AddScoped<IRequestHandler<DeleteMedicineCategoryCommand>, DeleteMedicineCategoryCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateMedicineCategoryCommand>, UpdateMedicineCategoryCommandHandler>();
+            services.AddScoped<IRequestHandler<UpdatePrescriptionCommand>, UpdatePrescriptionCommandHandler>();
+            services.AddScoped<IRequestHandler<IssuePrescriptionCommand>, IssuePrescriptionCommandHandler>();
+            services.AddScoped<IRequestHandler<CancelPrescriptionCommand>, CancelPrescriptionCommandHandler>();
+            services.AddScoped<IRequestHandler<AcknowledgeClinicalWarningCommand>, AcknowledgeClinicalWarningCommandHandler>();
             #endregion
 
             #region Laboratory Imaging Flow
@@ -603,6 +626,7 @@ namespace PhysioBoo.Application.Extensions
         public static IServiceCollection AddSortProviders(this IServiceCollection services)
         {
             services.AddScoped<ISortingExpressionProvider<MedicalSpecialtyViewModel, MedicalSpecialty>, MedicalSpecialtyViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<ArticleViewModel, Article>, ArticleViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<DepartmentViewModel, Department>, DepartmentViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<AppointmentTypeViewModel, AppointmentType>, AppointmentTypeViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<ImagingModalityViewModel, ImagingModality>, ImagingModalityViewModelSortProvider>();
@@ -620,6 +644,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<ISortingExpressionProvider<AddressViewModel, Address>, AddressViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<PatientViewModel, Patient>, PatientViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<PrintTemplateViewModel, PrintTemplate>, PrintTemplateViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<AppointmentViewModel, Appointment>, AppointmentViewModelSortProvider>();
 
             return services;
         }

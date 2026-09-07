@@ -1,4 +1,4 @@
-﻿using PhysioBoo.Domain.Enums;
+﻿
 
 namespace PhysioBoo.Domain.Entities.System
 {

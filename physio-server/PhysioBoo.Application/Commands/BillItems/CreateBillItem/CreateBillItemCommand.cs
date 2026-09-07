@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.BillItems;
 using PhysioBoo.SharedKernel.Commands;
 

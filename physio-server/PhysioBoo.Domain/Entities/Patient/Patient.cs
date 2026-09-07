@@ -3,11 +3,11 @@ using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
-using PhysioBoo.Domain.Entities.Operation;
-using PhysioBoo.Domain.Enums;
+
+
 using PhysioBoo.SharedKernel.Attributes;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+
+
 using Column = System.ComponentModel.DataAnnotations.Schema.ColumnAttribute;
 
 namespace PhysioBoo.Domain.Entities.PatientInformation
@@ -153,6 +153,8 @@ namespace PhysioBoo.Domain.Entities.PatientInformation
         public virtual ICollection<PatientMedicalHistory> MedicalHistories { get; private set; } = new List<PatientMedicalHistory>();
         public virtual ICollection<Payment> Payments { get; private set; } = new List<Payment>();
         public virtual ICollection<Prescription> Prescriptions { get; private set; } = new List<Prescription>();
+        public virtual ICollection<RetailCart> RetailCarts { get; private set; } = new List<RetailCart>();
+        public virtual ICollection<RetailTransaction> RetailTransactions { get; private set; } = new List<RetailTransaction>();
         #endregion
 
         #region Constructor (37)

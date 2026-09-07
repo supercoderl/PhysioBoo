@@ -1,5 +1,6 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Entities.Operation;
+
+
 
 namespace PhysioBoo.Domain.Entities.Clinical
 {
@@ -23,12 +24,24 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public decimal TotalPrice { get; private set; }
         public bool SubtituteAllowed { get; private set; }
         public bool IsControlledSubstance { get; private set; }
+        public bool TimingMorning { get; private set; }
+        public bool TimingNoon { get; private set; }
+        public bool TimingAfternoon { get; private set; }
+        public bool TimingEvening { get; private set; }
+        public bool IsPrn { get; private set; }
+        public BeforeAfterMeal BeforeAfterMeal { get; private set; }
+        public string Unit { get; private set; }
+        public int RefillCount { get; private set; }
+        public bool IsInsuranceCovered { get; private set; }
+        public bool IsCatalogVerified { get; private set; } = true;
 
         public virtual User? Creator { get; private set; }
         public virtual User? Updater { get; private set; }
         public virtual Prescription? Prescription { get; private set; }
         public virtual Medicine? Medicine { get; private set; }
         public virtual HospitalGroup? HospitalGroup { get; private set; }
+
+        public virtual ICollection<PrescriptionClinicalWarning> PrescriptionClinicalWarnings { get; private set; } = new List<PrescriptionClinicalWarning>();
         #endregion
 
         #region Constructor (18)
@@ -46,7 +59,8 @@ namespace PhysioBoo.Domain.Entities.Clinical
             int durationInDays,
             string? routeOfAdministration,
             string? specialInstructions,
-            decimal pricePerUnit
+            decimal pricePerUnit,
+            string unit
         ) : base(id)
         {
             PrescriptionId = prescriptionId;
@@ -66,6 +80,7 @@ namespace PhysioBoo.Domain.Entities.Clinical
             TotalPrice = quantityPrescribed * pricePerUnit;
             SubtituteAllowed = true;
             IsControlledSubstance = false;
+            Unit = unit;
         }
         #endregion
 
@@ -94,6 +109,16 @@ namespace PhysioBoo.Domain.Entities.Clinical
         public void SetQuantityDispensed(int quantityDispensed) { QuantityDispensed = quantityDispensed; }
         public void SetSubtituteAllowed(bool subtituteAllowed) { SubtituteAllowed = subtituteAllowed; }
         public void SetIsControlledSubstance(bool isControlledSubstance) { IsControlledSubstance = isControlledSubstance; }
+        public void SetTimingMorning(bool timingMorning) { TimingMorning = timingMorning; }
+        public void SetTimingNoon(bool timingNoon) { TimingNoon = timingNoon; }
+        public void SetTimingAfternoon(bool timingAfternoon) { TimingAfternoon = timingAfternoon; }
+        public void SetTimingEvening(bool timingEvening) { TimingEvening = timingEvening; }
+        public void SetIsPrn(bool isPrn) { IsPrn = isPrn; }
+        public void SetBeforeAfterMeal(BeforeAfterMeal beforeAfterMeal) { BeforeAfterMeal = beforeAfterMeal; }
+        public void SetUnit(string unit) { Unit = unit; }
+        public void SetRefillCount(int refillCount) { RefillCount = refillCount; }
+        public void SetIsInsuranceCovered(bool isInsuranceCovered) { IsInsuranceCovered = isInsuranceCovered; }
+        public void SetIsCatalogVerified(bool isCatalogVerified) { IsCatalogVerified = isCatalogVerified; }
         #endregion
     }
 }

@@ -1,11 +1,11 @@
 using MediatR;
 using PhysioBoo.Application.Commands.DoctorWorkExperiences.CreateDoctorWorkExperience;
 using PhysioBoo.Application.ViewModels.DoctorWorkExperiences;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
+
+
 using PhysioBoo.Domain.Notifications;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

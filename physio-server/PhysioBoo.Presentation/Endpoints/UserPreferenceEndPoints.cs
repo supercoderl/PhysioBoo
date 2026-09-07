@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
 using PhysioBoo.Application.Commands.UserPreferences.UpsertUserPreference;
 using PhysioBoo.Application.ViewModels.UserPreferences;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
 using PhysioBoo.Application.Commands.Addresses.CreateAddress;
 using PhysioBoo.Application.Commands.Addresses.DeleteAddress;
 using PhysioBoo.Application.Commands.Addresses.UpdateAddress;
 using PhysioBoo.Application.Queries.Addresses.GetAll;
 using PhysioBoo.Application.Queries.Addresses.GetById;
 using PhysioBoo.Application.ViewModels.Addresses;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

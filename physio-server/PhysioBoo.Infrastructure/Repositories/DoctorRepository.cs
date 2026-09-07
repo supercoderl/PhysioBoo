@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.MedicalStaff;
-using PhysioBoo.Domain.Interfaces.Repositories;
+
 using PhysioBoo.Infrastructure.Database;
 using PhysioBoo.SharedKernel.Results;
 

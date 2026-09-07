@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
 using Microsoft.EntityFrameworkCore.Storage;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.PatientInformation;
-using PhysioBoo.Domain.Interfaces.Repositories;
+
 using PhysioBoo.Infrastructure.Database;
 using PhysioBoo.SharedKernel.Results;
 

@@ -1,7 +1,7 @@
 ﻿using NpgsqlTypes;
 using PhysioBoo.SharedKernel.Attributes;
-using PhysioBoo.SharedKernel.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+
+
 
 namespace PhysioBoo.Domain.Entities.LaboratoryImaging
 {

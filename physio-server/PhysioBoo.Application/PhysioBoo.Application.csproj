@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <Folder Include="Commands\DoctorSchedules\CreateDoctorSchedule\" />
+    <Folder Include="Commands\Medicines\UpdateMedicine\" />
   </ItemGroup>
 
   <ItemGroup>

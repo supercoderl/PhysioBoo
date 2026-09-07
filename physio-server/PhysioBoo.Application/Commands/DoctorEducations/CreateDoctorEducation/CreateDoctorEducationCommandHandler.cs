@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces;

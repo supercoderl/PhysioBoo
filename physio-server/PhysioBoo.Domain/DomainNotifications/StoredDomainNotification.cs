@@ -1,5 +1,5 @@
 ﻿using PhysioBoo.Domain.Notifications;
-using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace PhysioBoo.Domain.DomainNotifications
 {

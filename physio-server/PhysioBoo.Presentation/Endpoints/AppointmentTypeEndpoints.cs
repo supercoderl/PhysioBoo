@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
 using PhysioBoo.Application.Commands.AppointmentTypes.CreateAppointmentType;
 using PhysioBoo.Application.Commands.AppointmentTypes.DeleteAppointmentType;
 using PhysioBoo.Application.Commands.AppointmentTypes.UpdateAppointmentType;
 using PhysioBoo.Application.Queries.AppointmentTypes.GetAll;
 using PhysioBoo.Application.Queries.AppointmentTypes.GetById;
 using PhysioBoo.Application.ViewModels.AppointmentTypes;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

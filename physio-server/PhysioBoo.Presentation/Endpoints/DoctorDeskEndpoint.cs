@@ -1,9 +1,9 @@
 ﻿using PhysioBoo.Application.Queries.DoctorDesks.GetSnapshot;
 using PhysioBoo.Application.ViewModels.DoctorDesks;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

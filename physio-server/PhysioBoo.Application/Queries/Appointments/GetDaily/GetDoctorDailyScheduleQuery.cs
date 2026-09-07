@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.Appointments;
 
 namespace PhysioBoo.Application.Queries.Appointments.GetDaily

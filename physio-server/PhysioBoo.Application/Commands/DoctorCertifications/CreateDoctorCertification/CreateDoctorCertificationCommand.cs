@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels.DoctorCertifications;
 using PhysioBoo.SharedKernel.Commands;
 

@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Notifications;
-using PhysioBoo.Presentation.Models;
+
 using System.Net;
 
 namespace PhysioBoo.Presentation.Filters

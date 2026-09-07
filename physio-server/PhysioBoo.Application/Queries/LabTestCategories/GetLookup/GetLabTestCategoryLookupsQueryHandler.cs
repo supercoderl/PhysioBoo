@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿
 using PhysioBoo.Application.ViewModels;
 using PhysioBoo.Application.ViewModels.LabTestCategories;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;

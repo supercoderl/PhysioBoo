@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+
 using PhysioBoo.Domain.Entities;
 using PhysioBoo.Domain.Entities.Clinical;
+using PhysioBoo.Domain.Entities.Cms;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
@@ -25,6 +26,7 @@ namespace PhysioBoo.Infrastructure.Database
         #region DbSet
         public DbSet<Address> Addresses { get; set; } = null!;
         public DbSet<Appointment> Appointments { get; set; } = null!;
+        public DbSet<Article> Articles { get; set; } = null!;
         public DbSet<AppointmentType> AppointmentTypes { get; set; } = null!;
         public DbSet<Bill> Bills { get; set; } = null!;
         public DbSet<BillItem> BillItems { get; set; } = null!;
@@ -45,6 +47,7 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<ImagingOrder> ImagingOrders { get; set; } = null!;
         public DbSet<ImagingReport> ImagingReports { get; set; } = null!;
         public DbSet<InsuranceCompany> InsuranceCompanies { get; set; } = null!;
+        public DbSet<InventoryAlert> InventoryAlerts { get; set; } = null!;
         public DbSet<LabOrder> LabOrders { get; set; } = null!;
         public DbSet<LabOrderItem> LabOrdersItem { get; set; } = null!;
         public DbSet<LabReport> LabReports { get; set; } = null!;
@@ -61,7 +64,22 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<PatientMedicalHistory> PatientMedicalHistories { get; set; } = null!;
         public DbSet<Payment> Payments { get; set; } = null!;
         public DbSet<Prescription> Prescriptions { get; set; } = null!;
+        public DbSet<Transaction> Transactions { get; set; } = null!;
         public DbSet<PrescriptionItem> PrescriptionItems { get; set; } = null!;
+        public DbSet<PrescriptionClinicalWarning> PrescriptionClinicalWarnings { get; set; } = null!;
+        public DbSet<FavoriteMedication> FavoriteMedications { get; set; } = null!;
+        public DbSet<PrescriptionTemplate> PrescriptionTemplates { get; set; } = null!;
+        public DbSet<PrescriptionTemplateItem> PrescriptionTemplateItems { get; set; } = null!;
+        public DbSet<StockMovement> StockMovements { get; set; } = null!;
+        public DbSet<PhysioBoo.Domain.Entities.Support.WarehouseZone> WarehouseZones { get; set; } = null!;
+        public DbSet<RetailCart> RetailCarts { get; set; } = null!;
+        public DbSet<RetailCartLineItem> RetailCartLineItems { get; set; } = null!;
+        public DbSet<RetailTransaction> RetailTransactions { get; set; } = null!;
+        public DbSet<RetailTransactionLineItem> RetailTransactionLineItems { get; set; } = null!;
+        public DbSet<RetailPaymentSplit> RetailPaymentSplits { get; set; } = null!;
+        public DbSet<StockTake> StockTakes { get; set; } = null!;
+        public DbSet<StockTakeItem> StockTakeItems { get; set; } = null!;
+        public DbSet<StockTakeActivity> StockTakeActivities { get; set; } = null!;
         public DbSet<Profile> Profiles { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
         public DbSet<Room> Rooms { get; set; } = null!;
@@ -169,6 +187,7 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new BillConfiguration());
             builder.ApplyConfiguration(new BillItemConfiguration());
             builder.ApplyConfiguration(new DepartmentConfiguration());
+            builder.ApplyConfiguration(new RoomConfiguration());
             builder.ApplyConfiguration(new DoctorAwardConfiguration());
             builder.ApplyConfiguration(new DoctorCertificationConfiguration());
             builder.ApplyConfiguration(new DoctorConfiguration());
@@ -193,6 +212,7 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new ManufacturerConfiguration());
             builder.ApplyConfiguration(new MedicalRecordConfiguration());
             builder.ApplyConfiguration(new MedicalSpecialtyConfiguration());
+            builder.ApplyConfiguration(new ArticleConfiguration());
             builder.ApplyConfiguration(new MedicineCategoryConfiguration());
             builder.ApplyConfiguration(new MedicineConfiguration());
             builder.ApplyConfiguration(new MedicineInventoryConfiguration());
@@ -200,8 +220,24 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new PatientConfiguration());
             builder.ApplyConfiguration(new PatientMedicalHistoryConfiguration());
             builder.ApplyConfiguration(new PaymentConfiguration());
+            builder.ApplyConfiguration(new TransactionConfiguration());
             builder.ApplyConfiguration(new PrescriptionConfiguration());
             builder.ApplyConfiguration(new PrescriptionItemConfiguration());
+            builder.ApplyConfiguration(new PrescriptionClinicalWarningConfiguration());
+            builder.ApplyConfiguration(new FavoriteMedicationConfiguration());
+            builder.ApplyConfiguration(new PrescriptionTemplateConfiguration());
+            builder.ApplyConfiguration(new PrescriptionTemplateItemConfiguration());
+            builder.ApplyConfiguration(new WarehouseZoneConfiguration());
+            builder.ApplyConfiguration(new StockMovementConfiguration());
+            builder.ApplyConfiguration(new InventoryAlertConfiguration());
+            builder.ApplyConfiguration(new RetailCartConfiguration());
+            builder.ApplyConfiguration(new RetailCartLineItemConfiguration());
+            builder.ApplyConfiguration(new RetailTransactionConfiguration());
+            builder.ApplyConfiguration(new RetailTransactionLineItemConfiguration());
+            builder.ApplyConfiguration(new RetailPaymentSplitConfiguration());
+            builder.ApplyConfiguration(new StockTakeConfiguration());
+            builder.ApplyConfiguration(new StockTakeItemConfiguration());
+            builder.ApplyConfiguration(new StockTakeActivityConfiguration());
             builder.ApplyConfiguration(new ProfileConfiguration());
             builder.ApplyConfiguration(new ReviewConfiguration());
             builder.ApplyConfiguration(new SupplierConfiguration());

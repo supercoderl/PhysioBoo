@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+
 using PhysioBoo.Application.Commands.PrintTemplates.CreatePrintTemplate;
 using PhysioBoo.Application.Commands.PrintTemplates.DeletePrintTemplate;
 using PhysioBoo.Application.Commands.PrintTemplates.SaveVersionPrintTemplate;
@@ -10,11 +10,11 @@ using PhysioBoo.Application.Queries.PrintTemplates.GetById;
 using PhysioBoo.Application.Queries.PrintTemplates.Render;
 using PhysioBoo.Application.ViewModels.PrintTemplates;
 using PhysioBoo.Application.ViewModels.PrintTemplateVersions;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

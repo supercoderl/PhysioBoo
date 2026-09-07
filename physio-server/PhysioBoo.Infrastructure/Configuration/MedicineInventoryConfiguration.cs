@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿
+
 using PhysioBoo.Domain.Entities.Clinical;
 
 namespace PhysioBoo.Infrastructure.Configuration
@@ -50,6 +50,11 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .WithMany(hg => hg.MedicineInventories)
                    .HasForeignKey(i => i.TenantId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(i => i.WarehouseZone)
+                   .WithMany(z => z.MedicineInventories)
+                   .HasForeignKey(i => i.WarehouseZoneId)
+                   .OnDelete(DeleteBehavior.SetNull);
             // Properties
             builder.Property(i => i.BatchNumber)
                    .HasMaxLength(100);
@@ -81,6 +86,15 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(i => i.IsExpired).IsRequired();
             builder.Property(i => i.IsNearExpiry).IsRequired();
+
+            builder.Property(i => i.ReservedQuantity).IsRequired();
+
+            builder.Property(i => i.Status)
+                   .HasConversion<string>()
+                   .IsRequired();
+
+            builder.Property(i => i.LockReason).HasMaxLength(500);
+            builder.Property(i => i.DisposalReason).HasMaxLength(500);
         }
     }
 }

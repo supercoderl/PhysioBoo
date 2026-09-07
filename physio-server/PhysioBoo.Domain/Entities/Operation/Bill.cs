@@ -1,9 +1,9 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Entities.Support;
-using PhysioBoo.Domain.Enums;
+
 using PhysioBoo.SharedKernel.Attributes;
-using PhysioBoo.SharedKernel.Utils;
+
 
 namespace PhysioBoo.Domain.Entities.Operation
 {
@@ -18,7 +18,10 @@ namespace PhysioBoo.Domain.Entities.Operation
         public Guid PatientId { get; private set; }
 
         [Placeholder(Label = "Appointment ID", Example = "f1a9b0d2-3c44-42f8-91de-77d9d5b2a123")]
-        public Guid AppointmentId { get; private set; }
+        public Guid? AppointmentId { get; private set; }
+
+        [Placeholder(Label = "Bill Source", Example = "WalkIn")]
+        public BillSource Source { get; private set; }
 
         [Placeholder(Label = "Hospital ID", Example = "6b2c7f91-2d1f-4a2e-a1b9-3d2f9b7e5c21")]
         public Guid HospitalId { get; private set; }
@@ -117,7 +120,8 @@ namespace PhysioBoo.Domain.Entities.Operation
             Guid id,
             string billNumber,
             Guid patientId,
-            Guid appointmentId,
+            Guid? appointmentId,
+            BillSource source,
             Guid hospitalId,
             Guid departmentId,
             BillType type,
@@ -132,6 +136,7 @@ namespace PhysioBoo.Domain.Entities.Operation
             BillNumber = billNumber;
             PatientId = patientId;
             AppointmentId = appointmentId;
+            Source = source;
             HospitalId = hospitalId;
             DepartmentId = departmentId;
             Type = type;
@@ -163,7 +168,8 @@ namespace PhysioBoo.Domain.Entities.Operation
         #region Setter Methods (39)
         public void SetBillNumber(string billNumber) { BillNumber = billNumber; }
         public void SetPatientId(Guid patientId) { PatientId = patientId; }
-        public void SetAppointmentId(Guid appointmentId) { AppointmentId = appointmentId; }
+        public void SetAppointmentId(Guid? appointmentId) { AppointmentId = appointmentId; }
+        public void SetSource(BillSource source) { Source = source; }
         public void SetHospitalId(Guid hospitalId) { HospitalId = hospitalId; }
         public void SetDepartmentId(Guid departmentId) { DepartmentId = departmentId; }
         public void SetType(BillType type) { Type = type; }

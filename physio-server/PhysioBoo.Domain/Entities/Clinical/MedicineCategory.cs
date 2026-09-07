@@ -1,7 +1,7 @@
 ﻿using NpgsqlTypes;
 using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Entities.Operation;
-using System.ComponentModel.DataAnnotations.Schema;
+
+
 
 namespace PhysioBoo.Domain.Entities.Clinical
 {

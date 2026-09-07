@@ -1,15 +1,15 @@
-using Microsoft.AspNetCore.Mvc;
+
 using PhysioBoo.Application.Commands.ImagingModalities.CreateImagingModality;
 using PhysioBoo.Application.Commands.ImagingModalities.DeleteImagingModality;
 using PhysioBoo.Application.Commands.ImagingModalities.UpdateImagingModality;
 using PhysioBoo.Application.Queries.ImagingModalities.GetAll;
 using PhysioBoo.Application.Queries.ImagingModalities.GetById;
 using PhysioBoo.Application.ViewModels.ImagingModalities;
-using PhysioBoo.Domain.Constants;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Presentation.Filters;
-using PhysioBoo.Presentation.Models;
-using PhysioBoo.SharedKernel.Common;
+
+
+
+
+
 
 namespace PhysioBoo.Presentation.Endpoints
 {

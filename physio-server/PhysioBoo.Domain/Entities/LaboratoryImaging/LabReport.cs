@@ -1,8 +1,8 @@
 ﻿using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.MedicalStaff;
-using PhysioBoo.Domain.Entities.Operation;
+
 using PhysioBoo.Domain.Entities.PatientInformation;
-using PhysioBoo.SharedKernel.Utils;
+
 
 namespace PhysioBoo.Domain.Entities.LaboratoryImaging
 {

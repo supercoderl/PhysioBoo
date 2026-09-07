@@ -228,6 +228,22 @@ services/admin/retail-pos.service.ts        (RetailPosService — mock-fallback 
 
 ## 13. Proposed Backend API Contract
 
+### 13.0 Required domain model changes (prerequisite)
+
+Shared entities (`WarehouseZone`, `StockMovement`, `InventoryAlert`, extended `MedicineInventory`) are specified once in `docs/inventory-management-redesign.md` §19.0 — implement there, this module consumes them (e.g. checkout writes `StockMovement` rows of `Type = RetailSale` and decrements the selected `MedicineInventory` batches).
+
+Retail-specific new entities, none of which exist today:
+
+| Entity | Key fields | Notes |
+|---|---|---|
+| `RetailCart` | `Id, Name, Status (RetailCartStatus enum: Active/Held), CustomerType, CustomerPatientId?, CustomerFullName, CustomerPhone, CustomerMrn?, CustomerInsuranceProvider?, CustomerInsuranceCoverageAmount?, CustomerLoyaltyPoints?, CustomerPrescriptionReference?, CustomerAllergyInformation?, HospitalId, CreatedAt` | Mutable/transient — customer fields are a snapshot on the cart itself, not a relationship, since a walk-in customer may not have a `Patient` record at all |
+| `RetailCartLineItem` | `Id, RetailCartId, MedicineId, Quantity, UnitPrice, DiscountPercent, InsuranceCoveredAmount` | Deletable/editable while the cart is `Active` |
+| `RetailTransaction` | `Id, TransactionNumber, CashierId, (customer fields, same shape as RetailCart's), Subtotal, DiscountTotal, InsuranceCoverage, Vat, GrandTotal, AmountTendered, ChangeDue, CompletedAt, Status (Completed/Refunded/Suspended), HospitalId` | Immutable snapshot created at checkout — never edited after creation, only superseded by a linked refund |
+| `RetailTransactionLineItem` | `Id, RetailTransactionId, MedicineId, MedicineNameSnapshot, Quantity, UnitPriceSnapshot, DiscountPercent, InsuranceCoveredAmount, Total` | Frozen at sale time (price/discount/insurance as they were then) — deliberately **not** a foreign-key-only reference to `RetailCartLineItem`, so later catalog price changes never alter historical transactions |
+| `RetailPaymentSplit` | `Id, RetailTransactionId, Method (RetailPaymentMethod enum: Cash/Card/QR/Insurance/Mixed), Amount` | One transaction can have multiple splits (e.g. part cash, part insurance) |
+
+**Checkout must be transactional**: in one unit of work, create `RetailTransaction` + line items + payment splits, decrement the selected `MedicineInventory` batches' `QuantityAvailable`/`QuantitySold` (FEFO-selected), and write one `StockMovement` (`Type = RetailSale`) per line — mirrors the header+items transactional-create requirement from module 8's Prescription create endpoint.
+
 All endpoints assume hospital/tenant scoping via existing auth middleware (not repeated per row). Response envelope follows the existing `PagedResponse<T>` / `PaginationData<T>` shape used across the app.
 
 | # | Purpose | Method | URL | Request | Response | Frontend Usage |

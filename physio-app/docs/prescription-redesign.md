@@ -278,32 +278,114 @@ PrescriptionPageComponent
 
 ---
 
-## 12. Required Frontend APIs
+## 12. Backend API Contract (proposed — not implemented)
 
-Frontend-consumption contract only — no implementation. Existing relevant pattern: `MedicalRecordService.getPrescriptions(patientId)` already returns `PrescriptionRow`/`PrescriptionItemRow`; the endpoints below extend that model to support the redesigned workflow.
+**Current backend reality (as of this proposal):** `PhysioBoo.Presentation/Endpoints/PrescriptionEndpoints.cs` exposes exactly one route, `POST api/prescriptions/create`, backed by `Commands/Prescriptions/CreatePrescription` — which builds only the `Prescription` header row and does **not** create any `PrescriptionItem` rows (those require N separate calls to `POST api/prescription-items/create`). No `Queries/Prescriptions` folder exists — the only read shape anywhere in the backend is `Queries/MedicalRecords/GetPrescriptions`, scoped to a patient and returning fake pagination (`page 1 of 1` always). No Update/Issue/Cancel/CDS/cost/favorites/templates support exists at all. `Prescription.Status` (`PrescriptionStatus` enum: `Active, Dispensed, PartiallyDispensed, Expired, Cancelled`) has no `Draft`/`Issued` states and defaults to `Active` in the constructor — this does not match the frontend's `Draft | Issued | Cancelled | Expired` vocabulary and must be reconciled (see §12.0).
 
-| Endpoint | Purpose |
+The frontend's `PrescriptionService` (`src/app/services/admin/prescription.service.ts`) currently calls 10 endpoints under `BASE_API.PRESCRIPTION_RX`, none of which exist server-side today. This section is the full contract to close that gap. Endpoints that already exist elsewhere in the backend and should be **reused, not duplicated**, are called out explicitly.
+
+### 12.0 Required domain model changes (prerequisite to any endpoint below)
+
+| Change | Reason |
 |---|---|
-| `GET /api/prescriptions/{id}` | Load a single prescription (header + items + status) for the page on open/edit. |
-| `POST /api/prescriptions` | Create a new prescription (Save Draft / first save). |
-| `PUT /api/prescriptions/{id}` | Update an existing draft (autosave, manual save, inline edits). |
-| `POST /api/prescriptions/{id}/issue` | Transition Draft → Issued; server validates required fields and unacknowledged critical warnings. |
-| `POST /api/prescriptions/{id}/cancel` | Transition to Cancelled; accepts a reason. |
-| `GET /api/patients/{id}/clinical-summary` | Demographics, vitals (height/weight/BMI/blood type), risk/warning flags (allergy, pregnancy, pediatric, elderly, high-risk, controlled-restriction) for the Patient Summary Card. |
-| `GET /api/patients/{id}/allergies` | Allergy list, feeding both the warning badge and CDS allergy checks. |
-| `GET /api/patients/{id}/diagnoses?encounterId=` | Pre-fill diagnosis section from the current encounter. |
-| `GET /api/icd10?query=` | ICD-10 autocomplete for diagnosis entry. |
-| `GET /api/medicines?query=` | Drug search/autocomplete (name, generic, brand) for the Add Medication drawer. |
-| `GET /api/medicines/{id}` | Full drug detail (strength, form, route options, stock, insurance default) to auto-fill the drawer on selection. |
-| `POST /api/prescriptions/cds-check` | Submit patient ID + current draft item list → returns clinical warnings (interaction, duplicate, allergy, contraindication, dose, pregnancy/pediatric, renal/liver) with severities. Called on every add/edit so the table and sidebar always reflect current state. |
-| `GET /api/prescriptions/{id}/cost-estimate` | Returns total cost, insurance coverage amount/%, patient payment for the Summary strip — recalculated whenever items change. |
-| `GET /api/patients/{id}/prescriptions/recent?limit=3` | Recent Prescriptions sidebar widget. |
-| `GET /api/doctors/{id}/favorite-medications` | Favorites sidebar widget. |
-| `POST /api/doctors/{id}/favorite-medications` / `DELETE .../{medicationId}` | Manage favorites. |
-| `GET /api/prescription-templates?doctorId=` | Prescription Templates sidebar widget. |
-| `POST /api/prescriptions/{id}/apply-template/{templateId}` | Bulk-add a template's medications to the current draft. |
-| `GET /api/medicines/{id}/stock-status` | Stock status badge in the table (could be embedded in `GET /api/medicines/{id}` instead — listed separately if stock changes faster than catalog data). |
-| `GET /api/prescriptions/{id}/print` | Returns a print-ready representation (or PDF URL) for Preview/Print actions. |
+| `PrescriptionStatus` enum: add `Draft`, add `Issued`; keep `Dispensed`/`PartiallyDispensed`/`Expired`/`Cancelled`; drop or repurpose `Active` | FE models the lifecycle as `Draft → Issued → (Dispensed by pharmacy) / Cancelled / Expired`. Dispensing status is a pharmacy-side concern already tracked separately by `PrescriptionItem.QuantityDispensed` — `Prescription.Status` should reflect the doctor-authored lifecycle, not conflate the two. |
+| `Prescription` constructor default status → `Draft` (not `Active`) | A newly created prescription via Save Draft must not appear as already-active/issued. |
+| Add domain methods `Issue()`, `Cancel(reason)` on `Prescription` (replacing generic `SetStatus()` calls from the application layer) | Encodes valid transitions (e.g. cannot Issue from `Cancelled`) at the domain layer per Clean Architecture convention already used elsewhere in `PhysioBoo.Domain`. |
+| `Prescription`: add `CancelReason` (string?), `IssuedAt` (DateTime?), `CancelledAt` (DateTime?) | FE cancel flow captures a reason (§9 Edge Cases); issue/cancel timestamps needed for audit and for the "Cancelling an already-issued prescription" edge case. |
+| `PrescriptionItem`: add `TimingMorning`/`TimingNoon`/`TimingAfternoon`/`TimingEvening` (bool), `IsPrn` (bool), `BeforeAfterMeal` (enum: `Before`/`After`/`None`), `Unit` (string), `RefillCount` (int), `IsInsuranceCovered` (bool), `IsCatalogVerified` (bool, default true — false for custom/manual entries) | Every one of these fields is rendered and edited in `rx-medication-table`/`rx-medication-drawer` today with no backend counterpart — the domain model is currently too thin to persist what the UI already collects. |
+| New entity `PrescriptionClinicalWarning` (`PrescriptionItemId`, `Type`, `Severity`, `Message`, `RecommendedAction`, `AcknowledgedBy`, `AcknowledgedAt`) | CDS results must persist server-side (not just live in FE memory) so Critical-warning acknowledgement is auditable at Issue time, per §9 "Critical warning ignored" edge case. |
+| New entity `FavoriteMedication` (`DoctorId`, `MedicineId`, custom default dosing fields) | Backs the Favorites sidebar widget; currently no persistence layer exists for it. |
+| New entity `PrescriptionTemplate` + `PrescriptionTemplateItem` (`DoctorId`, `Name`, ordered list of default medication lines) | Backs the Templates sidebar widget and "apply template" bulk-add action. |
+| `CreatePrescriptionCommand`: extend to accept a nested `Items[]` array and insert both header + items in one transaction | Today creation is two non-transactional round trips (header, then N item calls) — a partial failure leaves an orphaned header with no items. |
+
+### 12.1 `GET /api/prescriptions/{id}`
+- **Purpose**: Load a single prescription (header + items + status + persisted clinical warnings) when the page opens in edit mode.
+- **Request**: path `id` (guid). `id = "new"` is **not** a valid backend call — the frontend must stop hardcoding `prescriptionId = 'new'` and instead only call this once a real id exists (see §12.2 for creation-first flow).
+- **Response**: `PagedResponse<PrescriptionDraft>` — `id, prescriptionNumber, patientId, doctorId, appointmentId, medicalRecordId, status, prescriptionDate, diagnosis[], instructions, items: PrescriptionItemDraft[], pharmacistNotes, refillCount, maxRefills, validUntil`. Each `PrescriptionItemDraft` includes all §12.0 fields plus any persisted `clinicalWarnings[]`.
+- **Frontend usage**: `PrescriptionService.getDraft(prescriptionId)`.
+
+### 12.2 `POST /api/prescriptions`
+- **Purpose**: Create a new prescription in `Draft` status — replaces today's disconnected header-only `POST api/prescriptions/create`. Called once, on first save, with the full item list already attached (transactional).
+- **Request**: `{ patientId, doctorId, appointmentId, medicalRecordId, hospitalId, diagnosis[], instructions?, items: PrescriptionItemInput[] }` (items array may be empty — an empty-but-saved draft is valid).
+- **Response**: `PagedResponse<PrescriptionDraft>` (same shape as §12.1, with server-generated `id`/`prescriptionNumber`).
+- **Frontend usage**: `PrescriptionService.saveDraft(draft)` when `draft.id` is not yet set (first save of a new prescription). Requires the page to actually be entered with `patientId`/`doctorId`/`appointmentId`/`medicalRecordId` route/state context — currently absent (see §11/§14 IA gap: no navigation handoff from Doctor Desk into this page with that context).
+
+### 12.3 `PUT /api/prescriptions/{id}`
+- **Purpose**: Update an existing Draft (autosave, manual Save Draft, inline table edits). Rejected (409) if `status != Draft`.
+- **Request**: same shape as §12.2's body, full replace of `diagnosis`/`instructions`/`items` for simplicity (matches the FE's whole-draft autosave model rather than a partial-patch model).
+- **Response**: `PagedResponse<PrescriptionDraft>`.
+- **Frontend usage**: `PrescriptionService.saveDraft(draft)` when `draft.id` is already set; also the debounced (1200ms) autosave path in `prescription.component.ts`.
+
+### 12.4 `POST /api/prescriptions/{id}/issue`
+- **Purpose**: Transition `Draft → Issued`. Server-side validates: at least one item present, no unacknowledged `Critical`-severity `PrescriptionClinicalWarning`, all required item fields populated (dose/frequency/duration/quantity). Sets `IssuedAt`.
+- **Request**: `{}` (no body needed — server re-validates against persisted state, not client-supplied state, to prevent a stale-client bypass of the Critical-warning gate).
+- **Response**: `PagedResponse<PrescriptionDraft>` with `status: "Issued"`, or `422` with a structured validation error list if blocked.
+- **Frontend usage**: `PrescriptionService.issue(draft)`.
+
+### 12.5 `POST /api/prescriptions/{id}/cancel`
+- **Purpose**: Transition to `Cancelled` from `Draft` or `Issued`. Sets `CancelReason`, `CancelledAt`.
+- **Request**: `{ reason: string }` (required, non-empty — today's FE hardcodes `'Cancelled by doctor'` client-side; the drawer/dialog for reason entry described in §9 needs to actually collect this and send it here).
+- **Response**: `PagedResponse<PrescriptionDraft>` with `status: "Cancelled"`.
+- **Frontend usage**: `PrescriptionService.cancel(draft, reason)`.
+
+### 12.6 `POST /api/prescriptions/cds-check`
+- **Purpose**: Submit patient id + current (possibly unsaved) item list → returns clinical warnings (interaction, duplicate, allergy, contraindication, high/low dose, pregnancy/pediatric, renal/liver) keyed by item id. Called live from the drawer (400ms debounce) on every med add/edit — must operate on draft data, not just persisted items, since items aren't saved until the drawer's Save.
+- **Request**: `{ patientId: string, items: { medicineId, doseText, frequency, durationInDays }[] }`.
+- **Response**: `PagedResponse<Record<string, ClinicalWarning[]>>` — `ClinicalWarning: { id, type, severity, message, recommendedAction }`.
+- **Frontend usage**: `PrescriptionService.checkClinicalWarnings(patientId, items)`.
+- **Note**: acknowledgement of a returned warning (checkbox in the drawer) must be persisted via §12.1's item update, writing to `PrescriptionClinicalWarning.AcknowledgedBy/AcknowledgedAt`, so §12.4's Issue-time re-validation can trust it server-side rather than re-trusting client state.
+
+### 12.7 `POST /api/prescriptions/{id}/cost-estimate`
+- **Purpose**: Compute total cost, insurance coverage amount/%, patient payment from the current item list — replaces the FE's hardcoded 80%-coverage client-side calculation in `rx-medication-table`'s `summary()`.
+- **Request**: `{ items: { medicineId, quantity }[] }` (POST, not GET, since it must reflect unsaved draft edits, matching the existing FE method signature `getCostEstimate(prescriptionId, items)`).
+- **Response**: `PagedResponse<PrescriptionSummaryTotals>` — `{ totalCost, insuranceCoverageAmount, insuranceCoveragePercent, patientPayment, currency }`. Insurance percent must be sourced from the patient's actual insurance record, not a fixed constant.
+- **Frontend usage**: `PrescriptionService.getCostEstimate(prescriptionId, items)` — currently a dead method (defined but never called); wiring it into the Summary strip is an implementation-time task once this endpoint exists.
+
+### 12.8 `GET /api/medical-records/{patientId}/prescriptions` (existing — reuse, do not duplicate)
+- **Already implemented**: `MedicalRecordEndpoints.cs` line 201, backed by `GetMedicalRecordPrescriptionsQuery`, returning `PagedResult<PrescriptionViewModel>` (full items included, but fake pagination — always page 1 of 1).
+- **Change needed**: fix the handler's pagination to be real (`skip/take` against the actual query, real `totalCount`), and add an optional `limit` query param.
+- **Frontend usage**: replaces the proposed-but-nonexistent `GET /api/patients/{id}/prescriptions/recent` — `PrescriptionService.getRecentPrescriptions(patientId)` should call this existing endpoint with `?limit=3`, mapping `PrescriptionViewModel[]` down to the FE's flatter `RecentPrescriptionSummary` shape client-side (or add a `medicationNames` computed field server-side to avoid client-side flattening).
+
+### 12.9 `GET /api/medical-records/{patientId}/allergies` (existing — reuse for CDS/warning-badge context)
+- **Already implemented**: `MedicalRecordEndpoints.cs` line 138. The Patient Summary Card's allergy badge and CDS allergy-check (§12.6) should source from this existing endpoint rather than a new `/api/patients/{id}/allergies` — avoids a second allergy read path diverging from the Medical Record module's data.
+
+### 12.10 `GET /api/medical-records/{patientId}/demographics` (existing — reuse for Patient Summary Card)
+- **Already implemented**: `MedicalRecordEndpoints.cs` line 96. Covers the "clinical-summary" need (demographics/vitals) originally proposed as a new `/api/patients/{id}/clinical-summary` — reuse this instead. If it lacks risk flags (pregnancy/pediatric/elderly/high-risk/controlled-restriction), extend its `ViewModel` rather than standing up a parallel endpoint.
+
+### 12.11 `GET /api/medical-records/{patientId}/diagnoses?encounterId=` (existing — reuse for Diagnosis Section pre-fill)
+- **Already implemented**: `MedicalRecordEndpoints.cs` line 180. Diagnosis Section (§3.4) pre-fill should call this rather than a new endpoint.
+
+### 12.12 `GET /api/medicines?query=` (extend existing group — currently missing)
+- **Current state**: `MedicineEndpoints.cs` exposes only `POST api/medicines/create` — no search/list route exists at all.
+- **Change needed**: add `GET api/medicines?query=&page=&pageSize=` to the existing `api/medicines` group, searching by name/generic/brand, paginated (never return the full catalog — hospital networks run tens of thousands of SKUs, per §14 scalability note).
+- **Response**: `PagedResponse<PaginationData<MedicineCatalogItem>>` — `{ id, name, genericName, brandName, strength, dosageForm, isControlledSubstance, isHighAlert, isOtc, defaultInsuranceCovered }`.
+- **Frontend usage**: `PrescriptionService.searchMedicines(query)` in the drawer's debounced (250ms) drug search.
+
+### 12.13 `GET /api/medicines/{id}` (extend existing group)
+- **Purpose**: Full drug detail to auto-fill the drawer on selection (strength, form, route options, stock, insurance default) and to disambiguate a catalog vs. custom-entered medicine.
+- **Response**: `PagedResponse<MedicineDetail>` extending §12.12's shape with `routeOptions[]`, `stockStatus`, `pricePerUnit`.
+- **Frontend usage**: called from the drawer immediately after `searchMedicines` selection.
+
+### 12.14 `GET /api/doctors/{doctorId}/favorite-medications`, `POST .../favorite-medications`, `DELETE .../favorite-medications/{id}`
+- **Purpose**: CRUD for the Favorites sidebar widget, backed by the new `FavoriteMedication` entity (§12.0).
+- **Request/Response**: `POST` body `{ medicineId, defaultDose?, defaultFrequency? }`; all responses `PagedResponse<FavoriteMedication[]>` or single item.
+- **Frontend usage**: `PrescriptionService.getFavorites(doctorId)`; add/remove actions from the sidebar (not yet implemented client-side — currently read-only in the sidebar spec).
+
+### 12.15 `GET /api/prescription-templates?doctorId=`, `POST /api/prescriptions/{id}/apply-template/{templateId}`
+- **Purpose**: List a doctor's saved templates; bulk-apply one to the current draft (appends its items), backed by the new `PrescriptionTemplate`/`PrescriptionTemplateItem` entities (§12.0).
+- **Response** (list): `PagedResponse<PrescriptionTemplate[]>` — `{ id, name, itemCount }`. **Response** (apply): `PagedResponse<PrescriptionDraft>` with the template's items appended.
+- **Frontend usage**: `PrescriptionService.getTemplates(doctorId)`; sidebar template click-to-apply.
+
+### 12.16 `GET /api/prescriptions/{id}/print`
+- **Purpose**: Print-ready representation (server-rendered HTML fragment or PDF URL) for Preview/Print actions — replaces today's bespoke in-component modal + `window.print()`, ideally reusing the app's existing shared print-template infrastructure (`components/print/print-template-picker`) rather than a one-off.
+- **Response**: `PagedResponse<{ url: string } | { html: string }>`.
+- **Frontend usage**: Preview/Print buttons in `rx-action-bar`/`rx-footer`.
+
+### 12.17 `GET /api/icd10?query=`
+- **Purpose**: ICD-10 code+description autocomplete for the Diagnosis Section (currently two free-text inputs with no lookup at all).
+- **Response**: `PagedResponse<{ code: string, description: string }[]>`.
+- **Frontend usage**: `boo-select` search-mode autocomplete in `rx-diagnosis-section`.
+- **Note**: requires sourcing an ICD-10 code table (static seed data or a licensed terminology service) — flagged as a data-sourcing dependency, not just an endpoint, before implementation.
 
 ---
 

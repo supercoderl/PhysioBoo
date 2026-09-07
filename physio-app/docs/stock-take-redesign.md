@@ -251,6 +251,24 @@ New, created only because no existing component covers the need: `StockTakeHeroH
 
 ## 17. Backend API Contract (proposed — not implemented)
 
+### 17.0 Required domain model changes (prerequisite)
+
+Shared entities (`WarehouseZone`, `StockMovement`, extended `MedicineInventory`) are specified once in `docs/inventory-management-redesign.md` §19.0 — implement there, this module consumes them.
+
+**Scope decision:** `StockTakeItem` is Medicine-only for this pass — it links to `MedicineInventoryId`, not a generic polymorphic item reference. The frontend's `StockTakeCategoryType` (`Medicine | Consumable | MedicalSupply | Equipment`) is broader than the backend will support initially; `Consumable`/`MedicalSupply`/`Equipment` counting is deferred until a real catalog entity exists for those item types — building a polymorphic `ItemId`+`ItemType` reference now would be speculative against nothing to reference.
+
+New entities, none of which exist today:
+
+| Entity | Key fields | Notes |
+|---|---|---|
+| `StockTake` | `Id, HospitalId (backs the frontend's WarehouseId — one hospital = one warehouse, no dedicated Warehouse entity), DepartmentId, CreatedBy, AssignedTo (Guid?), CreatedDate, ScheduledDate, Status (new enum StockTakeStatus: Draft/Counting/PendingApproval/Approved/Rejected/Cancelled), Notes?, RejectionReason?` | `Code` is server-generated (not client-supplied), same pattern as `Prescription.PrescriptionNumber`. `ItemsCount`/`CompletedPercent`/`DifferenceValue` (frontend fields) are computed from child `StockTakeItem` rows, not stored |
+| `StockTakeItem` | `Id, StockTakeId, MedicineInventoryId, SystemQty (snapshot at count start — copy `QuantityAvailable`, don't live-reference it, so mid-count inventory changes elsewhere don't corrupt the count), ActualQty (int?), Reason (string?, one of the app's `STOCK_TAKE_REASONS` values), Notes?, IsCounted (bool)` | `Difference` (frontend field) is computed (`ActualQty - SystemQty`), not stored |
+| `StockTakeActivity` | `Id, StockTakeId, Type (new enum StockTakeActivityType: Created/Assigned/Started/ItemCounted/Completed/Approved/Rejected/Cancelled), Message, Actor (Guid), OccurredAt` | Append-only audit trail scoped to the stock-take lifecycle — separate from `StockMovement`, which tracks quantity changes, not workflow events |
+
+**Approval must reconcile inventory**: when a `StockTake` transitions to `Approved` with a non-zero variance, the handler must write `StockMovement` rows (`Type = Adjustment`) per counted item to bring `MedicineInventory.QuantityAvailable` in line with `ActualQty` — this is the actual link between Stock Take and Inventory, and neither this doc nor the Inventory doc's original API contract specified it explicitly; it's a new requirement surfaced by this domain-model pass.
+
+**Resolved:** `StockTake.HospitalId` backs the frontend's `WarehouseId` field directly (one hospital = one warehouse) — no dedicated `Warehouse` entity. The frontend's `getWarehouses()` lookup (§17.19/doc's "not implemented" list) should be implemented as a thin projection over the existing `Hospital` list, not a new entity/endpoint from scratch. If a hospital later needs multiple physical stock locations, that's a `WarehouseZone`-level concern (already modeled in the Inventory doc §19.0), not a new top-level `Warehouse` entity.
+
 All endpoints are namespaced under `/api/stock-takes` and added to `BASE_API.STOCK_TAKE` in
 `src/app/shared/api/base.ts`. None of these exist yet; the frontend service falls back to bundled
 mock data until they do (same `getOr`/`postOr` pattern as `InventoryManagementService`).

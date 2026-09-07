@@ -243,6 +243,28 @@ New, created only because no existing component covers the need:
 
 ## 19. Backend API Contract (proposed — not implemented)
 
+### 19.0 Required domain model changes (prerequisite — shared across Retail, Inventory, and Stock Take)
+
+**Current backend reality:** no `Warehouse`, `WarehouseZone`, `StockMovement`, `InventoryAlert`, `RetailCart`/`RetailTransaction`, or `StockTake` entities exist anywhere in `PhysioBoo.Domain`. `Medicine`/`MedicineInventory`/`MedicineCategory` are the only real Pharmacy entities, and `MedicineInventory`/`Medicine` are create-only (no search/get/update/delete endpoints). These changes are shared by all three Pharmacy sub-area docs (this doc, `pharmacy-retail-redesign.md`, `stock-take-redesign.md`) — implement once, all three consume it.
+
+**Extend `MedicineInventory`** (do not create a parallel `WarehouseBatch` entity — `MedicineInventory` already models batch number, expiry, quantities, storage location, min/max/reorder; extending it avoids two sources of truth for the same batch row):
+
+| New field | Type | Reason |
+|---|---|---|
+| `ReservedQuantity` | `int` | frontend's `WarehouseBatch.reservedQuantity` — nothing today distinguishes reserved-but-undispensed stock from available |
+| `WarehouseZoneId` | `Guid?` | replaces free-text `StorageLocation` as the queryable dimension the Warehouse Heat Map needs; keep `StorageLocation` as a human-readable shelf label *within* the zone, not instead of it |
+| `Status` | `BatchLifecycleStatus` (new enum: `Active, Reserved, Locked, Disposed, Expired`) | drives the Lock/Dispose/Reserve batch actions (§19.7/19.9/19.10/19.11 below) |
+| `LockReason` | `string?` | set when `Status = Locked` |
+| `DisposalReason` | `string?` | set when `Status = Disposed` |
+
+`AvailableQuantity` (frontend field) stays **computed** (`QuantityAvailable - ReservedQuantity`), not persisted — same reasoning as not persisting a redundant total.
+
+**New entity `WarehouseZone`**: `Id, HospitalId, Name, Type (new enum WarehouseZoneType: Shelf, Cabinet, Refrigerator, ControlledDrugSafe)`. `CapacityPercent`/`ActivityLevel`/`HasExpiringStock`/`IsOverstocked` (frontend fields) are all **derived at query time** from the batches assigned to the zone — not stored, to avoid drift from the underlying `MedicineInventory` rows.
+
+**New entity `StockMovement`** (append-only ledger, the load-bearing shared entity): `Id, MedicineId, MedicineInventoryId (Guid?, the batch), Type (new enum StockMovementType: Purchase, Receiving, Transfer, Dispense, RetailSale, Return, Adjustment, Disposal, Expiry), Quantity (signed int), WarehouseZoneId (Guid?), PerformedBy (Guid), OccurredAt, Reference (string?, e.g. cart id / prescription id / stock-take code), Note (string?)`. Every stock-changing action across modules — Prescriptions dispense (module 8), Retail checkout, Inventory receive/transfer/adjust/dispose, Stock Take approval — must write one `StockMovement` row. This single entity is what backs §19.16 (Movements feed), §19.19 (medicine History tab), Retail's per-medicine inventory-movement list, and Stock Take's variance trail — do not build separate movement tables per module.
+
+**New entity `InventoryAlert`** (persisted, per team decision — enables acknowledgement history, matching how `PrescriptionClinicalWarning` was modeled in module 8): `Id, Type (new enum InventoryAlertType: LowStock, OutOfStock, NearExpiry, ExpiredBatch, Overstock, Discrepancy, TemperatureExcursion, ControlledDrug), Severity (new enum InventoryAlertSeverity: Info, Warning, High, Critical), MedicineId (Guid?), Message, Recommendation (string?), AcknowledgedBy (Guid?), AcknowledgedAt (DateTime?)`. **Not user-created** — requires a background rule evaluator (a scheduled job or a post-`StockMovement`-write trigger) that checks `MedicineInventory` thresholds and inserts rows; this is a job/worker design task, not just an entity, and should be scoped as its own implementation step before the alert endpoints (§19.17/19.18) can return real data.
+
 All endpoints are namespaced under `/api/pharmacy/inventory/...` and added to `BASE_API.INVENTORY`
 in `src/app/shared/api/base.ts`. None of these exist yet; the frontend service falls back to bundled
 mock data until they do (same pattern as `RetailPosService`/`DispensingService`).

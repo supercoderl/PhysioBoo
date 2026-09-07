@@ -1,0 +1,106 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/doctors"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Doctor profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="isLoading()">
+    <div class="header-skel">
+      <ion-skeleton-text [animated]="true" style="width: 88px; height: 88px; border-radius: 50%;"></ion-skeleton-text>
+      <ion-skeleton-text [animated]="true" style="width: 50%; height: 20px;"></ion-skeleton-text>
+      <ion-skeleton-text [animated]="true" style="width: 35%;"></ion-skeleton-text>
+    </div>
+  </ng-container>
+
+  <ion-card class="state-card" *ngIf="!isLoading() && loadError">
+    <ion-card-content>
+      <ion-text color="medium"><p>Couldn't load this doctor's profile.</p></ion-text>
+      <ion-button fill="clear" (click)="load()">
+        <ion-icon slot="start" name="refresh-outline"></ion-icon>
+        Retry
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="state-card" *ngIf="!isLoading() && !loadError && notFound">
+    <ion-card-content>
+      <ion-text color="medium"><p>This doctor could not be found.</p></ion-text>
+    </ion-card-content>
+  </ion-card>
+
+  <ng-container *ngIf="!isLoading() && !loadError && doctor as doctor">
+    <div class="profile-header">
+      <ion-avatar>
+        <img [src]="doctor.avatar || 'assets/icon/favicon.png'" [alt]="doctor.fullName" />
+      </ion-avatar>
+      <h1>{{ doctor.fullName }}</h1>
+      <p class="specialty">{{ doctor.primarySpecialtyName || 'General practice' }}</p>
+      <div class="chips">
+        <ion-chip *ngIf="doctor.ratingAverage">
+          <ion-icon name="star-outline"></ion-icon>
+          <ion-label>{{ doctor.ratingAverage | number: '1.1-1' }} ({{ doctor.ratingCount || 0 }})</ion-label>
+        </ion-chip>
+        <ion-chip *ngIf="doctor.yearsOfExperience">
+          <ion-icon name="time-outline"></ion-icon>
+          <ion-label>{{ doctor.yearsOfExperience }} yrs exp.</ion-label>
+        </ion-chip>
+        <ion-chip *ngIf="doctor.hospitalName">
+          <ion-icon name="business-outline"></ion-icon>
+          <ion-label>{{ doctor.hospitalName }}</ion-label>
+        </ion-chip>
+      </div>
+    </div>
+
+    <ion-card *ngIf="doctor.about || doctor.bio">
+      <ion-card-content>
+        <h2>About</h2>
+        <p>{{ doctor.about || doctor.bio }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card *ngIf="doctor.languagesSpoken?.length">
+      <ion-card-content>
+        <h2>
+          <ion-icon name="language-outline"></ion-icon>
+          Languages
+        </h2>
+        <p>{{ doctor.languagesSpoken.join(', ') }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-content>
+        <h2>Consultation</h2>
+        <p class="row" *ngIf="doctor.consultationFeeMin">
+          <ion-icon name="cash-outline"></ion-icon>
+          <span>
+            {{ doctor.consultationFeeMin | number }}
+            <ng-container *ngIf="doctor.consultationFeeMax">– {{ doctor.consultationFeeMax | number }}</ng-container>
+            VND
+          </span>
+        </p>
+        <p class="row" *ngIf="doctor.isAvailableOnline">
+          <ion-icon name="videocam-outline"></ion-icon>
+          <span>Online consultation available</span>
+        </p>
+        <p class="row" *ngIf="doctor.isAvailableHomeVisit">
+          <ion-icon name="home-outline"></ion-icon>
+          <span>Home visit available</span>
+        </p>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+</ion-content>
+
+<ion-footer *ngIf="!isLoading() && !loadError && doctor" class="ion-no-border">
+  <ion-toolbar>
+    <ion-button expand="block" class="ion-margin-horizontal" (click)="bookAppointment()">
+      <ion-icon slot="start" name="calendar-outline"></ion-icon>
+      Book an appointment
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

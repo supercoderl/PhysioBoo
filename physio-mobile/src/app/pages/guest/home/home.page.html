@@ -1,0 +1,95 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>PhysioBoo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="hero">
+    <h1>Your health, in your hands</h1>
+    <p>Find trusted doctors, book appointments, and manage your care — all from your phone.</p>
+    <ion-button expand="block" color="light" routerLink="/doctors">
+      Find a doctor
+      <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <div class="quick-actions">
+    <ion-card button routerLink="/doctors" class="quick-actions__card">
+      <ion-card-content>
+        <ion-icon name="medical-outline"></ion-icon>
+        <span>Doctors</span>
+      </ion-card-content>
+    </ion-card>
+    <ion-card button routerLink="/hospitals" class="quick-actions__card">
+      <ion-card-content>
+        <ion-icon name="business-outline"></ion-icon>
+        <span>Hospitals</span>
+      </ion-card-content>
+    </ion-card>
+    <ion-card button routerLink="/news" class="quick-actions__card">
+      <ion-card-content>
+        <ion-icon name="newspaper-outline"></ion-icon>
+        <span>News</span>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <div class="section">
+    <div class="section__header">
+      <h2>Featured doctors</h2>
+      <a routerLink="/doctors">See all</a>
+    </div>
+
+    <ng-container *ngIf="isLoadingFeatured(); else loaded">
+      <ion-card *ngFor="let i of [1,2,3]">
+        <ion-card-content class="doctor-row">
+          <ion-skeleton-text [animated]="true" style="width: 48px; height: 48px; border-radius: 50%;"></ion-skeleton-text>
+          <div class="doctor-row__text">
+            <ion-skeleton-text [animated]="true" style="width: 60%;"></ion-skeleton-text>
+            <ion-skeleton-text [animated]="true" style="width: 40%;"></ion-skeleton-text>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </ng-container>
+
+    <ng-template #loaded>
+      <ion-card *ngIf="loadError" class="state-card">
+        <ion-card-content>
+          <ion-text color="medium">
+            <p>Couldn't load featured doctors.</p>
+          </ion-text>
+          <ion-button fill="clear" (click)="loadFeaturedDoctors()">
+            <ion-icon slot="start" name="refresh-outline"></ion-icon>
+            Retry
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card *ngIf="!loadError && featuredDoctors.length === 0" class="state-card">
+        <ion-card-content>
+          <ion-text color="medium">
+            <p>No featured doctors right now.</p>
+          </ion-text>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card *ngFor="let doctor of featuredDoctors" button (click)="goToDoctor(doctor.id)">
+        <ion-card-content class="doctor-row">
+          <ion-avatar>
+            <img [src]="doctor.avatar || 'assets/icon/favicon.png'" [alt]="doctor.fullName" />
+          </ion-avatar>
+          <div class="doctor-row__text">
+            <h3>{{ doctor.fullName }}</h3>
+            <p>{{ doctor.primarySpecialtyName || 'General practice' }}</p>
+          </div>
+          <ion-icon name="arrow-forward-outline" color="medium"></ion-icon>
+        </ion-card-content>
+      </ion-card>
+    </ng-template>
+  </div>
+</ion-content>

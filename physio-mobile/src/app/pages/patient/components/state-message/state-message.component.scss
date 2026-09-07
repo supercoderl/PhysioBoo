@@ -1,0 +1,35 @@
+.state-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  padding: 32px 20px;
+  min-height: 240px;
+
+  &__icon {
+    font-size: 48px;
+    margin-bottom: 4px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  &__message {
+    margin: 0 0 8px;
+    font-size: 14px;
+    max-width: 320px;
+  }
+
+  ion-button {
+    margin-top: 4px;
+  }
+}
+
+.state-message--empty .state-message__icon { color: var(--ion-color-medium); }
+.state-message--permission .state-message__icon { color: var(--ion-color-warning); }
+.state-message--error .state-message__icon { color: var(--ion-color-danger); }

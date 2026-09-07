@@ -1,0 +1,52 @@
+.cover {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+
+ion-card-content {
+  h2 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+
+  .excerpt {
+    margin: 0 0 8px;
+    font-size: 13px;
+    color: var(--ion-color-medium);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .meta {
+    display: flex;
+    gap: 14px;
+    font-size: 11px;
+    color: var(--ion-color-medium);
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    ion-icon {
+      font-size: 13px;
+    }
+  }
+}
+
+.state-card {
+  text-align: center;
+  margin: 24px 16px;
+
+  &__icon {
+    font-size: 40px;
+    color: var(--ion-color-medium);
+    margin-bottom: 8px;
+  }
+}

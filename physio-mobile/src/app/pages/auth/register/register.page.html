@@ -1,0 +1,103 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/auth/login"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Create account</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="intro">
+    <h1>Hello, new friend!</h1>
+    <p>Create an account to book appointments and manage your health with PhysioBoo.</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <ion-item class="field" fill="outline">
+      <ion-label position="stacked">Email</ion-label>
+      <ion-input
+        formControlName="email"
+        type="email"
+        inputmode="email"
+        autocomplete="email"
+        placeholder="Enter your email"
+        aria-label="Email"
+      ></ion-input>
+    </ion-item>
+    <ion-text color="danger" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+      <p class="error">Enter a valid email address.</p>
+    </ion-text>
+
+    <ion-item class="field" fill="outline">
+      <ion-label position="stacked">Phone number</ion-label>
+      <ion-input
+        formControlName="phone"
+        type="tel"
+        inputmode="tel"
+        autocomplete="tel"
+        placeholder="Enter your phone number"
+        aria-label="Phone number"
+      ></ion-input>
+    </ion-item>
+    <ion-text color="danger" *ngIf="form.get('phone')?.touched && form.get('phone')?.invalid">
+      <p class="error">Phone number is required.</p>
+    </ion-text>
+
+    <ion-item class="field" fill="outline">
+      <ion-label position="stacked">Password</ion-label>
+      <ion-input
+        formControlName="password"
+        [type]="passwordVisible ? 'text' : 'password'"
+        autocomplete="new-password"
+        placeholder="At least 6 characters"
+        aria-label="Password"
+      >
+        <ion-icon
+          slot="end"
+          [name]="passwordVisible ? 'eye-off-outline' : 'eye-outline'"
+          (click)="togglePassword()"
+          [attr.aria-label]="passwordVisible ? 'Hide password' : 'Show password'"
+          role="button"
+          tabindex="0"
+        ></ion-icon>
+      </ion-input>
+    </ion-item>
+    <ion-text color="danger" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+      <p class="error">Password must be at least 6 characters.</p>
+    </ion-text>
+
+    <ion-item class="field" fill="outline">
+      <ion-label position="stacked">Confirm password</ion-label>
+      <ion-input
+        formControlName="confirmPassword"
+        [type]="confirmPasswordVisible ? 'text' : 'password'"
+        autocomplete="new-password"
+        placeholder="Re-enter your password"
+        aria-label="Confirm password"
+      >
+        <ion-icon
+          slot="end"
+          [name]="confirmPasswordVisible ? 'eye-off-outline' : 'eye-outline'"
+          (click)="toggleConfirmPassword()"
+          [attr.aria-label]="confirmPasswordVisible ? 'Hide password' : 'Show password'"
+          role="button"
+          tabindex="0"
+        ></ion-icon>
+      </ion-input>
+    </ion-item>
+    <ion-text color="danger" *ngIf="form.get('confirmPassword')?.touched && form.errors?.['passwordsMismatch']">
+      <p class="error">Passwords do not match.</p>
+    </ion-text>
+
+    <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="isLoading()">
+      <ion-icon slot="start" name="person-add-outline"></ion-icon>
+      {{ isLoading() ? 'Creating account...' : 'Register' }}
+    </ion-button>
+  </form>
+
+  <div class="footer-link">
+    <span>Already have an account?</span>
+    <a routerLink="/auth/login">Log in</a>
+  </div>
+</ion-content>

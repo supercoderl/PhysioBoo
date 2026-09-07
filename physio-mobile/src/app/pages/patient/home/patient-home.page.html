@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Home</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="userInfo$ | async as user">
+    <h1 class="greeting">Hi, {{ user.fullName || user.firstName }}</h1>
+  </ng-container>
+
+  <ion-card class="next-appt-card">
+    <ion-card-content>
+      <div class="next-appt-card__header">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>Next appointment</span>
+      </div>
+
+      <ng-container *ngIf="loading()">
+        <ion-skeleton-text animated style="width: 70%; height: 20px; margin-top: 8px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 50%; height: 16px;"></ion-skeleton-text>
+      </ng-container>
+
+      <ng-container *ngIf="!loading()">
+        <app-state-message
+          *ngIf="loadFailed()"
+          variant="permission"
+          title="Not available yet"
+          message="We can't load your upcoming appointment right now. Please contact reception for your schedule."
+        ></app-state-message>
+
+        <app-state-message
+          *ngIf="!loadFailed() && !nextAppointment()"
+          variant="empty"
+          icon="time-outline"
+          title="No upcoming appointment"
+          message="You don't have any upcoming appointment scheduled. Book one whenever you're ready."
+          actionLabel="Book appointment"
+          (action)="goBook()"
+        ></app-state-message>
+
+        <button
+          *ngIf="!loadFailed() && nextAppointment() as appt"
+          class="next-appt-card__details"
+          (click)="goAppointmentDetail()"
+        >
+          <div class="next-appt-card__row">
+            <strong>{{ appt.scheduledDate | date: 'EEE, MMM d' }} · {{ appt.scheduledTime }}</strong>
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </div>
+          <div class="next-appt-card__row next-appt-card__meta">
+            <span>Dr. {{ appt.doctorName }}</span>
+            <span class="status-badge" [class]="'status-badge--' + appt.status.toLowerCase()">{{ appt.status }}</span>
+          </div>
+        </button>
+      </ng-container>
+    </ion-card-content>
+  </ion-card>
+
+  <div class="quick-actions">
+    <button class="quick-actions__item" (click)="goBook()">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <span>Book appointment</span>
+    </button>
+    <button class="quick-actions__item" (click)="goRecords()">
+      <ion-icon name="document-text-outline"></ion-icon>
+      <span>View records</span>
+    </button>
+  </div>
+</ion-content>

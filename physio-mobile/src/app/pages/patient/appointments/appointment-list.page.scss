@@ -1,0 +1,15 @@
+.status-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--ion-color-light);
+  color: var(--ion-color-medium-shade);
+  margin-top: 4px;
+
+  &--scheduled, &--confirmed { background: rgba(56, 128, 255, 0.12); color: #3880ff; }
+  &--checkedin, &--inprogress { background: rgba(255, 196, 9, 0.15); color: #b58500; }
+  &--completed { background: rgba(45, 211, 111, 0.15); color: #2dd36f; }
+  &--cancelled, &--noshow, &--rescheduled { background: rgba(235, 68, 90, 0.12); color: #eb445a; }
+}

@@ -1,0 +1,47 @@
+<ion-list *ngIf="loading()">
+  <ion-item *ngFor="let i of [1,2,3]">
+    <ion-label>
+      <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 50%;"></ion-skeleton-text>
+    </ion-label>
+  </ion-item>
+</ion-list>
+
+<app-state-message
+  *ngIf="!loading() && loadFailed()"
+  variant="permission"
+  title="Not available yet"
+  message="We can't load your prescriptions right now. Please contact reception for your prescription history."
+></app-state-message>
+
+<app-state-message
+  *ngIf="!loading() && !loadFailed() && prescriptions().length === 0"
+  variant="empty"
+  title="No prescriptions"
+  message="You have no prescriptions on file yet."
+></app-state-message>
+
+<ion-card *ngFor="let rx of prescriptions()">
+  <ion-card-content>
+    <div class="rx-header">
+      <h3>{{ rx.prescriptionNumber }}</h3>
+      <ion-badge color="medium">{{ rx.status }}</ion-badge>
+    </div>
+    <p class="rx-meta">{{ rx.prescriptionDate | date: 'MMM d, y' }} &middot; Dr. {{ rx.doctorName }}</p>
+    <p *ngIf="rx.diagnosis" class="rx-diagnosis">Diagnosis: {{ rx.diagnosis }}</p>
+
+    <ion-list lines="none" class="rx-items">
+      <ion-item *ngFor="let item of rx.items">
+        <ion-label>
+          <h4>{{ item.medicineName }}</h4>
+          <p>
+            <ng-container *ngIf="item.dosage">{{ item.dosage }}</ng-container>
+            <ng-container *ngIf="item.frequency"> &middot; {{ item.frequency }}</ng-container>
+            <ng-container *ngIf="item.duration"> &middot; {{ item.duration }}</ng-container>
+          </p>
+          <p *ngIf="item.instructions" class="rx-instructions">{{ item.instructions }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-card-content>
+</ion-card>

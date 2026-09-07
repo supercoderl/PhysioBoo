@@ -1,0 +1,58 @@
+/* Shared styles for the Records segment tab components (history/prescriptions/labs/billing). */
+.rx-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  h3, h4 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+  }
+}
+
+.rx-meta {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin: 4px 0;
+}
+
+.rx-diagnosis {
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+.rx-items {
+  margin-top: 8px;
+
+  ion-item {
+    --padding-start: 0;
+  }
+}
+
+.rx-instructions {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 16px 0 8px;
+  color: var(--ion-color-medium-shade);
+}
+
+.summary-card .summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 14px;
+
+  &--outstanding {
+    border-top: 1px solid var(--ion-color-light-shade);
+    margin-top: 4px;
+    padding-top: 10px;
+    font-weight: 700;
+  }
+}

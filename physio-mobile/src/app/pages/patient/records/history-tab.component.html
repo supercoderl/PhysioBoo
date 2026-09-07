@@ -1,0 +1,49 @@
+<ion-list *ngIf="loading()">
+  <ion-item *ngFor="let i of [1,2,3]">
+    <ion-label>
+      <ion-skeleton-text animated style="width: 90%;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
+    </ion-label>
+  </ion-item>
+</ion-list>
+
+<app-state-message
+  *ngIf="!loading() && loadFailed()"
+  variant="permission"
+  title="Not available yet"
+  message="We can't load your medical history right now. Please contact reception for your records."
+></app-state-message>
+
+<app-state-message
+  *ngIf="!loading() && !loadFailed() && !hasAnyField"
+  variant="empty"
+  title="No history on file"
+  message="There is no medical history recorded for you yet."
+></app-state-message>
+
+<div *ngIf="!loading() && !loadFailed() && hasAnyField">
+  <ion-card *ngIf="history()?.pastMedicalHistory">
+    <ion-card-content>
+      <h3>Past medical history</h3>
+      <p>{{ history()?.pastMedicalHistory }}</p>
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngIf="history()?.familyHistory">
+    <ion-card-content>
+      <h3>Family history</h3>
+      <p>{{ history()?.familyHistory }}</p>
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngIf="history()?.socialHistory">
+    <ion-card-content>
+      <h3>Social history</h3>
+      <p>{{ history()?.socialHistory }}</p>
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngIf="history()?.reviewOfSystems">
+    <ion-card-content>
+      <h3>Review of systems</h3>
+      <p>{{ history()?.reviewOfSystems }}</p>
+    </ion-card-content>
+  </ion-card>
+</div>

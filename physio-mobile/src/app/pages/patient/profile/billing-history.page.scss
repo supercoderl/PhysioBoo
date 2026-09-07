@@ -1,0 +1,24 @@
+.summary-card {
+  margin-bottom: 16px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 14px;
+
+  &--outstanding {
+    border-top: 1px solid var(--ion-color-light-shade);
+    margin-top: 4px;
+    padding-top: 10px;
+    font-weight: 700;
+  }
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 16px 0 8px;
+  color: var(--ion-color-medium-shade);
+}

@@ -1,0 +1,87 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/patient/appointments"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Book appointment</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <app-state-message
+    *ngIf="!patientId"
+    variant="empty"
+    title="No patient record linked"
+    message="Your account isn't linked to a patient record yet — please visit reception to complete your registration before booking online."
+  ></app-state-message>
+
+  <form *ngIf="patientId" [formGroup]="form" (ngSubmit)="submit()">
+    <ion-list *ngIf="doctorsLoading()">
+      <ion-item>
+        <ion-skeleton-text animated style="width: 100%; height: 24px;"></ion-skeleton-text>
+      </ion-item>
+    </ion-list>
+
+    <app-state-message
+      *ngIf="!doctorsLoading() && doctorsLoadFailed()"
+      variant="error"
+      title="Couldn't load doctors"
+      message="We couldn't load the list of doctors. Check your connection and try again."
+      actionLabel="Retry"
+      (action)="loadDoctors()"
+    ></app-state-message>
+
+    <ion-list *ngIf="!doctorsLoading() && !doctorsLoadFailed()" lines="full" class="form-list">
+      <ion-item>
+        <ion-select
+          label="Doctor"
+          labelPlacement="stacked"
+          placeholder="Select a doctor"
+          formControlName="doctorId"
+          interface="action-sheet"
+        >
+          <ion-select-option *ngFor="let doc of doctors()" [value]="doc.id">
+            Dr. {{ doc.fullName }}<ng-container *ngIf="doc.primarySpecialtyName"> · {{ doc.primarySpecialtyName }}</ng-container>
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Date &amp; time</ion-label>
+        <ion-datetime-button datetime="apptDatetime" slot="end"></ion-datetime-button>
+      </ion-item>
+
+      <ion-modal [keepContentsMounted]="true">
+        <ng-template>
+          <ion-datetime
+            id="apptDatetime"
+            formControlName="scheduledDateTime"
+            presentation="date-time"
+            [showDefaultButtons]="true"
+            [min]="minDate"
+          ></ion-datetime>
+        </ng-template>
+      </ion-modal>
+
+      <ion-item lines="none">
+        <ion-textarea
+          label="Chief complaint (optional)"
+          labelPlacement="stacked"
+          placeholder="Briefly describe the reason for your visit"
+          formControlName="chiefComplaint"
+          autoGrow="true"
+          rows="3"
+        ></ion-textarea>
+      </ion-item>
+    </ion-list>
+
+    <ion-button
+      expand="block"
+      type="submit"
+      class="submit-btn"
+      [disabled]="form.invalid || submitting()"
+    >
+      {{ submitting() ? 'Booking...' : 'Book appointment' }}
+    </ion-button>
+  </form>
+</ion-content>

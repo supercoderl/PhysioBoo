@@ -1,0 +1,76 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Hospitals</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Search hospitals by name or city"
+      [debounce]="0"
+      (ionInput)="onSearchChange($event)"
+      aria-label="Search hospitals"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ng-container *ngIf="isFirstLoading(); else content">
+    <ion-list>
+      <ion-item *ngFor="let i of [1,2,3,4,5]">
+        <ion-thumbnail slot="start">
+          <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+        </ion-thumbnail>
+        <ion-label>
+          <ion-skeleton-text [animated]="true" style="width: 60%;"></ion-skeleton-text>
+          <ion-skeleton-text [animated]="true" style="width: 40%;"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <ng-template #content>
+    <ion-card class="state-card" *ngIf="loadError">
+      <ion-card-content>
+        <ion-text color="medium"><p>Couldn't load hospitals. Check your connection and try again.</p></ion-text>
+        <ion-button fill="clear" (click)="resetAndLoad()">
+          <ion-icon slot="start" name="refresh-outline"></ion-icon>
+          Retry
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="state-card" *ngIf="!loadError && hospitals.length === 0">
+      <ion-card-content>
+        <ion-icon name="business-outline" class="state-card__icon"></ion-icon>
+        <ion-text color="medium"><p>No hospitals found{{ searchTerm ? ' for "' + searchTerm + '"' : '' }}.</p></ion-text>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-list *ngIf="!loadError && hospitals.length > 0">
+      <ion-item button *ngFor="let hospital of hospitals" (click)="goToDetail(hospital.id)" detail="false">
+        <ion-thumbnail slot="start">
+          <img [src]="hospital.logoUrl || 'assets/icon/favicon.png'" [alt]="hospital.name" />
+        </ion-thumbnail>
+        <ion-label>
+          <h2>{{ hospital.name }}</h2>
+          <p *ngIf="hospital.city || hospital.address">
+            <ion-icon name="location-outline"></ion-icon>
+            {{ hospital.address || hospital.city }}
+          </p>
+          <ion-badge color="danger" *ngIf="hospital.hasEmergencyServices">
+            <ion-icon name="medkit-outline"></ion-icon>
+            Emergency
+          </ion-badge>
+        </ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
+      </ion-item>
+    </ion-list>
+
+    <ion-infinite-scroll (ionInfinite)="loadMore($event)" [disabled]="!page.hasNext">
+      <ion-infinite-scroll-content loadingSpinner="crescent" loadingText="Loading more hospitals..."></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ng-template>
+</ion-content>

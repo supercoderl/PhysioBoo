@@ -1,0 +1,100 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="userInfo$ | async as user">
+    <div class="profile-header">
+      <ion-avatar>
+        <img *ngIf="user.avatarUrl; else initialsAvatar" [src]="user.avatarUrl" alt="" />
+        <ng-template #initialsAvatar>
+          <div class="initials-avatar">{{ initials(user.fullName) }}</div>
+        </ng-template>
+      </ion-avatar>
+      <div>
+        <h2>{{ user.fullName }}</h2>
+        <p class="ion-text-muted">{{ user.isVerified ? 'Verified account' : 'Unverified account' }}</p>
+      </div>
+    </div>
+
+    <ion-list lines="full" class="info-list">
+      <ion-item>
+        <ion-icon name="mail-outline" slot="start"></ion-icon>
+        <ion-label>
+          <p>Email</p>
+          <h3>{{ user.email }}</h3>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-icon name="call-outline" slot="start"></ion-icon>
+        <ion-label>
+          <p>Phone</p>
+          <h3>{{ user.phone || '—' }}</h3>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <app-state-message
+    *ngIf="!patientId"
+    variant="empty"
+    title="No patient record linked"
+    message="Your account isn't linked to a patient record yet. Please visit reception to complete your registration."
+  ></app-state-message>
+
+  <ng-container *ngIf="patientId">
+    <ion-list *ngIf="loading()" lines="full">
+      <ion-item>
+        <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
+      </ion-item>
+    </ion-list>
+
+    <app-state-message
+      *ngIf="!loading() && loadFailed()"
+      variant="permission"
+      title="Not available yet"
+      message="We can't load your patient record details right now. Please contact reception for insurance and medical details."
+    ></app-state-message>
+
+    <ion-list *ngIf="!loading() && !loadFailed() && patient() as p" lines="full" class="info-list">
+      <ion-item>
+        <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+        <ion-label>
+          <p>Insurance</p>
+          <h3>{{ p.inssuranceProvider || 'Not on file' }}</h3>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-icon name="medical-outline" slot="start"></ion-icon>
+        <ion-label>
+          <p>Allergies</p>
+          <h3>{{ p.allergyInformation || 'None recorded' }}</h3>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-icon name="medical-outline" slot="start"></ion-icon>
+        <ion-label>
+          <p>Current medications</p>
+          <h3>{{ p.currentMedications || 'None recorded' }}</h3>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <div class="profile-actions">
+    <ion-button expand="block" fill="outline" [disabled]="!patientId" (click)="goEdit()">
+      <ion-icon name="create-outline" slot="start"></ion-icon>
+      Edit profile
+    </ion-button>
+    <ion-button expand="block" fill="outline" (click)="goBilling()">
+      <ion-icon name="card-outline" slot="start"></ion-icon>
+      Billing history
+    </ion-button>
+    <ion-button expand="block" color="danger" fill="clear" (click)="logout()">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      Log out
+    </ion-button>
+  </div>
+</ion-content>

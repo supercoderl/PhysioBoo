@@ -1,0 +1,75 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Appointments</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="segment()" (ionChange)="onSegmentChange($any($event.detail.value))">
+      <ion-segment-button value="upcoming">
+        <ion-label>Upcoming</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="past">
+        <ion-label>Past</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="ion-padding" *ngIf="notLinked()">
+    <app-state-message
+      variant="empty"
+      title="No patient record linked"
+      message="Your account isn't linked to a patient record yet. Please visit reception to complete your registration."
+    ></app-state-message>
+  </div>
+
+  <ng-container *ngIf="!notLinked()">
+    <ion-list *ngIf="loading()">
+      <ion-item *ngFor="let i of [1,2,3]">
+        <ion-label>
+          <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <div class="ion-padding" *ngIf="!loading() && loadFailed()">
+      <app-state-message
+        variant="permission"
+        title="Not available yet"
+        message="We can't load your appointments right now. Please contact reception for your appointment schedule."
+      ></app-state-message>
+    </div>
+
+    <div class="ion-padding" *ngIf="!loading() && !loadFailed() && appointments().length === 0">
+      <app-state-message
+        variant="empty"
+        [title]="segment() === 'upcoming' ? 'No upcoming appointments' : 'No past appointments'"
+        [message]="segment() === 'upcoming' ? 'You have no upcoming appointments scheduled.' : 'You have no past appointment history yet.'"
+        [actionLabel]="segment() === 'upcoming' ? 'Book appointment' : undefined"
+        (action)="goBook()"
+      ></app-state-message>
+    </div>
+
+    <ion-list *ngIf="!loading() && !loadFailed() && appointments().length > 0">
+      <ion-item button *ngFor="let appt of appointments()" (click)="openDetail(appt)">
+        <ion-label>
+          <h2>{{ appt.scheduledDate | date: 'EEE, MMM d, y' }} · {{ appt.scheduledTime }}</h2>
+          <p>Dr. {{ appt.doctorName }} &middot; {{ appt.appointmentTypeName || 'General' }}</p>
+          <p class="status-badge" [class]="'status-badge--' + appt.status.toLowerCase()">{{ appt.status }}</p>
+        </ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="goBook()" aria-label="Book appointment">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

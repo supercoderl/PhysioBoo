@@ -1,0 +1,10 @@
+<div class="state-message" [class]="'state-message--' + variant">
+  <ion-icon [name]="resolvedIcon" class="state-message__icon"></ion-icon>
+  <h3 class="state-message__title">{{ title }}</h3>
+  <ion-text color="medium">
+    <p class="state-message__message">{{ message }}</p>
+  </ion-text>
+  <ion-button *ngIf="actionLabel" fill="outline" size="default" (click)="action.emit()">
+    {{ actionLabel }}
+  </ion-button>
+</div>

@@ -1,0 +1,56 @@
+<ion-list *ngIf="loading()">
+  <ion-item *ngFor="let i of [1,2,3]">
+    <ion-label>
+      <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 50%;"></ion-skeleton-text>
+    </ion-label>
+  </ion-item>
+</ion-list>
+
+<app-state-message
+  *ngIf="!loading() && loadFailed()"
+  variant="permission"
+  title="Not available yet"
+  message="We can't load your lab or imaging results right now. Please contact reception for your results."
+></app-state-message>
+
+<app-state-message
+  *ngIf="!loading() && !loadFailed() && !hasAny"
+  variant="empty"
+  title="No results yet"
+  message="You have no lab or imaging results on file yet."
+></app-state-message>
+
+<ng-container *ngIf="!loading() && !loadFailed() && hasAny">
+  <h3 class="section-title" *ngIf="labResults().length > 0">Lab results</h3>
+  <ion-card *ngFor="let r of labResults()">
+    <ion-card-content>
+      <div class="rx-header">
+        <h4>{{ r.testName }}</h4>
+        <ion-badge [color]="r.isCritical ? 'danger' : (r.abnormalFlag ? 'warning' : 'medium')">
+          {{ r.abnormalFlag || r.status }}
+        </ion-badge>
+      </div>
+      <p class="rx-meta" *ngIf="r.panelName">{{ r.panelName }}</p>
+      <p>
+        <span *ngIf="r.resultValue">{{ r.resultValue }} {{ r.resultUnit }}</span>
+        <span *ngIf="r.referenceRange"> (ref: {{ r.referenceRange }})</span>
+      </p>
+      <p class="rx-meta">Ordered by Dr. {{ r.orderingDoctorName }}<ng-container *ngIf="r.resultedAt"> &middot; {{ r.resultedAt | date: 'MMM d, y' }}</ng-container></p>
+    </ion-card-content>
+  </ion-card>
+
+  <h3 class="section-title" *ngIf="imagingStudies().length > 0">Imaging</h3>
+  <ion-card *ngFor="let s of imagingStudies()">
+    <ion-card-content>
+      <div class="rx-header">
+        <h4>{{ s.modalityName }}<ng-container *ngIf="s.bodyPart"> · {{ s.bodyPart }}</ng-container></h4>
+        <ion-badge [color]="s.isCritical ? 'danger' : (s.isNormal ? 'success' : 'medium')">
+          {{ s.reportStatus || s.orderStatus }}
+        </ion-badge>
+      </div>
+      <p class="rx-meta" *ngIf="s.studyDate">{{ s.studyDate | date: 'MMM d, y' }}</p>
+      <p *ngIf="s.impression">{{ s.impression }}</p>
+    </ion-card-content>
+  </ion-card>
+</ng-container>

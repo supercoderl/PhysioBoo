@@ -1,0 +1,77 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Log in</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="intro">
+    <h1>Welcome back</h1>
+    <p>Log in to book appointments and manage your care.</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <ion-item class="field" fill="outline">
+      <ion-label position="stacked">Email or phone</ion-label>
+      <ion-input
+        formControlName="identifier"
+        type="text"
+        inputmode="email"
+        autocomplete="username"
+        placeholder="Enter your email or phone"
+        aria-label="Email or phone"
+      ></ion-input>
+    </ion-item>
+    <ion-text color="danger" *ngIf="form.get('identifier')?.touched && form.get('identifier')?.invalid">
+      <p class="error">Email or phone is required.</p>
+    </ion-text>
+
+    <ion-item class="field" fill="outline">
+      <ion-label position="stacked">Password</ion-label>
+      <ion-input
+        formControlName="password"
+        [type]="passwordVisible ? 'text' : 'password'"
+        autocomplete="current-password"
+        placeholder="Enter your password"
+        aria-label="Password"
+      >
+        <ion-icon
+          slot="end"
+          [name]="passwordVisible ? 'eye-off-outline' : 'eye-outline'"
+          (click)="togglePassword()"
+          [attr.aria-label]="passwordVisible ? 'Hide password' : 'Show password'"
+          role="button"
+          tabindex="0"
+        ></ion-icon>
+      </ion-input>
+    </ion-item>
+    <ion-text color="danger" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+      <p class="error">Password is required.</p>
+    </ion-text>
+
+    <ion-item class="field" fill="outline">
+      <ion-label position="stacked">OTP (if enabled)</ion-label>
+      <ion-input
+        formControlName="otp"
+        type="text"
+        inputmode="numeric"
+        placeholder="Optional 6-digit code"
+        aria-label="One-time passcode"
+      ></ion-input>
+    </ion-item>
+
+    <div class="forgot">
+      <a routerLink="/auth/forgot-password">Forgot password?</a>
+    </div>
+
+    <ion-button expand="block" type="submit" [disabled]="isLoading()">
+      <ion-icon slot="start" name="log-in-outline"></ion-icon>
+      {{ isLoading() ? 'Logging in...' : 'Log in' }}
+    </ion-button>
+  </form>
+
+  <div class="footer-link">
+    <span>Don't have an account?</span>
+    <a routerLink="/auth/register">Register</a>
+  </div>
+</ion-content>

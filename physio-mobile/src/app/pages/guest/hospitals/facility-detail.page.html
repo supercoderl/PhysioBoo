@@ -1,0 +1,91 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/hospitals"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Hospital</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="isLoading()">
+    <div class="header-skel">
+      <ion-skeleton-text [animated]="true" style="width: 70%; height: 22px;"></ion-skeleton-text>
+      <ion-skeleton-text [animated]="true" style="width: 45%;"></ion-skeleton-text>
+    </div>
+  </ng-container>
+
+  <ion-card class="state-card" *ngIf="!isLoading() && loadError">
+    <ion-card-content>
+      <ion-text color="medium"><p>Couldn't load this hospital's details.</p></ion-text>
+      <ion-button fill="clear" (click)="load()">
+        <ion-icon slot="start" name="refresh-outline"></ion-icon>
+        Retry
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="state-card" *ngIf="!isLoading() && !loadError && notFound">
+    <ion-card-content>
+      <ion-text color="medium"><p>This hospital could not be found.</p></ion-text>
+    </ion-card-content>
+  </ion-card>
+
+  <ng-container *ngIf="!isLoading() && !loadError && hospital as hospital">
+    <div class="profile-header">
+      <ion-icon name="business-outline" class="profile-header__icon"></ion-icon>
+      <h1>{{ hospital.name }}</h1>
+      <p class="group" *ngIf="hospital.hospitalGroupName">{{ hospital.hospitalGroupName }}</p>
+      <div class="chips">
+        <ion-badge color="danger" *ngIf="hospital.hasEmergencyServices">
+          <ion-icon name="medkit-outline"></ion-icon>
+          Emergency
+        </ion-badge>
+        <ion-badge color="tertiary" *ngIf="hospital.hasIcu">
+          <ion-icon name="pulse-outline"></ion-icon>
+          ICU
+        </ion-badge>
+      </div>
+    </div>
+
+    <ion-card>
+      <ion-card-content>
+        <h2>Contact</h2>
+        <p class="row" *ngIf="hospital.address || hospital.city || hospital.country">
+          <ion-icon name="location-outline"></ion-icon>
+          <span>{{ formattedAddress(hospital) }}</span>
+        </p>
+        <p class="row" *ngIf="hospital.phone">
+          <ion-icon name="call-outline"></ion-icon>
+          <span>{{ hospital.phone }}</span>
+        </p>
+        <p class="row" *ngIf="hospital.email">
+          <ion-icon name="mail-outline"></ion-icon>
+          <span>{{ hospital.email }}</span>
+        </p>
+        <p class="row" *ngIf="hospital.website">
+          <ion-icon name="globe-outline"></ion-icon>
+          <span>{{ hospital.website }}</span>
+        </p>
+        <ion-text color="medium" *ngIf="!hospital.address && !hospital.city && !hospital.phone && !hospital.email && !hospital.website">
+          <p>No contact information available.</p>
+        </ion-text>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card *ngIf="departmentsLoaded && departments.length > 0">
+      <ion-card-content>
+        <h2>Departments</h2>
+      </ion-card-content>
+      <ion-list>
+        <ion-item lines="full" *ngFor="let dept of departments">
+          <ion-label>
+            <h3>{{ dept.name }}</h3>
+            <p *ngIf="dept.description">{{ dept.description }}</p>
+          </ion-label>
+          <ion-badge slot="end" color="danger" *ngIf="dept.isEmergency">Emergency</ion-badge>
+        </ion-item>
+      </ion-list>
+    </ion-card>
+  </ng-container>
+</ion-content>

@@ -1,0 +1,70 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>News</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Search articles"
+      [debounce]="0"
+      (ionInput)="onSearchChange($event)"
+      aria-label="Search articles"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ng-container *ngIf="isFirstLoading(); else content">
+    <ion-card *ngFor="let i of [1,2,3]">
+      <ion-skeleton-text [animated]="true" style="width: 100%; height: 140px; margin: 0;"></ion-skeleton-text>
+      <ion-card-content>
+        <ion-skeleton-text [animated]="true" style="width: 80%;"></ion-skeleton-text>
+        <ion-skeleton-text [animated]="true" style="width: 50%;"></ion-skeleton-text>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+
+  <ng-template #content>
+    <ion-card class="state-card" *ngIf="loadError">
+      <ion-card-content>
+        <ion-text color="medium"><p>Couldn't load news. Check your connection and try again.</p></ion-text>
+        <ion-button fill="clear" (click)="resetAndLoad()">
+          <ion-icon slot="start" name="refresh-outline"></ion-icon>
+          Retry
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="state-card" *ngIf="!loadError && articles.length === 0">
+      <ion-card-content>
+        <ion-icon name="newspaper-outline" class="state-card__icon"></ion-icon>
+        <ion-text color="medium"><p>No articles found{{ searchTerm ? ' for "' + searchTerm + '"' : '' }}.</p></ion-text>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card *ngFor="let article of articles" button (click)="goToDetail(article.id)">
+      <img *ngIf="article.coverImageUrl" [src]="article.coverImageUrl" [alt]="article.title" class="cover" />
+      <ion-card-content>
+        <h2>{{ article.title }}</h2>
+        <p class="excerpt">{{ article.excerpt }}</p>
+        <div class="meta">
+          <span *ngIf="article.author">
+            <ion-icon name="person-outline"></ion-icon>
+            {{ article.author }}
+          </span>
+          <span *ngIf="article.publishDate">
+            <ion-icon name="calendar-outline"></ion-icon>
+            {{ article.publishDate | date: 'mediumDate' }}
+          </span>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-infinite-scroll (ionInfinite)="loadMore($event)" [disabled]="!page.hasNext">
+      <ion-infinite-scroll-content loadingSpinner="crescent" loadingText="Loading more articles..."></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ng-template>
+</ion-content>

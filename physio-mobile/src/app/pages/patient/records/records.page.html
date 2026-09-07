@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Records</ion-title>
+  </ion-toolbar>
+  <ion-toolbar *ngIf="patientId">
+    <ion-segment [value]="segment()" (ionChange)="onSegmentChange($any($event.detail.value))" scrollable="true">
+      <ion-segment-button value="history">
+        <ion-label>History</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="prescriptions">
+        <ion-label>Prescriptions</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="labs">
+        <ion-label>Labs &amp; Imaging</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="billing">
+        <ion-label>Billing</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <app-state-message
+    *ngIf="!patientId"
+    variant="empty"
+    title="No patient record linked"
+    message="Your account isn't linked to a patient record yet. Please visit reception to complete your registration."
+  ></app-state-message>
+
+  <ng-container *ngIf="patientId">
+    <app-history-tab *ngIf="segment() === 'history'" [patientId]="patientId"></app-history-tab>
+    <app-prescriptions-tab *ngIf="segment() === 'prescriptions'" [patientId]="patientId"></app-prescriptions-tab>
+    <app-labs-tab *ngIf="segment() === 'labs'" [patientId]="patientId"></app-labs-tab>
+    <app-billing-tab *ngIf="segment() === 'billing'" [patientId]="patientId"></app-billing-tab>
+  </ng-container>
+</ion-content>

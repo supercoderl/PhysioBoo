@@ -1,0 +1,73 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/patient/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Billing history</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <app-state-message
+    *ngIf="!patientId"
+    variant="empty"
+    title="No patient record linked"
+    message="Your account isn't linked to a patient record yet. Please visit reception to complete your registration."
+  ></app-state-message>
+
+  <ng-container *ngIf="patientId">
+    <ion-list *ngIf="loading()">
+      <ion-item *ngFor="let i of [1,2,3]">
+        <ion-label>
+          <ion-skeleton-text animated style="width: 70%;"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <app-state-message
+      *ngIf="!loading() && loadFailed()"
+      variant="permission"
+      title="Not available yet"
+      message="We can't load your billing history right now. Please contact reception for your billing statement."
+    ></app-state-message>
+
+    <ng-container *ngIf="!loading() && !loadFailed() && summary() as s">
+      <ion-card class="summary-card">
+        <ion-card-content>
+          <div class="summary-row"><span>Total charges</span><strong>{{ s.totalCharges | number: '1.0-2' }} {{ s.currency }}</strong></div>
+          <div class="summary-row"><span>Total payments</span><strong>{{ s.totalPayments | number: '1.0-2' }} {{ s.currency }}</strong></div>
+          <div class="summary-row"><span>Insurance paid</span><strong>{{ s.insurancePaid | number: '1.0-2' }} {{ s.currency }}</strong></div>
+          <div class="summary-row summary-row--outstanding"><span>Outstanding balance</span><strong>{{ s.outstandingBalance | number: '1.0-2' }} {{ s.currency }}</strong></div>
+        </ion-card-content>
+      </ion-card>
+
+      <app-state-message
+        *ngIf="s.bills.length === 0"
+        variant="empty"
+        title="No bills yet"
+        message="You have no bills on file yet."
+      ></app-state-message>
+
+      <h3 class="section-title" *ngIf="s.bills.length > 0">Bills</h3>
+      <ion-list *ngIf="s.bills.length > 0" lines="full">
+        <ion-item *ngFor="let bill of s.bills">
+          <ion-label>
+            <h3>{{ bill.billNumber }}</h3>
+            <p>{{ bill.billDate | date: 'MMM d, y' }} &middot; Paid {{ bill.paidAmount | number: '1.0-2' }} / {{ bill.totalAmount | number: '1.0-2' }}</p>
+          </ion-label>
+          <ion-badge slot="end" color="medium">{{ bill.status }}</ion-badge>
+        </ion-item>
+      </ion-list>
+
+      <h3 class="section-title" *ngIf="s.recentPayments.length > 0">Recent payments</h3>
+      <ion-list *ngIf="s.recentPayments.length > 0" lines="full">
+        <ion-item *ngFor="let payment of s.recentPayments">
+          <ion-label>
+            <h3>{{ payment.amount | number: '1.0-2' }} {{ s.currency }}</h3>
+            <p>{{ payment.paidAt | date: 'MMM d, y, h:mm a' }} &middot; {{ payment.method }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-container>
+  </ng-container>
+</ion-content>

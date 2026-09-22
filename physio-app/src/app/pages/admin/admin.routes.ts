@@ -339,22 +339,6 @@ export const routes: Routes = [
                 ]
             },
             {
-                path: 'academy',
-                data: { breadcrumb: ['academy'] },
-                children: [
-                    {
-                        path: '',
-                        redirectTo: 'list',
-                        pathMatch: 'full'
-                    },
-                    {
-                        path: 'list',
-                        loadComponent: () => import('./academy/list/academy-list.component').then(m => m.AcademyListComponent),
-                        data: { breadcrumb: ['list'] },
-                    }
-                ]
-            },
-            {
                 path: 'system',
                 data: { breadcrumb: ['system'] },
                 children: [

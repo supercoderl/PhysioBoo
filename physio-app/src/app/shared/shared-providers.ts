@@ -74,8 +74,7 @@ import { NzTreeViewModule } from 'ng-zorro-antd/tree-view';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { NzWaterMarkModule } from 'ng-zorro-antd/water-mark';
-import { ColorByFileTypePipe, ColorByTypePipe } from './pipes/color.pipe';
-import { CompletionTextPipe } from './pipes/completion.pipe';
+import { ColorByFileTypePipe } from './pipes/color.pipe';
 import { DefaultUserPipe } from './pipes/default-user.pipe';
 import { EnumKeysPipe } from './pipes/enum.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
@@ -390,10 +389,8 @@ export const SHARED_LUCIDE_ICONS: Record<string, LucideIconData> = {
 }
 
 export const SHARED_PIPES = [
-    ColorByTypePipe,
     ColorByFileTypePipe,
     FilterPipe,
-    CompletionTextPipe,
     DefaultUserPipe,
     SafeHtmlPipe,
     EnumKeysPipe

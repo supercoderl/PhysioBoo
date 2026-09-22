@@ -1,6 +1,6 @@
 export interface HomeSettings {
   hospitalName: string;
-  tagline: string;
+  tagLine: string;
   welcomeMessage: string;
   contactPhone: string;
   contactEmail: string;

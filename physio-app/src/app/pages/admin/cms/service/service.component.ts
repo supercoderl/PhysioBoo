@@ -5,6 +5,8 @@ import { CmsServiceDrawerComponent } from "../../../../components/layout/admin/c
 import { CmsServiceTableCardComponent } from "../../../../components/layout/admin/cms/service/service-table-card.component";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { MedicalServiceService } from "../../../../services/admin/medical-service.service";
+import { DepartmentService } from "../../../../services/admin/department.service";
+import { DoctorService } from "../../../../services/admin/doctor.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -42,7 +44,7 @@ export class AdminServiceComponent implements OnInit {
     editingId    = signal<string | null>(null);
     detailId     = signal<string | null>(null);
 
-    /** Lookup options — populated from a lookup endpoint once available. */
+    /** Lookup options for the drawer's department/doctor selects. */
     departmentOptions = signal<{ label: string; value: string }[]>([]);
     doctorOptions     = signal<{ label: string; value: string }[]>([]);
 
@@ -100,6 +102,8 @@ export class AdminServiceComponent implements OnInit {
     // ────────────────────────────────────────────────────────────
     constructor(
         private srv: MedicalServiceService,
+        private departmentSrv: DepartmentService,
+        private doctorSrv: DoctorService,
         private toastSrv: ToastService,
         private dialogSrv: DialogService,
         protected loadingSrv: LocalLoadingService,
@@ -108,6 +112,8 @@ export class AdminServiceComponent implements OnInit {
     ngOnInit(): void {
         this.loadStats();
         this.load();
+        this.loadDepartmentOptions();
+        this.loadDoctorOptions();
     }
 
     // ────────────────────────────────────────────────────────────
@@ -136,6 +142,30 @@ export class AdminServiceComponent implements OnInit {
             .subscribe({
                 next: (res) => { if (res.success) this.stats.set(res.data); },
                 error: () => { /* KPI strip already falls back to '—'; global toast covers the failure */ },
+            });
+    }
+
+    loadDepartmentOptions(): void {
+        this.departmentSrv.search({ pageNumber: 1, pageSize: 200, sort: '+name' })
+            .subscribe({
+                next: (res) => {
+                    if (res.success) {
+                        this.departmentOptions.set(res.data.items.map(d => ({ label: d.name, value: d.id })));
+                    }
+                },
+                error: () => { /* drawer just shows no department options; not fatal */ },
+            });
+    }
+
+    loadDoctorOptions(): void {
+        this.doctorSrv.search({ pageNumber: 1, pageSize: 200, sort: '+fullName' })
+            .subscribe({
+                next: (res) => {
+                    if (res.success) {
+                        this.doctorOptions.set(res.data.items.map(d => ({ label: d.fullName, value: d.id })));
+                    }
+                },
+                error: () => { /* drawer just shows no doctor options; not fatal */ },
             });
     }
 

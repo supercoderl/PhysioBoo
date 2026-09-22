@@ -67,6 +67,9 @@ export const BASE_API = {
     BASE: '/api/hospital-groups',
     SEARCH: '/api/hospital-groups/search'
   },
+  TENANT: {
+    REGISTER: '/api/tenants/register'
+  },
   HOSPITAL: {
     BASE: '/api/hospitals',
     SEARCH: '/api/hospitals/search'

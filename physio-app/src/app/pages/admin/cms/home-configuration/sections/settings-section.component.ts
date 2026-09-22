@@ -32,7 +32,7 @@ import { SharedModule } from "../../../../../shared/shared-imports";
       <div [formGroup]="form" class="space-y-6 max-w-3xl">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <boo-input label="Hospital Name" [required]="true" formControlName="hospitalName" placeholder="Enter hospital name"></boo-input>
-          <boo-input label="Tagline" formControlName="tagline" placeholder="Enter tagline"></boo-input>
+          <boo-input label="Tagline" formControlName="tagLine" placeholder="Enter tagline"></boo-input>
         </div>
 
         <boo-textarea label="Welcome Message" formControlName="welcomeMessage" placeholder="Enter welcome message"></boo-textarea>
@@ -75,7 +75,7 @@ export class HomeConfigSettingsSectionComponent implements OnInit {
     ) {
         this.form = this.fb.group({
             hospitalName: ['', [Validators.required, Validators.maxLength(150)]],
-            tagline: [''],
+            tagLine: [''],
             welcomeMessage: [''],
             contactPhone: [''],
             contactEmail: ['', [Validators.email]],

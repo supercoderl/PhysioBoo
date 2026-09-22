@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.RefreshTokens;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken
 {

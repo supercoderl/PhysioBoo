@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.PatientMedicalHistories;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.PatientMedicalHistories.CreatePatientMedicalHistory
 {

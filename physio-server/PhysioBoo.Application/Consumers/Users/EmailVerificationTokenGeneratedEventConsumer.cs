@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Application.Queries.Users.GetById;
 using PhysioBoo.Domain.Enums;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Settings;
 using PhysioBoo.Shared.Events.Users;
 using PhysioBoo.SharedKernel.Utils;

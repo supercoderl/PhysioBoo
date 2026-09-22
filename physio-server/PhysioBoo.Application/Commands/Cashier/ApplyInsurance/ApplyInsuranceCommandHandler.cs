@@ -2,9 +2,9 @@
 using PhysioBoo.Application.Extensions;
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 
 namespace PhysioBoo.Application.Commands.Cashier.ApplyInsurance
 {

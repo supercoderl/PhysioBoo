@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.Bills;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.Bills.CreateBill
 {

@@ -1,9 +1,9 @@
 ﻿
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 using PhysioBoo.Shared.Events.MedicalSpecialties;
 
 namespace PhysioBoo.Application.Commands.MedicalSpecialties.CreateMedicalSpecialty

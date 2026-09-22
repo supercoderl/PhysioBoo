@@ -2,9 +2,9 @@
 using PhysioBoo.Application.ViewModels.LabTests;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 
 namespace PhysioBoo.Application.Queries.LabTests.GetById
 {

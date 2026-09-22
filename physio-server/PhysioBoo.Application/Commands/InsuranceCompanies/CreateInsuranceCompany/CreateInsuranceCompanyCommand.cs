@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.InsuranceCompanies;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.InsuranceCompanies.CreateInsuranceCompany
 {

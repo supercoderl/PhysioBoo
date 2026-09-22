@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.Prescriptions;
-using PhysioBoo.SharedKernel.Commands;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

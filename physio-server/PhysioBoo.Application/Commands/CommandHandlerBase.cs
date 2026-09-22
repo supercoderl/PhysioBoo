@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Notifications;
-using PhysioBoo.SharedKernel.Commands;
+
+
+
 
 namespace PhysioBoo.Application.Commands
 {

@@ -1,6 +1,6 @@
 ﻿using MassTransit;
 using Newtonsoft.Json;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.EventHandlers;
 using PhysioBoo.Shared.Events;
 

@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.Manufacturers;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.Manufacturers.CreateManufacturer
 {

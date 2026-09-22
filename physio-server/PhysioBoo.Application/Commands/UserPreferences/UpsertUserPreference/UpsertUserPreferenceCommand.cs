@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.UserPreferences;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.UserPreferences.UpsertUserPreference
 {

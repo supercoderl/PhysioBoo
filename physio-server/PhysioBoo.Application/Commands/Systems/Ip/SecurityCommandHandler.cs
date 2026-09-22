@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.Extensions.Caching.Distributed;
-using PhysioBoo.Domain.Interfaces;
-using PhysioBoo.Domain.Notifications;
+
+
 using PhysioBoo.SharedKernel.Utils;
 using System.Text.Json;
 

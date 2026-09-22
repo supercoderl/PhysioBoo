@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.PrintTemplates;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.PrintTemplates.CreatePrintTemplate
 {

@@ -1,7 +1,7 @@
 using FluentValidation.Results;
 
 using PhysioBoo.Application.ViewModels.Articles;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.Articles.CreateArticle
 {

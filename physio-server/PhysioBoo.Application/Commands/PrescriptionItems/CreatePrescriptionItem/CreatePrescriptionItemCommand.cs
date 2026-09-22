@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.PrescriptionItems;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.PrescriptionItems.CreatePrescriptionItem
 {

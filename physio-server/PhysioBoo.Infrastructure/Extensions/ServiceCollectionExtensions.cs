@@ -1,13 +1,11 @@
 ﻿using CloudinaryDotNet;
 using MediatR;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Domain.DomainEvents;
 using PhysioBoo.Domain.Interfaces;
-
 using PhysioBoo.Domain.Interfaces.Seeding;
 using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Infrastructure.BackgroundJobs;
@@ -132,6 +130,9 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IPrintTemplateVersionRepository, PrintTemplateVersionRepository>();
             services.AddScoped<IPrintLogRepository, PrintLogRepository>();
             services.AddScoped<IUserPreferenceRepository, UserPreferenceRepository>();
+            services.AddScoped<ITenantInviteRepository, TenantInviteRepository>();
+            services.AddScoped<IHomeSettingRepository, HomeSettingRepository>();
+            services.AddScoped<IMedicalServiceRepository, MedicalServiceRepository>();
 
             return services;
         }

@@ -2,9 +2,9 @@
 using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 
 namespace PhysioBoo.Application.Commands.Patients.InvitePatient
 {
@@ -65,6 +65,8 @@ namespace PhysioBoo.Application.Commands.Patients.InvitePatient
                 patient.Profile,
                 _user.GetUserId()
             );
+
+            newUser.SetTenantId(_user.GetTenantId());
 
             SharedKernel.Results.DbResult<Guid> result = await _userRepository.InsertAsync<User, Guid>(newUser);
 

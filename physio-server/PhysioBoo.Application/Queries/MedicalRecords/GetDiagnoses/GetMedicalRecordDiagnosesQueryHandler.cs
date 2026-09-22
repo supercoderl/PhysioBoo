@@ -24,7 +24,12 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetDiagnoses
                 includeProperties: "DiagnosedDoctor.User.Profile"
             ).ToListAsync();
 
-            return new PagedResult<DiagnosisViewModel>(0, histories.Select(x => DiagnosisViewModel.FromPatientMedicalHistory(x)).ToList(), 1, 1);
+            return new PagedResult<DiagnosisViewModel>(
+                histories.Count(),
+                histories.Select(x => DiagnosisViewModel.FromPatientMedicalHistory(x)).ToList(),
+                1,
+                histories.Count() == 0 ? 1 : histories.Count()
+            );
         }
     }
 }

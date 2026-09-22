@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.Sys_SequenceTrackers;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.Sys_SequenceTrackers.CreateSys_SequenceTracker
 {

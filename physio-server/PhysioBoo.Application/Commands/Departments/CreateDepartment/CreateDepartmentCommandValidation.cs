@@ -18,7 +18,7 @@ namespace PhysioBoo.Application.Commands.Departments.CreateDepartment
 
         public void RuleForName()
         {
-            RuleFor(cmd => cmd.NewDepartment.Name).NotEmpty().WithErrorCode(DomainErrorCodes.Department.EmptyHospitalId).WithMessage("Name may not be empty.");
+            RuleFor(cmd => cmd.NewDepartment.Name).NotEmpty().WithErrorCode(DomainErrorCodes.Department.EmptyName).WithMessage("Name may not be empty.");
         }
     }
 }

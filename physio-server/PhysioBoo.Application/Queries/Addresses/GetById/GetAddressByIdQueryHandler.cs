@@ -2,9 +2,9 @@
 using PhysioBoo.Application.ViewModels.Addresses;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 
 namespace PhysioBoo.Application.Queries.Addresses.GetById
 {

@@ -171,6 +171,7 @@
 
         public static class Admin
         {
+            public const string InviteCreate = "admin:invite:create";
             public const string HospitalRead = "admin:hospital:read";
             public const string HospitalCreate = "admin:hospital:create";
             public const string HospitalUpdate = "admin:hospital:update";
@@ -243,6 +244,12 @@
             public const string ArticleCreate = "cms:article:create";
             public const string ArticleUpdate = "cms:article:update";
             public const string ArticleDelete = "cms:article:delete";
+            public const string HomeSettingsRead = "cms:home-settings:read";
+            public const string HomeSettingsUpdate = "cms:home-settings:update";
+            public const string ServiceRead = "cms:service:read";
+            public const string ServiceCreate = "cms:service:create";
+            public const string ServiceUpdate = "cms:service:update";
+            public const string ServiceDelete = "cms:service:delete";
         }
 
         public static class Portal

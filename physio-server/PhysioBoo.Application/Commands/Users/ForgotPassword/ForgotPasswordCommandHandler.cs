@@ -3,9 +3,9 @@ using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 
 namespace PhysioBoo.Application.Commands.Users.ForgotPassword
 {

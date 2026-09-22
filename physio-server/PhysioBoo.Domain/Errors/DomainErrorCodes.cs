@@ -15,6 +15,7 @@
             public const string LastNameExceedsMaxLength = "USER_LAST_NAME_EXCEEDS_MAX_LENGTH";
             public const string InvalidEmail = "USER_INVALID_EMAIL";
             public const string InvalidRole = "USER_INVALID_ROLE";
+            public const string PasswordTooShort = "USER_PASSWORD_TOO_SHORT";
 
             // User Password Validation
             public const string EmptyPassword = "USER_PASSWORD_MAY_NOT_BE_EMPTY";
@@ -164,6 +165,31 @@
             public const string EmptyOrganizationName = "DOCTOR_WORK_EXPERIENCE_EMPTY_ORGANIZATION_NAME";
         }
 
+        public static class HomeSetting
+        {
+            public const string EmptyHospitalName = "HOME_SETTING_EMPTY_HOSPITAL_NAME";
+            public const string HospitalNameExceedsMaxLength = "HOME_SETTING_HOSPITAL_NAME_EXCEEDS_MAX_LENGTH";
+            public const string TagLineExceedsMaxLength = "HOME_SETTING_TAG_LINE_EXCEEDS_MAX_LENGTH";
+            public const string WelcomeMessageExceedsMaxLength = "HOME_SETTING_WELCOME_MESSAGE_EXCEEDS_MAX_LENGTH";
+            public const string ContactPhoneExceedsMaxLength = "HOME_SETTING_CONTACT_PHONE_EXCEEDS_MAX_LENGTH";
+            public const string ContactEmailExceedsMaxLength = "HOME_SETTING_CONTACT_EMAIL_EXCEEDS_MAX_LENGTH";
+            public const string InvalidContactEmail = "HOME_SETTING_INVALID_CONTACT_EMAIL";
+            public const string AddressExceedsMaxLength = "HOME_SETTING_ADDRESS_EXCEEDS_MAX_LENGTH";
+        }
+
+        public static class MedicalService
+        {
+            public const string EmptyCode = "MEDICAL_SERVICE_EMPTY_CODE";
+            public const string CodeExceedsMaxLength = "MEDICAL_SERVICE_CODE_EXCEEDS_MAX_LENGTH";
+            public const string CodeAlreadyExists = "MEDICAL_SERVICE_CODE_ALREADY_EXISTS";
+            public const string EmptyName = "MEDICAL_SERVICE_EMPTY_NAME";
+            public const string NameExceedsMaxLength = "MEDICAL_SERVICE_NAME_EXCEEDS_MAX_LENGTH";
+            public const string InvalidPrice = "MEDICAL_SERVICE_INVALID_PRICE";
+            public const string InvalidCurrency = "MEDICAL_SERVICE_INVALID_CURRENCY";
+            public const string InvalidDuration = "MEDICAL_SERVICE_INVALID_DURATION";
+            public const string EmptyIds = "MEDICAL_SERVICE_EMPTY_IDS";
+        }
+
         public static class HospitalGroup
         {
             // Hospital Group Validation
@@ -184,6 +210,7 @@
             public const string EmptyAccreditationBody = "HOSPITAL_EMPTY_ACCREDITATION_BODY";
             public const string EmptyInsuranceAccepted = "HOSPITAL_EMPTY_INSURANCE_ACCEPTED";
             public const string EmptyLanguagesSupported = "HOSPITAL_EMPTY_LANGUAGES_SUPPORTED";
+            public const string EmptyBranches = "HOSPITAL_EMPTY_BRANCHES";
         }
 
         public static class HospitalStaff
@@ -469,6 +496,14 @@
             public const string EmptyRoute = "ADMIN_MENU_EMPTY_ROUTE";
             public const string InvalidOrder = "ADMIN_MENU_INVALID_ORDER";
             public const string EmptyPermissionCode = "ADMIN_MENU_EMPTY_PERMISSION_CODE";
+        }
+
+        public static class TenantInvite
+        {
+            // Tenant Invite Validation
+            public const string AlreadyUsed = "TENANT_INVITE_ALREADY_USED";
+            public const string Expired = "TENANT_INVITE_EXPIRED";
+            public const string EmailMismatch = "TENANT_INVITE_EMAIL_MISMATCH";
         }
     }
 }

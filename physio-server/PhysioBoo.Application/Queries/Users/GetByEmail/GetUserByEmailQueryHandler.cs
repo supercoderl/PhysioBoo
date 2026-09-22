@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
 using System.Data;
 using System.Text;

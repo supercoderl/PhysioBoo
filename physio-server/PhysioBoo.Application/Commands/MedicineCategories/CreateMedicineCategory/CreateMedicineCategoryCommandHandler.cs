@@ -1,9 +1,9 @@
 ﻿
 using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 
 namespace PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCategory
 {

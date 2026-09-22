@@ -2,17 +2,12 @@
 using PhysioBoo.Application.ViewModels.Bills;
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 
 namespace PhysioBoo.Application.Commands.Bills.CreateBill
 {
-    // Transactional header+items create (same lesson as module 8/9's CreatePrescription/
-    // CheckoutCart) — replaces the old two-step create-bill-then-N-create-bill-item-calls flow.
-    // NOTE ON ATOMICITY: same infrastructure limitation as CheckoutCartCommandHandler — this
-    // codebase's repository layer commits each call individually, no cross-call transaction wrapper
-    // exists yet.
     public sealed class CreateBillCommandHandler : CommandHandlerBase, IRequestHandler<CreateBillCommand>
     {
         private readonly IBillRepository _billRepository;

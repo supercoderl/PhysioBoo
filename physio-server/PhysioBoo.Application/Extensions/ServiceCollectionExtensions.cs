@@ -208,6 +208,7 @@ using PhysioBoo.Application.ViewModels.Appointments;
 using PhysioBoo.Application.ViewModels.AppointmentTypes;
 using PhysioBoo.Application.ViewModels.Configurations;
 using PhysioBoo.Application.ViewModels.Departments;
+using PhysioBoo.Application.ViewModels.MedicalServices;
 using PhysioBoo.Application.ViewModels.Doctors;
 using PhysioBoo.Application.ViewModels.HospitalGroups;
 using PhysioBoo.Application.ViewModels.Hospitals;
@@ -645,6 +646,7 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<ISortingExpressionProvider<PatientViewModel, Patient>, PatientViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<PrintTemplateViewModel, PrintTemplate>, PrintTemplateViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<AppointmentViewModel, Appointment>, AppointmentViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<MedicalServiceViewModel, MedicalService>, MedicalServiceViewModelSortProvider>();
 
             return services;
         }

@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.Hospitals;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.Hospitals.CreateHospital
 {

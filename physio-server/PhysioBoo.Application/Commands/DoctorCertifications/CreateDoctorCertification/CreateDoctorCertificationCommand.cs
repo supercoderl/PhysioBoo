@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.DoctorCertifications;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.DoctorCertifications.CreateDoctorCertification
 {

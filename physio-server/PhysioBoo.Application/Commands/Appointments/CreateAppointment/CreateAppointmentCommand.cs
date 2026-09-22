@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.Appointments;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.Appointments.CreateAppointment
 {

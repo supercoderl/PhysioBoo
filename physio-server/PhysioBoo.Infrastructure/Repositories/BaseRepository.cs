@@ -3,6 +3,7 @@ using Ardalis.Specification.EntityFrameworkCore;
 using Dapper;
 
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Caching.Memory;
 using Npgsql;
 using NpgsqlTypes;
@@ -140,10 +141,19 @@ namespace PhysioBoo.Infrastructure.Repositories
             {
                 TableMetadata metadata = GetTableMetadata<T>();
                 string sql = GenerateInsertSql<T>(metadata, returnsKey: true);
-
-                using NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
                 DynamicParameters parameters = BuildParameters(entity, metadata);
 
+                IDbContextTransaction? activeTx = _dbContext.Database.CurrentTransaction;
+                if (activeTx != null)
+                {
+                    NpgsqlConnection sharedConnection = (NpgsqlConnection)_dbContext.Database.GetDbConnection();
+                    NpgsqlTransaction sharedTransaction = (NpgsqlTransaction)activeTx.GetDbTransaction();
+
+                    TKey idInTx = await sharedConnection.QuerySingleAsync<TKey>(sql, parameters, transaction: sharedTransaction);
+                    return DbResult<TKey>.Ok(idInTx);
+                }
+
+                using NpgsqlConnection connection = new NpgsqlConnection(_connectionString);
                 TKey id = await connection.QuerySingleAsync<TKey>(sql, parameters);
 
                 return DbResult<TKey>.Ok(id);

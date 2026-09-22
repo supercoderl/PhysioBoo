@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.LabTestCategories;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.LabTestCategories.CreateLabTestCategory
 {

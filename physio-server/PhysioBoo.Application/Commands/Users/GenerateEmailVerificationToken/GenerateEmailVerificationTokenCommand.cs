@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.VerificationTokens;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken
 {

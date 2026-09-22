@@ -1,6 +1,6 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Shared.Events.Users;
 
 namespace PhysioBoo.Application.Consumers.Users

@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.MedicalRecords;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.MedicalRecords.CreateMedicalRecord
 {

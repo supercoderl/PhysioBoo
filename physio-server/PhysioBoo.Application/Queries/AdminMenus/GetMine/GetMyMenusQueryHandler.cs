@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
 
 namespace PhysioBoo.Application.Queries.AdminMenus.GetMine

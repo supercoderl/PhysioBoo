@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using PhysioBoo.Application.ViewModels.MedicalRecords;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
 
 namespace PhysioBoo.Application.Queries.MedicalRecords.GetBillingSummary

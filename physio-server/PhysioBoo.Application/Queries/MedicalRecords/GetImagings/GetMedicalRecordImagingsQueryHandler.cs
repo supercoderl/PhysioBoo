@@ -27,7 +27,12 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetImagings
                 includeProperties: "ImagingOrder"
             ).ToListAsync();
 
-            return new PagedResult<ImagingStudyViewModel>(0, imagingReports.Select(x => ImagingStudyViewModel.FromImaging(x)).ToList(), 1, 1);
+            return new PagedResult<ImagingStudyViewModel>(
+                imagingReports.Count(),
+                imagingReports.Select(x => ImagingStudyViewModel.FromImaging(x)).ToList(),
+                1,
+                imagingReports.Count() == 0 ? 1 : imagingReports.Count()
+            );
         }
     }
 }

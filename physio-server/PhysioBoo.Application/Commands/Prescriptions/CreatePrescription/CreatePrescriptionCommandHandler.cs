@@ -2,15 +2,16 @@
 using PhysioBoo.Application.ViewModels.Prescriptions;
 using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 using PhysioBoo.SharedKernel.Results;
 
 namespace PhysioBoo.Application.Commands.Prescriptions.CreatePrescription
 {
     public sealed class CreatePrescriptionCommandHandler : CommandHandlerBase, IRequestHandler<CreatePrescriptionCommand>
     {
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IPrescriptionRepository _prescriptionRepository;
         private readonly IPrescriptionItemRepository _prescriptionItemRepository;
         private readonly IUser _user;
@@ -24,6 +25,7 @@ namespace PhysioBoo.Application.Commands.Prescriptions.CreatePrescription
             IUser user
         ) : base(bus, unitOfWork, notifications)
         {
+            _unitOfWork = unitOfWork;
             _prescriptionRepository = prescriptionRepository;
             _prescriptionItemRepository = prescriptionItemRepository;
             _user = user;
@@ -32,6 +34,8 @@ namespace PhysioBoo.Application.Commands.Prescriptions.CreatePrescription
         public async Task Handle(CreatePrescriptionCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
+
+            await _unitOfWork.BeginTransactionAsync(ct);
 
             Prescription newPrescription = new Prescription(
                 request.NewPrescription.Id,
@@ -55,6 +59,7 @@ namespace PhysioBoo.Application.Commands.Prescriptions.CreatePrescription
 
             if (!result.Success)
             {
+                await _unitOfWork.RollbackTransactionAsync(ct);
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
                     $"Insert failed, please try again. Error: {result.Error}",
@@ -101,6 +106,7 @@ namespace PhysioBoo.Application.Commands.Prescriptions.CreatePrescription
 
                 if (!itemResult.Success)
                 {
+                    await _unitOfWork.RollbackTransactionAsync(ct);
                     await NotifyAsync(new DomainNotification(
                         request.MessageType,
                         $"Insert failed for prescription item '{itemInput.MedicineName}'. Error: {itemResult.Error}",
@@ -110,6 +116,8 @@ namespace PhysioBoo.Application.Commands.Prescriptions.CreatePrescription
                     return;
                 }
             }
+
+            await _unitOfWork.CommitTransactionAsync(ct);
         }
     }
 }

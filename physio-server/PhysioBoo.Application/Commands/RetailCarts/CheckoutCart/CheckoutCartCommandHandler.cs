@@ -3,23 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 
 namespace PhysioBoo.Application.Commands.RetailCarts.CheckoutCart
 {
-    // NOTE ON ATOMICITY: this codebase's repository layer commits each InsertAsync/UpdateTrackedAsync
-    // call individually (raw Dapper connection per call, or a standalone SaveChangesAsync) — there is
-    // no shared unit-of-work transaction spanning multiple repository calls today (IUnitOfWork only
-    // exposes CommitAsync(), no BeginTransaction). CreatePrescriptionCommandHandler has the same
-    // limitation (documented in docs/prescription-redesign.md). A genuinely atomic checkout would
-    // require adding transaction support to IUnitOfWork/BaseRepository first — a larger, separate
-    // change — so this handler follows the existing sequential pattern rather than silently claiming
-    // a guarantee the infrastructure doesn't back. If it fails partway, manual reconciliation of
-    // MedicineInventory quantities against StockMovement rows may be needed.
     public sealed class CheckoutCartCommandHandler : CommandHandlerBase, IRequestHandler<CheckoutCartCommand>
     {
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IRetailCartRepository _retailCartRepository;
         private readonly IRetailTransactionRepository _retailTransactionRepository;
         private readonly IRetailTransactionLineItemRepository _retailTransactionLineItemRepository;
@@ -41,6 +33,7 @@ namespace PhysioBoo.Application.Commands.RetailCarts.CheckoutCart
             IUser user
         ) : base(bus, unitOfWork, notifications)
         {
+            _unitOfWork = unitOfWork;
             _retailCartRepository = retailCartRepository;
             _retailTransactionRepository = retailTransactionRepository;
             _retailTransactionLineItemRepository = retailTransactionLineItemRepository;
@@ -54,15 +47,17 @@ namespace PhysioBoo.Application.Commands.RetailCarts.CheckoutCart
         {
             if (!await TestValidityAsync(request)) return;
 
+            await _unitOfWork.BeginTransactionAsync(ct);
+
             RetailCart? cart = await _retailCartRepository.GetByIdAsync(request.CartId, includeProperties: "RetailCartLineItems.Medicine", ct: ct);
 
             if (cart == null || cart.RetailCartLineItems.Count == 0)
             {
+                await _unitOfWork.RollbackTransactionAsync(ct);
                 await NotifyAsync(new DomainNotification(request.MessageType, "Cart not found or empty.", ErrorCodes.ObjectNotFound));
                 return;
             }
 
-            // Stock availability + FEFO batch deduction, per cart line
             foreach (RetailCartLineItem line in cart.RetailCartLineItems)
             {
                 int remaining = line.Quantity;
@@ -76,6 +71,7 @@ namespace PhysioBoo.Application.Commands.RetailCarts.CheckoutCart
 
                 if (batches.Sum(b => b.QuantityAvailable) < remaining)
                 {
+                    await _unitOfWork.RollbackTransactionAsync(ct);
                     await NotifyAsync(new DomainNotification(
                         request.MessageType,
                         $"Insufficient stock for medicine {line.Medicine?.Name ?? line.MedicineId.ToString()}.",
@@ -112,7 +108,6 @@ namespace PhysioBoo.Application.Commands.RetailCarts.CheckoutCart
                 }
             }
 
-            // Totals — no VAT/tax-rate configuration entity exists yet, so Vat is always 0 until one is added.
             decimal subtotal = cart.RetailCartLineItems.Sum(i => i.UnitPrice * i.Quantity);
             decimal discountTotal = cart.RetailCartLineItems.Sum(i => i.UnitPrice * i.Quantity * i.DiscountPercent / 100m);
             decimal insuranceCoverage = cart.RetailCartLineItems.Sum(i => i.InsuranceCoveredAmount);
@@ -172,10 +167,9 @@ namespace PhysioBoo.Application.Commands.RetailCarts.CheckoutCart
                 await _retailPaymentSplitRepository.InsertAsync(paymentSplit);
             }
 
-            // Cart is done — remove it from the active queue.
             _retailCartRepository.SoftDeleteSingle(cart, ct: ct);
 
-            await CommitAsync();
+            await _unitOfWork.CommitTransactionAsync(ct);
         }
 
         private static string GenerateTransactionNumber()

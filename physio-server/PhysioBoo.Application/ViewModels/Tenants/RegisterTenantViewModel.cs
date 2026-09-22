@@ -1,0 +1,63 @@
+﻿using PhysioBoo.Domain.Enums;
+
+namespace PhysioBoo.Application.ViewModels.Tenants
+{
+    public sealed record RegisterTenantCompanyViewModel(
+        string Name,
+        string? Description,
+        string? HeadquartersAddress,
+        string? Website,
+        string? Phone,
+        string? Email,
+        string? LogoUrl,
+        DateTime? EstablishedDate,
+        string? LicenseNumber,
+        string? AccreditationDetails
+    );
+
+    public sealed record RegisterTenantBranchViewModel(
+        string Name,
+        HospitalType HospitalType,
+        int EmergencyCapacity,
+        int OperationTheaters,
+        string Address,
+        string City,
+        string StateProvince,
+        string? PostalCode,
+        string Country,
+        string? Phone,
+        string? Fax,
+        string? Email,
+        string? Website,
+        string? EmergencyPhone,
+        string? AmbulancePhone,
+        decimal? Latitude,
+        decimal? Longtitude,
+        DateTime? EstablishedDate,
+        string? LicenseNumber,
+        DateTime? LicenseExpiry,
+        string AccreditationBody,
+        DateTime? AccreditationExpiry,
+        string[] InsuranceAccepted,
+        string[] LanguagesSupported,
+        string? Facilities,
+        string? OperatingHours,
+        string? LogoUrl,
+        string? Images,
+        string? Description,
+        string? MissionStatement,
+        string? VisionStatement
+    );
+
+    public sealed record RegisterTenantOwnerViewModel(
+        string Email,
+        string Phone,
+        string Password
+    );
+
+    public sealed record RegisterTenantViewModel(
+        RegisterTenantCompanyViewModel Company,
+        List<RegisterTenantBranchViewModel> Branches,
+        RegisterTenantOwnerViewModel Owner
+    );
+}

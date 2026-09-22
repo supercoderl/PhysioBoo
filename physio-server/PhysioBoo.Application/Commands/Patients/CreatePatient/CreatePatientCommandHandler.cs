@@ -3,9 +3,9 @@ using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 using PhysioBoo.Shared.Events.Patients;
 
 namespace PhysioBoo.Application.Commands.Patients.CreatePatient

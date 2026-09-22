@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.Payments;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.Payments.CreatePayment
 {

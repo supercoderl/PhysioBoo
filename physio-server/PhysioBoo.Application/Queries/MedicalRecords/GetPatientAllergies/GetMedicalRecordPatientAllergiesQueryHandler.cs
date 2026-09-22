@@ -23,7 +23,12 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetPatientAllergies
                 filter: x => x.PatientId == request.PatientId
             ).ToListAsync();
 
-            return new PagedResult<PatientAllergyViewModel>(0, allergies.Select(x => PatientAllergyViewModel.FromPatientAllergy(x)).ToList(), 1, 1);
+            return new PagedResult<PatientAllergyViewModel>(
+                allergies.Count(),
+                allergies.Select(x => PatientAllergyViewModel.FromPatientAllergy(x)).ToList(),
+                1,
+                allergies.Count() == 0 ? 1 : allergies.Count()
+            );
         }
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using PhysioBoo.Application.Commands.Users.GenerateEmailVerificationToken;
 using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Enums;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Shared.Events.Doctors;
 using PhysioBoo.SharedKernel.Utils;
 

@@ -23,7 +23,12 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetEncounters
                 filter: x => x.PatientId == request.PatientId
             ).ToListAsync();
 
-            return new PagedResult<EncounterViewModel>(0, appointments.Select(x => EncounterViewModel.FromEntity(x)).ToList(), 1, 1);
+            return new PagedResult<EncounterViewModel>(
+                appointments.Count(),
+                appointments.Select(x => EncounterViewModel.FromEntity(x)).ToList(),
+                1,
+                appointments.Count() == 0 ? 1 : appointments.Count()
+            );
         }
     }
 }

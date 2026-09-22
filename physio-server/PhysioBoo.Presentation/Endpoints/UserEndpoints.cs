@@ -9,6 +9,7 @@ using PhysioBoo.Application.Commands.Users.LoginUser;
 using PhysioBoo.Application.Commands.Users.LogoutUser;
 using PhysioBoo.Application.Commands.Users.OAuthLoginUser;
 using PhysioBoo.Application.Commands.Users.RefreshToken;
+using PhysioBoo.Application.Commands.Users.RegisterWithInvite;
 using PhysioBoo.Application.Commands.Users.ResendVerification;
 using PhysioBoo.Application.Commands.Users.ResetPassword;
 using PhysioBoo.Application.Commands.Users.UpdateUser;
@@ -65,6 +66,34 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Create new user")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            #endregion
+
+            #region Register with invite
+            group.MapPost("/register-with-invite", async (
+                [FromBody] RegisterWithInviteViewModel request,
+                IMediatorHandler bus,
+                CancellationToken ct
+            ) =>
+            {
+                Guid newId = Guid.NewGuid();
+
+                await bus.SendCommandAsync(new RegisterWithInviteCommand(newId, request));
+
+                return Results.Created(
+                    $"/api/users/{newId}",
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
+            }).WithName("RegisterWithInvite")
+            .WithSummary("Redeem a tenant invite token and create the invited user's account")
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest);
+            // Deliberately no .RequireAuthorization() — the invited person has no account yet;
+            // the invite token itself is what authorizes this call (resolved server-side inside
+            // RegisterWithInviteCommandHandler, never trusted from the request body).
             #endregion
 
             #region Resend verification
@@ -235,8 +264,7 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("Reset password")
             .WithSummary("Change old password to new password")
             .Produces(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization();
+            .Produces(StatusCodes.Status400BadRequest);
             #endregion
 
             #region Refresh token

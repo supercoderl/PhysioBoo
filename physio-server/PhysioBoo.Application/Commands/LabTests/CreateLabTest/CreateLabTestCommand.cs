@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.LabTests;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.LabTests.CreateLabTest
 {

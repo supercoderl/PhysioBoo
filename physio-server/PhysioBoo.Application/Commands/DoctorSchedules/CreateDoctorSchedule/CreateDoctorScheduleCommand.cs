@@ -1,7 +1,7 @@
 ﻿using FluentValidation.Results;
 
 using PhysioBoo.Application.ViewModels.DoctorSchedules;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.DoctorSchedules.CreateDoctorSchedule
 {

@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.Profiles;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.Profiles.CreateProfile
 {

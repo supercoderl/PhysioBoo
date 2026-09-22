@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.Prescriptions;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.Prescriptions.UpdatePrescription
 {

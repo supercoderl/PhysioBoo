@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.MedicineCategories;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCategory
 {

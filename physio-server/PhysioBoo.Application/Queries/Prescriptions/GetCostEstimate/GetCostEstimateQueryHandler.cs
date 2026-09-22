@@ -1,11 +1,12 @@
 ﻿
+using Microsoft.EntityFrameworkCore;
 using PhysioBoo.Application.ViewModels.Prescriptions;
 using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Entities.PatientInformation;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 
 namespace PhysioBoo.Application.Queries.Prescriptions.GetCostEstimate
 {
@@ -41,20 +42,16 @@ namespace PhysioBoo.Application.Queries.Prescriptions.GetCostEstimate
             }
 
             Patient? patient = await _patientRepository.GetByIdAsync(prescription.PatientId, ct: ct);
-
-            // Insurance coverage is stored as a percentage (0-100) on Patient.InssuranceCoverageAmount.
             decimal coveragePercent = Math.Clamp(patient?.InssuranceCoverageAmount ?? 0m, 0m, 100m);
-
             decimal totalCost = 0m;
+            List<Guid> medicineIds = request.Items.Select(i => i.MedicineId).Distinct().ToList();
+            List<Medicine> medicines = await _medicineRepository.GetAllNoTracking(filter: m => medicineIds.Contains(m.Id)).ToListAsync(ct);
+            Dictionary<Guid, Medicine> medicinesById = medicines.ToDictionary(m => m.Id);
 
             foreach (CostEstimateItemInput item in request.Items)
             {
-                // Trust the catalog price for a real catalog medicine; only fall back to the
-                // client-supplied price for a custom/non-catalog entry that has no catalog row
-                // to price from (see prescription-redesign.md IsCatalogVerified).
-                Medicine? medicine = await _medicineRepository.GetByIdAsync(item.MedicineId, ct: ct);
+                Medicine? medicine = medicinesById.GetValueOrDefault(item.MedicineId);
                 decimal unitPrice = medicine?.SellingPrice ?? medicine?.Mrp ?? item.ClientPricePerUnit;
-
                 totalCost += unitPrice * item.QuantityPrescribed;
             }
 

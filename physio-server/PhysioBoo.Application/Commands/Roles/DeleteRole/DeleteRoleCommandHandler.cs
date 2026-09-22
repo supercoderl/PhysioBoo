@@ -1,8 +1,8 @@
 ﻿
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 using PhysioBoo.Shared.Events.Roles;
 
 namespace PhysioBoo.Application.Commands.Roles.DeleteRole

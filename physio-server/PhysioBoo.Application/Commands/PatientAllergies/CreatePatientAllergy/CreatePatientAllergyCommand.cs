@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.PatientAllergies;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.PatientAllergies.CreatePatientAllergy
 {

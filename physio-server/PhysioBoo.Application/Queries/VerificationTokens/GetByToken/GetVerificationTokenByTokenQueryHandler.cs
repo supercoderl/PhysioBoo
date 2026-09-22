@@ -4,9 +4,9 @@ using PhysioBoo.Application.ViewModels.VerificationTokens;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 using PhysioBoo.SharedKernel.Utils;
 using System.Data;
 using System.Text;

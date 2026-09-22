@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using PhysioBoo.Application.ViewModels.DoctorDesks;
 using PhysioBoo.Domain.Enums;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Application.Queries.DoctorDesks.GetSnapshot

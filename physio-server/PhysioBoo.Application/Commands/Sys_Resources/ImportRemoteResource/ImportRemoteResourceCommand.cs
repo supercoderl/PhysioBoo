@@ -1,4 +1,4 @@
-﻿using PhysioBoo.SharedKernel.Commands;
+﻿
 using System.Text.Json.Serialization;
 
 namespace PhysioBoo.Application.Commands.Sys_Resources.ImportRemoteResource

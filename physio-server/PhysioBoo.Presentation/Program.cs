@@ -318,12 +318,15 @@ namespace PhysioBoo.Presentation
             void MapCommonEndpoints(WebApplication app)
             {
                 app.MapUserEndpoints();
+                app.MapInviteEndpoints();
                 app.MapUserPreferenceEndpoints();
                 app.MapAddressEndpoints();
                 app.MapProfileEndpoints();
                 app.MapReviewEndpoints();
                 app.MapMedicalSpecialtyEndpoints();
                 app.MapArticleEndpoints();
+                app.MapHomeSettingsEndpoints();
+                app.MapMedicalServiceEndpoints();
                 app.MapRoleEndpoints();
                 app.MapConfigEndpoints();
                 app.MapAdminMenuEndpoints();

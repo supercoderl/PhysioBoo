@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using PhysioBoo.Application.ViewModels.MedicalRecords;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.SharedKernel.Common;
 
@@ -27,7 +27,12 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetClinicalNotes
                 filter: x => x.PatientId == q.PatientId
             ).ToListAsync();
 
-            return new PagedResult<ClinicalNoteViewModel>(0, medicalRecords.Select(x => ClinicalNoteViewModel.FromMedicalRecord(x)).ToList(), 1, 1);
+            return new PagedResult<ClinicalNoteViewModel>(
+                medicalRecords.Count(),
+                medicalRecords.Select(x => ClinicalNoteViewModel.FromMedicalRecord(x)).ToList(),
+                1,
+                medicalRecords.Count() == 0 ? 1 : medicalRecords.Count()
+            );
         }
     }
 }

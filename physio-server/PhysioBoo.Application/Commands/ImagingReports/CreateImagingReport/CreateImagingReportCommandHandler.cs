@@ -1,9 +1,9 @@
 ﻿
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Application.Commands.ImagingReports.CreateImagingReport

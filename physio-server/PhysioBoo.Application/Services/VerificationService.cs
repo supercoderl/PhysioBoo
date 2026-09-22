@@ -1,7 +1,7 @@
 ﻿using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Enums;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Shared.Events.Users;
 using PhysioBoo.SharedKernel.Utils;

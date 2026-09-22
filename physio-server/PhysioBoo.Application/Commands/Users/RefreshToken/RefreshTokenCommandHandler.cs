@@ -3,9 +3,9 @@ using Microsoft.Extensions.Options;
 using PhysioBoo.Application.ViewModels.Users;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 using PhysioBoo.Domain.Settings;
 using PhysioBoo.Shared.Events.Users;
 using PhysioBoo.SharedKernel.Utils;

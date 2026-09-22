@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.ImagingReports;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.ImagingReports.CreateImagingReport
 {

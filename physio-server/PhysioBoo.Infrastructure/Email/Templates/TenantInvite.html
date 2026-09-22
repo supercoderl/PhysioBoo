@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>You're Invited</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f6f6f6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: #4CAF50;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .content {
+            padding: 30px;
+            color: #333333;
+            line-height: 1.6;
+        }
+
+        .button {
+            display: inline-block;
+            margin: 20px 0;
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #888888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>You've Been Invited</h2>
+        </div>
+        <div class="content">
+            <p>Hello,</p>
+            <p>You've been invited to join a team on Physio Boo. Click the button below to set up your account:</p>
+            <p style="text-align:center;">
+                <a href="{{RedeemUrl}}" class="button">Accept Invitation</a>
+            </p>
+            <p>This invite link expires on <strong>{{ExpiresAt}}</strong>.</p>
+            <p>If you weren't expecting this invitation, you can safely ignore this email.</p>
+        </div>
+        <div class="footer">
+            &copy; {{Year}} PhysioBoo. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

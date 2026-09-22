@@ -8,12 +8,6 @@ using PhysioBoo.Domain.Enums;
 
 namespace PhysioBoo.Infrastructure.BackgroundJobs
 {
-    // Evaluates MedicineInventory thresholds every 15 minutes and raises InventoryAlert rows.
-    // Covers LowStock/OutOfStock/NearExpiry/ExpiredBatch/Overstock — all directly computable from
-    // existing MedicineInventory fields. Discrepancy (needs StockTake variance data),
-    // TemperatureExcursion (needs sensor data — no such source exists), and ControlledDrug (needs a
-    // dedicated compliance rule set) are deliberately NOT implemented yet — flagged here rather than
-    // silently only covering part of InventoryAlertType.
     public sealed class InventoryAlertJob : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
@@ -62,7 +56,6 @@ namespace PhysioBoo.Infrastructure.BackgroundJobs
                 .GetAllNoTracking(filter: b => b.Status != BatchLifecycleStatus.Disposed)
                 .ToListAsync(ct);
 
-            // Existing unacknowledged alerts, so this pass doesn't spam a duplicate every 15 minutes.
             List<InventoryAlert> existingUnacknowledged = await inventoryAlertRepository
                 .GetAllNoTracking(filter: a => a.AcknowledgedAt == null)
                 .ToListAsync(ct);

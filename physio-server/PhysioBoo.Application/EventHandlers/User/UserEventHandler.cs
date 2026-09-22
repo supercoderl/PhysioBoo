@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using PhysioBoo.Application.Queries.VerificationTokens.GetByToken;
 using PhysioBoo.Domain;
 using PhysioBoo.Domain.Enums;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Settings;
 using PhysioBoo.Shared.Events.Users;
 using PhysioBoo.SharedKernel.Utils;

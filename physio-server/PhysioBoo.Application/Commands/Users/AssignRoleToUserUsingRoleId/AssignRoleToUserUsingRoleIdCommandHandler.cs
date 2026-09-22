@@ -1,8 +1,8 @@
 ﻿
 using PhysioBoo.Domain.Entities.Core;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 
 namespace PhysioBoo.Application.Commands.Users.AssignRoleToUserUsingRoleId
 {

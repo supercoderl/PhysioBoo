@@ -1,5 +1,5 @@
 ﻿
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
 
 namespace PhysioBoo.Application.Queries.Roles.GetPermissionsByRole

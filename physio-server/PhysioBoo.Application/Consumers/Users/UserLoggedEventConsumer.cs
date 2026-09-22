@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken;
 using PhysioBoo.Application.ViewModels.RefreshTokens;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Settings;
 using PhysioBoo.Shared.Events.Users;
 using PhysioBoo.SharedKernel.Utils;

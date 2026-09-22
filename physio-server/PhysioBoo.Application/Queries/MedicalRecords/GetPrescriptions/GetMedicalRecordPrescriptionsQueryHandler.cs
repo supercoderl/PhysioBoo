@@ -24,7 +24,12 @@ namespace PhysioBoo.Application.Queries.MedicalRecords.GetPrescriptions
                 includeProperties: "PrescriptionItems"
             ).ToListAsync(ct);
 
-            return new PagedResult<PrescriptionViewModel>(0, prescriptions.Select(x => PrescriptionViewModel.FromPrescription(x)).ToList(), 1, 1);
+            return new PagedResult<PrescriptionViewModel>(
+                prescriptions.Count(),
+                prescriptions.Select(x => PrescriptionViewModel.FromPrescription(x)).ToList(),
+                1,
+                prescriptions.Count() == 0 ? 1 : prescriptions.Count()
+            );
         }
     }
 }

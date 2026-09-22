@@ -106,6 +106,9 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<PrintTemplateVersion> PrintTemplateVersions { get; set; } = null!;
         public DbSet<PrintLog> PrintLogs { get; set; } = null!;
         public DbSet<UserPreference> UserPreferences { get; set; } = null!;
+        public DbSet<TenantInvite> TenantInvites { get; set; } = null!;
+        public DbSet<HomeSetting> HomeSettings { get; set; } = null!;
+        public DbSet<MedicalService> MedicalServices { get; set; } = null!;
         #endregion
 
         public ApplicationDbContext(
@@ -263,6 +266,11 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new PrintTemplateVersionConfiguration());
             builder.ApplyConfiguration(new PrintLogConfiguration());
             builder.ApplyConfiguration(new UserPreferenceConfiguration());
+            builder.ApplyConfiguration(new TenantInviteConfiguration());
+            builder.ApplyConfiguration(new HomeSettingsConfiguration());
+            builder.ApplyConfiguration(new MedicalServiceConfiguration());
+            builder.ApplyConfiguration(new MedicalServiceDepartmentConfiguration());
+            builder.ApplyConfiguration(new MedicalServiceDoctorConfiguration());
         }
         #endregion
 

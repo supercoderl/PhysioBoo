@@ -2,9 +2,9 @@
 using PhysioBoo.Application.ViewModels.MedicalSpecialties;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 
 namespace PhysioBoo.Application.Queries.MedicalSpecialties.GetById
 {

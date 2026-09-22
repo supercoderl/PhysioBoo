@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using PhysioBoo.Application.Commands.Sys_Media.CreateMedia;
 using PhysioBoo.Application.ViewModels.Sys_MediaFiles;
 using PhysioBoo.Domain.Entities.MedicalStaff;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Shared.Events.MedicalSpecialties;
 
 namespace PhysioBoo.Application.Consumers.MedicalSpecialties

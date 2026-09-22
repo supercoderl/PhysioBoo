@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.DoctorAwards;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.DoctorAwards.CreateDoctorAward
 {

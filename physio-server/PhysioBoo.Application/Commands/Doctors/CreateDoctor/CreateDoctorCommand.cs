@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.Doctors;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.Doctors.CreateDoctor
 {

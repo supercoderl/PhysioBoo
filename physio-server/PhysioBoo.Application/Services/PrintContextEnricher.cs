@@ -1,5 +1,5 @@
 ﻿using PhysioBoo.Application.Interfaces;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.SharedKernel.Utils;
 
 namespace PhysioBoo.Application.Services

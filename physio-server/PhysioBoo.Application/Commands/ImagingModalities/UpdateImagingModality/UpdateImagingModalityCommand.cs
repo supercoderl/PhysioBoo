@@ -1,5 +1,5 @@
 ﻿using PhysioBoo.Application.ViewModels.ImagingModalities;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.ImagingModalities.UpdateImagingModality
 {

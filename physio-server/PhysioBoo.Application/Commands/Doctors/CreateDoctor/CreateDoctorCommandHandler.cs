@@ -2,9 +2,9 @@
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 using PhysioBoo.Shared.Events.Doctors;
 using PhysioBoo.SharedKernel.Results;
 using PhysioBoo.SharedKernel.Utils;

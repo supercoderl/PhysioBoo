@@ -8,6 +8,11 @@
         {
         }
 
+        protected TenantEntity(Guid id, Guid tenantId) : base(id)
+        {
+            TenantId = tenantId;
+        }
+
         public void SetTenantId(Guid tenantId) { TenantId = tenantId; }
     }
 }

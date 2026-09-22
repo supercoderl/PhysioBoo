@@ -8,6 +8,7 @@ using PhysioBoo.Infrastructure.Database;
 using PhysioBoo.Shared.Events;
 using PhysioBoo.Shared.Events.Doctors;
 using PhysioBoo.Shared.Events.MedicalSpecialties;
+using PhysioBoo.Shared.Events.Tenants;
 using PhysioBoo.Shared.Events.Users;
 using PhysioBoo.SharedKernel.Utils;
 
@@ -152,6 +153,14 @@ namespace PhysioBoo.Infrastructure.Outbox
 
                 // DOCTOR EVENT
                 DoctorCreatedEvent e => new DoctorCreatedEvent(e.AggregateId),
+
+                // INVITE EVENT
+                TenantInviteCreatedEvent e => new TenantInviteCreatedEvent(
+                    e.AggregateId,
+                    e.Email,
+                    e.Token,
+                    e.ExpiresAt
+                ),
 
                 _ => null
             };

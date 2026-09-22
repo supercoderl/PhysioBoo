@@ -1,5 +1,5 @@
 ﻿using PhysioBoo.Application.ViewModels.MedicalSpecialties;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.MedicalSpecialties.UpdateMedicalSpecialty
 {

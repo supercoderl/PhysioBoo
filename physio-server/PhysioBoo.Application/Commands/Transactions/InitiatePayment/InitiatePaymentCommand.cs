@@ -1,6 +1,6 @@
 
 using PhysioBoo.Application.ViewModels.Transactions;
-using PhysioBoo.SharedKernel.Commands;
+
 using System.Text.Json.Serialization;
 
 namespace PhysioBoo.Application.Commands.Transactions.InitiatePayment

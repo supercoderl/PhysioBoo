@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.LabReports;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.LabReports.CreateLabReport
 {

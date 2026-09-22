@@ -1,5 +1,5 @@
 ﻿using PhysioBoo.Application.ViewModels.Departments;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.Departments.UpdateDepartment
 {

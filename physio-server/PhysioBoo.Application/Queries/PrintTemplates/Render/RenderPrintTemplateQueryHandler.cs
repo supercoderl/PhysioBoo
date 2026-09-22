@@ -4,9 +4,9 @@ using PhysioBoo.Application.Queries.PrintTemplates.GetById;
 using PhysioBoo.Application.ViewModels.PrintTemplates;
 using PhysioBoo.Domain.Entities.System;
 using PhysioBoo.Domain.Errors;
-using PhysioBoo.Domain.Interfaces;
+
 using PhysioBoo.Domain.Interfaces.Repositories;
-using PhysioBoo.Domain.Notifications;
+
 
 namespace PhysioBoo.Application.Queries.PrintTemplates.Render
 {

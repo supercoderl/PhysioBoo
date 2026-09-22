@@ -1,6 +1,6 @@
 ﻿
 using PhysioBoo.Application.ViewModels.AppointmentTypes;
-using PhysioBoo.SharedKernel.Commands;
+
 
 namespace PhysioBoo.Application.Commands.AppointmentTypes.CreateAppointmentType
 {

@@ -1,4 +1,3 @@
-﻿
 using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCategory
@@ -15,7 +14,10 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.CreateMedicineCatego
             RuleFor(cmd => cmd.NewMedicineCategory.Name)
                 .NotEmpty()
                 .WithErrorCode(DomainErrorCodes.MedicineCategory.EmptyName)
-                .WithMessage("Name may not be empty.");
+                .WithMessage("Name may not be empty.")
+                .MaximumLength(255)
+                .WithErrorCode(DomainErrorCodes.Validation.ExceedsMaxLength)
+                .WithMessage("Name may not be longer than 255 characters.");
         }
     }
 }

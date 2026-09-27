@@ -1,4 +1,4 @@
-﻿
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.Patients.InvitePatient
 {
@@ -6,11 +6,15 @@ namespace PhysioBoo.Application.Commands.Patients.InvitePatient
     {
         public InvitePatientToPortalCommandValidation()
         {
-            // TODO: Add your validation rules here
-            // Example:
-            // RuleFor(x => x.NewUser.Name)
-            //     .NotEmpty()
-            //     .WithMessage("Name is required");
+            RuleForPatientId();
+        }
+
+        public void RuleForPatientId()
+        {
+            RuleFor(cmd => cmd.PatientId)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.Patient.EmptyId)
+                .WithMessage("PatientId may not be empty.");
         }
     }
 }

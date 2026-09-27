@@ -1,4 +1,4 @@
-﻿
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.Prescriptions.CancelPrescription
 {
@@ -6,11 +6,24 @@ namespace PhysioBoo.Application.Commands.Prescriptions.CancelPrescription
     {
         public CancelPrescriptionCommandValidation()
         {
-            // TODO: Add your validation rules here
-            // Example:
-            // RuleFor(x => x.NewUser.Name)
-            //     .NotEmpty()
-            //     .WithMessage("Name is required");
+            RuleForPrescriptionId();
+            RuleForReason();
+        }
+
+        public void RuleForPrescriptionId()
+        {
+            RuleFor(cmd => cmd.PrescriptionId)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.Prescription.EmptyId)
+                .WithMessage("PrescriptionId may not be empty.");
+        }
+
+        public void RuleForReason()
+        {
+            RuleFor(cmd => cmd.Prescription.Reason)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.Validation.Required)
+                .WithMessage("Reason may not be empty.");
         }
     }
 }

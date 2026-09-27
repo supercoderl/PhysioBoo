@@ -1,4 +1,5 @@
-﻿
+using PhysioBoo.Application.Extensions.Validation;
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.Sys_SequenceTrackers.CreateSys_SequenceTracker
 {
@@ -6,11 +7,44 @@ namespace PhysioBoo.Application.Commands.Sys_SequenceTrackers.CreateSys_Sequence
     {
         public CreateSys_SequenceTrackerCommandValidation()
         {
-            // TODO: Add your validation rules here
-            // Example:
-            // RuleFor(x => x.NewUser.Name)
-            //     .NotEmpty()
-            //     .WithMessage("Name is required");
+            RuleForNewId();
+            RuleForEntityType();
+            RuleForPrefix();
+            RuleForSequence();
+        }
+
+        public void RuleForNewId()
+        {
+            RuleFor(cmd => cmd.NewId)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.SequenceTracker.EmptyId)
+                .WithMessage("Id may not be empty.");
+        }
+
+        public void RuleForEntityType()
+        {
+            RuleFor(cmd => cmd.NewSys_SequenceTracker.EntityType)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.Validation.Required)
+                .WithMessage("EntityType may not be empty.");
+        }
+
+        public void RuleForPrefix()
+        {
+            RuleFor(cmd => cmd.NewSys_SequenceTracker.Prefix)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.Validation.Required)
+                .WithMessage("Prefix may not be empty.");
+        }
+
+        public void RuleForSequence()
+        {
+            RuleFor(cmd => cmd.NewSys_SequenceTracker.SequenceLength)
+                .GreaterThan(0)
+                .WithErrorCode(DomainErrorCodes.Validation.OutOfRange)
+                .WithMessage("SequenceLength must be greater than 0.");
+
+            RuleFor(cmd => cmd.NewSys_SequenceTracker.CurrentSequence).NotNegative("CurrentSequence");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿
 using PhysioBoo.Domain.Errors;
+using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
 namespace PhysioBoo.Application.Extensions.Validation
@@ -31,6 +32,70 @@ namespace PhysioBoo.Application.Extensions.Validation
                 .Matches("[0-9]").WithErrorCode(DomainErrorCodes.User.NumberPassword)
                 .Matches("[^a-zA-Z0-9]").WithErrorCode(DomainErrorCodes.User.SpecialCharPassword);
             return options;
+        }
+
+        private static readonly Regex s_phone = new(@"^\+?[0-9][0-9\s\-().]{5,19}$", RegexOptions.Compiled);
+
+        public static IRuleBuilderOptions<T, string> PhoneNumber<T>(this IRuleBuilder<T, string> ruleBuilder)
+        {
+            return ruleBuilder.Matches(s_phone);
+        }
+
+        public static IRuleBuilderOptions<T, string?> MaxLen<T>(this IRuleBuilder<T, string?> ruleBuilder, int max, string field)
+        {
+            return ruleBuilder
+                .MaximumLength(max)
+                .WithErrorCode(DomainErrorCodes.Validation.ExceedsMaxLength)
+                .WithMessage($"{field} may not be longer than {max} characters.");
+        }
+
+        public static IRuleBuilderOptions<T, string?> OptionalEmail<T>(this IRuleBuilder<T, string?> ruleBuilder, string field)
+        {
+            return ruleBuilder
+                .Must(v => string.IsNullOrWhiteSpace(v) || new EmailAddressAttribute().IsValid(v))
+                .WithErrorCode(DomainErrorCodes.Validation.InvalidEmail)
+                .WithMessage($"{field} is not a valid email address.");
+        }
+
+        public static IRuleBuilderOptions<T, string?> OptionalPhone<T>(this IRuleBuilder<T, string?> ruleBuilder, string field)
+        {
+            return ruleBuilder
+                .Must(v => string.IsNullOrWhiteSpace(v) || s_phone.IsMatch(v))
+                .WithErrorCode(DomainErrorCodes.Validation.InvalidPhone)
+                .WithMessage($"{field} is not a valid phone number.");
+        }
+
+        public static IRuleBuilderOptions<T, string?> OptionalUrl<T>(this IRuleBuilder<T, string?> ruleBuilder, string field)
+        {
+            return ruleBuilder
+                .Must(v => string.IsNullOrWhiteSpace(v)
+                    || (Uri.TryCreate(v, UriKind.Absolute, out var uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)))
+                .WithErrorCode(DomainErrorCodes.Validation.InvalidUrl)
+                .WithMessage($"{field} is not a valid URL.");
+        }
+
+        public static IRuleBuilderOptions<T, decimal> NotNegative<T>(this IRuleBuilder<T, decimal> ruleBuilder, string field)
+        {
+            return ruleBuilder
+                .GreaterThanOrEqualTo(0)
+                .WithErrorCode(DomainErrorCodes.Validation.OutOfRange)
+                .WithMessage($"{field} may not be negative.");
+        }
+
+        public static IRuleBuilderOptions<T, decimal?> NotNegative<T>(this IRuleBuilder<T, decimal?> ruleBuilder, string field)
+        {
+            return ruleBuilder
+                .GreaterThanOrEqualTo(0)
+                .WithErrorCode(DomainErrorCodes.Validation.OutOfRange)
+                .WithMessage($"{field} may not be negative.");
+        }
+
+        public static IRuleBuilderOptions<T, int> NotNegative<T>(this IRuleBuilder<T, int> ruleBuilder, string field)
+        {
+            return ruleBuilder
+                .GreaterThanOrEqualTo(0)
+                .WithErrorCode(DomainErrorCodes.Validation.OutOfRange)
+                .WithMessage($"{field} may not be negative.");
         }
 
         public static IRuleBuilder<T, decimal> GeographicCoordinate<T>(

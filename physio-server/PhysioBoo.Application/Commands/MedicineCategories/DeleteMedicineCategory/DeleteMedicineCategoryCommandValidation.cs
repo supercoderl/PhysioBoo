@@ -1,4 +1,4 @@
-﻿
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.MedicineCategories.DeleteMedicineCategory
 {
@@ -6,7 +6,15 @@ namespace PhysioBoo.Application.Commands.MedicineCategories.DeleteMedicineCatego
     {
         public DeleteMedicineCategoryCommandValidation()
         {
+            RuleForId();
+        }
 
+        public void RuleForId()
+        {
+            RuleFor(cmd => cmd.Id)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.MedicineCategory.EmptyId)
+                .WithMessage("Id may not be empty.");
         }
     }
 }

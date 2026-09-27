@@ -1,4 +1,4 @@
-﻿
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.LabTestCategories.DeleteLabTestCategory
 {
@@ -6,7 +6,15 @@ namespace PhysioBoo.Application.Commands.LabTestCategories.DeleteLabTestCategory
     {
         public DeleteLabTestCategoryCommandValidation()
         {
+            RuleForId();
+        }
 
+        public void RuleForId()
+        {
+            RuleFor(cmd => cmd.Id)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.LabTestCategory.EmptyId)
+                .WithMessage("Id may not be empty.");
         }
     }
 }

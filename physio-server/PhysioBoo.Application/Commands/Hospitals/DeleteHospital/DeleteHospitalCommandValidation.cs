@@ -1,4 +1,4 @@
-﻿
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.Hospitals.DeleteHospital
 {
@@ -6,11 +6,15 @@ namespace PhysioBoo.Application.Commands.Hospitals.DeleteHospital
     {
         public DeleteHospitalCommandValidation()
         {
-            // TODO: Add your validation rules here
-            // Example:
-            // RuleFor(x => x.NewUser.Name)
-            //     .NotEmpty()
-            //     .WithMessage("Name is required");
+            RuleForId();
+        }
+
+        public void RuleForId()
+        {
+            RuleFor(cmd => cmd.Id)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.Hospital.EmptyId)
+                .WithMessage("Id may not be empty.");
         }
     }
 }

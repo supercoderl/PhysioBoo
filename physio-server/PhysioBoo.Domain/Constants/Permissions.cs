@@ -259,5 +259,14 @@
             public const string ProfileRead = "portal:profile:read";
             public const string ProfileCreate = "portal:profile:create";
         }
+
+        public static class Crm
+        {
+            public const string LeadRead = "crm:lead:read";
+            public const string LeadCreate = "crm:lead:create";
+            public const string LeadUpdate = "crm:lead:update";
+            public const string LeadDelete = "crm:lead:delete";
+        }
+
     }
 }

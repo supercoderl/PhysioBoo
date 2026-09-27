@@ -1,4 +1,4 @@
-﻿
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.Departments.DeleteDepartment
 {
@@ -6,11 +6,15 @@ namespace PhysioBoo.Application.Commands.Departments.DeleteDepartment
     {
         public DeleteDepartmentCommandValidation()
         {
-            // TODO: Add your validation rules here
-            // Example:
-            // RuleFor(x => x.NewUser.Name)
-            //     .NotEmpty()
-            //     .WithMessage("Name is required");
+            RuleForId();
+        }
+
+        public void RuleForId()
+        {
+            RuleFor(cmd => cmd.Id)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.Department.EmptyId)
+                .WithMessage("Id may not be empty.");
         }
     }
 }

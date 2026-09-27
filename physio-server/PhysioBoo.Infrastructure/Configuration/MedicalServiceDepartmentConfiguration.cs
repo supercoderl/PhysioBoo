@@ -1,3 +1,5 @@
+using PhysioBoo.Domain.Entities.Operation;
+
 namespace PhysioBoo.Infrastructure.Configuration
 {
     public sealed class MedicalServiceDepartmentConfiguration : IEntityTypeConfiguration<MedicalServiceDepartment>

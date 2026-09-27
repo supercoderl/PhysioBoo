@@ -1,4 +1,4 @@
-﻿
+using PhysioBoo.Domain.Errors;
 
 namespace PhysioBoo.Application.Commands.Roles.DeletePermissionFromRole
 {
@@ -6,11 +6,24 @@ namespace PhysioBoo.Application.Commands.Roles.DeletePermissionFromRole
     {
         public DeletePermissionFromRoleCommandValidation()
         {
-            // TODO: Add your validation rules here
-            // Example:
-            // RuleFor(x => x.NewUser.Name)
-            //     .NotEmpty()
-            //     .WithMessage("Name is required");
+            RuleForRoleId();
+            RuleForPermissionId();
+        }
+
+        public void RuleForRoleId()
+        {
+            RuleFor(cmd => cmd.RoleId)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.Role.EmptyId)
+                .WithMessage("RoleId may not be empty.");
+        }
+
+        public void RuleForPermissionId()
+        {
+            RuleFor(cmd => cmd.PermissionId)
+                .NotEmpty()
+                .WithErrorCode(DomainErrorCodes.Permission.EmptyId)
+                .WithMessage("PermissionId may not be empty.");
         }
     }
 }

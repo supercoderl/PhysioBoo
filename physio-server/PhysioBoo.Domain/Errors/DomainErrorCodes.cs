@@ -2,6 +2,21 @@
 {
     public static class DomainErrorCodes
     {
+        public static class Validation
+        {
+            // Generic field validation, shared by all modules
+            public const string ExceedsMaxLength = "VALIDATION_EXCEEDS_MAX_LENGTH";
+            public const string InvalidEmail = "VALIDATION_INVALID_EMAIL";
+            public const string InvalidPhone = "VALIDATION_INVALID_PHONE";
+            public const string InvalidUrl = "VALIDATION_INVALID_URL";
+            public const string OutOfRange = "VALIDATION_OUT_OF_RANGE";
+            public const string InvalidEnum = "VALIDATION_INVALID_ENUM";
+            public const string Required = "VALIDATION_REQUIRED";
+            public const string EmptyFile = "VALIDATION_EMPTY_FILE";
+            public const string InvalidFileType = "VALIDATION_INVALID_FILE_TYPE";
+            public const string DuplicateKey = "VALIDATION_DUPLICATE_KEY";
+        }
+
         public static class User
         {
             // User Validation
@@ -16,6 +31,13 @@
             public const string InvalidEmail = "USER_INVALID_EMAIL";
             public const string InvalidRole = "USER_INVALID_ROLE";
             public const string PasswordTooShort = "USER_PASSWORD_TOO_SHORT";
+            public const string InvalidPhone = "USER_INVALID_PHONE";
+            public const string PhoneExceedsMaxLength = "USER_PHONE_EXCEEDS_MAX_LENGTH";
+            public const string InvalidAlternatePhone = "USER_INVALID_ALTERNATE_PHONE";
+            public const string EmptyPreferredLanguage = "USER_EMPTY_PREFERRED_LANGUAGE";
+            public const string PreferredLanguageExceedsMaxLength = "USER_PREFERRED_LANGUAGE_EXCEEDS_MAX_LENGTH";
+            public const string EmptyTimeZone = "USER_EMPTY_TIME_ZONE";
+            public const string TimeZoneExceedsMaxLength = "USER_TIME_ZONE_EXCEEDS_MAX_LENGTH";
 
             // User Password Validation
             public const string EmptyPassword = "USER_PASSWORD_MAY_NOT_BE_EMPTY";
@@ -90,6 +112,7 @@
         public static class Department
         {
             // Department Validation
+            public const string EmptyId = "DEPARTMENT_EMPTY_ID";
             public const string EmptyHospitalId = "DEPARTMENT_EMPTY_HOSPITAL_ID";
             public const string EmptyName = "DEPARTMENT_EMPTY_NAME";
         }
@@ -136,7 +159,21 @@
         public static class Doctor
         {
             // Doctor Validation
+            public const string EmptyId = "DOCTOR_EMPTY_ID";
             public const string EmptyMedicalLicenseNumber = "DOCTOR_EMPTY_MEDICAL_LICENSE_NUMBER";
+        }
+
+        public static class PrintTemplate
+        {
+            // Print Template Validation
+            public const string EmptyId = "PRINT_TEMPLATE_EMPTY_ID";
+            public const string EmptyName = "PRINT_TEMPLATE_EMPTY_NAME";
+        }
+
+        public static class SequenceTracker
+        {
+            // Sequence Tracker Validation
+            public const string EmptyId = "SEQUENCE_TRACKER_EMPTY_ID";
         }
 
         public static class DoctorSchedule
@@ -461,6 +498,7 @@
             public const string EmptyCity = "SUPPLIER_EMPTY_CITY";
             public const string EmptyStateProvince = "SUPPLIER_EMPTY_STATE_PROVINCE";
             public const string EmptyCountry = "SUPPLIER_EMPTY_COUNTRY";
+            public const string EmptyCurrency = "SUPPLIER_EMPTY_CURRENCY";
         }
 
         public static class Role
@@ -505,5 +543,24 @@
             public const string Expired = "TENANT_INVITE_EXPIRED";
             public const string EmailMismatch = "TENANT_INVITE_EMAIL_MISMATCH";
         }
+
+        public static class Lead
+        {
+            // Lead Validation
+            public const string EmptyName = "LEAD_EMPTY_NAME";
+            public const string NameExceedsMaxLength = "LEAD_NAME_EXCEEDS_MAX_LENGTH";
+            public const string EmptyPhone = "LEAD_EMPTY_PHONE";
+            public const string PhoneExceedsMaxLength = "LEAD_PHONE_EXCEEDS_MAX_LENGTH";
+            public const string EmptyEmail = "LEAD_EMPTY_EMAIL";
+            public const string InvalidEmail = "LEAD_INVALID_EMAIL";
+            public const string EmailExceedsMaxLength = "LEAD_EMAIL_EXCEEDS_MAX_LENGTH";
+            public const string EmptyService = "LEAD_EMPTY_SERVICE";
+            public const string EmptySource = "LEAD_EMPTY_SOURCE";
+            public const string InvalidStatus = "LEAD_INVALID_STATUS";
+            public const string InvalidPriority = "LEAD_INVALID_PRIORITY";
+            public const string NotesExceedsMaxLength = "LEAD_NOTES_EXCEEDS_MAX_LENGTH";
+            public const string EmptyId = "LEAD_EMPTY_ID";
+        }
+
     }
 }

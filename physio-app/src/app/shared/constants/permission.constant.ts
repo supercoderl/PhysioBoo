@@ -180,6 +180,9 @@ export const Permissions = {
         SecurityUnblockIp: "system:security:unblock-ip",
         DevAccess: "system:dev:access",
     },
+    Academy: {
+        CourseManage: "academy:course:manage",
+    },
     Portal: {
         ReviewRead: "portal:review:read",
         ReviewCreate: "portal:review:create",

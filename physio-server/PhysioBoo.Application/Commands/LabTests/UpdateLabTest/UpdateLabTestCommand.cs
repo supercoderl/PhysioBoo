@@ -1,7 +1,7 @@
 ﻿using PhysioBoo.Application.ViewModels.LabTests;
 
 
-namespace PhysioBoo.Application.Commands.LabTests.UpdateLabTest.Commands.UpdateLabTestCommand
+namespace PhysioBoo.Application.Commands.LabTests.UpdateLabTest
 {
     public sealed class UpdateLabTestCommand : CommandBase
     {

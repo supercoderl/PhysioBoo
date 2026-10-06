@@ -15,12 +15,12 @@ namespace PhysioBoo.Application.Queries.Dispensing
         /// </summary>
         public static readonly PrescriptionStatus[] DispensableStatuses = { PrescriptionStatus.Issued, PrescriptionStatus.PartiallyDispensed };
 
-        public static string SeverityLabel(Severity severity) => severity switch
+        public static string SeverityLabel(Domain.Enums.Severity severity) => severity switch
         {
-            Severity.Critical => "Critical",
-            Severity.Severe => "High",
-            Severity.Moderate => "Medium",
-            Severity.Mild => "Low",
+            Domain.Enums.Severity.Critical => "Critical",
+            Domain.Enums.Severity.Severe => "High",
+            Domain.Enums.Severity.Moderate => "Medium",
+            Domain.Enums.Severity.Mild => "Low",
             _ => "Info"
         };
 
@@ -33,7 +33,7 @@ namespace PhysioBoo.Application.Queries.Dispensing
         };
 
         public static bool HasUnacknowledgedCritical(Prescription prescription) =>
-            prescription.PrescriptionItems.Any(i => i.PrescriptionClinicalWarnings.Any(w => w.Severity == Severity.Critical && w.AcknowledgedAt == null));
+            prescription.PrescriptionItems.Any(i => i.PrescriptionClinicalWarnings.Any(w => w.Severity == Domain.Enums.Severity.Critical && w.AcknowledgedAt == null));
 
         public static string Priority(Prescription prescription)
         {
@@ -42,12 +42,12 @@ namespace PhysioBoo.Application.Queries.Dispensing
                 .Where(w => w.AcknowledgedAt == null)
                 .ToList();
 
-            if (open.Any(w => w.Severity == Severity.Critical)) return "Critical";
+            if (open.Any(w => w.Severity == Domain.Enums.Severity.Critical)) return "Critical";
 
             bool highRiskPatient = prescription.Patient?.RiskLevel is RiskLevel.High or RiskLevel.Critical;
             bool controlled = prescription.PrescriptionItems.Any(i => i.IsControlledSubstance);
 
-            return open.Any(w => w.Severity == Severity.Severe) || highRiskPatient || controlled ? "High" : "Normal";
+            return open.Any(w => w.Severity == Domain.Enums.Severity.Severe) || highRiskPatient || controlled ? "High" : "Normal";
         }
 
         /// <summary>

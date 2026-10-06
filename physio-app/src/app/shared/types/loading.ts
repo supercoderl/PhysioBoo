@@ -65,6 +65,32 @@ export const LoadingKeys = {
         DISCHARGE: 'surgery-discharge',
         PATIENT_SUMMARY: 'surgery-patient-summary'
     },
+    NOTE: {
+        LIST: 'note-list',
+        LABELS: 'note-labels',
+        SAVE: 'note-save',
+        DELETE: 'note-delete'
+    },
+    SCRUMBOARD: {
+        BOARDS: 'scrumboard-boards',
+        BOARD: 'scrumboard-board',
+        BOARD_SAVE: 'scrumboard-board-save',
+        BOARD_DELETE: 'scrumboard-board-delete',
+        LIST_SAVE: 'scrumboard-list-save',
+        LIST_DELETE: 'scrumboard-list-delete',
+        CARD_SAVE: 'scrumboard-card-save',
+        CARD_DELETE: 'scrumboard-card-delete',
+        CARD_MOVE: 'scrumboard-card-move'
+    },
+    ACADEMY: {
+        COURSES: 'academy-courses',
+        COURSE: 'academy-course',
+        COURSE_SAVE: 'academy-course-save',
+        COURSE_DELETE: 'academy-course-delete',
+        LESSON_SAVE: 'academy-lesson-save',
+        LESSON_DELETE: 'academy-lesson-delete',
+        LESSON_COMPLETE: 'academy-lesson-complete'
+    },
     INSURANCE_CLAIMS: {
         CLAIMS_SEARCH: 'insurance-claims-search',
         CLAIM_DETAIL: 'insurance-claim-detail',

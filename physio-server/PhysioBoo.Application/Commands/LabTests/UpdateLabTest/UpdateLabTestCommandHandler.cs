@@ -4,7 +4,7 @@ using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces.Repositories;
 
 
-namespace PhysioBoo.Application.Commands.LabTests.UpdateLabTest.Commands.UpdateLabTestCommand
+namespace PhysioBoo.Application.Commands.LabTests.UpdateLabTest
 {
     public sealed class UpdateLabTestCommandHandler : CommandHandlerBase, IRequestHandler<UpdateLabTestCommand>
     {

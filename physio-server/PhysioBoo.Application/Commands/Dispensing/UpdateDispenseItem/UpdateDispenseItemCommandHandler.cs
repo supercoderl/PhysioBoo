@@ -81,7 +81,7 @@ namespace PhysioBoo.Application.Commands.Dispensing.UpdateDispenseItem
                 DispenseItemStatus status = Enum.Parse<DispenseItemStatus>(request.Status, true);
 
                 if (status == DispenseItemStatus.Picked
-                    && prescriptionItem.PrescriptionClinicalWarnings.Any(w => w.Severity == Severity.Critical && w.AcknowledgedAt == null))
+                    && prescriptionItem.PrescriptionClinicalWarnings.Any(w => w.Severity == Domain.Enums.Severity.Critical && w.AcknowledgedAt == null))
                 {
                     await NotifyAsync(new DomainNotification(request.MessageType, "Acknowledge the Critical clinical alert on this line before picking it.", DomainErrorCodes.Dispensing.UnacknowledgedCritical));
                     return;

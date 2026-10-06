@@ -1,246 +1,106 @@
 <div class="relative z-10 flex min-h-0 flex-auto flex-col">
   <div class="container flex shrink-0 grow flex-col items-center p-4">
-    <div style="opacity: 1">
-      <div class="flex flex-col">
-        <admin-breadcrumb></admin-breadcrumb>
-        <p
-          class="tracking-tight font-extrabold leading-none text-[22px] text-center m-0"
-        >
-          Scrumboard Boards
-        </p>
+    <div class="flex flex-col">
+      <admin-breadcrumb></admin-breadcrumb>
+      <p class="tracking-tight font-extrabold leading-none text-[22px] text-center m-0">
+        Scrumboard Boards
+      </p>
+    </div>
+
+    <!-- Loading skeleton -->
+    <div *ngIf="isLoading()" class="mt-8 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:mt-12 md:gap-6 lg:grid-cols-4" aria-busy="true">
+      <div *ngFor="let i of [1, 2, 3, 4]" class="min-h-60 animate-pulse rounded-lg bg-surface p-6 shadow-sm">
+        <div class="h-12 w-12 rounded-full bg-gray-200"></div>
+        <div class="mt-5 h-4 w-2/3 rounded bg-gray-200"></div>
+        <div class="mt-3 h-3 w-full rounded bg-gray-100"></div>
       </div>
     </div>
-    <div
-      class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-2 md:mt-12 md:gap-6 lg:grid-cols-4"
-    >
-      <div
-        class="min-h-80 min-w-full sm:min-w-56 md:min-h-90"
-        style="opacity: 1; transform: none"
+
+    <div *ngIf="!isLoading()" class="mt-8 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:mt-12 md:gap-6 lg:grid-cols-4">
+      <a
+        *ngFor="let board of boards(); trackBy: trackById"
+        [routerLink]="['/admin/system/scrumboard/board', board.id]"
+        class="min-h-60 md:p-6 transition-shadow duration-150 ease-in-out shadow-sm hover:shadow-md p-4 rounded-lg flex flex-col w-full h-full bg-surface text-[#1F232B] no-underline focus:outline-none focus:ring-2 focus:ring-primary"
       >
-        <a
-          role="button"
-          class="md:p-6 transition-shadow duration-150 ease-in-out shadow-sm p-4 rounded-lg flex flex-col w-full h-full bg-surface text-[#1F232B]"
-          href="/apps/scrumboard/boards/2c82225f-2a6c-45d3-b18a-1132712a4234"
-          data-discover="true"
-          >
-          <div
-            class="flex w-full flex-auto flex-col items-start justify-start"
-          >
-            <div
-              class="p-4 rounded-full flex-center-center bg-primary/20 text-primary"
-            >
-              <boo-icon name="blocks"></boo-icon>
-            </div>
-            <p
-              class="font-medium leading-5 text-[14px] mt-5 m-0"
-            >
-              Admin Dashboard
-            </p>
-            <p
-              class="line-clamp-2 mt-0.5 m-0 text-[13px] leading-[1.5]"
-            >
-              Roadmap for the new project
-            </p>
-            <hr
-              class="w-12 h-0.5 mt-6 m-0 shrink-0 border-[0_0_thin] border-solid border-[#E5E7EB]"
-            />
+        <div class="flex w-full flex-auto flex-col items-start justify-start">
+          <div class="p-4 rounded-full flex-center-center bg-primary/20 text-primary">
+            <boo-icon name="blocks"></boo-icon>
           </div>
-          <div class="flex w-full flex-auto flex-col items-start justify-end">
-            <div
-              class="flex flex-row-reverse"
-            >
-              <div
-                class="border-2 border-solid border-[#F6F7F8] -ml-2 relative flex-center-center shrink-0 leading-none rounded-full overflow-hidden text-[#F6F7F8] bg-[#9CA3AF] w-9 h-9 text-[13px]"
-              >
-                +2
-              </div>
-              <div
-                class="border-2 border-solid border-[#F6F7F8] -ml-2 relative flex-center-center shrink-0 leading-none rounded-full overflow-hidden w-9 h-9 text-[13px]"
-              >
-                <img
-                  alt="member"
-                  class="w-full h-full text-center object-cover"
-                  src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/avatars/female-12.jpg"
-                />
-              </div>
-              <div
-                class="border-2 border-solid border-[#F6F7F8] -ml-2 relative flex-center-center shrink-0 leading-none rounded-full overflow-hidden w-9 h-9 text-[13px]"
-              >
-                <img
-                  alt="member"
-                  class="w-full h-full text-center object-cover"
-                  src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/avatars/female-05.jpg"
-                />
-              </div>
-              <div
-                class="border-2 border-solid border-[#F6F7F8] -ml-2 relative flex-center-center shrink-0 leading-none rounded-full overflow-hidden w-9 h-9 text-[13px]"
-              >
-                <img
-                  alt="member"
-                  class="w-full h-full text-center object-cover"
-                  src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/avatars/female-10.jpg"
-                />
-              </div>
-            </div>
-            <div class="text-md font-md mt-6 flex items-center">
-              <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
-                Edited:
-              </p>
-              <p
-                class="truncate mx-1 m-0 text-[13px] leading-[1.5]"
-              >
-                almost 4 years ago
-              </p>
-            </div>
-          </div></a
-        >
-      </div>
-      <div
-        class="min-h-80 min-w-full sm:min-w-56 md:min-h-90"
-        style="opacity: 1; transform: none"
-      >
-        <a
-          role="button"
-          class="md:p-6 transition-shadow duration-150 ease-in-out shadow-sm p-4 rounded-lg flex flex-col w-full h-full bg-surface text-[#1F232B]"
-          href="/apps/scrumboard/boards/0168b519-3dab-4b46-b2ea-0e678e38a583"
-          data-discover="true"
-          ><div
-            class="flex w-full flex-auto flex-col items-start justify-start"
-          >
-            <div
-              class="p-4 rounded-full flex-center-center bg-primary/20 text-primary"
-            >
-              <boo-icon name="calendar"></boo-icon>
-            </div>
-            <p
-              class="font-medium leading-5 text-[14px] mt-5 m-0"
-            >
-              Weekly Planning
-            </p>
-            <p
-              class="line-clamp-2 mt-0.5 m-0 text-[13px] leading-[1.5]"
-            >
-              Job related tasks for the week
-            </p>
-            <hr
-              class="w-12 h-0.5 mt-6 m-0 shrink-0 border-[0_0_thin] border-solid border-[#E5E7EB]"
-            />
-          </div>
-          <div class="flex w-full flex-auto flex-col items-start justify-end">
-            <div
-              class="flex flex-row-reverse"
-            >
-              <div
-                class="border-2 border-solid border-[#F6F7F8] -ml-2 relative flex-center-center shrink-0 leading-none rounded-full overflow-hidden w-9 h-9 text-[13px]"
-              >
-                <img
-                  alt="member"
-                  class="w-full h-full text-center object-cover"
-                  src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/avatars/male-02.jpg"
-                />
-              </div>
-              <div
-                class="border-2 border-solid border-[#F6F7F8] -ml-2 relative flex-center-center shrink-0 leading-none rounded-full overflow-hidden w-9 h-9 text-[13px]"
-              >
-                <img
-                  alt="member"
-                  class="w-full h-full text-center object-cover"
-                  src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/avatars/male-03.jpg"
-                />
-              </div>
-              <div
-                class="border-2 border-solid border-[#F6F7F8] -ml-2 relative flex-center-center shrink-0 leading-none rounded-full overflow-hidden w-9 h-9 text-[13px]"
-              >
-                <img
-                  alt="member"
-                  class="w-full h-full text-center object-cover"
-                  src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/avatars/female-03.jpg"
-                />
-              </div>
-            </div>
-            <div class="text-md font-md mt-6 flex items-center">
-              <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
-                Edited:
-              </p>
-              <p
-                class="truncate mx-1 m-0 text-[13px] leading-[1.5]"
-              >
-                almost 4 years ago
-              </p>
-            </div>
-          </div></a
-        >
-      </div>
-      <div
-        class="min-h-80 min-w-full sm:min-w-56 md:min-h-90"
-        style="opacity: 1; transform: none"
-      >
-        <a
-          role="button"
-          class="md:p-6 transition-shadow duration-150 ease-in-out shadow-sm p-4 rounded-lg flex flex-col w-full h-full bg-surface text-[#1F232B]"
-          href="/apps/scrumboard/boards/bc7db965-3c4f-4233-abf5-69bd70c3c175"
-          data-discover="true"
-          ><div
-            class="flex w-full flex-auto flex-col items-start justify-start"
-          >
-            <div
-              class="p-4 rounded-full flex-center-center bg-primary/20 text-primary"
-            >
-              <boo-icon name="house"></boo-icon>
-            </div>
-            <p
-              class="font-medium leading-5 text-[14px] mt-5 m-0"
-            >
-              Personal Tasks
-            </p>
-            <p
-              class="line-clamp-2 mt-0.5 m-0 text-[13px] leading-[1.5]"
-            >
-              Personal tasks around the house
-            </p>
-            <hr
-              class="w-12 h-0.5 mt-6 m-0 shrink-0 border-[0_0_thin] border-solid border-[#E5E7EB]"
-            />
-          </div>
-          <div class="flex w-full flex-auto flex-col items-start justify-end">
-            <div
-              class="flex flex-row-reverse"
-            >
-              <div
-                class="border-2 border-solid border-[#F6F7F8] -ml-2 relative flex-center-center shrink-0 leading-none rounded-full overflow-hidden w-9 h-9 text-[13px]"
-              >
-                <img
-                  alt="member"
-                  class="w-full h-full text-center object-cover"
-                  src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/avatars/female-01.jpg"
-                />
-              </div>
-            </div>
-            <div class="text-md font-md mt-6 flex items-center">
-              <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
-                Edited:
-              </p>
-              <p
-                class="truncate mx-1 m-0 text-[13px] leading-[1.5]"
-              >
-                almost 4 years ago
-              </p>
-            </div>
-          </div></a
-        >
-      </div>
-      <div
-        class="min-h-80 min-w-full sm:min-w-56 md:min-h-90"
-        style="opacity: 1; transform: none"
-      >
-        <div
-          class="hover:bg-hover flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 transition-colors duration-150 ease-in-out MuiBox-root muiltr-13hff95"
-          role="button"
-          tabindex="0"
-        >
-          <boo-icon name="plus" [size]="52" classname="stroke-[#BFC4CC]"></boo-icon>
+          <p class="font-medium leading-5 text-[14px] mt-5 m-0">{{ board.title }}</p>
+          <p *ngIf="board.description" class="line-clamp-2 mt-0.5 m-0 text-[13px] leading-[1.5]">{{ board.description }}</p>
+          <hr class="w-12 h-0.5 mt-6 m-0 shrink-0 border-[0_0_thin] border-solid border-[#E5E7EB]" />
         </div>
-      </div>
+        <div class="flex w-full flex-auto flex-col items-start justify-end">
+          <p class="m-0 mt-4 text-[13px] leading-[1.5] text-[#4B5563]">
+            {{ board.listCount }} {{ board.listCount === 1 ? 'list' : 'lists' }} · {{ board.cardCount }} {{ board.cardCount === 1 ? 'card' : 'cards' }}
+          </p>
+          <div class="mt-2 flex items-center text-[13px] leading-[1.5]">
+            <span class="text-[#4B5563]">Edited:</span>
+            <span class="truncate mx-1">{{ board.updatedAt | date:'MMM d, y, h:mm a' }}</span>
+          </div>
+        </div>
+      </a>
+
+      <button
+        type="button"
+        (click)="openDialog()"
+        class="min-h-60 flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-[#E5E7EB] bg-transparent p-4 text-[#4B5563] hover:border-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+      >
+        <boo-icon name="plus" [size]="28"></boo-icon>
+        <span class="text-[14px] font-medium">New board</span>
+      </button>
+    </div>
+
+    <div *ngIf="!isLoading() && !boards().length" class="mt-6 w-full">
+      <boo-empty-state icon="blocks" title="No boards yet" description="Create the first board to start organising work."></boo-empty-state>
+    </div>
+  </div>
+</div>
+
+<!-- New board dialog -->
+<div *ngIf="draft() as d" class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4" (click)="closeDialog()">
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-label="New board"
+    class="w-full max-w-md rounded-xl bg-surface shadow-xl"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="border-b border-[#E5E7EB] px-4 py-3">
+      <h2 class="m-0 text-[16px] font-semibold">New board</h2>
+    </div>
+    <div class="space-y-3 px-4 py-3">
+      <label class="block">
+        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Title</span>
+        <input
+          type="text"
+          [(ngModel)]="d.title"
+          (keydown.enter)="createBoard()"
+          maxlength="120"
+          autofocus
+          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
+        />
+      </label>
+      <label class="block">
+        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Description</span>
+        <textarea
+          [(ngModel)]="d.description"
+          maxlength="500"
+          rows="3"
+          class="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-[14px] outline-none focus:border-primary"
+        ></textarea>
+      </label>
+    </div>
+    <div class="flex justify-end gap-2 border-t border-[#E5E7EB] px-4 py-3">
+      <button type="button" (click)="closeDialog()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#4B5563] hover:bg-gray-100">Cancel</button>
+      <button
+        type="button"
+        (click)="createBoard()"
+        [disabled]="!canCreate()"
+        class="rounded-lg bg-primary px-4 min-h-10 text-[13px] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {{ isSaving() ? 'Creating...' : 'Create' }}
+      </button>
     </div>
   </div>
 </div>

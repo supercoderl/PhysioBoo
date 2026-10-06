@@ -1,6 +1,6 @@
 ﻿
 
-namespace PhysioBoo.Application.Commands.LabTests.DeleteLabTest.Commands.DeleteLabTestCommand
+namespace PhysioBoo.Application.Commands.LabTests.DeleteLabTest
 {
     public sealed class DeleteLabTestCommand : CommandBase
     {

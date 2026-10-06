@@ -264,9 +264,9 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces<ResponseMessage<WarehouseBatchViewModel?>>(StatusCodes.Status200OK)
             .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryCreate);
 
-            group.MapPost("/batches/{id:guid}/transfer", ([FromRoute] Guid id, [FromBody] TransferBatchViewModel body, IMediatorHandler bus) =>
+            group.MapPost("/batches/{id:guid}/transfer", ([FromRoute] Guid id, [FromBody] TransferInventoryBatchViewModel body, IMediatorHandler bus) =>
                 ChangeBatchAsync(bus, new ChangeBatchCommand(id, InventoryBatchAction.Transfer) { Quantity = body.Quantity, ToZoneId = body.ToZoneId }))
-            .WithName("TransferBatch")
+            .WithName("TransferInventoryBatch")
             .WithSummary("Move a batch (or part of it) to another warehouse zone")
             .Produces<ResponseMessage<WarehouseBatchViewModel?>>(StatusCodes.Status200OK)
             .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryUpdate);
@@ -278,23 +278,23 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces<ResponseMessage<WarehouseBatchViewModel?>>(StatusCodes.Status200OK)
             .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryUpdate);
 
-            group.MapPost("/batches/{id:guid}/reserve", ([FromRoute] Guid id, [FromBody] ReserveBatchViewModel body, IMediatorHandler bus) =>
+            group.MapPost("/batches/{id:guid}/reserve", ([FromRoute] Guid id, [FromBody] ReserveInventoryBatchViewModel body, IMediatorHandler bus) =>
                 ChangeBatchAsync(bus, new ChangeBatchCommand(id, InventoryBatchAction.Reserve) { Quantity = body.Quantity, Reason = body.Reference }))
-            .WithName("ReserveBatch")
+            .WithName("ReserveInventoryBatch")
             .WithSummary("Reserve part of a batch")
             .Produces<ResponseMessage<WarehouseBatchViewModel?>>(StatusCodes.Status200OK)
             .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryUpdate);
 
-            group.MapPost("/batches/{id:guid}/lock", ([FromRoute] Guid id, [FromBody] LockBatchViewModel body, IMediatorHandler bus) =>
+            group.MapPost("/batches/{id:guid}/lock", ([FromRoute] Guid id, [FromBody] LockInventoryBatchViewModel body, IMediatorHandler bus) =>
                 ChangeBatchAsync(bus, new ChangeBatchCommand(id, InventoryBatchAction.Lock) { Reason = body.Reason }))
-            .WithName("LockBatch")
+            .WithName("LockInventoryBatch")
             .WithSummary("Quarantine a batch so it can't be dispensed or sold")
             .Produces<ResponseMessage<WarehouseBatchViewModel?>>(StatusCodes.Status200OK)
             .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryUpdate);
 
-            group.MapPost("/batches/{id:guid}/dispose", ([FromRoute] Guid id, [FromBody] DisposeBatchViewModel body, IMediatorHandler bus) =>
+            group.MapPost("/batches/{id:guid}/dispose", ([FromRoute] Guid id, [FromBody] DisposeInventoryBatchViewModel body, IMediatorHandler bus) =>
                 ChangeBatchAsync(bus, new ChangeBatchCommand(id, InventoryBatchAction.Dispose) { Quantity = body.Quantity, Reason = body.Reason }))
-            .WithName("DisposeBatch")
+            .WithName("DisposeInventoryBatch")
             .WithSummary("Write off damaged or expired stock from a batch")
             .Produces<ResponseMessage<WarehouseBatchViewModel?>>(StatusCodes.Status200OK)
             .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryDelete);

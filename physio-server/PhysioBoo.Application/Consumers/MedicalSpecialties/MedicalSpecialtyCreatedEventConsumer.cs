@@ -1,6 +1,6 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
-using PhysioBoo.Application.Commands.Sys_Media.CreateMedia;
+using PhysioBoo.Application.Commands.Sys_MediaFiles.CreateMedia;
 using PhysioBoo.Application.ViewModels.Sys_MediaFiles;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 

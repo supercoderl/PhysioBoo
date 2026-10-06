@@ -339,6 +339,27 @@ export const routes: Routes = [
                 ]
             },
             {
+                path: 'academy',
+                data: { breadcrumb: ['academy'] },
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'list',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'list',
+                        data: { breadcrumb: ['list'] },
+                        loadComponent: () => import('./academy/list/list.component').then(m => m.ListAcademyComponent),
+                    },
+                    {
+                        path: 'course/:id',
+                        data: { breadcrumb: ['course'] },
+                        loadComponent: () => import('./academy/course/course.component').then(m => m.CourseAcademyComponent),
+                    }
+                ]
+            },
+            {
                 path: 'system',
                 data: { breadcrumb: ['system'] },
                 children: [
@@ -381,6 +402,11 @@ export const routes: Routes = [
                                 path: 'list',
                                 data: { breadcrumb: ['list'] },
                                 loadComponent: () => import('./system/scrumboard/list/list.component').then(m => m.ListScrumboardComponent),
+                            },
+                            {
+                                path: 'board/:id',
+                                data: { breadcrumb: ['board'] },
+                                loadComponent: () => import('./system/scrumboard/board/board.component').then(m => m.BoardScrumboardComponent),
                             }
                         ]
                     },

@@ -1,7 +1,7 @@
 ﻿using PhysioBoo.Application.ViewModels.Sys_MediaFiles;
 
 
-namespace PhysioBoo.Application.Commands.Sys_Media.CreateMedia
+namespace PhysioBoo.Application.Commands.Sys_MediaFiles.CreateMedia
 {
     public sealed class CreateMediaCommand : CommandBase
     {

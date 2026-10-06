@@ -1,555 +1,300 @@
 <admin-content-header>
-  <div
-    class="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center"
-  >
+  <div class="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center">
     <div class="flex min-w-0 flex-auto flex-col sm:flex-row sm:items-center">
       <div class="flex flex-auto flex-col">
-        <p class="tracking-tight font-extrabold leading-none text-[22px] m-0">
-          Notes
-        </p>
-        <p
-          class="tracking-tight font-medium m-0 text-[13px] leading-[1.5] text-[#4B5563]"
-        >
+        <p class="tracking-tight font-extrabold leading-none text-[22px] m-0">Notes</p>
+        <p class="tracking-tight font-medium m-0 text-[13px] leading-[1.5] text-[#4B5563]">
           Capture and organize your thoughts and ideas
         </p>
       </div>
       <div class="mt-2 flex items-center gap-2 sm:mx-2 sm:mt-0">
-        <button-icon [icon]="{ name: 'menu' }"></button-icon>
-        <button-icon
-          [icon]="{ name: 'arrow-up-down', class: 'stroke-[#E5E7EB]' }"
-        ></button-icon>
-        <div
-          class="flex flex-auto sm:grow-0"
-          style="opacity: 1; transform: none"
+        <button
+          type="button"
+          (click)="toggleArchived()"
+          [attr.aria-pressed]="showArchived"
+          class="flex items-center gap-1.5 rounded-lg border px-3 min-h-10 text-[13px] font-medium transition-colors"
+          [ngClass]="showArchived ? 'bg-primary text-white border-primary' : 'bg-surface text-[#4B5563] border-[#E5E7EB] hover:bg-gray-50'"
         >
-          <boo-search></boo-search>
-        </div>
+          <boo-icon name="archive" [size]="16"></boo-icon>
+          Archived
+        </button>
+        <label class="flex flex-auto sm:grow-0 items-center gap-2 rounded-lg border border-[#E5E7EB] bg-surface px-3 min-h-10">
+          <boo-icon name="search" [size]="16" iconClass="text-gray-400"></boo-icon>
+          <input
+            type="search"
+            [(ngModel)]="search"
+            (ngModelChange)="onSearchChange($event)"
+            placeholder="Search notes"
+            aria-label="Search notes"
+            class="w-full bg-transparent text-[14px] outline-none"
+          />
+        </label>
       </div>
     </div>
   </div>
 </admin-content-header>
-<div
-  class="relative z-10 container flex flex-auto flex-col overflow-hidden"
->
-  <div
-    class="flex flex-1 z-[2] max-w-full min-w-0 bg-surface rounded-t-[12px] mt-0.5 mx-0.5"
-  >
-    <div id="" class="ps flex flex-col flex-1 z-[9999]">
-      <div class="flex-[1_0_auto]">
-        <div class="flex w-full flex-col items-center p-4 md:p-6">
-          <div class="flex w-full justify-center pb-4">
-            <div
-              class="border border-solid rounded-lg flex items-center shrink-0 max-w-128 w-full min-h-10 bg-surface border-[#E5E7EB]"
-            >
-              <p
-                class="text-[14px] leading-[1.5] px-3 w-full m-0 text-[#4B5563]"
+
+<div class="relative z-10 container flex flex-auto flex-col overflow-hidden">
+  <div class="flex-[1_0_auto]">
+    <div class="flex w-full flex-col items-center p-4 md:p-6">
+      <!-- Composer -->
+      <div *ngIf="!showArchived" class="flex w-full justify-center pb-4">
+        <button
+          type="button"
+          (click)="openNew()"
+          class="border border-solid rounded-lg flex items-center gap-2 shrink-0 max-w-128 w-full min-h-10 bg-surface border-[#E5E7EB] px-3 text-left text-[14px] leading-[1.5] text-[#4B5563] hover:border-gray-300"
+        >
+          <boo-icon name="plus" [size]="16"></boo-icon>
+          Take a note...
+        </button>
+      </div>
+
+      <!-- Labels -->
+      <div *ngIf="labels().length" class="flex w-full flex-wrap gap-2 pb-4" role="group" aria-label="Filter by label">
+        <button
+          *ngFor="let l of labels()"
+          type="button"
+          (click)="selectLabel(l.label)"
+          [attr.aria-pressed]="activeLabel === l.label"
+          class="rounded-full border px-3 py-1 text-[12px] font-medium transition-colors"
+          [ngClass]="activeLabel === l.label ? 'bg-primary text-white border-primary' : 'bg-surface text-[#1F232B] border-[#E5E7EB] hover:bg-gray-50'"
+        >
+          {{ l.label }} <span class="opacity-70">· {{ l.count }}</span>
+        </button>
+      </div>
+
+      <!-- Loading skeleton -->
+      <div *ngIf="isLoading()" class="w-full columns-1 sm:columns-2 lg:columns-3 gap-4" aria-busy="true">
+        <div *ngFor="let i of [1, 2, 3, 4, 5, 6]" class="break-inside-avoid mb-4 rounded-lg border border-[#E5E7EB] bg-surface p-4 animate-pulse">
+          <div class="h-4 w-2/3 rounded bg-gray-200"></div>
+          <div class="mt-3 h-3 w-full rounded bg-gray-100"></div>
+          <div class="mt-2 h-3 w-4/5 rounded bg-gray-100"></div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!isLoading() && !notes().length" class="w-full">
+        <boo-empty-state
+          icon="sticky-note"
+          [title]="showArchived ? 'No archived notes' : (search || activeLabel ? 'No notes match your search' : 'No notes yet')"
+          [description]="showArchived ? 'Notes you archive appear here.' : (search || activeLabel ? 'Try a different search or label.' : 'Use “Take a note...” to add your first one.')"
+        ></boo-empty-state>
+      </div>
+
+      <!-- Notes -->
+      <div *ngIf="!isLoading() && notes().length" class="w-full columns-1 sm:columns-2 lg:columns-3 gap-4">
+        <div *ngFor="let note of notes(); trackBy: trackById" class="break-inside-avoid mb-4">
+          <div
+            role="button"
+            tabindex="0"
+            (click)="openNote(note)"
+            (keydown.enter)="openNote(note)"
+            [attr.aria-label]="'Open note ' + (note.title || note.content)"
+            class="group border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <div class="flex items-start justify-between gap-2 px-4 pt-3">
+              <p class="m-0 font-semibold text-[14px] leading-[1.5] break-words">{{ note.title }}</p>
+              <button
+                type="button"
+                (click)="togglePin(note, $event)"
+                [attr.aria-label]="note.isPinned ? 'Unpin note' : 'Pin note'"
+                [attr.aria-pressed]="note.isPinned"
+                class="shrink-0 rounded p-1 hover:bg-gray-200"
+                [ngClass]="note.isPinned ? 'text-primary' : 'text-gray-400'"
               >
-                Take a note...
-              </p>
+                <boo-icon name="pin" [size]="16"></boo-icon>
+              </button>
             </div>
-          </div>
-          <div class="flex w-full flex-wrap">
-            <div
-              class="w-full columns-3 gap-4"
-            >
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
+
+            <div *ngIf="note.content" class="px-4 my-3 text-[13px] leading-[1.5]">
+              <div class="w-full break-words whitespace-pre-line">{{ note.content }}</div>
+            </div>
+
+            <ul *ngIf="note.checklist.length" class="my-3 flex flex-wrap px-4 list-none">
+              <li *ngFor="let item of note.checklist; let i = index" class="flex w-full items-center">
+                <button
+                  type="button"
+                  (click)="toggleItem(note, i, $event)"
+                  [attr.aria-label]="(item.done ? 'Mark not done: ' : 'Mark done: ') + item.text"
+                  class="shrink-0 rounded p-1"
+                  [ngClass]="item.done ? 'text-primary' : 'text-gray-400'"
                 >
-                  <div class="px-4 my-3 text-[13px] leading-[1.5]">
-                    <div class="w-full break-words text-base">
-                      Find a new company name
-                    </div>
-                  </div>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/e2f749f5-41ed-49d0-a92a-1c83d879e371"
-                      data-discover="true"
-                    >
-                      <span class="truncate px-2">Work</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
-                >
-                  <img
-                    class="block w-full"
-                    alt="note"
-                    src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/cards/14-640x480.jpg"
-                  />
-                  <div class="px-4 my-3 text-[13px] leading-[1.5]">
-                    <div class="w-full break-words text-base">
-                      Send the photos of last summer to John
-                    </div>
-                  </div>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/bbc73458-940b-421c-8d5f-8dcd23a9b0d6"
-                      data-discover="true"
-                    >
-                      <span class="truncate px-2">Personal</span>
-                    </a>
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/b1cde9ee-e54d-4142-ad8b-cf55dafc9528"
-                      data-discover="true"
-                    >
-                      <span class="truncate px-2">Tasks</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
-                >
-                  <div class="px-4 my-3 text-[13px] leading-[1.5]">
-                    <div class="w-full break-words text-base">
-                      Update the design of the theme
-                    </div>
-                  </div>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/6c288794-47eb-4605-8bdf-785b61a449d3"
-                      data-discover="true"
-                    >
-                      <span class="truncate px-2">Priority</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
-                >
-                  <div class="px-4 my-3 text-[13px] leading-[1.5]">
-                    <div class="w-full break-words text-base">
-                      Theming support for all apps
-                    </div>
-                  </div>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <div
-                      class="max-w-full mt-1 mx-0.5 text-[12px] inlineFlex-center-center leading-[1.5] align-middle text-[#1F232B] bg-transparent h-5.5 min-h-5.5 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                    >
-                      <boo-icon name="clock"></boo-icon>
-                      <span class="text-[11px] leading-[1.4] truncate px-2"
-                        >Mar 10 22, 4:34</span
-                      >
-                    </div>
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/e2f749f5-41ed-49d0-a92a-1c83d879e371"
-                      data-discover="true"
-                    >
-                      <span class="truncate px-2">Work</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
-                >
-                  <p class="font-semibold text-[13px] leading-[1.5] px-4 my-3">
-                    Gift Ideas
-                  </p>
-                  <div class="px-4 my-3 text-[13px] leading-[1.5]">
-                    <div class="w-full break-words text-base">
-                      Stephanie's birthday is coming and I need to pick a
-                      present for her. Take a look at the below list and buy one
-                      of them (or all of them)
-                    </div>
-                  </div>
-                  <ul class="my-3 flex flex-wrap px-4">
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p class="text-[11px] leading-[1.4] truncate mx-2 mb-0">
-                        Scarf
-                      </p>
-                    </li>
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p
-                        class="line-through text-[12px] truncate mx-2 mb-0 leading-[1.5] text-[#4B5563]"
-                      >
-                        A new bike helmet
-                      </p>
-                    </li>
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p class="text-[11px] leading-[1.4] truncate mx-2 mb-0">
-                        Necklace
-                      </p>
-                    </li>
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p class="text-[11px] leading-[1.4] truncate mx-2 mb-0">
-                        Flowers
-                      </p>
-                    </li>
-                  </ul>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/f47c92e5-20b9-44d9-917f-9ff4ad25dfd0"
-                      data-discover="true"
-                    >
-                      <span class="truncate px-2">Family</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
-                >
-                  <p class="font-semibold text-[13px] leading-[1.5] px-4 my-3">
-                    Shopping list
-                  </p>
-                  <ul class="my-3 flex flex-wrap px-4">
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p
-                        class="line-through text-[12px] truncate mx-2 mb-0 leading-[1.5] text-[#4B5563]"
-                      >
-                        Bread
-                      </p>
-                    </li>
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p class="text-[11px] leading-[1.4] truncate mx-2 mb-0">
-                        Milk
-                      </p>
-                    </li>
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p class="text-[11px] leading-[1.4] truncate mx-2 mb-0">
-                        Onions
-                      </p>
-                    </li>
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p
-                        class="line-through text-[12px] truncate mx-2 mb-0 leading-[1.5] text-[#4B5563]"
-                      >
-                        Coffee
-                      </p>
-                    </li>
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p
-                        class="line-through text-[12px] truncate mx-2 mb-0 leading-[1.5] text-[#4B5563]"
-                      >
-                        Toilet Paper
-                      </p>
-                    </li>
-                  </ul>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <div
-                      class="max-w-full mt-1 mx-0.5 text-[12px] inlineFlex-center-center leading-[1.5] align-middle text-[#1F232B] bg-transparent h-5.5 min-h-5.5 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                    >
-                      <boo-icon name="clock"></boo-icon>
-                      <span class="text-[11px] leading-[1.4] truncate px-2"
-                        >Dec 15 22, 2:44</span
-                      >
-                    </div>
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/b1cde9ee-e54d-4142-ad8b-cf55dafc9528"
-                      data-discover="true"
-                    >
-                      <span class="truncate px-2">Tasks</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
-                >
-                  <p class="font-semibold text-[13px] leading-[1.5] px-4 my-3">
-                    Keynote Schedule
-                  </p>
-                  <ul class="my-3 flex flex-wrap px-4">
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p
-                        class="line-through text-[12px] truncate mx-2 mb-0 leading-[1.5] text-[#4B5563]"
-                      >
-                        Breakfast
-                      </p>
-                    </li>
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p
-                        class="line-through text-[12px] truncate mx-2 mb-0 leading-[1.5] text-[#4B5563]"
-                      >
-                        Opening ceremony
-                      </p>
-                    </li>
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p
-                        class="line-through text-[12px] truncate mx-2 mb-0 leading-[1.5] text-[#4B5563]"
-                      >
-                        Talk 1: How we did it!
-                      </p>
-                    </li>
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p class="text-[11px] leading-[1.4] truncate mx-2 mb-0">
-                        Talk 2: How can you do it!
-                      </p>
-                    </li>
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p class="text-[11px] leading-[1.4] truncate mx-2 mb-0">
-                        Lunch break
-                      </p>
-                    </li>
-                  </ul>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <div
-                      class="max-w-full mt-1 mx-0.5 text-[12px] inlineFlex-center-center leading-[1.5] align-middle text-[#1F232B] bg-transparent h-5.5 min-h-5.5 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                    >
-                      <boo-icon name="clock"></boo-icon>
-                      <span class="text-[11px] leading-[1.4] truncate px-2"
-                        >Jan 05 22, 3:27</span
-                      >
-                    </div>
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/b1cde9ee-e54d-4142-ad8b-cf55dafc9528"
-                      data-discover="true"
-                    >
-                      <span class="truncate px-2">Tasks</span>
-                    </a>
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/e2f749f5-41ed-49d0-a92a-1c83d879e371"
-                      data-discover="true"
-                    >
-                      <span class="truncate px-2">Work</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
-                >
-                  <div class="px-4 my-3 text-[13px] leading-[1.5]">
-                    <div class="w-full break-words text-base">
-                      Organize the dad's surprise retirement party
-                    </div>
-                  </div>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <div
-                      class="max-w-full mt-1 mx-0.5 text-[12px] inlineFlex-center-center leading-[1.5] align-middle text-[#1F232B] bg-transparent h-5.5 min-h-5.5 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                    >
-                      <boo-icon name="clock"></boo-icon>
-                      <span class="text-[11px] leading-[1.4] truncate px-2"
-                        >Dec 25 22, 6:56</span
-                      >
-                    </div>
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/f47c92e5-20b9-44d9-917f-9ff4ad25dfd0"
-                      data-discover="true"
-                    >
-                      <span class="truncate px-2">Family</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
-                >
-                  <img
-                    class="block w-full"
-                    alt="note"
-                    src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/cards/17-640x480.jpg"
-                  />
-                  <p class="font-semibold text-[13px] leading-[1.5] px-4 my-3">
-                    Plan the road trip
-                  </p>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/2dc11344-3507-48e0-83d6-1c047107f052"
-                      data-discover="true"
-                      ><span class="truncate px-2">Friends</span></a
-                    >
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/b1cde9ee-e54d-4142-ad8b-cf55dafc9528"
-                      data-discover="true"
-                      ><span class="truncate px-2">Tasks</span></a
-                    >
-                  </div>
-                </div>
-              </div>
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
-                >
-                  <p class="font-semibold text-[13px] leading-[1.5] px-4 my-3">
-                    Office Address
-                  </p>
-                  <div class="px-4 my-3 text-[13px] leading-[1.5]">
-                    <div class="w-full break-words text-base">
-                      933 8th Street Stamford, CT 06902
-                    </div>
-                  </div>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/e2f749f5-41ed-49d0-a92a-1c83d879e371"
-                      data-discover="true"
-                      ><span class="truncate px-2">Work</span></a
-                    >
-                  </div>
-                </div>
-              </div>
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
-                >
-                  <p class="font-semibold text-[13px] leading-[1.5] px-4 my-3">
-                    Tasks
-                  </p>
-                  <ul class="my-3 flex flex-wrap px-4">
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p
-                        class="line-through text-[12px] truncate mx-2 mb-0 leading-[1.5] text-[#4B5563]"
-                      >
-                        Wash the dishes
-                      </p>
-                    </li>
-                    <li class="flex w-full items-center">
-                      <boo-icon name="circle-check"></boo-icon>
-                      <p class="text-[11px] leading-[1.4] truncate mx-2 mb-0">
-                        Walk the dog
-                      </p>
-                    </li>
-                  </ul>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <div
-                      class="max-w-full mt-1 mx-0.5 text-[12px] inlineFlex-center-center leading-[1.5] align-middle text-[#1F232B] bg-transparent h-5.5 min-h-5.5 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                    >
-                      <boo-icon name="clock"></boo-icon>
-                      <span class="text-[11px] leading-[1.4] truncate px-2"
-                        >Jan 17 22, 5:43</span
-                      >
-                    </div>
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/bbc73458-940b-421c-8d5f-8dcd23a9b0d6"
-                      data-discover="true"
-                      ><span class="truncate px-2">Personal</span></a
-                    >
-                  </div>
-                </div>
-              </div>
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
-                >
-                  <div class="px-4 my-3 text-[13px] leading-[1.5]">
-                    <div class="w-full break-words text-base">
-                      Dinner with parents
-                    </div>
-                  </div>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/f47c92e5-20b9-44d9-917f-9ff4ad25dfd0"
-                      data-discover="true"
-                      ><span class="truncate px-2">Family</span></a
-                    >
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/6c288794-47eb-4605-8bdf-785b61a449d3"
-                      data-discover="true"
-                      ><span class="truncate px-2">Priority</span></a
-                    >
-                  </div>
-                </div>
-              </div>
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
-                >
-                  <div class="px-4 my-3 text-[13px] leading-[1.5]">
-                    <div class="w-full break-words text-base">
-                      Re-fill the medicine cabinet
-                    </div>
-                  </div>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/bbc73458-940b-421c-8d5f-8dcd23a9b0d6"
-                      data-discover="true"
-                      ><span class="truncate px-2">Personal</span></a
-                    >
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/6c288794-47eb-4605-8bdf-785b61a449d3"
-                      data-discover="true"
-                      ><span class="truncate px-2">Priority</span></a
-                    >
-                  </div>
-                </div>
-              </div>
-              <div class="break-inside-avoid mb-4" style="opacity: 1; transform: none">
-                <div
-                  class="border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB]"
-                >
-                  <div class="px-4 my-3 text-[13px] leading-[1.5]">
-                    <div class="w-full break-words text-base">
-                      Update the icons pack
-                    </div>
-                  </div>
-                  <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-                    <a
-                      class="max-w-full mt-1 mx-0.5 relative text-[12px] inlineFlex-center-center leading-[1.5] text-[#1F232B] cursor-pointer bg-transparent h-5.5 min-h-5.5 mb-0 whitespace-nowrap outline-none border border-solid border-[#9CA3AF] rounded-[6px] p-0.5"
-                      tabindex="0"
-                      href="/apps/notes/labels/e2f749f5-41ed-49d0-a92a-1c83d879e371"
-                      data-discover="true"
-                      ><span class="truncate px-2">Work</span></a
-                    >
-                  </div>
-                </div>
-              </div>
+                  <boo-icon [name]="item.done ? 'circle-check' : 'circle'" [size]="16"></boo-icon>
+                </button>
+                <span
+                  class="text-[12px] leading-[1.5] truncate mx-1"
+                  [ngClass]="item.done ? 'line-through text-[#4B5563]' : ''"
+                >{{ item.text }}</span>
+              </li>
+            </ul>
+
+            <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
+              <span *ngIf="note.reminderAt" class="max-w-full mt-1 mx-0.5 flex items-center text-[#4B5563]">
+                <boo-icon name="clock" [size]="14"></boo-icon>
+                <span class="text-[11px] leading-[1.4] truncate px-1">{{ note.reminderAt | date:'MMM d, y, h:mm a' }}</span>
+              </span>
+              <span
+                *ngFor="let label of note.labels"
+                class="max-w-full mt-1 mx-0.5 rounded-full bg-gray-200 px-2 text-[12px] leading-[1.5] truncate"
+              >{{ label }}</span>
+            </div>
+
+            <div class="flex items-center justify-end gap-1 px-2 pb-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity">
+              <button
+                type="button"
+                (click)="toggleArchive(note, $event)"
+                [attr.aria-label]="note.isArchived ? 'Restore note' : 'Archive note'"
+                class="rounded p-1.5 text-gray-500 hover:bg-gray-200"
+              >
+                <boo-icon [name]="note.isArchived ? 'archive-restore' : 'archive'" [size]="16"></boo-icon>
+              </button>
+              <button
+                type="button"
+                (click)="deleteNote(note, $event)"
+                aria-label="Delete note"
+                class="rounded p-1.5 text-gray-500 hover:bg-gray-200 hover:text-red-600"
+              >
+                <boo-icon name="trash-2" [size]="16"></boo-icon>
+              </button>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Editor -->
+<div
+  *ngIf="draft() as d"
+  class="fixed inset-0 z-40 flex items-end sm:items-center justify-center bg-black/40 p-0 sm:p-4"
+  (click)="closeEditor()"
+>
+  <div
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="d.id ? 'Edit note' : 'New note'"
+    class="flex max-h-[90vh] w-full sm:max-w-lg flex-col rounded-t-xl sm:rounded-xl bg-surface shadow-xl"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-3">
+      <h2 class="m-0 text-[16px] font-semibold">{{ d.id ? 'Edit note' : 'New note' }}</h2>
+      <button
+        type="button"
+        (click)="d.isPinned = !d.isPinned"
+        [attr.aria-pressed]="d.isPinned"
+        [attr.aria-label]="d.isPinned ? 'Unpin note' : 'Pin note'"
+        class="rounded p-1.5 hover:bg-gray-100"
+        [ngClass]="d.isPinned ? 'text-primary' : 'text-gray-400'"
+      >
+        <boo-icon name="pin" [size]="18"></boo-icon>
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+      <input
+        type="text"
+        [(ngModel)]="d.title"
+        maxlength="200"
+        placeholder="Title"
+        aria-label="Title"
+        autofocus
+        class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
+      />
+      <textarea
+        [(ngModel)]="d.content"
+        maxlength="10000"
+        rows="5"
+        placeholder="Take a note..."
+        aria-label="Content"
+        class="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-[14px] outline-none focus:border-primary"
+      ></textarea>
+
+      <!-- Checklist -->
+      <div>
+        <p class="m-0 mb-1 text-[12px] font-semibold text-[#4B5563]">Checklist</p>
+        <ul class="list-none p-0 m-0 space-y-1">
+          <li *ngFor="let item of d.checklist; let i = index" class="flex items-center gap-2">
+            <input type="checkbox" [(ngModel)]="item.done" [attr.aria-label]="'Done: ' + item.text" class="h-4 w-4" />
+            <input
+              type="text"
+              [(ngModel)]="item.text"
+              maxlength="200"
+              aria-label="Checklist item"
+              class="flex-1 rounded border border-transparent px-2 min-h-8 text-[13px] outline-none hover:border-[#E5E7EB] focus:border-primary"
+              [ngClass]="item.done ? 'line-through text-[#4B5563]' : ''"
+            />
+            <button type="button" (click)="removeItem(i)" [attr.aria-label]="'Remove ' + item.text" class="rounded p-1 text-gray-400 hover:text-red-600">
+              <boo-icon name="x" [size]="14"></boo-icon>
+            </button>
+          </li>
+        </ul>
+        <input
+          type="text"
+          [(ngModel)]="newItem"
+          (keydown.enter)="addItem(); $event.preventDefault()"
+          maxlength="200"
+          placeholder="Add an item and press Enter"
+          aria-label="New checklist item"
+          class="mt-1 w-full rounded-lg border border-[#E5E7EB] px-3 min-h-9 text-[13px] outline-none focus:border-primary"
+        />
+      </div>
+
+      <!-- Labels -->
+      <div>
+        <p class="m-0 mb-1 text-[12px] font-semibold text-[#4B5563]">Labels</p>
+        <div class="flex flex-wrap gap-1 pb-1">
+          <span *ngFor="let label of d.labels; let i = index" class="flex items-center gap-1 rounded-full bg-gray-200 pl-2 pr-1 text-[12px]">
+            {{ label }}
+            <button type="button" (click)="removeLabel(i)" [attr.aria-label]="'Remove label ' + label" class="rounded-full p-0.5 hover:bg-gray-300">
+              <boo-icon name="x" [size]="12"></boo-icon>
+            </button>
+          </span>
+        </div>
+        <input
+          type="text"
+          [(ngModel)]="newLabel"
+          (keydown.enter)="addLabel(); $event.preventDefault()"
+          maxlength="30"
+          placeholder="Add a label and press Enter"
+          aria-label="New label"
+          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-9 text-[13px] outline-none focus:border-primary"
+        />
+      </div>
+
+      <!-- Reminder -->
+      <label class="block">
+        <span class="m-0 mb-1 block text-[12px] font-semibold text-[#4B5563]">Reminder</span>
+        <input
+          type="datetime-local"
+          [(ngModel)]="d.reminderAt"
+          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-9 text-[13px] outline-none focus:border-primary"
+        />
+      </label>
+    </div>
+
+    <div class="flex items-center justify-between gap-2 border-t border-[#E5E7EB] px-4 py-3">
+      <button
+        *ngIf="d.id"
+        type="button"
+        (click)="deleteFromEditor()"
+        class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-red-600 hover:bg-red-50"
+      >
+        Delete
+      </button>
+      <span *ngIf="!d.id"></span>
+      <div class="flex items-center gap-2">
+        <button type="button" (click)="closeEditor()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#4B5563] hover:bg-gray-100">
+          Cancel
+        </button>
+        <button
+          type="button"
+          (click)="save()"
+          [disabled]="!canSave()"
+          class="rounded-lg bg-primary px-4 min-h-10 text-[13px] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {{ isSaving() ? 'Saving...' : 'Save' }}
+        </button>
       </div>
     </div>
   </div>

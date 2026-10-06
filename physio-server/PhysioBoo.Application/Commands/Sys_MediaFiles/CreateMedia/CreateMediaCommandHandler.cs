@@ -9,7 +9,7 @@ using PhysioBoo.Domain.Interfaces.Repositories;
 using PhysioBoo.Shared.Events.Cloudinaries;
 using PhysioBoo.SharedKernel.Results;
 
-namespace PhysioBoo.Application.Commands.Sys_Media.CreateMedia
+namespace PhysioBoo.Application.Commands.Sys_MediaFiles.CreateMedia
 {
     public sealed class CreateMediaCommandHandler : CommandHandlerBase, IRequestHandler<CreateMediaCommand>
     {

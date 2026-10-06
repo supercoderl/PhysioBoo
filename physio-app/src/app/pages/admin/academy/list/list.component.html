@@ -1,0 +1,151 @@
+<div class="relative z-10 flex min-h-0 flex-auto flex-col">
+  <div class="container flex shrink-0 grow flex-col p-4 md:p-6">
+    <admin-breadcrumb></admin-breadcrumb>
+
+    <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 class="m-0 text-[22px] font-extrabold leading-none tracking-tight">Academy</h1>
+        <p class="m-0 mt-1 text-[13px] leading-[1.5] text-[#4B5563]">Training courses for the team</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-surface px-3 min-h-10">
+          <boo-icon name="search" [size]="16" iconClass="text-gray-400"></boo-icon>
+          <input
+            type="search"
+            [(ngModel)]="search"
+            (ngModelChange)="onSearchChange($event)"
+            placeholder="Search courses"
+            aria-label="Search courses"
+            class="bg-transparent text-[14px] outline-none"
+          />
+        </label>
+        <button
+          *ngIf="canManage"
+          type="button"
+          (click)="toggleManage()"
+          [attr.aria-pressed]="manageMode"
+          class="flex items-center gap-1.5 rounded-lg border px-3 min-h-10 text-[13px] font-medium transition-colors"
+          [ngClass]="manageMode ? 'bg-primary text-white border-primary' : 'bg-surface text-[#4B5563] border-[#E5E7EB] hover:bg-gray-50'"
+        >
+          <boo-icon name="settings-2" [size]="16"></boo-icon>
+          Manage
+        </button>
+        <button
+          *ngIf="canManage && manageMode"
+          type="button"
+          (click)="openDialog()"
+          class="flex items-center gap-1.5 rounded-lg bg-primary px-3 min-h-10 text-[13px] font-medium text-white"
+        >
+          <boo-icon name="plus" [size]="16"></boo-icon>
+          New course
+        </button>
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <div *ngIf="categories().length" class="mt-4 flex flex-wrap gap-2" role="group" aria-label="Filter by category">
+      <button
+        *ngFor="let c of categories()"
+        type="button"
+        (click)="selectCategory(c)"
+        [attr.aria-pressed]="category === c"
+        class="rounded-full border px-3 py-1 text-[12px] font-medium transition-colors"
+        [ngClass]="category === c ? 'bg-primary text-white border-primary' : 'bg-surface text-[#1F232B] border-[#E5E7EB] hover:bg-gray-50'"
+      >{{ c }}</button>
+    </div>
+
+    <!-- Loading skeleton -->
+    <div *ngIf="isLoading()" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
+      <div *ngFor="let i of [1, 2, 3]" class="h-48 animate-pulse rounded-lg bg-surface p-5 shadow-sm">
+        <div class="h-4 w-1/3 rounded bg-gray-200"></div>
+        <div class="mt-4 h-4 w-2/3 rounded bg-gray-200"></div>
+        <div class="mt-3 h-3 w-full rounded bg-gray-100"></div>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!isLoading() && !courses().length" class="mt-6">
+      <boo-empty-state
+        icon="graduation-cap"
+        [title]="search || category ? 'No courses match your search' : 'No courses yet'"
+        [description]="search || category ? 'Try a different search or category.' : (canManage ? 'Switch to Manage to add the first course.' : 'Courses will appear here when they are published.')"
+      ></boo-empty-state>
+    </div>
+
+    <!-- Courses -->
+    <div *ngIf="!isLoading() && courses().length" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <a
+        *ngFor="let course of courses(); trackBy: trackById"
+        [routerLink]="['/admin/academy/course', course.id]"
+        class="flex flex-col rounded-lg bg-surface p-5 text-[#1F232B] no-underline shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <span class="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">{{ course.category }}</span>
+          <span *ngIf="!course.isPublished" class="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700">Draft</span>
+        </div>
+        <p class="m-0 mt-3 text-[15px] font-semibold leading-[1.4]">{{ course.title }}</p>
+        <p *ngIf="course.description" class="line-clamp-2 m-0 mt-1 text-[13px] leading-[1.5] text-[#4B5563]">{{ course.description }}</p>
+
+        <div class="mt-auto pt-4">
+          <p class="m-0 text-[12px] text-[#4B5563]">
+            {{ course.lessonCount }} {{ course.lessonCount === 1 ? 'lesson' : 'lessons' }} · {{ course.totalMinutes }} min
+          </p>
+          <div class="mt-2 flex items-center gap-2">
+            <div
+              class="h-2 flex-auto overflow-hidden rounded-full bg-gray-200"
+              role="progressbar"
+              [attr.aria-valuenow]="progress(course)"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-label]="'Progress in ' + course.title"
+            >
+              <div class="h-full rounded-full bg-primary" [style.width.%]="progress(course)"></div>
+            </div>
+            <span class="text-[12px] font-medium">{{ progress(course) }}%</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- New course dialog -->
+<div *ngIf="draft() as d" class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4" (click)="closeDialog()">
+  <div role="dialog" aria-modal="true" aria-label="New course" class="w-full max-w-md rounded-xl bg-surface shadow-xl" (click)="$event.stopPropagation()">
+    <div class="border-b border-[#E5E7EB] px-4 py-3">
+      <h2 class="m-0 text-[16px] font-semibold">New course</h2>
+    </div>
+    <div class="space-y-3 px-4 py-3">
+      <label class="block">
+        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Title</span>
+        <input type="text" [(ngModel)]="d.title" maxlength="200" autofocus
+          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
+      </label>
+      <label class="block">
+        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Category</span>
+        <input type="text" [(ngModel)]="d.category" maxlength="60" list="academy-categories"
+          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
+        <datalist id="academy-categories">
+          <option *ngFor="let c of categories()" [value]="c"></option>
+        </datalist>
+      </label>
+      <label class="block">
+        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Description</span>
+        <textarea [(ngModel)]="d.description" maxlength="2000" rows="3"
+          class="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-[14px] outline-none focus:border-primary"></textarea>
+      </label>
+      <label class="flex items-center gap-2 text-[13px]">
+        <input type="checkbox" [(ngModel)]="d.isPublished" class="h-4 w-4" />
+        Publish now (otherwise it stays a draft)
+      </label>
+    </div>
+    <div class="flex justify-end gap-2 border-t border-[#E5E7EB] px-4 py-3">
+      <button type="button" (click)="closeDialog()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#4B5563] hover:bg-gray-100">Cancel</button>
+      <button type="button" (click)="createCourse()" [disabled]="!canCreate()"
+        class="rounded-lg bg-primary px-4 min-h-10 text-[13px] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50">
+        {{ isSaving() ? 'Creating...' : 'Create' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-﻿namespace PhysioBoo.Domain.Errors
+namespace PhysioBoo.Domain.Errors
 {
     public static class DomainErrorCodes
     {
@@ -630,6 +630,77 @@
             // Admission Business Rules
             public const string AlreadyAdmitted = "ADMISSION_ALREADY_ADMITTED";
             public const string NotAdmitted = "ADMISSION_NOT_ADMITTED";
+        }
+
+        public static class Academy
+        {
+            // Academy Validation
+            public const string EmptyId = "ACADEMY_EMPTY_ID";
+            public const string EmptyTitle = "ACADEMY_EMPTY_TITLE";
+            public const string EmptyCategory = "ACADEMY_EMPTY_CATEGORY";
+            public const string EmptyContent = "ACADEMY_EMPTY_CONTENT";
+            public const string InvalidDuration = "ACADEMY_INVALID_DURATION";
+            public const string TextExceedsMaxLength = "ACADEMY_TEXT_EXCEEDS_MAX_LENGTH";
+
+            // Academy Business Rules
+            public const string CourseNotPublished = "ACADEMY_COURSE_NOT_PUBLISHED";
+        }
+
+        public static class Scrumboard
+        {
+            // Scrumboard Validation
+            public const string EmptyId = "SCRUMBOARD_EMPTY_ID";
+            public const string EmptyTitle = "SCRUMBOARD_EMPTY_TITLE";
+            public const string TextExceedsMaxLength = "SCRUMBOARD_TEXT_EXCEEDS_MAX_LENGTH";
+            public const string InvalidPosition = "SCRUMBOARD_INVALID_POSITION";
+
+            // Scrumboard Business Rules
+            public const string WrongBoard = "SCRUMBOARD_WRONG_BOARD";
+            public const string ListNotEmpty = "SCRUMBOARD_LIST_NOT_EMPTY";
+            public const string NotBoardCreator = "SCRUMBOARD_NOT_BOARD_CREATOR";
+        }
+
+        public static class Note
+        {
+            // Note Validation
+            public const string EmptyId = "NOTE_EMPTY_ID";
+            public const string EmptyContent = "NOTE_EMPTY_CONTENT";
+            public const string TextExceedsMaxLength = "NOTE_TEXT_EXCEEDS_MAX_LENGTH";
+            public const string TooManyLabels = "NOTE_TOO_MANY_LABELS";
+            public const string TooManyItems = "NOTE_TOO_MANY_ITEMS";
+        }
+
+        public static class Surgery
+        {
+            // Surgery Validation
+            public const string EmptyId = "SURGERY_EMPTY_ID";
+            public const string EmptyPatientId = "SURGERY_EMPTY_PATIENT_ID";
+            public const string EmptyRoomId = "SURGERY_EMPTY_ROOM_ID";
+            public const string EmptyProcedure = "SURGERY_EMPTY_PROCEDURE";
+            public const string EmptyDiagnosis = "SURGERY_EMPTY_DIAGNOSIS";
+            public const string TextExceedsMaxLength = "SURGERY_TEXT_EXCEEDS_MAX_LENGTH";
+            public const string InvalidDuration = "SURGERY_INVALID_DURATION";
+            public const string InvalidPriority = "SURGERY_INVALID_PRIORITY";
+            public const string InvalidConsentStatus = "SURGERY_INVALID_CONSENT_STATUS";
+            public const string InvalidStatus = "SURGERY_INVALID_STATUS";
+            public const string InvalidStage = "SURGERY_INVALID_STAGE";
+            public const string InvalidRole = "SURGERY_INVALID_ROLE";
+            public const string InvalidCategory = "SURGERY_INVALID_CATEGORY";
+            public const string InvalidQuantity = "SURGERY_INVALID_QUANTITY";
+            public const string InvalidValue = "SURGERY_INVALID_VALUE";
+            public const string EmptyReason = "SURGERY_EMPTY_REASON";
+            public const string EmptyRoomNumber = "SURGERY_EMPTY_ROOM_NUMBER";
+            public const string EmptyStaffId = "SURGERY_EMPTY_STAFF_ID";
+            public const string EmptyName = "SURGERY_EMPTY_NAME";
+
+            // Surgery Business Rules
+            public const string RoomConflict = "SURGERY_ROOM_CONFLICT";
+            public const string RoomNotUsable = "SURGERY_ROOM_NOT_USABLE";
+            public const string DuplicateRoomNumber = "SURGERY_DUPLICATE_ROOM_NUMBER";
+            public const string NotEditable = "SURGERY_NOT_EDITABLE";
+            public const string StageOutOfOrder = "SURGERY_STAGE_OUT_OF_ORDER";
+            public const string NotInRecovery = "SURGERY_NOT_IN_RECOVERY";
+            public const string RoomInUse = "SURGERY_ROOM_IN_USE";
         }
 
         public static class Nursing

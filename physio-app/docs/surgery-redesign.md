@@ -277,3 +277,19 @@ All endpoints assume hospital/tenant scoping via existing auth middleware (not r
 - [x] `SURGERY` block in `src/app/shared/api/base.ts`
 - [x] Route kept at `/admin/paraclinical/surgery`
 - [x] Components: shell + 7 tabs (Dashboard, Schedule, Operating Rooms, Surgical Queue, Intra-Operative Tracking, Post-Operative Recovery, Clinical Alerts) + Surgery Detail Drawer
+
+---
+
+## 15. Server behaviour (implemented)
+
+Backend lives in `physio-server` (`api/surgery`, permissions `surgery:case:read|schedule|update`, `surgery:room:manage`). The frontend contract in §13 is kept; differences and rules:
+
+- **Search** (`GET /cases/search`) takes optional query params (`search, operatingRoom, department, surgeon, status, priority, emergencyOnly, dateFrom, dateTo, pageNumber, pageSize`); the default page size is 200 because the UI filters on the client. `status=Delayed` is derived (not stored): a case still `Scheduled`/`PatientArrived`/`PreOpReady` more than 15 minutes after its scheduled start.
+- **Scheduling** (`POST /cases`) rejects a room that is in maintenance/closed or already booked for an overlapping time (`SURGERY_ROOM_CONFLICT`). It numbers the case `SUR-…`, adds the standard 8-item pre-op checklist, records the `Scheduled` timeline event, and raises `MissingConsent` / `Allergy` alerts when they apply.
+- **Stages** (`POST /cases/{id}/timeline/{stage}`) only move forward; a repeated or earlier stage returns `SURGERY_STAGE_OUT_OF_ORDER`. Stage → status: PreOpCompleted→PreOpReady, AnesthesiaStarted→AnesthesiaStarted, SurgeryStarted→InProgress (room → InSurgery), ProcedureCompleted→ProcedureCompleted (room → Cleaning), Recovery→Recovery, DischargedFromOr→Discharged. The timeline event, case status and room status change in one transaction.
+- **Cancel** is allowed only before theatre (Scheduled / PatientArrived / PreOpReady); **intra-op** data only while AnesthesiaStarted/InProgress; **post-op** data only after the procedure and before discharge; **discharge** only from ProcedureCompleted/Recovery. Violations return `SURGERY_NOT_EDITABLE` / `SURGERY_NOT_IN_RECOVERY`.
+- Intra-op and post-op PATCHes are partial: a field that is left out keeps its stored value.
+- **Checklist** sign-off records the signed-in user (the `signedBy` the UI sends is ignored). **Equipment** marked `Missing` raises one `EquipmentMissing` alert.
+- **Rooms**: a room with an operation in progress cannot be set to any status other than InSurgery (`SURGERY_ROOM_IN_USE`); room numbers are unique.
+- **Alerts** are unacknowledged-only; acknowledging twice is not an error. `DelayedSurgery` alerts are not stored — delay is derived on read.
+- **Not implemented**: consent PDF print (§13 #22) and saved filters (§13 #23–24).

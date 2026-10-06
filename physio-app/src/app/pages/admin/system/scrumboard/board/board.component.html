@@ -1,0 +1,216 @@
+<div class="relative z-10 flex min-h-0 flex-auto flex-col">
+  <div class="container flex shrink-0 flex-col p-4">
+    <admin-breadcrumb></admin-breadcrumb>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading()" class="mt-4 flex gap-4 overflow-hidden" aria-busy="true">
+      <div *ngFor="let i of [1, 2, 3]" class="h-72 w-72 shrink-0 animate-pulse rounded-lg bg-gray-100"></div>
+    </div>
+
+    <!-- Not found -->
+    <div *ngIf="!isLoading() && !board()" class="mt-6">
+      <boo-empty-state icon="blocks" title="Board not found" description="It may have been deleted. Go back to the board list."></boo-empty-state>
+      <div class="mt-3 text-center">
+        <a routerLink="/admin/system/scrumboard/list" class="text-primary text-[13px] font-medium">Back to boards</a>
+      </div>
+    </div>
+
+    <ng-container *ngIf="board() as b">
+      <!-- Header -->
+      <div class="mt-2 flex flex-wrap items-start justify-between gap-2">
+        <div class="min-w-0 flex-auto">
+          <ng-container *ngIf="!isEditingBoard">
+            <div class="flex items-center gap-2">
+              <h1 class="m-0 truncate text-[22px] font-extrabold leading-tight tracking-tight">{{ b.title }}</h1>
+              <button type="button" (click)="startEditBoard()" aria-label="Edit board" class="rounded p-1.5 text-gray-500 hover:bg-gray-100">
+                <boo-icon name="pencil" [size]="16"></boo-icon>
+              </button>
+            </div>
+            <p *ngIf="b.description" class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">{{ b.description }}</p>
+          </ng-container>
+
+          <div *ngIf="isEditingBoard" class="flex flex-col gap-2 sm:max-w-md">
+            <input type="text" [(ngModel)]="boardTitle" (keydown.enter)="saveBoard()" maxlength="120" aria-label="Board title"
+              class="rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
+            <input type="text" [(ngModel)]="boardDescription" (keydown.enter)="saveBoard()" maxlength="500" placeholder="Description" aria-label="Board description"
+              class="rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
+            <div class="flex gap-2">
+              <button type="button" (click)="saveBoard()" [disabled]="!boardTitle.trim()" class="rounded-lg bg-primary px-4 min-h-9 text-[13px] font-medium text-white disabled:opacity-50">Save</button>
+              <button type="button" (click)="cancelInline()" class="rounded-lg px-3 min-h-9 text-[13px] font-medium text-[#4B5563] hover:bg-gray-100">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <button
+          *ngIf="b.canDelete"
+          type="button"
+          (click)="deleteBoard()"
+          class="flex items-center gap-1.5 rounded-lg px-3 min-h-10 text-[13px] font-medium text-red-600 hover:bg-red-50"
+        >
+          <boo-icon name="trash-2" [size]="16"></boo-icon>
+          Delete board
+        </button>
+      </div>
+
+      <!-- Columns -->
+      <div class="mt-4 flex items-start gap-4 overflow-x-auto pb-4">
+        <section
+          *ngFor="let list of b.lists; trackBy: trackById"
+          class="flex max-h-[calc(100vh-14rem)] w-72 shrink-0 flex-col rounded-lg bg-[#F6F7F8]"
+          [attr.aria-label]="list.title"
+        >
+          <header class="flex items-center justify-between gap-2 px-3 pt-3 pb-2">
+            <input
+              *ngIf="renamingListId === list.id; else listTitle"
+              type="text"
+              [(ngModel)]="renamingTitle"
+              (keydown.enter)="saveRename(list)"
+              (blur)="saveRename(list)"
+              maxlength="120"
+              aria-label="List title"
+              autofocus
+              class="w-full rounded border border-primary px-2 min-h-8 text-[14px] font-semibold outline-none"
+            />
+            <ng-template #listTitle>
+              <button type="button" (click)="startRename(list)" class="min-w-0 flex-auto truncate bg-transparent p-0 text-left text-[14px] font-semibold" [attr.aria-label]="'Rename list ' + list.title">
+                {{ list.title }}
+                <span class="ml-1 text-[12px] font-normal text-[#4B5563]">{{ list.cards.length }}</span>
+              </button>
+            </ng-template>
+            <button
+              type="button"
+              (click)="deleteList(list)"
+              [disabled]="list.cards.length > 0"
+              [attr.aria-label]="'Delete list ' + list.title"
+              [title]="list.cards.length ? 'Move or delete the cards first' : 'Delete list'"
+              class="shrink-0 rounded p-1.5 text-gray-500 hover:bg-gray-200 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <boo-icon name="trash-2" [size]="14"></boo-icon>
+            </button>
+          </header>
+
+          <div
+            cdkDropList
+            [id]="list.id"
+            [cdkDropListData]="list.cards"
+            [cdkDropListConnectedTo]="connectedLists()"
+            (cdkDropListDropped)="drop($event, list)"
+            class="flex min-h-10 flex-col gap-2 overflow-y-auto px-2 pb-1"
+          >
+            <div
+              *ngFor="let card of list.cards; trackBy: trackById"
+              cdkDrag
+              [cdkDragData]="card"
+              role="button"
+              tabindex="0"
+              (click)="openCard(card)"
+              (keydown.enter)="openCard(card)"
+              class="cursor-grab rounded-lg border border-[#E5E7EB] bg-surface px-3 py-2 shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <p class="m-0 break-words text-[13px] leading-[1.5]">{{ card.title }}</p>
+              <div *ngIf="card.dueDate || card.description" class="mt-1 flex items-center gap-2 text-[11px] text-[#4B5563]">
+                <span *ngIf="card.dueDate" class="flex items-center gap-1" [ngClass]="isOverdue(card) ? 'text-red-600 font-medium' : ''">
+                  <boo-icon name="calendar" [size]="12"></boo-icon>
+                  {{ card.dueDate | date:'MMM d' }}
+                </span>
+                <boo-icon *ngIf="card.description" name="file-text" [size]="12"></boo-icon>
+              </div>
+            </div>
+          </div>
+
+          <footer class="px-2 pb-2 pt-1">
+            <div *ngIf="addingCardListId === list.id; else addCardButton" class="flex flex-col gap-2">
+              <textarea
+                [(ngModel)]="newCardTitle"
+                (keydown.enter)="addCard(list); $event.preventDefault()"
+                maxlength="200"
+                rows="2"
+                placeholder="Card title"
+                aria-label="New card title"
+                autofocus
+                class="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-[13px] outline-none focus:border-primary"
+              ></textarea>
+              <div class="flex gap-2">
+                <button type="button" (click)="addCard(list)" [disabled]="!newCardTitle.trim()" class="rounded-lg bg-primary px-3 min-h-8 text-[12px] font-medium text-white disabled:opacity-50">Add card</button>
+                <button type="button" (click)="cancelInline()" class="rounded-lg px-3 min-h-8 text-[12px] font-medium text-[#4B5563] hover:bg-gray-200">Cancel</button>
+              </div>
+            </div>
+            <ng-template #addCardButton>
+              <button type="button" (click)="startAddCard(list)" class="flex w-full items-center gap-1.5 rounded-lg px-2 min-h-9 text-[13px] text-[#4B5563] hover:bg-gray-200">
+                <boo-icon name="plus" [size]="14"></boo-icon>
+                Add a card
+              </button>
+            </ng-template>
+          </footer>
+        </section>
+
+        <!-- Add list -->
+        <div class="w-72 shrink-0 rounded-lg border-2 border-dashed border-[#E5E7EB] p-2">
+          <input
+            type="text"
+            [(ngModel)]="newListTitle"
+            (keydown.enter)="addList()"
+            maxlength="120"
+            placeholder="Add a list"
+            aria-label="New list title"
+            class="w-full rounded-lg border border-[#E5E7EB] bg-surface px-3 min-h-10 text-[13px] outline-none focus:border-primary"
+          />
+          <button
+            *ngIf="newListTitle.trim()"
+            type="button"
+            (click)="addList()"
+            class="mt-2 rounded-lg bg-primary px-3 min-h-8 text-[12px] font-medium text-white"
+          >
+            Add list
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<!-- Card dialog -->
+<div *ngIf="cardDraft() as d" class="fixed inset-0 z-40 flex items-end sm:items-center justify-center bg-black/40 p-0 sm:p-4" (click)="closeCard()">
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-label="Edit card"
+    class="flex max-h-[90vh] w-full sm:max-w-lg flex-col rounded-t-xl sm:rounded-xl bg-surface shadow-xl"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="border-b border-[#E5E7EB] px-4 py-3">
+      <h2 class="m-0 text-[16px] font-semibold">Edit card</h2>
+    </div>
+    <div class="flex-1 space-y-3 overflow-y-auto px-4 py-3">
+      <label class="block">
+        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Title</span>
+        <input type="text" [(ngModel)]="d.title" maxlength="200" autofocus
+          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
+      </label>
+      <label class="block">
+        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Description</span>
+        <textarea [(ngModel)]="d.description" maxlength="4000" rows="5"
+          class="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-[14px] outline-none focus:border-primary"></textarea>
+      </label>
+      <label class="block">
+        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Due date</span>
+        <input type="date" [(ngModel)]="d.dueDate"
+          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
+      </label>
+    </div>
+    <div class="flex items-center justify-between gap-2 border-t border-[#E5E7EB] px-4 py-3">
+      <button type="button" (click)="deleteCard()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-red-600 hover:bg-red-50">Delete</button>
+      <div class="flex items-center gap-2">
+        <button type="button" (click)="closeCard()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#4B5563] hover:bg-gray-100">Cancel</button>
+        <button
+          type="button"
+          (click)="saveCard()"
+          [disabled]="!canSaveCard()"
+          class="rounded-lg bg-primary px-4 min-h-10 text-[13px] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {{ isSaving() ? 'Saving...' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

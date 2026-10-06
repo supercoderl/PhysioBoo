@@ -9,23 +9,23 @@ Status legend: ⬜ not started · 🟡 in progress · ✅ done
 
 | #   | Module              | Frontend path             | Status | Notes                                                                                                                |
 | --- | ------------------- | ------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------- |
-| 1   | Academy             | academy/list              | ⬜     |                                                                                                                      |
+| 1   | Academy             | academy/list              | 🟡     | Code + pages written (courses, lessons, per-user progress; there was no page before). **Open:** not built/migrated; assign academy:course:manage to managers. |
 | 2   | Home Configuration  | cms/home-configuration    | ✅     | Home Settings done. Frontend still calls a `HOME_BANNER` API that has no endpoints.                                  |
 | 3   | CMS Service         | cms/service               | ✅     | Built, migrated, applied. **Open:** Create/Duplicate do not save department/doctor join rows. Not tested end to end. |
-| 4   | Lead Management     | crm/lead-management       | ⬜     |                                                                                                                      |
-| 5   | Marketing Campaign  | crm/marketing-campaign    | ⬜     |                                                                                                                      |
+| 4   | Lead Management     | crm/lead-management       | 🟡     | Code committed (entity, endpoints, frontend service). **Open:** no migration includes the Leads table yet (latest is MedicalService); not tested. |
+| 5   | Marketing Campaign  | crm/marketing-campaign    | 🟡     | Code committed (entity, endpoints, frontend service). **Open:** no migration includes the Campaigns table yet; needs a `Campaign` sequence row; not tested. |
 | 6   | Member Points       | crm/member-point          | 🟡     | Code complete (members, ledger, rewards). **Open:** not built, migration not created, not tested. Needs sequence rows. |
 | 7   | Support / Complaint | crm/support-complaint     | 🟡     | Code complete, frontend already matched. **Open:** not built, migration not created, not tested. Needs sequence row. |
-| 8   | Finance Reports     | finance/report            | ⬜     | Analytics/reporting, no entity of its own.                                                                           |
+| 8   | Finance Reports     | finance/report            | ✅     | Delivered in an earlier commit (RevenueReportEndpoints); no new work. |
 | 9   | Admission           | inpatient/admission       | 🟡     | Code + page rewritten. **Open:** not built/migrated/tested. Needs `Admission` sequence row (`ADM-`).                  |
 | 10  | Bed Map             | inpatient/bed-map         | 🟡     | Code complete (wards, beds, stays). **Open:** not built/migrated/tested; no UI to create wards/beds (use Swagger).   |
 | 11  | Treatment Sheet     | inpatient/treatment-sheet | 🟡     | Code complete except PDF export. **Open:** not built/migrated/tested. Orders and doses have no create UI.           |
 | 12  | Nursing Dashboard   | nursing/dashboard         | 🟡     | Code complete. **Open:** not built/migrated/tested. Needs assignments (`POST /api/nursing/assignments`) to show data. |
 | 13  | Nursing Handover    | nursing/handover          | 🟡     | Code complete (cards generated on read). **Open:** not built/migrated/tested. No endpoint to edit SBAR text.         |
-| 14  | Surgery             | paraclinical/surgery      | ⬜     |                                                                                                                      |
-| 15  | Reception Queue     | reception/queue           | ⬜     |                                                                                                                      |
-| 16  | Notes               | system/note               | ⬜     |                                                                                                                      |
-| 17  | Scrumboard          | system/scrumboard         | ⬜     |                                                                                                                      |
+| 14  | Surgery             | paraclinical/surgery      | 🟡     | Code complete except consent PDF and saved filters. **Open:** not built/migrated; needs SUR- sequence row (EntityType SurgeryCase) and surgery:* permissions assigned. |
+| 15  | Reception Queue     | reception/queue           | ✅     | No backend needed: the page runs on existing appointment/check-in data. |
+| 16  | Notes               | system/note               | 🟡     | Code + page rewritten (personal notes, per user). **Open:** not built/migrated; no permission code (login only). |
+| 17  | Scrumboard          | system/scrumboard         | 🟡     | Code + pages written (boards/lists/cards, shared per tenant). **Open:** not built/migrated; login only (no permission code); list reordering not implemented. |
 
 ## 2. Prompt to start a new session
 

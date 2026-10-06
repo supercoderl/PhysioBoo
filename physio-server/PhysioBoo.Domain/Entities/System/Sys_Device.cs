@@ -9,7 +9,7 @@ namespace PhysioBoo.Domain.Entities.System
         public Guid UserId { get; private set; }
         public string DeviceId { get; private set; }
         public string FcmToken { get; private set; }
-        public Platform Platform { get; private set; }
+        public Enums.Platform Platform { get; private set; }
         public DateTime LastActiveAt { get; private set; }
 
         public virtual User? User { get; private set; }
@@ -19,7 +19,7 @@ namespace PhysioBoo.Domain.Entities.System
             Guid userId,
             string deviceId,
             string fcmToken,
-            Platform platform
+            Enums.Platform platform
         ) : base(id)
         {
             UserId = userId;
@@ -32,7 +32,7 @@ namespace PhysioBoo.Domain.Entities.System
         public void SetUserId(Guid userId) { UserId = userId; }
         public void SetDeviceId(string deviceId) { DeviceId = deviceId; }
         public void SetFcmToken(string fcmToken) { FcmToken = fcmToken; }
-        public void SetPlatform(Platform platform) { Platform = platform; }
+        public void SetPlatform(Enums.Platform platform) { Platform = platform; }
         public void SetLastActiveAt(DateTime lastActiveAt) { LastActiveAt = lastActiveAt; }
     }
 }

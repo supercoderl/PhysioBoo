@@ -1,7 +1,7 @@
 
 using PhysioBoo.Application.Commands.LabTests.CreateLabTest;
-using PhysioBoo.Application.Commands.LabTests.DeleteLabTest.Commands.DeleteLabTestCommand;
-using PhysioBoo.Application.Commands.LabTests.UpdateLabTest.Commands.UpdateLabTestCommand;
+using PhysioBoo.Application.Commands.LabTests.DeleteLabTest;
+using PhysioBoo.Application.Commands.LabTests.UpdateLabTest;
 using PhysioBoo.Application.Queries.LabTests.GetAll;
 using PhysioBoo.Application.Queries.LabTests.GetById;
 using PhysioBoo.Application.ViewModels.LabTests;

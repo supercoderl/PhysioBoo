@@ -282,6 +282,19 @@
             public const string TreatmentSheetWrite = "inpatient:treatment-sheet:write";
         }
 
+        public static class Academy
+        {
+            public const string CourseManage = "academy:course:manage";
+        }
+
+        public static class Surgery
+        {
+            public const string SurgeryRead = "surgery:case:read";
+            public const string SurgerySchedule = "surgery:case:schedule";
+            public const string SurgeryUpdate = "surgery:case:update";
+            public const string RoomManage = "surgery:room:manage";
+        }
+
         public static class Crm
         {
             public const string LeadRead = "crm:lead:read";

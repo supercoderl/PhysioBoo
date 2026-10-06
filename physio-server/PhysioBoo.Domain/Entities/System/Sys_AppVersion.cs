@@ -5,7 +5,7 @@ namespace PhysioBoo.Domain.Entities.System
     public class Sys_AppVersion : Entity
     {
         public string AppId { get; private set; }
-        public Platform Platform { get; private set; }
+        public Enums.Platform Platform { get; private set; }
         public string VersionNo { get; private set; }
         public string Title { get; private set; }
         public string Message { get; private set; }
@@ -16,7 +16,7 @@ namespace PhysioBoo.Domain.Entities.System
         public Sys_AppVersion(
             Guid id,
             string appId,
-            Platform platform,
+            Enums.Platform platform,
             string versionNo,
             string title,
             string message,
@@ -35,7 +35,7 @@ namespace PhysioBoo.Domain.Entities.System
         }
 
         public void SetAppId(string appId) { AppId = appId; }
-        public void SetPlatform(Platform platform) { Platform = platform; }
+        public void SetPlatform(Enums.Platform platform) { Platform = platform; }
         public void SetVersionNo(string versionNo) { VersionNo = versionNo; }
         public void SetTitle(string title) { Title = title; }
         public void SetMessage(string message) { Message = message; }

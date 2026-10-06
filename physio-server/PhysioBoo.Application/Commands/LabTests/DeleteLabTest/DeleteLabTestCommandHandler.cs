@@ -4,7 +4,7 @@ using PhysioBoo.Domain.Errors;
 using PhysioBoo.Domain.Interfaces.Repositories;
 
 
-namespace PhysioBoo.Application.Commands.LabTests.DeleteLabTest.Commands.DeleteLabTestCommand
+namespace PhysioBoo.Application.Commands.LabTests.DeleteLabTest
 {
     public sealed class DeleteLabTestCommandHandler : CommandHandlerBase, IRequestHandler<DeleteLabTestCommand>
     {

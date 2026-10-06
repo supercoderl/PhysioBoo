@@ -24,7 +24,10 @@ export class DispensingService {
 
   // Methods
   getQueue(search?: string, status?: DispenseQueueStatus | null) {
-    return this.http.get<PagedResponse<PaginationData<DispenseQueueItem>>>(BASE_API.DISPENSING.QUEUE, { context: createHttpContext({ loadingKey: LoadingKeys.DISPENSING.QUEUE }) });
+    const params: Record<string, string> = {};
+    if (search) params['search'] = search;
+    if (status) params['status'] = status;
+    return this.http.get<PagedResponse<PaginationData<DispenseQueueItem>>>(BASE_API.DISPENSING.QUEUE, { params, context: createHttpContext({ loadingKey: LoadingKeys.DISPENSING.QUEUE }) });
   }
 
   getStats() {

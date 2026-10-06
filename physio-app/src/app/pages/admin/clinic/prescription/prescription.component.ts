@@ -75,7 +75,8 @@ import { hasUnacknowledgedAtOrAbove, severityRank } from "./prescription-rx.util
               [items]="d.items" [editable]="editable()"
               (itemsChange)="updateItems($event)"
               (addMedication)="openAddDrawer()"
-              (editMedication)="openEditDrawer($event)">
+              (editMedication)="openEditDrawer($event)"
+              (favoriteMedication)="addToFavorites($event)">
             </rx-medication-table>
 
             <rx-sidebar
@@ -84,6 +85,9 @@ import { hasUnacknowledgedAtOrAbove, severityRank } from "./prescription-rx.util
               (scrollToRow)="scrollToRow($event)"
               (applyFavorite)="applyFavorite($event)"
               (applyTemplate)="applyTemplate($event)"
+              (removeFavorite)="removeFavorite($event)"
+              (deleteTemplate)="deleteTemplate($event)"
+              (saveTemplate)="saveAsTemplate($event)"
               (doctorNotesChange)="updateDoctorNotes($event)">
             </rx-sidebar>
           </div>
@@ -321,6 +325,72 @@ export class AdminPrescriptionComponent implements OnInit, OnDestroy {
         this.patch(d => ({ ...d, items: [...d.items, ...items] }));
         this.refreshCds(this.draft()?.items ?? []);
         this.toastSrv.success(`${tpl.name} template applied (${items.length} medications)`);
+    }
+
+    addToFavorites(item: RxMedicationItem) {
+        const d = this.draft();
+        if (!d || !item.medicineId) return;
+        this.rxSrv.addFavorite(d.doctor.doctorId, {
+            medicineId: item.medicineId,
+            dose: item.dose,
+            frequency: item.frequency,
+            durationDays: item.durationDays,
+        }).subscribe(res => {
+            if (!res.success || !res.data) return;
+            const fav = res.data;
+            this.favorites.update(list => [...list.filter(f => f.id !== fav.id), fav].sort((a, b) => a.name.localeCompare(b.name)));
+            this.toastSrv.success(`${item.name} saved to favorites`);
+        });
+    }
+
+    removeFavorite(fav: FavoriteMedication) {
+        const d = this.draft();
+        if (!d) return;
+        this.rxSrv.removeFavorite(d.doctor.doctorId, fav.id).subscribe(res => {
+            if (res.success) this.favorites.update(list => list.filter(f => f.id !== fav.id));
+        });
+    }
+
+    saveAsTemplate(name: string) {
+        const d = this.draft();
+        if (!d) return;
+        // Only catalog medications can be templated; custom free-text lines are skipped.
+        const lines = d.items.filter(i => !!i.medicineId);
+        if (!lines.length) {
+            this.toastSrv.error('Add at least one catalog medication before saving a template');
+            return;
+        }
+        this.rxSrv.createTemplate({
+            doctorId: d.doctor.doctorId,
+            name,
+            items: lines.map(i => ({
+                medicineId: i.medicineId!,
+                dose: i.dose,
+                frequency: i.frequency,
+                durationDays: i.durationDays,
+                quantity: i.quantity,
+                unit: i.unit,
+                route: i.route ?? null,
+                timing: i.timing,
+                beforeMeal: i.beforeMeal,
+                afterMeal: i.afterMeal,
+                prn: i.prn,
+            })),
+        }).subscribe(res => {
+            if (!res.success || !res.data) return;
+            const tpl = res.data;
+            this.templates.update(list => [...list, tpl].sort((a, b) => a.name.localeCompare(b.name)));
+            const skipped = d.items.length - lines.length;
+            this.toastSrv.success(`Template "${name}" saved${skipped ? ` (${skipped} custom line(s) skipped)` : ''}`);
+        });
+    }
+
+    deleteTemplate(tpl: PrescriptionTemplate) {
+        this.dialogSrv.confirmDelete(() => {
+            this.rxSrv.deleteTemplate(tpl.id).subscribe(res => {
+                if (res.success) this.templates.update(list => list.filter(t => t.id !== tpl.id));
+            });
+        }, `template "${tpl.name}"`);
     }
 
     scrollToRow(itemId: string) {

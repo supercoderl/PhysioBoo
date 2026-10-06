@@ -1,10 +1,12 @@
+/**
+ * Must mirror PhysioBoo.Domain.Enums.HospitalType (sent to the API as its numeric value).
+ */
 export enum HospitalType {
-    GeneralHospital = 0,
-    SpecialistHospital = 1,
-    Polyclinic = 2,
-    Clinic = 3,
-    EmergencyCenter = 4,
-    RehabilitationCenter = 5,
-    MaternityHospital = 6,
-    PediatricHospital = 7
+    General = 0,
+    Specialty = 1,
+    Teaching = 2,
+    Research = 3,
+    Clinic = 4,
+    Emergency = 5,
+    Rehabilitation = 6
 }

@@ -1,3 +1,4 @@
+using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Enums;
 
 namespace PhysioBoo.Application.ViewModels.Inventory
@@ -20,5 +21,29 @@ namespace PhysioBoo.Application.ViewModels.Inventory
         public BatchLifecycleStatus Status { get; set; }
         public bool IsNearExpiry { get; set; }
         public bool IsExpired { get; set; }
+
+        /// <summary>
+        /// Expects Supplier to be loaded for the supplier name.
+        /// </summary>
+        public static WarehouseBatchViewModel FromEntity(MedicineInventory b)
+        {
+            return new WarehouseBatchViewModel
+            {
+                Id = b.Id,
+                BatchNo = b.BatchNumber,
+                MedicineId = b.MedicineId,
+                ExpiryDate = b.ExpiryDate,
+                ManufacturingDate = b.PurchaseDate,
+                Quantity = b.QuantityAvailable,
+                ReservedQuantity = b.ReservedQuantity,
+                AvailableQuantity = b.QuantityAvailable - b.ReservedQuantity,
+                Supplier = b.Supplier?.SupplierName,
+                PurchasePrice = b.UnitPurchasePrice,
+                StorageLocation = b.StorageLocation,
+                Status = b.Status,
+                IsNearExpiry = b.IsNearExpiry,
+                IsExpired = b.IsExpired
+            };
+        }
     }
 }

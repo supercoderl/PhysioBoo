@@ -70,6 +70,15 @@ export const BASE_API = {
   TENANT: {
     REGISTER: '/api/tenants/register'
   },
+  BILLING: {
+    PLANS: '/api/billing/plans',
+    PLAN: (id: string) => `/api/billing/plans/${id}`,
+    SUBSCRIPTIONS: '/api/billing/subscriptions',
+    SUBSCRIPTION: (hospitalGroupId: string) => `/api/billing/subscriptions/${hospitalGroupId}`,
+    ISSUE_INVOICE: (hospitalGroupId: string) => `/api/billing/subscriptions/${hospitalGroupId}/invoices`,
+    PAY_INVOICE: (invoiceId: string) => `/api/billing/invoices/${invoiceId}/pay`,
+    VOID_INVOICE: (invoiceId: string) => `/api/billing/invoices/${invoiceId}/void`,
+  },
   HOSPITAL: {
     BASE: '/api/hospitals',
     SEARCH: '/api/hospitals/search'
@@ -177,6 +186,9 @@ export const BASE_API = {
     RECENT: (patientId: string) => `/api/patients/${patientId}/prescriptions/recent`,
     FAVORITES: (doctorId: string) => `/api/doctors/${doctorId}/favorite-medications`,
     TEMPLATES: (doctorId: string) => `/api/prescription-templates?doctorId=${doctorId}`,
+    TEMPLATE_CREATE: '/api/prescription-templates',
+    TEMPLATE_DELETE: (templateId: string) => `/api/prescription-templates/${templateId}`,
+    FAVORITE_DELETE: (doctorId: string, favoriteId: string) => `/api/doctors/${doctorId}/favorite-medications/${favoriteId}`,
   },
   BED_MAP: {
     WARDS: '/api/bed-map/wards',

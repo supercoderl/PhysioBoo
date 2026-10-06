@@ -5,14 +5,16 @@ import { createHttpContext } from "../../shared/contexts/option.context";
 import { PagedResponse } from "../../shared/types/common";
 import { LoadingKeys } from "../../shared/types/loading";
 import {
-  ClinicalWarning,
-  FavoriteMedication,
-  MedicineCatalogItem,
-  PrescriptionDraft,
-  PrescriptionSummaryTotals,
-  PrescriptionTemplate,
-  RecentPrescriptionSummary,
-  RxMedicationItem,
+    AddFavoriteMedicationRequest,
+    ClinicalWarning,
+    CreatePrescriptionTemplateRequest,
+    FavoriteMedication,
+    MedicineCatalogItem,
+    PrescriptionDraft,
+    PrescriptionSummaryTotals,
+    PrescriptionTemplate,
+    RecentPrescriptionSummary,
+    RxMedicationItem,
 } from "../../shared/types/prescription-rx.types";
 
 @Injectable({ providedIn: 'root' })
@@ -27,7 +29,7 @@ export class PrescriptionService {
   }
 
   saveDraft(draft: PrescriptionDraft) {
-    return this.http.post<PagedResponse<PrescriptionDraft>>(BASE_API.PRESCRIPTION_RX.UPDATE(draft.id), draft, { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.SAVE_DRAFT }) });
+    return this.http.put<PagedResponse<PrescriptionDraft>>(BASE_API.PRESCRIPTION_RX.UPDATE(draft.id), draft, { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.SAVE_DRAFT }) });
   }
 
   issue(draft: PrescriptionDraft) {
@@ -65,6 +67,22 @@ export class PrescriptionService {
 
   getFavorites(doctorId: string) {
     return this.http.get<PagedResponse<FavoriteMedication[]>>(BASE_API.PRESCRIPTION_RX.FAVORITES(doctorId), { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.FAVORITES }) });
+  }
+
+  addFavorite(doctorId: string, payload: AddFavoriteMedicationRequest) {
+    return this.http.post<PagedResponse<FavoriteMedication | null>>(BASE_API.PRESCRIPTION_RX.FAVORITES(doctorId), payload, { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.FAVORITES }) });
+  }
+
+  removeFavorite(doctorId: string, favoriteId: string) {
+    return this.http.delete<PagedResponse<string>>(BASE_API.PRESCRIPTION_RX.FAVORITE_DELETE(doctorId, favoriteId), { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.FAVORITES }) });
+  }
+
+  createTemplate(payload: CreatePrescriptionTemplateRequest) {
+    return this.http.post<PagedResponse<PrescriptionTemplate | null>>(BASE_API.PRESCRIPTION_RX.TEMPLATE_CREATE, payload, { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.TEMPLATES }) });
+  }
+
+  deleteTemplate(templateId: string) {
+    return this.http.delete<PagedResponse<string>>(BASE_API.PRESCRIPTION_RX.TEMPLATE_DELETE(templateId), { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.TEMPLATES }) });
   }
 
   getTemplates(doctorId: string) {

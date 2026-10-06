@@ -1,4 +1,4 @@
-using PhysioBoo.Application.Commands.StockTakes.ApproveStockTake;
+﻿using PhysioBoo.Application.Commands.StockTakes.ApproveStockTake;
 using PhysioBoo.Application.Commands.StockTakes.AssignCounter;
 using PhysioBoo.Application.Commands.StockTakes.CancelStockTake;
 using PhysioBoo.Application.Commands.StockTakes.CompleteStockTake;
@@ -8,6 +8,7 @@ using PhysioBoo.Application.Commands.StockTakes.RejectStockTake;
 using PhysioBoo.Application.Commands.StockTakes.StartStockTake;
 using PhysioBoo.Application.Commands.StockTakes.UpdateStockTake;
 using PhysioBoo.Application.Commands.StockTakes.UpdateStockTakeItems;
+using PhysioBoo.Application.Queries.StockTakes.Export;
 using PhysioBoo.Application.Queries.StockTakes.GetById;
 using PhysioBoo.Application.Queries.StockTakes.GetCategories;
 using PhysioBoo.Application.Queries.StockTakes.GetHistory;
@@ -48,6 +49,19 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("SearchStockTakes")
             .Produces<ResponseMessage<PagedResult<StockTakeViewModel>>>(StatusCodes.Status200OK)
             .RequireAuthorization(Permissions.Pharmacy.StockTakeRead);
+
+            // Export (same filters as search) — downloads an .xlsx file
+            group.MapPost("/export", async (
+                PagedRequest<StockTakeFilter> request,
+                IMediatorHandler bus,
+                CancellationToken ct
+            ) =>
+            {
+                byte[] content = await bus.QueryAsync(new ExportStockTakesQuery(request.Filter, request.Search));
+                return Results.File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"stock-takes_{DateTime.UtcNow:yyyyMMdd}.xlsx");
+            }).WithName("ExportStockTakes")
+            .Produces(StatusCodes.Status200OK, contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            .RequireAuthorization(Permissions.Pharmacy.StockTakeExport);
 
             // KPIs
             group.MapGet("/kpis", async (

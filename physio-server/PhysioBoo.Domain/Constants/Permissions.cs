@@ -93,6 +93,9 @@
             public const string RetailTransactionRead = "pharmacy:retail-transaction:read";
             public const string RetailTransactionCreate = "pharmacy:retail-transaction:create";
             public const string RetailTransactionRefund = "pharmacy:retail-transaction:refund";
+            public const string DispensingRead = "pharmacy:dispensing:read";
+            public const string DispensingProcess = "pharmacy:dispensing:process";
+            public const string StockTakeExport = "pharmacy:stock-take:export";
             public const string StockTakeRead = "pharmacy:stock-take:read";
             public const string StockTakeCreate = "pharmacy:stock-take:create";
             public const string StockTakeUpdate = "pharmacy:stock-take:update";
@@ -266,6 +269,15 @@
             public const string LeadCreate = "crm:lead:create";
             public const string LeadUpdate = "crm:lead:update";
             public const string LeadDelete = "crm:lead:delete";
+        }
+
+        public static class Subscription
+        {
+            public const string PlanRead = "subscription:plan:read";
+            public const string PlanManage = "subscription:plan:manage";
+            public const string SubscriptionRead = "subscription:subscription:read";
+            public const string SubscriptionManage = "subscription:subscription:manage";
+            public const string InvoiceManage = "subscription:invoice:manage";
         }
 
         public static class Finance

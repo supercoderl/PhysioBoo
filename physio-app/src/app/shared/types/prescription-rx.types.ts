@@ -176,6 +176,32 @@ export interface PrescriptionTemplate {
     items: Omit<RxMedicationItem, 'id' | 'warnings'>[];
 }
 
+export interface AddFavoriteMedicationRequest {
+    medicineId: string;
+    dose?: string | null;
+    frequency?: string | null;
+    durationDays?: number | null;
+}
+
+export interface CreatePrescriptionTemplateRequest {
+    doctorId: string;
+    name: string;
+    description?: string | null;
+    items: {
+        medicineId: string;
+        dose: string;
+        frequency: string;
+        durationDays: number;
+        quantity: number;
+        unit: string;
+        route?: string | null;
+        timing: Partial<Record<DoseTiming, boolean>>;
+        beforeMeal: boolean;
+        afterMeal: boolean;
+        prn: boolean;
+    }[];
+}
+
 export interface RecentPrescriptionSummary {
     id: string;
     prescriptionNumber: string;

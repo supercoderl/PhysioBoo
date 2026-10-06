@@ -109,6 +109,8 @@ export class AdminInventoryManagementComponent implements OnInit {
     kpis = signal<InventoryKpis | null>(null);
     error = signal<string | null>(null);
     selectedMedicineId = signal<string | null>(null);
+    /** Destination for batch transfers: the zone last chosen in the warehouse map. */
+    targetZone = signal<WarehouseZone | null>(null);
     selectedMedicineName = signal<string | null>(null);
     batches = signal<WarehouseBatch[]>([]);
 
@@ -148,6 +150,7 @@ export class AdminInventoryManagementComponent implements OnInit {
     }
 
     onZoneFilter(zone: WarehouseZone): void {
+        this.targetZone.set(zone);
         this.toastSrv.info(`Showing medicines stored in ${zone.name}`);
     }
 
@@ -163,18 +166,33 @@ export class AdminInventoryManagementComponent implements OnInit {
     }
 
     onTransfer(batch: WarehouseBatch): void {
+        const zone = this.targetZone();
+        if (!zone) {
+            this.toastSrv.info('Pick the destination zone in the warehouse map first, then transfer the batch.');
+            return;
+        }
         this.dialogSrv.confirm(
-            `Transfer batch ${batch.batchNo} to another warehouse zone?`,
+            `Transfer ${batch.availableQuantity} units of batch ${batch.batchNo} to ${zone.name}?`,
             () => {
-                this.srv.transferBatch(batch.id, { toZoneId: 'central-warehouse', quantity: batch.availableQuantity }).subscribe();
-                this.toastSrv.success(`Batch ${batch.batchNo} transfer initiated`);
+                this.srv.transferBatch(batch.id, { toZoneId: zone.id, quantity: batch.availableQuantity }).subscribe(res => {
+                    if (res.success) this.toastSrv.success(`Batch ${batch.batchNo} moved to ${zone.name}`);
+                });
             },
             'Transfer Batch', 'info', 'Transfer', 'Cancel',
         );
     }
 
     onPrintBarcode(batch: WarehouseBatch): void {
-        this.srv.printBarcode(batch.id).subscribe(() => this.toastSrv.success(`Barcode for ${batch.batchNo} sent to printer`));
+        this.srv.printBarcode(batch.id).subscribe(res => {
+            if (!res.success || !res.data.barcodeImageUrl) return;
+            const win = window.open('', '_blank', 'width=480,height=320');
+            if (!win) {
+                this.toastSrv.error('Allow pop-ups to print barcode labels');
+                return;
+            }
+            win.document.write(`<html><head><title>${batch.batchNo}</title></head><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh"><img src="${res.data.barcodeImageUrl}" onload="window.print();window.close()"></body></html>`);
+            win.document.close();
+        });
     }
 
     onAlertAcknowledged(alert: InventoryAlert): void {

@@ -171,6 +171,9 @@ type EditableField = 'dose' | 'frequency' | 'durationDays' | 'quantity' | 'instr
                 <button *ngIf="editable" type="button" (click)="editMedication.emit(item)" class="text-secondary hover:text-primary p-1" title="Edit">
                   <boo-icon name="pencil" [size]="15"></boo-icon>
                 </button>
+                <button *ngIf="editable && item.medicineId" type="button" (click)="favoriteMedication.emit(item)" class="text-secondary hover:text-amber-500 p-1" title="Add to favorites">
+                  <boo-icon name="star" [size]="15"></boo-icon>
+                </button>
                 <button *ngIf="editable" type="button" (click)="duplicateItem(item)" class="text-secondary hover:text-primary p-1" title="Duplicate">
                   <boo-icon name="copy" [size]="15"></boo-icon>
                 </button>
@@ -212,6 +215,7 @@ export class PrescriptionMedicationTableComponent {
     @Output() itemsChange = new EventEmitter<RxMedicationItem[]>();
     @Output() addMedication = new EventEmitter<void>();
     @Output() editMedication = new EventEmitter<RxMedicationItem>();
+    @Output() favoriteMedication = new EventEmitter<RxMedicationItem>();
 
     private _items = signal<RxMedicationItem[]>([]);
 

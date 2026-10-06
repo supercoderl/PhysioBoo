@@ -69,24 +69,48 @@ interface AlertEntry {
       <!-- Favorites -->
       <div class="bg-surface border border-gray-200 rounded-lg p-4" *ngIf="editable">
         <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-2">Favorite Medications</h3>
-        <button *ngFor="let f of favorites" type="button" (click)="applyFavorite.emit(f)"
-          class="w-full text-left flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0 hover:bg-gray-50 rounded px-1 -mx-1">
-          <span class="text-xs text-primary">{{ f.name }} <span class="text-secondary">{{ f.strength }}</span></span>
-          <boo-icon name="plus-circle" [size]="14" class="text-primary"></boo-icon>
-        </button>
+        <div *ngIf="!favorites.length" class="text-xs text-secondary">Star a medication line to add it here.</div>
+        <div *ngFor="let f of favorites" class="flex items-center gap-1 py-1.5 border-b border-gray-50 last:border-0">
+          <button type="button" (click)="applyFavorite.emit(f)"
+            class="flex-1 text-left flex items-center justify-between hover:bg-gray-50 rounded px-1 -mx-1">
+            <span class="text-xs text-primary">{{ f.name }} <span class="text-secondary">{{ f.strength }}</span></span>
+            <boo-icon name="plus-circle" [size]="14" class="text-primary"></boo-icon>
+          </button>
+          <button type="button" (click)="removeFavorite.emit(f)" class="text-secondary hover:text-rose-600 p-0.5" title="Remove from favorites" aria-label="Remove from favorites">
+            <boo-icon name="x" [size]="12"></boo-icon>
+          </button>
+        </div>
       </div>
 
       <!-- Templates -->
       <div class="bg-surface border border-gray-200 rounded-lg p-4" *ngIf="editable">
         <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-2">Prescription Templates</h3>
-        <button *ngFor="let t of templates" type="button" (click)="applyTemplate.emit(t)"
-          class="w-full text-left flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0 hover:bg-gray-50 rounded px-1 -mx-1">
-          <span class="text-xs">
-            <span class="font-medium text-primary">{{ t.name }}</span>
-            <span class="text-secondary"> · {{ t.itemCount }} items</span>
-          </span>
-          <boo-icon name="layers" [size]="14" class="text-primary"></boo-icon>
-        </button>
+        <div *ngIf="!templates.length" class="text-xs text-secondary">No templates yet.</div>
+        <div *ngFor="let t of templates" class="flex items-center gap-1 py-1.5 border-b border-gray-50 last:border-0">
+          <button type="button" (click)="applyTemplate.emit(t)"
+            class="flex-1 text-left flex items-center justify-between hover:bg-gray-50 rounded px-1 -mx-1">
+            <span class="text-xs">
+              <span class="font-medium text-primary">{{ t.name }}</span>
+              <span class="text-secondary"> · {{ t.itemCount }} items</span>
+            </span>
+            <boo-icon name="layers" [size]="14" class="text-primary"></boo-icon>
+          </button>
+          <button type="button" (click)="deleteTemplate.emit(t)" class="text-secondary hover:text-rose-600 p-0.5" title="Delete template" aria-label="Delete template">
+            <boo-icon name="x" [size]="12"></boo-icon>
+          </button>
+        </div>
+
+        <div *ngIf="items.length" class="mt-3 pt-3 border-t border-gray-100">
+          <button *ngIf="!savingTemplate" type="button" (click)="savingTemplate = true" class="text-xs font-semibold text-primary hover:underline">
+            + Save current medications as template
+          </button>
+          <div *ngIf="savingTemplate" class="flex items-center gap-1.5">
+            <input type="text" [(ngModel)]="templateName" placeholder="Template name" maxlength="120" (keydown.enter)="submitTemplate()"
+              class="flex-1 min-w-0 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary" />
+            <button type="button" (click)="submitTemplate()" [disabled]="!templateName.trim()" class="text-xs font-semibold text-white bg-primary px-2 py-1 rounded disabled:opacity-50">Save</button>
+            <button type="button" (click)="savingTemplate = false; templateName = ''" class="text-xs text-secondary px-1">Cancel</button>
+          </div>
+        </div>
       </div>
 
       <!-- Doctor notes -->
@@ -110,6 +134,20 @@ export class PrescriptionSidebarComponent {
     @Output() scrollToRow = new EventEmitter<string>();
     @Output() applyFavorite = new EventEmitter<FavoriteMedication>();
     @Output() applyTemplate = new EventEmitter<PrescriptionTemplate>();
+    @Output() removeFavorite = new EventEmitter<FavoriteMedication>();
+    @Output() deleteTemplate = new EventEmitter<PrescriptionTemplate>();
+    @Output() saveTemplate = new EventEmitter<string>();
+
+    savingTemplate = false;
+    templateName = '';
+
+    submitTemplate(): void {
+        const name = this.templateName.trim();
+        if (!name) return;
+        this.saveTemplate.emit(name);
+        this.savingTemplate = false;
+        this.templateName = '';
+    }
     @Output() doctorNotesChange = new EventEmitter<string>();
 
     readonly severityIcon = severityIcon;

@@ -21,7 +21,7 @@ export class StockTakeService {
   private readonly http = inject(HttpClient);
 
   search(request: PagedRequest<StockTakeFilter>) {
-    return this.http.get<PagedResponse<PaginationData<StockTake>>>(BASE_API.STOCK_TAKE.SEARCH, { context: createHttpContext({ loadingKey: LoadingKeys.STOCK_TAKE.SEARCH }) });
+    return this.http.post<PagedResponse<PaginationData<StockTake>>>(BASE_API.STOCK_TAKE.SEARCH, request, { context: createHttpContext({ loadingKey: LoadingKeys.STOCK_TAKE.SEARCH }) });
   }
 
   getById(id: string) {
@@ -33,11 +33,11 @@ export class StockTakeService {
   }
 
   update(id: string, payload: CreateStockTakePayload) {
-    return this.http.post<PagedResponse<string>>(BASE_API.STOCK_TAKE.DETAIL(id), payload, { context: createHttpContext({ loadingKey: LoadingKeys.STOCK_TAKE.UPDATE }) });
+    return this.http.put<PagedResponse<string>>(BASE_API.STOCK_TAKE.DETAIL(id), payload, { context: createHttpContext({ loadingKey: LoadingKeys.STOCK_TAKE.UPDATE }) });
   }
 
   delete(id: string) {
-    return this.http.post<PagedResponse<string>>(BASE_API.STOCK_TAKE.DETAIL(id), {}, { context: createHttpContext({ loadingKey: LoadingKeys.STOCK_TAKE.DELETE }) });
+    return this.http.delete<PagedResponse<string>>(BASE_API.STOCK_TAKE.DETAIL(id), { context: createHttpContext({ loadingKey: LoadingKeys.STOCK_TAKE.DELETE }) });
   }
 
   start(id: string) {
@@ -93,7 +93,7 @@ export class StockTakeService {
   }
 
   exportExcel(filter: StockTakeFilter) {
-    return this.http.get<PagedResponse<{ fileUrl: string }>>(BASE_API.STOCK_TAKE.EXPORT, { context: createHttpContext({ loadingKey: LoadingKeys.STOCK_TAKE.EXPORT }) });
+    return this.http.post(BASE_API.STOCK_TAKE.EXPORT, { pageNumber: 1, pageSize: 100, filter }, { responseType: 'blob', context: createHttpContext({ loadingKey: LoadingKeys.STOCK_TAKE.EXPORT }) });
   }
 
   print(id: string) {

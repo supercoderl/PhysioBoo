@@ -562,6 +562,65 @@
             public const string EmptyId = "LEAD_EMPTY_ID";
         }
 
+        public static class Subscription
+        {
+            // Subscription / Plan / Invoice Validation
+            public const string EmptyCode = "SUBSCRIPTION_PLAN_EMPTY_CODE";
+            public const string EmptyName = "SUBSCRIPTION_PLAN_EMPTY_NAME";
+            public const string InvalidPrice = "SUBSCRIPTION_PLAN_INVALID_PRICE";
+            public const string InvalidCurrency = "SUBSCRIPTION_PLAN_INVALID_CURRENCY";
+            public const string InvalidLimit = "SUBSCRIPTION_PLAN_INVALID_LIMIT";
+            public const string DuplicateCode = "SUBSCRIPTION_PLAN_DUPLICATE_CODE";
+            public const string PlanInactive = "SUBSCRIPTION_PLAN_INACTIVE";
+            public const string EmptyTenant = "SUBSCRIPTION_EMPTY_TENANT";
+            public const string InvalidAction = "SUBSCRIPTION_INVALID_ACTION";
+            public const string InvalidState = "SUBSCRIPTION_INVALID_STATE";
+            public const string DuplicateInvoice = "SUBSCRIPTION_DUPLICATE_INVOICE";
+        }
+
+        public static class PrescriptionTemplate
+        {
+            // Prescription Template / Favorite Validation
+            public const string EmptyDoctor = "PRESCRIPTION_TEMPLATE_EMPTY_DOCTOR";
+            public const string EmptyName = "PRESCRIPTION_TEMPLATE_EMPTY_NAME";
+            public const string NameExceedsMaxLength = "PRESCRIPTION_TEMPLATE_NAME_EXCEEDS_MAX_LENGTH";
+            public const string EmptyItems = "PRESCRIPTION_TEMPLATE_EMPTY_ITEMS";
+            public const string EmptyMedicine = "PRESCRIPTION_TEMPLATE_EMPTY_MEDICINE";
+            public const string InvalidQuantity = "PRESCRIPTION_TEMPLATE_INVALID_QUANTITY";
+            public const string InvalidDuration = "PRESCRIPTION_TEMPLATE_INVALID_DURATION";
+            public const string EmptyDose = "PRESCRIPTION_TEMPLATE_EMPTY_DOSE";
+            public const string EmptyFrequency = "PRESCRIPTION_TEMPLATE_EMPTY_FREQUENCY";
+        }
+
+        public static class InventoryBatch
+        {
+            // Inventory Batch Validation
+            public const string EmptyId = "INVENTORY_BATCH_EMPTY_ID";
+            public const string InvalidQuantity = "INVENTORY_BATCH_INVALID_QUANTITY";
+            public const string EmptyReason = "INVENTORY_BATCH_EMPTY_REASON";
+            public const string InvalidZone = "INVENTORY_BATCH_INVALID_ZONE";
+            public const string InvalidState = "INVENTORY_BATCH_INVALID_STATE";
+            public const string InsufficientStock = "INVENTORY_BATCH_INSUFFICIENT_STOCK";
+        }
+
+        public static class Dispensing
+        {
+            // Dispensing Validation
+            public const string EmptyId = "DISPENSING_EMPTY_ID";
+            public const string NotDispensable = "DISPENSING_PRESCRIPTION_NOT_DISPENSABLE";
+            public const string SessionClosed = "DISPENSING_SESSION_CLOSED";
+            public const string InvalidQuantity = "DISPENSING_INVALID_QUANTITY";
+            public const string InvalidStatus = "DISPENSING_INVALID_STATUS";
+            public const string BatchUnavailable = "DISPENSING_BATCH_UNAVAILABLE";
+            public const string InsufficientStock = "DISPENSING_INSUFFICIENT_STOCK";
+            public const string SubstitutionNotAllowed = "DISPENSING_SUBSTITUTION_NOT_ALLOWED";
+            public const string InvalidAlternative = "DISPENSING_INVALID_ALTERNATIVE";
+            public const string UnacknowledgedCritical = "DISPENSING_UNACKNOWLEDGED_CRITICAL_ALERT";
+            public const string LinesNotPicked = "DISPENSING_LINES_NOT_PICKED";
+            public const string EmptyReason = "DISPENSING_EMPTY_REASON";
+            public const string EmptyBarcode = "DISPENSING_EMPTY_BARCODE";
+        }
+
         public static class InsuranceClaim
         {
             // Insurance Claim Validation

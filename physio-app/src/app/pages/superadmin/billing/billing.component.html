@@ -1,165 +1,225 @@
-<div
-  class="ps shadow-md bg-surface flex flex-col flex-1 min-h-0 h-screen"
-  style="border-top-left-radius: 12px"
-  custom-scrollbar
->
-  <div class="container">
-    <div class="max-w-2xl flex-auto p-4 md:p-6">
-      <div class="flex flex-col mb-4">
-        <admin-breadcrumb></admin-breadcrumb>
-        <div class="flex items-center gap-2">
-          <p
-            class="lg:ml-0 tracking-tight font-bold leading-none text-[22px] m-0"
-          >
-            Plan &amp; Billing
-          </p>
-        </div>
+<div class="space-y-5">
+  <admin-breadcrumb></admin-breadcrumb>
+
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+      <h2 class="text-xl font-bold text-brandDark mb-0.5">Plan &amp; Billing</h2>
+      <p class="text-sm text-brandDark m-0">Subscription plans and billing for every tenant on the platform.</p>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div class="bg-surface rounded-xl border border-gray-200 px-4 py-3">
+      <div class="text-lg font-bold text-brandDark leading-none">{{ totalTenants() }}</div>
+      <div class="text-[11px] text-brandDark mt-0.5">Tenants</div>
+    </div>
+    <div class="bg-surface rounded-xl border border-gray-200 px-4 py-3">
+      <div class="text-lg font-bold text-brandDark leading-none">{{ money(monthlyRecurring(), 'USD') }}</div>
+      <div class="text-[11px] text-brandDark mt-0.5">Monthly recurring (this page)</div>
+    </div>
+    <div class="bg-surface rounded-xl border border-gray-200 px-4 py-3">
+      <div class="text-lg font-bold leading-none" [class.text-amber-600]="pastDueCount() > 0">{{ pastDueCount() }}</div>
+      <div class="text-[11px] text-brandDark mt-0.5">Past due</div>
+    </div>
+    <div class="bg-surface rounded-xl border border-gray-200 px-4 py-3">
+      <div class="text-lg font-bold text-brandDark leading-none">{{ money(outstanding(), 'USD') }}</div>
+      <div class="text-[11px] text-brandDark mt-0.5">Outstanding invoices</div>
+    </div>
+  </div>
+
+  <!-- Plans -->
+  <section class="bg-surface rounded-xl border border-gray-200 p-4">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <h3 class="text-sm font-bold text-brandDark mb-0">Plans</h3>
+        <p class="text-xs text-secondary m-0">Plan changes apply immediately to subscribed tenants.</p>
       </div>
-      <div class="w-full max-w-5xl">
-        <form class="flex w-full flex-col gap-12">
-          <div class="flex flex-col gap-4">
-            <div class="w-full">
-              <p class="font-medium text-base m-0">Change your plan</p>
-              <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
-                Upgrade or downgrade your current plan.
-              </p>
-            </div>
-            <div class="grid w-full gap-4 sm:grid-cols-3">
-              <div class="sm:col-span-3">
-                <div
-                  class="text-[13px] leading-[1.43] flex bg-[#eff6fe] text-[#3B82F6] py-3 px-4 rounded-[8px] border border-solid border-[#3B82F6]"
-                  role="alert"
-                >
-                  <div
-                    class="text-[#3B82F6] mr-3 flex opacity-90 p-0.5 text-base"
-                  >
-                    <boo-icon name="info"></boo-icon>
-                  </div>
-                  <div class="min-w-0 overflow-auto p-0">
-                    Changing the plan will take effect immediately. You will be
-                    charged for the rest of the current month.
-                  </div>
-                </div>
-              </div>
-              <div
-                class="p-6 rounded-[6px] flex flex-col cursor-pointer flex-1 relative bg-surface text-[#1F232B] shadow-sm border border-solid border-[#E5E7EB]"
-              >
-                <p
-                  class="uppercase font-semibold m-0 text-[13px] leading-[1.5]"
-                >
-                  Basic
-                </p>
-                <p class="mt-1 m-0 text-[13px] leading-[1.5] text-[#4B5563]">
-                  Starter plan for individuals.
-                </p>
-                <div class="flex-auto"></div>
-                <div class="mt-2 flex items-end text-lg">
-                  <p class="m-0 text-[13px] leading-[1.5]">$9.00</p>
-                  <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
-                    / month
-                  </p>
-                </div>
-              </div>
-              <div
-                class="p-6 rounded-md flex flex-col cursor-pointer flex-1 relative border border-solid border-primary bg-surface text-[#1F232B] shadow-sm"
-              >
-                <boo-icon name="circle-check" classname="mt-3 mr-3"></boo-icon>
-                <p
-                  class="uppercase font-semibold m-0 text-[13px] leading-[1.5]"
-                >
-                  Team
-                </p>
-                <p class="mt-1 m-0 text-[13px] leading-[1.5] text-[#4B5563]">
-                  Collaborate up to 10 people.
-                </p>
-                <div class="flex-auto"></div>
-                <div class="mt-2 flex items-end text-lg">
-                  <p class="m-0 text-[13px] leading-[1.5]">$29.00</p>
-                  <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
-                    / month
-                  </p>
-                </div>
-              </div>
-              <div
-                class="p-6 rounded-[6px] flex flex-col cursor-pointer flex-1 relative bg-surface text-[#1F232B] shadow-sm border border-solid border-[#E5E7EB]"
-              >
-                <p
-                  class="uppercase font-semibold m-0 text-[13px] leading-[1.5]"
-                >
-                  Enterprise
-                </p>
-                <p class="mt-1 m-0 text-[13px] leading-[1.5] text-[#4B5563]">
-                  For bigger businesses.
-                </p>
-                <div class="flex-auto"></div>
-                <div class="mt-2 flex items-end text-lg">
-                  <p class="m-0 text-[13px] leading-[1.5]">$99.00</p>
-                  <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
-                    / month
-                  </p>
-                </div>
-              </div>
-            </div>
+      <button type="button" (click)="newPlan()" class="text-xs font-semibold text-white bg-primary px-3 py-1.5 rounded-lg hover:bg-primary/90">+ New plan</button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div *ngFor="let plan of plans()" class="rounded-lg border p-4" [ngClass]="plan.isActive ? 'border-gray-200' : 'border-dashed border-gray-300 opacity-70'">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <p class="text-sm font-bold text-brandDark mb-0">{{ plan.name }} <span class="text-[10px] font-mono text-secondary">{{ plan.code }}</span></p>
+            <p class="text-xs text-secondary mb-0">{{ plan.description }}</p>
           </div>
-          <div class="flex flex-col gap-4">
-            <div class="w-full">
-              <p class="text-base m-0">Payment Details</p>
-              <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
-                Update your billing information. Make sure to set your location
-                correctly as it could affect your tax rates.
-              </p>
-            </div>
-            <div class="grid w-full grid-cols-4 gap-4">
-              <div class="col-span-4">
-                <boo-input-v2 [label]="{ text: 'Card holder' }">
-                  <boo-icon
-                    name="circle-user"
-                    class="leading-none"
-                    prefix
-                  ></boo-icon>
-                </boo-input-v2>
-              </div>
-              <div class="col-span-4 sm:col-span-2">
-                <boo-input-v2 [label]="{ text: 'Card number' }">
-                  <boo-icon
-                    name="credit-card"
-                    class="leading-none"
-                    prefix
-                  ></boo-icon>
-                </boo-input-v2>
-              </div>
-              <div class="col-span-2 sm:col-span-1">
-                <boo-input-v2 [label]="{ text: 'Expiration date' }">
-                  <boo-icon
-                    name="credit-card"
-                    class="leading-none"
-                    prefix
-                  ></boo-icon>
-                </boo-input-v2>
-              </div>
-              <div class="col-span-2 sm:col-span-1">
-                <boo-input-v2 [label]="{ text: 'CVC / CVC2' }">
-                  <boo-icon name="lock" class="leading-none" prefix></boo-icon>
-                </boo-input-v2>
-              </div>
-              <div class="col-span-4 sm:col-span-2">
-                <boo-input-v2 [label]="{ text: 'Country' }">
-                  <boo-icon name="map" class="leading-none" prefix></boo-icon>
-                </boo-input-v2>
-              </div>
-              <div class="col-span-4 sm:col-span-2">
-                <boo-input-v2 [label]="{ text: 'ZIP / Postal code' }">
-                  <boo-icon name="hash" class="leading-none" prefix></boo-icon>
-                </boo-input-v2>
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center justify-end gap-2">
-            <boo-button-admin> Cancel </boo-button-admin>
-            <boo-button-admin> Save </boo-button-admin>
-          </div>
-        </form>
+          <boo-status-badge *ngIf="!plan.isActive" label="Hidden" tone="neutral"></boo-status-badge>
+        </div>
+        <div class="flex items-baseline gap-1 mt-3">
+          <span class="text-2xl font-bold text-brandDark">{{ money(plan.monthlyPrice, plan.currency) }}</span>
+          <span class="text-xs text-secondary">/ month</span>
+        </div>
+        <div class="text-xs text-secondary mt-2 space-y-0.5">
+          <div>{{ plan.maxUsers ?? 'Unlimited' }} users · {{ plan.maxBranches ?? 'Unlimited' }} branches</div>
+          <div>{{ plan.subscriberCount }} subscribed tenant(s)</div>
+        </div>
+        <button type="button" (click)="editPlan(plan)" class="mt-3 text-xs font-semibold text-primary hover:underline">Edit</button>
       </div>
     </div>
+
+    <!-- Plan editor -->
+    <div *ngIf="editingPlan() as plan" class="mt-4 rounded-lg border border-primary/30 bg-primary/5 p-4">
+      <p class="text-sm font-bold text-brandDark mb-3">{{ plan.id ? 'Edit plan' : 'New plan' }}</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+        <label class="flex flex-col gap-1">Code
+          <input type="text" [(ngModel)]="plan.code" [disabled]="!!plan.id" maxlength="32" class="px-2 py-1.5 border border-gray-300 rounded disabled:bg-gray-100" />
+        </label>
+        <label class="flex flex-col gap-1">Name
+          <input type="text" [(ngModel)]="plan.name" maxlength="80" class="px-2 py-1.5 border border-gray-300 rounded" />
+        </label>
+        <label class="flex flex-col gap-1">Monthly price
+          <input type="number" min="0" step="0.01" [(ngModel)]="plan.monthlyPrice" class="px-2 py-1.5 border border-gray-300 rounded" />
+        </label>
+        <label class="flex flex-col gap-1">Currency
+          <input type="text" [(ngModel)]="plan.currency" maxlength="3" class="px-2 py-1.5 border border-gray-300 rounded uppercase" />
+        </label>
+        <label class="flex flex-col gap-1">Max users (empty = unlimited)
+          <input type="number" min="1" [(ngModel)]="plan.maxUsers" class="px-2 py-1.5 border border-gray-300 rounded" />
+        </label>
+        <label class="flex flex-col gap-1">Max branches (empty = unlimited)
+          <input type="number" min="1" [(ngModel)]="plan.maxBranches" class="px-2 py-1.5 border border-gray-300 rounded" />
+        </label>
+        <label class="flex flex-col gap-1">Sort order
+          <input type="number" [(ngModel)]="plan.sortOrder" class="px-2 py-1.5 border border-gray-300 rounded" />
+        </label>
+        <label class="flex items-center gap-2 mt-5">
+          <input type="checkbox" [(ngModel)]="plan.isActive" /> Offered to tenants
+        </label>
+        <label class="flex flex-col gap-1 col-span-2 md:col-span-4">Description
+          <input type="text" [(ngModel)]="plan.description" maxlength="500" class="px-2 py-1.5 border border-gray-300 rounded" />
+        </label>
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button type="button" (click)="savePlan()" [disabled]="!plan.code.trim() || !plan.name.trim()" class="text-xs font-semibold text-white bg-primary px-3 py-1.5 rounded-lg disabled:opacity-50">Save plan</button>
+        <button type="button" (click)="editingPlan.set(null)" class="text-xs text-secondary px-3 py-1.5">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid grid-cols-1 gap-4" [ngClass]="selected() ? 'xl:grid-cols-[1fr_420px]' : ''">
+    <!-- Tenants -->
+    <section class="bg-surface rounded-xl border border-gray-200 p-4 min-w-0">
+      <div class="flex items-center gap-2 flex-wrap mb-3">
+        <h3 class="text-sm font-bold text-brandDark mb-0 mr-auto">Tenant subscriptions</h3>
+        <input type="search" [(ngModel)]="search" (keydown.enter)="onSearch()" placeholder="Search tenant or email"
+          class="px-2.5 py-1.5 text-xs border border-gray-300 rounded-lg w-56" />
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onSearch()" class="px-2 py-1.5 text-xs border border-gray-300 rounded-lg">
+          <option value="">All statuses</option>
+          <option *ngFor="let s of statusOptions" [value]="s">{{ statusLabel(s) }}</option>
+        </select>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="text-left text-secondary border-b border-gray-200">
+              <th class="py-2 pr-3 font-semibold">Tenant</th>
+              <th class="py-2 pr-3 font-semibold">Plan</th>
+              <th class="py-2 pr-3 font-semibold">Status</th>
+              <th class="py-2 pr-3 font-semibold">Period ends</th>
+              <th class="py-2 pr-3 font-semibold text-right">Outstanding</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of tenants()" (click)="openTenant(t)" class="border-b border-gray-50 cursor-pointer hover:bg-gray-50"
+              [ngClass]="{ 'bg-primary/5': selected()?.hospitalGroupId === t.hospitalGroupId }">
+              <td class="py-2 pr-3">
+                <div class="font-semibold text-brandDark">{{ t.tenantName }}</div>
+                <div class="text-secondary">{{ t.tenantEmail }}</div>
+              </td>
+              <td class="py-2 pr-3">{{ t.planName ?? '—' }}<span *ngIf="t.planName" class="text-secondary"> · {{ money(t.monthlyPrice, t.currency) }}</span></td>
+              <td class="py-2 pr-3"><boo-status-badge [label]="statusLabel(t.status)" [tone]="statusTone(t.status)"></boo-status-badge></td>
+              <td class="py-2 pr-3">{{ (t.status === 'Trial' ? t.trialEndsAt : t.currentPeriodEnd) | date: 'mediumDate' }}</td>
+              <td class="py-2 pr-3 text-right" [class.text-amber-600]="t.outstandingAmount > 0">
+                {{ t.outstandingAmount > 0 ? money(t.outstandingAmount, t.currency) : '—' }}
+              </td>
+            </tr>
+            <tr *ngIf="!loading() && !tenants().length">
+              <td colspan="5" class="py-6 text-center text-secondary">No tenants match these filters.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 mt-3 text-xs text-secondary">
+        <span>Page {{ pageNumber }} · {{ totalTenants() }} tenant(s)</span>
+        <button type="button" (click)="changePage(-1)" [disabled]="pageNumber === 1" class="px-2 py-1 border border-gray-300 rounded disabled:opacity-40">Prev</button>
+        <button type="button" (click)="changePage(1)" [disabled]="pageNumber * pageSize >= totalTenants()" class="px-2 py-1 border border-gray-300 rounded disabled:opacity-40">Next</button>
+      </div>
+    </section>
+
+    <!-- Tenant detail -->
+    <aside *ngIf="selected() as t" class="bg-surface rounded-xl border border-gray-200 p-4 space-y-4 h-fit">
+      <div class="flex items-start justify-between gap-2">
+        <div>
+          <h3 class="text-sm font-bold text-brandDark mb-0">{{ t.tenantName }}</h3>
+          <p class="text-xs text-secondary m-0">{{ t.tenantEmail }}</p>
+        </div>
+        <button type="button" (click)="closeTenant()" class="text-secondary hover:text-brandDark" aria-label="Close">
+          <boo-icon name="x" [size]="16"></boo-icon>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div><span class="text-secondary">Status</span><div><boo-status-badge [label]="statusLabel(t.status)" [tone]="statusTone(t.status)"></boo-status-badge></div></div>
+        <div><span class="text-secondary">Since</span><div class="font-medium">{{ (t.startedAt | date: 'mediumDate') ?? '—' }}</div></div>
+        <div><span class="text-secondary">Current period</span><div class="font-medium">{{ t.currentPeriodStart | date: 'shortDate' }} – {{ t.currentPeriodEnd | date: 'shortDate' }}</div></div>
+        <div *ngIf="t.trialEndsAt"><span class="text-secondary">Trial ends</span><div class="font-medium">{{ t.trialEndsAt | date: 'mediumDate' }}</div></div>
+      </div>
+
+      <div class="space-y-2">
+        <label class="flex flex-col gap-1 text-xs">Plan
+          <select [(ngModel)]="selectedPlanId" class="px-2 py-1.5 border border-gray-300 rounded-lg">
+            <option *ngFor="let p of activePlans()" [value]="p.id">{{ p.name }} — {{ money(p.monthlyPrice, p.currency) }}/mo</option>
+          </select>
+        </label>
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" (click)="change('ChangePlan')" [disabled]="!selectedPlanId || selectedPlanId === t.planId" class="text-xs font-semibold text-white bg-primary px-2.5 py-1.5 rounded-lg disabled:opacity-50">
+            {{ t.status === 'None' ? 'Subscribe' : 'Change plan' }}
+          </button>
+          <button *ngIf="t.status === 'Trial' || t.status === 'PastDue' || t.status === 'Cancelled'" type="button" (click)="change('Activate')" class="text-xs font-semibold border border-emerald-300 text-emerald-700 px-2.5 py-1.5 rounded-lg">Activate</button>
+          <button *ngIf="t.status === 'Active'" type="button" (click)="change('MarkPastDue')" class="text-xs font-semibold border border-amber-300 text-amber-700 px-2.5 py-1.5 rounded-lg">Mark past due</button>
+          <button *ngIf="t.status !== 'Cancelled' && t.status !== 'None'" type="button" (click)="change('Cancel')" class="text-xs font-semibold border border-rose-300 text-rose-700 px-2.5 py-1.5 rounded-lg">Cancel</button>
+        </div>
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <label class="flex flex-col gap-1">Billing email
+          <input type="email" [(ngModel)]="billingEmail" class="px-2 py-1.5 border border-gray-300 rounded-lg" />
+        </label>
+        <label class="flex flex-col gap-1">Notes
+          <textarea rows="2" [(ngModel)]="notes" maxlength="1000" class="px-2 py-1.5 border border-gray-300 rounded-lg"></textarea>
+        </label>
+        <button *ngIf="t.status !== 'None'" type="button" (click)="change('UpdateDetails')" class="text-xs font-semibold text-primary hover:underline">Save details</button>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <h4 class="text-xs font-bold text-secondary uppercase tracking-wider mb-0">Invoices</h4>
+          <button *ngIf="t.status === 'Active' || t.status === 'PastDue'" type="button" (click)="issueInvoice()" class="text-xs font-semibold text-primary hover:underline">+ Bill current period</button>
+        </div>
+        <p *ngIf="!t.invoices.length" class="text-xs text-secondary">No invoices yet.</p>
+        <div *ngFor="let inv of t.invoices" class="border border-gray-100 rounded-lg p-2.5 mb-2 text-xs">
+          <div class="flex items-center justify-between">
+            <span class="font-mono font-semibold">{{ inv.invoiceNumber }}</span>
+            <boo-status-badge [label]="inv.status" [tone]="statusTone(inv.status)"></boo-status-badge>
+          </div>
+          <div class="text-secondary mt-1">{{ inv.planName }} · {{ inv.periodStart | date: 'shortDate' }} – {{ inv.periodEnd | date: 'shortDate' }}</div>
+          <div class="flex items-center justify-between mt-1">
+            <span class="font-semibold">{{ money(inv.amount, inv.currency) }}</span>
+            <span class="text-secondary" *ngIf="inv.status === 'Open'">Due {{ inv.dueDate | date: 'mediumDate' }}</span>
+            <span class="text-secondary" *ngIf="inv.status === 'Paid'">Paid {{ inv.paidAt | date: 'mediumDate' }}{{ inv.paymentReference ? ' · ' + inv.paymentReference : '' }}</span>
+          </div>
+          <div *ngIf="inv.status === 'Open'" class="flex items-center gap-1.5 mt-2">
+            <input type="text" [(ngModel)]="paymentReference[inv.id]" placeholder="Payment reference (optional)" maxlength="120"
+              class="flex-1 min-w-0 px-2 py-1 border border-gray-300 rounded" />
+            <button type="button" (click)="payInvoice(inv)" class="font-semibold text-white bg-emerald-600 px-2 py-1 rounded">Mark paid</button>
+            <button type="button" (click)="voidInvoice(inv)" class="text-rose-600 px-1">Void</button>
+          </div>
+        </div>
+      </div>
+    </aside>
   </div>
 </div>

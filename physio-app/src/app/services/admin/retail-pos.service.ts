@@ -60,7 +60,7 @@ export class RetailPosService {
   }
 
   removeCartItem(cartId: string, lineItemId: string) {
-    return this.http.post<PagedResponse<RetailCart>>(BASE_API.PHARMACY_RETAIL.CART_ITEM_REMOVE(cartId, lineItemId), {}, { context: createHttpContext({ loadingKey: LoadingKeys.RETAIL_POS.REMOVE_CART }) });
+    return this.http.delete<PagedResponse<RetailCart>>(BASE_API.PHARMACY_RETAIL.CART_ITEM_REMOVE(cartId, lineItemId), { context: createHttpContext({ loadingKey: LoadingKeys.RETAIL_POS.REMOVE_CART }) });
   }
 
   attachCustomer(cartId: string, customer: RetailCustomer) {

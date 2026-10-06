@@ -6,6 +6,7 @@ using PhysioBoo.Domain.Entities.Cms;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.Crm;
 using PhysioBoo.Domain.Entities.Finance;
+using PhysioBoo.Domain.Entities.Platform;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
@@ -115,6 +116,11 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<InsuranceClaim> InsuranceClaims { get; set; } = null!;
         public DbSet<InsuranceClaimDocument> InsuranceClaimDocuments { get; set; } = null!;
         public DbSet<InsuranceClaimActivity> InsuranceClaimActivities { get; set; } = null!;
+        public DbSet<DispenseSession> DispenseSessions { get; set; } = null!;
+        public DbSet<DispenseSessionItem> DispenseSessionItems { get; set; } = null!;
+        public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; } = null!;
+        public DbSet<TenantSubscription> TenantSubscriptions { get; set; } = null!;
+        public DbSet<SubscriptionInvoice> SubscriptionInvoices { get; set; } = null!;
         #endregion
 
         public ApplicationDbContext(
@@ -281,6 +287,11 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new InsuranceClaimConfiguration());
             builder.ApplyConfiguration(new InsuranceClaimDocumentConfiguration());
             builder.ApplyConfiguration(new InsuranceClaimActivityConfiguration());
+            builder.ApplyConfiguration(new DispenseSessionConfiguration());
+            builder.ApplyConfiguration(new DispenseSessionItemConfiguration());
+            builder.ApplyConfiguration(new SubscriptionPlanConfiguration());
+            builder.ApplyConfiguration(new TenantSubscriptionConfiguration());
+            builder.ApplyConfiguration(new SubscriptionInvoiceConfiguration());
         }
         #endregion
 

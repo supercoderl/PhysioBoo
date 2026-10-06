@@ -48,6 +48,7 @@ namespace PhysioBoo.Infrastructure.Database.Seeding
                 await SeedPermissionsAsync(ct);
                 await SeedSuperAdminPermissionsAsync(ct);
                 await SeedAdminMenusAsync(ct);
+                await SeedSubscriptionPlansAsync(ct);
 
                 if (_hostEnvironment.IsDevelopment())
                 {
@@ -167,6 +168,24 @@ namespace PhysioBoo.Infrastructure.Database.Seeding
                 await _context.SaveChangesAsync(ct);
                 _logger.LogInformation("Seeded {Count} new permission(s).", permissions.Count);
             }
+        }
+
+        /// <summary>
+        /// Default SaaS plans (editable later from Super Admin → Billing). Only seeded when none exist.
+        /// </summary>
+        private async Task SeedSubscriptionPlansAsync(CancellationToken ct = default)
+        {
+            if (await _context.SubscriptionPlans.AnyAsync(ct)) return;
+
+            await _context.SubscriptionPlans.AddRangeAsync(new[]
+            {
+                new Domain.Entities.Platform.SubscriptionPlan(Guid.NewGuid(), "BASIC", "Basic", "Starter plan for a single clinic.", 9m, "USD", 5, 1, 1),
+                new Domain.Entities.Platform.SubscriptionPlan(Guid.NewGuid(), "TEAM", "Team", "Collaborate with up to 10 people.", 29m, "USD", 10, 3, 2),
+                new Domain.Entities.Platform.SubscriptionPlan(Guid.NewGuid(), "ENTERPRISE", "Enterprise", "For hospital groups with many branches.", 99m, "USD", null, null, 3)
+            }, ct);
+
+            await _context.SaveChangesAsync(ct);
+            _logger.LogInformation("Seeded default subscription plans.");
         }
 
         private async Task SeedSuperAdminPermissionsAsync(CancellationToken ct = default)

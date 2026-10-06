@@ -1,4 +1,6 @@
-﻿using PhysioBoo.Application.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using PhysioBoo.Domain.Entities.Platform;
+using PhysioBoo.Application.Interfaces;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.Operation;
 using PhysioBoo.Domain.Enums;
@@ -18,6 +20,8 @@ namespace PhysioBoo.Application.Commands.Tenants.RegisterTenant
         private readonly IUserRepository _userRepository;
         private readonly IUserProvisioningService _userProvisioningService;
         private readonly ISys_SequenceTrackerRepository _sys_SequenceTrackerRepository;
+        private readonly ISubscriptionPlanRepository _subscriptionPlanRepository;
+        private readonly ITenantSubscriptionRepository _tenantSubscriptionRepository;
 
         public RegisterTenantCommandHandler(
             IMediatorHandler bus,
@@ -27,7 +31,9 @@ namespace PhysioBoo.Application.Commands.Tenants.RegisterTenant
             IHospitalRepository hospitalRepository,
             IUserRepository userRepository,
             IUserProvisioningService userProvisioningService,
-            ISys_SequenceTrackerRepository sys_SequenceTrackerRepository
+            ISys_SequenceTrackerRepository sys_SequenceTrackerRepository,
+            ISubscriptionPlanRepository subscriptionPlanRepository,
+            ITenantSubscriptionRepository tenantSubscriptionRepository
         ) : base(bus, unitOfWork, notifications)
         {
             _unitOfWork = unitOfWork;
@@ -36,11 +42,26 @@ namespace PhysioBoo.Application.Commands.Tenants.RegisterTenant
             _userRepository = userRepository;
             _userProvisioningService = userProvisioningService;
             _sys_SequenceTrackerRepository = sys_SequenceTrackerRepository;
+            _subscriptionPlanRepository = subscriptionPlanRepository;
+            _tenantSubscriptionRepository = tenantSubscriptionRepository;
         }
 
         public async Task Handle(RegisterTenantCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
+
+            // The sequence generator opens its own transaction, so codes must be reserved before ours starts.
+            List<string> hospitalCodes = new List<string>();
+            foreach (ViewModels.Tenants.RegisterTenantBranchViewModel _ in request.NewTenant.Branches)
+            {
+                hospitalCodes.Add(await GenerateHospitalCodeAsync(cancellationToken));
+            }
+
+            Guid? trialPlanId = await _subscriptionPlanRepository
+                .GetAllNoTracking(p => p.IsActive)
+                .OrderBy(p => p.SortOrder)
+                .Select(p => (Guid?)p.Id)
+                .FirstOrDefaultAsync(cancellationToken);
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
@@ -72,11 +93,30 @@ namespace PhysioBoo.Application.Commands.Tenants.RegisterTenant
                 return;
             }
 
-            (bool BranchesSuccess, List<Guid> HospitalIds) branchOutcome = await RegisterBranch(request, cancellationToken);
+            (bool BranchesSuccess, List<Guid> HospitalIds) branchOutcome = await RegisterBranch(request, hospitalCodes, cancellationToken);
             if (!branchOutcome.BranchesSuccess) return;
 
             (bool OwnerSuccess, Guid? UserId) ownerOutcome = await RegisterOwner(request, cancellationToken);
             if (!ownerOutcome.OwnerSuccess) return;
+
+            // Every new tenant starts on a trial of the entry-level plan.
+            if (trialPlanId.HasValue)
+            {
+                TenantSubscription trial = TenantSubscription.StartTrial(Guid.NewGuid(), request.NewId, trialPlanId.Value, TimeZoneHelper.GetLocalTimeNow());
+                trial.SetBillingEmail(request.NewTenant.Company.Email ?? request.NewTenant.Owner.Email);
+
+                SharedKernel.Results.DbResult<Guid> trialResult = await _tenantSubscriptionRepository.InsertAsync<TenantSubscription, Guid>(trial);
+                if (!trialResult.Success)
+                {
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                    await NotifyAsync(new DomainNotification(
+                        request.MessageType,
+                        $"Insert failed, please try again. Error: {trialResult.Error}",
+                        ErrorCodes.CommitFailed
+                    ));
+                    return;
+                }
+            }
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
@@ -92,13 +132,27 @@ namespace PhysioBoo.Application.Commands.Tenants.RegisterTenant
             ));
         }
 
-        private async Task<(bool Success, List<Guid> HospitalIds)> RegisterBranch(RegisterTenantCommand request, CancellationToken ct)
+        private async Task<string> GenerateHospitalCodeAsync(CancellationToken ct)
+        {
+            try
+            {
+                return await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Hospital), ct);
+            }
+            catch (Exception)
+            {
+                // No "Hospital" sequence rule configured yet (fresh install): fall back to a random code.
+                return $"HOS-{Guid.NewGuid().ToString("N")[..8].ToUpperInvariant()}";
+            }
+        }
+
+        private async Task<(bool Success, List<Guid> HospitalIds)> RegisterBranch(RegisterTenantCommand request, List<string> hospitalCodes, CancellationToken ct)
         {
             List<Guid> hospitalIds = new List<Guid>();
 
-            foreach (ViewModels.Tenants.RegisterTenantBranchViewModel branch in request.NewTenant.Branches)
+            for (int index = 0; index < request.NewTenant.Branches.Count; index++)
             {
-                string code = await _sys_SequenceTrackerRepository.GenerateNextCodeAsync(nameof(Hospital), ct);
+                ViewModels.Tenants.RegisterTenantBranchViewModel branch = request.NewTenant.Branches[index];
+                string code = hospitalCodes[index];
 
                 Hospital newHospital = new Hospital(
                     Guid.NewGuid(),

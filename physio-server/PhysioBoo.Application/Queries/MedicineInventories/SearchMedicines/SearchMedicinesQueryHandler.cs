@@ -59,36 +59,7 @@ namespace PhysioBoo.Application.Queries.MedicineInventories.SearchMedicines
                 .GetAllNoTracking(filter: b => medicineIds.Contains(b.MedicineId) && b.Status != BatchLifecycleStatus.Disposed)
                 .ToListAsync(ct);
 
-            List<MedicineStockViewModel> items = pageMedicines.Select(m =>
-            {
-                List<MedicineInventory> medicineBatches = batches.Where(b => b.MedicineId == m.Id).ToList();
-                int currentStock = medicineBatches.Sum(b => b.QuantityAvailable);
-                // No per-medicine safety/reorder field exists — approximated as the sum across
-                // this medicine's batches, since those levels are set per batch today.
-                int safetyStock = medicineBatches.Sum(b => b.MinimumStockLevel);
-                int reorderLevel = medicineBatches.Sum(b => b.ReorderLevel);
-
-                string status = currentStock <= 0 ? "OutOfStock"
-                    : currentStock <= reorderLevel ? "LowStock"
-                    : "InStock";
-
-                return new MedicineStockViewModel
-                {
-                    Id = m.Id,
-                    Name = m.Name,
-                    GenericName = m.GenericName,
-                    CurrentStock = currentStock,
-                    SafetyStock = safetyStock,
-                    ReorderLevel = reorderLevel,
-                    Status = status,
-                    BatchCount = medicineBatches.Count,
-                    SoonestExpiryDate = medicineBatches.Where(b => b.ExpiryDate.HasValue).OrderBy(b => b.ExpiryDate).Select(b => b.ExpiryDate).FirstOrDefault(),
-                    IsNearExpiry = medicineBatches.Any(b => b.IsNearExpiry),
-                    StorageLocation = medicineBatches.FirstOrDefault()?.StorageLocation,
-                    Category = m.Category?.Name,
-                    Barcode = m.Barcode
-                };
-            }).ToList();
+            List<MedicineStockViewModel> items = pageMedicines.Select(m => MedicineStockViewModel.FromMedicine(m, batches)).ToList();
 
             // Filter by computed status after paging (status depends on batch aggregation, which
             // can't be expressed as a SQL WHERE clause without a computed column).

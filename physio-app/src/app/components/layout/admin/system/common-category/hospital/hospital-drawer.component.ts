@@ -133,14 +133,13 @@ export class CommonCategoryHospitalDrawerComponent implements OnChanges {
     form: FormGroup;
 
     readonly hospitalTypeOptions = [
-        { label: 'General Hospital', value: HospitalType.GeneralHospital },
-        { label: 'Specialist Hospital', value: HospitalType.SpecialistHospital },
-        { label: 'Polyclinic', value: HospitalType.Polyclinic },
+        { label: 'General Hospital', value: HospitalType.General },
+        { label: 'Specialty Hospital', value: HospitalType.Specialty },
+        { label: 'Teaching Hospital', value: HospitalType.Teaching },
+        { label: 'Research Hospital', value: HospitalType.Research },
         { label: 'Clinic', value: HospitalType.Clinic },
-        { label: 'Emergency Center', value: HospitalType.EmergencyCenter },
-        { label: 'Rehabilitation Center', value: HospitalType.RehabilitationCenter },
-        { label: 'Maternity Hospital', value: HospitalType.MaternityHospital },
-        { label: 'Pediatric Hospital', value: HospitalType.PediatricHospital },
+        { label: 'Emergency Center', value: HospitalType.Emergency },
+        { label: 'Rehabilitation Center', value: HospitalType.Rehabilitation },
     ];
     // #endregion
 
@@ -171,7 +170,7 @@ export class CommonCategoryHospitalDrawerComponent implements OnChanges {
             name: ['', [Validators.required, Validators.maxLength(100)]],
             code: [''],
             hospitalGroupId: [null, [Validators.required]],
-            type: [HospitalType.GeneralHospital, [Validators.required]],
+            type: [HospitalType.General, [Validators.required]],
             address: [''],
             city: [''],
             country: [''],
@@ -259,7 +258,7 @@ export class CommonCategoryHospitalDrawerComponent implements OnChanges {
             name: '',
             code: '',
             hospitalGroupId: null,
-            type: HospitalType.GeneralHospital,
+            type: HospitalType.General,
             address: '',
             city: '',
             country: '',

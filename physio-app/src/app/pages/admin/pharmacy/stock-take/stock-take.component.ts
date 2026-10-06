@@ -280,6 +280,13 @@ export class AdminStockTakeComponent implements OnInit {
     }
 
     onExport(): void {
-        this.srv.exportExcel(this.filter).subscribe(() => this.toastSrv.success('Export started — check your downloads'));
+        this.srv.exportExcel(this.filter).subscribe(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `stock-takes-${Date.now()}.xlsx`;
+            document.body.appendChild(a); a.click(); a.remove();
+            URL.revokeObjectURL(url);
+            this.toastSrv.success('Stock takes exported');
+        });
     }
 }

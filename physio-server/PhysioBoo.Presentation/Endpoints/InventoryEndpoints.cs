@@ -1,4 +1,8 @@
-using PhysioBoo.Application.Commands.InventoryAlerts.AcknowledgeAlert;
+﻿using PhysioBoo.Application.Commands.InventoryAlerts.AcknowledgeAlert;
+using PhysioBoo.Application.Commands.MedicineInventories.ChangeBatch;
+using PhysioBoo.Application.Queries.MedicineInventories.GetBatchBarcode;
+using PhysioBoo.Application.Queries.MedicineInventories.GetBatchById;
+using PhysioBoo.Application.Queries.MedicineInventories.GetMedicineByBarcode;
 using PhysioBoo.Application.Queries.MedicineInventories.GetInventoryAlerts;
 using PhysioBoo.Application.Queries.MedicineInventories.GetInventoryHistory;
 using PhysioBoo.Application.Queries.MedicineInventories.GetInventoryKpis;
@@ -227,6 +231,81 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Acknowledge an inventory alert")
             .Produces(StatusCodes.Status204NoContent)
             .RequireAuthorization(Permissions.Pharmacy.InventoryAlertAcknowledge);
+
+            #region Barcodes
+            group.MapGet("/medicines/barcode/{code}", async (string code, IMediatorHandler bus) =>
+                Results.Ok(new ResponseMessage<MedicineStockViewModel?> { Success = true, Data = await bus.QueryAsync(new GetMedicineByBarcodeQuery(code)) }))
+            .WithName("GetMedicineByBarcode")
+            .WithSummary("Scanner lookup by medicine barcode / QR / drug code / batch number (null when nothing matches)")
+            .Produces<ResponseMessage<MedicineStockViewModel?>>(StatusCodes.Status200OK)
+            .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryRead);
+
+            group.MapGet("/batches/{id:guid}/barcode", async (Guid id, IMediatorHandler bus) =>
+            {
+                string? url = await bus.QueryAsync(new GetBatchBarcodeQuery(id));
+                return Results.Ok(new ResponseMessage<object> { Success = true, Data = new { barcodeImageUrl = url } });
+            })
+            .WithName("GetBatchBarcode")
+            .WithSummary("Code 128 label for the batch number, as an SVG data URL")
+            .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryRead);
+            #endregion
+
+            #region Batch Operations
+            group.MapPost("/batches/{id:guid}/receive", ([FromRoute] Guid id, [FromBody] ReceiveBatchViewModel body, IMediatorHandler bus) =>
+                ChangeBatchAsync(bus, new ChangeBatchCommand(id, InventoryBatchAction.Receive)
+                {
+                    Quantity = body.Quantity,
+                    PurchasePrice = body.PurchasePrice,
+                    SupplierId = body.SupplierId,
+                    ExpiryDate = body.ExpiryDate
+                }))
+            .WithName("ReceiveBatchStock")
+            .WithSummary("Receive more stock into an existing batch")
+            .Produces<ResponseMessage<WarehouseBatchViewModel?>>(StatusCodes.Status200OK)
+            .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryCreate);
+
+            group.MapPost("/batches/{id:guid}/transfer", ([FromRoute] Guid id, [FromBody] TransferBatchViewModel body, IMediatorHandler bus) =>
+                ChangeBatchAsync(bus, new ChangeBatchCommand(id, InventoryBatchAction.Transfer) { Quantity = body.Quantity, ToZoneId = body.ToZoneId }))
+            .WithName("TransferBatch")
+            .WithSummary("Move a batch (or part of it) to another warehouse zone")
+            .Produces<ResponseMessage<WarehouseBatchViewModel?>>(StatusCodes.Status200OK)
+            .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryUpdate);
+
+            group.MapPost("/batches/{id:guid}/adjust", ([FromRoute] Guid id, [FromBody] AdjustBatchViewModel body, IMediatorHandler bus) =>
+                ChangeBatchAsync(bus, new ChangeBatchCommand(id, InventoryBatchAction.Adjust) { Quantity = body.NewQuantity, Reason = body.Reason }))
+            .WithName("AdjustBatchQuantity")
+            .WithSummary("Correct the on-hand quantity of a batch")
+            .Produces<ResponseMessage<WarehouseBatchViewModel?>>(StatusCodes.Status200OK)
+            .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryUpdate);
+
+            group.MapPost("/batches/{id:guid}/reserve", ([FromRoute] Guid id, [FromBody] ReserveBatchViewModel body, IMediatorHandler bus) =>
+                ChangeBatchAsync(bus, new ChangeBatchCommand(id, InventoryBatchAction.Reserve) { Quantity = body.Quantity, Reason = body.Reference }))
+            .WithName("ReserveBatch")
+            .WithSummary("Reserve part of a batch")
+            .Produces<ResponseMessage<WarehouseBatchViewModel?>>(StatusCodes.Status200OK)
+            .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryUpdate);
+
+            group.MapPost("/batches/{id:guid}/lock", ([FromRoute] Guid id, [FromBody] LockBatchViewModel body, IMediatorHandler bus) =>
+                ChangeBatchAsync(bus, new ChangeBatchCommand(id, InventoryBatchAction.Lock) { Reason = body.Reason }))
+            .WithName("LockBatch")
+            .WithSummary("Quarantine a batch so it can't be dispensed or sold")
+            .Produces<ResponseMessage<WarehouseBatchViewModel?>>(StatusCodes.Status200OK)
+            .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryUpdate);
+
+            group.MapPost("/batches/{id:guid}/dispose", ([FromRoute] Guid id, [FromBody] DisposeBatchViewModel body, IMediatorHandler bus) =>
+                ChangeBatchAsync(bus, new ChangeBatchCommand(id, InventoryBatchAction.Dispose) { Quantity = body.Quantity, Reason = body.Reason }))
+            .WithName("DisposeBatch")
+            .WithSummary("Write off damaged or expired stock from a batch")
+            .Produces<ResponseMessage<WarehouseBatchViewModel?>>(StatusCodes.Status200OK)
+            .RequireAuthorization(Permissions.Pharmacy.MedicineInventoryDelete);
+            #endregion
+        }
+
+        private static async Task<IResult> ChangeBatchAsync(IMediatorHandler bus, ChangeBatchCommand command)
+        {
+            await bus.SendCommandAsync(command);
+            WarehouseBatchViewModel? batch = await bus.QueryAsync(new GetWarehouseBatchByIdQuery(command.BatchId));
+            return Results.Ok(new ResponseMessage<WarehouseBatchViewModel?> { Success = true, Data = batch });
         }
     }
 }

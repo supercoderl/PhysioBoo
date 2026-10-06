@@ -22,23 +22,7 @@ namespace PhysioBoo.Application.Queries.MedicineInventories.GetWarehouseBatches
                 .OrderBy(b => b.ExpiryDate ?? DateOnly.MaxValue)
                 .ToListAsync(ct);
 
-            return batches.Select(b => new WarehouseBatchViewModel
-            {
-                Id = b.Id,
-                BatchNo = b.BatchNumber,
-                MedicineId = b.MedicineId,
-                ExpiryDate = b.ExpiryDate,
-                ManufacturingDate = b.PurchaseDate,
-                Quantity = b.QuantityAvailable,
-                ReservedQuantity = b.ReservedQuantity,
-                AvailableQuantity = b.QuantityAvailable - b.ReservedQuantity,
-                Supplier = b.Supplier?.SupplierName,
-                PurchasePrice = b.UnitPurchasePrice,
-                StorageLocation = b.StorageLocation,
-                Status = b.Status,
-                IsNearExpiry = b.IsNearExpiry,
-                IsExpired = b.IsExpired
-            }).ToList();
+            return batches.Select(WarehouseBatchViewModel.FromEntity).ToList();
         }
     }
 }

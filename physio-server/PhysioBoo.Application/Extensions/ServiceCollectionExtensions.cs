@@ -290,6 +290,9 @@ namespace PhysioBoo.Application.Extensions
             // User Provisioning
             services.AddScoped<IUserProvisioningService, UserProvisioningService>();
 
+            // Dispensing
+            services.AddScoped<Commands.Dispensing.DispenseSessionLoader>();
+
             return services;
         }
 

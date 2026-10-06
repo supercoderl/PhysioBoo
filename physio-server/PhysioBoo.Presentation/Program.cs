@@ -330,6 +330,10 @@ namespace PhysioBoo.Presentation
                 app.MapLeadEndpoints();
                 app.MapInsuranceClaimEndpoints();
                 app.MapRevenueReportEndpoints();
+                app.MapDispensingEndpoints();
+                app.MapPrescriptionTemplateEndpoints();
+                app.MapTenantEndpoints();
+                app.MapSubscriptionEndpoints();
                 app.MapRoleEndpoints();
                 app.MapConfigEndpoints();
                 app.MapAdminMenuEndpoints();

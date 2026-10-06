@@ -179,14 +179,13 @@ export class RegisterTenantComponent {
   ownerForm: FormGroup;
 
   readonly hospitalTypeOptions = [
-    { label: 'General Hospital', value: HospitalType.GeneralHospital },
-    { label: 'Specialist Hospital', value: HospitalType.SpecialistHospital },
-    { label: 'Polyclinic', value: HospitalType.Polyclinic },
+    { label: 'General Hospital', value: HospitalType.General },
+    { label: 'Specialty Hospital', value: HospitalType.Specialty },
+    { label: 'Teaching Hospital', value: HospitalType.Teaching },
+    { label: 'Research Hospital', value: HospitalType.Research },
     { label: 'Clinic', value: HospitalType.Clinic },
-    { label: 'Emergency Center', value: HospitalType.EmergencyCenter },
-    { label: 'Rehabilitation Center', value: HospitalType.RehabilitationCenter },
-    { label: 'Maternity Hospital', value: HospitalType.MaternityHospital },
-    { label: 'Pediatric Hospital', value: HospitalType.PediatricHospital },
+    { label: 'Emergency Center', value: HospitalType.Emergency },
+    { label: 'Rehabilitation Center', value: HospitalType.Rehabilitation },
   ];
   // #endregion
 
@@ -237,7 +236,7 @@ export class RegisterTenantComponent {
   private createBranchGroup(): FormGroup {
     return this.fb.group({
       name: ['', Validators.required],
-      hospitalType: [HospitalType.GeneralHospital, Validators.required],
+      hospitalType: [HospitalType.General, Validators.required],
       address: ['', Validators.required],
       city: ['', Validators.required],
       stateProvince: ['', Validators.required],

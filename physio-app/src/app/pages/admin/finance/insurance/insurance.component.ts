@@ -421,7 +421,7 @@ export class AdminInsuranceComponent implements OnInit {
     switch (payload.mode) {
       case 'create':
         this.srv.createClaim({
-          patientId: '',
+          patientId: null,
           patientName: payload.create.patientName,
           providerId: payload.create.providerId,
           policyNumber: payload.create.policyNumber,
@@ -455,9 +455,13 @@ export class AdminInsuranceComponent implements OnInit {
         break;
       case 'upload':
         if (claimId && payload.files.length) {
-          payload.files.forEach(f => this.srv.uploadDocument(claimId, f, 'PDF').subscribe());
-          this.toastSrv.success(`${payload.files.length} document(s) uploaded`);
-          this.refreshAfterAction(claimId);
+          forkJoin(payload.files.map(f => this.srv.uploadDocument(claimId, f, 'PDF'))).subscribe({
+            next: () => {
+              this.toastSrv.success(`${payload.files.length} document(s) uploaded`);
+              this.refreshAfterAction(claimId);
+            },
+            error: () => this.refreshAfterAction(claimId),
+          });
         }
         break;
     }

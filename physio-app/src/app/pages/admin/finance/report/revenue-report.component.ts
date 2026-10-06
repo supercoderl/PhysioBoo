@@ -209,19 +209,23 @@ export class AdminRevenueReportComponent implements OnInit {
     onExport(): void {
         this.loadingSrv.setLoading('export', true);
         this.revenueReportSrv.export(this.filter).subscribe({
-            next: res => {
+            next: blob => {
                 this.loadingSrv.setLoading('export', false);
-                if (res.success && res.data.fileUrl) {
-                    window.open(res.data.fileUrl, '_blank');
-                } else {
-                    this.toastSrv.error('Failed to export report');
-                }
+                this.downloadBlob(blob, `revenue-report_${this.filter.start}_${this.filter.end}.xlsx`);
             },
             error: () => {
                 this.loadingSrv.setLoading('export', false);
                 this.toastSrv.error('Failed to export report');
             }
         });
+    }
+
+    private downloadBlob(blob: Blob, filename: string): void {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
     }
 
     onPrint(): void {

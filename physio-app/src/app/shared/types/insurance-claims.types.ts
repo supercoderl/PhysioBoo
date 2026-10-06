@@ -190,7 +190,7 @@ export interface SavedSearch {
 export type ClaimActionMode = 'create' | 'submit' | 'upload' | 'approve' | 'reject' | 'appeal' | 'settle';
 
 export interface CreateInsuranceClaimRequest {
-  patientId: string;
+  patientId: string | null;
   patientName: string;
   providerId: string;
   policyNumber: string;

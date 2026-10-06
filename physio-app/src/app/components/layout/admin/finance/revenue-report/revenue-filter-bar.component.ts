@@ -89,7 +89,7 @@ export class RevenueFilterBarComponent implements OnInit {
             if (res.success) this.departments = res.data.items.map(d => ({ id: d.id, name: d.name }));
         });
         this.doctorSrv.search({ pageNumber: 1, pageSize: 100 }).subscribe(res => {
-            if (res.success) this.doctors = res.data.items.map(d => ({ id: d.id, name: "" }));
+            if (res.success) this.doctors = res.data.items.map(d => ({ id: d.id, name: d.fullName }));
         });
     }
 

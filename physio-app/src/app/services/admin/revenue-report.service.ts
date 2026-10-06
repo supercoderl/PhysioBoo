@@ -71,6 +71,6 @@ export class RevenueReportService {
     }
 
     export(filter: RevenueReportFilter) {
-        return this.http.post<PagedResponse<{ fileUrl: string }>>(BASE_API.REVENUE_REPORT.EXPORT, filter);
+        return this.http.post(BASE_API.REVENUE_REPORT.EXPORT, filter, { responseType: 'blob' });
     }
 }

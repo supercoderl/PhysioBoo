@@ -268,5 +268,15 @@
             public const string LeadDelete = "crm:lead:delete";
         }
 
+        public static class Finance
+        {
+            public const string RevenueReportRead = "finance:revenue-report:read";
+            public const string RevenueReportExport = "finance:revenue-report:export";
+            public const string InsuranceClaimRead = "finance:insurance-claim:read";
+            public const string InsuranceClaimCreate = "finance:insurance-claim:create";
+            public const string InsuranceClaimUpdate = "finance:insurance-claim:update";
+            public const string InsuranceClaimProcess = "finance:insurance-claim:process";
+        }
+
     }
 }

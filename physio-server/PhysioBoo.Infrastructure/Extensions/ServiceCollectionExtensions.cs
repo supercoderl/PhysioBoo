@@ -134,6 +134,7 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IHomeSettingRepository, HomeSettingRepository>();
             services.AddScoped<IMedicalServiceRepository, MedicalServiceRepository>();
             services.AddScoped<ILeadRepository, LeadRepository>();
+            services.AddScoped<IInsuranceClaimRepository, InsuranceClaimRepository>();
 
             return services;
         }

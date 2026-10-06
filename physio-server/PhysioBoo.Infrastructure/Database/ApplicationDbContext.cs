@@ -5,6 +5,7 @@ using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Entities.Cms;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.Crm;
+using PhysioBoo.Domain.Entities.Finance;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
@@ -111,6 +112,9 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<HomeSetting> HomeSettings { get; set; } = null!;
         public DbSet<MedicalService> MedicalServices { get; set; } = null!;
         public DbSet<Lead> Leads { get; set; } = null!;
+        public DbSet<InsuranceClaim> InsuranceClaims { get; set; } = null!;
+        public DbSet<InsuranceClaimDocument> InsuranceClaimDocuments { get; set; } = null!;
+        public DbSet<InsuranceClaimActivity> InsuranceClaimActivities { get; set; } = null!;
         #endregion
 
         public ApplicationDbContext(
@@ -274,6 +278,9 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new MedicalServiceDepartmentConfiguration());
             builder.ApplyConfiguration(new MedicalServiceDoctorConfiguration());
             builder.ApplyConfiguration(new LeadConfiguration());
+            builder.ApplyConfiguration(new InsuranceClaimConfiguration());
+            builder.ApplyConfiguration(new InsuranceClaimDocumentConfiguration());
+            builder.ApplyConfiguration(new InsuranceClaimActivityConfiguration());
         }
         #endregion
 

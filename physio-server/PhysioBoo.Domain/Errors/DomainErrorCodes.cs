@@ -562,5 +562,30 @@
             public const string EmptyId = "LEAD_EMPTY_ID";
         }
 
+        public static class InsuranceClaim
+        {
+            // Insurance Claim Validation
+            public const string EmptyId = "INSURANCE_CLAIM_EMPTY_ID";
+            public const string EmptyPatientName = "INSURANCE_CLAIM_EMPTY_PATIENT_NAME";
+            public const string PatientNameExceedsMaxLength = "INSURANCE_CLAIM_PATIENT_NAME_EXCEEDS_MAX_LENGTH";
+            public const string EmptyProvider = "INSURANCE_CLAIM_EMPTY_PROVIDER";
+            public const string EmptyPolicyNumber = "INSURANCE_CLAIM_EMPTY_POLICY_NUMBER";
+            public const string PolicyNumberExceedsMaxLength = "INSURANCE_CLAIM_POLICY_NUMBER_EXCEEDS_MAX_LENGTH";
+            public const string EmptyDiagnosis = "INSURANCE_CLAIM_EMPTY_DIAGNOSIS";
+            public const string DiagnosisExceedsMaxLength = "INSURANCE_CLAIM_DIAGNOSIS_EXCEEDS_MAX_LENGTH";
+            public const string InvalidAmount = "INSURANCE_CLAIM_INVALID_AMOUNT";
+            public const string InvalidPriority = "INSURANCE_CLAIM_INVALID_PRIORITY";
+            public const string InvalidAction = "INSURANCE_CLAIM_INVALID_ACTION";
+            public const string EmptyReason = "INSURANCE_CLAIM_EMPTY_REASON";
+            public const string EmptySettlementMethod = "INSURANCE_CLAIM_EMPTY_SETTLEMENT_METHOD";
+            public const string EmptyMessage = "INSURANCE_CLAIM_EMPTY_MESSAGE";
+            public const string MessageExceedsMaxLength = "INSURANCE_CLAIM_MESSAGE_EXCEEDS_MAX_LENGTH";
+            public const string EmptyFile = "INSURANCE_CLAIM_EMPTY_FILE";
+            public const string FileTooLarge = "INSURANCE_CLAIM_FILE_TOO_LARGE";
+            public const string InvalidStatusTransition = "INSURANCE_CLAIM_INVALID_STATUS_TRANSITION";
+            public const string MissingDocuments = "INSURANCE_CLAIM_MISSING_DOCUMENTS";
+            public const string UploadFailed = "INSURANCE_CLAIM_UPLOAD_FAILED";
+        }
+
     }
 }

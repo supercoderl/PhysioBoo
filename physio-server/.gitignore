@@ -485,3 +485,4 @@ $RECYCLE.BIN/
 
 # Ignore appsettings.Development.json in Presentation
 PhysioBoo.Presentation/appsettings.Development.json
+

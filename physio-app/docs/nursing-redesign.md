@@ -243,6 +243,23 @@ All endpoints assume hospital/tenant scoping is applied via existing auth middle
 | 16 | Get shift handover cards | GET | `/api/nursing/handover?outgoingShift=Day&wardId=` | query params | `ShiftHandoverCard[]` | Handover page |
 | 17 | Submit/acknowledge handover card | POST | `/api/nursing/handover/{cardId}/acknowledge` | `{ acknowledgedBy: string }` | `ShiftHandoverCard` | Handover acknowledge |
 
+### Server behaviour (implemented)
+
+All 17 endpoints above exist (`NursingEndpoints.cs`). Enums travel as strings. Points that differ from, or add to, the table:
+
+- **"My patients".** `assignments`, `stats` and `alerts` return data for the signed-in nurse's assignments of that shift's date. A night shift started yesterday still counts before noon. A nurse with no assignment sees an empty dashboard (not an error).
+- **Assignments are created by `POST /api/nursing/assignments`** (`{admissionId, shift, shiftDate?, nurseUserId?, acuity, fallRisk}`, permission `inpatient:nursing:manage`); posting again for the same admission/shift/date updates it. There is no UI for it yet. It also raises open alerts for fall risk, allergies, emergency admission and an isolation bed.
+- **Risk flags** other than fall risk are derived from the admission and bed (emergency type, allergies text, isolation bed). Fall risk and acuity are the nurse's per-shift assessment.
+- **Vitals:** the server computes `isAbnormal` from adult thresholds and ignores the client's flag and `recordedBy`. An abnormal reading raises an `AbnormalVitals` alert (Critical or High) unless one is already open.
+- **MAR** is the single medication record shared with the Treatment Sheet. Nursing shows `Scheduled` as `Due` and `Refused` as `Held`. A dose can be recorded once (Scheduled or Held → Given/Missed/Held); a second nurse gets `NURSING_DOSE_ALREADY_RECORDED`.
+- **Tasks:** `Overdue` is derived (Pending and past due). Only a pending task can be completed or cancelled (`NURSING_TASK_NOT_PENDING`). Tasks are created by `POST /api/nursing/patients/{id}/tasks`.
+- **Scheduled doses** are created by `POST /api/nursing/patients/{id}/mar`. Generating them from prescriptions is a follow-up.
+- **Notes** are one shared feed (doctor, nursing, consultation); this endpoint returns all of them.
+- **Alerts:** acknowledging is idempotent; the signed-in user is recorded.
+- **Handover:** `GET /handover` first creates any missing SBAR card for that outgoing shift's assignments, composed from the stay, last vitals, open alerts, pending tasks and doses due. `acknowledge` records the signed-in user (the client's `acknowledgedBy` is ignored). There is no endpoint to edit the SBAR text yet.
+
+Prerequisites: permissions `inpatient:nursing:read | write | manage` on the right roles; at least one active admission and one assignment to see data.
+
 ---
 
 ## 14. Deliverables Checklist

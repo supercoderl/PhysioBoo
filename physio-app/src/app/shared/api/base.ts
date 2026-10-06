@@ -116,6 +116,18 @@ export const BASE_API = {
     SEARCH: '/api/leads/search',
     STATS: '/api/leads/stats',
   },
+  MEMBER: {
+    BASE: '/api/members',
+    SEARCH: '/api/members/search',
+    STATS: '/api/members/stats',
+    TRANSACTIONS: (id: string) => `/api/members/${id}/transactions/search`,
+    ADD_POINTS: (id: string) => `/api/members/${id}/points/add`,
+    REDEEM_POINTS: (id: string) => `/api/members/${id}/points/redeem`,
+  },
+  REWARD: {
+    BASE: '/api/rewards',
+    SEARCH: '/api/rewards/search',
+  },
   COMPLAINT: {
     BASE: '/api/complaints',
     SEARCH: '/api/complaints/search',
@@ -200,6 +212,12 @@ export const BASE_API = {
     ASSIGN: (bedId: string) => `/api/bed-map/beds/${bedId}/assign`,
     DISCHARGE: (bedId: string) => `/api/bed-map/beds/${bedId}/discharge`,
     HISTORY: (bedId: string) => `/api/bed-map/beds/${bedId}/history`,
+    WARD_BY_ID: (wardId: string) => `/api/bed-map/wards/${wardId}`,
+  },
+  ADMISSION: {
+    BASE: '/api/admissions',
+    SEARCH: '/api/admissions/search',
+    DISCHARGE: (id: string) => `/api/admissions/${id}/discharge`,
   },
   PRINT_TEMPLATE: {
     BASE: '/api/print-templates',
@@ -212,6 +230,7 @@ export const BASE_API = {
     STATS: '/api/nursing/stats',
     ALERTS: '/api/nursing/alerts',
     ALERT_ACKNOWLEDGE: (alertId: string) => `/api/nursing/alerts/${alertId}/acknowledge`,
+    ASSIGNMENT_BY_ID: (assignmentId: string) => `/api/nursing/assignments/${assignmentId}`,
     PATIENT: (patientId: string) => `/api/nursing/patients/${patientId}`,
     VITALS: (patientId: string) => `/api/nursing/patients/${patientId}/vitals`,
     MAR: (patientId: string) => `/api/nursing/patients/${patientId}/mar`,

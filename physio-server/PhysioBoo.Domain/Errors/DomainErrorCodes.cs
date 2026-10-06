@@ -562,6 +562,172 @@
             public const string EmptyId = "LEAD_EMPTY_ID";
         }
 
+        public static class Campaign
+        {
+            // Campaign Validation
+            public const string EmptyName = "CAMPAIGN_EMPTY_NAME";
+            public const string NameExceedsMaxLength = "CAMPAIGN_NAME_EXCEEDS_MAX_LENGTH";
+            public const string InvalidType = "CAMPAIGN_INVALID_TYPE";
+            public const string InvalidStatus = "CAMPAIGN_INVALID_STATUS";
+            public const string GoalExceedsMaxLength = "CAMPAIGN_GOAL_EXCEEDS_MAX_LENGTH";
+            public const string InvalidDateRange = "CAMPAIGN_INVALID_DATE_RANGE";
+            public const string NegativeBudget = "CAMPAIGN_NEGATIVE_BUDGET";
+            public const string DescriptionExceedsMaxLength = "CAMPAIGN_DESCRIPTION_EXCEEDS_MAX_LENGTH";
+            public const string EmptyId = "CAMPAIGN_EMPTY_ID";
+        }
+
+        public static class Ward
+        {
+            // Ward Validation
+            public const string EmptyId = "WARD_EMPTY_ID";
+            public const string EmptyName = "WARD_EMPTY_NAME";
+            public const string NameExceedsMaxLength = "WARD_NAME_EXCEEDS_MAX_LENGTH";
+            public const string CodeExceedsMaxLength = "WARD_CODE_EXCEEDS_MAX_LENGTH";
+            public const string DuplicateCode = "WARD_DUPLICATE_CODE";
+            public const string InvalidFloor = "WARD_INVALID_FLOOR";
+            public const string HasBeds = "WARD_HAS_BEDS";
+        }
+
+        public static class Bed
+        {
+            // Bed Validation
+            public const string EmptyId = "BED_EMPTY_ID";
+            public const string EmptyWardId = "BED_EMPTY_WARD_ID";
+            public const string EmptyNumber = "BED_EMPTY_NUMBER";
+            public const string NumberExceedsMaxLength = "BED_NUMBER_EXCEEDS_MAX_LENGTH";
+            public const string RoomNumberExceedsMaxLength = "BED_ROOM_NUMBER_EXCEEDS_MAX_LENGTH";
+            public const string NotesExceedsMaxLength = "BED_NOTES_EXCEEDS_MAX_LENGTH";
+            public const string InvalidFloor = "BED_INVALID_FLOOR";
+            public const string InvalidType = "BED_INVALID_TYPE";
+            public const string InvalidStatus = "BED_INVALID_STATUS";
+            public const string DuplicateNumber = "BED_DUPLICATE_NUMBER";
+            public const string EmptyPatientId = "BED_EMPTY_PATIENT_ID";
+
+            // Bed Business Rules
+            public const string NotAvailable = "BED_NOT_AVAILABLE";
+            public const string NotOccupied = "BED_NOT_OCCUPIED";
+            public const string Occupied = "BED_OCCUPIED";
+            public const string PatientAlreadyAssigned = "BED_PATIENT_ALREADY_ASSIGNED";
+        }
+
+        public static class Admission
+        {
+            // Admission Validation
+            public const string EmptyId = "ADMISSION_EMPTY_ID";
+            public const string EmptyPatientId = "ADMISSION_EMPTY_PATIENT_ID";
+            public const string EmptyDepartmentId = "ADMISSION_EMPTY_DEPARTMENT_ID";
+            public const string EmptyDoctorId = "ADMISSION_EMPTY_DOCTOR_ID";
+            public const string InvalidType = "ADMISSION_INVALID_TYPE";
+            public const string InvalidStatus = "ADMISSION_INVALID_STATUS";
+            public const string EmptyChiefComplaint = "ADMISSION_EMPTY_CHIEF_COMPLAINT";
+            public const string ChiefComplaintExceedsMaxLength = "ADMISSION_CHIEF_COMPLAINT_EXCEEDS_MAX_LENGTH";
+            public const string EmptyProvisionalDiagnosis = "ADMISSION_EMPTY_PROVISIONAL_DIAGNOSIS";
+            public const string ProvisionalDiagnosisExceedsMaxLength = "ADMISSION_PROVISIONAL_DIAGNOSIS_EXCEEDS_MAX_LENGTH";
+            public const string TextExceedsMaxLength = "ADMISSION_TEXT_EXCEEDS_MAX_LENGTH";
+            public const string ReferredByExceedsMaxLength = "ADMISSION_REFERRED_BY_EXCEEDS_MAX_LENGTH";
+            public const string InsuranceDetailsRequired = "ADMISSION_INSURANCE_DETAILS_REQUIRED";
+
+            // Admission Business Rules
+            public const string AlreadyAdmitted = "ADMISSION_ALREADY_ADMITTED";
+            public const string NotAdmitted = "ADMISSION_NOT_ADMITTED";
+        }
+
+        public static class Nursing
+        {
+            // Nursing Validation
+            public const string EmptyPatientId = "NURSING_EMPTY_PATIENT_ID";
+            public const string EmptyId = "NURSING_EMPTY_ID";
+            public const string InvalidShift = "NURSING_INVALID_SHIFT";
+            public const string InvalidAcuity = "NURSING_INVALID_ACUITY";
+            public const string InvalidStatus = "NURSING_INVALID_STATUS";
+            public const string InvalidVitalValue = "NURSING_INVALID_VITAL_VALUE";
+            public const string InvalidDirection = "NURSING_INVALID_DIRECTION";
+            public const string InvalidCategory = "NURSING_INVALID_CATEGORY";
+            public const string InvalidVolume = "NURSING_INVALID_VOLUME";
+            public const string EmptyLabel = "NURSING_EMPTY_LABEL";
+            public const string EmptyContent = "NURSING_EMPTY_CONTENT";
+            public const string EmptyMedicationName = "NURSING_EMPTY_MEDICATION_NAME";
+            public const string TextExceedsMaxLength = "NURSING_TEXT_EXCEEDS_MAX_LENGTH";
+
+            // Nursing Business Rules
+            public const string NoActiveAdmission = "NURSING_NO_ACTIVE_ADMISSION";
+            public const string AlreadyAssigned = "NURSING_ALREADY_ASSIGNED";
+            public const string TaskNotPending = "NURSING_TASK_NOT_PENDING";
+            public const string AlertAlreadyAcknowledged = "NURSING_ALERT_ALREADY_ACKNOWLEDGED";
+            public const string DoseAlreadyRecorded = "NURSING_DOSE_ALREADY_RECORDED";
+        }
+
+        public static class Treatment
+        {
+            // Treatment Sheet Validation
+            public const string EmptyId = "TREATMENT_EMPTY_ID";
+            public const string InvalidOrderType = "TREATMENT_INVALID_ORDER_TYPE";
+            public const string InvalidPriority = "TREATMENT_INVALID_PRIORITY";
+            public const string InvalidStatus = "TREATMENT_INVALID_STATUS";
+            public const string InvalidNoteType = "TREATMENT_INVALID_NOTE_TYPE";
+            public const string EmptyOrderName = "TREATMENT_EMPTY_ORDER_NAME";
+            public const string EmptyProcedureName = "TREATMENT_EMPTY_PROCEDURE_NAME";
+            public const string EmptyDepartment = "TREATMENT_EMPTY_DEPARTMENT";
+            public const string EmptyContent = "TREATMENT_EMPTY_CONTENT";
+            public const string TextExceedsMaxLength = "TREATMENT_TEXT_EXCEEDS_MAX_LENGTH";
+            public const string InvalidDateRange = "TREATMENT_INVALID_DATE_RANGE";
+            public const string InvalidRange = "TREATMENT_INVALID_RANGE";
+        }
+
+        public static class Complaint
+        {
+            // Complaint Validation
+            public const string EmptyId = "COMPLAINT_EMPTY_ID";
+            public const string EmptyPatientName = "COMPLAINT_EMPTY_PATIENT_NAME";
+            public const string PatientNameExceedsMaxLength = "COMPLAINT_PATIENT_NAME_EXCEEDS_MAX_LENGTH";
+            public const string InvalidPatientId = "COMPLAINT_INVALID_PATIENT_ID";
+            public const string EmptyEmail = "COMPLAINT_EMPTY_EMAIL";
+            public const string InvalidEmail = "COMPLAINT_INVALID_EMAIL";
+            public const string EmailExceedsMaxLength = "COMPLAINT_EMAIL_EXCEEDS_MAX_LENGTH";
+            public const string EmptyPhone = "COMPLAINT_EMPTY_PHONE";
+            public const string PhoneExceedsMaxLength = "COMPLAINT_PHONE_EXCEEDS_MAX_LENGTH";
+            public const string InvalidCategory = "COMPLAINT_INVALID_CATEGORY";
+            public const string InvalidPriority = "COMPLAINT_INVALID_PRIORITY";
+            public const string InvalidStatus = "COMPLAINT_INVALID_STATUS";
+            public const string EmptySubject = "COMPLAINT_EMPTY_SUBJECT";
+            public const string SubjectExceedsMaxLength = "COMPLAINT_SUBJECT_EXCEEDS_MAX_LENGTH";
+            public const string EmptyDescription = "COMPLAINT_EMPTY_DESCRIPTION";
+            public const string DescriptionExceedsMaxLength = "COMPLAINT_DESCRIPTION_EXCEEDS_MAX_LENGTH";
+            public const string AssignedToExceedsMaxLength = "COMPLAINT_ASSIGNED_TO_EXCEEDS_MAX_LENGTH";
+        }
+
+        public static class Member
+        {
+            // Member Validation
+            public const string EmptyId = "MEMBER_EMPTY_ID";
+            public const string EmptyPatientId = "MEMBER_EMPTY_PATIENT_ID";
+            public const string InvalidTier = "MEMBER_INVALID_TIER";
+            public const string InvalidStatus = "MEMBER_INVALID_STATUS";
+            public const string AlreadyEnrolled = "MEMBER_ALREADY_ENROLLED";
+            public const string NotActive = "MEMBER_NOT_ACTIVE";
+        }
+
+        public static class PointTransaction
+        {
+            // Point Transaction Validation
+            public const string InvalidPoints = "POINT_TRANSACTION_INVALID_POINTS";
+            public const string EmptyDescription = "POINT_TRANSACTION_EMPTY_DESCRIPTION";
+            public const string DescriptionExceedsMaxLength = "POINT_TRANSACTION_DESCRIPTION_EXCEEDS_MAX_LENGTH";
+            public const string InsufficientPoints = "POINT_TRANSACTION_INSUFFICIENT_POINTS";
+        }
+
+        public static class Reward
+        {
+            // Reward Validation
+            public const string EmptyId = "REWARD_EMPTY_ID";
+            public const string EmptyTitle = "REWARD_EMPTY_TITLE";
+            public const string TitleExceedsMaxLength = "REWARD_TITLE_EXCEEDS_MAX_LENGTH";
+            public const string DescriptionExceedsMaxLength = "REWARD_DESCRIPTION_EXCEEDS_MAX_LENGTH";
+            public const string InvalidPointsRequired = "REWARD_INVALID_POINTS_REQUIRED";
+            public const string InvalidCategory = "REWARD_INVALID_CATEGORY";
+            public const string NotAvailable = "REWARD_NOT_AVAILABLE";
+        }
+
         public static class Subscription
         {
             // Subscription / Plan / Invoice Validation

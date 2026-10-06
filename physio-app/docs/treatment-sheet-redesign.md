@@ -218,6 +218,21 @@ All endpoints assume hospital/tenant scoping via existing auth middleware (not r
 | 16 | Add a progress note | POST | `/api/treatment-sheet/patients/{patientId}/notes` | `{ type: ProgressNoteType, content: string }` | `TreatmentProgressNote` | Notes "Add Note" |
 | 17 | Export treatment sheet as PDF | GET | `/api/treatment-sheet/patients/{patientId}/export` | — | binary (`application/pdf`) | "Export PDF" quick action |
 
+### Server behaviour (implemented)
+
+Endpoints 1–16 exist (`TreatmentSheetEndpoints.cs`). Enums travel as strings.
+
+- **Needs an active admission.** `summary` returns 404 for a patient who is not admitted. The other endpoints work by patient id.
+- **No duplicated clinical data.** Laboratory and imaging rows are read from the existing laboratory and radiology orders (`LabOrderItem`, `ImagingOrder`); they are not created here. Imaging "ReportPending" is shown as Completed.
+- **Medications** are the same records as the nursing MAR (one source of truth); updating a dose here updates nursing and vice versa. Statuses: Scheduled, Given, Missed, Refused, Held. Doses are created by `POST …/medications` (no UI yet).
+- **Orders:** the ordering doctor is the signed-in user; status defaults to Active. `POST …/orders` exists although the page has no "Add order" action yet.
+- **Alerts:** only types the sheet understands (allergy, drug interaction, abnormal lab, critical vitals, infection control, isolation, pending critical order). Severity `Low`/`Medium` are shown as `Information`/`Warning`. Acknowledging is shared with nursing and idempotent.
+- **Stats:** `medicationDue` counts scheduled doses due within the hour or overdue; `criticalAlerts` counts open Critical alerts.
+- **Timeline** merges orders, doses, procedures, lab orders, imaging, notes and completed nursing tasks in the chosen window, newest first, capped at 200 entries. `range` is `Today`, `Last24Hours`, `Last7Days`, or `Custom` with `from` and `to`.
+- **Not implemented:** `GET …/export` (PDF). The page does not call it; it needs the print/PDF service.
+
+Prerequisites: permissions `inpatient:treatment-sheet:read | write` on the right roles.
+
 ---
 
 ## 14. Deliverables Checklist

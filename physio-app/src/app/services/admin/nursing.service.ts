@@ -6,6 +6,8 @@ import { PagedResponse, PaginationData } from "../../shared/types/common";
 import { LoadingKeys } from "../../shared/types/loading";
 import { Note } from "../../shared/types/note.types";
 import {
+  CreateNursingAssignmentRequest,
+  CreateNursingTaskRequest,
   IntakeOutputEntry,
   MarEntry,
   NursingAlert,
@@ -13,6 +15,7 @@ import {
   NursingPatient,
   NursingStats,
   NursingTask,
+  ScheduleMedicationRequest,
   ShiftCode,
   ShiftHandoverCard,
   VitalsReading,
@@ -76,6 +79,23 @@ export class NursingService {
 
   updateTaskStatus(taskId: string, status: NursingTask['status']) {
     return this.http.patch<PagedResponse<NursingTask>>(BASE_API.NURSING.TASK_UPDATE(taskId), { status }, { context: createHttpContext({ loadingKey: LoadingKeys.NURSING.TASK_UPDATE }) });
+  }
+
+  // Management (no UI yet): assignments, tasks and scheduled doses are created through these.
+  createAssignment(params: CreateNursingAssignmentRequest) {
+    return this.http.post<PagedResponse<string>>(BASE_API.NURSING.ASSIGNMENTS, params);
+  }
+
+  deleteAssignment(assignmentId: string) {
+    return this.http.delete<PagedResponse<string>>(BASE_API.NURSING.ASSIGNMENT_BY_ID(assignmentId));
+  }
+
+  createTask(patientId: string, params: CreateNursingTaskRequest) {
+    return this.http.post<PagedResponse<NursingTask>>(BASE_API.NURSING.TASKS(patientId), params);
+  }
+
+  scheduleMedication(patientId: string, params: ScheduleMedicationRequest) {
+    return this.http.post<PagedResponse<MarEntry>>(BASE_API.NURSING.MAR(patientId), params);
   }
 
   getNotes(patientId: string) {

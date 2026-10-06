@@ -120,6 +120,17 @@ export interface TreatmentProgressNote {
   writtenAt: string;
 }
 
+/** The ordering doctor is the signed-in user; status defaults to Active. */
+export interface CreateTreatmentOrderRequest {
+  orderType: OrderType;
+  orderName: string;
+  priority: OrderPriority;
+  frequency?: string | null;
+  startTime: string;
+  endTime?: string | null;
+  status?: OrderStatus | null;
+}
+
 export interface TreatmentOrderFilter {
   search?: string | null;
   orderType?: OrderType | null;

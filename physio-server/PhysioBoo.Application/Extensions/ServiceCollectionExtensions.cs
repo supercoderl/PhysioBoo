@@ -213,6 +213,12 @@ using PhysioBoo.Application.ViewModels.ImagingModalities;
 using PhysioBoo.Application.ViewModels.InsuranceCompanies;
 using PhysioBoo.Application.ViewModels.LabTestCategories;
 using PhysioBoo.Application.ViewModels.LabTests;
+using PhysioBoo.Application.ViewModels.Admissions;
+using PhysioBoo.Application.ViewModels.BedMap;
+using PhysioBoo.Application.ViewModels.Campaigns;
+using PhysioBoo.Application.ViewModels.Complaints;
+using PhysioBoo.Application.ViewModels.Members;
+using PhysioBoo.Application.ViewModels.Rewards;
 using PhysioBoo.Application.ViewModels.Leads;
 using PhysioBoo.Application.ViewModels.Manufacturers;
 using PhysioBoo.Application.ViewModels.MedicalRecords;
@@ -236,6 +242,7 @@ using PhysioBoo.Domain.Entities.Clinical;
 using PhysioBoo.Domain.Entities.Cms;
 using PhysioBoo.Domain.Entities.Core;
 using PhysioBoo.Domain.Entities.Crm;
+using PhysioBoo.Domain.Entities.Inpatient;
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 using PhysioBoo.Domain.Entities.MedicalStaff;
 using PhysioBoo.Domain.Entities.Operation;
@@ -652,6 +659,12 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<ISortingExpressionProvider<AppointmentViewModel, Appointment>, AppointmentViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<MedicalServiceViewModel, MedicalService>, MedicalServiceViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<LeadViewModel, Lead>, LeadViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<CampaignViewModel, Campaign>, CampaignViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<BedViewModel, Bed>, BedViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<AdmissionViewModel, Admission>, AdmissionViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<ComplaintViewModel, Complaint>, ComplaintViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<MemberViewModel, MemberPoint>, MemberViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<RewardViewModel, Reward>, RewardViewModelSortProvider>();
 
 
             return services;

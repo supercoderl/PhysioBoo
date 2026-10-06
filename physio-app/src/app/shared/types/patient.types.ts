@@ -7,6 +7,9 @@ import { PatientType, RiskLevel } from "../enums/patient";
 export interface Patient {
   id: string;
   patientNumber: string;
+  fullName: string;
+  email: string;
+  phone: string;
 
   patientType: PatientType;
   riskLevel: RiskLevel;

@@ -121,6 +121,30 @@ export interface ShiftHandoverCard {
   acknowledgedBy?: string | null;
 }
 
+/** Assigns an admitted patient to a nurse for one shift. Posting again for the same admission, shift and date updates it. */
+export interface CreateNursingAssignmentRequest {
+  admissionId: string;
+  shift: ShiftCode;
+  shiftDate?: string | null;
+  nurseUserId?: string | null;
+  acuity: AcuityLevel;
+  fallRisk: boolean;
+}
+
+export interface CreateNursingTaskRequest {
+  label: string;
+  dueAt: string;
+  assignedNurseName?: string | null;
+}
+
+export interface ScheduleMedicationRequest {
+  medicationName: string;
+  dose: string;
+  route: string;
+  frequency: string;
+  scheduledAt: string;
+}
+
 export interface NursingAssignmentFilter {
   shift: ShiftCode;
   wardId?: string | null;

@@ -177,6 +177,28 @@ export interface CampaignFilter {
     status: number | null,
 }
 
+export interface AdmissionFilter {
+    start: string | null;
+    end: string | null;
+    status: string | null;
+    type: string | null;
+    departmentId: string | null;
+}
+
+export interface MemberFilter {
+    tier: string | null;
+    status: string | null;
+}
+
+export interface PointTransactionFilter {
+    type: string | null;
+}
+
+export interface RewardFilter {
+    category: string | null;
+    available: boolean | null;
+}
+
 export interface LeadFilter {
     start: string | null;
     end: string | null;

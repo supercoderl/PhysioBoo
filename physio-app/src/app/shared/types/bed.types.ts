@@ -39,3 +39,26 @@ export interface DischargeRequest {
   dischargeDate?: string | null;
   notes?: string | null;
 }
+
+/** Floor defaults to the ward's floor when omitted. */
+export interface CreateBedRequest {
+  wardId: string;
+  number: string;
+  roomNumber: string | null;
+  floor: number | null;
+  bedType: BedType;
+  isolationRequired: boolean;
+  notes: string | null;
+}
+
+/** Occupied is only ever set by assigning a patient. */
+export interface UpdateBedRequest {
+  wardId: string;
+  number: string;
+  roomNumber: string | null;
+  floor: number;
+  bedType: BedType;
+  status: Exclude<BedStatus, 'Occupied'>;
+  isolationRequired: boolean;
+  notes: string | null;
+}

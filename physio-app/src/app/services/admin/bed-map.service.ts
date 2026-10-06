@@ -1,10 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
-import { AssignPatientRequest, Bed, BedHistoryEntry, DischargeRequest } from "../../shared/types/bed.types";
+import { AssignPatientRequest, Bed, BedHistoryEntry, CreateBedRequest, DischargeRequest, UpdateBedRequest } from "../../shared/types/bed.types";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
 import { BedFilter } from "../../shared/types/filter.types";
-import { BedMapSnapshot, BedMapStats, Ward } from "../../shared/types/ward.types";
+import { BedMapSnapshot, BedMapStats, CreateWardRequest, UpdateWardRequest, Ward } from "../../shared/types/ward.types";
 
 @Injectable({ providedIn: 'root' })
 export class BedMapService {
@@ -40,5 +40,30 @@ export class BedMapService {
 
     history(bedId: string) {
         return this.http.get<PagedResponse<BedHistoryEntry[]>>(BASE_API.BED_MAP.HISTORY(bedId));
+    }
+
+    // Ward and bed management (no UI yet; used to populate the map).
+    createWard(params: CreateWardRequest) {
+        return this.http.post<PagedResponse<string>>(BASE_API.BED_MAP.WARDS, params);
+    }
+
+    updateWard(wardId: string, params: UpdateWardRequest) {
+        return this.http.patch<PagedResponse<string>>(BASE_API.BED_MAP.WARD_BY_ID(wardId), params);
+    }
+
+    deleteWard(wardId: string) {
+        return this.http.delete<PagedResponse<string>>(BASE_API.BED_MAP.WARD_BY_ID(wardId));
+    }
+
+    createBed(params: CreateBedRequest) {
+        return this.http.post<PagedResponse<string>>(BASE_API.BED_MAP.BEDS, params);
+    }
+
+    updateBed(bedId: string, params: UpdateBedRequest) {
+        return this.http.patch<PagedResponse<string>>(BASE_API.BED_MAP.BED_BY_ID(bedId), params);
+    }
+
+    deleteBed(bedId: string) {
+        return this.http.delete<PagedResponse<string>>(BASE_API.BED_MAP.BED_BY_ID(bedId));
     }
 }

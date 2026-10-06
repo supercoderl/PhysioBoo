@@ -328,6 +328,14 @@ namespace PhysioBoo.Presentation
                 app.MapHomeSettingsEndpoints();
                 app.MapMedicalServiceEndpoints();
                 app.MapLeadEndpoints();
+                app.MapCampaignEndpoints();
+                app.MapBedMapEndpoints();
+                app.MapAdmissionEndpoints();
+                app.MapNursingEndpoints();
+                app.MapTreatmentSheetEndpoints();
+                app.MapComplaintEndpoints();
+                app.MapMemberEndpoints();
+                app.MapRewardEndpoints();
                 app.MapInsuranceClaimEndpoints();
                 app.MapRevenueReportEndpoints();
                 app.MapDispensingEndpoints();

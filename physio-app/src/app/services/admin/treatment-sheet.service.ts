@@ -4,8 +4,10 @@ import { BASE_API } from "../../shared/api/base";
 import { createHttpContext } from "../../shared/contexts/option.context";
 import { PagedResponse, PaginationData } from "../../shared/types/common";
 import { LoadingKeys } from "../../shared/types/loading";
+import { ScheduleMedicationRequest } from "../../shared/types/nursing.types";
 import {
   ClinicalAlert,
+  CreateTreatmentOrderRequest,
   MedicationAdministration,
   TreatmentImagingOrderRow,
   TreatmentLabOrderRow,
@@ -82,6 +84,15 @@ export class TreatmentSheetService {
 
   getImagingOrders(patientId: string) {
     return this.http.get<PagedResponse<PaginationData<TreatmentImagingOrderRow>>>(BASE_API.TREATMENT_SHEET.IMAGING(patientId), { context: createHttpContext({ loadingKey: LoadingKeys.TREATMENT.IMAGING }) });
+  }
+
+  // Management (no UI yet): orders and scheduled doses are created through these.
+  createOrder(patientId: string, params: CreateTreatmentOrderRequest) {
+    return this.http.post<PagedResponse<TreatmentOrder>>(BASE_API.TREATMENT_SHEET.ORDERS(patientId), params);
+  }
+
+  scheduleMedication(patientId: string, params: ScheduleMedicationRequest) {
+    return this.http.post<PagedResponse<MedicationAdministration>>(BASE_API.TREATMENT_SHEET.MEDICATIONS(patientId), params);
   }
 
   getNotes(patientId: string) {

@@ -263,12 +263,54 @@
             public const string ProfileCreate = "portal:profile:create";
         }
 
+        public static class Inpatient
+        {
+            public const string BedRead = "inpatient:bed:read";
+            public const string BedAssign = "inpatient:bed:assign";
+            public const string BedManage = "inpatient:bed:manage";
+
+            public const string AdmissionRead = "inpatient:admission:read";
+            public const string AdmissionCreate = "inpatient:admission:create";
+            public const string AdmissionUpdate = "inpatient:admission:update";
+            public const string AdmissionDischarge = "inpatient:admission:discharge";
+
+            public const string NursingRead = "inpatient:nursing:read";
+            public const string NursingWrite = "inpatient:nursing:write";
+            public const string NursingManage = "inpatient:nursing:manage";
+
+            public const string TreatmentSheetRead = "inpatient:treatment-sheet:read";
+            public const string TreatmentSheetWrite = "inpatient:treatment-sheet:write";
+        }
+
         public static class Crm
         {
             public const string LeadRead = "crm:lead:read";
             public const string LeadCreate = "crm:lead:create";
             public const string LeadUpdate = "crm:lead:update";
             public const string LeadDelete = "crm:lead:delete";
+
+            public const string CampaignRead = "crm:campaign:read";
+            public const string CampaignCreate = "crm:campaign:create";
+            public const string CampaignUpdate = "crm:campaign:update";
+            public const string CampaignDelete = "crm:campaign:delete";
+
+            public const string ComplaintRead = "crm:complaint:read";
+            public const string ComplaintCreate = "crm:complaint:create";
+            public const string ComplaintUpdate = "crm:complaint:update";
+            public const string ComplaintDelete = "crm:complaint:delete";
+
+            public const string MemberRead = "crm:member:read";
+            public const string MemberCreate = "crm:member:create";
+            public const string MemberUpdate = "crm:member:update";
+            public const string MemberDelete = "crm:member:delete";
+
+            public const string PointAdd = "crm:point:add";
+            public const string PointRedeem = "crm:point:redeem";
+
+            public const string RewardRead = "crm:reward:read";
+            public const string RewardCreate = "crm:reward:create";
+            public const string RewardUpdate = "crm:reward:update";
+            public const string RewardDelete = "crm:reward:delete";
         }
 
         public static class Subscription

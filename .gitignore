@@ -1,0 +1,9 @@
+.env
+.vs/PhysioBoo/v17/workspaceFileList.bin
+.vs/slnx.sqlite
+CLAUDE.md
+physio-data/Permission.csv
+physio-data/Role.csv
+physio-data/Scripts/Find_Tables_Reference_With_UserId.sql
+/swagger.json
+swagger.json

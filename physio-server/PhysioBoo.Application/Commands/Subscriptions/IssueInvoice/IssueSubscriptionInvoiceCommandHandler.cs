@@ -33,7 +33,7 @@ namespace PhysioBoo.Application.Commands.Subscriptions.IssueInvoice
             if (!await TestValidityAsync(request)) return;
 
             TenantSubscription? subscription = await _subscriptionRepository
-                .GetAll(s => s.HospitalGroupId == request.HospitalGroupId, includeProperties: "Plan")
+                .GetAll(s => s.HospitalGroupId == request.HospitalGroupId, includeProperties: "Plan").AsTracking()
                 .FirstOrDefaultAsync(ct);
 
             if (subscription == null || subscription.Plan == null)

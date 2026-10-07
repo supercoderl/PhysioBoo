@@ -4,6 +4,8 @@
 **Source:** Claude Design project "Dashboard Redesign" (`Dashboard Redesign.dc.html`), imported via the `claude_design` MCP.
 **Scope:** Full layout replacement of the admin dashboard body (sidebar/header/shell are unchanged — this redesign only replaces what renders inside the existing admin content area). Supersedes the earlier "visual polish" pass documented previously in this file: this is the "Full redesign" pass that pass explicitly deferred (live data via service, new information architecture, new API contract).
 
+**Status (2026-10-07):** Backend implemented: `GET /api/dashboard/overview`, `POST /api/dashboard/alerts/{source:id}/dismiss` (acknowledges the alert in its module) and `POST /api/dashboard/export` (CSV). `DashboardOverviewService` now calls the API (no mock data). Targets (revenue, pharmacy) are the trailing 28-day daily average, since no target table exists.
+
 ---
 
 ## 1. UX Audit — Previous State

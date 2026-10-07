@@ -9,23 +9,31 @@ Status legend: ⬜ not started · 🟡 in progress · ✅ done
 
 | #   | Module              | Frontend path             | Status | Notes                                                                                                                |
 | --- | ------------------- | ------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------- |
-| 1   | Academy             | academy/list              | 🟡     | Code + pages written (courses, lessons, per-user progress; there was no page before). **Open:** not built/migrated; assign academy:course:manage to managers. |
-| 2   | Home Configuration  | cms/home-configuration    | ✅     | Home Settings done. Frontend still calls a `HOME_BANNER` API that has no endpoints.                                  |
-| 3   | CMS Service         | cms/service               | ✅     | Built, migrated, applied. **Open:** Create/Duplicate do not save department/doctor join rows. Not tested end to end. |
-| 4   | Lead Management     | crm/lead-management       | 🟡     | Code committed (entity, endpoints, frontend service). **Open:** no migration includes the Leads table yet (latest is MedicalService); not tested. |
-| 5   | Marketing Campaign  | crm/marketing-campaign    | 🟡     | Code committed (entity, endpoints, frontend service). **Open:** no migration includes the Campaigns table yet; needs a `Campaign` sequence row; not tested. |
-| 6   | Member Points       | crm/member-point          | 🟡     | Code complete (members, ledger, rewards). **Open:** not built, migration not created, not tested. Needs sequence rows. |
-| 7   | Support / Complaint | crm/support-complaint     | 🟡     | Code complete, frontend already matched. **Open:** not built, migration not created, not tested. Needs sequence row. |
-| 8   | Finance Reports     | finance/report            | ✅     | Delivered in an earlier commit (RevenueReportEndpoints); no new work. |
-| 9   | Admission           | inpatient/admission       | 🟡     | Code + page rewritten. **Open:** not built/migrated/tested. Needs `Admission` sequence row (`ADM-`).                  |
-| 10  | Bed Map             | inpatient/bed-map         | 🟡     | Code complete (wards, beds, stays). **Open:** not built/migrated/tested; no UI to create wards/beds (use Swagger).   |
-| 11  | Treatment Sheet     | inpatient/treatment-sheet | 🟡     | Code complete except PDF export. **Open:** not built/migrated/tested. Orders and doses have no create UI.           |
-| 12  | Nursing Dashboard   | nursing/dashboard         | 🟡     | Code complete. **Open:** not built/migrated/tested. Needs assignments (`POST /api/nursing/assignments`) to show data. |
-| 13  | Nursing Handover    | nursing/handover          | 🟡     | Code complete (cards generated on read). **Open:** not built/migrated/tested. No endpoint to edit SBAR text.         |
-| 14  | Surgery             | paraclinical/surgery      | 🟡     | Code complete except consent PDF and saved filters. **Open:** not built/migrated; needs SUR- sequence row (EntityType SurgeryCase) and surgery:* permissions assigned. |
-| 15  | Reception Queue     | reception/queue           | ✅     | No backend needed: the page runs on existing appointment/check-in data. |
-| 16  | Notes               | system/note               | 🟡     | Code + page rewritten (personal notes, per user). **Open:** not built/migrated; no permission code (login only). |
-| 17  | Scrumboard          | system/scrumboard         | 🟡     | Code + pages written (boards/lists/cards, shared per tenant). **Open:** not built/migrated; login only (no permission code); list reordering not implemented. |
+| 1   | Academy             | academy/list              | ✅     | Built and migrated (`New_Modules_V2`). **Ops:** assign `academy:course:manage` to managers. |
+| 2   | Home Configuration  | cms/home-configuration    | ✅     | Home Settings plus banners, features and testimonials (`/api/home-banners`, `/api/home-features`, `/api/home-testimonials`). |
+| 3   | CMS Service         | cms/service               | ✅     | Create/Duplicate now save department and doctor links (`SaveLinksAsync`). |
+| 4   | Lead Management     | crm/lead-management       | ✅     | Migrated. |
+| 5   | Marketing Campaign  | crm/marketing-campaign    | ✅     | Migrated; `CMP-` sequence seeded; audience segments are built in (`/api/audience-segments/lookup`, counted live). |
+| 6   | Member Points       | crm/member-point          | ✅     | Migrated; `MEM-`, `TXN-`, `RWD-` sequences seeded. |
+| 7   | Support / Complaint | crm/support-complaint     | ✅     | Migrated; `CPL-` sequence seeded. |
+| 8   | Finance Reports     | finance/report            | ✅     | Delivered earlier (RevenueReportEndpoints). |
+| 9   | Admission           | inpatient/admission       | ✅     | Migrated; `ADM-` sequence seeded. |
+| 10  | Bed Map             | inpatient/bed-map         | ✅     | "Wards & beds" drawer on the map creates/deletes wards and beds. |
+| 11  | Treatment Sheet     | inpatient/treatment-sheet | ✅     | New order and schedule-dose forms; Export PDF prints via the browser (Save as PDF). |
+| 12  | Nursing Dashboard   | nursing/dashboard         | ✅     | "Assign patient" panel creates nursing assignments. |
+| 13  | Nursing Handover    | nursing/handover          | ✅     | `PATCH /api/nursing/handover/{id}` edits SBAR until the card is acknowledged. |
+| 14  | Surgery             | paraclinical/surgery      | ✅     | `SUR-` sequence seeded; printable consent form. **Ops:** assign `surgery:*` permissions. |
+| 15  | Reception Queue     | reception/queue           | ✅     | No backend needed. |
+| 16  | Notes               | system/note               | ✅     | Login only by design (personal notes). |
+| 17  | Scrumboard          | system/scrumboard         | ✅     | Columns drag to reorder (`POST /api/scrumboard/lists/{id}/move`). |
+| 18  | Laboratory          | paraclinical/laboratory   | ✅     | `/api/laboratory/*`: orders (`LAB-`), sample tracking, results with range flags, verification, panic-value alerts. Orders are placed from the Medical Record. |
+| 19  | Radiology           | paraclinical/radiology    | ✅     | `/api/radiology/*`: orders (`RAD-`), scheduling, modality queue, studies, reporting with templates and critical-finding alerts. |
+| 20  | Dashboard           | overview/dashboard        | ✅     | `/api/dashboard/overview` aggregates every module; alerts dismiss at their source; CSV export. |
+| 21  | Settings            | system/settings           | ✅     | Account (`/api/users/me/account`), Security (password, sessions), Team (invites, roles), Billing (`/api/billing/me/*`). |
+
+Migrations: `20261006150900_New_Modules_V2` (modules 1–17) and `20261007075826_Workspaces_Lab_Radiology_Cms` (home content, lab/radiology workflow, alerts, session device info; backfills statuses of existing lab items and imaging reports).
+
+**Not in source control:** the PostgreSQL functions the repositories call (`get_identifier_for_login`, `get_owner_permission_codes`, `get_users_dynamic`, … 15 in total) exist only in the team database. A fresh database cannot log in until they are added; export them (`pg_dump --schema-only`) into a migration.
 
 ## 2. Prompt to start a new session
 
@@ -124,6 +132,9 @@ Copy this block into the module's notes and tick it off. Paths are under `physio
 10. **`dotnet ef migrations add` diffs the whole model.** It can pick up older unmigrated changes. Read the file before applying.
 11. **Presentation has global usings** for `Microsoft.AspNetCore.Mvc`, `PhysioBoo.Domain.Constants` and `PhysioBoo.SharedKernel.Common`. Application does not import `PhysioBoo.Domain.Enums` or EF Core globally, so add those `using`s in files that need them.
 12. **Solution file is `physio-server.sln`**, not `PhysioBoo.sln`.
+13. **Queries are no-tracking by default** (`UseQueryTrackingBehavior(NoTrackingWithIdentityResolution)` in `Program.cs`). Load an entity you will change with `.GetAll(...).AsTracking()`; otherwise `CommitAsync()` saves nothing and still reports success.
+14. **Bus event constructors must match properties.** Every constructor parameter of an event sent over RabbitMQ needs a property of the same name (the id parameter is `aggregateId`), or the consumer fails to deserialize it.
+15. **Computed properties need `[NotMapped]`.** `InsertAsync` reflects over public properties, so a getter-only property like `FullName` becomes a non-existent column.
 
 ## 5. Reference: MedicalService file map
 

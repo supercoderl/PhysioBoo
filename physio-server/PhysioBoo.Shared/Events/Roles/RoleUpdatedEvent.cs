@@ -2,7 +2,7 @@
 {
     public sealed class RoleUpdatedEvent : DomainEvent
     {
-        public RoleUpdatedEvent(Guid id) : base(id)
+        public RoleUpdatedEvent(Guid aggregateId) : base(aggregateId)
         {
 
         }

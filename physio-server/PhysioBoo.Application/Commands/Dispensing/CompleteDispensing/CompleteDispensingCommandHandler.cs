@@ -70,7 +70,7 @@ namespace PhysioBoo.Application.Commands.Dispensing.CompleteDispensing
 
             // Tracked batches: the ones already chosen, plus FEFO candidates for lines without a batch.
             List<MedicineInventory> batches = await _inventoryRepository
-                .GetAll(b => batchIds.Contains(b.Id) || unbatchedMedicineIds.Contains(b.MedicineId))
+                .GetAll(b => batchIds.Contains(b.Id) || unbatchedMedicineIds.Contains(b.MedicineId)).AsTracking()
                 .OrderBy(b => b.ExpiryDate ?? DateOnly.MaxValue)
                 .ToListAsync(ct);
 

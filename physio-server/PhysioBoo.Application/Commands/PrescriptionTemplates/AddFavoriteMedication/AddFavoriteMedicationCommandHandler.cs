@@ -48,7 +48,7 @@ namespace PhysioBoo.Application.Commands.PrescriptionTemplates.AddFavoriteMedica
             string? frequency = string.IsNullOrWhiteSpace(request.Favorite.Frequency) ? null : request.Favorite.Frequency.Trim();
 
             FavoriteMedication? favorite = await _favoriteRepository
-                .GetAll(f => f.DoctorId == request.DoctorId && f.MedicineId == request.Favorite.MedicineId)
+                .GetAll(f => f.DoctorId == request.DoctorId && f.MedicineId == request.Favorite.MedicineId).AsTracking()
                 .FirstOrDefaultAsync(ct);
 
             if (favorite == null)

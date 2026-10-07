@@ -2,7 +2,7 @@
 {
     public sealed class MedicalSpecialtyDeletedEvent : DomainEvent
     {
-        public MedicalSpecialtyDeletedEvent(Guid id) : base(id)
+        public MedicalSpecialtyDeletedEvent(Guid aggregateId) : base(aggregateId)
         {
 
         }

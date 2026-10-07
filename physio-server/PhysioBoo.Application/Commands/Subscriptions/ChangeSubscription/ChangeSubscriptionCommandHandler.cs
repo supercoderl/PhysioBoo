@@ -57,7 +57,7 @@ namespace PhysioBoo.Application.Commands.Subscriptions.ChangeSubscription
             }
 
             TenantSubscription? subscription = await _subscriptionRepository
-                .GetAll(s => s.HospitalGroupId == request.HospitalGroupId)
+                .GetAll(s => s.HospitalGroupId == request.HospitalGroupId).AsTracking()
                 .FirstOrDefaultAsync(ct);
 
             if (subscription == null)

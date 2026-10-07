@@ -4,6 +4,8 @@
 **Current implementation:** `src/app/pages/admin/paraclinical/laboratory/laboratory.component.ts` — a single demo component with an always-empty mock array (`initializeSampleData()` never populates anything), `ngModel`-bound filters, a table whose every cell binds to `test.testName` regardless of column, and action handlers that call `alert()`/`confirm()`. No service, no models beyond the unrelated `LabTest` (test catalog) type, no workflow beyond a static list.
 **Scope:** Frontend UI/UX only. No backend implementation — see §13 for the proposed API contract. Reuses the conventions already established by the Treatment Sheet module (`docs/treatment-sheet-redesign.md`) and the Medical Record / Nursing modules: standalone components, Angular signals, `DrawerComponent`, `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `BooIcon`, `BooSelect`, `BooInput`, `LocalLoadingService`, `ToastService`, `DialogService`, Tailwind, mock-fallback services.
 
+**Status (2026-10-07):** Backend implemented at `/api/laboratory/*` (see `LaboratoryEndpoints.cs`). One `LabOrderItem` is one specimen and one result; order statuses are derived from its items. Results are flagged L/H against the reference range and LL/HH (panic, raises a critical alert) below half / above double it. Orders are placed from Medical Record → Order lab test. Barcode labels (Code 128) and the patient report print from the browser. Saved filters, bulk status and server-side export from §13 were not built (the UI does not use them).
+
 ---
 
 ## 1. UX Audit — Current State

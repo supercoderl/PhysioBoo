@@ -52,12 +52,18 @@ namespace PhysioBoo.Infrastructure.BackgroundJobs
             IMedicineInventoryRepository medicineInventoryRepository = scope.ServiceProvider.GetRequiredService<IMedicineInventoryRepository>();
             IInventoryAlertRepository inventoryAlertRepository = scope.ServiceProvider.GetRequiredService<IInventoryAlertRepository>();
 
+            // A background job has no signed-in user, so the per-tenant query filter can't run:
+            // scan every tenant (soft-deleted rows excluded by hand); each alert keeps its batch's tenant.
             List<MedicineInventory> batches = await medicineInventoryRepository
                 .GetAllNoTracking(filter: b => b.Status != BatchLifecycleStatus.Disposed)
+                .IgnoreQueryFilters()
+                .Where(b => b.DeletedAt == null)
                 .ToListAsync(ct);
 
             List<InventoryAlert> existingUnacknowledged = await inventoryAlertRepository
                 .GetAllNoTracking(filter: a => a.AcknowledgedAt == null)
+                .IgnoreQueryFilters()
+                .Where(a => a.DeletedAt == null)
                 .ToListAsync(ct);
 
             int raised = 0;
@@ -124,7 +130,7 @@ namespace PhysioBoo.Infrastructure.BackgroundJobs
         {
             if (!condition) return 0;
 
-            bool alreadyRaised = existingUnacknowledged.Any(a => a.Type == type && a.MedicineId == batch.MedicineId);
+            bool alreadyRaised = existingUnacknowledged.Any(a => a.Type == type && a.MedicineId == batch.MedicineId && a.TenantId == batch.TenantId);
             if (alreadyRaised) return 0;
 
             InventoryAlert alert = new InventoryAlert(Guid.NewGuid(), type, severity, batch.MedicineId, message, recommendation);

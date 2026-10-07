@@ -4,6 +4,8 @@
 **Current implementation:** `src/app/pages/admin/paraclinical/radiology/radiology.component.ts` — a single demo component. `initializeSampleData()` hardcodes 7 `RadiologyExam` rows directly on the component, filtering is `ngModel`-bound and client-side only, and every action (`openScheduleExamModal`, `viewImages`, `viewReport`, `editExam`, `deleteExam`) calls `alert()`/`confirm()`. No service, no workflow stages beyond a flat `status` string, no scheduling, no examination queue, no structured reporting/verification, no critical-findings alerting, no PACS placeholder.
 **Scope:** Frontend UI/UX only. No backend implementation — see §13 for the proposed API contract. Reuses the conventions already established by the Laboratory module (`docs/laboratory-redesign.md`) and Treatment Sheet / Medical Record: standalone components, Angular signals, `DrawerComponent`, `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `BooIcon`, `BooSelect`, `BooInput`, `LocalLoadingService`, `ToastService`, `DialogService`, Tailwind, mock-fallback services.
 
+**Status (2026-10-07):** Backend implemented at `/api/radiology/*` (see `RadiologyEndpoints.cs`). One `ImagingOrder` is also its schedule slot, queue entry and study (same id); its latest `ImagingReport` is the report, created on first save. Unscheduled orders are booked from the Orders tab; reports have a "Critical finding" checkbox that raises an alert on approval; report templates are built in; voice dictation uses the browser Web Speech API. No PACS/image viewer is integrated. Saved filters, bulk status and server-side export from §13 were not built.
+
 ---
 
 ## 1. UX Audit — Current State

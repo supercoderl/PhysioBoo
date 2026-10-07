@@ -28,7 +28,7 @@ namespace PhysioBoo.Application.Commands.Subscriptions.SettleInvoice
             if (!await TestValidityAsync(request)) return;
 
             SubscriptionInvoice? invoice = await _invoiceRepository
-                .GetAll(i => i.Id == request.InvoiceId, includeProperties: "Subscription")
+                .GetAll(i => i.Id == request.InvoiceId, includeProperties: "Subscription").AsTracking()
                 .FirstOrDefaultAsync(ct);
 
             if (invoice == null)

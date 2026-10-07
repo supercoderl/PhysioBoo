@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Commands.PrescriptionTemplates.RemoveFavoriteMed
             if (!await TestValidityAsync(request)) return;
 
             FavoriteMedication? favorite = await _favoriteRepository
-                .GetAll(f => f.Id == request.FavoriteId && f.DoctorId == request.DoctorId)
+                .GetAll(f => f.Id == request.FavoriteId && f.DoctorId == request.DoctorId).AsTracking()
                 .FirstOrDefaultAsync(ct);
 
             if (favorite == null)

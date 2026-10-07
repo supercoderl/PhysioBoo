@@ -30,7 +30,12 @@ namespace PhysioBoo.Infrastructure.BackgroundJobs
                         .Expression("tags=temporary AND created_at<1d")
                         .MaxResults(500).ExecuteAsync();
 
-                    if (searchResults.Resources.Any())
+                    // On a failed call (bad credentials, rate limit) Resources is null and Error says why.
+                    if (searchResults.Error != null)
+                    {
+                        _logger.LogWarning("Cloudinary search failed: {Message}", searchResults.Error.Message);
+                    }
+                    else if (searchResults.Resources?.Any() == true)
                     {
                         List<string> publicIds = searchResults.Resources.Select(r => r.PublicId).ToList();
                         await _cloudinary.DeleteResourcesAsync(new DelResParams

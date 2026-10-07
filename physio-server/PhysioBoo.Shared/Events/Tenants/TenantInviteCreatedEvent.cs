@@ -7,11 +7,11 @@
         public DateTime ExpiresAt { get; }
 
         public TenantInviteCreatedEvent(
-            Guid inviteId,
+            Guid aggregateId,
             string? email,
             string token,
             DateTime expiresAt
-        ) : base(inviteId)
+        ) : base(aggregateId)
         {
             Email = email;
             Token = token;

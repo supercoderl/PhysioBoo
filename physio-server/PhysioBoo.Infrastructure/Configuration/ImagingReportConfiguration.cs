@@ -1,4 +1,5 @@
-﻿
+﻿using PhysioBoo.Domain.Enums;
+
 
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 
@@ -34,6 +35,11 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.HasOne(r => r.Radiologist)
                    .WithMany(u => u.ImagingReports)
                    .HasForeignKey(r => r.RadiologistId);
+
+            builder.HasOne(r => r.Verifier)
+                   .WithMany()
+                   .HasForeignKey(r => r.VerifierId)
+                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(r => r.Creator)
                    .WithMany(u => u.CreatedImagingReports)
@@ -90,6 +96,19 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasMaxLength(500);
 
             builder.Property(r => r.ImagesUrl).HasColumnType("jsonb");
+
+            // Radiology workspace reporting workflow
+            builder.Property(r => r.ClinicalIndication).HasMaxLength(2000);
+
+            builder.Property(r => r.WorkflowStatus)
+                   .HasConversion<string>()
+                   .HasMaxLength(24)
+                   .HasDefaultValue(RadiologyReportStatus.Reporting)
+                   .IsRequired();
+
+            builder.Property(r => r.RejectionReason).HasMaxLength(500);
+            builder.Property(r => r.ReleasedAt);
+            builder.Property(r => r.LastSavedAt);
         }
     }
 }

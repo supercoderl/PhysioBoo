@@ -117,6 +117,18 @@ namespace PhysioBoo.Infrastructure.Configuration
                    .HasColumnType("numeric(10,2)")
                    .IsRequired();
 
+            // Radiology workspace workflow
+            builder.Property(o => o.RoomName).HasMaxLength(100);
+            builder.Property(o => o.TechnicianName).HasMaxLength(150);
+            builder.Property(o => o.CancelReason).HasMaxLength(500);
+            builder.Property(o => o.QueueStatus)
+                   .HasConversion<string>()
+                   .HasMaxLength(16);
+            builder.Property(o => o.QueueCalledAt);
+            builder.Property(o => o.ArrivedAt);
+            builder.Property(o => o.ImagingStartedAt);
+            builder.Property(o => o.ImagingCompletedAt);
+
             builder.Property(o => o.Status)
                    .HasConversion<string>()
                    .IsRequired();

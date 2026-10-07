@@ -39,7 +39,7 @@
             (ngModelChange)="inviteRoleId.set($event)"
             name="inviteRole">
             <option value="" disabled>Select role</option>
-            <option *ngFor="let r of roles()" [value]="r.id">{{ r.name }}</option>
+            <option *ngFor="let r of invitableRoles()" [value]="r.id">{{ r.name }}</option>
           </select>
           <button type="submit"
             [disabled]="inviting() || !inviteEmail() || !inviteRoleId()"
@@ -107,6 +107,7 @@
               [value]="roleIdFor(m)"
               [disabled]="m.id === currentUserId || changingRoleFor() === m.id"
               (change)="onChangeRole(m, $any($event.target).value)">
+              <option value="" disabled>No role</option>
               <option *ngFor="let r of roles()" [value]="r.id">{{ r.name }}</option>
             </select>
 
@@ -136,7 +137,7 @@
             </div>
             <div class="flex-1 min-w-0">
               <div class="text-sm font-medium text-gray-900 truncate">{{ inv.email }}</div>
-              <div class="text-xs text-gray-500">Invited {{ inv.invitedAt }} · expires {{ inv.expiresAt }}</div>
+              <div class="text-xs text-gray-500">{{ roleNameFor(inv.roleCode) }} · invited {{ inv.invitedAt }} · expires {{ inv.expiresAt }}</div>
             </div>
             <span class="text-xs px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Pending</span>
             <button type="button" class="text-xs text-gray-500 hover:text-red-600" (click)="onRevokeInvite(inv)">

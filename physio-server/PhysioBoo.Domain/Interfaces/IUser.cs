@@ -9,5 +9,9 @@
         string GetUserRole();
         string GetUserEmail();
         bool IsAuthenticated { get; }
+
+        // Request details recorded with sign-in sessions (null outside an HTTP request).
+        string? UserAgent { get; }
+        string? IpAddress { get; }
     }
 }

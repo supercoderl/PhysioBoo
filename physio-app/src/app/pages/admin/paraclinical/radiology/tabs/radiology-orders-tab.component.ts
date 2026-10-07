@@ -5,6 +5,7 @@ import { BooSelectComponent } from "../../../../../components/select/boo-select/
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
+import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ImagingOrderRow, ImagingOrderStatus, RadiologyPriority, ReportStatus } from "../../../../../shared/types/radiology.types";
 
@@ -69,7 +70,15 @@ import { ImagingOrderRow, ImagingOrderStatus, RadiologyPriority, ReportStatus } 
               <td class="px-4 py-3"><boo-status-badge [label]="o.reportStatus" [tone]="reportStatusTone(o.reportStatus)"></boo-status-badge></td>
               <td class="px-4 py-3 text-gray-500">{{ o.orderTime | date:'short' }}</td>
               <td class="px-4 py-3">
-                <button (click)="viewPatient.emit(o.mrn)" class="text-primary text-xs font-semibold hover:underline">View</button>
+                <div class="flex items-center gap-3">
+                  <button (click)="viewPatient.emit(o.mrn)" class="text-primary text-xs font-semibold hover:underline">View</button>
+                  <button *ngIf="o.status === 'Ordered' && schedulingId() !== o.id" (click)="startScheduling(o)" class="text-primary text-xs font-semibold hover:underline">Schedule</button>
+                </div>
+                <div *ngIf="schedulingId() === o.id" class="flex items-center gap-2 mt-2">
+                  <input type="datetime-local" [(ngModel)]="scheduleAt" class="border border-gray-300 rounded px-2 py-1 text-xs" />
+                  <button (click)="confirmSchedule(o)" [disabled]="!scheduleAt" class="text-primary text-xs font-semibold hover:underline disabled:opacity-50">Book</button>
+                  <button (click)="schedulingId.set(null)" class="text-gray-500 text-xs hover:underline">Cancel</button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -107,7 +116,10 @@ export class RadiologyOrdersTabComponent implements OnInit {
     { label: 'Released', value: 'Released' }, { label: 'Rejected', value: 'Rejected' }, { label: 'Returned for Revision', value: 'ReturnedForRevision' },
   ];
 
-  constructor(private srv: RadiologyService) { }
+  schedulingId = signal<string | null>(null);
+  scheduleAt = '';
+
+  constructor(private srv: RadiologyService, private toastSrv: ToastService) { }
 
   ngOnInit(): void {
     this.srv.getOrders().subscribe({
@@ -117,6 +129,29 @@ export class RadiologyOrdersTabComponent implements OnInit {
   }
 
   onSearch(query: string): void { this.search = query; }
+
+  startScheduling(o: ImagingOrderRow): void {
+    // Default to the next quarter hour, in the browser's local time (the datetime-local format).
+    const next = new Date(Math.ceil(Date.now() / (15 * 60 * 1000)) * 15 * 60 * 1000);
+    const pad = (n: number) => `${n}`.padStart(2, '0');
+    this.scheduleAt = `${next.getFullYear()}-${pad(next.getMonth() + 1)}-${pad(next.getDate())}T${pad(next.getHours())}:${pad(next.getMinutes())}`;
+    this.schedulingId.set(o.id);
+  }
+
+  confirmSchedule(o: ImagingOrderRow): void {
+    if (!this.scheduleAt) return;
+    // Send the wall-clock time as entered; the server stores local hospital time.
+    const scheduledTime = `${this.scheduleAt}:00`;
+    this.srv.rescheduleSlot(o.id, scheduledTime, '').subscribe(res => {
+      if (res.success) {
+        this.orders.update(list => list.map(x => x.id === o.id ? { ...x, status: 'Scheduled' as const, scheduledTime } : x));
+        this.schedulingId.set(null);
+        this.toastSrv.success(`${o.orderNumber} scheduled`);
+      } else {
+        this.toastSrv.error('Unable to schedule the exam');
+      }
+    });
+  }
 
   clearFilters(): void {
     this.search = '';

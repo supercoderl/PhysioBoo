@@ -24,6 +24,7 @@ namespace PhysioBoo.Domain.Entities.Core
         public string? EmergencyContactRelationship { get; private set; }
         public PreferredCommunication PreferredCommunication { get; private set; }
 
+        [NotMapped]
         public string FullName => $"{FirstName} {(string.IsNullOrEmpty(MiddleName) ? "" : MiddleName + " ")}{LastName}".Trim();
 
         public virtual User? User { get; private set; }

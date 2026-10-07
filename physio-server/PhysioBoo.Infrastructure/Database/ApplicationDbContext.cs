@@ -143,7 +143,12 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<MemberPoint> MemberPoints { get; set; } = null!;
         public DbSet<PointTransaction> PointTransactions { get; set; } = null!;
         public DbSet<Reward> Rewards { get; set; } = null!;
+        public DbSet<LabAlert> LabAlerts { get; set; } = null!;
+        public DbSet<RadiologyAlert> RadiologyAlerts { get; set; } = null!;
         public DbSet<Note> Notes { get; set; } = null!;
+        public DbSet<HomeBanner> HomeBanners { get; set; } = null!;
+        public DbSet<HomeFeature> HomeFeatures { get; set; } = null!;
+        public DbSet<HomeTestimonial> HomeTestimonials { get; set; } = null!;
         public DbSet<ScrumBoard> ScrumBoards { get; set; } = null!;
         public DbSet<ScrumList> ScrumLists { get; set; } = null!;
         public DbSet<ScrumCard> ScrumCards { get; set; } = null!;
@@ -347,7 +352,12 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new MemberPointConfiguration());
             builder.ApplyConfiguration(new PointTransactionConfiguration());
             builder.ApplyConfiguration(new RewardConfiguration());
+            builder.ApplyConfiguration(new LabAlertConfiguration());
+            builder.ApplyConfiguration(new RadiologyAlertConfiguration());
             builder.ApplyConfiguration(new NoteConfiguration());
+            builder.ApplyConfiguration(new HomeBannerConfiguration());
+            builder.ApplyConfiguration(new HomeFeatureConfiguration());
+            builder.ApplyConfiguration(new HomeTestimonialConfiguration());
             builder.ApplyConfiguration(new ScrumBoardConfiguration());
             builder.ApplyConfiguration(new ScrumListConfiguration());
             builder.ApplyConfiguration(new ScrumCardConfiguration());

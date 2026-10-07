@@ -6,11 +6,12 @@ import { BooInputComponent } from "../../../../components/input/boo-input/boo-in
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { AdmissionService } from "../../../../services/admin/admission.service";
 import { NursingService } from "../../../../services/admin/nursing.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { AlertSeverity, NursingAlert, NursingAssignmentFilter, NursingPatient, NursingStats, ShiftCode } from "../../../../shared/types/nursing.types";
+import { AcuityLevel, AlertSeverity, NursingAlert, NursingAssignmentFilter, NursingPatient, NursingStats, ShiftCode } from "../../../../shared/types/nursing.types";
 
 @Component({
     selector: 'admin-nursing-dashboard',
@@ -29,12 +30,37 @@ import { AlertSeverity, NursingAlert, NursingAssignmentFilter, NursingPatient, N
             <boo-select label="Shift" [(ngModel)]="shift" (ngModelChange)="onShiftChange()" [options]="shiftOptions" bindLabel="label" bindValue="value"></boo-select>
             <boo-select label="Ward" [(ngModel)]="filter.wardId" (ngModelChange)="applyFilters()" [options]="wardOptions" bindLabel="label" bindValue="value"></boo-select>
             <boo-input label="Search patient or bed..." size="small" (search)="onSearch($event)"></boo-input>
+            <button (click)="toggleAssign()"
+              class="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+              <boo-icon name="user-plus" [size]="16"></boo-icon>
+              Assign patient
+            </button>
             <button (click)="refresh()" [disabled]="loadingSrv.isLoading('nursing-dashboard')"
               class="px-4 py-2 bg-surface border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2 disabled:opacity-50">
               <boo-icon name="refresh-cw" [size]="16" [class.animate-spin]="loadingSrv.isLoading('nursing-dashboard')"></boo-icon>
               Refresh
             </button>
           </div>
+        </div>
+
+        <!-- Assign patient -->
+        <div *ngIf="assignOpen()" class="mb-6 bg-surface rounded-lg shadow-md p-5">
+          <h3 class="text-sm font-semibold text-gray-800 mb-3">Assign an admitted patient to you for the {{ shift }} shift</h3>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+            <boo-select label="Patient" [(ngModel)]="assignForm.admissionId" [options]="admissionOptions()" bindLabel="label" bindValue="value"></boo-select>
+            <boo-select label="Acuity" [(ngModel)]="assignForm.acuity" [options]="acuityOptions" bindLabel="label" bindValue="value"></boo-select>
+            <label class="flex items-center gap-2 text-sm text-gray-700 select-none">
+              <input type="checkbox" [(ngModel)]="assignForm.fallRisk" class="rounded border-gray-300" /> Fall risk
+            </label>
+            <div class="flex gap-2 justify-end">
+              <button (click)="assignOpen.set(false)" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
+              <button (click)="assign()" [disabled]="!assignForm.admissionId || assigning()"
+                class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:opacity-90 disabled:opacity-50">
+                {{ assigning() ? 'Assigning…' : 'Assign' }}
+              </button>
+            </div>
+          </div>
+          <p *ngIf="!admissionOptions().length" class="text-xs text-gray-500 mt-2">No admitted patients found.</p>
         </div>
 
         <!-- Error -->
@@ -189,7 +215,17 @@ export class AdminNursingDashboardComponent implements OnInit {
         { label: 'Due Soon', value: 'DueSoon' },
     ];
 
+    assignOpen = signal(false);
+    assigning = signal(false);
+    admissionOptions = signal<{ label: string; value: string }[]>([]);
+    assignForm: { admissionId: string | null; acuity: AcuityLevel; fallRisk: boolean } = { admissionId: null, acuity: 'Medium', fallRisk: false };
+    readonly acuityOptions: { label: string; value: AcuityLevel }[] = [
+        { label: 'Low', value: 'Low' }, { label: 'Medium', value: 'Medium' },
+        { label: 'High', value: 'High' }, { label: 'Critical', value: 'Critical' },
+    ];
+
     constructor(
+        private admissionSrv: AdmissionService,
         private nursingSrv: NursingService,
         private router: Router,
         private toastSrv: ToastService,
@@ -246,6 +282,40 @@ export class AdminNursingDashboardComponent implements OnInit {
     }
 
     refresh(): void { this.load(); }
+
+    toggleAssign(): void {
+        this.assignOpen.set(!this.assignOpen());
+        if (!this.assignOpen() || this.admissionOptions().length) return;
+        this.admissionSrv.search({
+            pageNumber: 1, pageSize: 200, search: '', sort: '-admittedAt',
+            filter: { start: null, end: null, status: 'Admitted', type: null, departmentId: null }
+        }).subscribe({
+            next: res => {
+                if (res.success) this.admissionOptions.set(res.data.items.map(a => ({ label: `${a.patientName} · ${a.admissionNumber}`, value: a.id })));
+            },
+            error: () => this.toastSrv.error('Failed to load admitted patients')
+        });
+    }
+
+    assign(): void {
+        if (!this.assignForm.admissionId || this.assigning()) return;
+        this.assigning.set(true);
+        this.nursingSrv.createAssignment({
+            admissionId: this.assignForm.admissionId,
+            shift: this.shift,
+            acuity: this.assignForm.acuity,
+            fallRisk: this.assignForm.fallRisk,
+        }).pipe(finalize(() => this.assigning.set(false))).subscribe({
+            next: res => {
+                if (!res.success) { this.toastSrv.error('Unable to assign the patient'); return; }
+                this.toastSrv.success('Patient assigned');
+                this.assignForm = { admissionId: null, acuity: 'Medium', fallRisk: false };
+                this.assignOpen.set(false);
+                this.load();
+            },
+            error: () => this.toastSrv.error('Unable to assign the patient')
+        });
+    }
     onShiftChange(): void { this.load(); }
     applyFilters(): void { /* filters apply client-side against the loaded snapshot */ }
     onSearch(query: string): void { this.filter.search = query; }

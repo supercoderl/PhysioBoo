@@ -1,3 +1,4 @@
+using PhysioBoo.Application.Commands.Scrumboard.MoveList;
 using PhysioBoo.Application.Commands.Scrumboard.CreateBoard;
 using PhysioBoo.Application.Commands.Scrumboard.CreateCard;
 using PhysioBoo.Application.Commands.Scrumboard.CreateList;
@@ -106,6 +107,18 @@ namespace PhysioBoo.Presentation.Endpoints
                 return Results.Ok(new ResponseMessage<Guid> { Success = true, Data = id });
             }).WithName("UpdateScrumList")
             .WithSummary("Rename a column.")
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
+
+            group.MapPost("/lists/{id:guid}/move", async (Guid id, [FromBody] MoveScrumListViewModel request, IMediatorHandler bus, CancellationToken ct) =>
+            {
+                await bus.SendCommandAsync(new MoveScrumListCommand(id, request));
+
+                return Results.Ok(new ResponseMessage<Guid> { Success = true, Data = id });
+            }).WithName("MoveScrumList")
+            .WithSummary("Move a column to a position on its board; all columns are renumbered.")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status404NotFound)

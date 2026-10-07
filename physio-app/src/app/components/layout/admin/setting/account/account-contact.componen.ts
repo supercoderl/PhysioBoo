@@ -1,7 +1,9 @@
-import { Component } from "@angular/core";
+import { Component, Input } from "@angular/core";
+import { FormGroup } from "@angular/forms";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
+import { BooDatepickerComponent } from "../../../../date-picker/boo-date-picker.component";
 import { PreferredCommunication } from "../../../../../shared/enums/preferred-communication";
 
 @Component({
@@ -10,10 +12,11 @@ import { PreferredCommunication } from "../../../../../shared/enums/preferred-co
     imports: [
         SharedModule,
         BooInputComponent,
-        BooSelectComponent
+        BooSelectComponent,
+        BooDatepickerComponent
     ],
     template: `
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4" [formGroup]="form">
             <div class="w-full">
               <p class="font-semibold text-base m-0">Contact & ID</p>
               <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
@@ -120,13 +123,11 @@ import { PreferredCommunication } from "../../../../../shared/enums/preferred-co
                     >
                         Identification Expiry
                     </label>
-                    <boo-input
-                        [label]="'e.g. 18/01/2028'"
+                    <boo-datepicker
+                        [label]="'DD/MM/YYYY'"
                         formControlName="identificationExpiry"
-                        [required]="true"
-                        booError
                         size="small"
-                    ></boo-input>
+                    ></boo-datepicker>
                 </div>
             </div>
         </div>
@@ -134,12 +135,14 @@ import { PreferredCommunication } from "../../../../../shared/enums/preferred-co
 })
 
 export class AdminAccountContactComponent {
+    @Input({ required: true }) form!: FormGroup;
+
     // #region Inputs, Outputs, Properties
     preferredCommunicationOptions = Object.keys(PreferredCommunication)
         .filter(key => isNaN(Number(key)))
         .map(key => ({
             label: key,
-            value: PreferredCommunication[key as keyof typeof PreferredCommunication]
+            value: key
         }));
     // #endregion
 }

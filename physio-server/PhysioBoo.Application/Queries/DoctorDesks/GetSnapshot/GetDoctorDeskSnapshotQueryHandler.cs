@@ -14,16 +14,19 @@ namespace PhysioBoo.Application.Queries.DoctorDesks.GetSnapshot
     {
         private readonly IDoctorRepository _doctorRepository;
         private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IVitalSignRepository _vitalSignRepository;
         private readonly IMediatorHandler _bus;
 
         public GetDoctorDeskSnapshotQueryHandler(
             IDoctorRepository doctorRepository,
             IAppointmentRepository appointmentRepository,
+            IVitalSignRepository vitalSignRepository,
             IMediatorHandler bus
         )
         {
             _doctorRepository = doctorRepository;
             _appointmentRepository = appointmentRepository;
+            _vitalSignRepository = vitalSignRepository;
             _bus = bus;
         }
 
@@ -48,6 +51,7 @@ namespace PhysioBoo.Application.Queries.DoctorDesks.GetSnapshot
 
             List<Domain.Entities.Operation.Appointment> appointments = await q
                 .Include(a => a.Patient).ThenInclude(p => p!.Profile)
+                .Include(a => a.Patient).ThenInclude(p => p!.Allergies)
                 .Include(a => a.AppointmentType)
                 .Where(a =>
                     a.DoctorId == doctor.Id &&
@@ -58,7 +62,28 @@ namespace PhysioBoo.Application.Queries.DoctorDesks.GetSnapshot
                 .OrderBy(a => a.CheckedInAt)
                 .ToListAsync(ct);
 
-            return DoctorDeskSnapshotViewModel.FromEntity(doctor, appointments);
+            // Latest recorded vitals per patient (no SpO2 is captured by VitalSign).
+            List<Guid> patientIds = appointments.Select(a => a.PatientId).Distinct().ToList();
+            var vitals = await _vitalSignRepository
+                .GetAllNoTracking(v => patientIds.Contains(v.PatientId))
+                .Select(v => new { v.PatientId, v.RecordedAt, v.BloodPressureSystolic, v.BloodPressureDiastolic, v.HeartRate, v.Temperature })
+                .ToListAsync(ct);
+
+            Dictionary<Guid, DoctorDeskSnapshotViewModel.VitalsViewModel> latestVitals = vitals
+                .GroupBy(v => v.PatientId)
+                .ToDictionary(g => g.Key, g =>
+                {
+                    var v = g.OrderByDescending(x => x.RecordedAt).First();
+                    return new DoctorDeskSnapshotViewModel.VitalsViewModel
+                    {
+                        BloodPressure = $"{v.BloodPressureSystolic}/{v.BloodPressureDiastolic}",
+                        HeartRate = v.HeartRate,
+                        Temperature = v.Temperature,
+                        Spo2 = null
+                    };
+                });
+
+            return DoctorDeskSnapshotViewModel.FromEntity(doctor, appointments, latestVitals);
         }
     }
 }

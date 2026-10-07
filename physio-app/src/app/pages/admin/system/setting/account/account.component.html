@@ -28,18 +28,18 @@
         </div>
       </header>
 
-      <form class="flex flex-col gap-6">
+      <form class="flex flex-col gap-6" (ngSubmit)="onSave()">
 
         <section class="bg-surface rounded-lg border border-gray-200 p-5">
-          <admin-account-profile [userInfo]="(userInfo$ | async)" />
+          <admin-account-profile [userInfo]="(userInfo$ | async)" [form]="form" />
         </section>
 
         <section class="bg-surface rounded-lg border border-gray-200 p-5">
-          <admin-account-contact />
+          <admin-account-contact [form]="form" />
         </section>
 
         <section class="bg-surface rounded-lg border border-gray-200 p-5">
-          <admin-account-emergency />
+          <admin-account-emergency [form]="form" />
         </section>
 
         <!-- <ng-container *ngIf="(userInfo$ | async | defaultUser).doctor != null">
@@ -60,10 +60,9 @@
               <h2 class="text-base font-semibold text-red-700 mb-1">Danger zone</h2>
               <p class="text-sm text-gray-500">Permanent actions that affect your account.</p>
             </div>
-            <button type="button"
-              class="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-md hover:bg-red-50 transition-colors">
-              Delete account
-            </button>
+            <p class="text-sm text-gray-600 max-w-sm">
+              To delete your account, ask an administrator to remove you in Settings → Team.
+            </p>
           </div>
         </section>
 

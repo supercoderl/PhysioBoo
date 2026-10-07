@@ -160,7 +160,12 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IMemberRepository, MemberRepository>();
             services.AddScoped<IPointTransactionRepository, PointTransactionRepository>();
             services.AddScoped<IRewardRepository, RewardRepository>();
+            services.AddScoped<ILabAlertRepository, LabAlertRepository>();
+            services.AddScoped<IRadiologyAlertRepository, RadiologyAlertRepository>();
             services.AddScoped<INoteRepository, NoteRepository>();
+            services.AddScoped<IHomeBannerRepository, HomeBannerRepository>();
+            services.AddScoped<IHomeFeatureRepository, HomeFeatureRepository>();
+            services.AddScoped<IHomeTestimonialRepository, HomeTestimonialRepository>();
             services.AddScoped<IScrumBoardRepository, ScrumBoardRepository>();
             services.AddScoped<IScrumListRepository, ScrumListRepository>();
             services.AddScoped<IScrumCardRepository, ScrumCardRepository>();

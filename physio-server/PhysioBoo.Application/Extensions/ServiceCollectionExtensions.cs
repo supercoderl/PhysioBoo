@@ -202,6 +202,7 @@ using PhysioBoo.Application.SortProviders;
 using PhysioBoo.Application.ViewModels.Addresses;
 using PhysioBoo.Application.ViewModels.AdminMenus;
 using PhysioBoo.Application.ViewModels.Admissions;
+using PhysioBoo.Application.ViewModels.HomeContent;
 using PhysioBoo.Application.ViewModels.Appointments;
 using PhysioBoo.Application.ViewModels.AppointmentTypes;
 using PhysioBoo.Application.ViewModels.Articles;
@@ -662,6 +663,9 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<ISortingExpressionProvider<CampaignViewModel, Campaign>, CampaignViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<BedViewModel, Bed>, BedViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<AdmissionViewModel, Admission>, AdmissionViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<HomeBannerViewModel, HomeBanner>, HomeBannerViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<HomeFeatureViewModel, HomeFeature>, HomeFeatureViewModelSortProvider>();
+            services.AddScoped<ISortingExpressionProvider<HomeTestimonialViewModel, HomeTestimonial>, HomeTestimonialViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<ComplaintViewModel, Complaint>, ComplaintViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<MemberViewModel, MemberPoint>, MemberViewModelSortProvider>();
             services.AddScoped<ISortingExpressionProvider<RewardViewModel, Reward>, RewardViewModelSortProvider>();

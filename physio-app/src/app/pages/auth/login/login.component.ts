@@ -1,4 +1,4 @@
-import { GoogleSigninButtonDirective, SocialAuthService } from '@abacritt/angularx-social-login';
+import { GoogleSigninButtonModule, SocialAuthService } from '@abacritt/angularx-social-login';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -26,7 +26,7 @@ import { AppValidators } from '../../../shared/validator/validator-config.valida
     BooButtonComponent,
     BooCheckboxComponent,
     FormWrapperComponent,
-    GoogleSigninButtonDirective
+    GoogleSigninButtonModule
   ],
   templateUrl: './login.component.html'
 })

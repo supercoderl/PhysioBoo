@@ -1,9 +1,11 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { finalize, of } from 'rxjs';
+import { finalize, forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AdminBreadcrumbComponent } from "../../../../../components/breadcrumb/admin-breadcrumb.component";
 import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
+import { InviteService } from '../../../../../services/admin/invite.service';
+import { RoleService } from '../../../../../services/admin/role.service';
 import { UserService } from '../../../../../services/admin/user.service';
 import { AuthService } from '../../../../../services/auth/auth.service';
 import { ToastService } from '../../../../../services/common/toast.service';
@@ -16,8 +18,14 @@ interface PendingInvite {
   email: string;
   invitedAt: string;
   expiresAt: string;
-  roleId: string;
+  roleCode: string;
 }
+
+// Invites carry a built-in role code (backend Role enum); custom roles are assigned after sign-up.
+const INVITABLE_ROLE_CODES = [
+  'ADMIN', 'NURSE', 'PHAMACIST', 'CASHIER', 'LAB_TECHNICIAN', 'RADIOLOGIST',
+  'RECEPTIONIST', 'ACCOUNTANT', 'INVENTORY_MANAGER', 'IT_SUPPORT', 'DOCTOR',
+];
 
 @Component({
   selector: 'setting-team',
@@ -32,6 +40,8 @@ interface PendingInvite {
 })
 export class TeamComponent implements OnInit {
   private userSrv = inject(UserService);
+  private roleSrv = inject(RoleService);
+  private inviteSrv = inject(InviteService);
   private authSrv = inject(AuthService);
   private toastSrv = inject(ToastService);
 
@@ -43,6 +53,7 @@ export class TeamComponent implements OnInit {
   members = signal<User[]>([]);
   roles = signal<Role[]>([]);
   pendingInvites = signal<PendingInvite[]>([]);
+  invitableRoles = computed(() => this.roles().filter(r => INVITABLE_ROLE_CODES.includes(r.code)));
 
   search = signal('');
   inviteEmail = signal('');
@@ -63,6 +74,7 @@ export class TeamComponent implements OnInit {
     this.authSrv.userInfo$.subscribe(u => { if (u) this.currentUserId = u.id; });
     this.loadMembers();
     this.loadRoles();
+    this.loadInvites();
   }
 
   loadMembers(): void {
@@ -82,19 +94,38 @@ export class TeamComponent implements OnInit {
   }
 
   loadRoles(): void {
-    // TODO: replace with real role service when available
-    this.roles.set([
-      { id: 'admin', name: 'Admin', code: 'ADMIN', isSystemRole: true, isActive: true } as Role,
-      { id: 'manager', name: 'Manager', code: 'MANAGER', isSystemRole: false, isActive: true } as Role,
-      { id: 'member', name: 'Member', code: 'MEMBER', isSystemRole: false, isActive: true } as Role,
-      { id: 'viewer', name: 'Viewer', code: 'VIEWER', isSystemRole: false, isActive: true } as Role,
-    ]);
+    this.roleSrv.search({
+      pageNumber: 1,
+      pageSize: 100,
+      search: '',
+      sort: '+name',
+      filter: { start: '', end: '', isActive: true, isSystemRole: null }
+    }).pipe(
+      catchError(() => { this.toastSrv.error('Failed to load roles'); return of(null); })
+    ).subscribe(res => {
+      if (res?.success && res.data) this.roles.set((res.data.items ?? []).filter(r => r.code !== 'SUPER_ADMIN'));
+    });
+  }
+
+  loadInvites(): void {
+    this.inviteSrv.getPending().pipe(
+      catchError(() => of(null))
+    ).subscribe(res => {
+      if (!res?.success) return;
+      this.pendingInvites.set(res.data.map(i => ({
+        id: i.id,
+        email: i.email ?? '(no email)',
+        invitedAt: new Date(i.invitedAt).toLocaleDateString(),
+        expiresAt: new Date(i.expiresAt).toLocaleDateString(),
+        roleCode: i.intendedRole
+      })));
+    });
   }
 
   onInvite(): void {
     const email = this.inviteEmail().trim();
-    const roleId = this.inviteRoleId();
-    if (!email || !roleId || this.inviting()) return;
+    const role = this.roles().find(r => r.id === this.inviteRoleId());
+    if (!email || !role || this.inviting()) return;
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       this.toastSrv.error('Please enter a valid email address');
@@ -106,36 +137,37 @@ export class TeamComponent implements OnInit {
     }
 
     this.inviting.set(true);
-    // TODO: wire to real backend — POST /api/team/members  body: { email, roleId }
-    setTimeout(() => {
-      this.pendingInvites.update(list => [
-        ...list,
-        {
-          id: `inv_${Date.now()}`,
-          email,
-          invitedAt: new Date().toLocaleDateString(),
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-          roleId
-        }
-      ]);
-      this.inviteEmail.set('');
-      this.inviteRoleId.set('');
-      this.inviting.set(false);
-      this.toastSrv.success(`Invited ${email}`);
-    }, 400);
+    this.inviteSrv.create({ email, intendedRole: role.code })
+      .pipe(
+        finalize(() => this.inviting.set(false)),
+        catchError(() => { this.toastSrv.error('Failed to send invite'); return of(null); })
+      )
+      .subscribe(res => {
+        if (!res?.success) return;
+        this.inviteEmail.set('');
+        this.inviteRoleId.set('');
+        this.toastSrv.success(`Invited ${email}`);
+        this.loadInvites();
+      });
   }
 
   onChangeRole(member: User, roleId: string): void {
     if (this.changingRoleFor()) return;
     this.changingRoleFor.set(member.id);
-    this.userSrv.assignRole({ userId: member.id, roleId })
-      .pipe(
-        finalize(() => this.changingRoleFor.set(null)),
-        catchError(() => { this.toastSrv.error('Failed to update role'); return of(null); })
-      )
-      .subscribe(res => {
-        if (res?.success !== false) this.toastSrv.success('Role updated');
-      });
+    // The team table shows one role per member, so switching replaces the previous role(s).
+    const previous = (member.roles ?? []).map(r => r.id).filter(id => id !== roleId);
+    forkJoin([
+      this.userSrv.assignRole({ userId: member.id, roleId }),
+      ...previous.map(id => this.userSrv.removeRole({ userId: member.id, roleId: id }))
+    ]).pipe(
+      finalize(() => this.changingRoleFor.set(null)),
+      catchError(() => { this.toastSrv.error('Failed to update role'); return of(null); })
+    ).subscribe(results => {
+      if (!results || results.some(r => !r.success)) return;
+      const role = this.roles().find(r => r.id === roleId);
+      this.members.update(list => list.map(m => m.id === member.id ? { ...m, roles: role ? [role] : [] } : m));
+      this.toastSrv.success('Role updated');
+    });
   }
 
   onRemove(member: User): void {
@@ -143,19 +175,27 @@ export class TeamComponent implements OnInit {
     if (!confirm(`Remove ${this.displayNameFor(member)} from the team?`)) return;
 
     this.removing.set(member.id);
-    // TODO: wire to real backend — DELETE /api/team/members/{userId}
-    setTimeout(() => {
-      this.members.update(list => list.filter(m => m.id !== member.id));
-      this.removing.set(null);
-      this.toastSrv.success('Member removed');
-    }, 300);
+    this.userSrv.delete(member.id)
+      .pipe(
+        finalize(() => this.removing.set(null)),
+        catchError(() => { this.toastSrv.error('Failed to remove member'); return of(null); })
+      )
+      .subscribe(res => {
+        if (!res?.success) return;
+        this.members.update(list => list.filter(m => m.id !== member.id));
+        this.toastSrv.success('Member removed');
+      });
   }
 
   onRevokeInvite(inv: PendingInvite): void {
     if (!confirm(`Revoke invitation for ${inv.email}?`)) return;
-    // TODO: wire to real backend — DELETE /api/team/invitations/{id}
-    this.pendingInvites.update(list => list.filter(i => i.id !== inv.id));
-    this.toastSrv.success('Invitation revoked');
+    this.inviteSrv.revoke(inv.id).pipe(
+      catchError(() => { this.toastSrv.error('Failed to revoke invitation'); return of(null); })
+    ).subscribe(res => {
+      if (!res?.success) return;
+      this.pendingInvites.update(list => list.filter(i => i.id !== inv.id));
+      this.toastSrv.success('Invitation revoked');
+    });
   }
 
   displayNameFor(u: User): string {
@@ -174,9 +214,11 @@ export class TeamComponent implements OnInit {
   }
 
   roleIdFor(u: User): string {
-    const roles: string[] | undefined = (u as any).roles;
-    if (!roles?.length) return this.roles()[0]?.id ?? '';
-    const match = this.roles().find(r => roles.includes(r.code) || roles.includes(r.id));
-    return match?.id ?? this.roles()[0]?.id ?? '';
+    const ids = (u.roles ?? []).map(r => r.id);
+    return this.roles().find(r => ids.includes(r.id))?.id ?? '';
+  }
+
+  roleNameFor(code: string): string {
+    return this.roles().find(r => r.code === code)?.name ?? code;
   }
 }

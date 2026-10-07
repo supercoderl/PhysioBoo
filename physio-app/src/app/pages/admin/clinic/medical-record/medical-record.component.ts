@@ -2,9 +2,9 @@ import { Component, inject, OnInit, signal } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { forkJoin } from "rxjs";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
+import { ClinicalAction, ClinicalActionDrawerComponent } from "../../../../components/layout/admin/clinic/clinical-action-drawer.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { MedicalRecordService } from "../../../../services/admin/medical-record.service";
-import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import {
     BillingSummary,
@@ -45,6 +45,7 @@ interface TabDef {
     selector: 'admin-medical-record',
     standalone: true,
     imports: [
+        ClinicalActionDrawerComponent,
         SharedModule,
         BooIconComponent,
         ErrorStateComponent,
@@ -97,20 +98,33 @@ export class AdminMedicalRecordComponent implements OnInit {
     private srv = inject(MedicalRecordService);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
-    private toastSrv = inject(ToastService);
 
     // #endregion
 
-    private patientId = '';
+    patientId = '';
+    actionOpen = signal(false);
+    action: ClinicalAction = 'lab';
 
     ngOnInit(): void {
-        const patientId = this.route.snapshot.paramMap.get('patientId');
-        if (!patientId) {
-            this.router.navigate(['/admin/reception/patient-lookup']);
+        // Callers pass ?patientId=<id or MRN>; the medical record API needs the id.
+        const key = this.route.snapshot.queryParamMap.get('patientId') ?? this.route.snapshot.paramMap.get('patientId');
+        if (!key) {
+            this.router.navigate(['/admin/crm/patient']);
             return;
         }
-        this.patientId = patientId;
-        this.loadAll(patientId);
+        if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(key)) {
+            this.patientId = key;
+            this.loadAll(key);
+            return;
+        }
+        this.isLoading.set(true);
+        this.srv.resolvePatient(key).subscribe({
+            next: res => {
+                if (res.success && res.data) { this.patientId = res.data; this.loadAll(res.data); }
+                else { this.isLoading.set(false); this.error.set(`No patient found for "${key}".`); }
+            },
+            error: () => { this.isLoading.set(false); this.error.set(`No patient found for "${key}".`); }
+        });
     }
 
     retryLoad(): void {
@@ -162,16 +176,30 @@ export class AdminMedicalRecordComponent implements OnInit {
     setTab(k: TabKey): void { this.activeTab.set(k); }
 
     onQuickAction(action: string): void {
-        // Wire to real flows when the corresponding endpoints / drawers exist.
-        const messages: Record<string, string> = {
-            encounter: 'New encounter — not wired yet',
-            note: 'Add note — not wired yet',
-            prescribe: 'Prescribe medication — not wired yet',
-            lab: 'Order lab test — not wired yet',
-            imaging: 'Order imaging — not wired yet',
-            print: 'Printing medical record…',
-            discharge: 'Discharge workflow — not wired yet',
-        };
-        this.toastSrv.success(messages[action] || action);
+        switch (action) {
+            case 'lab':
+            case 'imaging':
+            case 'note':
+                this.action = action;
+                this.actionOpen.set(true);
+                break;
+            case 'encounter':
+                // A new encounter is a new visit: book it at reception.
+                this.router.navigate(['/admin/reception/booking/list'], { queryParams: { patientId: this.patientId } });
+                break;
+            case 'prescribe':
+                this.router.navigate(['/admin/clinic/prescription'], { queryParams: { patientId: this.patientId } });
+                break;
+            case 'discharge':
+                this.router.navigate(['/admin/inpatient/admission'], { queryParams: { patientId: this.patientId } });
+                break;
+            case 'print':
+                window.print();
+                break;
+        }
+    }
+
+    onActionDone(): void {
+        this.loadAll(this.patientId);
     }
 }

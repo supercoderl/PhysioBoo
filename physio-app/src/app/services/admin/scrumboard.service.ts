@@ -47,6 +47,10 @@ export class ScrumboardService {
   deleteList(listId: string) {
     return this.http.delete<PagedResponse<string>>(BASE_API.SCRUMBOARD.LIST(listId), { context: createHttpContext({ loadingKey: LoadingKeys.SCRUMBOARD.LIST_DELETE }) });
   }
+
+  moveList(listId: string, targetIndex: number) {
+    return this.http.post<PagedResponse<string>>(BASE_API.SCRUMBOARD.LIST_MOVE(listId), { targetIndex }, { context: createHttpContext({ loadingKey: LoadingKeys.SCRUMBOARD.LIST_SAVE }) });
+  }
   // #endregion
 
   // #region Cards

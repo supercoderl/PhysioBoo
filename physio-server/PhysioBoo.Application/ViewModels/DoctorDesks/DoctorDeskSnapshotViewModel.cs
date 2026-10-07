@@ -17,9 +17,18 @@ namespace PhysioBoo.Application.ViewModels.DoctorDesks
             public bool IsOnline { get; set; }
         }
 
+        public sealed class VitalsViewModel
+        {
+            public string? BloodPressure { get; set; }
+            public int? HeartRate { get; set; }
+            public decimal? Temperature { get; set; }
+            public int? Spo2 { get; set; }
+        }
+
         public sealed class QueuePatientViewModel
         {
             public Guid Id { get; set; }
+            public Guid PatientId { get; set; }
             public Guid AppointmentId { get; set; }
             public string QueueNumber { get; set; } = string.Empty;
             public string Name { get; set; } = string.Empty;
@@ -31,12 +40,13 @@ namespace PhysioBoo.Application.ViewModels.DoctorDesks
             public string Status { get; set; } = string.Empty;
             public string Priority { get; set; } = string.Empty;
             public List<string> Allergies { get; set; } = new();
+            public VitalsViewModel? Vitals { get; set; }
         }
 
         public DoctorContextViewModel Context { get; set; } = new();
         public List<QueuePatientViewModel> Patients { get; set; } = new();
 
-        public static DoctorDeskSnapshotViewModel FromEntity(Doctor doctor, List<Appointment> appointments)
+        public static DoctorDeskSnapshotViewModel FromEntity(Doctor doctor, List<Appointment> appointments, IReadOnlyDictionary<Guid, VitalsViewModel>? latestVitals = null)
         {
             return new DoctorDeskSnapshotViewModel
             {
@@ -52,6 +62,7 @@ namespace PhysioBoo.Application.ViewModels.DoctorDesks
                 Patients = appointments.Select(a => new QueuePatientViewModel
                 {
                     Id = a.Id,
+                    PatientId = a.PatientId,
                     AppointmentId = a.Id,
                     QueueNumber = a.AppointmentNumber,
                     Name = a.Patient?.Profile!.FullName ?? string.Empty,
@@ -62,7 +73,8 @@ namespace PhysioBoo.Application.ViewModels.DoctorDesks
                     ArrivalTime = a.CheckedInAt?.ToString("HH:mm") ?? string.Empty,
                     Status = a.AppointmentStatus.ToString().ToLower(),
                     Priority = (a.AppointmentType?.IsEmergency ?? false) ? "urgent" : "normal",
-                    Allergies = a.Patient?.Allergies.Select(al => al.AllergenName).ToList() ?? new List<string>()
+                    Allergies = a.Patient?.Allergies.Select(al => al.AllergenName).ToList() ?? new List<string>(),
+                    Vitals = latestVitals != null && latestVitals.TryGetValue(a.PatientId, out VitalsViewModel? v) ? v : null
                 }).ToList()
             };
         }

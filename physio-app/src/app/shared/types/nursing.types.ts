@@ -152,3 +152,12 @@ export interface NursingAssignmentFilter {
   riskFlag?: 'FallRisk' | 'Isolation' | 'Emergency' | null;
   taskState?: 'Overdue' | 'DueSoon' | null;
 }
+
+/** A clinical note on a patient's nursing record (not the personal Notes app in system/note). */
+export interface NursingNote {
+  id: string;
+  time: string;
+  type: 'nursing' | 'doctor' | 'general';
+  content: string;
+  writtenBy: string;
+}

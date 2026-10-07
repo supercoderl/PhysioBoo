@@ -33,7 +33,7 @@ namespace PhysioBoo.Application.ViewModels.Campaigns
                 Type = entity.Type,
                 Status = entity.Status,
                 AudienceSegmentId = entity.AudienceSegmentId,
-                AudienceSegmentName = null,
+                AudienceSegmentName = Queries.AudienceSegments.AudienceSegmentCatalog.FindName(entity.AudienceSegmentId),
                 Goal = entity.Goal,
                 StartDate = entity.StartDate,
                 EndDate = entity.EndDate,

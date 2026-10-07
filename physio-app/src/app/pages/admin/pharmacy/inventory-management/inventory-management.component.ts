@@ -62,7 +62,7 @@ import { InventoryTimelinePanelComponent } from "./inventory-timeline-panel.comp
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.4fr_1.1fr_1fr] gap-4">
         <div class="h-[560px]">
-          <inventory-explorer-panel [selectedId]="selectedMedicineId()" (select)="onSelectMedicine($event)" (zoneFilter)="onZoneFilter($event)"></inventory-explorer-panel>
+          <inventory-explorer-panel [selectedId]="selectedMedicineId()" [kpiFilter]="kpiFilter()" (clearKpiFilter)="kpiFilter.set(null)" (select)="onSelectMedicine($event)" (zoneFilter)="onZoneFilter($event)"></inventory-explorer-panel>
         </div>
         <div class="h-[560px]">
           <inventory-intelligence-panel [medicineId]="selectedMedicineId()" [medicineName]="selectedMedicineName()"></inventory-intelligence-panel>
@@ -140,8 +140,13 @@ export class AdminInventoryManagementComponent implements OnInit {
         });
     }
 
+    // Stock-state tiles filter the explorer list; the other tiles are totals with nothing to filter.
+    kpiFilter = signal<string | null>(null);
+    private readonly filterableKpis = ['lowStock', 'outOfStock', 'nearExpiry', 'expired', 'available'];
+
     onKpiClick(key: string): void {
-        this.toastSrv.info(`Filtering Inventory Explorer by "${key}" (placeholder — backend filter not wired yet)`);
+        if (!this.filterableKpis.includes(key)) return;
+        this.kpiFilter.set(this.kpiFilter() === key ? null : key);
     }
 
     onSelectMedicine(med: InventoryMedicineCard): void {

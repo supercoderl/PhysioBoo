@@ -1,14 +1,18 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { AdminBreadcrumbComponent } from "../../../../../components/breadcrumb/admin-breadcrumb.component";
 import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
+import { finalize } from 'rxjs';
+import { BillingService } from '../../../../../services/admin/billing.service';
 import { ToastService } from '../../../../../services/common/toast.service';
+import { SubscriptionPlan, TenantSubscriptionDetail } from '../../../../../shared/types/billing.types';
 import { SharedModule } from '../../../../../shared/shared-imports';
 
 interface Plan {
-  id: 'starter' | 'pro' | 'enterprise';
+  id: string;
   name: string;
   price: number;
-  interval: 'month' | 'year';
+  currency: string;
+  interval: 'month';
   description: string;
   features: string[];
   recommended?: boolean;
@@ -20,14 +24,7 @@ interface Invoice {
   amount: number;
   date: string;
   status: 'paid' | 'pending' | 'failed';
-  downloadUrl?: string;
-}
-
-interface PaymentMethod {
-  brand: string;
-  last4: string;
-  expMonth: number;
-  expYear: number;
+  label: string;
 }
 
 @Component({
@@ -42,108 +39,116 @@ interface PaymentMethod {
 })
 export class SettingBillingComponent implements OnInit {
   private toastSrv = inject(ToastService);
+  private billingSrv = inject(BillingService);
 
   loading = signal(false);
-  changingPlan = signal<Plan['id'] | null>(null);
+  changingPlan = signal<string | null>(null);
 
-  currentPlanId = signal<Plan['id']>('pro');
-  renewsAt = signal<string>('Jun 14, 2026');
-  paymentMethod = signal<PaymentMethod | null>({
-    brand: 'Visa', last4: '4242', expMonth: 6, expYear: 2027
+  subscription = signal<TenantSubscriptionDetail | null>(null);
+  plans: Plan[] = [];
+
+  currentPlanId = computed(() => this.subscription()?.planId ?? null);
+  status = computed(() => this.subscription()?.status ?? 'None');
+  isCancelled = computed(() => this.status() === 'Cancelled' || this.status() === 'None');
+  renewsAt = computed(() => {
+    const end = this.subscription()?.currentPeriodEnd;
+    return end ? new Date(end).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
   });
+  outstanding = computed(() => this.subscription()?.outstandingAmount ?? 0);
 
-  invoices = signal<Invoice[]>([
-    { id: '1', number: 'INV-2026-005', amount: 79, date: 'May 14, 2026', status: 'paid' },
-    { id: '2', number: 'INV-2026-004', amount: 79, date: 'Apr 14, 2026', status: 'paid' },
-    { id: '3', number: 'INV-2026-003', amount: 79, date: 'Mar 14, 2026', status: 'paid' },
-    { id: '4', number: 'INV-2026-002', amount: 79, date: 'Feb 14, 2026', status: 'paid' },
-  ]);
+  invoices = computed<Invoice[]>(() => (this.subscription()?.invoices ?? []).map(i => ({
+    id: i.id,
+    number: i.invoiceNumber,
+    amount: i.amount,
+    date: new Date(i.issuedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }),
+    status: i.status === 'Paid' ? 'paid' : i.status === 'Open' ? 'pending' : 'failed',
+    label: i.status === 'Open' ? 'due' : `${i.status}`.toLowerCase(),
+  })));
 
-  plans: Plan[] = [
-    {
-      id: 'starter',
-      name: 'Starter',
-      price: 19,
+  currentPlan = computed<Plan>(() =>
+    this.plans.find(p => p.id === this.currentPlanId()) ?? {
+      id: '',
+      name: this.subscription()?.planName ?? 'No',
+      price: this.subscription()?.monthlyPrice ?? 0,
+      currency: this.subscription()?.currency ?? 'USD',
       interval: 'month',
-      description: 'For solo practitioners getting started.',
-      features: [
-        'Up to 100 patients',
-        '1 staff member',
-        'Email support',
-      ]
-    },
-    {
-      id: 'pro',
-      name: 'Pro',
-      price: 79,
-      interval: 'month',
-      description: 'For growing clinics with multiple staff.',
-      recommended: true,
-      features: [
-        'Unlimited patients',
-        'Up to 10 staff members',
-        'Priority email & chat support',
-        'Custom branding',
-      ]
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise',
-      price: 299,
-      interval: 'month',
-      description: 'For hospital groups and large networks.',
-      features: [
-        'Unlimited everything',
-        'Dedicated account manager',
-        'SLA-backed support',
-        'On-premise option',
-        'Custom integrations',
-      ]
-    }
-  ];
-
-  currentPlan = computed(() => this.plans.find(p => p.id === this.currentPlanId())!);
+      description: '',
+      features: [],
+    });
 
   ngOnInit(): void {
-    // TODO: replace with real GET /api/billing/subscription + /api/billing/payment-method + /api/billing/invoices
+    this.loading.set(true);
+    this.billingSrv.getMyPlans().subscribe({
+      next: res => { if (res.success) this.plans = this.toPlans(res.data); },
+      error: () => this.toastSrv.error('Failed to load plans')
+    });
+    this.billingSrv.getMySubscription()
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: res => { if (res.success) this.subscription.set(res.data); },
+        error: () => this.toastSrv.error('Failed to load your subscription')
+      });
+  }
+
+  private toPlans(plans: SubscriptionPlan[]): Plan[] {
+    const sorted = [...plans].sort((a, b) => a.sortOrder - b.sortOrder);
+    return sorted.map((p, index) => ({
+      id: p.id,
+      name: p.name,
+      price: p.monthlyPrice,
+      currency: p.currency,
+      interval: 'month' as const,
+      description: p.description ?? '',
+      // The middle tier is highlighted, as on a pricing page.
+      recommended: sorted.length > 2 && index === Math.floor(sorted.length / 2),
+      features: [
+        p.maxUsers ? `Up to ${p.maxUsers} staff accounts` : 'Unlimited staff accounts',
+        p.maxBranches ? `Up to ${p.maxBranches} branch${p.maxBranches === 1 ? '' : 'es'}` : 'Unlimited branches',
+      ],
+    }));
   }
 
   selectPlan(plan: Plan): void {
     if (plan.id === this.currentPlanId() || this.changingPlan()) return;
-    if (!confirm(`Change to ${plan.name} plan ($${plan.price}/${plan.interval})?`)) return;
+    if (!confirm(`Change to ${plan.name} plan (${plan.price} ${plan.currency}/${plan.interval})?`)) return;
 
     this.changingPlan.set(plan.id);
-    // TODO: POST /api/billing/subscription { planId }
-    setTimeout(() => {
-      this.currentPlanId.set(plan.id);
-      this.changingPlan.set(null);
-      this.toastSrv.success(`Switched to ${plan.name} plan`);
-    }, 600);
-  }
-
-  updatePaymentMethod(): void {
-    // TODO: open Stripe / payment portal — POST /api/billing/portal-session and redirect
-    this.toastSrv.success('Opening secure payment portal…');
-  }
-
-  removePaymentMethod(): void {
-    if (!confirm('Remove your payment method? Your subscription will be paused.')) return;
-    this.paymentMethod.set(null);
-    this.toastSrv.success('Payment method removed');
+    this.billingSrv.changeMyPlan(plan.id)
+      .pipe(finalize(() => this.changingPlan.set(null)))
+      .subscribe({
+        next: res => {
+          if (!res.success) { this.toastSrv.error('Unable to change plan'); return; }
+          this.subscription.set(res.data);
+          this.toastSrv.success(`Switched to ${plan.name} plan`);
+        },
+        error: () => this.toastSrv.error('Unable to change plan')
+      });
   }
 
   downloadInvoice(inv: Invoice): void {
-    if (inv.downloadUrl) {
-      window.open(inv.downloadUrl, '_blank');
-      return;
-    }
-    // TODO: GET /api/billing/invoices/{id}/download
-    this.toastSrv.success(`Downloading ${inv.number}…`);
+    this.billingSrv.downloadMyInvoice(inv.id).subscribe({
+      next: blob => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${inv.number}.html`;
+        link.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => this.toastSrv.error(`Unable to download ${inv.number}`)
+    });
   }
 
   cancelSubscription(): void {
+    if (this.isCancelled()) return;
     if (!confirm('Cancel your subscription? Access will end at the next renewal date.')) return;
-    // TODO: DELETE /api/billing/subscription
-    this.toastSrv.success('Subscription cancelled. Access continues until ' + this.renewsAt());
+    this.billingSrv.cancelMySubscription().subscribe({
+      next: res => {
+        if (!res.success) { this.toastSrv.error('Unable to cancel the subscription'); return; }
+        this.subscription.set(res.data);
+        this.toastSrv.success('Subscription cancelled. Access continues until ' + this.renewsAt());
+      },
+      error: () => this.toastSrv.error('Unable to cancel the subscription')
+    });
   }
 }

@@ -53,3 +53,11 @@
     </main>
   </ng-container>
 </div>
+
+<clinical-action-drawer
+  [isOpen]="actionOpen()"
+  [action]="action"
+  [patientId]="patientId"
+  [patientName]="patient()?.fullName ?? ''"
+  (close)="actionOpen.set(false)"
+  (done)="onActionDone()" />

@@ -1,4 +1,5 @@
-﻿
+﻿using PhysioBoo.Domain.Enums;
+
 
 using PhysioBoo.Domain.Entities.LaboratoryImaging;
 
@@ -82,6 +83,28 @@ namespace PhysioBoo.Infrastructure.Configuration
 
             builder.Property(i => i.VerifiedAt);
             builder.Property(i => i.Notes);
+
+            // Lab workspace workflow
+            builder.Property(i => i.SampleStatus)
+                   .HasConversion<string>()
+                   .HasMaxLength(16)
+                   .HasDefaultValue(LabSampleStatus.NotCollected)
+                   .IsRequired();
+
+            builder.Property(i => i.VerificationStatus)
+                   .HasConversion<string>()
+                   .HasMaxLength(24)
+                   .HasDefaultValue(LabVerificationStatus.PendingVerification)
+                   .IsRequired();
+
+            builder.Property(i => i.Barcode).HasMaxLength(64);
+            builder.Property(i => i.ContainerType).HasMaxLength(64);
+            builder.Property(i => i.CollectorName).HasMaxLength(150);
+            builder.Property(i => i.RejectionReason).HasMaxLength(500);
+            builder.Property(i => i.ReceivedAt);
+            builder.Property(i => i.ProcessingStartedAt);
+            builder.Property(i => i.ResultEnteredAt);
+            builder.Property(i => i.ReleasedAt);
         }
     }
 }

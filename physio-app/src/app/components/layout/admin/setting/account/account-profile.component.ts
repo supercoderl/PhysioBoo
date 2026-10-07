@@ -1,4 +1,5 @@
 import { Component, inject, Input, OnInit } from "@angular/core";
+import { FormGroup } from "@angular/forms";
 import { Router } from "@angular/router";
 import { BloodGroup } from "../../../../../shared/enums/blood-group";
 import { Gender } from "../../../../../shared/enums/gender";
@@ -19,7 +20,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
     BooSelectComponent
   ],
   template: `
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4" [formGroup]="form">
             <div class="w-full">
               <p class="font-semibold text-base m-0">Profile</p>
               <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
@@ -183,25 +184,26 @@ export class AdminAccountProfileComponent implements OnInit {
 
   // #region Inputs, Outputs, Properties
   @Input() userInfo?: UserProfileBase | null;
+  @Input({ required: true }) form!: FormGroup;
   genderOptions = Object.keys(Gender)
     .filter(key => isNaN(Number(key)))
     .map(key => ({
       label: key,
-      value: Gender[key as keyof typeof Gender]
+      value: key
     }));
 
   maritalStatusOptions = Object.keys(MaritalStatus)
     .filter(key => isNaN(Number(key)))
     .map(key => ({
       label: key,
-      value: MaritalStatus[key as keyof typeof MaritalStatus]
+      value: key
     }));
 
   bloodGroupOptions = Object.keys(BloodGroup)
     .filter(key => isNaN(Number(key)))
     .map(key => ({
       label: key,
-      value: BloodGroup[key as keyof typeof BloodGroup]
+      value: key
     }));
   // #endregion
 

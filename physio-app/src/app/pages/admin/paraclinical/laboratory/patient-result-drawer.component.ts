@@ -8,6 +8,7 @@ import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/statu
 import { LaboratoryService } from "../../../../services/admin/laboratory.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
+import { escapeHtml, htmlTable, printHtmlDocument } from "../../../../shared/utils/print.utils";
 import { LabOrderRow, LabPatientResultSummary, LabVerificationStatus } from "../../../../shared/types/laboratory.types";
 
 @Component({
@@ -128,7 +129,29 @@ export class LaboratoryPatientResultDrawerComponent implements OnChanges {
     window.print();
   }
 
+  /** Cumulative lab report for the patient, printed via the browser (Save as PDF). */
   exportPdf(): void {
-    this.toastSrv.info('Export PDF — not wired yet');
+    const s = this.summary();
+    if (!s) return;
+    this.srv.getResults().subscribe({
+      next: res => {
+        const results = res.success ? res.data.items.filter(r => r.mrn === s.mrn) : [];
+        const body = `
+          <h1>Laboratory report</h1>
+          <div class="grid">
+            <div><strong>Patient:</strong> ${escapeHtml(s.fullName)}</div><div><strong>MRN:</strong> ${escapeHtml(s.mrn)}</div>
+            <div><strong>Visit:</strong> ${escapeHtml(s.visitNumber || '—')}</div><div><strong>Department:</strong> ${escapeHtml(s.departmentName || '—')}</div>
+          </div>
+          <h2>Results</h2>
+          ${htmlTable(['Order', 'Test', 'Result', 'Unit', 'Reference', 'Flag', 'Status', 'Verified'],
+            results.map(r => [r.orderNumber, r.testName, r.value, r.unit ?? '', r.referenceRange ?? '', r.flag, r.verificationStatus,
+              r.verifiedAt ? new Date(r.verifiedAt).toLocaleString() : '']))}
+          <h2>Orders</h2>
+          ${htmlTable(['Order', 'Ordered', 'Tests', 'Priority', 'Status', 'Doctor'],
+            this.history().map(o => [o.orderNumber, new Date(o.orderTime).toLocaleString(), this.testNames(o), o.priority, o.labStatus, o.orderingDoctorName]))}`;
+        printHtmlDocument(`Lab report ${s.mrn}`, body);
+      },
+      error: () => this.toastSrv.error('Unable to load results for the report')
+    });
   }
 }

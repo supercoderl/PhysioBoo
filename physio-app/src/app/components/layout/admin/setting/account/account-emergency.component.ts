@@ -1,4 +1,5 @@
-import { Component } from "@angular/core";
+import { Component, Input } from "@angular/core";
+import { FormGroup } from "@angular/forms";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 
@@ -10,7 +11,7 @@ import { BooInputComponent } from "../../../../input/boo-input/boo-input.compone
         BooInputComponent,
     ],
     template: `
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4" [formGroup]="form">
             <div class="w-full">
                 <p class="font-semibold text-base m-0">Emergency Contact</p>
                 <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
@@ -65,4 +66,6 @@ import { BooInputComponent } from "../../../../input/boo-input/boo-input.compone
     `
 })
 
-export class AdminAccountEmergencyComponent { }
+export class AdminAccountEmergencyComponent {
+    @Input({ required: true }) form!: FormGroup;
+}

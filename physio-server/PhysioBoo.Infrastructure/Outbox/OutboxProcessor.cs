@@ -145,7 +145,7 @@ namespace PhysioBoo.Infrastructure.Outbox
                     e.Type
                 ),
                 UserVerifiedEvent e => new UserVerifiedEvent(e.Token, e.Type),
-                UserLoggedEvent e => new UserLoggedEvent(e.UserId, e.AccessToken, e.RefreshToken),
+                UserLoggedEvent e => new UserLoggedEvent(e.UserId, e.AccessToken, e.RefreshToken, e.UserAgent, e.IpAddress),
 
                 // MEDICAL SPECIALTY EVENT
                 MedicalSpecialtyCreatedEvent e => new MedicalSpecialtyCreatedEvent(e.AggregateId, e.IconPublicId, e.IconUrl),

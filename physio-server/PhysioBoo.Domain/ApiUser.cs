@@ -21,6 +21,30 @@ namespace PhysioBoo.Domain
             _logger = logger;
         }
 
+        public string? UserAgent
+        {
+            get
+            {
+                string? agent = _httpContextAccessor.HttpContext?.Request.Headers["User-Agent"].ToString();
+                return string.IsNullOrWhiteSpace(agent) ? null : agent;
+            }
+        }
+
+        // Behind the nginx proxy the client address arrives in X-Forwarded-For (first hop).
+        public string? IpAddress
+        {
+            get
+            {
+                HttpContext? context = _httpContextAccessor.HttpContext;
+                if (context == null) return null;
+
+                string? forwarded = context.Request.Headers["X-Forwarded-For"].ToString();
+                if (!string.IsNullOrWhiteSpace(forwarded)) return forwarded.Split(',')[0].Trim();
+
+                return context.Connection.RemoteIpAddress?.ToString();
+            }
+        }
+
         public Guid GetUserId()
         {
             if (_userId != Guid.Empty)

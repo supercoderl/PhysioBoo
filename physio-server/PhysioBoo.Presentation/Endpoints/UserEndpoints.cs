@@ -1,4 +1,12 @@
-﻿
+﻿using PhysioBoo.Application.Commands.Users.AddUserRole;
+using PhysioBoo.Application.Commands.Users.RemoveUserRole;
+using PhysioBoo.Application.Commands.Users.UpdateMyAccount;
+using PhysioBoo.Application.Queries.Users.GetMyAccount;
+using PhysioBoo.Application.Commands.Sessions.RevokeOtherSessions;
+using PhysioBoo.Application.Commands.Sessions.RevokeSession;
+using PhysioBoo.Application.Queries.Sessions.GetMySessions;
+using PhysioBoo.Application.ViewModels.Sessions;
+
 using Microsoft.Extensions.Options;
 using PhysioBoo.Application.Commands.Users.AssignRoleToUser;
 using PhysioBoo.Application.Commands.Users.ChangePasswordUser;
@@ -232,6 +240,82 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
+            .RequireAuthorization();
+            #endregion
+
+            #region User roles (one at a time)
+            group.MapPost("{id:guid}/roles/{roleId:guid}", async (Guid id, Guid roleId, IMediatorHandler bus) =>
+            {
+                await bus.SendCommandAsync(new AddUserRoleCommand(id, roleId));
+                return Results.Ok(new ResponseMessage<Guid> { Success = true, Data = roleId });
+            }).WithName("AddUserRole")
+            .WithSummary("Grant a role to a user of the current tenant.")
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Iam.UserAssignRole);
+
+            group.MapDelete("{id:guid}/roles/{roleId:guid}", async (Guid id, Guid roleId, IMediatorHandler bus) =>
+            {
+                await bus.SendCommandAsync(new RemoveUserRoleCommand(id, roleId));
+                return Results.Ok(new ResponseMessage<Guid> { Success = true, Data = roleId });
+            }).WithName("RemoveUserRole")
+            .WithSummary("Revoke a role from a user of the current tenant.")
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Iam.UserAssignRole);
+            #endregion
+
+            #region My account
+            group.MapGet("/me/account", async (IMediatorHandler bus) =>
+            {
+                MyAccountViewModel? result = await bus.QueryAsync(new GetMyAccountQuery());
+                return Results.Ok(new ResponseMessage<MyAccountViewModel?> { Success = true, Data = result });
+            }).WithName("GetMyAccount")
+            .WithSummary("Editable profile and contact details of the signed-in user.")
+            .Produces<ResponseMessage<MyAccountViewModel?>>(StatusCodes.Status200OK)
+            .RequireAuthorization();
+
+            group.MapPut("/me/account", async ([FromBody] UpdateMyAccountViewModel body, IMediatorHandler bus) =>
+            {
+                await bus.SendCommandAsync(new UpdateMyAccountCommand(body));
+                MyAccountViewModel? result = await bus.QueryAsync(new GetMyAccountQuery());
+                return Results.Ok(new ResponseMessage<MyAccountViewModel?> { Success = true, Data = result });
+            }).WithName("UpdateMyAccount")
+            .WithSummary("Update the signed-in user's profile and contact details (email can't be changed here).")
+            .Produces<ResponseMessage<MyAccountViewModel?>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<MyAccountViewModel?>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
+            #endregion
+
+            #region Sessions
+            group.MapGet("/me/sessions", async (HttpContext context, IMediatorHandler bus) =>
+            {
+                context.Request.Cookies.TryGetValue("refresh_token", out string? current);
+                List<UserSessionViewModel> result = await bus.QueryAsync(new GetMySessionsQuery(current));
+                return Results.Ok(new ResponseMessage<List<UserSessionViewModel>> { Success = true, Data = result });
+            }).WithName("GetMySessions")
+            .WithSummary("Devices signed in to the current account; the calling device is flagged as current.")
+            .Produces<ResponseMessage<List<UserSessionViewModel>>>(StatusCodes.Status200OK)
+            .RequireAuthorization();
+
+            group.MapDelete("/me/sessions/{id:guid}", async (Guid id, IMediatorHandler bus) =>
+            {
+                await bus.SendCommandAsync(new RevokeSessionCommand(id));
+                return Results.Ok(new ResponseMessage<Guid> { Success = true, Data = id });
+            }).WithName("RevokeMySession")
+            .WithSummary("Sign one of your devices out.")
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization();
+
+            group.MapPost("/me/sessions/revoke-others", async (HttpContext context, IMediatorHandler bus) =>
+            {
+                context.Request.Cookies.TryGetValue("refresh_token", out string? current);
+                await bus.SendCommandAsync(new RevokeOtherSessionsCommand(current));
+                return Results.Ok(new ResponseMessage<bool> { Success = true, Data = true });
+            }).WithName("RevokeMyOtherSessions")
+            .WithSummary("Sign out every device except this one.")
+            .Produces<ResponseMessage<bool>>(StatusCodes.Status200OK)
             .RequireAuthorization();
             #endregion
 

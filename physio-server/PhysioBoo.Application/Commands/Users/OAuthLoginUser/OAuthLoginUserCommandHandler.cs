@@ -20,6 +20,7 @@ namespace PhysioBoo.Application.Commands.Users.OAuthLoginUser
         private readonly IUserLoginRepository _userLoginRepository;
         private readonly IUserRepository _userRepository;
         private readonly TokenSettings _token;
+        private readonly IUser _user;
         private readonly GoogleSettings _google;
 
         public OAuthLoginUserCommandHandler(
@@ -29,9 +30,11 @@ namespace PhysioBoo.Application.Commands.Users.OAuthLoginUser
             IUserLoginRepository userLoginRepository,
             IUserRepository userRepository,
             IOptions<TokenSettings> tokenOptions,
-            IOptions<GoogleSettings> googleOptions
+            IOptions<GoogleSettings> googleOptions,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
+            _user = user;
             _userLoginRepository = userLoginRepository;
             _userRepository = userRepository;
             _token = tokenOptions.Value;
@@ -102,7 +105,7 @@ namespace PhysioBoo.Application.Commands.Users.OAuthLoginUser
 
                 request.Result = new AuthResult(accessToken, refreshToken);
 
-                await Bus.RaiseEventAsync(new UserLoggedEvent(user.Id, accessToken, refreshToken));
+                await Bus.RaiseEventAsync(new UserLoggedEvent(user.Id, accessToken, refreshToken, _user.UserAgent, _user.IpAddress));
             }
         }
 

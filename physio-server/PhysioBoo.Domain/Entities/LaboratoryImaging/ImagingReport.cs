@@ -36,11 +36,20 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public string? ReportPdfUrl { get; private set; }
         public string? ImagesUrl { get; private set; }
 
+        // Radiology workspace reporting workflow
+        public string? ClinicalIndication { get; private set; }
+        public RadiologyReportStatus WorkflowStatus { get; private set; }
+        public Guid? VerifierId { get; private set; }
+        public DateTime? ReleasedAt { get; private set; }
+        public string? RejectionReason { get; private set; }
+        public DateTime? LastSavedAt { get; private set; }
+
         public virtual User? Creator { get; private set; }
         public virtual User? Updater { get; private set; }
         public virtual ImagingOrder? ImagingOrder { get; private set; }
         public virtual Patient? Patient { get; private set; }
         public virtual User? Radiologist { get; private set; }
+        public virtual User? Verifier { get; private set; }
         public virtual HospitalGroup? HospitalGroup { get; private set; }
         #endregion
 
@@ -88,6 +97,7 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
             StudyDate = DateOnly.FromDateTime(TimeZoneHelper.GetLocalTimeNow());
             StudyTime = TimeOnly.FromDateTime(TimeZoneHelper.GetLocalTimeNow());
             Status = ReportStatus.Draft;
+            WorkflowStatus = RadiologyReportStatus.Reporting;
             ImagesCount = 0;
             IsCritical = false;
             IsNormal = false;
@@ -123,6 +133,59 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public void SetImagesUrl(string? imagesUrl) { ImagesUrl = imagesUrl; }
         public void SetStudyDate(DateOnly studyDate) { StudyDate = studyDate; }
         public void SetStudyTime(TimeOnly studyTime) { StudyTime = studyTime; }
+        public void SetClinicalIndication(string? clinicalIndication) { ClinicalIndication = clinicalIndication; }
+        #endregion
+
+        #region Workflow
+        /// <summary>
+        /// Saves the draft text. A report with both findings and impression is ready for verification;
+        /// saving after a rejection or a return for revision puts it back in that queue.
+        /// </summary>
+        public void SaveDraft(Guid? radiologistId, bool isCritical, DateTime at)
+        {
+            if (WorkflowStatus is RadiologyReportStatus.Verified or RadiologyReportStatus.Released) return;
+
+            RadiologistId ??= radiologistId;
+            IsCritical = isCritical;
+            DictatedAt ??= at;
+            LastSavedAt = at;
+            WorkflowStatus = string.IsNullOrWhiteSpace(Findings) || string.IsNullOrWhiteSpace(Impression)
+                ? RadiologyReportStatus.Reporting
+                : RadiologyReportStatus.PendingVerification;
+        }
+
+        public void Approve(Guid verifierId, DateTime at)
+        {
+            WorkflowStatus = RadiologyReportStatus.Verified;
+            VerifierId = verifierId;
+            VerifiedAt = at;
+            ReleasedAt = at;
+            IsFinal = true;
+            Status = ReportStatus.Final;
+            RejectionReason = null;
+        }
+
+        public void Reject(string reason)
+        {
+            WorkflowStatus = RadiologyReportStatus.Rejected;
+            RejectionReason = reason;
+            VerifierId = null;
+            VerifiedAt = null;
+            ReleasedAt = null;
+            IsFinal = false;
+            Status = ReportStatus.Draft;
+        }
+
+        public void ReturnForRevision(string reason)
+        {
+            WorkflowStatus = RadiologyReportStatus.ReturnedForRevision;
+            RejectionReason = reason;
+            VerifierId = null;
+            VerifiedAt = null;
+            ReleasedAt = null;
+            IsFinal = false;
+            Status = ReportStatus.Draft;
+        }
         #endregion
     }
 }

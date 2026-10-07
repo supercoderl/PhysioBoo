@@ -17,6 +17,7 @@ namespace PhysioBoo.Application.Commands.Users.RefreshToken
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IUserRepository _userRepository;
         private readonly TokenSettings _token;
+        private readonly IUser _user;
 
         public RefreshTokenCommandHandler(
            IMediatorHandler bus,
@@ -24,9 +25,11 @@ namespace PhysioBoo.Application.Commands.Users.RefreshToken
            INotificationHandler<DomainNotification> notifications,
            IRefreshTokenRepository refreshTokenRepository,
            IUserRepository userRepository,
-           IOptions<TokenSettings> options
+           IOptions<TokenSettings> options,
+           IUser user
         ) : base(bus, unitOfWork, notifications)
         {
+            _user = user;
             _refreshTokenRepository = refreshTokenRepository;
             _userRepository = userRepository;
             _token = options.Value;
@@ -91,7 +94,7 @@ namespace PhysioBoo.Application.Commands.Users.RefreshToken
 
             request.Result = new AuthResult(accessToken, refreshToken);
 
-            await Bus.RaiseEventAsync(new UserLoggedEvent(token.UserId, accessToken, refreshToken));
+            await Bus.RaiseEventAsync(new UserLoggedEvent(token.UserId, accessToken, refreshToken, _user.UserAgent, _user.IpAddress));
         }
     }
 }

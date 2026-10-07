@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { finalize, firstValueFrom, forkJoin } from "rxjs";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { BedMapAssignDrawerComponent } from "../../../../components/layout/admin/inpatient/bed-map/bed-assign-drawer.component";
+import { BedMapManageDrawerComponent } from "../../../../components/layout/admin/inpatient/bed-map/bed-manage-drawer.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BedMapService } from "../../../../services/admin/bed-map.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
@@ -18,7 +19,8 @@ import { BedMapStats, Ward } from "../../../../shared/types/ward.types";
         SharedModule,
         BooIconComponent,
         BooSelectComponent,
-        BedMapAssignDrawerComponent
+        BedMapAssignDrawerComponent,
+        BedMapManageDrawerComponent
     ],
     template: `
         <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -29,12 +31,20 @@ import { BedMapStats, Ward } from "../../../../shared/types/ward.types";
             <h2 class="text-2xl font-bold text-gray-800 mb-2">Bed Management System</h2>
             <p class="text-gray-600">Real-time bed occupancy and availability</p>
           </div>
-          <button (click)="refresh()" [disabled]="loadingSrv.isLoading('bed-map-snapshot')"
-            class="px-4 py-2 bg-surface border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2 disabled:opacity-50">
-            <boo-icon name="refresh-cw" [size]="16" [class.animate-spin]="loadingSrv.isLoading('bed-map-snapshot')"></boo-icon>
-            Refresh
-          </button>
+          <div class="flex items-center gap-2">
+            <button (click)="manageOpen = true"
+              class="px-4 py-2 bg-surface border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
+              <boo-icon name="settings-2" [size]="16"></boo-icon>
+              Wards & beds
+            </button>
+            <button (click)="refresh()" [disabled]="loadingSrv.isLoading('bed-map-snapshot')"
+              class="px-4 py-2 bg-surface border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2 disabled:opacity-50">
+              <boo-icon name="refresh-cw" [size]="16" [class.animate-spin]="loadingSrv.isLoading('bed-map-snapshot')"></boo-icon>
+              Refresh
+            </button>
+          </div>
         </div>
+        <bed-map-manage-drawer [isOpen]="manageOpen" (close)="manageOpen = false" (changed)="refresh()" />
 
         <!-- Error State -->
         <div *ngIf="hasError && !loadingSrv.isLoading('bed-map-snapshot')" class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6 flex items-center justify-between">
@@ -271,6 +281,7 @@ import { BedMapStats, Ward } from "../../../../shared/types/ward.types";
     `
 })
 export class AdminBedMapComponent implements OnInit {
+    manageOpen = false;
     // #region Inputs, Outputs, Properties
     wards: Ward[] = [];
     beds: Bed[] = [];

@@ -85,4 +85,6 @@ namespace PhysioBoo.Application.ViewModels.Scrumboard
     public sealed record SaveScrumCardViewModel(string Title, string? Description, DateTime? DueDate);
 
     public sealed record MoveScrumCardViewModel(Guid TargetListId, int TargetIndex);
+
+    public sealed record MoveScrumListViewModel(int TargetIndex);
 }

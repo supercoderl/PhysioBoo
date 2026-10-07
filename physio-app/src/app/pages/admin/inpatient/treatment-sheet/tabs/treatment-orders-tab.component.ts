@@ -5,8 +5,17 @@ import { BooSelectComponent } from "../../../../../components/select/boo-select/
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
+import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { OrderPriority, OrderStatus, OrderType, TreatmentOrder } from "../../../../../shared/types/treatment-sheet.types";
+import { CreateTreatmentOrderRequest, OrderPriority, OrderStatus, OrderType, TreatmentOrder } from "../../../../../shared/types/treatment-sheet.types";
+
+/** Now rounded up to the next quarter hour, as a datetime-local value (local wall-clock time). */
+function nextQuarterHour(): string {
+  const d = new Date(Math.ceil(Date.now() / 900000) * 900000);
+  const pad = (n: number) => `${n}`.padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 
 @Component({
   selector: 'treatment-orders-tab',
@@ -23,6 +32,38 @@ import { OrderPriority, OrderStatus, OrderType, TreatmentOrder } from "../../../
         [ngClass]="groupByCategory ? 'bg-primary/10 border-primary text-primary' : 'bg-surface border-gray-200 text-gray-600'">
         Group by Category
       </button>
+      <button (click)="toggleNew()" class="ml-auto px-3 py-2 rounded-lg text-xs font-semibold bg-primary text-white hover:opacity-90">
+        New order
+      </button>
+    </div>
+
+    <div *ngIf="newOpen()" class="mb-4 rounded-lg border border-gray-200 bg-surface p-4">
+      <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
+        <label class="md:col-span-2 flex flex-col gap-1 text-xs text-gray-600">Order
+          <input [(ngModel)]="draft.orderName" maxlength="200" placeholder="e.g. Chest physiotherapy BID" class="rounded border border-gray-300 px-3 py-2 text-sm" />
+        </label>
+        <label class="flex flex-col gap-1 text-xs text-gray-600">Type
+          <select [(ngModel)]="draft.orderType" class="rounded border border-gray-300 px-2 py-2 text-sm bg-surface">
+            <option *ngFor="let t of typeOptions.slice(1)" [value]="t.value">{{ t.label }}</option>
+          </select>
+        </label>
+        <label class="flex flex-col gap-1 text-xs text-gray-600">Priority
+          <select [(ngModel)]="draft.priority" class="rounded border border-gray-300 px-2 py-2 text-sm bg-surface">
+            <option *ngFor="let p of priorityOptions.slice(1)" [value]="p.value">{{ p.label }}</option>
+          </select>
+        </label>
+        <label class="flex flex-col gap-1 text-xs text-gray-600">Frequency
+          <input [(ngModel)]="draft.frequency" maxlength="50" placeholder="e.g. q8h" class="rounded border border-gray-300 px-3 py-2 text-sm" />
+        </label>
+        <label class="flex flex-col gap-1 text-xs text-gray-600">Start
+          <input type="datetime-local" [(ngModel)]="draft.startTime" class="rounded border border-gray-300 px-2 py-2 text-sm" />
+        </label>
+      </div>
+      <div class="flex justify-end gap-2 mt-3">
+        <button (click)="newOpen.set(false)" class="px-3 py-2 rounded-lg text-xs border border-gray-300 text-gray-700">Cancel</button>
+        <button (click)="createOrder()" [disabled]="!draft.orderName.trim() || !draft.startTime || saving()"
+          class="px-3 py-2 rounded-lg text-xs font-semibold bg-primary text-white disabled:opacity-50">{{ saving() ? 'Saving…' : 'Create order' }}</button>
+      </div>
     </div>
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
@@ -92,7 +133,43 @@ export class TreatmentOrdersTabComponent implements OnChanges {
     { label: 'Routine', value: 'Routine' }, { label: 'Urgent', value: 'Urgent' }, { label: 'Stat', value: 'Stat' },
   ];
 
-  constructor(private srv: TreatmentSheetService) { }
+  newOpen = signal(false);
+  saving = signal(false);
+  draft = this.emptyDraft();
+
+  constructor(private srv: TreatmentSheetService, private toastSrv: ToastService) { }
+
+  private emptyDraft() {
+    return { orderName: '', orderType: 'Doctor' as OrderType, priority: 'Routine' as OrderPriority, frequency: '', startTime: nextQuarterHour() };
+  }
+
+  toggleNew(): void {
+    if (!this.newOpen()) this.draft = this.emptyDraft();
+    this.newOpen.set(!this.newOpen());
+  }
+
+  createOrder(): void {
+    const request: CreateTreatmentOrderRequest = {
+      orderType: this.draft.orderType,
+      orderName: this.draft.orderName.trim(),
+      priority: this.draft.priority,
+      frequency: this.draft.frequency.trim() || null,
+      startTime: `${this.draft.startTime}:00`,
+      endTime: null,
+      status: 'Active',
+    };
+    this.saving.set(true);
+    this.srv.createOrder(this.patientId, request).subscribe({
+      next: res => {
+        this.saving.set(false);
+        if (!res.success) { this.toastSrv.error('Unable to create the order'); return; }
+        if (res.data) this.orders.set([res.data, ...this.orders()]);
+        this.newOpen.set(false);
+        this.toastSrv.success('Order created');
+      },
+      error: () => { this.saving.set(false); this.toastSrv.error('Unable to create the order'); }
+    });
+  }
 
   ngOnChanges(): void {
     if (!this.patientId) return;

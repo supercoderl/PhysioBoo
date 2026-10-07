@@ -9,6 +9,7 @@ import {
   ImagingOrderRow,
   QueueEntry,
   QueueStatus,
+  RadiologyPriority,
   RadiologyDashboardTrend,
   RadiologyPatientStudySummary,
   RadiologyReport,
@@ -25,6 +26,11 @@ export class RadiologyService {
   // #endregion
 
   // #region Methods
+  /** Order an imaging exam; the server attaches it to the patient's latest visit. */
+  placeOrder(params: { patientId: string; modalityId: string; bodyPart?: string | null; clinicalIndication?: string | null; priority: RadiologyPriority; contrastRequired: boolean }) {
+    return this.http.post<PagedResponse<string>>(BASE_API.RADIOLOGY.ORDERS, params);
+  }
+
   getStats() {
     return this.http.get<PagedResponse<RadiologyStats>>(BASE_API.RADIOLOGY.STATS, { context: createHttpContext({ loadingKey: LoadingKeys.RADIOLOGY.STATS }) });
   }

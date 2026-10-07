@@ -8,6 +8,7 @@ import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/statu
 import { TreatmentSheetService } from "../../../../services/admin/treatment-sheet.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
+import { escapeHtml, htmlTable, printHtmlDocument } from "../../../../shared/utils/print.utils";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { AlertSeverityLevel, ClinicalAlert, TreatmentPatientSummary, TreatmentStats } from "../../../../shared/types/treatment-sheet.types";
 import { TreatmentImagingTabComponent } from "./tabs/treatment-imaging-tab.component";
@@ -294,7 +295,37 @@ export class AdminTreatmentSheetComponent implements OnInit {
     window.print();
   }
 
+  /** Treatment sheet (orders, medication record, notes) printed via the browser — "Save as PDF" exports it. */
   exportPdf(): void {
-    this.toastSrv.info('Export PDF — not wired yet');
+    const p = this.summary();
+    if (!p) return;
+    forkJoin({
+      orders: this.srv.getOrders(this.patientId),
+      meds: this.srv.getMedications(this.patientId),
+      notes: this.srv.getNotes(this.patientId),
+    }).subscribe({
+      next: ({ orders, meds, notes }) => {
+        const when = (v?: string | null) => v ? new Date(v).toLocaleString() : '';
+        const body = `
+          <h1>Treatment sheet</h1>
+          <div class="grid">
+            <div><strong>Patient:</strong> ${escapeHtml(p.fullName)}</div><div><strong>MRN:</strong> ${escapeHtml(p.mrn)}</div>
+            <div><strong>Ward / bed:</strong> ${escapeHtml(p.wardName)} / ${escapeHtml(p.bedNumber)}</div><div><strong>Department:</strong> ${escapeHtml(p.departmentName)}</div>
+            <div><strong>Admitted:</strong> ${escapeHtml(when(p.admissionDate))}</div><div><strong>Attending:</strong> ${escapeHtml(p.attendingDoctorName)}</div>
+            <div><strong>Diagnosis:</strong> ${escapeHtml(p.primaryDiagnosis ?? '—')}</div><div><strong>Allergies:</strong> ${escapeHtml(p.allergies.join(', ') || 'None known')}</div>
+          </div>
+          <h2>Orders</h2>
+          ${htmlTable(['Order', 'Type', 'Priority', 'Frequency', 'Start', 'Status', 'Ordered by'],
+            (orders.success ? orders.data.items : []).map(o => [o.orderName, o.orderType, o.priority, o.frequency ?? '', when(o.startTime), o.status, o.orderingDoctorName]))}
+          <h2>Medication administration record</h2>
+          ${htmlTable(['Medication', 'Dose', 'Route', 'Frequency', 'Scheduled', 'Status', 'Given by', 'Notes'],
+            (meds.success ? meds.data.items : []).map(m => [m.medicationName, m.dose, m.route, m.frequency, when(m.scheduledTime), m.status, m.administeredByName ?? '', m.notes ?? '']))}
+          <h2>Progress notes</h2>
+          ${htmlTable(['Written', 'Type', 'Author', 'Note'],
+            (notes.success ? notes.data.items : []).map(n => [when(n.writtenAt), n.type, n.authorName, n.content]))}`;
+        printHtmlDocument(`Treatment sheet ${p.mrn}`, body);
+      },
+      error: () => this.toastSrv.error('Unable to load the treatment sheet for export')
+    });
   }
 }

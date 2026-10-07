@@ -8,6 +8,8 @@ import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { ShiftCode, ShiftHandoverCard } from "../../../../shared/types/nursing.types";
 
+type SbarKey = 'situation' | 'background' | 'assessment' | 'recommendation';
+
 @Component({
     selector: 'admin-nursing-handover',
     standalone: true,
@@ -48,17 +50,37 @@ import { ShiftCode, ShiftHandoverCard } from "../../../../shared/types/nursing.t
                 <boo-icon name="check-circle" [size]="14"></boo-icon> Acknowledged
               </span>
             </div>
-            <dl class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-              <div><dt class="text-xs text-gray-500 mb-0.5">Situation</dt><dd class="text-gray-800 m-0">{{ c.situation }}</dd></div>
-              <div><dt class="text-xs text-gray-500 mb-0.5">Background</dt><dd class="text-gray-800 m-0">{{ c.background }}</dd></div>
-              <div><dt class="text-xs text-gray-500 mb-0.5">Assessment</dt><dd class="text-gray-800 m-0">{{ c.assessment }}</dd></div>
-              <div><dt class="text-xs text-gray-500 mb-0.5">Recommendation</dt><dd class="text-gray-800 m-0">{{ c.recommendation }}</dd></div>
+            <dl *ngIf="editingId() !== c.id" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+              <div><dt class="text-xs text-gray-500 mb-0.5">Situation</dt><dd class="text-gray-800 m-0 whitespace-pre-line">{{ c.situation }}</dd></div>
+              <div><dt class="text-xs text-gray-500 mb-0.5">Background</dt><dd class="text-gray-800 m-0 whitespace-pre-line">{{ c.background }}</dd></div>
+              <div><dt class="text-xs text-gray-500 mb-0.5">Assessment</dt><dd class="text-gray-800 m-0 whitespace-pre-line">{{ c.assessment }}</dd></div>
+              <div><dt class="text-xs text-gray-500 mb-0.5">Recommendation</dt><dd class="text-gray-800 m-0 whitespace-pre-line">{{ c.recommendation }}</dd></div>
             </dl>
-            <div class="mt-4 flex justify-end" *ngIf="!c.acknowledged">
-              <button (click)="acknowledge(c)" [disabled]="loadingSrv.isLoading('ack-' + c.id)"
-                class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:opacity-90 disabled:opacity-50">
-                Acknowledge
-              </button>
+            <div *ngIf="editingId() === c.id" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+              <label *ngFor="let f of sbarFields" class="flex flex-col gap-1">
+                <span class="text-xs text-gray-500">{{ f.label }}</span>
+                <textarea rows="3" maxlength="2000" [(ngModel)]="draft[f.key]" [name]="f.key + '-' + c.id"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-primary"></textarea>
+              </label>
+            </div>
+            <div class="mt-4 flex justify-end gap-2" *ngIf="!c.acknowledged">
+              <ng-container *ngIf="editingId() !== c.id; else editActions">
+                <button (click)="startEdit(c)"
+                  class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">
+                  Edit SBAR
+                </button>
+                <button (click)="acknowledge(c)" [disabled]="loadingSrv.isLoading('ack-' + c.id)"
+                  class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:opacity-90 disabled:opacity-50">
+                  Acknowledge
+                </button>
+              </ng-container>
+              <ng-template #editActions>
+                <button (click)="editingId.set(null)" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
+                <button (click)="saveEdit(c)" [disabled]="savingEdit()"
+                  class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:opacity-90 disabled:opacity-50">
+                  {{ savingEdit() ? 'Saving…' : 'Save' }}
+                </button>
+              </ng-template>
             </div>
           </div>
         </div>
@@ -68,6 +90,16 @@ import { ShiftCode, ShiftHandoverCard } from "../../../../shared/types/nursing.t
 })
 export class AdminNursingHandoverComponent implements OnInit {
     cards: ShiftHandoverCard[] = [];
+
+    readonly sbarFields: { key: SbarKey; label: string }[] = [
+        { key: 'situation', label: 'Situation' },
+        { key: 'background', label: 'Background' },
+        { key: 'assessment', label: 'Assessment' },
+        { key: 'recommendation', label: 'Recommendation' },
+    ];
+    editingId = signal<string | null>(null);
+    savingEdit = signal(false);
+    draft: Record<SbarKey, string> = { situation: '', background: '', assessment: '', recommendation: '' };
     error = signal<string | null>(null);
     outgoingShift: ShiftCode = 'Day';
 
@@ -104,6 +136,32 @@ export class AdminNursingHandoverComponent implements OnInit {
 
     retryLoad(): void { this.load(); }
 
+    startEdit(card: ShiftHandoverCard): void {
+        this.draft = { situation: card.situation, background: card.background, assessment: card.assessment, recommendation: card.recommendation };
+        this.editingId.set(card.id);
+    }
+
+    saveEdit(card: ShiftHandoverCard): void {
+        if (Object.values(this.draft).some(v => !v.trim())) {
+            this.toastSrv.error('All four SBAR sections are required');
+            return;
+        }
+        this.savingEdit.set(true);
+        this.srv.updateHandover(card.id, this.draft).subscribe({
+            next: (res) => {
+                this.savingEdit.set(false);
+                if (res.success && res.data) {
+                    this.cards = this.cards.map(c => c.id === card.id ? res.data : c);
+                    this.editingId.set(null);
+                    this.toastSrv.success('Handover updated');
+                } else {
+                    this.toastSrv.error('Unable to update handover');
+                }
+            },
+            error: () => { this.savingEdit.set(false); this.toastSrv.error('Unable to update handover'); },
+        });
+    }
+
     acknowledge(card: ShiftHandoverCard): void {
         const key = 'ack-' + card.id;
         this.loadingSrv.setLoading(key, true);
@@ -111,7 +169,7 @@ export class AdminNursingHandoverComponent implements OnInit {
             next: (res) => {
                 this.loadingSrv.setLoading(key, false);
                 if (res.success) {
-                    this.cards = this.cards.map(c => c.id === card.id ? { ...c, acknowledged: true, acknowledgedBy: 'You' } : c);
+                    this.cards = this.cards.map(c => c.id === card.id ? (res.data ?? { ...c, acknowledged: true }) : c);
                     this.toastSrv.success('Handover acknowledged');
                 } else {
                     this.toastSrv.error('Unable to acknowledge handover');

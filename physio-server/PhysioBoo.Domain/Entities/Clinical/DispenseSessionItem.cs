@@ -65,6 +65,7 @@ namespace PhysioBoo.Domain.Entities.Clinical
         /// <summary>
         /// Lines that leave the pharmacy when dispensing completes.
         /// </summary>
+        [NotMapped]
         public bool IsReadyToDispense => QuantityToDispense > 0 && Status is DispenseItemStatus.Picked
             or DispenseItemStatus.Verified
             or DispenseItemStatus.Replaced;

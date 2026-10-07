@@ -53,13 +53,19 @@
       </div>
 
       <!-- Columns -->
-      <div class="mt-4 flex items-start gap-4 overflow-x-auto pb-4">
+      <div class="mt-4 flex items-start gap-4 overflow-x-auto pb-4"
+        cdkDropList
+        cdkDropListOrientation="horizontal"
+        [cdkDropListData]="b.lists"
+        (cdkDropListDropped)="dropList($event)">
         <section
           *ngFor="let list of b.lists; trackBy: trackById"
+          cdkDrag
+          [cdkDragData]="list"
           class="flex max-h-[calc(100vh-14rem)] w-72 shrink-0 flex-col rounded-lg bg-[#F6F7F8]"
           [attr.aria-label]="list.title"
         >
-          <header class="flex items-center justify-between gap-2 px-3 pt-3 pb-2">
+          <header cdkDragHandle class="flex cursor-grab items-center justify-between gap-2 px-3 pt-3 pb-2" title="Drag to reorder the list">
             <input
               *ngIf="renamingListId === list.id; else listTitle"
               type="text"

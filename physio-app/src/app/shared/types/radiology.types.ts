@@ -105,6 +105,7 @@ export interface RadiologyReport {
   findings: string;
   impression: string;
   recommendations: string;
+  isCritical: boolean;
   attachments: string[];
   reportingRadiologistName: string | null;
   verifyingRadiologistName: string | null;

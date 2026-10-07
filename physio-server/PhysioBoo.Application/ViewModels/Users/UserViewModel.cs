@@ -5,6 +5,8 @@ using PhysioBoo.Domain.Entities.Core;
 
 namespace PhysioBoo.Application.ViewModels.Users
 {
+    public sealed record UserRoleSummaryViewModel(Guid Id, string Name, string Code);
+
     public sealed class UserViewModel
     {
         public Guid Id { get; set; }
@@ -32,6 +34,9 @@ namespace PhysioBoo.Application.ViewModels.Users
         public PatientViewModel? Patient { get; set; }
         public ProfileViewModel? Profile { get; set; }
 
+        // Filled only when the query loads UserRoles.Role (user search does).
+        public List<UserRoleSummaryViewModel> Roles { get; set; } = new();
+
         public static UserViewModel FromUser(User user)
         {
             return new UserViewModel
@@ -48,7 +53,8 @@ namespace PhysioBoo.Application.ViewModels.Users
                 FailedLoginAttempts = user.FailedLoginAttempts,
                 AccountLockedUntil = user.AccountLockedUntil,
                 TwoFactorEnabled = user.TwoFactorEnabled,
-                TwoFactorSecret = user.TwoFactorSecret,
+                // Never sent to clients: anyone who can list users would otherwise read their 2FA secrets.
+                TwoFactorSecret = null,
                 ProfilePicture = user.ProfilePicture,
                 PreferredLanguage = user.PreferredLanguage,
                 TimeZone = user.TimeZone,
@@ -58,7 +64,11 @@ namespace PhysioBoo.Application.ViewModels.Users
                 UpdatedBy = user.UpdatedBy,
                 Doctor = user.Doctor != null ? DoctorViewModel.FromDoctor(user.Doctor) : null,
                 Patient = user.Patient != null ? PatientViewModel.FromPatient(user.Patient) : null,
-                Profile = user.Profile != null ? ProfileViewModel.FromProfile(user.Profile) : null
+                Profile = user.Profile != null ? ProfileViewModel.FromProfile(user.Profile) : null,
+                Roles = user.UserRoles
+                    .Where(ur => ur.Role != null)
+                    .Select(ur => new UserRoleSummaryViewModel(ur.RoleId, ur.Role!.Name, ur.Role.Code))
+                    .ToList()
             };
         }
     }

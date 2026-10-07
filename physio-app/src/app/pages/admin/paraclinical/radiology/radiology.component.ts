@@ -1,3 +1,4 @@
+import { ActivatedRoute } from "@angular/router";
 import { Component, OnInit, signal } from "@angular/core";
 import { finalize, forkJoin } from "rxjs";
 import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
@@ -143,6 +144,7 @@ export class AdminRadiologyComponent implements OnInit {
   ];
 
   constructor(
+    private route: ActivatedRoute,
     private srv: RadiologyService,
     private toastSrv: ToastService,
     protected loadingSrv: LocalLoadingService,
@@ -150,6 +152,9 @@ export class AdminRadiologyComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    // Deep link from the treatment sheet, surgery or medical record: ?patient=<id or MRN>
+    const patient = this.route.snapshot.queryParamMap.get('patient');
+    if (patient) this.openPatientDrawer(patient);
   }
 
   load(): void {

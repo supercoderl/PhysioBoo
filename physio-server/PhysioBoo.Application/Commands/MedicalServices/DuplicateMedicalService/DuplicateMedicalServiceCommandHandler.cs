@@ -67,7 +67,14 @@ namespace PhysioBoo.Application.Commands.MedicalServices.DuplicateMedicalService
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType, $"Insert failed, please try again. Error: {result.Error}", ErrorCodes.CommitFailed));
+                return;
             }
+
+            await _medicalServiceRepository.SaveLinksAsync(
+                copy.Id,
+                source.Departments.Select(d => d.DepartmentId),
+                source.Doctors.Select(d => d.DoctorId),
+                cancellationToken);
         }
 
         private async Task<string> NextAvailableCodeAsync(string baseCode, CancellationToken ct)

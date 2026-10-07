@@ -1,3 +1,4 @@
+import { Router } from "@angular/router";
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
@@ -52,7 +53,7 @@ export class TreatmentLaboratoryTabComponent implements OnChanges {
   isLoading = signal(true);
   labs = signal<TreatmentLabOrderRow[]>([]);
 
-  constructor(private srv: TreatmentSheetService, private toastSrv: ToastService) { }
+  constructor(private srv: TreatmentSheetService, private toastSrv: ToastService, private router: Router) { }
 
   ngOnChanges(): void {
     if (!this.patientId) return;
@@ -73,6 +74,6 @@ export class TreatmentLaboratoryTabComponent implements OnChanges {
   }
 
   viewResult(): void {
-    this.toastSrv.info('View result — not wired yet');
+    this.router.navigate(['/admin/paraclinical/laboratory'], { queryParams: { patient: this.patientId } });
   }
 }

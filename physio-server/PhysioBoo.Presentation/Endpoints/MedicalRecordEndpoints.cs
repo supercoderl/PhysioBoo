@@ -1,3 +1,4 @@
+using PhysioBoo.Application.Queries.Patients.Resolve;
 using PhysioBoo.Application.Commands.MedicalRecords.CreateMedicalRecord;
 using PhysioBoo.Application.Queries.MedicalRecords.GetBillingSummary;
 using PhysioBoo.Application.Queries.MedicalRecords.GetClinicalNotes;
@@ -51,6 +52,15 @@ namespace PhysioBoo.Presentation.Endpoints
             #endregion
 
             #region Get Record Context
+            group.MapGet("/resolve/{patientKey}", async (string patientKey, IMediatorHandler bus) =>
+            {
+                Guid? result = await bus.QueryAsync(new ResolvePatientQuery(patientKey));
+                return Results.Ok(new ResponseMessage<Guid?> { Success = true, Data = result });
+            }).WithName("ResolveMedicalRecordPatient")
+            .WithSummary("Turn a patient id or medical record number into the patient id used by the other medical record routes.")
+            .Produces<ResponseMessage<Guid?>>(StatusCodes.Status200OK)
+            .RequireAuthorization(Permissions.Clinical.MedicalRecordRead);
+
             group.MapGet("{patientId:guid}/context", async (
                 Guid patientId,
                 IMediatorHandler bus,

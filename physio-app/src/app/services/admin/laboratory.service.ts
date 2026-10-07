@@ -7,6 +7,7 @@ import {
   LabCriticalAlert,
   LabDashboardTrend,
   LabOrderRow,
+  LabPriority,
   LabPatientResultSummary,
   LabResultEntry,
   LabSample,
@@ -21,6 +22,11 @@ export class LaboratoryService {
   // #endregion
 
   // Methods
+  /** Order tests for a patient; the server attaches the order to the patient's latest visit. */
+  placeOrder(params: { patientId: string; testIds: string[]; priority: LabPriority; clinicalNotes?: string | null }) {
+    return this.http.post<PagedResponse<string>>(BASE_API.LABORATORY.ORDERS, params);
+  }
+
   getStats() {
     return this.http.get<PagedResponse<LabStats>>(BASE_API.LABORATORY.STATS, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.STATS }) });
   }

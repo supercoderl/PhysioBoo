@@ -26,12 +26,15 @@ namespace PhysioBoo.Application.Commands.RefreshTokens.CreateRefreshToken
         {
             if (!await TestValidityAsync(request)) return;
 
-            var result = await _refreshTokenRepository.InsertAsync<RefreshToken, Guid>(new RefreshToken(
+            RefreshToken refreshToken = new RefreshToken(
                 request.NewRefreshToken.Id,
                 request.NewRefreshToken.UserId,
                 request.NewRefreshToken.Token,
                 request.NewRefreshToken.ExpiresAt
-            ));
+            );
+            refreshToken.SetClient(request.NewRefreshToken.UserAgent, request.NewRefreshToken.IpAddress);
+
+            var result = await _refreshTokenRepository.InsertAsync<RefreshToken, Guid>(refreshToken);
 
             if (!result.Success)
             {

@@ -39,36 +39,50 @@ namespace PhysioBoo.Infrastructure.Database.Seeding
 
         public async Task SeedAsync(CancellationToken ct = default)
         {
-            await using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync(ct);
+            // The context uses a retrying execution strategy, which rejects user-started transactions
+            // unless the whole unit runs inside the strategy (so it can be retried as one).
+            Microsoft.EntityFrameworkCore.Storage.IExecutionStrategy strategy = _context.Database.CreateExecutionStrategy();
 
-            try
+            await strategy.ExecuteAsync(async () =>
             {
-                await SeedRoleAsync(ct);
-                await SeedSystemAdminAsync(ct);
-                await SeedPermissionsAsync(ct);
-                await SeedSuperAdminPermissionsAsync(ct);
-                await SeedAdminMenusAsync(ct);
-                await SeedSubscriptionPlansAsync(ct);
+                _context.ChangeTracker.Clear();
+                await using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync(ct);
 
-                if (_hostEnvironment.IsDevelopment())
+                try
                 {
-                    await SetDevelopmentDataAsync();
+                    await SeedRoleAsync(ct);
+                    await SeedSystemAdminAsync(ct);
+                    await SeedPermissionsAsync(ct);
+                    await SeedSuperAdminPermissionsAsync(ct);
+                    await SeedAdminMenusAsync(ct);
+                    await SeedSubscriptionPlansAsync(ct);
+                    await SeedSequenceTrackersAsync(ct);
+
+                    if (_hostEnvironment.IsDevelopment())
+                    {
+                        await SetDevelopmentDataAsync();
+                    }
+
                     await transaction.CommitAsync(ct);
                     _logger.LogInformation("Database seeding completed.");
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Database seeding failed. Rolling back.");
-                await transaction.RollbackAsync(ct);
-                throw;
-            }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Database seeding failed. Rolling back.");
+                    await transaction.RollbackAsync(ct);
+                    throw;
+                }
+            });
         }
 
         private async Task SeedRoleAsync(CancellationToken ct = default)
         {
             HashSet<string> existingCodes = await _context.Roles.Select(r => r.Code).ToHashSetAsync(ct);
             List<Domain.Entities.Core.Role> roles = new List<Domain.Entities.Core.Role>();
+
+            // On a fresh database the admin user is created after the roles (it needs SUPER_ADMIN),
+            // so CreatedBy can only point at it once it exists.
+            bool adminExists = await _context.Users.IgnoreQueryFilters().AnyAsync(u => u.Id == UserConstants.AdminId, ct);
 
             foreach (Role role in Enum.GetValues<Role>())
             {
@@ -91,7 +105,7 @@ namespace PhysioBoo.Infrastructure.Database.Seeding
                     metadata.IsPublicForRegistration
                 );
 
-                newRole.SetCreatedBy(UserConstants.AdminId);
+                newRole.SetCreatedBy(adminExists ? UserConstants.AdminId : null);
                 roles.Add(newRole);
             }
 
@@ -119,6 +133,14 @@ namespace PhysioBoo.Infrastructure.Database.Seeding
             Domain.Entities.Core.Role? role = await _context.Roles
                 .FirstOrDefaultAsync(r => r.Code == Role.SUPER_ADMIN.ToString(), ct)
                 ?? throw new InvalidOperationException("SUPER_ADMIN role not found after seeding.");
+
+            // The system admin is not inside any hospital tenant: its TenantId is Guid.Empty, which the
+            // Users -> HospitalGroups foreign key requires to exist as a "platform" row.
+            // Raw SQL because EF treats an empty Guid key as "generate one".
+            await _context.Database.ExecuteSqlRawAsync(
+                "INSERT INTO \"HospitalGroups\" (\"Id\", \"Name\", \"IsActive\", \"CreatedAt\") " +
+                "VALUES ('00000000-0000-0000-0000-000000000000', 'PhysioBoo Platform', TRUE, now()) ON CONFLICT (\"Id\") DO NOTHING;",
+                ct);
 
             Domain.Entities.Core.User admin = new Domain.Entities.Core.User(
                 UserConstants.AdminId,
@@ -186,6 +208,63 @@ namespace PhysioBoo.Infrastructure.Database.Seeding
 
             await _context.SaveChangesAsync(ct);
             _logger.LogInformation("Seeded default subscription plans.");
+        }
+
+        /// <summary>
+        /// Code-numbering rules used by Sys_SequenceTrackerRepository.GenerateNextCodeAsync.
+        /// Create handlers throw when their rule is missing, so every entity type that generates a code is seeded here.
+        /// Existing rows are left untouched.
+        /// </summary>
+        private async Task SeedSequenceTrackersAsync(CancellationToken ct = default)
+        {
+            (string EntityType, string Prefix)[] rules =
+            {
+                ("Patient", "PAT-"),
+                ("Appointment", "APT-"),
+                ("AppointmentType", "AT-"),
+                ("Doctor", "DOC-"),
+                ("Hospital", "HOS-"),
+                ("InsuranceCompany", "INS-"),
+                ("LabTest", "LT-"),
+                ("LabTestCategory", "LTC-"),
+                ("Manufacturer", "MFR-"),
+                ("MedicineCategory", "MC-"),
+                ("Supplier", "SUP-"),
+                ("Bill", "INV-"),
+                ("Payment", "PAY-"),
+                ("Admission", "ADM-"),
+                ("SurgeryCase", "SUR-"),
+                ("Campaign", "CMP-"),
+                ("Complaint", "CPL-"),
+                ("MemberPoint", "MEM-"),
+                ("PointTransaction", "TXN-"),
+                ("Reward", "RWD-"),
+                ("LabOrder", "LAB-"),
+                ("ImagingOrder", "RAD-"),
+            };
+
+            HashSet<string> existing = await _context.Sys_SequenceTrackers
+                .IgnoreQueryFilters()
+                .Select(s => s.EntityType)
+                .ToHashSetAsync(ct);
+
+            List<Domain.Entities.System.Sys_SequenceTracker> missing = rules
+                .Where(r => !existing.Contains(r.EntityType))
+                .Select(r =>
+                {
+                    Domain.Entities.System.Sys_SequenceTracker tracker = new Domain.Entities.System.Sys_SequenceTracker(
+                        Guid.NewGuid(), r.EntityType, r.Prefix, null, null);
+                    tracker.SetCreatedBy(UserConstants.AdminId);
+                    return tracker;
+                })
+                .ToList();
+
+            if (missing.Count > 0)
+            {
+                await _context.Sys_SequenceTrackers.AddRangeAsync(missing, ct);
+                await _context.SaveChangesAsync(ct);
+                _logger.LogInformation("Seeded {Count} sequence rule(s).", missing.Count);
+            }
         }
 
         private async Task SeedSuperAdminPermissionsAsync(CancellationToken ct = default)

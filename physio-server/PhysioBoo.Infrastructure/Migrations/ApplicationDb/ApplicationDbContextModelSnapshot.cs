@@ -2145,6 +2145,163 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.ToTable("Articles", (string)null);
                 });
 
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Cms.HomeBanner", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ButtonLink")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ButtonText")
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Subtitle")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "Active", "Order");
+
+                    b.ToTable("HomeBanners", (string)null);
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Cms.HomeFeature", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "Active", "Order");
+
+                    b.ToTable("HomeFeatures", (string)null);
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Cms.HomeTestimonial", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PatientName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "Active", "Date");
+
+                    b.ToTable("HomeTestimonials", (string)null);
+                });
+
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Core.Address", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2508,8 +2665,14 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("text");
+
                     b.Property<string>("Token")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserAgent")
                         .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
@@ -4743,9 +4906,16 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<Guid>("AppointmentId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime?>("ArrivedAt")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("BodyPart")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<string>("CancelReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<bool>("Claustrophobia")
                         .HasColumnType("boolean");
@@ -4780,6 +4950,12 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<Guid>("HospitalId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ImagingCompletedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("ImagingStartedAt")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ImplantDetails")
                         .HasColumnType("text");
@@ -4818,8 +4994,19 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("ProvisionalDiagnosis")
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("QueueCalledAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("QueueStatus")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
                     b.Property<Guid?>("RadiologistId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("RoomName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateOnly?>("ScheduledDate")
                         .HasColumnType("date");
@@ -4836,6 +5023,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<Guid?>("TechnicianId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("TechnicianName")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
@@ -4889,6 +5080,10 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("AmendmentReason")
                         .HasColumnType("text");
 
+                    b.Property<string>("ClinicalIndication")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
                     b.Property<string>("ComparisonStudies")
                         .HasColumnType("text");
 
@@ -4938,6 +5133,9 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<bool>("IsNormal")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime?>("LastSavedAt")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("Limitations")
                         .HasColumnType("text");
 
@@ -4949,6 +5147,13 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<string>("Recommendations")
                         .HasColumnType("text");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("ReleasedAt")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ReportNumber")
                         .IsRequired()
@@ -4987,6 +5192,16 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<DateTime?>("VerifiedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("VerifierId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("WorkflowStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(24)
+                        .HasColumnType("character varying(24)")
+                        .HasDefaultValue("Reporting");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
@@ -5004,7 +5219,88 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("UpdatedBy");
 
+                    b.HasIndex("VerifierId");
+
                     b.ToTable("ImagingReports", (string)null);
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.LabAlert", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Acknowledged")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("AcknowledgedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("AcknowledgedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid?>("LabOrderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("LabOrderItemId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("OrderNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("PatientName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("RaisedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<string>("SuggestedAction")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LabOrderItemId");
+
+                    b.HasIndex("TenantId", "Acknowledged", "RaisedAt");
+
+                    b.ToTable("LabAlerts", (string)null);
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.LabOrder", b =>
@@ -5132,6 +5428,18 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
+                    b.Property<string>("Barcode")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("CollectorName")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("ContainerType")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
@@ -5156,8 +5464,24 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("ProcessingStartedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("ReceivedAt")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("ReferenceRange")
                         .HasColumnType("text");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("ReleasedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("ResultEnteredAt")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ResultUnit")
                         .HasMaxLength(50)
@@ -5174,6 +5498,13 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<Guid?>("SampleCollectorId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("SampleStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasDefaultValue("NotCollected");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -5198,6 +5529,13 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("VerificationStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(24)
+                        .HasColumnType("character varying(24)")
+                        .HasDefaultValue("PendingVerification");
 
                     b.Property<DateTime?>("VerifiedAt")
                         .HasColumnType("timestamp without time zone");
@@ -5495,6 +5833,80 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("Name");
 
                     b.ToTable("LabTestCategories", (string)null);
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.RadiologyAlert", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Acknowledged")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("AcknowledgedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("AcknowledgedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid?>("ImagingOrderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Notified")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("OrderNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("PatientName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("RaisedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImagingOrderId");
+
+                    b.HasIndex("TenantId", "Acknowledged", "RaisedAt");
+
+                    b.ToTable("RadiologyAlerts", (string)null);
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.MedicalStaff.Doctor", b =>
@@ -11793,6 +12205,11 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", "Verifier")
+                        .WithMany()
+                        .HasForeignKey("VerifierId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Creator");
 
                     b.Navigation("HospitalGroup");
@@ -11804,6 +12221,8 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("Radiologist");
 
                     b.Navigation("Updater");
+
+                    b.Navigation("Verifier");
                 });
 
             modelBuilder.Entity("PhysioBoo.Domain.Entities.LaboratoryImaging.LabOrder", b =>

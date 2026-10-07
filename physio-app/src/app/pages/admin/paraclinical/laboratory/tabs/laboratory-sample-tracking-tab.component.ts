@@ -6,6 +6,8 @@ import { LaboratoryService } from "../../../../../services/admin/laboratory.serv
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
+import { code128Svg } from "../../../../../shared/utils/barcode.utils";
+import { escapeHtml, printHtmlDocument } from "../../../../../shared/utils/print.utils";
 import { LabSample, LabSampleTimelineEvent, SampleCollectionStatus } from "../../../../../shared/types/laboratory.types";
 
 const STAGE_LABELS: Record<LabSampleTimelineEvent['stage'], string> = {
@@ -103,12 +105,21 @@ export class LaboratorySampleTrackingTabComponent implements OnInit {
     }
   }
 
+  /** Prints a specimen label (Code 128) sized for a 50 x 25 mm label printer. */
   printBarcode(s: LabSample): void {
-    this.toastSrv.info(`Printing barcode ${s.barcode} — not wired yet`);
+    const label = `
+      <div class="label">
+        <div class="name">${escapeHtml(s.patientName)}</div>
+        <div>${escapeHtml(s.testName)} · ${escapeHtml(s.sampleType)}</div>
+        ${code128Svg(s.barcode, 40, 1.2)}
+        <div class="code">${escapeHtml(s.barcode)}</div>
+      </div>`;
+    printHtmlDocument(`Label ${s.barcode}`, label,
+      `@page { size: 50mm 25mm; margin: 1mm; } body { margin: 0; font-size: 8px; } .label { text-align: center; } .name { font-weight: 700; } .code { font-family: monospace; letter-spacing: 1px; } p.muted { display: none; }`);
   }
 
   markCollected(s: LabSample): void {
-    this.srv.markSampleCollected(s.id, 'You', s.containerType).subscribe(res => {
+    this.srv.markSampleCollected(s.id, '', s.containerType).subscribe(res => {
       if (res.success) {
         this.samples.update(list => list.map(x => x.id === s.id ? { ...x, collectionStatus: 'Collected' as const } : x));
         this.toastSrv.success('Sample marked collected');

@@ -12,7 +12,15 @@ export interface QueuePatient {
     status: string;
     priority: string;
     allergies: string[];
+    vitals?: QueuePatientVitals | null;
     consultationStartedAt?: string;
+}
+
+export interface QueuePatientVitals {
+    bloodPressure: string | null;
+    heartRate: number | null;
+    temperature: number | null;
+    spo2: number | null;
 }
 
 export interface DoctorDeskContext {

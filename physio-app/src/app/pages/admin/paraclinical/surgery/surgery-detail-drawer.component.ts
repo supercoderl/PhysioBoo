@@ -7,6 +7,7 @@ import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/statu
 import { SurgeryService } from "../../../../services/admin/surgery.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
+import { escapeHtml, printHtmlDocument } from "../../../../shared/utils/print.utils";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { EquipmentStatus, SurgeryCase, SurgeryTimelineStage } from "../../../../shared/types/surgery.types";
 
@@ -191,12 +192,38 @@ export class SurgeryDetailDrawerComponent implements OnChanges {
     this.router.navigate(['/admin/clinic/medical-record'], { queryParams: { patientId: this.detail()?.mrn } });
   }
 
+  /** Prints the surgical consent form for signature (browser print; "Save as PDF" also works). */
   printConsent(): void {
-    window.print();
+    const c = this.detail();
+    if (!c) return;
+    const line = '<div style="border-bottom:1px solid #111;height:28px"></div>';
+    const body = `
+      <h1>Informed consent for surgery</h1>
+      <p class="muted">Case ${escapeHtml(c.surgeryNumber)} · ${escapeHtml(c.department)}</p>
+      <div class="grid">
+        <div><strong>Patient:</strong> ${escapeHtml(c.patientName)}</div><div><strong>MRN:</strong> ${escapeHtml(c.mrn)}</div>
+        <div><strong>Procedure:</strong> ${escapeHtml(c.procedure)}</div><div><strong>Type:</strong> ${escapeHtml(c.surgeryType)}</div>
+        <div><strong>Scheduled:</strong> ${escapeHtml(new Date(c.scheduledStart).toLocaleString())}</div><div><strong>Theatre:</strong> ${escapeHtml(c.operatingRoomNumber)}</div>
+        <div><strong>Surgeon:</strong> ${escapeHtml(c.primarySurgeon)}</div><div><strong>Anaesthetist:</strong> ${escapeHtml(c.anesthesiologist ?? '—')}</div>
+      </div>
+      <h2>Diagnosis</h2><p>${escapeHtml(c.diagnosis)}</p>
+      <h2>Risk assessment</h2><p>${escapeHtml(c.riskAssessment || '—')}</p>
+      <h2>Allergies</h2><p>${escapeHtml(c.allergies.join(', ') || 'None known')}</p>
+      <h2>Declaration</h2>
+      <p>I confirm that the procedure above, its expected benefits, material risks and alternatives (including no treatment)
+      have been explained to me in a language I understand, that I have had the opportunity to ask questions, and that I
+      consent to the procedure and to any anaesthesia and additional procedures judged necessary during it.</p>
+      <div class="grid" style="margin-top:28px;gap:28px 24px">
+        <div>${line}<div class="muted">Patient (or legal representative) — signature and date</div></div>
+        <div>${line}<div class="muted">Relationship, if not the patient</div></div>
+        <div>${line}<div class="muted">Surgeon — ${escapeHtml(c.primarySurgeon)} — signature and date</div></div>
+        <div>${line}<div class="muted">Witness — name, signature and date</div></div>
+      </div>`;
+    printHtmlDocument(`Consent ${c.surgeryNumber}`, body);
   }
 
   viewImages(): void {
-    this.toastSrv.info('View Images — not wired yet');
+    this.router.navigate(['/admin/paraclinical/radiology'], { queryParams: { patient: this.detail()?.mrn } });
   }
 
   openTreatmentSheet(): void {

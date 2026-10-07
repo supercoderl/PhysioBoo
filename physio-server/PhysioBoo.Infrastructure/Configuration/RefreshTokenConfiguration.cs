@@ -24,6 +24,10 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(rt => rt.UserId).IsRequired();
 
             builder.Property(rt => rt.Token).IsRequired();
+
+            builder.Property(rt => rt.UserAgent).HasMaxLength(512);
+
+            builder.Property(rt => rt.IpAddress).HasMaxLength(64);
         }
     }
 }

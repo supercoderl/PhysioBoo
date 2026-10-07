@@ -4,7 +4,7 @@ import { BASE_API } from "../../shared/api/base";
 import { createHttpContext } from "../../shared/contexts/option.context";
 import { PagedResponse, PaginationData } from "../../shared/types/common";
 import { LoadingKeys } from "../../shared/types/loading";
-import { Note } from "../../shared/types/note.types";
+import { NursingNote } from "../../shared/types/nursing.types";
 import {
   CreateNursingAssignmentRequest,
   CreateNursingTaskRequest,
@@ -99,16 +99,20 @@ export class NursingService {
   }
 
   getNotes(patientId: string) {
-    return this.http.get<PagedResponse<PaginationData<Note>>>(BASE_API.NURSING.NOTES(patientId), { context: createHttpContext({ loadingKey: LoadingKeys.NURSING.NOTES }) });
+    return this.http.get<PagedResponse<PaginationData<NursingNote>>>(BASE_API.NURSING.NOTES(patientId), { context: createHttpContext({ loadingKey: LoadingKeys.NURSING.NOTES }) });
   }
 
   addNote(patientId: string, content: string) {
-    return this.http.post<PagedResponse<Note>>(BASE_API.NURSING.NOTES(patientId), { content }, { context: createHttpContext({ loadingKey: LoadingKeys.NURSING.NOTE_ADD }) });
+    return this.http.post<PagedResponse<NursingNote>>(BASE_API.NURSING.NOTES(patientId), { content }, { context: createHttpContext({ loadingKey: LoadingKeys.NURSING.NOTE_ADD }) });
   }
 
   getHandoverCards(outgoingShift: ShiftCode, wardId?: string | null) {
     const params = `?outgoingShift=${outgoingShift}${wardId ? `&wardId=${wardId}` : ''}`;
     return this.http.get<PagedResponse<ShiftHandoverCard[]>>(`${BASE_API.NURSING.HANDOVER}${params}`, { context: createHttpContext({ loadingKey: LoadingKeys.NURSING.HANDOVER }) });
+  }
+
+  updateHandover(cardId: string, sbar: Pick<ShiftHandoverCard, 'situation' | 'background' | 'assessment' | 'recommendation'>) {
+    return this.http.patch<PagedResponse<ShiftHandoverCard>>(BASE_API.NURSING.HANDOVER_UPDATE(cardId), sbar, { context: createHttpContext({ loadingKey: LoadingKeys.NURSING.HANDOVER_ACKNOWLEDGE }) });
   }
 
   acknowledgeHandover(cardId: string, acknowledgedBy: string) {

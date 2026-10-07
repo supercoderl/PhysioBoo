@@ -27,6 +27,11 @@ export class MedicalRecordService {
   // #endregion
 
   // #region Methods
+  /** Patient id for a patient id or medical record number (MRN). */
+  resolvePatient(patientKey: string) {
+    return this.http.get<PagedResponse<string | null>>(BASE_API.MEDICAL_RECORD.RESOLVE(encodeURIComponent(patientKey)));
+  }
+
   getContext(patientId: string) {
     return this.http.get<PagedResponse<PatientContext>>(BASE_API.MEDICAL_RECORD.CONTEXT(patientId), { context: createHttpContext({ loadingKey: LoadingKeys.MEDICAL_RECORD.CONTEXT }) });
   }

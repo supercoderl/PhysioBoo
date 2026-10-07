@@ -3,7 +3,7 @@ using PhysioBoo.Domain.Enums;
 
 namespace PhysioBoo.Application.ViewModels.Nursing
 {
-    // Matches the shared frontend Note type.
+    // Matches the frontend NursingNote type (shared/types/nursing.types.ts).
     public sealed class NursingNoteViewModel
     {
         public Guid Id { get; set; }

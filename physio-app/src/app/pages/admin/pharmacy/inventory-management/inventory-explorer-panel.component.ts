@@ -19,7 +19,12 @@ type ResultMode = 'All' | 'Favorites' | 'Recent';
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 space-y-2">
         <div class="flex items-center justify-between">
-          <h2 class="text-sm font-semibold text-regular">Inventory Explorer</h2>
+          <h2 class="text-sm font-semibold text-regular flex items-center gap-2">Inventory Explorer
+            <button *ngIf="kpiFilter" type="button" (click)="clearKpiFilter.emit()"
+              class="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[10px] font-semibold" title="Clear filter">
+              {{ kpiFilterLabel() }} ✕
+            </button>
+          </h2>
           <div class="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
             <button type="button" (click)="view.set('List')" class="px-2 py-1 rounded-md text-[11px] font-semibold" [ngClass]="view() === 'List' ? 'bg-surface shadow-sm text-primary' : 'text-gray-500'">List</button>
             <button type="button" (click)="view.set('HeatMap')" class="px-2 py-1 rounded-md text-[11px] font-semibold" [ngClass]="view() === 'HeatMap' ? 'bg-surface shadow-sm text-primary' : 'text-gray-500'">Heat Map</button>
@@ -99,6 +104,16 @@ export class InventoryExplorerPanelComponent implements OnInit {
     @Input() selectedId: string | null = null;
     @Output() select = new EventEmitter<InventoryMedicineCard>();
     @Output() zoneFilter = new EventEmitter<WarehouseZone>();
+    /** KPI tile the user clicked (lowStock, outOfStock, nearExpiry, expired, available); filters the list. */
+    @Input() kpiFilter: string | null = null;
+    @Output() clearKpiFilter = new EventEmitter<void>();
+
+    kpiFilterLabel(): string {
+        const labels: Record<string, string> = {
+            lowStock: 'Low stock', outOfStock: 'Out of stock', nearExpiry: 'Near expiry', expired: 'Expired', available: 'Available',
+        };
+        return this.kpiFilter ? labels[this.kpiFilter] ?? this.kpiFilter : '';
+    }
 
     @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
     @ViewChild('barcodeInput') barcodeInputRef!: ElementRef<HTMLInputElement>;
@@ -165,6 +180,14 @@ export class InventoryExplorerPanelComponent implements OnInit {
         if (this.resultMode() === 'Favorites') list = list.filter(m => m.isFavorite);
         if (this.resultMode() === 'Recent') list = list.filter(m => m.isRecentlyAccessed);
         if (this.activeCategory()) list = list.filter(m => m.category === this.activeCategory());
+        const today = new Date().toISOString().slice(0, 10);
+        switch (this.kpiFilter) {
+            case 'lowStock': list = list.filter(m => m.status === 'LowStock'); break;
+            case 'outOfStock': list = list.filter(m => m.status === 'OutOfStock'); break;
+            case 'available': list = list.filter(m => m.currentStock > 0); break;
+            case 'nearExpiry': list = list.filter(m => m.isNearExpiry); break;
+            case 'expired': list = list.filter(m => !!m.soonestExpiryDate && m.soonestExpiryDate.slice(0, 10) < today); break;
+        }
         if (this.query) {
             const q = this.query.toLowerCase();
             list = list.filter(m => m.name.toLowerCase().includes(q) || m.genericName.toLowerCase().includes(q));

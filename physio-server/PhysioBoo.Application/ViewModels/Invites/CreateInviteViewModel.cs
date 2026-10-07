@@ -2,7 +2,8 @@
 {
     public sealed record CreateInviteViewModel(
         Guid? HospitalId,
-        Domain.Enums.Role IntendedRole,
+        // Role code, e.g. "NURSE" (no JsonStringEnumConverter is configured, so enums travel as strings).
+        string IntendedRole,
         string? Email
     );
 }

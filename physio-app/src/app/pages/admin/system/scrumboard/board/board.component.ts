@@ -269,6 +269,20 @@ export class BoardScrumboardComponent implements OnInit {
   // #endregion
 
   // #region Drag and drop
+  dropList(event: CdkDragDrop<ScrumList[]>): void {
+    const board = this.board();
+    if (!board || event.previousIndex === event.currentIndex) return;
+
+    const list = board.lists[event.previousIndex];
+    moveItemInArray(board.lists, event.previousIndex, event.currentIndex);
+    this.board.set({ ...board });
+
+    this.scrumSrv.moveList(list.id, event.currentIndex).subscribe({
+      next: res => { if (!res.success) this.loadBoard(); },
+      error: () => this.loadBoard()
+    });
+  }
+
   drop(event: CdkDragDrop<ScrumCard[]>, targetList: ScrumList): void {
     const card = event.item.data as ScrumCard;
     if (event.previousContainer === event.container && event.previousIndex === event.currentIndex) return;

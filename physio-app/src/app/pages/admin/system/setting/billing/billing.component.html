@@ -20,20 +20,26 @@
             <h2 class="text-base font-semibold text-gray-900 mb-1">Current plan</h2>
             <p class="text-sm text-gray-500">You are on the <span class="font-medium text-gray-700">{{ currentPlan().name }}</span> plan.</p>
           </div>
-          <span class="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            Active
+          <span class="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded border"
+            [ngClass]="{
+              'text-emerald-700 bg-emerald-50 border-emerald-200': status() === 'Active' || status() === 'Trial',
+              'text-amber-700 bg-amber-50 border-amber-200': status() === 'PastDue',
+              'text-gray-600 bg-gray-50 border-gray-200': isCancelled()
+            }">
+            <span class="w-1.5 h-1.5 rounded-full"
+              [ngClass]="status() === 'Active' || status() === 'Trial' ? 'bg-emerald-500' : status() === 'PastDue' ? 'bg-amber-500' : 'bg-gray-400'"></span>
+            {{ status() === 'None' ? 'No subscription' : status() === 'PastDue' ? 'Past due' : status() }}
           </span>
         </div>
         <div class="p-5 flex items-end justify-between flex-wrap gap-4">
           <div>
             <div class="flex items-baseline gap-1">
-              <span class="text-3xl font-bold text-gray-900">${{ currentPlan().price }}</span>
+              <span class="text-3xl font-bold text-gray-900">{{ currentPlan().price | number:'1.0-2' }} {{ currentPlan().currency }}</span>
               <span class="text-sm text-gray-500">/ {{ currentPlan().interval }}</span>
             </div>
-            <p class="text-xs text-gray-500 mt-1">Renews on {{ renewsAt() }}</p>
+            <p class="text-xs text-gray-500 mt-1">{{ isCancelled() ? 'Access ends on' : 'Renews on' }} {{ renewsAt() }}</p>
           </div>
-          <button type="button" (click)="cancelSubscription()"
+          <button *ngIf="!isCancelled()" type="button" (click)="cancelSubscription()"
             class="text-sm text-gray-500 hover:text-red-600 hover:underline transition-colors">
             Cancel subscription
           </button>
@@ -75,7 +81,7 @@
             <div class="flex items-baseline gap-1 mt-4">
               <span class="text-2xl font-bold"
                 [class.text-white]="currentPlanId() === plan.id"
-                [class.text-gray-900]="currentPlanId() !== plan.id">${{ plan.price }}</span>
+                [class.text-gray-900]="currentPlanId() !== plan.id">{{ plan.price | number:'1.0-2' }} {{ plan.currency }}</span>
               <span class="text-xs"
                 [class.text-white]="currentPlanId() === plan.id"
                 [class.text-gray-500]="currentPlanId() !== plan.id">/ {{ plan.interval }}</span>
@@ -110,46 +116,19 @@
 
       <section class="bg-surface rounded-lg border border-gray-200 mb-6">
         <div class="p-5 border-b border-gray-100">
-          <h2 class="text-base font-semibold text-gray-900 mb-1">Payment method</h2>
-          <p class="text-sm text-gray-500">The card we'll charge on each renewal.</p>
+          <h2 class="text-base font-semibold text-gray-900 mb-1">Payment</h2>
+          <p class="text-sm text-gray-500">Invoices are paid by bank transfer. Quote the invoice number as the reference.</p>
         </div>
-        <div class="p-5">
-          <ng-container *ngIf="paymentMethod() as pm; else noPayment">
-            <div class="flex items-center justify-between gap-4 flex-wrap">
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-8 rounded bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-[10px] font-bold uppercase">
-                  {{ pm.brand }}
-                </div>
-                <div>
-                  <div class="text-sm font-medium text-gray-900">•••• •••• •••• {{ pm.last4 }}</div>
-                  <div class="text-xs text-gray-500">Expires {{ pm.expMonth }}/{{ pm.expYear }}</div>
-                </div>
-              </div>
-              <div class="flex items-center gap-2">
-                <button type="button" (click)="updatePaymentMethod()"
-                  class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
-                  Update
-                </button>
-                <button type="button" (click)="removePaymentMethod()"
-                  class="px-3 py-1.5 text-sm font-medium text-red-600 bg-white border border-gray-200 rounded-md hover:bg-red-50 hover:border-red-200 transition-colors">
-                  Remove
-                </button>
-              </div>
-            </div>
-          </ng-container>
-          <ng-template #noPayment>
-            <div class="flex flex-col items-center text-center py-6">
-              <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-                <boo-icon name="credit-card" iconClass="w-6 h-6 text-gray-400" />
-              </div>
-              <p class="text-sm font-medium text-gray-700 mb-1">No payment method on file</p>
-              <p class="text-xs text-gray-500 mb-3">Add a card to keep your subscription active.</p>
-              <button type="button" (click)="updatePaymentMethod()"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors">
-                <boo-icon name="plus" iconClass="w-4 h-4" />
-                Add payment method
-              </button>
-            </div>
+        <div class="p-5 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+            <boo-icon name="landmark" iconClass="w-5 h-5 text-gray-500" />
+          </div>
+          <div *ngIf="outstanding() > 0; else allPaid">
+            <div class="text-sm font-medium text-gray-900">{{ outstanding() | number:'1.2-2' }} {{ currentPlan().currency }} outstanding</div>
+            <div class="text-xs text-gray-500">Payments are recorded by our billing team once the transfer arrives.</div>
+          </div>
+          <ng-template #allPaid>
+            <div class="text-sm text-gray-700">You have no outstanding invoices.</div>
           </ng-template>
         </div>
       </section>
@@ -169,14 +148,14 @@
               <div class="text-sm font-medium text-gray-900 truncate">{{ inv.number }}</div>
               <div class="text-xs text-gray-500">{{ inv.date }}</div>
             </div>
-            <div class="text-sm font-medium text-gray-900">${{ inv.amount }}</div>
+            <div class="text-sm font-medium text-gray-900">{{ inv.amount | number:'1.2-2' }}</div>
             <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded"
               [ngClass]="{
                 'bg-emerald-50 text-emerald-700 border border-emerald-200': inv.status === 'paid',
                 'bg-amber-50 text-amber-700 border border-amber-200': inv.status === 'pending',
                 'bg-red-50 text-red-700 border border-red-200': inv.status === 'failed'
               }">
-              {{ inv.status }}
+              {{ inv.label }}
             </span>
             <button type="button" (click)="downloadInvoice(inv)"
               class="p-1.5 rounded-md text-gray-400 hover:text-primary hover:bg-primary/5 transition-colors"

@@ -42,7 +42,13 @@ import { ScheduleSlot } from "../../../../../shared/types/radiology.types";
               <span class="text-xs text-gray-500">{{ slot.scheduledTime | date:'shortTime' }}</span>
             </div>
             <div class="text-xs text-gray-500">{{ slot.examinationName }} · {{ slot.modalityName }}</div>
-            <div class="text-xs text-gray-400">{{ slot.technicianName ?? 'Unassigned technician' }} · {{ slot.estimatedDurationMinutes }} min</div>
+            <div *ngIf="reassigningId !== slot.id" class="text-xs text-gray-400">{{ slot.technicianName ?? 'Unassigned technician' }} · {{ slot.estimatedDurationMinutes }} min</div>
+            <div *ngIf="reassigningId === slot.id" class="flex items-center gap-1 mt-1">
+              <input [(ngModel)]="technicianDraft" maxlength="150" placeholder="Technician name" (keydown.enter)="saveReassign(slot)"
+                class="flex-1 min-w-0 rounded border border-gray-300 px-2 py-1 text-xs" />
+              <button (click)="saveReassign(slot)" [disabled]="!technicianDraft.trim()" class="text-primary text-[11px] font-semibold hover:underline disabled:opacity-40">Save</button>
+              <button (click)="reassigningId = null" class="text-gray-500 text-[11px] hover:underline">Cancel</button>
+            </div>
             <div class="text-xs text-amber-600 mt-1" *ngIf="slot.preparationInstructions">{{ slot.preparationInstructions }}</div>
             <div class="flex gap-2 mt-2">
               <button (click)="reassign(slot)" class="text-primary text-[11px] font-semibold hover:underline">Reassign</button>
@@ -87,8 +93,26 @@ export class RadiologySchedulingTabComponent implements OnInit {
     });
   }
 
+  reassigningId: string | null = null;
+  technicianDraft = '';
+
   reassign(slot: ScheduleSlot): void {
-    this.toastSrv.info(`Reassign technician for ${slot.orderNumber} — not wired yet`);
+    this.reassigningId = slot.id;
+    this.technicianDraft = slot.technicianName ?? '';
+  }
+
+  saveReassign(slot: ScheduleSlot): void {
+    const name = this.technicianDraft.trim();
+    if (!name) return;
+    this.srv.reassignTechnician(slot.id, name).subscribe(res => {
+      if (res.success) {
+        this.slots.update(list => list.map(s => s.id === slot.id ? { ...s, technicianName: name } : s));
+        this.reassigningId = null;
+        this.toastSrv.success(`${slot.orderNumber} assigned to ${name}`);
+      } else {
+        this.toastSrv.error('Unable to reassign the technician');
+      }
+    });
   }
 
   cancelSlot(slot: ScheduleSlot): void {

@@ -5,6 +5,8 @@
         Guid Id,
         Guid UserId,
         string Token,
-        DateTime ExpiresAt
+        DateTime ExpiresAt,
+        string? UserAgent = null,
+        string? IpAddress = null
     );
 }

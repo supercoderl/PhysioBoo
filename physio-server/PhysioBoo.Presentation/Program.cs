@@ -280,6 +280,7 @@ namespace PhysioBoo.Presentation
                 app.MapAppointmentEndpoints();
                 app.MapAppointmentTypeEndpoints();
                 app.MapMedicalRecordEndpoints();
+                app.MapDoctorDeskEndpoints();
                 app.MapPrescriptionEndpoints();
                 app.MapPrescriptionItemEndpoints();
             }
@@ -288,11 +289,13 @@ namespace PhysioBoo.Presentation
                 app.MapImagingModalityEndpoints();
                 app.MapImagingOrderEndpoints();
                 app.MapImagingReportEndpoints();
+                app.MapRadiologyEndpoints();
                 app.MapLabOrderEndpoints();
                 app.MapLabOrderItemEndpoints();
                 app.MapLabReportEndpoints();
                 app.MapLabTestEndpoints();
                 app.MapLabTestCategoryEndpoints();
+                app.MapLaboratoryEndpoints();
             }
             void MapPharmacyEndpoints(WebApplication app)
             {
@@ -326,9 +329,13 @@ namespace PhysioBoo.Presentation
                 app.MapMedicalSpecialtyEndpoints();
                 app.MapArticleEndpoints();
                 app.MapHomeSettingsEndpoints();
+                app.MapHomeBannerEndpoints();
+                app.MapHomeFeatureEndpoints();
+                app.MapHomeTestimonialEndpoints();
                 app.MapMedicalServiceEndpoints();
                 app.MapLeadEndpoints();
                 app.MapCampaignEndpoints();
+                app.MapAudienceSegmentEndpoints();
                 app.MapBedMapEndpoints();
                 app.MapAdmissionEndpoints();
                 app.MapSurgeryEndpoints();
@@ -342,6 +349,8 @@ namespace PhysioBoo.Presentation
                 app.MapRewardEndpoints();
                 app.MapInsuranceClaimEndpoints();
                 app.MapRevenueReportEndpoints();
+                app.MapMyBillingEndpoints();
+                app.MapDashboardEndpoints();
                 app.MapDispensingEndpoints();
                 app.MapPrescriptionTemplateEndpoints();
                 app.MapTenantEndpoints();

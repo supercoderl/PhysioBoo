@@ -51,8 +51,11 @@ import { ImagingOrderRow, RadiologyReport, RadiologyReportTemplate, ReportStatus
 
           <div class="flex flex-wrap items-center gap-3 mb-4">
             <boo-select label="Template / Favorite" [(ngModel)]="selectedTemplateId" [options]="templateOptions()" bindLabel="label" bindValue="value" (ngModelChange)="applyTemplate($event)"></boo-select>
-            <button type="button" disabled class="px-3 py-2 rounded-lg text-xs font-semibold border border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed flex items-center gap-1.5">
-              <boo-icon name="mic" [size]="14"></boo-icon> Voice Dictation (coming soon)
+            <button type="button" (click)="toggleDictation()" [disabled]="!dictationSupported || report()?.status === 'Verified'"
+              [title]="dictationSupported ? 'Dictate into Findings' : 'Voice dictation needs a browser with speech recognition (Chrome or Edge)'"
+              class="px-3 py-2 rounded-lg text-xs font-semibold border flex items-center gap-1.5 disabled:cursor-not-allowed disabled:text-gray-400 disabled:bg-gray-50"
+              [ngClass]="dictating() ? 'border-red-300 text-red-600 bg-red-50' : 'border-gray-200 text-gray-600 bg-surface hover:bg-gray-50'">
+              <boo-icon [name]="dictating() ? 'mic-off' : 'mic'" [size]="14"></boo-icon> {{ dictating() ? 'Stop dictation' : 'Voice dictation' }}
             </button>
           </div>
 
@@ -62,6 +65,10 @@ import { ImagingOrderRow, RadiologyReport, RadiologyReportTemplate, ReportStatus
             <boo-textarea label="Findings" [rows]="4" [(ngModel)]="report()!.findings" (ngModelChange)="onFieldChange()"></boo-textarea>
             <boo-textarea label="Impression" [rows]="3" [(ngModel)]="report()!.impression" (ngModelChange)="onFieldChange()"></boo-textarea>
             <boo-textarea label="Recommendations" [rows]="2" [(ngModel)]="report()!.recommendations" (ngModelChange)="onFieldChange()"></boo-textarea>
+            <label class="flex items-center gap-2 text-sm text-gray-700 select-none">
+              <input type="checkbox" class="rounded border-gray-300" [(ngModel)]="report()!.isCritical" (ngModelChange)="onFieldChange()" />
+              Critical finding (alerts the ordering clinician when the report is approved)
+            </label>
           </div>
 
           <div class="mt-3" *ngIf="report()!.attachments.length">
@@ -122,7 +129,38 @@ export class RadiologyReportingTabComponent implements OnInit, OnDestroy {
     this.srv.getReportTemplates().subscribe(res => { if (res.success) this.templates.set(res.data); });
   }
 
+  // #region Voice dictation (browser Web Speech API; text is appended to Findings)
+  private recognition: any = null;
+  readonly dictationSupported = typeof window !== 'undefined' && !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+  dictating = signal(false);
+
+  toggleDictation(): void {
+    if (this.dictating()) { this.recognition?.stop(); return; }
+    const Recognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!Recognition || !this.report()) return;
+
+    this.recognition = new Recognition();
+    this.recognition.continuous = true;
+    this.recognition.interimResults = false;
+    this.recognition.lang = navigator.language || 'en-US';
+    this.recognition.onresult = (event: any) => {
+      let text = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) text += event.results[i][0].transcript;
+      }
+      if (!text.trim()) return;
+      this.report.update(r => r ? { ...r, findings: `${r.findings ? r.findings.trimEnd() + ' ' : ''}${text.trim()}` } : r);
+      this.onFieldChange();
+    };
+    this.recognition.onerror = () => this.toastSrv.error('Dictation stopped: microphone unavailable or permission denied');
+    this.recognition.onend = () => this.dictating.set(false);
+    this.recognition.start();
+    this.dictating.set(true);
+  }
+  // #endregion
+
   ngOnDestroy(): void {
+    this.recognition?.stop();
     this.fieldChange$.complete();
   }
 
@@ -185,7 +223,8 @@ export class RadiologyReportingTabComponent implements OnInit, OnDestroy {
   approve(): void {
     const r = this.report();
     if (!r) return;
-    this.srv.approveReport(r.orderId).subscribe(() => {
+    this.srv.approveReport(r.orderId).subscribe(res => {
+      if (!res.success) { this.toastSrv.error('Unable to approve report'); return; }
       this.report.update(rep => rep ? { ...rep, status: 'Verified', verifiedAt: new Date().toISOString() } : rep);
       this.toastSrv.success('Report approved');
     });
@@ -197,7 +236,8 @@ export class RadiologyReportingTabComponent implements OnInit, OnDestroy {
     this.dialogSrv.confirm(
       'Reject this report? Provide a reason when prompted by your workflow.',
       () => {
-        this.srv.rejectReport(r.orderId, 'Rejected by verifying radiologist').subscribe(() => {
+        this.srv.rejectReport(r.orderId, 'Rejected by verifying radiologist').subscribe(res => {
+          if (!res.success) { this.toastSrv.error('Unable to reject report'); return; }
           this.report.update(rep => rep ? { ...rep, status: 'Rejected' } : rep);
           this.toastSrv.success('Report rejected');
         });
@@ -214,7 +254,8 @@ export class RadiologyReportingTabComponent implements OnInit, OnDestroy {
     this.dialogSrv.confirm(
       'Return this report to the reporting radiologist for revision?',
       () => {
-        this.srv.returnReportForRevision(r.orderId, 'Returned for revision').subscribe(() => {
+        this.srv.returnReportForRevision(r.orderId, 'Returned for revision').subscribe(res => {
+          if (!res.success) { this.toastSrv.error('Unable to return report'); return; }
           this.report.update(rep => rep ? { ...rep, status: 'ReturnedForRevision' } : rep);
           this.toastSrv.success('Report returned for revision');
         });

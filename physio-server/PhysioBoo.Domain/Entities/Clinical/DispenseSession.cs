@@ -39,6 +39,7 @@ namespace PhysioBoo.Domain.Entities.Clinical
         #endregion
 
         #region Methods
+        [NotMapped]
         public bool IsClosed => Status is DispenseStatus.Completed or DispenseStatus.Cancelled;
 
         public void SetPharmacistNotes(string? notes) { PharmacistNotes = notes; }

@@ -1,3 +1,4 @@
+using PhysioBoo.Application.Commands.Nursing.UpdateHandover;
 using PhysioBoo.Application.Commands.Nursing.AcknowledgeAlert;
 using PhysioBoo.Application.Commands.Nursing.AcknowledgeHandover;
 using PhysioBoo.Application.Commands.Nursing.AddIntakeOutput;
@@ -378,6 +379,23 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("SBAR handover cards of the outgoing shift, generated from recorded data.")
             .Produces<ResponseMessage<List<ShiftHandoverCardViewModel>>>(StatusCodes.Status200OK)
             .RequireAuthorization(Permissions.Inpatient.NursingRead);
+
+            group.MapPatch("/handover/{cardId:guid}", async (
+                Guid cardId,
+                [FromBody] UpdateHandoverViewModel request,
+                IMediatorHandler bus,
+                CancellationToken ct
+            ) =>
+            {
+                UpdateHandoverCommand command = new(cardId, request);
+                await bus.SendCommandAsync(command);
+
+                return Results.Ok(new ResponseMessage<ShiftHandoverCardViewModel?> { Success = true, Data = command.Result });
+            }).WithName("UpdateNursingHandover")
+            .WithSummary("Edit a handover card's SBAR text before it is acknowledged.")
+            .Produces<ResponseMessage<ShiftHandoverCardViewModel?>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<ShiftHandoverCardViewModel?>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Inpatient.NursingWrite);
 
             group.MapPost("/handover/{cardId:guid}/acknowledge", async (
                 Guid cardId,

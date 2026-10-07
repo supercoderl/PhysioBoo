@@ -35,7 +35,7 @@ namespace PhysioBoo.Application.Commands.Invites.CreateInvite
                 newToken,
                 _user.GetTenantId(),
                 request.NewInvitation.HospitalId,
-                request.NewInvitation.IntendedRole,
+                Enum.Parse<Domain.Enums.Role>(request.NewInvitation.IntendedRole, true),
                 request.NewInvitation.Email,
                 expiresAt
             );

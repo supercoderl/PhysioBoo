@@ -26,6 +26,18 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public DateTime? VerifiedAt { get; private set; }
         public string? Notes { get; private set; }
 
+        // Lab workspace workflow: one order item is one specimen and one result row.
+        public LabSampleStatus SampleStatus { get; private set; }
+        public string? Barcode { get; private set; }
+        public string? ContainerType { get; private set; }
+        public string? CollectorName { get; private set; }
+        public DateTime? ReceivedAt { get; private set; }
+        public DateTime? ProcessingStartedAt { get; private set; }
+        public DateTime? ResultEnteredAt { get; private set; }
+        public DateTime? ReleasedAt { get; private set; }
+        public LabVerificationStatus VerificationStatus { get; private set; }
+        public string? RejectionReason { get; private set; }
+
         public virtual LabOrder? LabOrder { get; private set; }
         public virtual LabTest? LabTest { get; private set; }
         public virtual User? SampleCollector { get; private set; }
@@ -74,6 +86,8 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
             VerifiedBy = verifiedBy;
             VerifiedAt = verifiedAt;
             Notes = notes;
+            SampleStatus = sampleCollectionTime.HasValue ? LabSampleStatus.Collected : LabSampleStatus.NotCollected;
+            VerificationStatus = verifiedAt.HasValue ? LabVerificationStatus.Verified : LabVerificationStatus.PendingVerification;
         }
         #endregion
 
@@ -96,6 +110,94 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public void SetVerifiedBy(Guid? verifiedBy) { VerifiedBy = verifiedBy; }
         public void SetVerifiedAt(DateTime? verifiedAt) { VerifiedAt = verifiedAt; }
         public void SetNotes(string? notes) { Notes = notes; }
+        public void SetBarcode(string? barcode) { Barcode = barcode; }
+        public void SetContainerType(string? containerType) { ContainerType = containerType; }
+        #endregion
+
+        #region Workflow
+        public void MarkCollected(Guid? collectorId, string? collectorName, string? containerType, DateTime at)
+        {
+            SampleCollected = true;
+            SampleCollectionTime = at;
+            SampleCollectorId = collectorId;
+            CollectorName = collectorName;
+            if (!string.IsNullOrWhiteSpace(containerType)) ContainerType = containerType;
+            SampleStatus = LabSampleStatus.Collected;
+            RejectionReason = null;
+            if (Status == ItemStatus.Pending) Status = ItemStatus.Collected;
+        }
+
+        /// <summary>Sends the specimen back to the collection queue (for example haemolysed or clotted).</summary>
+        public void RequestRecollection(string reason)
+        {
+            SampleCollected = false;
+            SampleCollectionTime = null;
+            SampleCollectorId = null;
+            CollectorName = null;
+            ReceivedAt = null;
+            ProcessingStartedAt = null;
+            SampleStatus = LabSampleStatus.NotCollected;
+            Status = ItemStatus.Pending;
+            RejectionReason = reason;
+        }
+
+        public void RejectSample(string reason)
+        {
+            SampleStatus = LabSampleStatus.Rejected;
+            RejectionReason = reason;
+        }
+
+        /// <summary>Records a (new) result value. Any earlier verification is reset.</summary>
+        public void EnterResult(string value, string? comments, string flag, bool critical, Guid? technicianId, DateTime at)
+        {
+            ResultValue = value;
+            if (comments != null) Notes = comments;
+            AbnormalFlag = flag;
+            CritialFlag = critical;
+            TechnicianId = technicianId;
+            ResultEnteredAt = at;
+            ProcessingStartedAt ??= at;
+            if (SampleStatus is LabSampleStatus.NotCollected or LabSampleStatus.Collected or LabSampleStatus.InTransit)
+            {
+                ReceivedAt ??= at;
+                SampleStatus = LabSampleStatus.Received;
+            }
+            Status = ItemStatus.Processing;
+            VerificationStatus = LabVerificationStatus.PendingVerification;
+            VerifiedBy = null;
+            VerifiedAt = null;
+            ReleasedAt = null;
+        }
+
+        public void Approve(Guid verifierId, DateTime at)
+        {
+            VerificationStatus = LabVerificationStatus.Verified;
+            VerifiedBy = verifierId;
+            VerifiedAt = at;
+            ReleasedAt = at;
+            Status = ItemStatus.Completed;
+            RejectionReason = null;
+        }
+
+        public void RejectResult(string reason)
+        {
+            VerificationStatus = LabVerificationStatus.Rejected;
+            RejectionReason = reason;
+            VerifiedBy = null;
+            VerifiedAt = null;
+            ReleasedAt = null;
+            Status = ItemStatus.Processing;
+        }
+
+        public void ReturnForReview(string reason)
+        {
+            VerificationStatus = LabVerificationStatus.ReturnedForReview;
+            RejectionReason = reason;
+            VerifiedBy = null;
+            VerifiedAt = null;
+            ReleasedAt = null;
+            Status = ItemStatus.Processing;
+        }
         #endregion
     }
 }

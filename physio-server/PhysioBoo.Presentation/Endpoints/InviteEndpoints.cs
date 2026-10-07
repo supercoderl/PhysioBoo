@@ -1,3 +1,5 @@
+using PhysioBoo.Application.Commands.Invites.RevokeInvite;
+using PhysioBoo.Application.Queries.Invites.GetPending;
 
 using PhysioBoo.Application.Commands.Invites.CreateInvite;
 using PhysioBoo.Application.ViewModels.Invites;
@@ -41,6 +43,29 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
             .RequireAuthorization(Permissions.Admin.InviteCreate);
+            #endregion
+
+            #region Pending Invites
+            group.MapGet("", async (IMediatorHandler bus) =>
+            {
+                List<TenantInviteViewModel> result = await bus.QueryAsync(new GetPendingInvitesQuery());
+                return Results.Ok(new ResponseMessage<List<TenantInviteViewModel>> { Success = true, Data = result });
+            }).WithName("GetPendingInvites")
+            .WithSummary("Unused, unexpired invites of the current tenant.")
+            .Produces<ResponseMessage<List<TenantInviteViewModel>>>(StatusCodes.Status200OK)
+            .RequireAuthorization(Permissions.Admin.InviteRead);
+            #endregion
+
+            #region Revoke Invite
+            group.MapDelete("{id:guid}", async (Guid id, IMediatorHandler bus) =>
+            {
+                await bus.SendCommandAsync(new RevokeInviteCommand(id));
+                return Results.Ok(new ResponseMessage<Guid> { Success = true, Data = id });
+            }).WithName("RevokeInvite")
+            .WithSummary("Revoke an unused invite.")
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Admin.InviteRevoke);
             #endregion
         }
     }

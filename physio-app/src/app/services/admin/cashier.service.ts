@@ -67,8 +67,5 @@ export class CashierService {
         return this.http.post<PagedResponse<{ printed: boolean }>>(BASE_API.CASHIER.PRINT_INVOICE, { invoiceId }, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.PRINT_INVOICE }) });
     }
 
-    printReceipt(paymentId: string) {
-        return this.http.post<PagedResponse<{ printed: boolean }>>(BASE_API.CASHIER.PRINT_RECEIPT, { paymentId }, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.PRINT_RECEIPT }) });
-    }
     // #endregion
 }

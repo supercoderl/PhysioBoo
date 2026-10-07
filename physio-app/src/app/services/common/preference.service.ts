@@ -53,12 +53,4 @@ export class PreferenceService {
     return this.http.post(BASE_API.PREFERENCE.BASE, { preferences });
   }
 
-  remove(key: string): Observable<unknown> {
-    this.cache.update(c => {
-      const next = { ...c };
-      delete next[key];
-      return next;
-    });
-    return this.http.delete(`${BASE_API.PREFERENCE.BASE}/${encodeURIComponent(key)}`);
-  }
 }

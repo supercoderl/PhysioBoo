@@ -79,7 +79,10 @@ namespace PhysioBoo.Application.Commands.MedicalServices.CreateMedicalService
                     $"Insert failed, please try again. Error: {result.Error}",
                     ErrorCodes.CommitFailed
                 ));
+                return;
             }
+
+            await _medicalServiceRepository.SaveLinksAsync(service.Id, vm.DepartmentIds ?? new List<Guid>(), vm.DoctorIds ?? new List<Guid>(), cancellationToken);
         }
     }
 }

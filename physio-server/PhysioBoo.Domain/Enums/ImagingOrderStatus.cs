@@ -7,6 +7,10 @@
         InProgress,
         Completed,
         Cancelled,
-        ReportPending
+        ReportPending,
+        // Radiology workspace stages (stored as strings, so appending is safe)
+        Arrived,
+        ImagingCompleted,
+        ImageUploaded
     }
 }

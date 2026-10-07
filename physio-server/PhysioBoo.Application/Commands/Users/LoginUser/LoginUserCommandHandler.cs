@@ -17,15 +17,18 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
     {
         private readonly IUserRepository _userRepository;
         private readonly TokenSettings _token;
+        private readonly IUser _user;
 
         public LoginUserCommandHandler(
             IMediatorHandler bus,
             IUnitOfWork unitOfWork,
             INotificationHandler<DomainNotification> notifications,
             IUserRepository userRepository,
-            IOptions<TokenSettings> options
+            IOptions<TokenSettings> options,
+            IUser user
         ) : base(bus, unitOfWork, notifications)
         {
+            _user = user;
             _userRepository = userRepository;
             _token = options.Value;
         }
@@ -86,7 +89,7 @@ namespace PhysioBoo.Application.Commands.Users.LoginUser
 
             request.Result = new AuthResult(accessToken, refreshToken);
 
-            await Bus.RaiseEventAsync(new UserLoggedEvent(user.Id, accessToken, refreshToken));
+            await Bus.RaiseEventAsync(new UserLoggedEvent(user.Id, accessToken, refreshToken, _user.UserAgent, _user.IpAddress));
         }
 
         #region Handle Validate User

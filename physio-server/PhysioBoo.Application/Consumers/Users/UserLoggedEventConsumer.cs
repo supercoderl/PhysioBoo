@@ -38,7 +38,9 @@ namespace PhysioBoo.Application.Consumers.Users
                 Guid.NewGuid(),
                 context.Message.AggregateId,
                 context.Message.RefreshToken,
-                TimeZoneHelper.GetLocalTimeNow().AddDays(_token.ExpiryDurationMinutes >= 15 ? _token.ExpiryDurationMinutes : 15)
+                TimeZoneHelper.GetLocalTimeNow().AddDays(_token.ExpiryDurationMinutes >= 15 ? _token.ExpiryDurationMinutes : 15),
+                context.Message.UserAgent,
+                context.Message.IpAddress
             )));
         }
     }

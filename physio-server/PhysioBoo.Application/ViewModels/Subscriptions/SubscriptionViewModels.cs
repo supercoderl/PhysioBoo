@@ -107,4 +107,6 @@ namespace PhysioBoo.Application.ViewModels.Subscriptions
     public sealed record ChangeSubscriptionViewModel(string Action, Guid? PlanId, string? BillingEmail, string? Notes);
 
     public sealed record SettleSubscriptionInvoiceViewModel(string? PaymentReference);
+
+    public sealed record ChangeMyPlanViewModel(Guid PlanId);
 }

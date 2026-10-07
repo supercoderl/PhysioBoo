@@ -4,7 +4,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { BehaviorSubject, catchError, finalize, firstValueFrom, forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { BASE_API } from '../../shared/api/base';
 import { createHttpContext } from '../../shared/contexts/option.context';
-import { MENU_CACHE_KEY, USER_DATA } from '../../shared/data/cache';
+import { MENU_CACHE_KEY } from '../../shared/data/cache';
 import { PagedResponse, PaginationData, PaginationDataWithInit } from '../../shared/types/common';
 import { UserProfileBase, UserProfileSummary } from '../../shared/types/core.types';
 import { LoadingKeys } from '../../shared/types/loading';
@@ -138,13 +138,6 @@ export class AuthService {
         LocalStorage.save(MENU_CACHE_KEY, cache);
     }
 
-    getUserData() {
-        this.http.get(BASE_API.USER.GET_USER_DATA).subscribe({
-            next: res => {
-                LocalStorage.save(USER_DATA, res);
-            }
-        })
-    }
 
     /** Fetches permission codes and caches them in permissionsSubject; used both standalone and as part of getProfile(). */
     private fetchPermissions() {

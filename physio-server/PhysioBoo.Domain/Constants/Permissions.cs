@@ -121,6 +121,10 @@
             public const string LabOrderItemCreate = "lab:lab-order-item:create";
             public const string LabReportRead = "lab:lab-report:read";
             public const string LabReportCreate = "lab:lab-report:create";
+            public const string SampleManage = "lab:sample:manage";
+            public const string ResultEnter = "lab:result:enter";
+            public const string ResultVerify = "lab:result:verify";
+            public const string AlertAcknowledge = "lab:alert:acknowledge";
         }
 
         public static class Imaging
@@ -133,6 +137,11 @@
             public const string ImagingModalityCreate = "imaging:imaging-modality:create";
             public const string ImagingModalityUpdate = "imaging:imaging-modality:update";
             public const string ImagingModalityDelete = "imaging:imaging-modality:delete";
+            public const string ScheduleManage = "imaging:schedule:manage";
+            public const string QueueManage = "imaging:queue:manage";
+            public const string ReportWrite = "imaging:report:write";
+            public const string ReportVerify = "imaging:report:verify";
+            public const string AlertAcknowledge = "imaging:alert:acknowledge";
         }
 
         public static class Billing
@@ -175,6 +184,8 @@
         public static class Admin
         {
             public const string InviteCreate = "admin:invite:create";
+            public const string InviteRead = "admin:invite:read";
+            public const string InviteRevoke = "admin:invite:revoke";
             public const string HospitalRead = "admin:hospital:read";
             public const string HospitalCreate = "admin:hospital:create";
             public const string HospitalUpdate = "admin:hospital:update";
@@ -239,6 +250,12 @@
             public const string SecurityUnblockIp = "system:security:unblock-ip";
             public const string DevAccess = "system:dev:access";
             public const string AuditLogRead = "system:audit-log:read";
+        }
+
+        public static class Dashboard
+        {
+            public const string OverviewRead = "dashboard:overview:read";
+            public const string AlertDismiss = "dashboard:alert:dismiss";
         }
 
         public static class Cms
@@ -333,6 +350,9 @@
             public const string SubscriptionRead = "subscription:subscription:read";
             public const string SubscriptionManage = "subscription:subscription:manage";
             public const string InvoiceManage = "subscription:invoice:manage";
+            // A tenant administrator viewing and changing the tenant's own plan (Settings > Billing).
+            public const string OwnRead = "subscription:own:read";
+            public const string OwnManage = "subscription:own:manage";
         }
 
         public static class Finance

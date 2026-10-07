@@ -5,7 +5,7 @@ import { NursingService } from "../../../../../services/admin/nursing.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { Note } from "../../../../../shared/types/note.types";
+import { NursingNote } from "../../../../../shared/types/nursing.types";
 
 @Component({
   selector: 'nursing-notes-tab',
@@ -44,7 +44,7 @@ export class NursingNotesTabComponent implements OnChanges {
   @Input({ required: true }) patientId!: string;
 
   isLoading = signal(true);
-  notes = signal<Note[]>([]);
+  notes = signal<NursingNote[]>([]);
   draft = '';
 
   constructor(private srv: NursingService, private toastSrv: ToastService, protected loadingSrv: LocalLoadingService) { }

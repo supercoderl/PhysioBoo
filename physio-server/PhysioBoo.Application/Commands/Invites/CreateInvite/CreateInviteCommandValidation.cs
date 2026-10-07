@@ -23,7 +23,9 @@ namespace PhysioBoo.Application.Commands.Invites.CreateInvite
         public void RuleForIntendedRole()
         {
             RuleFor(cmd => cmd.NewInvitation.IntendedRole)
-                .IsInEnum()
+                .Must(code => Enum.TryParse(code, true, out Domain.Enums.Role role) &&
+                              Enum.IsDefined(role) &&
+                              role != Domain.Enums.Role.SUPER_ADMIN)
                 .WithErrorCode(DomainErrorCodes.User.InvalidRole)
                 .WithMessage("Intended role is invalid.");
         }

@@ -121,8 +121,7 @@ export const LoadingKeys = {
         PAYMENT_HISTORY: 'cashier-payment-history',
         PATIENTS_SEARCH: 'cashier-patients-search',
         EXPORT: 'cashier-export',
-        PRINT_INVOICE: 'cashier-print-invoice',
-        PRINT_RECEIPT: 'cashier-print-receipt'
+        PRINT_INVOICE: 'cashier-print-invoice'
     },
     RETAIL_POS: {
         CATALOG_SEARCH: 'retail-pos-catalog-search',

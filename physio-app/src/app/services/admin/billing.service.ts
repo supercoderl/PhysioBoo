@@ -11,7 +11,8 @@ import {
 import { PagedResponse, PaginationData } from "../../shared/types/common";
 
 /**
- * Super-admin SaaS billing: plans, tenant subscriptions and subscription invoices.
+ * SaaS billing. Super-admin: plans, every tenant's subscription and invoices.
+ * Tenant self-service (Settings > Billing): the `my*` methods, always scoped to the caller's tenant.
  */
 @Injectable({ providedIn: 'root' })
 export class BillingService {
@@ -54,5 +55,25 @@ export class BillingService {
 
     voidInvoice(invoiceId: string) {
         return this.http.post<PagedResponse<string>>(BASE_API.BILLING.VOID_INVOICE(invoiceId), {});
+    }
+
+    getMySubscription() {
+        return this.http.get<PagedResponse<TenantSubscriptionDetail | null>>(BASE_API.BILLING.MY_SUBSCRIPTION);
+    }
+
+    getMyPlans() {
+        return this.http.get<PagedResponse<SubscriptionPlan[]>>(BASE_API.BILLING.MY_PLANS);
+    }
+
+    changeMyPlan(planId: string) {
+        return this.http.post<PagedResponse<TenantSubscriptionDetail | null>>(BASE_API.BILLING.MY_CHANGE_PLAN, { planId });
+    }
+
+    cancelMySubscription() {
+        return this.http.post<PagedResponse<TenantSubscriptionDetail | null>>(BASE_API.BILLING.MY_CANCEL, {});
+    }
+
+    downloadMyInvoice(invoiceId: string) {
+        return this.http.get(BASE_API.BILLING.MY_INVOICE_DOWNLOAD(invoiceId), { responseType: 'blob' });
     }
 }

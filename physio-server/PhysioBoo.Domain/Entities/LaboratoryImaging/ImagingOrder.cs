@@ -39,6 +39,16 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public Guid? TechnicianId { get; private set; }
         public Guid? RadiologistId { get; private set; }
 
+        // Radiology workspace workflow (scheduling, queue, acquisition)
+        public string? RoomName { get; private set; }
+        public string? TechnicianName { get; private set; }
+        public RadiologyQueueStatus? QueueStatus { get; private set; }
+        public DateTime? QueueCalledAt { get; private set; }
+        public DateTime? ArrivedAt { get; private set; }
+        public DateTime? ImagingStartedAt { get; private set; }
+        public DateTime? ImagingCompletedAt { get; private set; }
+        public string? CancelReason { get; private set; }
+
         public virtual Patient? Patient { get; private set; }
         public virtual Doctor? Doctor { get; private set; }
         public virtual Appointment? Appointment { get; private set; }
@@ -143,6 +153,67 @@ namespace PhysioBoo.Domain.Entities.LaboratoryImaging
         public void SetStatus(ImagingOrderStatus status) { Status = status; }
         public void SetTechnicianId(Guid? technicianId) { TechnicianId = technicianId; }
         public void SetRadiologistId(Guid? radiologistId) { RadiologistId = radiologistId; }
+        public void SetTechnicianName(string? technicianName) { TechnicianName = technicianName; }
+        #endregion
+
+        #region Workflow
+        [NotMapped]
+        public bool IsCancelled => Status == ImagingOrderStatus.Cancelled;
+
+        [NotMapped]
+        public bool IsImagingDone => Status is ImagingOrderStatus.ImagingCompleted or ImagingOrderStatus.ImageUploaded
+            or ImagingOrderStatus.Completed or ImagingOrderStatus.ReportPending;
+
+        /// <summary>Books (or moves) the exam. Unscheduled orders become Scheduled and join that day's queue.</summary>
+        public void Schedule(DateOnly date, TimeOnly time, string? roomName)
+        {
+            ScheduledDate = date;
+            ScheduledTime = time;
+            if (!string.IsNullOrWhiteSpace(roomName)) RoomName = roomName;
+            if (Status == ImagingOrderStatus.Ordered) Status = ImagingOrderStatus.Scheduled;
+            QueueStatus ??= RadiologyQueueStatus.Waiting;
+        }
+
+        public void Cancel(string reason)
+        {
+            Status = ImagingOrderStatus.Cancelled;
+            QueueStatus = RadiologyQueueStatus.Cancelled;
+            CancelReason = reason;
+        }
+
+        /// <summary>Moves the order through the modality queue and mirrors the step on the order status.</summary>
+        public void AdvanceQueue(RadiologyQueueStatus status, DateTime at)
+        {
+            QueueStatus = status;
+            switch (status)
+            {
+                case RadiologyQueueStatus.Waiting:
+                    break;
+                case RadiologyQueueStatus.Called:
+                    QueueCalledAt = at;
+                    ArrivedAt ??= at;
+                    if (Status is ImagingOrderStatus.Ordered or ImagingOrderStatus.Scheduled) Status = ImagingOrderStatus.Arrived;
+                    break;
+                case RadiologyQueueStatus.InProgress:
+                    ArrivedAt ??= at;
+                    ImagingStartedAt ??= at;
+                    Status = ImagingOrderStatus.InProgress;
+                    break;
+                case RadiologyQueueStatus.Completed:
+                    ImagingStartedAt ??= at;
+                    ImagingCompletedAt = at;
+                    Status = ImagingOrderStatus.ImagingCompleted;
+                    break;
+                case RadiologyQueueStatus.Cancelled:
+                    Cancel("Cancelled from the modality queue");
+                    break;
+            }
+        }
+
+        public void MarkImagesUploaded()
+        {
+            if (Status == ImagingOrderStatus.ImagingCompleted) Status = ImagingOrderStatus.ImageUploaded;
+        }
         #endregion
     }
 }

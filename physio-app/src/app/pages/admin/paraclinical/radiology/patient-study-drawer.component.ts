@@ -8,6 +8,7 @@ import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/statu
 import { RadiologyService } from "../../../../services/admin/radiology.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
+import { escapeHtml, htmlTable, printHtmlDocument } from "../../../../shared/utils/print.utils";
 import { ImagingOrderRow, RadiologyPatientStudySummary, ReportStatus } from "../../../../shared/types/radiology.types";
 
 @Component({
@@ -136,7 +137,20 @@ export class RadiologyPatientStudyDrawerComponent implements OnChanges {
     window.print();
   }
 
+  /** Imaging history for the patient, printed via the browser (Save as PDF). */
   exportPdf(): void {
-    this.toastSrv.info('Export PDF — not wired yet');
+    const s = this.summary();
+    if (!s) return;
+    const body = `
+      <h1>Imaging history</h1>
+      <div class="grid">
+        <div><strong>Patient:</strong> ${escapeHtml(s.fullName)}</div><div><strong>MRN:</strong> ${escapeHtml(s.mrn)}</div>
+        <div><strong>Visit:</strong> ${escapeHtml(s.visitNumber || '—')}</div><div><strong>Department:</strong> ${escapeHtml(s.departmentName || '—')}</div>
+      </div>
+      <h2>Studies</h2>
+      ${htmlTable(['Order', 'Ordered', 'Examination', 'Priority', 'Status', 'Report', 'Radiologist'],
+        this.history().map(o => [o.orderNumber, new Date(o.orderTime).toLocaleString(), o.examinations.map(e => e.examinationName).join(', '),
+          o.priority, o.status, o.reportStatus, o.radiologistName ?? '']))}`;
+    printHtmlDocument(`Imaging history ${s.mrn}`, body);
   }
 }

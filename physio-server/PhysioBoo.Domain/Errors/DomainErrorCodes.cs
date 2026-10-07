@@ -1,4 +1,4 @@
-namespace PhysioBoo.Domain.Errors
+﻿namespace PhysioBoo.Domain.Errors
 {
     public static class DomainErrorCodes
     {
@@ -716,6 +716,9 @@ namespace PhysioBoo.Domain.Errors
             public const string InvalidCategory = "NURSING_INVALID_CATEGORY";
             public const string InvalidVolume = "NURSING_INVALID_VOLUME";
             public const string EmptyLabel = "NURSING_EMPTY_LABEL";
+            public const string EmptySbar = "NURSING_EMPTY_SBAR";
+            public const string SbarExceedsMaxLength = "NURSING_SBAR_EXCEEDS_MAX_LENGTH";
+            public const string HandoverAlreadyAcknowledged = "NURSING_HANDOVER_ALREADY_ACKNOWLEDGED";
             public const string EmptyContent = "NURSING_EMPTY_CONTENT";
             public const string EmptyMedicationName = "NURSING_EMPTY_MEDICATION_NAME";
             public const string TextExceedsMaxLength = "NURSING_TEXT_EXCEEDS_MAX_LENGTH";
@@ -883,5 +886,79 @@ namespace PhysioBoo.Domain.Errors
             public const string UploadFailed = "INSURANCE_CLAIM_UPLOAD_FAILED";
         }
 
+        public static class HomeBanner
+        {
+            public const string EmptyId = "HOME_BANNER_EMPTY_ID";
+            public const string EmptyTitle = "HOME_BANNER_EMPTY_TITLE";
+            public const string TitleExceedsMaxLength = "HOME_BANNER_TITLE_EXCEEDS_MAX_LENGTH";
+            public const string SubtitleExceedsMaxLength = "HOME_BANNER_SUBTITLE_EXCEEDS_MAX_LENGTH";
+            public const string ImageUrlExceedsMaxLength = "HOME_BANNER_IMAGE_URL_EXCEEDS_MAX_LENGTH";
+            public const string ButtonTextExceedsMaxLength = "HOME_BANNER_BUTTON_TEXT_EXCEEDS_MAX_LENGTH";
+            public const string ButtonLinkExceedsMaxLength = "HOME_BANNER_BUTTON_LINK_EXCEEDS_MAX_LENGTH";
+            public const string InvalidOrder = "HOME_BANNER_INVALID_ORDER";
+        }
+
+        public static class HomeFeature
+        {
+            public const string EmptyId = "HOME_FEATURE_EMPTY_ID";
+            public const string IconExceedsMaxLength = "HOME_FEATURE_ICON_EXCEEDS_MAX_LENGTH";
+            public const string EmptyTitle = "HOME_FEATURE_EMPTY_TITLE";
+            public const string TitleExceedsMaxLength = "HOME_FEATURE_TITLE_EXCEEDS_MAX_LENGTH";
+            public const string DescriptionExceedsMaxLength = "HOME_FEATURE_DESCRIPTION_EXCEEDS_MAX_LENGTH";
+            public const string InvalidOrder = "HOME_FEATURE_INVALID_ORDER";
+        }
+
+        public static class HomeTestimonial
+        {
+            public const string EmptyId = "HOME_TESTIMONIAL_EMPTY_ID";
+            public const string EmptyPatientName = "HOME_TESTIMONIAL_EMPTY_PATIENT_NAME";
+            public const string PatientNameExceedsMaxLength = "HOME_TESTIMONIAL_PATIENT_NAME_EXCEEDS_MAX_LENGTH";
+            public const string InvalidRating = "HOME_TESTIMONIAL_INVALID_RATING";
+            public const string CommentExceedsMaxLength = "HOME_TESTIMONIAL_COMMENT_EXCEEDS_MAX_LENGTH";
+        }
+
+        public static class LabWorkspace
+        {
+            public const string EmptyId = "LAB_WORKSPACE_EMPTY_ID";
+            public const string EmptyReason = "LAB_WORKSPACE_EMPTY_REASON";
+            public const string ReasonExceedsMaxLength = "LAB_WORKSPACE_REASON_EXCEEDS_MAX_LENGTH";
+            public const string EmptyValue = "LAB_WORKSPACE_EMPTY_VALUE";
+            public const string ValueExceedsMaxLength = "LAB_WORKSPACE_VALUE_EXCEEDS_MAX_LENGTH";
+            public const string CommentsExceedsMaxLength = "LAB_WORKSPACE_COMMENTS_EXCEEDS_MAX_LENGTH";
+            public const string CollectorNameExceedsMaxLength = "LAB_WORKSPACE_COLLECTOR_NAME_EXCEEDS_MAX_LENGTH";
+            public const string ContainerTypeExceedsMaxLength = "LAB_WORKSPACE_CONTAINER_TYPE_EXCEEDS_MAX_LENGTH";
+            public const string SampleRejected = "LAB_WORKSPACE_SAMPLE_REJECTED";
+            public const string NoResultValue = "LAB_WORKSPACE_NO_RESULT_VALUE";
+            public const string AlreadyVerified = "LAB_WORKSPACE_ALREADY_VERIFIED";
+        }
+
+        public static class RadiologyWorkspace
+        {
+            public const string EmptyId = "RADIOLOGY_WORKSPACE_EMPTY_ID";
+            public const string EmptyReason = "RADIOLOGY_WORKSPACE_EMPTY_REASON";
+            public const string ReasonExceedsMaxLength = "RADIOLOGY_WORKSPACE_REASON_EXCEEDS_MAX_LENGTH";
+            public const string InvalidScheduledTime = "RADIOLOGY_WORKSPACE_INVALID_SCHEDULED_TIME";
+            public const string RoomNameExceedsMaxLength = "RADIOLOGY_WORKSPACE_ROOM_NAME_EXCEEDS_MAX_LENGTH";
+            public const string EmptyTechnicianName = "RADIOLOGY_WORKSPACE_EMPTY_TECHNICIAN_NAME";
+            public const string TechnicianNameExceedsMaxLength = "RADIOLOGY_WORKSPACE_TECHNICIAN_NAME_EXCEEDS_MAX_LENGTH";
+            public const string InvalidQueueStatus = "RADIOLOGY_WORKSPACE_INVALID_QUEUE_STATUS";
+            public const string TextExceedsMaxLength = "RADIOLOGY_WORKSPACE_TEXT_EXCEEDS_MAX_LENGTH";
+            public const string OrderCancelled = "RADIOLOGY_WORKSPACE_ORDER_CANCELLED";
+            public const string ImagingNotCompleted = "RADIOLOGY_WORKSPACE_IMAGING_NOT_COMPLETED";
+            public const string ReportIncomplete = "RADIOLOGY_WORKSPACE_REPORT_INCOMPLETE";
+            public const string NoReport = "RADIOLOGY_WORKSPACE_NO_REPORT";
+            public const string ReportAlreadyVerified = "RADIOLOGY_WORKSPACE_REPORT_ALREADY_VERIFIED";
+        }
+
+        public static class DashboardAlert
+        {
+            public const string InvalidId = "DASHBOARD_ALERT_INVALID_ID";
+            public const string NoteExceedsMaxLength = "DASHBOARD_ALERT_NOTE_EXCEEDS_MAX_LENGTH";
+        }
+
+        public static class Session
+        {
+            public const string EmptyId = "SESSION_EMPTY_ID";
+        }
     }
 }

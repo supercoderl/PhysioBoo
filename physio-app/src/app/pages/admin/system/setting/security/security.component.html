@@ -180,7 +180,7 @@
                 </span>
               </div>
               <div class="text-xs text-gray-500 mt-0.5">
-                {{ s.location }} · {{ s.ip }} · {{ s.lastActiveAt }}
+                <ng-container *ngIf="s.location">{{ s.location }} · </ng-container>{{ s.ip || 'Unknown IP' }} · {{ s.lastActiveAt }}
               </div>
             </div>
             <button type="button"

@@ -1,3 +1,4 @@
+import { Router } from "@angular/router";
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
@@ -57,7 +58,7 @@ export class TreatmentImagingTabComponent implements OnChanges {
   isLoading = signal(true);
   studies = signal<TreatmentImagingOrderRow[]>([]);
 
-  constructor(private srv: TreatmentSheetService, private toastSrv: ToastService) { }
+  constructor(private srv: TreatmentSheetService, private toastSrv: ToastService, private router: Router) { }
 
   ngOnChanges(): void {
     if (!this.patientId) return;
@@ -77,6 +78,11 @@ export class TreatmentImagingTabComponent implements OnChanges {
     }
   }
 
-  viewReport(): void { this.toastSrv.info('View report — not wired yet'); }
-  viewImages(): void { this.toastSrv.info('View images — not wired yet'); }
+  // Reports and studies live in the Radiology workspace (no separate image viewer is integrated).
+  viewReport(): void { this.openRadiology(); }
+  viewImages(): void { this.openRadiology(); }
+
+  private openRadiology(): void {
+    this.router.navigate(['/admin/paraclinical/radiology'], { queryParams: { patient: this.patientId } });
+  }
 }

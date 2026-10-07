@@ -65,9 +65,8 @@ export class DashboardComponent implements OnInit {
   }
 
   onExport(): void {
-    this.dashboardOverviewService.exportReport({
-      date: this.today.toISOString().slice(0, 10),
-      format: 'pdf'
-    }).subscribe();
+    const d = this.today;
+    const date = `${d.getFullYear()}-${`${d.getMonth() + 1}`.padStart(2, '0')}-${`${d.getDate()}`.padStart(2, '0')}`;
+    this.dashboardOverviewService.exportReport({ date }).subscribe();
   }
 }

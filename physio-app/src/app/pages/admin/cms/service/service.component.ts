@@ -3,7 +3,6 @@ import { AdminContentHeaderComponent } from "../../../../components/layout/admin
 import { CmsServiceDetailDrawerComponent } from "../../../../components/layout/admin/cms/service/service-detail-drawer.component";
 import { CmsServiceDrawerComponent } from "../../../../components/layout/admin/cms/service/service-drawer.component";
 import { CmsServiceTableCardComponent } from "../../../../components/layout/admin/cms/service/service-table-card.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { MedicalServiceService } from "../../../../services/admin/medical-service.service";
 import { DepartmentService } from "../../../../services/admin/department.service";
 import { DoctorService } from "../../../../services/admin/doctor.service";
@@ -23,7 +22,6 @@ import { BulkAction } from "../../../../shared/types/table.types";
     imports: [
         SharedModule,
         AdminContentHeaderComponent,
-        BooIconComponent,
         CmsServiceTableCardComponent,
         CmsServiceDrawerComponent,
         CmsServiceDetailDrawerComponent,

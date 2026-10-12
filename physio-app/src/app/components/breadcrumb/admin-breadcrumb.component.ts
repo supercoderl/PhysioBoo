@@ -11,8 +11,8 @@ import { SharedModule } from "../../shared/shared-imports";
     <nav
       *ngIf="breadcrumbs.length"
       [ngClass]="{
-        'flex w-fit rounded-sm border border-solid border-[#E5E7EB] px-2 mb-2 text-[13px] leading-[1.5]': true,
-        'text-[#4B5563]': theme === 'light',
+        'flex w-fit rounded-sm border border-solid border-[#EFE3E7] px-2 mb-2 text-[13px] leading-[1.5]': true,
+        'text-[#71606A]': theme === 'light',
         'text-white': theme === 'dark'
       }"
       aria-label="breadcrumb"
@@ -30,7 +30,7 @@ import { SharedModule } from "../../shared/shared-imports";
             *ngIf="!last"
             name="chevron-right"
             class="w-5 h-5 inlineFlex-center-center align-middle mx-1"
-            [style.stroke]="theme === 'light' ? '#4B5563' : 'white'"
+            [style.stroke]="theme === 'light' ? '#71606A' : 'white'"
           ></lucide-icon>
         </li>
       </ol>

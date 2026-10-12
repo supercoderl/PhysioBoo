@@ -1,14 +1,12 @@
 import { Component, ElementRef, HostListener, Input } from '@angular/core';
 import { SharedModule } from '../../../shared/shared-imports';
 import { ActionItem } from '../../../shared/types/common';
-import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
 
 @Component({
     selector: 'boo-action-admin',
     standalone: true,
     imports: [
-        SharedModule,
-        BooIconComponent
+        SharedModule,
     ],
     template: `
         <div class="relative inline-block text-left">
@@ -20,7 +18,7 @@ import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
                 [class.bg-gray-100]="isOpen" 
             >
                 <div class="pointer-events-none flex items-center">
-                    <boo-icon name="ellipsis" iconClass="stroke-regular" />
+                    <physio-icon name="ellipsis" class="stroke-regular" />
                 </div>
             </button>
 
@@ -40,7 +38,7 @@ import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
                     [class.text-gray-700]="!item.isDanger"
                 >
                     <span *ngIf="item.icon" class="mr-3 text-gray-400 group-hover:text-gray-500">
-                        <boo-icon [name]="item.icon" />
+                        <physio-icon [name]="item.icon" />
                     </span>
                     {{ item.label }}
                 </button>

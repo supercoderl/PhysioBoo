@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { StockTakeService } from "../../../../services/admin/stock-take.service";
@@ -15,7 +14,7 @@ const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
 @Component({
     selector: 'stock-take-history-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooIconComponent, EmptyStateComponent, StatusBadgeComponent],
+    imports: [SharedModule, DrawerComponent,EmptyStateComponent, StatusBadgeComponent],
     template: `
     <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="460" (close)="close.emit()">
       <div class="flex flex-col h-full bg-surface">
@@ -27,7 +26,7 @@ const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
             </p>
           </div>
           <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100" aria-label="Close">
-            <boo-icon name="x" [size]="20"></boo-icon>
+            <physio-icon name="x" [size]="20"></physio-icon>
           </button>
         </div>
 
@@ -39,13 +38,13 @@ const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
           <boo-empty-state *ngIf="!loading && !activities.length" icon="history" title="No history yet"></boo-empty-state>
 
           <div *ngIf="loading" class="flex items-center justify-center py-10">
-            <boo-icon name="loader-circle" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+            <physio-icon name="loader-circle" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
           </div>
 
           <ol class="relative border-s border-gray-100 ml-2 space-y-6" *ngIf="!loading && activities.length">
             <li *ngFor="let a of activities" class="ms-5">
               <span class="absolute -start-[9px] w-4 h-4 rounded-full bg-primary/10 flex items-center justify-center">
-                <boo-icon [name]="icon(a.type)" [size]="10" iconClass="text-primary"></boo-icon>
+                <physio-icon [name]="icon(a.type)" [size]="10" class="text-primary"></physio-icon>
               </span>
               <p class="text-sm text-regular font-medium">{{ a.message }}</p>
               <p class="text-xs text-secondary mt-0.5">{{ a.actor }} · {{ a.occurredAt | date:'medium' }}</p>

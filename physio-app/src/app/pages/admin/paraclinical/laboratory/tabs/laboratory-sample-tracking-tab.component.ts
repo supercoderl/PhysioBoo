@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { LaboratoryService } from "../../../../../services/admin/laboratory.service";
@@ -18,10 +17,10 @@ const STAGE_LABELS: Record<LabSampleTimelineEvent['stage'], string> = {
 @Component({
   selector: 'laboratory-sample-tracking-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !samples().length"><boo-empty-state icon="test-tube" title="No samples pending collection or tracking"></boo-empty-state></div>
@@ -30,7 +29,7 @@ const STAGE_LABELS: Record<LabSampleTimelineEvent['stage'], string> = {
       <div *ngFor="let s of samples()" class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
         <button type="button" (click)="toggleExpand(s.id)" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors text-left">
           <div class="flex items-center gap-4 min-w-0">
-            <boo-icon name="scan-barcode" [size]="18" iconClass="text-gray-400 shrink-0"></boo-icon>
+            <physio-icon name="scan-barcode" [size]="18" [class]="'text-gray-400 shrink-0'"></physio-icon>
             <div class="min-w-0">
               <div class="text-sm font-semibold text-gray-800 truncate">{{ s.barcode }} · {{ s.testName }}</div>
               <div class="text-xs text-gray-500 truncate">{{ s.patientName }} · {{ s.orderNumber }} · {{ s.sampleType }} ({{ s.containerType }})</div>
@@ -38,14 +37,14 @@ const STAGE_LABELS: Record<LabSampleTimelineEvent['stage'], string> = {
           </div>
           <div class="flex items-center gap-3 shrink-0">
             <boo-status-badge [label]="s.collectionStatus" [tone]="collectionTone(s.collectionStatus)"></boo-status-badge>
-            <boo-icon name="chevron-down" [size]="16" iconClass="text-gray-400 transition-transform" [ngClass]="expanded() === s.id ? 'rotate-180' : ''"></boo-icon>
+            <physio-icon name="chevron-down" [size]="16" [ngClass]="expanded() === s.id ? 'rotate-180' : ''" [class]="'text-gray-400 transition-transform'"></physio-icon>
           </div>
         </button>
 
         <div *ngIf="expanded() === s.id" class="border-t border-gray-100 px-4 py-4 bg-gray-50">
           <div class="flex flex-wrap items-center gap-2 mb-4">
             <button (click)="printBarcode(s)" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-              <boo-icon name="printer" [size]="14"></boo-icon> Print Barcode
+              <physio-icon name="printer" [size]="14"></physio-icon> Print Barcode
             </button>
             <button [disabled]="s.collectionStatus !== 'NotCollected'" (click)="markCollected(s)" class="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-semibold hover:bg-primary/15 disabled:opacity-40 disabled:cursor-not-allowed">
               Mark Collected
@@ -63,7 +62,7 @@ const STAGE_LABELS: Record<LabSampleTimelineEvent['stage'], string> = {
               <div class="flex flex-col items-center gap-1 shrink-0 w-28">
                 <div class="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold"
                   [ngClass]="ev.occurredAt ? 'bg-primary text-white' : 'bg-gray-200 text-gray-400'">
-                  <boo-icon [name]="ev.occurredAt ? 'check' : 'circle'" [size]="14"></boo-icon>
+                  <physio-icon [name]="ev.occurredAt ? 'check' : 'circle'" [size]="14"></physio-icon>
                 </div>
                 <span class="text-[11px] font-medium text-gray-700 text-center">{{ STAGE_LABELS[ev.stage] }}</span>
                 <span class="text-[10px] text-gray-400 text-center">{{ ev.occurredAt ? (ev.occurredAt | date:'short') : '—' }}</span>

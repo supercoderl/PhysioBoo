@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -20,7 +19,7 @@ interface FlatWarning extends ClinicalWarning {
 @Component({
     selector: 'dispense-picking-panel',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, StatusBadgeComponent, EmptyStateComponent, DispenseProgressStepperComponent],
+    imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent, DispenseProgressStepperComponent],
     template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <boo-empty-state *ngIf="!workspace" icon="clipboard-list" title="Select a prescription from the queue to begin verification"
@@ -39,14 +38,14 @@ interface FlatWarning extends ClinicalWarning {
 
           <div class="flex flex-wrap gap-1.5 mb-2">
             <span *ngFor="let a of workspace.patient.allergies" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700">
-              <boo-icon name="triangle-alert" [size]="11"></boo-icon> Allergy: {{ a }}
+              <physio-icon name="triangle-alert" [size]="11"></physio-icon> Allergy: {{ a }}
             </span>
             <span *ngIf="workspace.patient.allergyFreeText" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700" title="Free-text allergy — verify manually">
-              <boo-icon name="triangle-alert" [size]="11"></boo-icon> {{ workspace.patient.allergyFreeText }}
+              <physio-icon name="triangle-alert" [size]="11"></physio-icon> {{ workspace.patient.allergyFreeText }}
             </span>
             <span *ngFor="let c of workspace.patient.chronicConditions" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-600">{{ c }}</span>
             <span *ngIf="workspace.patient.isPregnant" class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-pink-50 text-pink-700">Pregnancy</span>
-            <span *ngIf="workspace.patient.isPediatric" class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-sky-50 text-sky-700">Pediatric</span>
+            <span *ngIf="workspace.patient.isPediatric" class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-primarySoft text-primaryHover">Pediatric</span>
             <span *ngIf="workspace.patient.isHighRisk" class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700">High Risk</span>
           </div>
 
@@ -59,7 +58,7 @@ interface FlatWarning extends ClinicalWarning {
           <!-- Clinical alerts -->
           <div *ngIf="flatWarnings.length" class="rounded-1.5 border border-rose-200 bg-rose-50/40 overflow-hidden">
             <div class="px-3 py-2 flex items-center gap-2 bg-rose-50 border-b border-rose-200">
-              <boo-icon name="shield-alert" [size]="14" iconClass="text-rose-600"></boo-icon>
+              <physio-icon name="shield-alert" [size]="14" class="text-rose-600"></physio-icon>
               <span class="text-xs font-semibold text-rose-700">Clinical Alerts ({{ flatWarnings.length }})</span>
             </div>
             <div class="divide-y divide-rose-100">
@@ -91,7 +90,7 @@ interface FlatWarning extends ClinicalWarning {
                   <div class="min-w-0">
                     <p class="text-sm font-semibold text-regular">
                       {{ item.name }} <span class="text-secondary font-normal" *ngIf="item.strength">· {{ item.strength }}</span>
-                      <boo-icon *ngIf="item.isHighAlert" name="octagon-alert" [size]="13" iconClass="text-rose-600 inline ml-1" title="High-alert medication"></boo-icon>
+                      <physio-icon *ngIf="item.isHighAlert" name="octagon-alert" [size]="13" title="High-alert medication" [class]="'text-rose-600 inline ml-1'"></physio-icon>
                     </p>
                     <p class="text-[11px] text-secondary">Shelf {{ item.shelfLocation }} · Batch {{ item.batchNo }} · Exp {{ item.expiryDate }}</p>
                     <p class="text-[11px] text-secondary">{{ item.dose }} · {{ item.frequency }} · {{ item.durationDays }}d</p>
@@ -110,13 +109,13 @@ interface FlatWarning extends ClinicalWarning {
                 </div>
                 <div class="flex items-center gap-1">
                   <button type="button" (click)="replaceItem.emit(item)" title="Replace Medicine" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-gray-100">
-                    <boo-icon name="repeat" [size]="14" iconClass="text-gray-500"></boo-icon>
+                    <physio-icon name="repeat" [size]="14" class="text-gray-500"></physio-icon>
                   </button>
                   <button type="button" (click)="reserveItem.emit(item)" title="Reserve Item" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-gray-100">
-                    <boo-icon name="package-search" [size]="14" iconClass="text-gray-500"></boo-icon>
+                    <physio-icon name="package-search" [size]="14" class="text-gray-500"></physio-icon>
                   </button>
                   <button type="button" (click)="cancelItem.emit(item)" title="Cancel Item" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-rose-50">
-                    <boo-icon name="x" [size]="14" iconClass="text-rose-500"></boo-icon>
+                    <physio-icon name="x" [size]="14" class="text-rose-500"></physio-icon>
                   </button>
                 </div>
               </div>
@@ -131,7 +130,7 @@ interface FlatWarning extends ClinicalWarning {
               class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary"></textarea>
 
             <div class="relative">
-              <boo-icon name="scan-line" [size]="14" iconClass="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"></boo-icon>
+              <physio-icon name="scan-line" [size]="14" [class]="'absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
               <input #barcodeInput type="text" placeholder="Scan barcode (Ctrl+B to focus)..."
                 (keydown.enter)="onBarcode(barcodeInput)"
                 class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg allow-shortcut focus:ring-2 focus:ring-primary/30 focus:border-primary" />

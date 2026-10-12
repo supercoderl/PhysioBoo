@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { Role } from 'src/app/shared/enums/role';
 import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
 import { FormWrapperComponent } from "../../../components/form/boo-form/boo-form.component";
-import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from '../../../components/input/boo-input/boo-input.component';
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
 import { ToastService } from '../../../services/common/toast.service';
@@ -21,8 +20,7 @@ import { generateUUID } from '../../../shared/utils/common';
     SharedModule,
     FormWrapperComponent,
     BooButtonComponent,
-    BooInputComponent,
-    BooIconComponent
+    BooInputComponent,
   ],
   templateUrl: './register.component.html'
 })

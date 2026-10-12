@@ -2,10 +2,9 @@ import { Component, OnInit, signal } from "@angular/core";
 import { catchError, of } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
+import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { HomeConfigTestimonialDrawerComponent } from "../../../../../components/layout/admin/cms/home-configuration/testimonial/testimonial-drawer.component";
 import { HomeConfigTestimonialTableCardComponent } from "../../../../../components/layout/admin/cms/home-configuration/testimonial/testimonial-table-card.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { BooSortAdminComponent } from "../../../../../components/table/boo-table-admin/boo-sort-admin.component";
 import { HomeTestimonialService } from "../../../../../services/admin/home-testimonial.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
@@ -13,8 +12,8 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PaginationData } from "../../../../../shared/types/common";
-import { Testimonial } from "../../../../../shared/types/testimonial.types";
 import { SortOption } from "../../../../../shared/types/sort";
+import { Testimonial } from "../../../../../shared/types/testimonial.types";
 
 @Component({
     selector: 'home-config-testimonial-section',
@@ -22,7 +21,6 @@ import { SortOption } from "../../../../../shared/types/sort";
     imports: [
         SharedModule,
         ButtonIconComponent,
-        BooIconComponent,
         BooInputComponent,
         BooButtonAdminComponent,
         BooSortAdminComponent,
@@ -33,20 +31,20 @@ import { SortOption } from "../../../../../shared/types/sort";
     <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
       <div class="table-search flex items-center">
         <boo-input label="Search..." size="small" (search)="onSearch($event)">
-          <boo-icon
+          <physio-icon
             [class.animate-spin]="loadingSrv.isLoading('search')"
             [name]="loadingSrv.isLoading('search') ? 'loader-circle' : 'search'"
-            color="#64748B"
             endfix
+          class="text-[#85757D]"
           />
         </boo-input>
       </div>
 
       <div class="flex items-center gap-3">
         <boo-button-admin
-          [icon]="{ name: 'refresh-cw', size: 14, color: '#6C7688' }"
-          buttonClass="!bg-surface h-full"
-          [border]="{ width: 1, color: '#e3e3e3' }"
+          [icon]="{ name: 'refresh', size: 14 }"
+          buttonClass="!bg-surface h-full text-secondary"
+          [border]="{ width: 1, color: '#EFE3E7' }"
           (click)="loadTestimonials()"
         >
           <span class="text-placeholder">Reload</span>

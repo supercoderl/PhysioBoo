@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { CashierChargeCategory, CashierInvoice } from "../../../../shared/types/cashier.types";
 
@@ -14,7 +13,7 @@ const CATEGORY_ICON: Record<CashierChargeCategory, string> = {
 
 const STATUS_CLASS: Record<CashierInvoice['status'], string> = {
     Pending: 'bg-amber-400/15 text-amber-100 border border-amber-300/30',
-    PartiallyPaid: 'bg-sky-400/15 text-sky-100 border border-sky-300/30',
+    PartiallyPaid: 'bg-primary/15 text-primary border border-primary/30',
     Paid: 'bg-emerald-400/15 text-emerald-100 border border-emerald-300/30',
     Cancelled: 'bg-slate-400/15 text-slate-200 border border-slate-300/30',
     Refunded: 'bg-rose-400/15 text-rose-100 border border-rose-300/30',
@@ -24,7 +23,7 @@ const STATUS_CLASS: Record<CashierInvoice['status'], string> = {
 @Component({
     selector: 'cashier-invoice-detail-panel',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div class="bg-surface rounded-2xl border border-slate-200 shadow-sm h-full flex flex-col overflow-hidden">
       <ng-container *ngIf="invoice; else emptyState">
@@ -72,7 +71,7 @@ const STATUS_CLASS: Record<CashierInvoice['status'], string> = {
           <div class="space-y-1.5 mb-4">
             <div *ngFor="let line of invoice.charges" class="flex items-center gap-2.5 py-1.5">
               <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-                <boo-icon [name]="categoryIcon(line.category)" [size]="13" iconClass="text-slate-500"></boo-icon>
+                <physio-icon [name]="categoryIcon(line.category)" [size]="13" class="text-slate-500"></physio-icon>
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-sm text-slate-700 truncate">{{ line.description }}</p>
@@ -92,7 +91,7 @@ const STATUS_CLASS: Record<CashierInvoice['status'], string> = {
               <span class="text-slate-500 flex items-center gap-1">
                 Discount
                 <button type="button" (click)="editingDiscount = !editingDiscount" class="text-amber-600 hover:text-amber-700">
-                  <boo-icon name="pencil" [size]="11"></boo-icon>
+                  <physio-icon name="pencil" [size]="11"></physio-icon>
                 </button>
               </span>
               <div class="flex items-center gap-2">
@@ -106,7 +105,7 @@ const STATUS_CLASS: Record<CashierInvoice['status'], string> = {
               <span class="text-slate-500 flex items-center gap-1">
                 Insurance Coverage
                 <button type="button" (click)="editingInsurance = !editingInsurance" class="text-amber-600 hover:text-amber-700">
-                  <boo-icon name="pencil" [size]="11"></boo-icon>
+                  <physio-icon name="pencil" [size]="11"></physio-icon>
                 </button>
               </span>
               <div class="flex items-center gap-2">
@@ -142,19 +141,19 @@ const STATUS_CLASS: Record<CashierInvoice['status'], string> = {
           <button type="button" (click)="receivePayment.emit(invoice)" [disabled]="invoice.remainingBalance <= 0"
             class="w-full py-2.5 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2"
             [ngClass]="invoice.remainingBalance > 0 ? 'bg-amber-500 text-slate-900 hover:bg-amber-400' : 'bg-slate-200 text-slate-400 cursor-not-allowed'">
-            <boo-icon name="wallet" [size]="15"></boo-icon> Receive Payment
+            <physio-icon name="wallet" [size]="15"></physio-icon> Receive Payment
           </button>
           <div class="grid grid-cols-3 gap-2 mt-2">
             <button type="button" (click)="printInvoice.emit(invoice)" class="py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1">
-              <boo-icon name="printer" [size]="13"></boo-icon> Print
+              <physio-icon name="printer" [size]="13"></physio-icon> Print
             </button>
             <button type="button" (click)="refund.emit(invoice)" [disabled]="invoice.paidAmount <= 0"
               class="py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed">
-              <boo-icon name="undo-2" [size]="13"></boo-icon> Refund
+              <physio-icon name="undo-2" [size]="13"></physio-icon> Refund
             </button>
             <button type="button" (click)="voidInvoice.emit(invoice)"
               class="py-2 rounded-lg border border-rose-200 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center justify-center gap-1">
-              <boo-icon name="ban" [size]="13"></boo-icon> Void
+              <physio-icon name="ban" [size]="13"></physio-icon> Void
             </button>
           </div>
         </div>
@@ -163,7 +162,7 @@ const STATUS_CLASS: Record<CashierInvoice['status'], string> = {
       <ng-template #emptyState>
         <div class="flex-1 flex flex-col items-center justify-center text-center px-6 py-16">
           <div class="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-3">
-            <boo-icon name="receipt" [size]="22" iconClass="text-slate-400"></boo-icon>
+            <physio-icon name="receipt" [size]="22" class="text-slate-400"></physio-icon>
           </div>
           <p class="text-sm font-semibold text-slate-500 mb-0.5">No invoice selected</p>
           <p class="text-xs text-slate-400">Select a bill from the list to review charges and collect payment</p>

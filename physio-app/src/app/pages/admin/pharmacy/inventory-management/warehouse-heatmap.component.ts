@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { WarehouseZone } from "../../../../shared/types/inventory-management.types";
@@ -7,7 +6,7 @@ import { WarehouseZone } from "../../../../shared/types/inventory-management.typ
 @Component({
     selector: 'warehouse-heatmap',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, EmptyStateComponent],
+    imports: [SharedModule,EmptyStateComponent],
     template: `
     <boo-empty-state *ngIf="!zones.length" icon="layout-grid" title="No warehouse zones configured"></boo-empty-state>
 
@@ -16,7 +15,7 @@ import { WarehouseZone } from "../../../../shared/types/inventory-management.typ
         class="text-left p-3 rounded-1.5 border transition-all hover:shadow-card hover:-translate-y-0.5"
         [ngClass]="zoneClass(zone)">
         <div class="flex items-center justify-between mb-2">
-          <boo-icon name="warehouse" [size]="14" [iconClass]="zoneIconClass(zone)"></boo-icon>
+          <physio-icon name="warehouse" [size]="14" [class]="zoneIconClass(zone)"></physio-icon>
           <span *ngIf="zone.hasExpiringStock" class="w-1.5 h-1.5 rounded-full bg-rose-500" title="Expiring stock present"></span>
         </div>
         <p class="text-xs font-semibold text-regular leading-tight">{{ zone.name }}</p>

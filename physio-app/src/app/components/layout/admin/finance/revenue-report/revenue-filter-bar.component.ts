@@ -5,7 +5,6 @@ import { SharedModule } from "../../../../../shared/shared-imports";
 import { Lookup } from "../../../../../shared/types/common";
 import { RevenueGranularity, RevenueReportFilter } from "../../../../../shared/types/filter.types";
 import { BooDatepickerComponent } from "../../../../date-picker/boo-date-picker.component";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 
 type RangePreset = 'today' | '7d' | '30d' | 'month' | 'quarter' | 'custom';
@@ -13,7 +12,7 @@ type RangePreset = 'today' | '7d' | '30d' | 'month' | 'quarter' | 'custom';
 @Component({
     selector: 'revenue-filter-bar',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, BooSelectComponent, BooDatepickerComponent],
+    imports: [SharedModule,BooSelectComponent, BooDatepickerComponent],
     template: `
     <div class="bg-surface border border-borderGray/60 rounded-2 p-3.5">
       <div class="flex flex-wrap items-center gap-1.5 mb-3">
@@ -42,7 +41,7 @@ type RangePreset = 'today' | '7d' | '30d' | 'month' | 'quarter' | 'custom';
             [options]="granularityOptions" bindLabel="label" bindValue="value" required></boo-select>
           <button type="button" (click)="onReset()" title="Reset filters"
             class="w-11 h-11 shrink-0 rounded-1.5 border border-gray-200 flex items-center justify-center hover:bg-gray-50" aria-label="Reset filters">
-            <boo-icon name="rotate-ccw" [size]="16" iconClass="text-gray-500"></boo-icon>
+            <physio-icon name="rotate-ccw" [size]="16" class="text-gray-500"></physio-icon>
           </button>
         </div>
       </div>

@@ -1,6 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { StockTakeService } from "../../../../services/admin/stock-take.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -17,7 +16,6 @@ const STEPS: StockTakeStatus[] = ['Draft', 'Counting', 'PendingApproval', 'Appro
     standalone: true,
     imports: [
         SharedModule,
-        BooIconComponent,
         StockTakeCategoryTreeComponent,
         StockTakeCountingTableComponent,
         StockTakeSummaryPanelComponent,
@@ -28,7 +26,7 @@ const STEPS: StockTakeStatus[] = ['Draft', 'Counting', 'PendingApproval', 'Appro
     <div class="flex-none bg-surface border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
       <div class="flex items-center gap-3 min-w-0">
         <button type="button" (click)="back()" class="w-9 h-9 rounded-1.5 border border-gray-200 flex items-center justify-center hover:bg-gray-50" aria-label="Back to Stock Take list">
-          <boo-icon name="arrow-left" [size]="16"></boo-icon>
+          <physio-icon name="arrow-left" [size]="16"></physio-icon>
         </button>
         <div class="min-w-0">
           <p class="text-sm font-bold text-regular truncate">{{ stockTake()?.code ?? 'Loading…' }}</p>
@@ -49,7 +47,7 @@ const STEPS: StockTakeStatus[] = ['Draft', 'Counting', 'PendingApproval', 'Appro
 
       <button type="button" (click)="completeOpen.set(true)" [disabled]="stockTake()?.status !== 'Counting'"
         class="px-4 py-2 rounded-1.5 bg-emerald-600 text-white text-sm font-semibold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5">
-        <boo-icon name="circle-check-big" [size]="15"></boo-icon> Complete Counting
+        <physio-icon name="circle-check-big" [size]="15"></physio-icon> Complete Counting
       </button>
     </div>
 

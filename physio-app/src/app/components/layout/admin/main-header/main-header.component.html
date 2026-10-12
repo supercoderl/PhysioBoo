@@ -10,10 +10,10 @@
         type="button"
         (click)="collapseEvent.emit()"
       >
-        <lucide-icon name="panelLeft" class="w-4 h-4 stroke-regular"></lucide-icon>
+        <physio-icon name="panelLeft" class="w-4 h-4 stroke-regular" />
       </button>
       <div
-        class="m-0 shrink-0 border-r border-solid border-[#E5E7EB] my-2 self-stretch h-auto"
+        class="m-0 shrink-0 border-r border-solid border-[#EFE3E7] my-2 self-stretch h-auto"
         role="separator"
       ></div>
       <div class="hidden md:flex shrink">
@@ -25,10 +25,7 @@
               type="button"
               aria-label="Calendar"
             >
-              <lucide-icon
-                name="calendar"
-                class="w-4 h-4 stroke-regular"
-              ></lucide-icon>
+              <physio-icon name="calendar" class="w-4 h-4 stroke-regular" />
             </button>
           </a>
           <a
@@ -41,10 +38,10 @@
               type="button"
               aria-label="Mail"
             >
-              <lucide-icon
+              <physio-icon
                 name="mail"
                 class="w-4 h-4 stroke-regular"
-              ></lucide-icon></button></a
+              /></button></a
           ><a role="button" href="/apps/contacts" data-discover="true"
             ><button
               class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
@@ -52,10 +49,7 @@
               type="button"
               aria-label="Contacts"
             >
-              <lucide-icon
-                name="users"
-                class="w-4 h-4 stroke-regular"
-              ></lucide-icon>
+              <physio-icon name="users" class="w-4 h-4 stroke-regular" />
             </button>
           </a>
           <button
@@ -65,10 +59,7 @@
             aria-haspopup="true"
             aria-label="Click to add/remove shortcut"
           >
-            <lucide-icon
-              name="star"
-              class="w-4 h-4 stroke-yellow-400"
-            ></lucide-icon>
+            <physio-icon name="star" class="w-4 h-4 stroke-yellow-400" />
           </button>
         </div>
       </div>
@@ -85,7 +76,11 @@
           alt="English"
           src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/flags/US.svg"
         />
-        <p class="text-[11px] text-regular font-medium uppercase m-0 leading-none">en</p>
+        <p
+          class="text-[11px] text-regular font-medium uppercase m-0 leading-none"
+        >
+          en
+        </p>
       </button>
       <div>
         <button
@@ -94,10 +89,7 @@
           type="button"
           (click)="openPopover($event, 'SIZE')"
         >
-          <lucide-icon
-            name="aLargeSmall"
-            class="w-4 h-4 stroke-regular"
-          ></lucide-icon>
+          <physio-icon name="aLargeSmall" class="w-4 h-4 stroke-regular" />
         </button>
       </div>
       <div>
@@ -107,10 +99,10 @@
           type="button"
           (click)="fs.toggleFullScreen()"
         >
-          <lucide-icon
+          <physio-icon
             [name]="fs.isFullScreen ? 'minimize' : 'maximize'"
             class="w-4 h-4 stroke-regular"
-          ></lucide-icon>
+          />
         </button>
       </div>
       <button
@@ -119,10 +111,10 @@
         type="button"
         (click)="themeSrv.toggleTheme()"
       >
-        <lucide-icon
+        <physio-icon
           [name]="themeSrv.isDark() ? 'moon' : 'sun'"
           class="w-4 h-4 stroke-regular"
-        ></lucide-icon>
+        />
       </button>
       <div class="flex muiltr-eqgs9o">
         <div role="button" tabindex="0" class="">
@@ -132,10 +124,7 @@
             type="button"
             (click)="toggleSearch()"
           >
-            <lucide-icon
-              name="search"
-              class="w-4 h-4 stroke-regular"
-            ></lucide-icon>
+            <physio-icon name="search" class="w-4 h-4 stroke-regular" />
           </button>
         </div>
         <div
@@ -164,15 +153,12 @@
               </div>
             </div>
             <button
-              class="mx-2 inlineFlex-center-center relative bg-transparent cursor-pointer align-middle text-center text-[#4B5563] text-[26px] w-9 h-9 max-h-9 m-0 flex-0 transition-[background-color_150ms_cubic-bezier(0.4,_0,_0.2,_1)] p-3 rounded-[8px] hover:bg-gray-100 focus:bg-gray-100"
+              class="mx-2 inlineFlex-center-center relative bg-transparent cursor-pointer align-middle text-center text-[#71606A] text-[26px] w-9 h-9 max-h-9 m-0 flex-0 transition-[background-color_150ms_cubic-bezier(0.4,_0,_0.2,_1)] p-3 rounded-[8px] hover:bg-gray-100 focus:bg-gray-100"
               type="button"
               #closeBtn
               (click)="toggleSearch()"
             >
-              <lucide-icon
-                name="x"
-                class="w-4 h-4 stroke-regular"
-              />
+              <physio-icon name="x" class="w-4 h-4 stroke-regular" />
             </button>
           </div>
         </div>
@@ -184,14 +170,11 @@
         (click)="
           drawerEvent.emit({
             type: 'CLOUD',
-            data: null
+            data: null,
           })
         "
       >
-        <lucide-icon
-          name="bookmark"
-          class="w-4 h-4 stroke-regular"
-        ></lucide-icon>
+        <physio-icon name="bookmark" class="w-4 h-4 stroke-regular" />
       </button>
       <button
         class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
@@ -200,16 +183,13 @@
         (click)="
           drawerEvent.emit({
             type: 'NOTIFICATION',
-            data: null
+            data: null,
           })
         "
       >
         <span class="relative inline-flex shrink-0 rounded-[6px]">
           <div style="transform: none">
-            <lucide-icon
-              name="bell"
-              class="w-4 h-4 stroke-regular"
-            ></lucide-icon>
+            <physio-icon name="bell" class="w-4 h-4 stroke-regular" />
           </div>
           <span
             class="flex-center-center flex-wrap absolute font-medium text-[11px] bg-secondary h-2 w-2 top-0 right-0 -translate-y-1/2 translate-x-1/2 rounded-[4px] origin-top"

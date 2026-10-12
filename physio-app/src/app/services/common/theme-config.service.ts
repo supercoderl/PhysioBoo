@@ -4,7 +4,8 @@ import { PreferenceService } from './preference.service';
 
 export type ThemeMode = 'light' | 'dark' | 'auto';
 export type FontSize = 'small' | 'medium' | 'large';
-export type AccentColor = 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'pink';
+/** The product has one accent. Saved choices from the old palette (blue, green, …) fall back to it. */
+export type AccentColor = 'rose';
 
 export interface ThemeConfig {
   mode: ThemeMode;
@@ -21,17 +22,10 @@ const KEYS = {
 const DEFAULTS: ThemeConfig = {
   mode: 'light',
   fontSize: 'medium',
-  accentColor: 'blue',
+  accentColor: 'rose',
 };
 
-const ACCENT_RGB: Record<AccentColor, string> = {
-  blue:   '21 101 192',   // #1565C0
-  green:  '22 163 74',    // #16A34A
-  purple: '147 51 234',   // #9333EA
-  orange: '234 88 12',    // #EA580C
-  red:    '220 38 38',    // #DC2626
-  pink:   '219 39 119',   // #DB2777
-};
+const ACCENTS: readonly AccentColor[] = ['rose'];
 
 const FONT_PX: Record<FontSize, string> = {
   small: '14px',
@@ -49,7 +43,7 @@ export class ThemeConfigService {
     const cfg: ThemeConfig = {
       mode: this.prefSrv.get<ThemeMode>(KEYS.MODE, DEFAULTS.mode),
       fontSize: this.prefSrv.get<FontSize>(KEYS.FONT, DEFAULTS.fontSize),
-      accentColor: this.prefSrv.get<AccentColor>(KEYS.ACCENT, DEFAULTS.accentColor),
+      accentColor: this.knownAccent(this.prefSrv.get<string>(KEYS.ACCENT, DEFAULTS.accentColor)),
     };
     this.config.set(cfg);
     this.apply(cfg);
@@ -88,7 +82,12 @@ export class ThemeConfigService {
     root.style.fontSize = FONT_PX[cfg.fontSize];
     root.dataset['fontSize'] = cfg.fontSize;
 
-    root.style.setProperty('--twc-primary', ACCENT_RGB[cfg.accentColor]);
+    // The palette lives in styles.scss; clear any inline override left by an older accent choice.
+    root.style.removeProperty('--twc-primary');
     root.dataset['accent'] = cfg.accentColor;
+  }
+
+  private knownAccent(value: string): AccentColor {
+    return ACCENTS.includes(value as AccentColor) ? (value as AccentColor) : DEFAULTS.accentColor;
   }
 }

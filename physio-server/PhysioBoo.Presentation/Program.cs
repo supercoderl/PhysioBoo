@@ -355,6 +355,7 @@ namespace PhysioBoo.Presentation
                 app.MapPrescriptionTemplateEndpoints();
                 app.MapTenantEndpoints();
                 app.MapSubscriptionEndpoints();
+                app.MapDevDataEndpoints();
                 app.MapRoleEndpoints();
                 app.MapConfigEndpoints();
                 app.MapAdminMenuEndpoints();

@@ -1,18 +1,17 @@
 import { Component, Input } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 import { DepartmentLoad } from "../../../../shared/types/dashboard-overview.types";
 
 @Component({
     selector: 'admin-dept-load-card',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div class="bg-surface border border-borderGray rounded-lg overflow-hidden h-full">
         <div class="flex items-center justify-between px-3.5 pt-[13px] pb-2.5 border-b border-gray-100">
             <div class="flex items-center gap-2">
                 <span class="w-7 h-7 rounded-md bg-amber-50 flex items-center justify-center shrink-0">
-                    <boo-icon name="gauge" [size]="13" color="#f59e0b"></boo-icon>
+                    <physio-icon name="gauge" [size]="13" class="text-[#f59e0b]"></physio-icon>
                 </span>
                 <div>
                     <h2 class="text-[12.5px] font-bold text-gray-900 m-0">Dept Load</h2>

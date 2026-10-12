@@ -3,20 +3,19 @@ import { MedicalServiceService } from "../../../../../services/admin/medical-ser
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { MedicalService, ServiceAvailability, ServiceStatus } from "../../../../../shared/types/service.types";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 
 @Component({
     selector: 'cms-service-detail-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooIconComponent],
+    imports: [SharedModule, DrawerComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="720" (close)="close.emit()">
             <div *ngIf="loading" class="flex items-center justify-center h-full">
-                <boo-icon name="loader" [size]="24" iconClass="animate-spin text-secondary"></boo-icon>
+                <physio-icon name="loader" [size]="24" [class]="'animate-spin text-secondary'"></physio-icon>
             </div>
 
             <div *ngIf="!loading && loadError" class="flex flex-col items-center justify-center h-full text-center px-6">
-                <boo-icon name="alert-triangle" [size]="28" iconClass="text-red-500 mb-3"></boo-icon>
+                <physio-icon name="alert-triangle" [size]="28" [class]="'text-red-500 mb-3'"></physio-icon>
                 <p class="text-sm font-semibold text-regular mb-1">Couldn't load this service</p>
                 <p class="text-xs15 text-secondary max-w-[280px] mb-4">The request failed. Please try again.</p>
                 <button (click)="reload()" class="px-3 py-1.5 text-sm font-medium text-red-700 border border-red-300 rounded-md hover:bg-red-100">
@@ -43,11 +42,11 @@ import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
                         <button (click)="editClick.emit(s)" class="px-3 py-1.5 text-sm border border-gray-200 rounded hover:bg-gray-50 flex items-center gap-1.5">
-                            <boo-icon name="pencil" iconClass="w-3.5 h-3.5"></boo-icon>
+                            <physio-icon name="pencil" class="w-3.5 h-3.5"></physio-icon>
                             Edit
                         </button>
                         <button (click)="close.emit()" class="w-8 h-8 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 flex items-center justify-center">
-                            <boo-icon name="x" [size]="20"></boo-icon>
+                            <physio-icon name="x" [size]="20"></physio-icon>
                         </button>
                     </div>
                 </div>
@@ -70,7 +69,7 @@ import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
                         <div>
                             <div class="text-xs text-secondary uppercase tracking-wider mb-1">Requirements</div>
                             <div class="flex gap-1 flex-wrap">
-                                <span *ngIf="s.requiresAppointment" class="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded">Appointment</span>
+                                <span *ngIf="s.requiresAppointment" class="text-xs px-2 py-0.5 bg-primarySoft text-primaryHover rounded">Appointment</span>
                                 <span *ngIf="s.requiresReferral" class="text-xs px-2 py-0.5 bg-purple-50 text-purple-700 rounded">Referral</span>
                                 <span *ngIf="!s.requiresAppointment && !s.requiresReferral" class="text-xs text-secondary italic">Walk-in</span>
                             </div>
@@ -132,21 +131,21 @@ import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
                 <div class="flex-none px-6 py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <button *ngIf="s.status === 'Draft'" (click)="publishClick.emit(s)" class="px-3 py-1.5 text-sm text-emerald-700 hover:bg-emerald-50 rounded flex items-center gap-1.5">
-                            <boo-icon name="check" iconClass="w-3.5 h-3.5"></boo-icon>
+                            <physio-icon name="check" class="w-3.5 h-3.5"></physio-icon>
                             Publish
                         </button>
                         <button (click)="duplicateClick.emit(s)" class="px-3 py-1.5 text-sm text-primary hover:bg-gray-100 rounded flex items-center gap-1.5">
-                            <boo-icon name="copy" iconClass="w-3.5 h-3.5"></boo-icon>
+                            <physio-icon name="copy" class="w-3.5 h-3.5"></physio-icon>
                             Duplicate
                         </button>
                     </div>
                     <div class="flex items-center gap-2">
                         <button (click)="archiveClick.emit(s)" class="px-3 py-1.5 text-sm text-secondary hover:bg-gray-100 rounded flex items-center gap-1.5">
-                            <boo-icon name="archive" iconClass="w-3.5 h-3.5"></boo-icon>
+                            <physio-icon name="archive" class="w-3.5 h-3.5"></physio-icon>
                             Archive
                         </button>
                         <button (click)="deleteClick.emit(s)" class="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-1.5">
-                            <boo-icon name="trash-2" iconClass="w-3.5 h-3.5"></boo-icon>
+                            <physio-icon name="trash-2" class="w-3.5 h-3.5"></physio-icon>
                             Delete
                         </button>
                     </div>

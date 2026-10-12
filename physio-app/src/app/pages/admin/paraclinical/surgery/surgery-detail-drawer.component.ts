@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { SurgeryService } from "../../../../services/admin/surgery.service";
@@ -20,7 +19,7 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
 @Component({
   selector: 'surgery-detail-drawer',
   standalone: true,
-  imports: [SharedModule, DrawerComponent, BooIconComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule, DrawerComponent,StatusBadgeComponent, EmptyStateComponent],
   template: `
     <drawer [isOpen]="isOpen" [width]="760" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
@@ -30,13 +29,13 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
             <p class="text-sm text-secondary m-0">{{ detail()?.surgeryNumber ?? 'Loading case...' }} — {{ detail()?.procedure }}</p>
           </div>
           <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-            <boo-icon name="x" [size]="20"></boo-icon>
+            <physio-icon name="x" [size]="20"></physio-icon>
           </button>
         </div>
 
         <div class="flex-1 overflow-y-auto bg-surface" custom-scrollbar>
           <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-            <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+            <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
           </div>
 
           <ng-container *ngIf="!isLoading() && detail() as c">
@@ -60,16 +59,16 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
             <!-- Quick actions -->
             <div class="px-6 py-4 border-b border-gray-100 flex flex-wrap gap-2">
               <button (click)="viewEmr()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <boo-icon name="file-text" [size]="14"></boo-icon> View EMR
+                <physio-icon name="file-text" [size]="14"></physio-icon> View EMR
               </button>
               <button (click)="printConsent()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <boo-icon name="printer" [size]="14"></boo-icon> Print Consent
+                <physio-icon name="printer" [size]="14"></physio-icon> Print Consent
               </button>
               <button (click)="viewImages()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <boo-icon name="image" [size]="14"></boo-icon> View Images
+                <physio-icon name="image" [size]="14"></physio-icon> View Images
               </button>
               <button (click)="openTreatmentSheet()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <boo-icon name="clipboard-list" [size]="14"></boo-icon> Open Treatment Sheet
+                <physio-icon name="clipboard-list" [size]="14"></physio-icon> Open Treatment Sheet
               </button>
             </div>
 
@@ -93,8 +92,8 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
               <div class="space-y-1.5">
                 <div *ngFor="let item of c.checklist" class="flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 rounded-md">
                   <div class="flex items-center gap-2 min-w-0">
-                    <boo-icon [name]="item.status === 'Completed' ? 'check-circle-2' : item.status === 'NotApplicable' ? 'circle-x' : 'clock'"
-                      [size]="16" [ngClass]="item.status === 'Completed' ? 'text-emerald-500' : item.status === 'NotApplicable' ? 'text-gray-400' : 'text-amber-500'"></boo-icon>
+                    <physio-icon [name]="item.status === 'Completed' ? 'check-circle-2' : item.status === 'NotApplicable' ? 'circle-x' : 'clock'"
+                      [size]="16" [ngClass]="item.status === 'Completed' ? 'text-emerald-500' : item.status === 'NotApplicable' ? 'text-gray-400' : 'text-amber-500'"></physio-icon>
                     <span class="text-sm text-gray-700 truncate" [attr.aria-label]="item.label + ' — ' + item.status">{{ item.label }}</span>
                   </div>
                   <span *ngIf="item.signedBy" class="text-[11px] text-gray-400 shrink-0">{{ item.signedBy }}</span>
@@ -124,7 +123,7 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
                   <div class="flex flex-col items-center gap-1 shrink-0 w-24">
                     <div class="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold"
                       [ngClass]="ev.occurredAt ? 'bg-primary text-white' : 'bg-gray-200 text-gray-400'">
-                      <boo-icon [name]="ev.occurredAt ? 'check' : 'clock'" [size]="14"></boo-icon>
+                      <physio-icon [name]="ev.occurredAt ? 'check' : 'clock'" [size]="14"></physio-icon>
                     </div>
                     <span class="text-[11px] font-medium text-gray-700 text-center">{{ STAGE_LABELS[ev.stage] }}</span>
                     <span class="text-[10px] text-gray-400 text-center">{{ ev.occurredAt ? (ev.occurredAt | date:'short') : '—' }}</span>

@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
+import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
 import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
 import { RevenueDepartmentTableCardComponent } from "../../../../components/layout/admin/finance/revenue-report/revenue-department-table-card.component";
 import { RevenueDoctorTableCardComponent } from "../../../../components/layout/admin/finance/revenue-report/revenue-doctor-table-card.component";
@@ -11,7 +12,6 @@ import { RevenueRefundDiscountCardComponent } from "../../../../components/layou
 import { RevenueTransactionDrawerComponent } from "../../../../components/layout/admin/finance/revenue-report/revenue-transaction-drawer.component";
 import { RevenueTransactionsTableCardComponent } from "../../../../components/layout/admin/finance/revenue-report/revenue-transactions-table-card.component";
 import { RevenueTrendChartComponent } from "../../../../components/layout/admin/finance/revenue-report/revenue-trend-chart.component";
-import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
 import { RevenueReportService } from "../../../../services/admin/revenue-report.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { PrintService } from "../../../../services/common/print.service";
@@ -63,7 +63,7 @@ import {
         <div class="flex items-center gap-2">
           <button-icon [icon]="{ name: 'printer', size: 16 }" (onClick)="onPrint()">Print</button-icon>
           <button-icon [icon]="{ name: 'download', size: 16 }" [loading]="loadingSrv.isLoading('export')" (onClick)="onExport()">Export</button-icon>
-          <button-icon buttonClass="!bg-primary text-white" [icon]="{ name: 'refresh-cw', size: 16, color: 'white' }" (onClick)="loadAll()">Refresh</button-icon>
+          <button-icon buttonClass="!bg-primary text-white" [icon]="{ name: 'refresh', size: 16 }" (onClick)="loadAll()">Refresh</button-icon>
         </div>
       </div>
 

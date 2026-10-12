@@ -76,7 +76,7 @@ const CATEGORY_LABELS: Record<ComplaintCategory, string> = {
                     <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium"
                         [ngClass]="{
                             'bg-gray-100 text-gray-700':   item.status === ComplaintStatus.Pending,
-                            'bg-blue-100 text-blue-700':   item.status === ComplaintStatus.InProgress,
+                            'bg-primarySoft text-primaryHover':   item.status === ComplaintStatus.InProgress,
                             'bg-green-100 text-green-700': item.status === ComplaintStatus.Resolved,
                             'bg-purple-100 text-purple-700': item.status === ComplaintStatus.Closed
                         }">

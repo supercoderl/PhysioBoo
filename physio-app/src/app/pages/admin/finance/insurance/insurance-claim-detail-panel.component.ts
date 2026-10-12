@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -21,7 +20,7 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BadgeTone> = {
 @Component({
   selector: 'insurance-claim-detail-panel',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
   template: `
     <section class="h-full flex flex-col bg-[var(--ic-ivory)] border-l border-[var(--ic-warm-gray-200)] min-w-0">
       <!-- Idle -->
@@ -38,7 +37,7 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BadgeTone> = {
               <p class="text-xs text-[var(--ic-warm-gray-600)] truncate">{{ c.patientName }} · {{ c.providerName }}</p>
             </div>
             <button type="button" class="p-1 rounded hover:bg-[var(--ic-warm-gray-200)] shrink-0" (click)="closeRequested.emit()" aria-label="Close detail panel">
-              <boo-icon name="panel-right-close" [size]="16" iconClass="text-[var(--ic-warm-gray-600)]"></boo-icon>
+              <physio-icon name="panel-right-close" [size]="16" class="text-[var(--ic-warm-gray-600)]"></physio-icon>
             </button>
           </div>
 
@@ -100,14 +99,14 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BadgeTone> = {
               [ngClass]="dragOver ? 'border-[var(--ic-forest)] bg-[var(--ic-forest)]/5' : 'border-[var(--ic-warm-gray-300)]'"
               (dragover)="onDragOver($event)" (dragleave)="dragOver = false" (drop)="onDrop($event)"
             >
-              <boo-icon name="upload-cloud" [size]="20" iconClass="text-[var(--ic-warm-gray-400)] mx-auto mb-1"></boo-icon>
+              <physio-icon name="upload-cloud" [size]="20" [class]="'text-[var(--ic-warm-gray-400)] mx-auto mb-1'"></physio-icon>
               <p class="text-[11px] text-[var(--ic-warm-gray-600)]">Drag and drop files, or</p>
               <button type="button" class="text-[11px] font-semibold text-[var(--ic-forest)] hover:underline" (click)="actionRequested.emit('upload')">browse to upload</button>
             </div>
 
             <div *ngFor="let d of c.documents" class="flex items-center gap-2 p-2 rounded-1.5 border border-[var(--ic-warm-gray-200)]" [class.opacity-70]="selectedDoc === d">
               <button type="button" class="flex items-center gap-2 flex-1 min-w-0 text-left" (click)="selectedDoc = selectedDoc === d ? null : d">
-                <boo-icon [name]="docIcon(d)" [size]="16" iconClass="text-[var(--ic-warm-gray-500)] shrink-0"></boo-icon>
+                <physio-icon [name]="docIcon(d)" [size]="16" [class]="'text-[var(--ic-warm-gray-500)] shrink-0'"></physio-icon>
                 <span class="flex-1 min-w-0 truncate text-[var(--ic-graphite)]">{{ d.name }}</span>
               </button>
               <boo-status-badge [label]="d.status" [tone]="docTone(d.status)"></boo-status-badge>
@@ -121,7 +120,7 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BadgeTone> = {
                 </ng-container>
                 <ng-template #previewAvailable>
                   <div class="flex flex-col items-center gap-1 text-[var(--ic-warm-gray-500)]">
-                    <boo-icon [name]="docIcon(d)" [size]="28"></boo-icon>
+                    <physio-icon [name]="docIcon(d)" [size]="28"></physio-icon>
                     <span class="text-[10px]">{{ d.type }} preview · {{ d.sizeKb }} KB</span>
                   </div>
                 </ng-template>
@@ -193,7 +192,7 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BadgeTone> = {
           <!-- Audit Logs -->
           <div *ngIf="activeTab() === 'audit'" class="space-y-2">
             <div *ngFor="let a of c.auditLogs" class="flex items-start gap-2">
-              <boo-icon name="history" [size]="13" iconClass="text-[var(--ic-warm-gray-400)] mt-0.5"></boo-icon>
+              <physio-icon name="history" [size]="13" [class]="'text-[var(--ic-warm-gray-400)] mt-0.5'"></physio-icon>
               <div>
                 <p class="text-[var(--ic-graphite)]">{{ a.action }} <span class="text-[var(--ic-warm-gray-500)]">by {{ a.actor }}</span></p>
                 <p class="text-[10px] text-[var(--ic-warm-gray-500)]">{{ a.occurredAt | date:'dd/MM/yyyy HH:mm' }}<span *ngIf="a.details"> · {{ a.details }}</span></p>

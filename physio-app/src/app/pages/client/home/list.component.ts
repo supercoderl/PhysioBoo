@@ -11,7 +11,7 @@ import { SharedModule } from '../../../shared/shared-imports';
     template: `
         <div class="relative -mt-10 z-[9]">
             <div class="container mx-auto px-3">
-                <div class="border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] rounded-2.5 relative flex flex-col bg-surface">
+                <div class="border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] rounded-2.5 relative flex flex-col bg-surface">
                     <div class="p-7.5 md:p-10 flex-1">
                         <div class="flex-center-center md:justify-between flex-wrap gap-6">
                             <a 
@@ -26,7 +26,7 @@ import { SharedModule } from '../../../shared/shared-imports';
                                 >
                                     <img alt="img" [src]="item.icon" class="group-hover:animate-flip360" />
                                 </div>
-                                <h6 class="text-base font-semibold text-primary transition-smooth group-hover:text-blue-400">{{item.title}}</h6>
+                                <h6 class="text-base font-semibold text-primary transition-smooth group-hover:text-primary/70">{{item.title}}</h6>
                             </a>
                         </div>
                     </div>

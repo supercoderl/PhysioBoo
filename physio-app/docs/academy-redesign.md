@@ -41,7 +41,7 @@ Hand hygiene [Edit course] [Delete]      ▓▓▓░░ 2/4
 ```
 
 ## 7. Component Hierarchy
-`ListAcademyComponent` (tiles, filters, new-course dialog) and `CourseAcademyComponent` (header, lesson list, reader, course and lesson dialogs), using `AdminBreadcrumbComponent`, `BooIconComponent`, `EmptyStateComponent`.
+`ListAcademyComponent` (tiles, filters, new-course dialog) and `CourseAcademyComponent` (header, lesson list, reader, course and lesson dialogs), using `AdminBreadcrumbComponent`, `IconComponent` (physio-icon), `EmptyStateComponent`.
 
 ## 8. UI Specification
 Tiles are white cards with a category pill, a "Draft" pill for unpublished courses and a progress bar (`role="progressbar"`). The open lesson is highlighted; finished lessons show a ticked circle in the primary colour.

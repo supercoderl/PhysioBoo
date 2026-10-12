@@ -10,7 +10,7 @@ import { DateItem } from "../../../../shared/types/date.types";
         SharedModule
     ],
     template: `
-        <div class="border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 rounded-2.5 flex">
+        <div class="border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 rounded-2.5 flex">
             <div class="p-5">
                 <div class="grid grid-cols-12">
                     <div class="col-span-5 px-3">

@@ -18,9 +18,9 @@ import { Size } from '../../../shared/types/common';
     template: `
     <div class="flex flex-col w-full relative border border-border transition-all duration-300 group"
          [class.border-red-400]="!isValid"
-         [class.focus-within:border-blue-400]="isValid"
+         [class.focus-within:border-primary]="isValid"
          [class.focus-within:ring-2]="isValid"
-         [class.focus-within:ring-blue-100]="isValid"
+         [class.focus-within:ring-primary]="isValid"
          [style.border-radius.px]="radius">
       
       <div class="flex items-center justify-between px-3 py-1.5 bg-gray-50/50 border-b border-border">

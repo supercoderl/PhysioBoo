@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { RadiologyDashboardTrend, RadiologyDashboardTrendPoint } from "../../../../../shared/types/radiology.types";
@@ -7,10 +6,10 @@ import { RadiologyDashboardTrend, RadiologyDashboardTrendPoint } from "../../../
 @Component({
   selector: 'radiology-dashboard-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && trend()" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -117,6 +116,6 @@ export class RadiologyDashboardTabComponent implements OnInit {
 
   donutStyle(rate: number): string {
     const pct = Math.min(100, Math.max(0, rate * 10));
-    return `conic-gradient(#e11d48 ${pct}%, #e5e7eb ${pct}% 100%)`;
+    return `conic-gradient(#e11d48 ${pct}%, #EFE3E7 ${pct}% 100%)`;
   }
 }

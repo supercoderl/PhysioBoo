@@ -18,7 +18,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                     <h3 class="mb-2.5 text-white text-[30px] md:text-[38px] font-bold text-balance">
                                         Download the Doccure App today!
                                     </h3>
-                                    <p class="m-0 text-[#e2edff] text-balance">
+                                    <p class="m-0 text-[#FFE9EE] text-balance">
                                         To download an app related to a doctor or medical services, you
                                         can typically visit the app store on your device.
                                     </p>
@@ -77,7 +77,7 @@ import { SharedModule } from "../../../shared/shared-imports";
     `,
     styles: `
         #app-bg {
-            background: linear-gradient(90.08deg,#0e82fd .09%,#06aed4 70.28%) no-repeat;
+            background: linear-gradient(90.08deg,#E11D48 .09%,#06aed4 70.28%) no-repeat;
         }
     `
 })

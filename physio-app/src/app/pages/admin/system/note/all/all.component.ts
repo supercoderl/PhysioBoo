@@ -1,6 +1,5 @@
 import { Component, HostListener, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { NoteService } from '../../../../../services/admin/note.service';
@@ -29,7 +28,6 @@ const SEARCH_DEBOUNCE_MS = 300;
   imports: [
     AdminContentHeaderComponent,
     SharedModule,
-    BooIconComponent,
     EmptyStateComponent
   ],
   templateUrl: './all.component.html',

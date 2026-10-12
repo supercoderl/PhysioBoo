@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output, WritableSignal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { PaginationData } from "../../../../shared/types/common";
 import { Role } from "../../../../shared/types/role.types";
@@ -9,8 +8,7 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
     selector: 'admin-user-permission-role-tab',
     standalone: true,
     imports: [
-    SharedModule,
-    BooIconComponent
+    SharedModule,
 ],
     template: `
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -26,10 +24,10 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
                             [style.background-color]="ColorUtils.softBg(ColorUtils.roleColorFor(r))"
                             [style.color]="ColorUtils.roleColorFor(r)"
                         >
-                            <boo-icon
+                            <physio-icon
                                 [name]="r.icon || 'shield'"
-                                iconClass="w-5 h-5"
-                            ></boo-icon>
+                            class="w-5 h-5"
+                            ></physio-icon>
                         </div>
                         <div class="min-w-0">
                             <div class="font-semibold text-primary truncate">
@@ -40,7 +38,7 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
                     </div>
                     <span
                         *ngIf="r.isSystemRole"
-                        class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-700"
+                        class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-primarySoft text-primaryHover"
                     >
                         System
                     </span>
@@ -62,7 +60,7 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
                     class="text-primary opacity-0 group-hover:opacity-100 transition-opacity font-medium flex items-center gap-1"
                 >
                     Configure
-                    <boo-icon name="arrow-right" iconClass="w-3 h-3"></boo-icon>
+                    <physio-icon name="arrow-right" class="w-3 h-3"></physio-icon>
                 </span>
                 </div>
             </div>
@@ -71,7 +69,7 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
                 (click)="onNewClick()"
                 class="bg-surface rounded-lg border-2 border-dashed border-gray-200 p-5 hover:border-primary hover:bg-primary/5 transition-all flex flex-col items-center justify-center min-h-[180px] text-secondary hover:text-primary"
             >
-                <boo-icon name="plus" iconClass="w-8 h-8 mb-2"></boo-icon>
+                <physio-icon name="plus" [class]="'w-8 h-8 mb-2'"></physio-icon>
                 <div class="text-sm font-medium">Create a new role</div>
                 <div class="text-xs mt-1">Bundle permissions for a job function</div>
             </button>
@@ -84,7 +82,7 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
             <div
                 class="w-12 h-12 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-3"
             >
-                <boo-icon name="shield" iconClass="w-6 h-6 text-gray-400"></boo-icon>
+                <physio-icon name="shield" class="w-6 h-6 text-gray-400"></physio-icon>
             </div>
             <div class="text-sm font-medium text-primary mb-1">No roles yet</div>
             <div class="text-xs text-secondary">

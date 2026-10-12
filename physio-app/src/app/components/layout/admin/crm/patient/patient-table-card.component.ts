@@ -44,7 +44,7 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
                 <ng-template appColumnDef="patientType" headerLabel="Type" headerClass="text-left" let-item>
                     <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium"
                         [ngClass]="{
-                            'bg-blue-100 text-blue-700': item.patientType === PatientType.Outpatient,
+                            'bg-primarySoft text-primaryHover': item.patientType === PatientType.Outpatient,
                             'bg-purple-100 text-purple-700': item.patientType === PatientType.Inpatient,
                             'bg-red-100 text-red-700': item.patientType === PatientType.Emergency,
                             'bg-orange-100 text-orange-700': item.patientType === PatientType.Referral
@@ -77,7 +77,7 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
                 <ng-template appColumnDef="flags" headerLabel="Flags" headerClass="text-center" cellClass="text-center" let-item>
                     <div class="flex justify-center gap-1">
                         <span *ngIf="item.isVip" class="inline-flex px-1.5 py-0.5 rounded text-xs bg-yellow-100 text-yellow-700">VIP</span>
-                        <span *ngIf="item.isSeniorCitizen" class="inline-flex px-1.5 py-0.5 rounded text-xs bg-blue-100 text-blue-700">Senior</span>
+                        <span *ngIf="item.isSeniorCitizen" class="inline-flex px-1.5 py-0.5 rounded text-xs bg-primarySoft text-primaryHover">Senior</span>
                         <span *ngIf="item.isChronicPatient" class="inline-flex px-1.5 py-0.5 rounded text-xs bg-red-100 text-red-700">Chronic</span>
                     </div>
                 </ng-template>

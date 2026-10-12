@@ -1,13 +1,12 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { BatchOption, DispenseMedicationItem, DispenseMedicineAlternative, DispenseMedicineDetail } from "../../../../shared/types/dispensing.types";
 
 @Component({
     selector: 'dispense-medication-drawer',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, DrawerComponent],
+    imports: [SharedModule,DrawerComponent],
     template: `
     <drawer [isOpen]="isOpen" [width]="480" (close)="close.emit()">
       <div class="flex flex-col h-full" *ngIf="item">
@@ -17,7 +16,7 @@ import { BatchOption, DispenseMedicationItem, DispenseMedicineAlternative, Dispe
             <p class="text-xs text-secondary">{{ item.genericName }} · {{ item.strength }} · {{ item.dosageForm }}</p>
           </div>
           <button type="button" (click)="close.emit()" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100">
-            <boo-icon name="x" [size]="16"></boo-icon>
+            <physio-icon name="x" [size]="16"></physio-icon>
           </button>
         </div>
 
@@ -67,7 +66,7 @@ import { BatchOption, DispenseMedicationItem, DispenseMedicineAlternative, Dispe
             <h4 class="text-xs font-semibold text-secondary uppercase mb-2">Drug Interactions</h4>
             <div class="space-y-1.5">
               <div *ngFor="let w of detail!.interactionWarnings" class="px-3 py-2 rounded-1.5 bg-amber-50 text-amber-800 text-xs flex items-start gap-2">
-                <boo-icon name="triangle-alert" [size]="13" iconClass="mt-0.5 shrink-0"></boo-icon>
+                <physio-icon name="triangle-alert" [size]="13" [class]="'mt-0.5 shrink-0'"></physio-icon>
                 <span>{{ w }}</span>
               </div>
             </div>

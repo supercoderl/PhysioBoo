@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
@@ -13,10 +12,10 @@ import { LabResultEntry, LabResultFlag, LabVerificationStatus } from "../../../.
 @Component({
   selector: 'laboratory-result-verification-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, BooInputComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooInputComponent, StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !results().length"><boo-empty-state icon="clipboard-check" title="No results pending entry or verification"></boo-empty-state></div>

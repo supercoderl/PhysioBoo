@@ -1,7 +1,6 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { catchError, of } from "rxjs";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
 import { SettingAdminMenuDrawerComponent } from "../../../../../components/layout/admin/setting/admin-menu/admin-menu-drawer.component";
@@ -22,7 +21,6 @@ import { MenuItem } from "../../../../../shared/types/menu.types";
         AdminContentHeaderComponent,
         ButtonIconComponent,
         BooInputComponent,
-        BooIconComponent,
         SettingAdminMenuTreeCardComponent,
         SettingAdminMenuDrawerComponent
     ],

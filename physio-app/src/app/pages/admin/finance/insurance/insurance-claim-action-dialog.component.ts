@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { ClaimActionMode, ClaimPriority, InsuranceProviderNode } from "../../../../shared/types/insurance-claims.types";
 
@@ -35,7 +34,7 @@ const TITLES: Record<ClaimActionMode, string> = {
 @Component({
   selector: 'insurance-claim-action-dialog',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div class="fixed inset-0 z-[10000]" [style.pointer-events]="isOpen ? 'auto' : 'none'">
       <div
@@ -55,7 +54,7 @@ const TITLES: Record<ClaimActionMode, string> = {
         <header class="flex items-center justify-between px-4 py-3 border-b border-[var(--ic-warm-gray-200)]">
           <h2 class="text-sm font-bold text-[var(--ic-graphite)]">{{ mode ? titles[mode] : '' }}</h2>
           <button type="button" class="p-1 rounded hover:bg-[var(--ic-warm-gray-200)]" (click)="close.emit()" aria-label="Close dialog">
-            <boo-icon name="x" [size]="16" iconClass="text-[var(--ic-warm-gray-600)]"></boo-icon>
+            <physio-icon name="x" [size]="16" class="text-[var(--ic-warm-gray-600)]"></physio-icon>
           </button>
         </header>
 
@@ -112,13 +111,13 @@ const TITLES: Record<ClaimActionMode, string> = {
           <ng-container *ngIf="mode === 'upload'">
             <div class="border-2 border-dashed border-[var(--ic-warm-gray-300)] rounded-1.5 p-6 text-center">
               <input type="file" multiple class="hidden" #fileInput (change)="filesPicked($event)" />
-              <boo-icon name="upload-cloud" [size]="24" iconClass="text-[var(--ic-warm-gray-400)] mx-auto mb-2"></boo-icon>
+              <physio-icon name="upload-cloud" [size]="24" [class]="'text-[var(--ic-warm-gray-400)] mx-auto mb-2'"></physio-icon>
               <button type="button" class="text-[11px] font-semibold text-[var(--ic-forest)] hover:underline" (click)="fileInput.click()">Choose files</button>
               <p class="text-[10px] text-[var(--ic-warm-gray-500)] mt-1">Medical bills, prescriptions, scans, reports</p>
             </div>
             <ul class="space-y-1" *ngIf="pickedFileNames.length">
               <li *ngFor="let n of pickedFileNames" class="flex items-center gap-1.5 text-[var(--ic-graphite)]">
-                <boo-icon name="file-text" [size]="12"></boo-icon>{{ n }}
+                <physio-icon name="file-text" [size]="12"></physio-icon>{{ n }}
               </li>
             </ul>
           </ng-container>

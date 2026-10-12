@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { StockTakeService } from "../../../../services/admin/stock-take.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -8,7 +7,7 @@ import { StockTake, StockTakeItem } from "../../../../shared/types/stock-take.ty
 @Component({
     selector: 'stock-take-difference-dialog',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, EmptyStateComponent],
+    imports: [SharedModule,EmptyStateComponent],
     template: `
     <div *ngIf="isOpen" class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="close.emit()"></div>
@@ -17,7 +16,7 @@ import { StockTake, StockTakeItem } from "../../../../shared/types/stock-take.ty
         <div class="px-6 py-5 border-b border-gray-100 flex items-start justify-between gap-4">
           <div class="flex items-start gap-4">
             <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <boo-icon name="scale" iconClass="text-primary" [size]="20"></boo-icon>
+              <physio-icon name="scale" [size]="20" class="text-primary"></physio-icon>
             </div>
             <div>
               <h3 class="text-lg font-semibold text-gray-900">Difference Detail — {{ stockTake?.code }}</h3>
@@ -25,7 +24,7 @@ import { StockTake, StockTakeItem } from "../../../../shared/types/stock-take.ty
             </div>
           </div>
           <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100" aria-label="Close">
-            <boo-icon name="x" [size]="18"></boo-icon>
+            <physio-icon name="x" [size]="18"></physio-icon>
           </button>
         </div>
 
@@ -33,7 +32,7 @@ import { StockTake, StockTakeItem } from "../../../../shared/types/stock-take.ty
           <boo-empty-state *ngIf="!loading && !differences.length" icon="circle-check" title="No differences found" description="Every counted item matches system stock."></boo-empty-state>
 
           <div *ngIf="loading" class="flex items-center justify-center py-10">
-            <boo-icon name="loader-circle" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+            <physio-icon name="loader-circle" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
           </div>
 
           <table class="w-full text-sm" *ngIf="!loading && differences.length">

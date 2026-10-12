@@ -16,9 +16,9 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
         <div class="relative inline-block text-left">
             <boo-button-admin
                 (click)="toggle()"
-                [icon]="{ name: 'calendar', size: 14, color: '#6C7688' }"
+                [icon]="{ name: 'calendar', size: 14, iconClass: 'text-gray-500' }"
                 buttonClass="!bg-surface h-full min-w-[180px] flex-row-reverse !justify-between"
-                [border]="{ width: 1, color: isOpen ? '#3b82f6' : '#e3e3e3' }"
+                [border]="{ width: 1, color: isOpen ? '#FB7185' : '#EFE3E7' }"
             >
                 <span class="text-[13px] font-medium text-placeholder">{{ displayText }}</span>
             </boo-button-admin>
@@ -32,8 +32,8 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
                             type="button"
                             (click)="selectPreset(item)"
                             class="w-full text-left px-3 py-2 text-sm rounded-md transition-colors capitalize flex justify-between items-center"
-                            [class.bg-blue-50]="activeType === item"
-                            [class.text-blue-600]="activeType === item"
+                            [class.bg-primarySoft]="activeType === item"
+                            [class.text-primary]="activeType === item"
                             [class.text-slate-600]="activeType !== item"
                             [class.hover:bg-gray-50]="activeType !== item"
                         >
@@ -43,7 +43,7 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
                                 <ng-container *ngIf="item === 'today'">Today</ng-container>
                                 <ng-container *ngIf="item === 'yesterday'">Yesterday</ng-container>
                             </span>
-                            <lucide-icon *ngIf="activeType === item" name="check" class="w-3.5 h-3.5"></lucide-icon>
+                            <physio-icon *ngIf="activeType === item" name="check" class="w-3.5 h-3.5"/>
                         </button>
                     </li>
                     <li>
@@ -51,27 +51,27 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
                             type="button"
                             (click)="selectPreset('custom')"
                             class="w-full text-left px-3 py-2 text-sm rounded-md transition-colors flex justify-between items-center"
-                            [class.bg-blue-50]="activeType === 'custom'"
-                            [class.text-blue-600]="activeType === 'custom'"
+                            [class.bg-primarySoft]="activeType === 'custom'"
+                            [class.text-primary]="activeType === 'custom'"
                             [class.text-slate-600]="activeType !== 'custom'"
                             [class.hover:bg-gray-50]="activeType !== 'custom'"
                         >
                         Custom Range
-                        <lucide-icon name="chevronRight" class="w-3.5 h-3.5"></lucide-icon>
+                        <physio-icon name="chevronRight" class="w-3.5 h-3.5"/>
                         </button>
                     </li>
                 </ul>
                 <div *ngIf="activeType === 'custom'" class="p-3 bg-gray-50 border-t border-gray-100">
                     <div class="flex flex-col gap-2 mb-3">
                         <div class="text-xs font-semibold text-gray-500">Start Date</div>
-                        <input type="date" [(ngModel)]="customStart" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:border-blue-500 outline-none">
+                        <input type="date" [(ngModel)]="customStart" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:border-primary outline-none">
                         
                         <div class="text-xs font-semibold text-gray-500 mt-1">End Date</div>
-                        <input type="date" [(ngModel)]="customEnd" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:border-blue-500 outline-none">
+                        <input type="date" [(ngModel)]="customEnd" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:border-primary outline-none">
                     </div>
                     <button (click)="applyCustom()" 
                             [disabled]="!customStart || !customEnd"
-                            class="w-full bg-blue-600 text-white text-xs font-bold py-2 rounded shadow-sm hover:bg-blue-700 disabled:opacity-50">
+                            class="w-full bg-primary text-white text-xs font-bold py-2 rounded shadow-sm hover:bg-primaryHover disabled:opacity-50">
                         Apply Date
                     </button>
                 </div>

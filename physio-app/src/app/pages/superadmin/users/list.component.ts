@@ -2,10 +2,11 @@ import { Component, OnInit, signal } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { firstValueFrom } from "rxjs";
 import { BooButtonAdminComponent } from "../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
 import { UserPermissionUserDrawerComponent } from "../../../components/layout/admin/system/user-permission/user-drawer.component";
+import { SuperadminPageHeaderComponent } from "../../../components/layout/superadmin/shared/superadmin-page-header.component";
 import { SuperadminUserTableCardComponent } from "../../../components/layout/superadmin/users/user-table-card.component";
+import { StatCardComponent } from "../../../components/ui/stat-card.component";
 import { BooActionAdminComponent } from "../../../components/table/boo-table-admin/boo-action-admin.component";
 import { BooDateAdminComponent } from "../../../components/table/boo-table-admin/boo-date-admin.component";
 import { BooFilterAdminComponent } from "../../../components/table/boo-table-admin/boo-filter-admin.component";
@@ -22,6 +23,7 @@ import { PaginationData } from "../../../shared/types/common";
 import { User } from "../../../shared/types/core.types";
 import { DateRange } from "../../../shared/types/date.types";
 import { FilterConfig } from "../../../shared/types/filter.types";
+import { UserStats } from "../../../shared/types/platform.types";
 import { Role } from "../../../shared/types/role.types";
 import { SortOption } from "../../../shared/types/sort";
 
@@ -31,16 +33,18 @@ import { SortOption } from "../../../shared/types/sort";
     imports: [
         SharedModule,
         BooButtonAdminComponent,
-        BooIconComponent,
         BooInputComponent,
         BooSortAdminComponent,
         BooFilterAdminComponent,
         BooDateAdminComponent,
         BooActionAdminComponent,
+        SuperadminPageHeaderComponent,
+        StatCardComponent,
         SuperadminUserTableCardComponent,
         UserPermissionUserDrawerComponent
     ],
-    templateUrl: './list.component.html'
+    templateUrl: './list.component.html',
+    host: { class: 'block h-full min-h-0' }
 })
 export class SuperadminUserListComponent implements OnInit {
     // #region Inputs, Outputs, Properties
@@ -75,13 +79,8 @@ export class SuperadminUserListComponent implements OnInit {
         }
     ];
 
-    get totalActive(): number {
-        return this.tableData()?.items.filter(u => u.isActive).length ?? 0;
-    }
-
-    get totalVerified(): number {
-        return this.tableData()?.items.filter(u => u.isVerified).length ?? 0;
-    }
+    stats = signal<UserStats | null>(null);
+    statsFailed = signal(false);
 
     rolesData = signal<PaginationData<Role> | null>(null);
     isDrawerOpen = signal(false);
@@ -109,11 +108,22 @@ export class SuperadminUserListComponent implements OnInit {
 
     ngOnInit() {
         this.loadUsers();
+        this.loadStats();
         this.loadRoles();
     }
     // #endregion
 
     // #region Methods
+    loadStats() {
+        this.userSrv.getStats().subscribe({
+            next: stats => {
+                this.statsFailed.set(false);
+                this.stats.set(stats);
+            },
+            error: () => this.statsFailed.set(true)
+        });
+    }
+
     loadUsers() {
         this.userSrv.search({
             pageNumber: this.params.pageNumber,
@@ -151,15 +161,6 @@ export class SuperadminUserListComponent implements OnInit {
     onPageClick(page: number) {
         this.params.pageNumber = page;
         this.loadUsers();
-    }
-
-    min(a: number, b: number) { return Math.min(a, b); }
-
-    getPages(current: number, total: number): number[] {
-        const delta = 2;
-        const pages: number[] = [];
-        for (let i = Math.max(1, current - delta); i <= Math.min(total, current + delta); i++) pages.push(i);
-        return pages;
     }
 
     loadRoles() {
@@ -230,6 +231,7 @@ export class SuperadminUserListComponent implements OnInit {
 
             this.toastSrv.success('User updated');
             this.loadUsers();
+            this.loadStats();
         } catch {
             this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
         }
@@ -242,6 +244,7 @@ export class SuperadminUserListComponent implements OnInit {
                     this.toastSrv.success('User deleted');
                     if (this.selectedUserId() === id) this.closeDrawer();
                     this.loadUsers();
+                    this.loadStats();
                 },
                 error: () => this.toastSrv.error('Failed to delete user')
             });

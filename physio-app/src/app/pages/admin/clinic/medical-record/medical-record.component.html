@@ -2,7 +2,7 @@
   <!-- Loading skeleton -->
   <div *ngIf="isLoading()" class="flex-1 flex items-center justify-center">
     <div class="text-center">
-      <boo-icon name="loader" iconClass="w-8 h-8 text-primary animate-spin mx-auto mb-3"></boo-icon>
+      <physio-icon name="loader" [class]="'w-8 h-8 text-primary animate-spin mx-auto mb-3'"></physio-icon>
       <div class="text-sm text-secondary">Loading medical record…</div>
     </div>
   </div>
@@ -27,7 +27,7 @@
           [ngClass]="activeTab() === t.key
             ? 'border-primary text-primary'
             : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
-          <boo-icon [name]="t.icon" iconClass="w-4 h-4"></boo-icon>
+          <physio-icon [name]="t.icon" class="w-4 h-4"></physio-icon>
           {{ t.label }}
           <span *ngIf="t.badge && t.badge() as n"
             class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold leading-none"

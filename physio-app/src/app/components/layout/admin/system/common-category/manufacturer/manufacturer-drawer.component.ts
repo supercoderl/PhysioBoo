@@ -10,7 +10,6 @@ import { Manufacturer } from "../../../../../../shared/types/support.types";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../input/boo-input/boo-input.component";
 import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-input.component";
 
@@ -20,8 +19,7 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
     imports: [
         SharedModule,
         DrawerComponent,
-        BooInputComponent,
-        BooIconComponent,
+        BooInputComponent,
         BooButtonAdminComponent,
         BooCheckboxComponent,
         BooDevJsonFillerComponent
@@ -42,7 +40,7 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
                         <p class="text-sm text-secondary m-0">Configure company details and certifications</p>
                     </div>
                     <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
@@ -50,7 +48,7 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
                     <boo-json-editor [targetForms]="form"></boo-json-editor>
                     
                     <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <boo-icon name="loader" class="animate-spin text-primary" [size]="32"></boo-icon>
+                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
                     </div>
                     
                     <div class="p-6">
@@ -133,12 +131,11 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
                             *ngIf="currentId" class="group flex items-center gap-1.5 text-red-500 hover:text-red-700 px-2 py-1.5 rounded-md hover:bg-red-50 transition-all text-sm font-medium"
                             (click)="onDelete()"
                         >
-                            <boo-icon 
+                            <physio-icon 
                                 name="trash-2" 
-                                [size]="16" 
-                                class="transition-transform group-hover:scale-110"
-                                color="#ef4444"
-                            ></boo-icon> 
+                                [size]="16"
+                            [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
+                            ></physio-icon> 
                             <span>Delete</span>
                         </button>
                     </div>

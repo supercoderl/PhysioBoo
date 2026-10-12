@@ -8,7 +8,6 @@ namespace PhysioBoo.Application.Commands.Hospitals.UpdateHospital
         public UpdateHospitalCommandValidation()
         {
             RuleForId();
-            RuleForHospitalGroupId();
             RuleForName();
             RuleForType();
             RuleForCapacities();
@@ -27,14 +26,6 @@ namespace PhysioBoo.Application.Commands.Hospitals.UpdateHospital
                 .NotEmpty()
                 .WithErrorCode(DomainErrorCodes.Hospital.EmptyId)
                 .WithMessage("Id may not be empty.");
-        }
-
-        public void RuleForHospitalGroupId()
-        {
-            RuleFor(cmd => cmd.Hospital.HospitalGroupId)
-                .NotEmpty()
-                .WithErrorCode(DomainErrorCodes.Hospital.EmptyHospitalGroupId)
-                .WithMessage("HospitalGroupId may not be empty.");
         }
 
         public void RuleForName()

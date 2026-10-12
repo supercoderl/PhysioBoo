@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, signal } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { forkJoin } from "rxjs";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { ClinicalAction, ClinicalActionDrawerComponent } from "../../../../components/layout/admin/clinic/clinical-action-drawer.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { MedicalRecordService } from "../../../../services/admin/medical-record.service";
@@ -46,8 +45,7 @@ interface TabDef {
     standalone: true,
     imports: [
         ClinicalActionDrawerComponent,
-        SharedModule,
-        BooIconComponent,
+        SharedModule,
         ErrorStateComponent,
         PatientContextHeaderComponent,
         ClinicalSnapshotComponent,

@@ -24,7 +24,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                     <div class="text-center mt-10">
                         <button 
                             type="button" 
-                            class="group left-[45%] md:left-[48%] -translate-x-1/2 flex-center-center w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth hover:bg-blue-500"
+                            class="group left-[45%] md:left-[48%] -translate-x-1/2 flex-center-center w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth hover:bg-primary"
                             (click)="slickModal.slickPrev()"
                         >
                             <lucide-angular [img]="ChevronLeft" class="font-black group-hover:stroke-white" />
@@ -74,7 +74,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                         <div class="text-center mt-10">
                             <button 
                                 type="button" 
-                                class="group left-[55%] md:left-[52%] -translate-x-1/2 flex-center-center ml-3 w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth hover:bg-blue-500"
+                                class="group left-[55%] md:left-[52%] -translate-x-1/2 flex-center-center ml-3 w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth hover:bg-primary"
                                 (click)="slickModal.slickNext()"
                             >
                                 <lucide-angular [img]="ChevronRight" class="font-black group-hover:stroke-white" />

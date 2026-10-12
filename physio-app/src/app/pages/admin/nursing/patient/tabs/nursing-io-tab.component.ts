@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { NursingService } from "../../../../../services/admin/nursing.service";
@@ -11,10 +10,10 @@ import { IntakeOutputCategory, IntakeOutputEntry } from "../../../../../shared/t
 @Component({
   selector: 'nursing-io-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, BooInputComponent, BooSelectComponent],
+  imports: [SharedModule,BooInputComponent, BooSelectComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading()">

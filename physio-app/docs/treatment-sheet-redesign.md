@@ -2,7 +2,7 @@
 
 **Path:** `admin/inpatient/treatment-sheet`
 **Current implementation:** `src/app/pages/admin/inpatient/treatment-sheet/treatment-sheet.component.ts` — a single monolithic component with hardcoded mock arrays, `ngModel`-bound "new record" forms, no services, no patient context, and an `ngSwitch` tab strip (`vitals` / `medications` / `procedures` / `notes` / `fluid`).
-**Scope:** Frontend UI/UX only. No backend implementation — see §13 for the proposed API contract. Reuses existing conventions established by the Nursing module (`docs/nursing-redesign.md`) and the Medical Record EMR module: standalone components, Angular signals, `DrawerComponent`, `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `BooIcon`, `BooSelect`, `BooInput`, `LocalLoadingService`, `ToastService`, `DialogService`, Tailwind, mock-fallback services.
+**Scope:** Frontend UI/UX only. No backend implementation — see §13 for the proposed API contract. Reuses existing conventions established by the Nursing module (`docs/nursing-redesign.md`) and the Medical Record EMR module: standalone components, Angular signals, `DrawerComponent`, `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `physio-icon`, `BooSelect`, `BooInput`, `LocalLoadingService`, `ToastService`, `DialogService`, Tailwind, mock-fallback services.
 
 ---
 
@@ -119,7 +119,7 @@ shared/types/treatment-sheet.ts        (TreatmentPatientSummary, TreatmentStats,
 services/admin/treatment-sheet.service.ts        (TreatmentSheetService — mock-fallback pattern, same as NursingService)
 ```
 
-**Reused without modification:** `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `BooIconComponent`, `BooSelectComponent`, `BooInputComponent`, `BooTextareaComponent`, `LocalLoadingService`, `ToastService`, `DialogService`.
+**Reused without modification:** `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `IconComponent` (physio-icon), `BooSelectComponent`, `BooInputComponent`, `BooTextareaComponent`, `LocalLoadingService`, `ToastService`, `DialogService`.
 
 **New (this feature):** everything under `treatment-sheet/` above, plus `treatment-sheet.ts` types and `treatment-sheet.service.ts`.
 

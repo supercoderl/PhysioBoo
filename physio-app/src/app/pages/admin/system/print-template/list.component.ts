@@ -1,7 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, of } from 'rxjs';
-import { BooIconComponent } from '../../../../components/icon/boo-icon/boo-icon.component';
 import { AdminContentHeaderComponent } from '../../../../components/layout/admin/content-header/content-header.component';
 import { BooActionAdminComponent } from '../../../../components/table/boo-table-admin/boo-action-admin.component';
 import { BooTableAdminComponent } from '../../../../components/table/boo-table-admin/boo-table-admin.component';
@@ -23,7 +22,6 @@ import { PrintTemplate } from '../../../../shared/types/print-template.types';
     BooTableAdminComponent,
     ColumnDefDirective,
     BooActionAdminComponent,
-    BooIconComponent
   ],
   host: { class: 'block h-full min-h-0' },
   template: `
@@ -36,7 +34,7 @@ import { PrintTemplate } from '../../../../shared/types/print-template.types';
           <button type="button"
             (click)="onCreate()"
             class="inline-flex items-center gap-1.5 px-3 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors">
-            <boo-icon name="plus" color="white" iconClass="w-4 h-4" />
+            <physio-icon name="plus" class="w-4 h-4 text-white" />
             New Template
           </button>
         </div>
@@ -60,7 +58,7 @@ import { PrintTemplate } from '../../../../shared/types/print-template.types';
           <ng-template appColumnDef="name" headerLabel="Name" headerClass="text-left" [sortable]="true" let-row>
             <div class="flex items-center gap-2 cursor-pointer" (click)="onEdit(row)">
               <div class="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center">
-                <boo-icon name="file-text" iconClass="w-4 h-4" />
+                <physio-icon name="file-text" class="w-4 h-4" />
               </div>
               <div class="min-w-0">
                 <div class="text-sm font-semibold text-primary truncate">{{ row.name }}</div>

@@ -46,7 +46,7 @@ Notes                                   [Archived] [Search notes   ]
 
 ## 7. Component Hierarchy
 
-`AllNoteComponent` (header, composer, label chips, grid, editor dialog) → `AdminContentHeaderComponent`, `BooIconComponent`, `EmptyStateComponent`. One component: the editor is state of the page (a draft), not reused elsewhere.
+`AllNoteComponent` (header, composer, label chips, grid, editor dialog) → `AdminContentHeaderComponent`, `IconComponent` (physio-icon), `EmptyStateComponent`. One component: the editor is state of the page (a draft), not reused elsewhere.
 
 ## 8. UI Specification
 

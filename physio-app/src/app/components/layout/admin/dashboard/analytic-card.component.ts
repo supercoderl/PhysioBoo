@@ -4,13 +4,11 @@ import { curveCatmullRom } from 'd3-shape';
 
 import { SharedModule } from "../../../../shared/shared-imports";
 import { AnalyticItem } from "../../../../shared/types/dashboard.types";
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 
 @Component({
     selector: 'admin-analytic-card',
     standalone: true,
     imports: [
-        BooIconComponent,
         SharedModule
     ],
     encapsulation: ViewEncapsulation.None,
@@ -23,7 +21,7 @@ import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
                             class="rounded-lg shrink-0 p-3 leading-none inlineFlex-center-center"
                             [style.background-color]="iconTint"
                         >
-                            <boo-icon [name]="analyticItem.icon" [color]="analyticItem.color"></boo-icon>
+                            <physio-icon [name]="analyticItem.icon" [style.color]="analyticItem.color"></physio-icon>
                         </span>
                         <div class="ms-3 overflow-hidden">
                             <p class="mb-0 text-truncate capitalize text-neutral">{{title}}</p>
@@ -37,7 +35,7 @@ import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
                                 ? 'text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-500/10'
                                 : 'text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-500/10'"
                         >
-                            <boo-icon [name]="isPositiveTrend ? 'trending-up' : 'trending-down'" [size]="12"></boo-icon>
+                            <physio-icon [name]="isPositiveTrend ? 'trending-up' : 'trending-down'" [size]="12"></physio-icon>
                             {{analyticItem.percent}}
                         </span>
                     </div>
@@ -70,7 +68,7 @@ export class AdminAnalyticCardComponent implements OnInit {
         name: 'custom',
         selectable: true,
         group: ScaleType.Ordinal,
-        domain: [] 
+        domain: []
     };
     curve = curveCatmullRom;
 

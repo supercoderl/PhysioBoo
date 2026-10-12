@@ -6,11 +6,11 @@ export class ColorByFileTypePipe implements PipeTransform {
         const colors: Record<string, string> = {
             pdf: '#e53935',        // red
             xls: '#43a047',    // green
-            doc: '#1e88e5',        // blue
+            doc: '#E11D48',        // rose
             txt: '#757575',    // gray
             jpg: '#ffb300',      // orange
         };
 
-        return colors[type.toLowerCase()] ?? '#9ca3af'; // default: light gray
+        return colors[type.toLowerCase()] ?? '#A1A1AA'; // default: light gray
     }
 }

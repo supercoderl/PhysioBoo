@@ -2031,7 +2031,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                     position: absolute;
                     z-index: 1000002;
                     opacity: 0;
-                    border: 2px solid rgb(26, 115, 232);
+                    border: 2px solid rgb(225, 29, 72);
                     "
                 ></div>
                 <div></div>

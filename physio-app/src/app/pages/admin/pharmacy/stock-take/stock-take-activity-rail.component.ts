@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { StockTakeService } from "../../../../services/admin/stock-take.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -19,7 +18,7 @@ const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
 @Component({
     selector: 'stock-take-activity-rail',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, EmptyStateComponent],
+    imports: [SharedModule,EmptyStateComponent],
     template: `
     <div class="sticky top-4 space-y-3">
       <div class="bg-surface border border-borderGray/60 rounded-2 p-3.5">
@@ -48,13 +47,13 @@ const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
         <boo-empty-state *ngIf="!loading && !activities.length" icon="inbox" title="No recent activity"></boo-empty-state>
 
         <div *ngIf="loading" class="flex items-center justify-center py-6">
-          <boo-icon name="loader-circle" iconClass="w-5 h-5 text-primary animate-spin"></boo-icon>
+          <physio-icon name="loader-circle" [class]="'w-5 h-5 text-primary animate-spin'"></physio-icon>
         </div>
 
         <ol class="space-y-3.5" *ngIf="!loading && activities.length">
           <li *ngFor="let a of activities" class="flex gap-2.5">
             <div class="w-7 h-7 rounded-full bg-primary/8 flex items-center justify-center shrink-0 mt-0.5">
-              <boo-icon [name]="icon(a.type)" [size]="13" iconClass="text-primary"></boo-icon>
+              <physio-icon [name]="icon(a.type)" [size]="13" class="text-primary"></physio-icon>
             </div>
             <div class="min-w-0">
               <p class="text-xs text-regular leading-snug">

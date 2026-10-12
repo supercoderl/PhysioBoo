@@ -4,12 +4,11 @@ import { Orientation } from '../../../shared/enums/print-orientation';
 import { PaperSize } from '../../../shared/enums/print-paper-size';
 import { SharedModule } from '../../../shared/shared-imports';
 import { PrintRenderResult } from '../../../shared/types/print-template.types';
-import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
 
 @Component({
   selector: 'print-preview',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   animations: [
     trigger('overlayAnim', [
       transition(':enter', [style({ opacity: 0 }), animate('120ms', style({ opacity: 1 }))]),
@@ -34,7 +33,7 @@ import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
         <header class="flex-none flex items-center justify-between gap-3 px-5 h-14 border-b border-gray-200">
           <div class="flex items-center gap-3 min-w-0">
             <div class="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center">
-              <boo-icon name="printer" iconClass="w-4 h-4" />
+              <physio-icon name="printer" class="w-4 h-4" />
             </div>
             <div class="min-w-0">
               <div class="text-sm font-semibold text-gray-900 truncate">{{ title || 'Print preview' }}</div>
@@ -50,7 +49,7 @@ import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
               [disabled]="zoom() <= 0.5"
               class="p-1.5 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-900 disabled:opacity-30"
               title="Zoom out">
-              <boo-icon name="zoom-out" iconClass="w-4 h-4" />
+              <physio-icon name="zoom-out" class="w-4 h-4" />
             </button>
             <span class="text-xs font-medium text-gray-600 w-12 text-center">{{ (zoom() * 100) | number:'1.0-0' }}%</span>
             <button type="button"
@@ -58,7 +57,7 @@ import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
               [disabled]="zoom() >= 2"
               class="p-1.5 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-900 disabled:opacity-30"
               title="Zoom in">
-              <boo-icon name="zoom-in" iconClass="w-4 h-4" />
+              <physio-icon name="zoom-in" class="w-4 h-4" />
             </button>
 
             <span class="w-px h-5 bg-gray-200 mx-1"></span>
@@ -72,17 +71,17 @@ import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
               (click)="onPrint()"
               [disabled]="!result || printing()"
               class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50">
-              <boo-icon
+              <physio-icon
                 [name]="printing() ? 'loader-circle' : 'printer'"
-                color="white"
-                [iconClass]="printing() ? 'w-4 h-4 animate-spin' : 'w-4 h-4'" />
+                class="text-white"
+                [class]="printing() ? 'w-4 h-4 animate-spin' : 'w-4 h-4'" />
               <span>{{ printing() ? 'Sending…' : 'Print' }}</span>
             </button>
             <button type="button"
               (click)="onClose()"
               class="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-900 ml-1"
               title="Close">
-              <boo-icon name="x" iconClass="w-4 h-4" />
+              <physio-icon name="x" class="w-4 h-4" />
             </button>
           </div>
         </header>

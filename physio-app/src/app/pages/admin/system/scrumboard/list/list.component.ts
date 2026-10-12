@@ -1,6 +1,5 @@
 import { Component, HostListener, OnInit, signal } from '@angular/core';
 import { AdminBreadcrumbComponent } from "../../../../../components/breadcrumb/admin-breadcrumb.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { ScrumboardService } from '../../../../../services/admin/scrumboard.service';
 import { ToastService } from '../../../../../services/common/toast.service';
@@ -13,7 +12,6 @@ import { ScrumBoardSummary } from '../../../../../shared/types/scrumboard.types'
   imports: [
     AdminBreadcrumbComponent,
     SharedModule,
-    BooIconComponent,
     EmptyStateComponent
   ],
   templateUrl: './list.component.html'

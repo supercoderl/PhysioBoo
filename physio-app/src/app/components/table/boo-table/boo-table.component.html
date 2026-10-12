@@ -19,7 +19,7 @@
                   <div
                     class="min-h-7 px-2 text-[13px] text-[#1F232B] inline-flex items-center rounded-2 relative bg-surface"
                   >
-                    <lucide-icon [name]="search" class="w-4 h-4"></lucide-icon>
+                    <physio-icon [name]="search" class="w-4 h-4" />
                     <input
                       aria-invalid="false"
                       autocomplete="off"
@@ -69,28 +69,28 @@
           </div>
           <div class="flex items-center z-[3]">
             <button
-              class="inlineFlex-center-center relative bg-transparent cursor-pointer text-center text-[#4B5563] w-8 h-8 max-h-8 m-0 flex-auto rounded-2"
+              class="inlineFlex-center-center relative bg-transparent cursor-pointer text-center text-[#71606A] w-8 h-8 max-h-8 m-0 flex-auto rounded-2"
               tabindex="0"
               type="button"
               aria-label="Show/Hide filters"
             >
-              <lucide-icon [name]="listFilter" class="w-4 h-4"></lucide-icon>
+              <physio-icon [name]="listFilter" class="w-4 h-4" />
             </button>
             <button
-              class="inlineFlex-center-center relative bg-transparent cursor-pointer text-center text-[#4B5563] w-8 h-8 max-h-8 m-0 flex-auto rounded-2"
+              class="inlineFlex-center-center relative bg-transparent cursor-pointer text-center text-[#71606A] w-8 h-8 max-h-8 m-0 flex-auto rounded-2"
               tabindex="0"
               type="button"
               aria-label="Show/Hide columns"
             >
-              <lucide-icon [name]="columns3cog" class="w-4 h-4"></lucide-icon>
+              <physio-icon [name]="columns3cog" class="w-4 h-4" />
             </button>
             <button
-              class="inlineFlex-center-center relative bg-transparent cursor-pointer text-center text-[#4B5563] w-8 h-8 max-h-8 m-0 flex-auto rounded-2"
+              class="inlineFlex-center-center relative bg-transparent cursor-pointer text-center text-[#71606A] w-8 h-8 max-h-8 m-0 flex-auto rounded-2"
               tabindex="0"
               type="button"
               aria-label="Toggle density"
             >
-              <lucide-icon [name]="rows4" class="w-4 h-4"></lucide-icon>
+              <physio-icon [name]="rows4" class="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -116,7 +116,10 @@
       </div>
     </div>
   </div>
-  <div class="flex-auto max-w-full overflow-auto relative" style="max-height: clamp(350px, -88px + 100vh, 9999px);">
+  <div
+    class="flex-auto max-w-full overflow-auto relative"
+    style="max-height: clamp(350px, -88px + 100vh, 9999px)"
+  >
     <table class="table w-full border-separate">
       <thead class="bg-gray-50 sticky top-0 z-10">
         <tr
@@ -160,7 +163,7 @@
                       (click)="handleSort(column.id)"
                       class="ml-1 hover:text-gray-700"
                     >
-                      <lucide-icon [name]="arrowDownUp" class="w-4 h-4"></lucide-icon>
+                      <physio-icon [name]="arrowDownUp" class="w-4 h-4" />
                     </button>
                   </ng-container>
                 </div>
@@ -173,13 +176,13 @@
                     class="cursor-move p-1 hover:bg-gray-200 rounded"
                     aria-label="Move"
                   >
-                    <lucide-icon [name]="gripVertical" class="w-4 h-4"></lucide-icon>
+                    <physio-icon [name]="gripVertical" class="w-4 h-4" />
                   </button>
                   <button
                     class="p-1 hover:bg-gray-200 rounded"
                     aria-label="Column Actions"
                   >
-                    <lucide-icon [name]="ellipsisVertical" class="w-4 h-4"></lucide-icon>
+                    <physio-icon [name]="ellipsisVertical" class="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -232,7 +235,7 @@
               <a
                 *ngIf="column.id === 'name'"
                 [href]="row.link"
-                class="text-blue-600 hover:text-blue-800 underline"
+                class="text-primary hover:text-primaryPressed underline"
               >
                 {{ row.name }}
               </a>

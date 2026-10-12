@@ -19,7 +19,7 @@ import { PreferredCommunication } from "../../../../../shared/enums/preferred-co
         <div class="flex flex-col gap-4" [formGroup]="form">
             <div class="w-full">
               <p class="font-semibold text-base m-0">Contact & ID</p>
-              <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
+              <p class="m-0 text-[13px] leading-[1.5] text-[#71606A]">
                 Contact Information
               </p>
             </div>
@@ -84,7 +84,7 @@ import { PreferredCommunication } from "../../../../../shared/enums/preferred-co
             </div>
             
             <div class="w-full">
-              <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
+              <p class="m-0 text-[13px] leading-[1.5] text-[#71606A]">
                 Identification Documents
               </p>
             </div>

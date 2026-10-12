@@ -4,7 +4,6 @@ import { SharedModule } from "../../../../../shared/shared-imports";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
 
@@ -12,8 +11,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
     selector: "user-permission-permission-drawer",
     standalone: true,
     imports: [
-        DrawerComponent, 
-        BooIconComponent, 
+        DrawerComponent, 
         BooInputComponent, 
         BooTextareaComponent, 
         BooCheckboxComponent, 
@@ -43,7 +41,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                         (click)="onClose()"
                         class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
                     >
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 

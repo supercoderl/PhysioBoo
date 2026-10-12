@@ -1,5 +1,4 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
@@ -13,10 +12,10 @@ const QUEUE_STATUSES: SurgeryStatus[] = ['Scheduled', 'PatientArrived', 'PreOpRe
 @Component({
   selector: 'surgery-queue-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !queue().length"><boo-empty-state icon="clipboard-check" title="The surgical queue is empty" description="No cases are currently in pre-operative stages."></boo-empty-state></div>
@@ -25,7 +24,7 @@ const QUEUE_STATUSES: SurgeryStatus[] = ['Scheduled', 'PatientArrived', 'PreOpRe
       <div *ngFor="let s of queue()" class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
         <button type="button" (click)="toggleExpand(s.id)" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors text-left">
           <div class="flex items-center gap-4 min-w-0">
-            <boo-icon name="user-round" [size]="18" iconClass="text-gray-400 shrink-0"></boo-icon>
+            <physio-icon name="user-round" [size]="18" [class]="'text-gray-400 shrink-0'"></physio-icon>
             <div class="min-w-0">
               <div class="text-sm font-semibold text-gray-800 truncate">{{ s.surgeryNumber }} · {{ s.procedure }}</div>
               <div class="text-xs text-gray-500 truncate">{{ s.patientName }} ({{ s.mrn }}) · {{ s.operatingRoomNumber }} · {{ s.scheduledStart | date:'shortTime' }}</div>
@@ -34,20 +33,20 @@ const QUEUE_STATUSES: SurgeryStatus[] = ['Scheduled', 'PatientArrived', 'PreOpRe
           <div class="flex items-center gap-3 shrink-0">
             <span *ngIf="checklists[s.id]" class="text-xs font-semibold text-gray-600">{{ completionFraction(s.id) }}</span>
             <boo-status-badge [label]="s.status" [tone]="statusTone(s.status)"></boo-status-badge>
-            <boo-icon name="chevron-down" [size]="16" iconClass="text-gray-400 transition-transform" [ngClass]="expanded() === s.id ? 'rotate-180' : ''"></boo-icon>
+            <physio-icon name="chevron-down" [size]="16" [ngClass]="expanded() === s.id ? 'rotate-180' : ''" [class]="'text-gray-400 transition-transform'"></physio-icon>
           </div>
         </button>
 
         <div *ngIf="expanded() === s.id" class="border-t border-gray-100 px-4 py-4 bg-gray-50">
           <div *ngIf="!checklists[s.id]" class="flex items-center justify-center py-6">
-            <boo-icon name="loader" iconClass="w-5 h-5 text-primary animate-spin"></boo-icon>
+            <physio-icon name="loader" [class]="'w-5 h-5 text-primary animate-spin'"></physio-icon>
           </div>
 
           <div *ngIf="checklists[s.id]" class="space-y-1.5">
             <div *ngFor="let item of checklists[s.id]" class="flex items-center justify-between gap-2 px-3 py-2 bg-surface rounded-md border border-gray-100">
               <div class="flex items-center gap-2 min-w-0">
-                <boo-icon [name]="item.status === 'Completed' ? 'check-circle-2' : item.status === 'NotApplicable' ? 'circle-x' : 'clock'"
-                  [size]="16" [ngClass]="item.status === 'Completed' ? 'text-emerald-500' : item.status === 'NotApplicable' ? 'text-gray-400' : 'text-amber-500'"></boo-icon>
+                <physio-icon [name]="item.status === 'Completed' ? 'check-circle-2' : item.status === 'NotApplicable' ? 'circle-x' : 'clock'"
+                  [size]="16" [ngClass]="item.status === 'Completed' ? 'text-emerald-500' : item.status === 'NotApplicable' ? 'text-gray-400' : 'text-amber-500'"></physio-icon>
                 <span class="text-sm text-gray-700 truncate" [attr.aria-label]="item.label + ' — ' + item.status">{{ item.label }}</span>
               </div>
               <div class="flex items-center gap-2 shrink-0">

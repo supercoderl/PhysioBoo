@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
@@ -10,10 +9,10 @@ import { CriticalFindingAlert, RadiologyAlertSeverity } from "../../../../../sha
 @Component({
   selector: 'radiology-critical-findings-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !alerts().length">

@@ -35,7 +35,7 @@ export class RevenueKpiStripComponent {
     get headlineItem(): AnalyticItem {
         return {
             icon: 'trending-up',
-            color: '#2563EB',
+            color: '#E11D48',
             current: this.summary?.totalRevenue ?? 0,
             percent: this.formatGrowth(this.summary?.totalRevenueGrowthPct),
             trend: this.summary?.revenueTrend ?? [],

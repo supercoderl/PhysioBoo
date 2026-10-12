@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { finalize, firstValueFrom } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { HomeSettingsService } from "../../../../../services/admin/home-settings.service";
@@ -21,12 +20,11 @@ import { SharedModule } from "../../../../../shared/shared-imports";
         BooTextareaComponent,
         BooCheckboxComponent,
         BooButtonAdminComponent,
-        BooIconComponent
     ],
     template: `
     <div class="bg-surface rounded-[6px] border border-gray-200 p-6 relative">
       <div *ngIf="loadingSrv.isLoading('search')" class="absolute inset-0 bg-surface/80 z-10 flex items-center justify-center backdrop-blur-sm rounded-[6px]">
-        <boo-icon name="loader" class="animate-spin text-primary" [size]="28"></boo-icon>
+        <physio-icon name="loader" [size]="28" [class]="'animate-spin text-primary'"></physio-icon>
       </div>
 
       <div [formGroup]="form" class="space-y-6 max-w-3xl">

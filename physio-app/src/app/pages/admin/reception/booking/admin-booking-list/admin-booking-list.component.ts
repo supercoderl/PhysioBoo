@@ -4,7 +4,6 @@ import { AdminContentHeaderComponent } from "../../../../../components/layout/ad
 import { AdminBookingTableCardComponent } from "../../../../../components/layout/admin/booking/booking-table-card.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { AppointmentService } from '../../../../../services/admin/appointment.service';
 import { DateService } from '../../../../../services/common/date.service';
@@ -21,7 +20,6 @@ import { PaginationData } from '../../../../../shared/types/common';
   imports: [
     ButtonIconComponent,
     BooButtonAdminComponent,
-    BooIconComponent,
     BooInputComponent,
     AdminBookingTableCardComponent,
     SharedModule,

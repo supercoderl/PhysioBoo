@@ -6,7 +6,6 @@ import { ColorUtils } from "../../../../../shared/utils/color.utils";
 import { IconUtils } from "../../../../../shared/utils/icon.utils";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
 
@@ -15,8 +14,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
     standalone: true,
     imports: [
         DrawerComponent, 
-        BooButtonAdminComponent, 
-        BooIconComponent, 
+        BooButtonAdminComponent, 
         BooInputComponent, 
         BooTextareaComponent,
         SharedModule
@@ -38,10 +36,10 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                             [style.background-color]="ColorUtils.softBg(form.get('color')?.value)"
                             [style.color]="form.get('color')?.value"
                         >
-                            <boo-icon
+                            <physio-icon
                                 [name]="form.get('icon')?.value || 'shield'"
-                                iconClass="w-5 h-5"
-                            ></boo-icon>
+                            class="w-5 h-5"
+                            ></physio-icon>
                         </div>
                         <div>
                             <h2 class="text-xl font-bold text-primary leading-none mb-1">
@@ -56,7 +54,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                         (click)="onClose()"
                         class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
                     >
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
@@ -106,11 +104,11 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                                         [style.background-color]="c.value"
                                         [title]="c.label"
                                     >
-                                        <boo-icon
+                                        <physio-icon
                                             *ngIf="form.get('color')?.value === c.value"
                                             name="check"
-                                            iconClass="w-4 h-4 text-white"
-                                        ></boo-icon>
+                                        class="w-4 h-4 text-white"
+                                        ></physio-icon>
                                     </button>
                                 </div>
                             </div>
@@ -128,7 +126,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                                             : 'border-gray-200 text-secondary hover:border-gray-300'
                                         "
                                     >
-                                        <boo-icon [name]="i" iconClass="w-4 h-4"></boo-icon>
+                                        <physio-icon [name]="i" class="w-4 h-4"></physio-icon>
                                     </button>
                                 </div>
                             </div>
@@ -161,10 +159,10 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                                     class="flex items-center justify-between px-4 py-2.5 bg-gray-50 border-b border-gray-200"
                                 >
                                     <div class="flex items-center gap-2">
-                                        <boo-icon
+                                        <physio-icon
                                             name="folder"
-                                            iconClass="w-4 h-4 text-secondary"
-                                        ></boo-icon>
+                                        class="w-4 h-4 text-secondary"
+                                        ></physio-icon>
                                         <span class="text-sm font-semibold text-primary">{{
                                             cat
                                         }}</span>
@@ -221,7 +219,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                         (click)="onDeleteRole(selectedRole()!)"
                     class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1.5"
                     >
-                        <boo-icon name="trash-2" [size]="16"></boo-icon>
+                        <physio-icon name="trash-2" [size]="16"></physio-icon>
                         Delete Role
                     </button>
                     <div class="flex gap-3 ml-auto">

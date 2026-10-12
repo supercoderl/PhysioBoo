@@ -24,18 +24,18 @@
       >
         <div class="flex w-full flex-auto flex-col items-start justify-start">
           <div class="p-4 rounded-full flex-center-center bg-primary/20 text-primary">
-            <boo-icon name="blocks"></boo-icon>
+            <physio-icon name="blocks"></physio-icon>
           </div>
           <p class="font-medium leading-5 text-[14px] mt-5 m-0">{{ board.title }}</p>
           <p *ngIf="board.description" class="line-clamp-2 mt-0.5 m-0 text-[13px] leading-[1.5]">{{ board.description }}</p>
-          <hr class="w-12 h-0.5 mt-6 m-0 shrink-0 border-[0_0_thin] border-solid border-[#E5E7EB]" />
+          <hr class="w-12 h-0.5 mt-6 m-0 shrink-0 border-[0_0_thin] border-solid border-[#EFE3E7]" />
         </div>
         <div class="flex w-full flex-auto flex-col items-start justify-end">
-          <p class="m-0 mt-4 text-[13px] leading-[1.5] text-[#4B5563]">
+          <p class="m-0 mt-4 text-[13px] leading-[1.5] text-[#71606A]">
             {{ board.listCount }} {{ board.listCount === 1 ? 'list' : 'lists' }} · {{ board.cardCount }} {{ board.cardCount === 1 ? 'card' : 'cards' }}
           </p>
           <div class="mt-2 flex items-center text-[13px] leading-[1.5]">
-            <span class="text-[#4B5563]">Edited:</span>
+            <span class="text-[#71606A]">Edited:</span>
             <span class="truncate mx-1">{{ board.updatedAt | date:'MMM d, y, h:mm a' }}</span>
           </div>
         </div>
@@ -44,9 +44,9 @@
       <button
         type="button"
         (click)="openDialog()"
-        class="min-h-60 flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-[#E5E7EB] bg-transparent p-4 text-[#4B5563] hover:border-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+        class="min-h-60 flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-[#EFE3E7] bg-transparent p-4 text-[#71606A] hover:border-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
       >
-        <boo-icon name="plus" [size]="28"></boo-icon>
+        <physio-icon name="plus" [size]="28"></physio-icon>
         <span class="text-[14px] font-medium">New board</span>
       </button>
     </div>
@@ -66,33 +66,33 @@
     class="w-full max-w-md rounded-xl bg-surface shadow-xl"
     (click)="$event.stopPropagation()"
   >
-    <div class="border-b border-[#E5E7EB] px-4 py-3">
+    <div class="border-b border-[#EFE3E7] px-4 py-3">
       <h2 class="m-0 text-[16px] font-semibold">New board</h2>
     </div>
     <div class="space-y-3 px-4 py-3">
       <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Title</span>
+        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]">Title</span>
         <input
           type="text"
           [(ngModel)]="d.title"
           (keydown.enter)="createBoard()"
           maxlength="120"
           autofocus
-          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
+          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
         />
       </label>
       <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Description</span>
+        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]">Description</span>
         <textarea
           [(ngModel)]="d.description"
           maxlength="500"
           rows="3"
-          class="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-[14px] outline-none focus:border-primary"
+          class="w-full rounded-lg border border-[#EFE3E7] px-3 py-2 text-[14px] outline-none focus:border-primary"
         ></textarea>
       </label>
     </div>
-    <div class="flex justify-end gap-2 border-t border-[#E5E7EB] px-4 py-3">
-      <button type="button" (click)="closeDialog()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#4B5563] hover:bg-gray-100">Cancel</button>
+    <div class="flex justify-end gap-2 border-t border-[#EFE3E7] px-4 py-3">
+      <button type="button" (click)="closeDialog()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#71606A] hover:bg-gray-100">Cancel</button>
       <button
         type="button"
         (click)="createBoard()"

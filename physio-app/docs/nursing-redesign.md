@@ -2,7 +2,7 @@
 
 **Path:** `admin/nursing`
 **Current implementation:** None. Only `Ward`/`Bed` types and the Inpatient Bed Map exist (`src/app/pages/admin/inpatient/bed-map`). There is no nursing workflow surface — no task list, MAR, vitals charting, I&O, nursing notes, or shift handover.
-**Scope:** Frontend UI/UX only. No backend, no DB schema. Reuses existing conventions: `DrawerComponent`, `StatusBadgeComponent`, `BooIcon`, `BooSelect`, `BooInput`, `BooTextarea`, `LocalLoadingService`, `ToastService`, `DialogService`, Tailwind, Angular signals. Mirrors the tabbed-chart pattern already established in `medical-record` and the dashboard/stat-card pattern from `inpatient/bed-map`.
+**Scope:** Frontend UI/UX only. No backend, no DB schema. Reuses existing conventions: `DrawerComponent`, `StatusBadgeComponent`, `physio-icon`, `BooSelect`, `BooInput`, `BooTextarea`, `LocalLoadingService`, `ToastService`, `DialogService`, Tailwind, Angular signals. Mirrors the tabbed-chart pattern already established in `medical-record` and the dashboard/stat-card pattern from `inpatient/bed-map`.
 
 ---
 
@@ -143,7 +143,7 @@ shared/types/nursing.ts                            (NursingPatient, NursingTask,
 services/admin/nursing.service.ts                  (NursingService — mock-fallback pattern, same as MedicalRecordService)
 ```
 
-**Reused without modification:** `DrawerComponent`, `StatusBadgeComponent`, `BooIconComponent`, `BooSelectComponent`, `BooInputComponent`, `BooTextareaComponent`, `BooSearchComponent`, `BooTableAdminComponent`, `BooAvatarComponent`, `LocalLoadingService`, `ToastService`, `DialogService`.
+**Reused without modification:** `DrawerComponent`, `StatusBadgeComponent`, `IconComponent` (physio-icon), `BooSelectComponent`, `BooInputComponent`, `BooTextareaComponent`, `BooSearchComponent`, `BooTableAdminComponent`, `BooAvatarComponent`, `LocalLoadingService`, `ToastService`, `DialogService`.
 
 **New (this feature):** everything under `nursing/` above, plus `nursing.ts` types and `nursing.service.ts`.
 

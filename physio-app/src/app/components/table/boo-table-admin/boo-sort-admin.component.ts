@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { SharedModule } from '../../../shared/shared-imports';
-import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-button-admin.component';
 import { DEFAULT_SORT_OPTIONS, SortOption } from '../../../shared/types/sort';
+import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-button-admin.component';
 
 @Component({
   selector: 'boo-sort-admin',
@@ -14,13 +14,13 @@ import { DEFAULT_SORT_OPTIONS, SortOption } from '../../../shared/types/sort';
     <div class="dropdown">
       <boo-button-admin
         buttonClass="!bg-surface h-full min-w-[140px] justify-between"
-        [border]="{ width: 1, color: '#e3e3e3' }"
+        [border]="{ width: 1, color: '#EFE3E7' }"
         (click)="toggle()"
       >
         <span class="text-placeholder mr-1">Sort By:</span>
         <span class="font-medium text-regular">{{ selectedLabel }}</span>
         
-        <lucide-icon name="chevronDown" class="w-3 h-3 ml-2 text-gray-400"></lucide-icon>
+        <physio-icon name="chevronDown" class="w-3 h-3 ml-2 text-gray-400"/>
       </boo-button-admin>
     </div>
 
@@ -34,13 +34,13 @@ import { DEFAULT_SORT_OPTIONS, SortOption } from '../../../shared/types/sort';
             type="button"
             (click)="selectOption(opt, true)"
             class="w-full text-left px-3 py-2 rounded-md transition-colors flex items-center justify-between group"
-            [class.bg-blue-50]="opt.value === value"
-            [class.text-blue-600]="opt.value === value"
+            [class.bg-primarySoft]="opt.value === value"
+            [class.text-primary]="opt.value === value"
             [class.text-slate-600]="opt.value !== value"
             [class.hover:bg-gray-50]="opt.value !== value"
           >
             <span class="text-regular group-hover:text-surface">{{ opt.label }}</span>
-            <lucide-icon *ngIf="opt.value === value" name="check" class="w-3.5 h-3.5"></lucide-icon>
+            <physio-icon *ngIf="opt.value === value" name="check" class="w-3.5 h-3.5"/>
           </button>
         </li>
       </ul>

@@ -237,7 +237,7 @@ cards/bottom-sheet).
 
 Reused as-is: `BooTableAdminComponent`, `BooActionAdminComponent`, `StatusBadgeComponent`,
 `EmptyStateComponent`, `DrawerComponent`, `DialogService`/`DialogComponent`, `ToastService`,
-`BooIconComponent`, `BooSelectComponent`, `BooDatepickerComponent`, `BooInputComponent`,
+`IconComponent` (physio-icon), `BooSelectComponent`, `BooDatepickerComponent`, `BooInputComponent`,
 `PrintPreviewComponent`, `StatCardComponent`.
 
 New, created only because no existing component covers the need: `StockTakeHeroHeaderComponent`,

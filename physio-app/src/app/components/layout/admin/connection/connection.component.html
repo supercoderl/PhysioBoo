@@ -1,6 +1,8 @@
 <!-- User List Panel - Always visible, sticky width 70px -->
 <div class="sticky flex top-0 right-0 h-screen z-[1000] w-[70px]">
-  <div class="flex flex-col w-full h-full bg-surface border-l border-solid border-[#E5E7EB]">
+  <div
+    class="flex flex-col w-full h-full bg-surface border-l border-solid border-[#EFE3E7]"
+  >
     <header class="shadow-md flex flex-col bg-primary">
       <div class="px-1 min-h-12 relative flex items-center justify-center">
         <button
@@ -9,10 +11,10 @@
           type="button"
           (click)="openDrawer()"
         >
-          <lucide-icon
-            [name]="messageSquareText"
+          <physio-icon
+            name="message-square-text"
             class="w-4 h-4 stroke-white"
-          ></lucide-icon>
+          ></physio-icon>
         </button>
       </div>
     </header>
@@ -58,12 +60,14 @@
 </div>
 
 <!-- Conversation Panel - Slides from right -->
-<div 
+<div
   class="fixed top-0 h-screen z-[999] transition-all duration-500 ease-in-out"
   [style.right]="isOpen ? '70px' : '-290px'"
   [style.width]="'290px'"
 >
-  <div class="flex flex-col w-full h-full bg-surface border-l border-solid border-[#E5E7EB] shadow-lg">
+  <div
+    class="flex flex-col w-full h-full bg-surface border-l border-solid border-[#EFE3E7] shadow-lg"
+  >
     <header class="shadow-md flex flex-col bg-primary">
       <div class="px-1 py-2.5 min-h-12 relative flex items-center">
         <div class="flex flex-1 items-center gap-3 px-3">
@@ -78,21 +82,21 @@
             type="button"
             (click)="closeDrawer()"
           >
-            <lucide-icon [name]="x" class="w-4 h-4 stroke-white"></lucide-icon>
+            <physio-icon name="x" class="w-4 h-4 stroke-white" />
           </button>
         </div>
       </div>
     </header>
     <div class="flex flex-1 overflow-hidden">
-      <div 
+      <div
         class="flex flex-1 flex-col items-center justify-center p-6 bg-gray-50"
       >
-        <lucide-icon 
-          [name]="messageSquareText" 
+        <physio-icon
+          name="message-square-text"
           class="w-16 h-16 text-gray-300"
-        ></lucide-icon>
+        />
         <p
-          class="mt-6 px-4 pb-6 text-center m-0 text-[13px] leading-[1.5] text-[#4B5563]"
+          class="mt-6 px-4 pb-6 text-center m-0 text-[13px] leading-[1.5] text-[#71606A]"
         >
           Select a contact to start a conversation.
         </p>

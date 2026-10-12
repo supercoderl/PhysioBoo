@@ -1,5 +1,4 @@
 import { Component, Input, computed, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { LabReportRow, LabResultRow } from "../../../../../shared/types/medical-record.types";
 
@@ -14,12 +13,12 @@ interface LabPanelGroup {
 @Component({
   selector: 'mr-laboratory-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div class="space-y-3">
       <!-- Critical / abnormal banner -->
       <div *ngIf="criticalCount() > 0" class="bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center gap-3">
-        <boo-icon name="alert-triangle" iconClass="w-5 h-5 text-red-600"></boo-icon>
+        <physio-icon name="alert-triangle" class="w-5 h-5 text-red-600"></physio-icon>
         <div class="text-sm">
           <strong class="text-red-700 font-semibold">{{ criticalCount() }} critical value{{ criticalCount() === 1 ? '' : 's' }}</strong>
           <span class="text-red-600 ml-1">require attention. Review highlighted rows below.</span>
@@ -39,7 +38,7 @@ interface LabPanelGroup {
       <article *ngFor="let g of grouped()" class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
         <header class="px-5 py-3 border-b border-gray-100 flex items-center justify-between gap-3">
           <h3 class="text-sm font-semibold text-primary m-0 flex items-center gap-2">
-            <boo-icon name="flask-conical" iconClass="w-4 h-4 text-secondary"></boo-icon>
+            <physio-icon name="flask-conical" class="w-4 h-4 text-secondary"></physio-icon>
             {{ g.panel }}
             <span class="text-xs text-secondary font-normal">({{ g.items.length }})</span>
           </h3>
@@ -91,7 +90,7 @@ interface LabPanelGroup {
       <article *ngIf="reports?.length" class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
         <header class="px-5 py-3 border-b border-gray-100">
           <h3 class="text-sm font-semibold text-primary m-0 flex items-center gap-2">
-            <boo-icon name="file-text" iconClass="w-4 h-4 text-secondary"></boo-icon>
+            <physio-icon name="file-text" class="w-4 h-4 text-secondary"></physio-icon>
             Pathologist reports
           </h3>
         </header>
@@ -148,14 +147,14 @@ export class LaboratoryTabComponent {
     if (r.isCritical) return 'text-red-700';
     if (!r.abnormalFlag || r.abnormalFlag === 'N') return 'text-primary';
     if (r.abnormalFlag.startsWith('H')) return 'text-red-600';
-    if (r.abnormalFlag.startsWith('L')) return 'text-blue-600';
+    if (r.abnormalFlag.startsWith('L')) return 'text-primary';
     return 'text-amber-700';
   }
 
   flagPillClass(flag: string): string {
     if (flag.startsWith('HH') || flag.startsWith('LL')) return 'bg-red-100 text-red-700';
     if (flag.startsWith('H')) return 'bg-red-50 text-red-700';
-    if (flag.startsWith('L')) return 'bg-blue-50 text-blue-700';
+    if (flag.startsWith('L')) return 'bg-primarySoft text-primaryHover';
     return 'bg-amber-50 text-amber-700';
   }
 }

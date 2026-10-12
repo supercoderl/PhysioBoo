@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
@@ -9,7 +8,7 @@ import { InventoryMedicineDetail, InventoryStockStatus } from "../../../../share
 @Component({
     selector: 'inventory-detail-panel',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, EmptyStateComponent, StatusBadgeComponent],
+    imports: [SharedModule,EmptyStateComponent, StatusBadgeComponent],
     template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex items-center justify-between">
@@ -21,7 +20,7 @@ import { InventoryMedicineDetail, InventoryStockStatus } from "../../../../share
         class="flex-1 flex items-center justify-center"></boo-empty-state>
 
       <div *ngIf="medicineId && loading()" class="flex-1 flex items-center justify-center">
-        <boo-icon name="loader-circle" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+        <physio-icon name="loader-circle" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
       </div>
 
       <div *ngIf="medicineId && !loading() && detail()" class="flex-1 overflow-y-auto p-3 space-y-3">

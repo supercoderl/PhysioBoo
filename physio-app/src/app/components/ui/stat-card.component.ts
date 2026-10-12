@@ -1,7 +1,6 @@
 import { Component, Input } from "@angular/core";
 import { SharedModule } from "../../shared/shared-imports";
 import { StatTone } from "../../shared/types/doctor-desk.types";
-import { BooIconComponent } from "../icon/boo-icon/boo-icon.component";
 
 const TONE_CLASSES: Record<StatTone, { bg: string; icon: string; ring: string }> = {
     primary: { bg: 'bg-primary/8', icon: 'text-primary', ring: 'ring-primary/10' },
@@ -14,13 +13,13 @@ const TONE_CLASSES: Record<StatTone, { bg: string; icon: string; ring: string }>
 @Component({
     selector: 'boo-stat-card',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
         <div
             class="flex items-center gap-3.5 bg-surface rounded-2 border border-borderGray/60 px-4 py-3.5 transition-all duration-200 hover:shadow-card hover:-translate-y-0.5"
         >
             <div class="flex items-center justify-center w-10 h-10 rounded-1.5 shrink-0 ring-1" [ngClass]="[tones.bg, tones.ring]">
-                <boo-icon [name]="icon" [size]="18" [iconClass]="tones.icon"></boo-icon>
+                <physio-icon [name]="icon" [size]="18" [class]="tones.icon"></physio-icon>
             </div>
             <div class="flex flex-col min-w-0">
                 <span class="text-[12px] font-medium text-secondary leading-none mb-1 truncate">{{ label }}</span>

@@ -8,7 +8,6 @@ import { ColorUtils } from "../../../../../shared/utils/color.utils";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 
 @Component({
@@ -16,8 +15,7 @@ import { BooInputComponent } from "../../../../input/boo-input/boo-input.compone
     standalone: true,
     imports: [
         SharedModule,
-        DrawerComponent,
-        BooIconComponent,
+        DrawerComponent,
         BooButtonAdminComponent,
         BooInputComponent,
         BooCheckboxComponent
@@ -40,7 +38,7 @@ import { BooInputComponent } from "../../../../input/boo-input/boo-input.compone
                         (click)="onClose()"
                         class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
                     >
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
@@ -68,20 +66,20 @@ import { BooInputComponent } from "../../../../input/boo-input/boo-input.compone
                                     *ngIf="su.isVerified"
                                     class="inline-flex items-center gap-1 mr-2"
                                 >
-                                    <boo-icon
+                                    <physio-icon
                                         name="badge-check"
-                                        iconClass="w-3 h-3 text-emerald-500"
-                                    ></boo-icon>
+                                    class="w-3 h-3 text-emerald-500"
+                                    ></physio-icon>
                                     Verified
                                 </span>
                                 <span
                                     *ngIf="su.twoFactorEnabled"
                                     class="inline-flex items-center gap-1"
                                 >
-                                    <boo-icon
+                                    <physio-icon
                                         name="shield-check"
-                                        iconClass="w-3 h-3 text-indigo-500"
-                                    ></boo-icon>
+                                    class="w-3 h-3 text-primary"
+                                    ></physio-icon>
                                     2FA on
                                 </span>
                             </div>
@@ -144,10 +142,10 @@ import { BooInputComponent } from "../../../../input/boo-input/boo-input.compone
                                     [style.background-color]="ColorUtils.softBg(ColorUtils.roleColorFor(r))"
                                     [style.color]="ColorUtils.roleColorFor(r)"
                             >
-                                <boo-icon
+                                <physio-icon
                                     [name]="r.icon || 'shield'"
-                                    iconClass="w-4 h-4"
-                                ></boo-icon>
+                                class="w-4 h-4"
+                                ></physio-icon>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="text-sm font-medium text-primary">{{ r.name }}</div>

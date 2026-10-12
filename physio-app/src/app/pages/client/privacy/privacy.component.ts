@@ -14,7 +14,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                     <div class="px-3">
                         <div>
                             <div class="pb-6 mb-4">
-                                <p class="text-base text-[#6b7280] mb-6">
+                                <p class="text-base text-[#85757D] mb-6">
                                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                                     eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
                                     enim ad minim veniam, quis nostrud exercitation ullamco laboris
@@ -23,7 +23,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                     nulla pariatur. Excepteur sint occaecat cupidatat non proident,
                                     sunt in culpa qui officia deserunt mollit anim id est laborum.
                                 </p>
-                                <p class="text-base text-[#6b7280] mb-6">
+                                <p class="text-base text-[#85757D] mb-6">
                                     Sed ut perspiciatis unde omnis iste natus error sit voluptatem
                                     accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
                                     quae ab illo inventore veritatis et quasi architecto beatae vitae
@@ -34,7 +34,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                     velit, sed quia non numquam eius modi tempora incidunt ut labore
                                     et dolore magnam aliquam quaerat voluptatem.
                                 </p>
-                                <p class="text-base text-[#6b7280]">
+                                <p class="text-base text-[#85757D]">
                                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                                     eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
                                     enim ad minim veniam, quis nostrud exercitation ullamco laboris
@@ -45,31 +45,31 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 </p>
                             </div>
                             <div class="pb-6 mb-4">
-                                <p class="mb-2.5 inline-flex items-start text-base text-[#6b7280] flex items-center">
+                                <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
                                     <lucide-angular [img]="CircleCheck" class="w-5 mr-2 fill-secondary stroke-white" /> At vero eos et accusamus et
                                     iusto odio dignissimos ducimus qui blanditiis praesentium
                                     voluptatum deleniti atque corrupti quos dolores et
                                 </p>
-                                <p class="mb-2.5 inline-flex items-start text-base text-[#6b7280] flex items-center">
+                                <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
                                     <lucide-angular [img]="CircleCheck" class="w-5 mr-2 fill-secondary stroke-white" /> Sed ut perspiciatis unde omnis
                                     iste natus error sit voluptatem accusantium doloremque laudantium,
                                 </p>
-                                <p class="mb-2.5 inline-flex items-start text-base text-[#6b7280] flex items-center">
+                                <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
                                     <lucide-angular [img]="CircleCheck" class="w-5 mr-2 fill-secondary stroke-white" /> Nemo enim ipsam voluptatem
                                     quia voluptas sit aspernatur aut odit aut fugit, sed quia
                                     consequuntur magni dolores eos qui ratione voluptatem sequi
                                     nesciunt.
                                 </p>
-                                <p class="mb-2.5 inline-flex items-start text-base text-[#6b7280] flex items-center">
+                                <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
                                     <lucide-angular [img]="CircleCheck" class="w-5 mr-2 fill-secondary stroke-white" /> At vero eos et accusamus et
                                     iusto odio dignissimos ducimus qui blanditiis praesentium
                                     voluptatum deleniti atque corrupti quos dolores et
                                 </p>
-                                <p class="mb-2.5 inline-flex items-start text-base text-[#6b7280] flex items-center">
+                                <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
                                     <lucide-angular [img]="CircleCheck" class="w-5 mr-2 fill-secondary stroke-white" /> Sed ut perspiciatis unde omnis
                                     iste natus error sit voluptatem accusantium doloremque laudantium,
                                 </p>
-                                <p class="mb-2.5 inline-flex items-start text-base text-[#6b7280] flex items-center">
+                                <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
                                     <lucide-angular [img]="CircleCheck" class="w-5 mr-2 fill-secondary stroke-white" /> Nemo enim ipsam voluptatem
                                     quia voluptas sit aspernatur aut odit aut fugit, sed quia
                                     consequuntur magni dolores eos qui ratione voluptatem sequi
@@ -77,7 +77,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 </p>
                             </div>
                             <div class="md:pb-6 md:mb-4">
-                                <p class="text-base text-[#6b7280] mb-6">
+                                <p class="text-base text-[#85757D] mb-6">
                                     Sed ut perspiciatis unde omnis iste natus error sit voluptatem
                                     accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
                                     quae ab illo inventore veritatis et quasi architecto beatae vitae
@@ -88,7 +88,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                     velit, sed quia non numquam eius modi tempora incidunt ut labore
                                     et dolore magnam aliquam quaerat voluptatem.
                                 </p>
-                                <p class="text-base text-[#6b7280] mb-6">
+                                <p class="text-base text-[#85757D] mb-6">
                                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                                     eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
                                     enim ad minim veniam, quis nostrud exercitation ullamco laboris

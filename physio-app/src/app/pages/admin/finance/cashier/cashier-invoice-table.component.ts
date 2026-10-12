@@ -17,7 +17,7 @@ const STATUS_LABEL: Record<CashierInvoiceStatus, string> = {
 
 const STATUS_CLASS: Record<CashierInvoiceStatus, string> = {
     Pending: 'bg-amber-100 text-amber-700',
-    PartiallyPaid: 'bg-sky-100 text-sky-700',
+    PartiallyPaid: 'bg-primarySoft text-primaryHover',
     Paid: 'bg-emerald-100 text-emerald-700',
     Cancelled: 'bg-slate-200 text-slate-600',
     Refunded: 'bg-rose-100 text-rose-700',

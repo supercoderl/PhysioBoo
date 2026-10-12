@@ -4,7 +4,6 @@ import { ColumnDefDirective } from "../../../../../../shared/directives/column-d
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { Banner } from "../../../../../../shared/types/banner.types";
 import { ActionItem, PaginationData } from "../../../../../../shared/types/common";
-import { BooIconComponent } from "../../../../../icon/boo-icon/boo-icon.component";
 import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo-table-admin.component";
 
@@ -16,7 +15,6 @@ import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo
     BooTableAdminComponent,
     ColumnDefDirective,
     BooActionAdminComponent,
-    BooIconComponent
   ],
   host: { class: 'block h-full min-h-0' },
   template: `
@@ -42,7 +40,7 @@ import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo
           />
           <ng-template #noImage>
             <div class="w-14 h-9 rounded-md bg-gray-100 flex items-center justify-center">
-              <boo-icon name="image" [size]="16" color="#9ca3af"></boo-icon>
+              <physio-icon name="image" [size]="16" class="text-[#A1A1AA]"></physio-icon>
             </div>
           </ng-template>
         </ng-template>

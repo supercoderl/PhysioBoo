@@ -1,12 +1,11 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailPaymentMethod, RetailPaymentSplit } from "../../../../shared/types/retail-pos.types";
 
 @Component({
   selector: 'retail-payment-dialog',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div *ngIf="isOpen" class="fixed inset-0 z-[10000] flex items-center justify-center">
       <div class="absolute inset-0 bg-black/50" (click)="close.emit()" aria-hidden="true"></div>
@@ -15,7 +14,7 @@ import { RetailPaymentMethod, RetailPaymentSplit } from "../../../../shared/type
         <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
           <h2 class="text-base font-semibold text-gray-800">Payment</h2>
           <button type="button" (click)="close.emit()" class="text-gray-400 hover:text-gray-600" aria-label="Close payment dialog">
-            <boo-icon name="x" [size]="18"></boo-icon>
+            <physio-icon name="x" [size]="18"></physio-icon>
           </button>
         </div>
 
@@ -28,7 +27,7 @@ import { RetailPaymentMethod, RetailPaymentSplit } from "../../../../shared/type
                 [disabled]="m.key === 'Insurance' && !hasInsurance"
                 class="px-2 py-2.5 rounded-lg border text-xs font-semibold flex flex-col items-center gap-1 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 [ngClass]="method === m.key ? 'bg-primary/10 border-primary text-primary' : 'bg-surface border-gray-200 text-gray-600 hover:border-gray-300'">
-                <boo-icon [name]="m.icon" [size]="16"></boo-icon>
+                <physio-icon [name]="m.icon" [size]="16"></physio-icon>
                 {{ m.label }}
               </button>
             </div>
@@ -53,10 +52,10 @@ import { RetailPaymentMethod, RetailPaymentSplit } from "../../../../shared/type
                   <option [disabled]="!hasInsurance" value="Insurance">Insurance</option>
                 </select>
                 <input type="number" [(ngModel)]="split.amount" min="0" step="0.01" class="flex-1 px-2 py-1.5 border border-gray-300 rounded-lg text-xs" />
-                <button type="button" (click)="removeSplit(i)" class="text-gray-400 hover:text-rose-600" aria-label="Remove split"><boo-icon name="x" [size]="14"></boo-icon></button>
+                <button type="button" (click)="removeSplit(i)" class="text-gray-400 hover:text-rose-600" aria-label="Remove split"><physio-icon name="x" [size]="14"></physio-icon></button>
               </div>
               <button type="button" (click)="addSplit()" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
-                <boo-icon name="plus" [size]="12"></boo-icon> Add payment line
+                <physio-icon name="plus" [size]="12"></physio-icon> Add payment line
               </button>
               <p class="text-xs mt-2" [ngClass]="remainingSplit() === 0 ? 'text-emerald-600' : 'text-amber-600'" aria-live="polite">
                 Remaining: \${{ remainingSplit().toFixed(2) }}

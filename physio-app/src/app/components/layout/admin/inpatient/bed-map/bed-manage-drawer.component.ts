@@ -8,7 +8,6 @@ import { SharedModule } from "../../../../../shared/shared-imports";
 import { Bed, BedType, CreateBedRequest } from "../../../../../shared/types/bed.types";
 import { CreateWardRequest, Ward } from "../../../../../shared/types/ward.types";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 
 /**
@@ -18,7 +17,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
 @Component({
     selector: 'bed-map-manage-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooIconComponent, BooSelectComponent],
+    imports: [SharedModule, DrawerComponent,BooSelectComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="560" (close)="close.emit()">
             <div class="flex flex-col h-full bg-surface">
@@ -28,7 +27,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                         <p class="text-sm text-secondary m-0">Set up the wards and beds shown on the map.</p>
                     </div>
                     <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100" aria-label="Close">
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
@@ -61,7 +60,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                     <section *ngFor="let w of wards()" class="rounded-lg border border-gray-200">
                         <div class="flex items-center justify-between px-4 py-3">
                             <button (click)="toggleWard(w)" class="flex items-center gap-2 text-left">
-                                <boo-icon [name]="expandedWardId() === w.id ? 'chevron-down' : 'chevron-right'" [size]="16"></boo-icon>
+                                <physio-icon [name]="expandedWardId() === w.id ? 'chevron-down' : 'chevron-right'" [size]="16"></physio-icon>
                                 <span class="font-semibold text-gray-800">{{ w.name }}</span>
                                 <span class="text-xs text-gray-500">{{ w.code ? w.code + ' · ' : '' }}Floor {{ w.floor }} · {{ w.totalBeds }} bed{{ w.totalBeds === 1 ? '' : 's' }}</span>
                             </button>

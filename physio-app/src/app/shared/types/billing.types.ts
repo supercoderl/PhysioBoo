@@ -68,6 +68,15 @@ export interface TenantSubscriptionDetail extends TenantSubscription {
     invoices: SubscriptionInvoice[];
 }
 
+/** Platform-wide billing figures for the stat strip. `partial` means more tenants exist than were summed. */
+export interface BillingSummary {
+    tenants: number;
+    monthlyRecurring: number;
+    pastDue: number;
+    outstanding: number;
+    partial: boolean;
+}
+
 export interface ChangeSubscriptionRequest {
     action: SubscriptionAction;
     planId?: string | null;

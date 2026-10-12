@@ -1,3 +1,17 @@
+const warmNeutral = {
+  50: '#FDF8F9',
+  100: '#FAF1F3',
+  200: '#EFE3E7',
+  300: '#E3D5DA',
+  400: '#A1A1AA',
+  500: '#85757D',
+  600: '#71606A',
+  700: '#55434B',
+  800: '#3F2129',
+  900: '#26141A',
+  950: '#1A0E12',
+};
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{html,js,ts}"],
@@ -6,9 +20,25 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['Geist', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+        mono: ['Geist Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
+        // Tailwind's default gray and slate carry a blue cast (visible on hover states); both are warm neutrals here.
+        gray: warmNeutral,
+        slate: warmNeutral,
         primary: 'rgb(var(--twc-primary) / <alpha-value>)',
+        primaryHover: 'rgb(var(--twc-primary-hover) / <alpha-value>)',
+        primaryPressed: 'rgb(var(--twc-primary-pressed) / <alpha-value>)',
+        primarySoft: 'rgb(var(--twc-primary-soft) / <alpha-value>)',
+        primaryDeep: 'rgb(var(--twc-primary-deep) / <alpha-value>)',
+        logo: 'rgb(var(--twc-logo) / <alpha-value>)',
+        rowDivider: 'rgb(var(--twc-row-divider) / <alpha-value>)',
+        dangerBorder: 'rgb(var(--twc-danger-border) / <alpha-value>)',
+        dangerSoft: 'rgb(var(--twc-danger-soft) / <alpha-value>)',
+        sidebarActive: 'rgb(var(--twc-sidebar-active) / <alpha-value>)',
+        sidebarHover: 'rgb(var(--twc-sidebar-hover) / <alpha-value>)',
+        sidebarGroup: 'rgb(var(--twc-sidebar-group) / <alpha-value>)',
+        sidebarDivider: 'rgb(var(--twc-sidebar-divider) / <alpha-value>)',
         secondary: 'rgb(var(--twc-secondary) / <alpha-value>)',
         neutral: 'rgb(var(--twc-neutral) / <alpha-value>)',
         borderGray: 'rgb(var(--twc-border) / <alpha-value>)',

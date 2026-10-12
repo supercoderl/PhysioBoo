@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { RetailPosService } from "../../../../services/admin/retail-pos.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailMedicineDetail } from "../../../../shared/types/retail-pos.types";
@@ -8,7 +7,7 @@ import { RetailMedicineDetail } from "../../../../shared/types/retail-pos.types"
 @Component({
   selector: 'retail-product-detail-drawer',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, DrawerComponent],
+  imports: [SharedModule,DrawerComponent],
   template: `
     <drawer [isOpen]="isOpen" [width]="480" (close)="close.emit()">
       <div class="p-5" *ngIf="detail">
@@ -18,7 +17,7 @@ import { RetailMedicineDetail } from "../../../../shared/types/retail-pos.types"
             <p class="text-sm text-gray-500">{{ detail.genericName }} · {{ detail.strength }} · {{ detail.packageLabel }}</p>
           </div>
           <button type="button" (click)="close.emit()" class="text-gray-400 hover:text-gray-600" aria-label="Close drawer">
-            <boo-icon name="x" [size]="18"></boo-icon>
+            <physio-icon name="x" [size]="18"></physio-icon>
           </button>
         </div>
 
@@ -34,7 +33,7 @@ import { RetailMedicineDetail } from "../../../../shared/types/retail-pos.types"
         <div class="mb-5" *ngIf="detail.interactionWarnings.length">
           <h3 class="text-xs font-semibold text-gray-500 uppercase mb-2">Interaction Warnings</h3>
           <div *ngFor="let w of detail.interactionWarnings" class="bg-rose-50 text-rose-700 text-xs rounded-lg p-2.5 mb-2 flex items-start gap-2">
-            <boo-icon name="alert-triangle" [size]="14" iconClass="mt-0.5 shrink-0"></boo-icon>
+            <physio-icon name="alert-triangle" [size]="14" [class]="'mt-0.5 shrink-0'"></physio-icon>
             <span>{{ w }}</span>
           </div>
         </div>

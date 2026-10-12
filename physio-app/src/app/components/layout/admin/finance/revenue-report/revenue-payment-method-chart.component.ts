@@ -1,13 +1,12 @@
 import { Component, Input } from "@angular/core";
 import { Color, ScaleType } from "@swimlane/ngx-charts";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PaymentMethodBreakdown } from "../../../../../shared/types/revenue.types";
 
 @Component({
     selector: 'revenue-payment-method-chart',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div class="bg-surface border border-borderGray/60 rounded-2 p-4 h-full">
       <h2 class="text-sm font-semibold text-regular mb-3">Payment Methods</h2>
@@ -15,7 +14,7 @@ import { PaymentMethodBreakdown } from "../../../../../shared/types/revenue.type
       <div *ngIf="loading" class="h-[280px] animate-pulse bg-gray-100 rounded-1.5"></div>
 
       <div *ngIf="!loading && data.length === 0" class="h-[280px] flex flex-col items-center justify-center text-center gap-2">
-        <boo-icon name="pie-chart" [size]="28" iconClass="text-gray-300"></boo-icon>
+        <physio-icon name="pie-chart" [size]="28" class="text-gray-300"></physio-icon>
         <p class="text-sm text-secondary">No payments recorded for the selected range.</p>
       </div>
 
@@ -55,7 +54,7 @@ export class RevenuePaymentMethodChartComponent {
         name: 'payment-methods',
         selectable: true,
         group: ScaleType.Ordinal,
-        domain: ['#2563EB', '#10B981', '#8B5CF6', '#F59E0B', '#64748B'],
+        domain: ['#E11D48', '#10B981', '#8B5CF6', '#F59E0B', '#85757D'],
     };
 
     get series() {

@@ -1,12 +1,11 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { WORKFLOW_STAGES, WorkflowStage } from "../../../../shared/types/insurance-claims.types";
 
 @Component({
   selector: 'insurance-workflow-rail',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <nav class="flex items-center gap-2 overflow-x-auto py-2" role="tablist" aria-label="Claim workflow stages">
       <ng-container *ngFor="let s of stages; let last = last">
@@ -26,7 +25,7 @@ import { WORKFLOW_STAGES, WorkflowStage } from "../../../../shared/types/insuran
             [ngClass]="activeStage === s.key ? 'bg-[var(--ic-ivory)]/25 text-[var(--ic-ivory)]' : 'bg-[var(--ic-warm-gray-200)] text-[var(--ic-warm-gray-700)]'"
           >{{ countFor(s.key) }}</span>
         </button>
-        <boo-icon *ngIf="!last" name="chevron-right" [size]="12" iconClass="text-[var(--ic-warm-gray-400)] shrink-0"></boo-icon>
+        <physio-icon *ngIf="!last" name="chevron-right" [size]="12" [class]="'text-[var(--ic-warm-gray-400)] shrink-0'"></physio-icon>
       </ng-container>
     </nav>
   `,

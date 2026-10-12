@@ -3,7 +3,7 @@
   <!-- Loading skeleton -->
   <div *ngIf="loadingSrv.isLoading(LoadingKeys.DOCTOR_DESK.SNAPSHOT)" class="flex-1 flex items-center justify-center">
     <div class="text-center">
-      <boo-icon name="loader" iconClass="w-8 h-8 text-primary animate-spin mx-auto mb-3"></boo-icon>
+      <physio-icon name="loader" [class]="'w-8 h-8 text-primary animate-spin mx-auto mb-3'"></physio-icon>
       <div class="text-sm text-secondary">Loading doctor desk…</div>
     </div>
   </div>

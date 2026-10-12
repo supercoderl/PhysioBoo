@@ -1,6 +1,5 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { forkJoin } from "rxjs";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { NursingService } from "../../../../../services/admin/nursing.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -9,10 +8,10 @@ import { IntakeOutputEntry, NursingTask, VitalsReading } from "../../../../../sh
 @Component({
   selector: 'nursing-overview-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, StatusBadgeComponent],
+  imports: [SharedModule,StatusBadgeComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading()" class="grid grid-cols-1 xl:grid-cols-2 gap-4">
@@ -20,7 +19,7 @@ import { IntakeOutputEntry, NursingTask, VitalsReading } from "../../../../../sh
       <section class="bg-surface border border-gray-200 rounded-lg">
         <header class="px-5 py-3 border-b border-gray-100">
           <h3 class="text-sm font-semibold text-primary m-0 flex items-center gap-2">
-            <boo-icon name="clipboard-list" iconClass="w-4 h-4 text-secondary"></boo-icon>
+            <physio-icon name="clipboard-list" class="w-4 h-4 text-secondary"></physio-icon>
             Open Tasks
           </h3>
         </header>
@@ -37,7 +36,7 @@ import { IntakeOutputEntry, NursingTask, VitalsReading } from "../../../../../sh
       <section class="bg-surface border border-gray-200 rounded-lg">
         <header class="px-5 py-3 border-b border-gray-100">
           <h3 class="text-sm font-semibold text-primary m-0 flex items-center gap-2">
-            <boo-icon name="activity" iconClass="w-4 h-4 text-secondary"></boo-icon>
+            <physio-icon name="activity" class="w-4 h-4 text-secondary"></physio-icon>
             Recent Vitals
           </h3>
         </header>
@@ -56,7 +55,7 @@ import { IntakeOutputEntry, NursingTask, VitalsReading } from "../../../../../sh
       <section class="bg-surface border border-gray-200 rounded-lg xl:col-span-2">
         <header class="px-5 py-3 border-b border-gray-100">
           <h3 class="text-sm font-semibold text-primary m-0 flex items-center gap-2">
-            <boo-icon name="droplets" iconClass="w-4 h-4 text-secondary"></boo-icon>
+            <physio-icon name="droplets" class="w-4 h-4 text-secondary"></physio-icon>
             Intake & Output Balance (last entries)
           </h3>
         </header>

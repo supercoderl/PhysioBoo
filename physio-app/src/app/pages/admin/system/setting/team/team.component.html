@@ -25,7 +25,7 @@
         </div>
         <form class="p-5 flex flex-col sm:flex-row gap-2" (submit)="$event.preventDefault(); onInvite()">
           <div class="flex-1 min-w-0 inline-flex items-center gap-2 h-10 px-3 border border-gray-200 rounded-md bg-surface focus-within:border-primary transition-colors">
-            <boo-icon name="mail" iconClass="w-4 h-4 text-gray-400" />
+            <physio-icon name="mail" class="w-4 h-4 text-gray-400" />
             <input type="email"
               placeholder="email@example.com"
               class="flex-1 min-w-0 text-sm bg-transparent outline-none border-0"
@@ -44,9 +44,9 @@
           <button type="submit"
             [disabled]="inviting() || !inviteEmail() || !inviteRoleId()"
             class="inline-flex items-center justify-center gap-1.5 h-10 px-4 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-            <boo-icon
+            <physio-icon
               [name]="inviting() ? 'loader-circle' : 'plus'"
-              [iconClass]="inviting() ? 'w-4 h-4 animate-spin' : 'w-4 h-4'" />
+              [class]="inviting() ? 'w-4 h-4 animate-spin' : 'w-4 h-4'" />
             <span>{{ inviting() ? 'Adding…' : 'Add' }}</span>
           </button>
         </form>
@@ -59,7 +59,7 @@
             <p class="text-sm text-gray-500">People with access to this workspace.</p>
           </div>
           <div class="inline-flex items-center gap-2 h-9 px-3 border border-gray-200 rounded-md bg-surface focus-within:border-primary w-56">
-            <boo-icon name="search" iconClass="w-4 h-4 text-gray-400" />
+            <physio-icon name="search" class="w-4 h-4 text-gray-400" />
             <input type="text"
               placeholder="Search members"
               class="flex-1 min-w-0 text-sm bg-transparent outline-none border-0"
@@ -71,14 +71,14 @@
 
         <div class="divide-y divide-gray-100">
           <div *ngIf="loading()" class="p-8 flex items-center justify-center text-sm text-gray-400">
-            <boo-icon name="loader-circle" iconClass="w-5 h-5 mr-2 animate-spin" />
+            <physio-icon name="loader-circle" [class]="'w-5 h-5 mr-2 animate-spin'" />
             Loading members…
           </div>
 
           <div *ngIf="!loading() && filteredMembers().length === 0"
             class="p-10 flex flex-col items-center text-center">
             <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-              <boo-icon name="users" iconClass="w-6 h-6 text-gray-400" />
+              <physio-icon name="users" class="w-6 h-6 text-gray-400" />
             </div>
             <p class="text-sm font-medium text-gray-700 mb-1">No members yet</p>
             <p class="text-xs text-gray-500">Invite teammates to collaborate in this workspace.</p>
@@ -116,9 +116,9 @@
               [disabled]="m.id === currentUserId || removing() === m.id"
               (click)="onRemove(m)"
               [title]="m.id === currentUserId ? 'You cannot remove yourself' : 'Remove member'">
-              <boo-icon
+              <physio-icon
                 [name]="removing() === m.id ? 'loader-circle' : 'trash-2'"
-                [iconClass]="removing() === m.id ? 'w-4 h-4 animate-spin' : 'w-4 h-4'" />
+                [class]="removing() === m.id ? 'w-4 h-4 animate-spin' : 'w-4 h-4'" />
             </button>
           </div>
         </div>
@@ -133,7 +133,7 @@
           <div *ngFor="let inv of pendingInvites()"
             class="flex items-center gap-4 px-5 py-3 hover:bg-gray-50/60">
             <div class="w-9 h-9 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-              <boo-icon name="mail" iconClass="w-4 h-4" />
+              <physio-icon name="mail" class="w-4 h-4" />
             </div>
             <div class="flex-1 min-w-0">
               <div class="text-sm font-medium text-gray-900 truncate">{{ inv.email }}</div>

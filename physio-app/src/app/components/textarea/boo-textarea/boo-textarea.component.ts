@@ -73,7 +73,7 @@ export class BooTextareaComponent {
   @Input() backgroundColor: string = 'white';
   @Input() borderWidth: number = 1;
   @Input() borderColor: string = '#e6e8ee';
-  @Input() placeholderColor: string = '#64748B'; // Slate-500
+  @Input() placeholderColor: string = '#85757D'; // Slate-500
   @ViewChild('textareaElement') textareaElement!: ElementRef;
 
   model: string = '';
@@ -94,7 +94,7 @@ export class BooTextareaComponent {
   }
 
   get textareaClasses(): string {
-    const base = 'block w-full text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 resize-y';
+    const base = 'block w-full text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/70 resize-y';
     
     let sizeClass = '';
     switch (this.size) {

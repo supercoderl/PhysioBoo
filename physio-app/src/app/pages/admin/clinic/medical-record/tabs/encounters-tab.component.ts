@@ -1,18 +1,17 @@
 import { Component, Input, computed, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { AppointmentStatus, EncounterRow } from "../../../../../shared/types/medical-record.types";
 
 @Component({
   selector: 'mr-encounters-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
       <!-- Filter strip -->
       <div class="px-5 py-3 border-b border-gray-200 flex items-center gap-3 flex-wrap">
         <div class="relative flex-1 min-w-[200px]">
-          <boo-icon name="search" iconClass="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></boo-icon>
+          <physio-icon name="search" [class]="'w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2'"></physio-icon>
           <input type="text" [ngModel]="search()" (ngModelChange)="search.set($event)"
             placeholder="Search by doctor, department, complaint…"
             class="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
@@ -59,7 +58,7 @@ import { AppointmentStatus, EncounterRow } from "../../../../../shared/types/med
               <span class="text-xs text-gray-400 mr-1.5">Plan</span>{{ e.treatmentPlan }}
             </div>
             <div *ngIf="e.followUpDate" class="text-xs text-secondary mt-1.5 inline-flex items-center gap-1">
-              <boo-icon name="calendar" iconClass="w-3 h-3"></boo-icon>
+              <physio-icon name="calendar" class="w-3 h-3"></physio-icon>
               Follow-up {{ e.followUpDate | date:'mediumDate' }}
             </div>
           </li>
@@ -102,7 +101,7 @@ export class EncountersTabComponent {
     switch (s) {
       case 'Completed': return 'bg-emerald-50 text-emerald-700';
       case 'Confirmed':
-      case 'Scheduled': return 'bg-blue-50 text-blue-700';
+      case 'Scheduled': return 'bg-primarySoft text-primaryHover';
       case 'InProgress':
       case 'CheckedIn': return 'bg-amber-50 text-amber-700';
       case 'Cancelled':
@@ -114,7 +113,7 @@ export class EncountersTabComponent {
     switch (s) {
       case 'Completed': return 'bg-emerald-500';
       case 'Confirmed':
-      case 'Scheduled': return 'bg-blue-500';
+      case 'Scheduled': return 'bg-primary';
       case 'InProgress':
       case 'CheckedIn': return 'bg-amber-500';
       case 'Cancelled':

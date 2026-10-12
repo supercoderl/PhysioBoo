@@ -1,6 +1,5 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { finalize } from "rxjs";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { PreferenceService } from "../../../../../services/common/preference.service";
 import { AccentColor, FontSize, ThemeConfig, ThemeConfigService, ThemeMode } from "../../../../../services/common/theme-config.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -11,11 +10,11 @@ interface FontSizeOption { value: FontSize; label: string; size: string; }
 interface AccentOption { value: AccentColor; color: string; name: string; }
 
 @Component({
-    selector: 'admin-system-setting-theme',
-    standalone: true,
-    imports: [SharedModule, BooIconComponent],
-    host: { class: 'block h-full min-h-0 overflow-y-auto' },
-    template: `
+  selector: 'admin-system-setting-theme',
+  standalone: true,
+  imports: [SharedModule],
+  host: { class: 'block h-full min-h-0 overflow-y-auto' },
+  template: `
     <main class="flex-1 py-4">
       <div class="max-w-4xl mx-auto">
         <header class="flex items-start justify-between mb-2">
@@ -43,7 +42,7 @@ interface AccentOption { value: AccentColor; color: string; name: string; }
               [class.border-gray-200]="config().mode !== opt.value"
               [class.text-gray-700]="config().mode !== opt.value"
               class="relative flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover:border-gray-300">
-              <boo-icon [name]="opt.icon" [size]="24" [color]="config().mode === opt.value ? 'white' : 'black'" />
+              <physio-icon [name]="opt.icon" [size]="24" [class]="config().mode === opt.value ? 'text-white' : 'text-black'" />
               <span class="text-sm font-medium">{{ opt.label }}</span>
               <span *ngIf="config().mode === opt.value"
                 class="absolute top-2 right-2 w-2 h-2 bg-white rounded-full"></span>
@@ -113,7 +112,7 @@ interface AccentOption { value: AccentColor; color: string; name: string; }
           </button>
           <button type="button" (click)="onSave()" [disabled]="saving() || !isDirty()"
             class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50">
-            <boo-icon *ngIf="saving()" name="loader-circle" iconClass="w-4 h-4 animate-spin" />
+            <physio-icon *ngIf="saving()" name="loader-circle" [class]="'w-4 h-4 animate-spin'" />
             <span>{{ saving() ? 'Saving…' : 'Save preferences' }}</span>
           </button>
         </footer>
@@ -122,90 +121,85 @@ interface AccentOption { value: AccentColor; color: string; name: string; }
     `
 })
 export class AdminSystemSettingThemeComponent implements OnInit {
-    private themeSrv = inject(ThemeConfigService);
-    private prefSrv = inject(PreferenceService);
-    private toastSrv = inject(ToastService);
+  private themeSrv = inject(ThemeConfigService);
+  private prefSrv = inject(PreferenceService);
+  private toastSrv = inject(ToastService);
 
-    loading = signal(false);
-    saving = signal(false);
+  loading = signal(false);
+  saving = signal(false);
 
-    private original = signal<ThemeConfig>({ mode: 'light', fontSize: 'medium', accentColor: 'blue' });
-    config = this.themeSrv.config;
+  private original = signal<ThemeConfig>({ mode: 'light', fontSize: 'medium', accentColor: 'rose' });
+  config = this.themeSrv.config;
 
-    themes: ThemeOption[] = [
-        { value: 'light', label: 'Light', icon: 'sun' },
-        { value: 'dark', label: 'Dark', icon: 'moon' },
-        { value: 'auto', label: 'Auto', icon: 'monitor' },
-    ];
-    fontSizes: FontSizeOption[] = [
-        { value: 'small', label: 'Small', size: '14px' },
-        { value: 'medium', label: 'Medium', size: '16px' },
-        { value: 'large', label: 'Large', size: '18px' },
-    ];
-    accentColors: AccentOption[] = [
-        { value: 'blue', color: '#1565C0', name: 'Blue' },
-        { value: 'green', color: '#16A34A', name: 'Green' },
-        { value: 'purple', color: '#9333EA', name: 'Purple' },
-        { value: 'orange', color: '#EA580C', name: 'Orange' },
-        { value: 'red', color: '#DC2626', name: 'Red' },
-        { value: 'pink', color: '#DB2777', name: 'Pink' },
-    ];
+  themes: ThemeOption[] = [
+    { value: 'light', label: 'Light', icon: 'sun' },
+    { value: 'dark', label: 'Dark', icon: 'moon' },
+    { value: 'auto', label: 'Auto', icon: 'monitor' },
+  ];
+  fontSizes: FontSizeOption[] = [
+    { value: 'small', label: 'Small', size: '14px' },
+    { value: 'medium', label: 'Medium', size: '16px' },
+    { value: 'large', label: 'Large', size: '18px' },
+  ];
+  accentColors: AccentOption[] = [
+    { value: 'rose', color: '#E11D48', name: 'Rose' },
+  ];
 
-    ngOnInit(): void {
-        this.loading.set(true);
-        this.prefSrv.loadAll()
-            .pipe(finalize(() => this.loading.set(false)))
-            .subscribe({
-                next: () => {
-                    this.themeSrv.hydrateFromCache();
-                    this.original.set({ ...this.themeSrv.config() });
-                },
-                error: () => this.toastSrv.error('Failed to load preferences')
-            });
-    }
+  ngOnInit(): void {
+    this.loading.set(true);
+    this.prefSrv.loadAll()
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: () => {
+          this.themeSrv.hydrateFromCache();
+          this.original.set({ ...this.themeSrv.config() });
+        },
+        error: () => this.toastSrv.error('Failed to load preferences')
+      });
+  }
 
-    pickMode(mode: ThemeMode) { this.themeSrv.preview({ mode }); }
-    pickFont(fontSize: FontSize) { this.themeSrv.preview({ fontSize }); }
-    pickAccent(accentColor: AccentColor) { this.themeSrv.preview({ accentColor }); }
+  pickMode(mode: ThemeMode) { this.themeSrv.preview({ mode }); }
+  pickFont(fontSize: FontSize) { this.themeSrv.preview({ fontSize }); }
+  pickAccent(accentColor: AccentColor) { this.themeSrv.preview({ accentColor }); }
 
-    isDirty(): boolean {
-        const a = this.original(), b = this.config();
-        return a.mode !== b.mode || a.fontSize !== b.fontSize || a.accentColor !== b.accentColor;
-    }
+  isDirty(): boolean {
+    const a = this.original(), b = this.config();
+    return a.mode !== b.mode || a.fontSize !== b.fontSize || a.accentColor !== b.accentColor;
+  }
 
-    onCancel(): void {
-        this.themeSrv.preview(this.original());
-    }
+  onCancel(): void {
+    this.themeSrv.preview(this.original());
+  }
 
-    onSave(): void {
-        if (this.saving()) return;
-        this.saving.set(true);
-        this.themeSrv.save(this.config())
-            .pipe(finalize(() => this.saving.set(false)))
-            .subscribe({
-                next: () => {
-                    this.original.set({ ...this.config() });
-                    this.toastSrv.success('Preferences saved');
-                },
-                error: () => this.toastSrv.error('Failed to save preferences')
-            });
-    }
+  onSave(): void {
+    if (this.saving()) return;
+    this.saving.set(true);
+    this.themeSrv.save(this.config())
+      .pipe(finalize(() => this.saving.set(false)))
+      .subscribe({
+        next: () => {
+          this.original.set({ ...this.config() });
+          this.toastSrv.success('Preferences saved');
+        },
+        error: () => this.toastSrv.error('Failed to save preferences')
+      });
+  }
 
-    onReset(): void {
-        if (!confirm('Reset appearance to defaults?')) return;
-        this.saving.set(true);
-        this.themeSrv.reset()
-            .pipe(finalize(() => this.saving.set(false)))
-            .subscribe({
-                next: () => {
-                    this.original.set({ ...this.config() });
-                    this.toastSrv.success('Preferences reset to defaults');
-                },
-                error: () => this.toastSrv.error('Failed to reset preferences')
-            });
-    }
+  onReset(): void {
+    if (!confirm('Reset appearance to defaults?')) return;
+    this.saving.set(true);
+    this.themeSrv.reset()
+      .pipe(finalize(() => this.saving.set(false)))
+      .subscribe({
+        next: () => {
+          this.original.set({ ...this.config() });
+          this.toastSrv.success('Preferences reset to defaults');
+        },
+        error: () => this.toastSrv.error('Failed to reset preferences')
+      });
+  }
 
-    hexFor(c: AccentColor): string {
-        return this.accentColors.find(x => x.value === c)?.color ?? '#1565C0';
-    }
+  hexFor(c: AccentColor): string {
+    return this.accentColors.find(x => x.value === c)?.color ?? '#E11D48';
+  }
 }

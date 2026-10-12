@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from "@angular/core";
 import { Subject, debounceTime, switchMap } from "rxjs";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { PrescriptionService } from "../../../../services/admin/prescription.service";
 import { DialogService } from "../../../../services/common/dialog.service";
@@ -29,8 +28,7 @@ import { hasUnacknowledgedAtOrAbove, severityRank } from "./prescription-rx.util
     selector: 'admin-prescription',
     standalone: true,
     imports: [
-        SharedModule,
-        BooIconComponent,
+        SharedModule,
         ErrorStateComponent,
         PrescriptionActionBarComponent,
         PrescriptionPatientSummaryComponent,
@@ -106,7 +104,7 @@ import { hasUnacknowledgedAtOrAbove, severityRank } from "./prescription-rx.util
         <div class="bg-white rounded-lg max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8" (click)="$event.stopPropagation()" id="rx-print-area">
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-bold text-primary">Prescription Preview</h2>
-            <button (click)="previewOpen.set(false)" class="text-secondary hover:text-primary"><boo-icon name="x" [size]="20"></boo-icon></button>
+            <button (click)="previewOpen.set(false)" class="text-secondary hover:text-primary"><physio-icon name="x" [size]="20"></physio-icon></button>
           </div>
           <ng-container *ngIf="draft() as d">
             <div class="text-sm text-secondary mb-1">{{ d.prescriptionNumber }} · {{ d.createdAt | date:'mediumDate' }}</div>

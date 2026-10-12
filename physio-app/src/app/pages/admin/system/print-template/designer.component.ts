@@ -3,7 +3,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, of } from 'rxjs';
-import { BooIconComponent } from '../../../../components/icon/boo-icon/boo-icon.component';
 import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
 import { PrintTemplateService } from '../../../../services/admin/print-template.service';
 import { PrintService } from '../../../../services/common/print.service';
@@ -23,7 +22,7 @@ type EditField = 'header' | 'body' | 'footer' | 'css';
 @Component({
   selector: 'admin-print-template-designer',
   standalone: true,
-  imports: [SharedModule, ReactiveFormsModule, BooIconComponent, BooSelectComponent],
+  imports: [SharedModule, ReactiveFormsModule,BooSelectComponent],
   host: { class: 'block h-full min-h-0' },
   template: `
     <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col h-full bg-slate-50">
@@ -33,7 +32,7 @@ type EditField = 'header' | 'body' | 'footer' | 'css';
         <div class="flex items-center gap-3 min-w-0">
           <button type="button" (click)="goBack()"
             class="p-1.5 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-900">
-            <boo-icon name="arrow-left" iconClass="w-4 h-4" />
+            <physio-icon name="arrow-left" class="w-4 h-4" />
           </button>
           <div class="min-w-0">
             <input type="text" formControlName="name" placeholder="Untitled template"
@@ -61,7 +60,7 @@ type EditField = 'header' | 'body' | 'footer' | 'css';
 
           <button type="button" (click)="onTestPrint()"
             class="inline-flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded hover:bg-gray-50 whitespace-nowrap shrink-0">
-            <boo-icon name="printer" iconClass="w-3.5 h-3.5" />
+            <physio-icon name="printer" class="w-3.5 h-3.5" />
             Test print
           </button>
           <button type="submit" [disabled]="!form.dirty || form.invalid"

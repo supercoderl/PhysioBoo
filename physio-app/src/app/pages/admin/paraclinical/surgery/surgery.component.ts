@@ -1,6 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { finalize, forkJoin } from "rxjs";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
@@ -28,7 +27,6 @@ const LOADING_KEY = 'surgery';
   standalone: true,
   imports: [
     SharedModule,
-    BooIconComponent,
     ErrorStateComponent,
     StatusBadgeComponent,
     StatCardComponent,
@@ -45,7 +43,7 @@ const LOADING_KEY = 'surgery';
   template: `
     <!-- Loading -->
     <div *ngIf="loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3">
-      <boo-icon name="loader" [size]="32" iconClass="animate-spin text-primary"></boo-icon>
+      <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
       <span class="text-gray-500 text-sm">Loading operating room workspace...</span>
     </div>
 
@@ -71,7 +69,7 @@ const LOADING_KEY = 'surgery';
               </button>
             </div>
             <button class="px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2">
-              <boo-icon name="circle-plus" [size]="16"></boo-icon> Schedule Surgery
+              <physio-icon name="circle-plus" [size]="16"></physio-icon> Schedule Surgery
             </button>
           </div>
         </div>
@@ -81,7 +79,7 @@ const LOADING_KEY = 'surgery';
           <button *ngFor="let t of tabs" type="button" (click)="setTab(t.key)" [attr.aria-selected]="activeTab() === t.key" role="tab"
             class="px-4 py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 -mb-px whitespace-nowrap"
             [ngClass]="activeTab() === t.key ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
-            <boo-icon [name]="t.icon" iconClass="w-4 h-4"></boo-icon>
+            <physio-icon [name]="t.icon" class="w-4 h-4"></physio-icon>
             {{ t.label }}
           </button>
         </nav>
@@ -92,13 +90,13 @@ const LOADING_KEY = 'surgery';
         <div *ngIf="alerts().length > 0" class="mb-6 flex gap-3 overflow-x-auto pb-1" aria-live="polite">
           <div *ngFor="let a of alertsBySeverity()" class="shrink-0 min-w-[280px] bg-surface border rounded-lg p-3 flex items-start gap-2"
             [ngClass]="alertBorderClass(a.severity)">
-            <boo-icon name="alert-triangle" [size]="18" [ngClass]="alertIconClass(a.severity)"></boo-icon>
+            <physio-icon name="alert-triangle" [size]="18" [ngClass]="alertIconClass(a.severity)"></physio-icon>
             <div class="flex-1 min-w-0">
               <boo-status-badge [label]="a.severity" [tone]="alertTone(a.severity)"></boo-status-badge>
               <p class="text-xs text-gray-700 mt-1">{{ a.description }}</p>
             </div>
             <button (click)="acknowledgeAlert(a)" class="text-gray-400 hover:text-gray-600" aria-label="Acknowledge alert">
-              <boo-icon name="x" [size]="16"></boo-icon>
+              <physio-icon name="x" [size]="16"></physio-icon>
             </button>
           </div>
         </div>

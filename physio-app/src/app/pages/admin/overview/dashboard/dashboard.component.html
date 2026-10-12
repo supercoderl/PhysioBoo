@@ -1,19 +1,25 @@
-<admin-dashboard-status-strip [status]="snapshot?.status ?? null" class="block" />
+<admin-dashboard-status-strip
+  [status]="snapshot?.status ?? null"
+  class="block"
+/>
 
 <div class="p-6 min-h-screen flex flex-col gap-3.5">
-
   <!-- Page title row -->
   <div class="flex items-center justify-between gap-3 flex-wrap">
     <div>
-      <h1 class="text-[19px] font-extrabold text-regular m-0 tracking-tight">Executive Dashboard</h1>
-      <p class="text-[12.5px] text-neutral m-0 mt-0.5">Hospital Intelligence Center · Live operational overview</p>
+      <h1 class="text-[19px] font-extrabold text-regular m-0 tracking-tight">
+        Executive Dashboard
+      </h1>
+      <p class="text-[12.5px] text-neutral m-0 mt-0.5">
+        Hospital Intelligence Center · Live operational overview
+      </p>
     </div>
     <div class="flex items-center gap-1.5">
       <boo-button-admin
         background="transparent"
         [border]="{ width: 1, color: 'rgb(var(--twc-border))' }"
         textColor="rgb(var(--twc-regular))"
-        [icon]="{ name: 'refresh-cw', size: 12 }"
+        [icon]="{ name: 'refresh', size: 12 }"
         [loading]="loading"
         padding="6px 11px"
         buttonClass="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -29,10 +35,10 @@
         padding="6px 11px"
         buttonClass="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
-        {{ today | date: 'MMM d, y' }}
+        {{ today | date: "MMM d, y" }}
       </boo-button-admin>
       <boo-button-admin
-        [icon]="{ name: 'download', size: 12, color: '#fff' }"
+        [icon]="{ name: 'download', size: 12 }"
         textColor="#ffffff"
         [fontWeight]="'600'"
         padding="6px 13px"
@@ -45,8 +51,14 @@
   </div>
 
   <!-- Error state -->
-  <div *ngIf="error" class="flex items-center justify-between gap-3 p-3.5 bg-red-50 border border-red-200 rounded-lg">
-    <span class="text-sm text-red-700">Couldn't load the dashboard overview. Showing last known data if available.</span>
+  <div
+    *ngIf="error"
+    class="flex items-center justify-between gap-3 p-3.5 bg-red-50 border border-red-200 rounded-lg"
+  >
+    <span class="text-sm text-red-700"
+      >Couldn't load the dashboard overview. Showing last known data if
+      available.</span
+    >
     <boo-button-admin
       background="transparent"
       [border]="{ width: 1, color: '#fecaca' }"
@@ -60,29 +72,54 @@
   </div>
 
   <!-- Main operational grid -->
-  <div class="grid xl:grid-cols-[4fr_2fr_2.5fr] xl:grid-rows-[auto_auto] grid-cols-1 gap-3 items-start">
-    <admin-patient-flow-card [flow]="snapshot?.patientFlow ?? null" class="block xl:col-start-1 xl:row-start-1" />
-    <admin-dept-load-card [depts]="snapshot?.departmentLoad ?? null" class="block xl:col-start-2 xl:row-start-1" />
+  <div
+    class="grid xl:grid-cols-[4fr_2fr_2.5fr] xl:grid-rows-[auto_auto] grid-cols-1 gap-3 items-start"
+  >
+    <admin-patient-flow-card
+      [flow]="snapshot?.patientFlow ?? null"
+      class="block xl:col-start-1 xl:row-start-1"
+    />
+    <admin-dept-load-card
+      [depts]="snapshot?.departmentLoad ?? null"
+      class="block xl:col-start-2 xl:row-start-1"
+    />
     <admin-alerts-card
       [alerts]="snapshot?.alerts ?? null"
       class="block xl:col-start-3 xl:row-start-1 xl:row-span-2"
       (respondAlert)="onDismissAlert($event)"
       (dismissAlert)="onDismissAlert($event)"
     />
-    <admin-bed-capacity-card [wards]="snapshot?.bedCapacity ?? null" class="block xl:col-start-1 xl:row-start-2" />
-    <admin-active-operations-card [ops]="snapshot?.activeOperations ?? null" class="block xl:col-start-2 xl:row-start-2" />
+    <admin-bed-capacity-card
+      [wards]="snapshot?.bedCapacity ?? null"
+      class="block xl:col-start-1 xl:row-start-2"
+    />
+    <admin-active-operations-card
+      [ops]="snapshot?.activeOperations ?? null"
+      class="block xl:col-start-2 xl:row-start-2"
+    />
   </div>
 
   <!-- Financial + clinical strip -->
-  <admin-financial-clinical-strip [financial]="snapshot?.financial ?? null" class="block" />
+  <admin-financial-clinical-strip
+    [financial]="snapshot?.financial ?? null"
+    class="block"
+  />
 
   <!-- Bottom row -->
   <div class="grid xl:grid-cols-[3fr_2fr] grid-cols-1 gap-3">
-    <admin-appointment-flow-card [flow]="snapshot?.appointmentFlow ?? null" class="block" />
+    <admin-appointment-flow-card
+      [flow]="snapshot?.appointmentFlow ?? null"
+      class="block"
+    />
     <div class="flex flex-col gap-3">
-      <admin-staff-duty-card [staff]="snapshot?.staffDuty ?? null" class="block" />
-      <admin-recent-events-card [events]="snapshot?.recentEvents ?? null" class="block flex-1" />
+      <admin-staff-duty-card
+        [staff]="snapshot?.staffDuty ?? null"
+        class="block"
+      />
+      <admin-recent-events-card
+        [events]="snapshot?.recentEvents ?? null"
+        class="block flex-1"
+      />
     </div>
   </div>
-
 </div>

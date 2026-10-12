@@ -40,8 +40,8 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                 <p class="text-sm font-medium text-gray-600">Total Members</p>
                 <p class="mt-2 text-3xl font-bold text-gray-900">{{ stats() ? (stats()!.totalMembers | number) : '—' }}</p>
               </div>
-              <div class="bg-blue-100 p-3 rounded-full">
-                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <div class="bg-primarySoft p-3 rounded-full">
+                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                 </svg>
               </div>
@@ -91,7 +91,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                 </svg>
               </div>
             </div>
-            <p class="mt-2 text-sm text-blue-600">This month</p>
+            <p class="mt-2 text-sm text-primary">This month</p>
           </div>
         </div>
 
@@ -104,11 +104,11 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
               role="tab"
               [attr.aria-selected]="activeTab === tab.id"
               (click)="activeTab = tab.id"
-              [class.border-blue-500]="activeTab === tab.id"
-              [class.text-blue-600]="activeTab === tab.id"
+              [class.border-primary]="activeTab === tab.id"
+              [class.text-primary]="activeTab === tab.id"
               [class.border-transparent]="activeTab !== tab.id"
               [class.text-gray-500]="activeTab !== tab.id"
-              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm hover:text-blue-600 hover:border-blue-300 transition-colors">
+              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm hover:text-primary hover:border-primary/70 transition-colors">
               {{ tab.label }}
             </button>
           </nav>
@@ -125,12 +125,12 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                 (ngModelChange)="onSearchChanged()"
                 aria-label="Search members"
                 placeholder="Search by name, phone, email or member number..."
-                class="md:col-span-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                class="md:col-span-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
               <select
                 [(ngModel)]="filterMembership"
                 (ngModelChange)="onFilterChanged()"
                 aria-label="Filter by membership"
-                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
                 <option value="">All Memberships</option>
                 <option *ngFor="let tier of tiers" [value]="tier">{{ tier }}</option>
               </select>
@@ -138,7 +138,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                 [(ngModel)]="filterStatus"
                 (ngModelChange)="onFilterChanged()"
                 aria-label="Filter by status"
-                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
                 <option value="">All Status</option>
                 <option *ngFor="let status of statuses" [value]="status">{{ status | titlecase }}</option>
               </select>
@@ -187,7 +187,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span [ngClass]="{
                         'bg-gray-100 text-gray-800': member.membershipType === 'Basic',
-                        'bg-blue-100 text-blue-800': member.membershipType === 'Silver',
+                        'bg-primarySoft text-primaryPressed': member.membershipType === 'Silver',
                         'bg-yellow-100 text-yellow-800': member.membershipType === 'Gold',
                         'bg-purple-100 text-purple-800': member.membershipType === 'Platinum'
                       }" class="px-3 py-1 text-xs font-semibold rounded-full">
@@ -195,7 +195,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                       </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm font-bold text-blue-600">{{ member.points | number }} pts</div>
+                      <div class="text-sm font-bold text-primary">{{ member.points | number }} pts</div>
                       <div class="text-xs text-gray-500">Last: {{ member.lastVisit ? (member.lastVisit | date:'yyyy-MM-dd') : '—' }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -208,7 +208,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                       </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                      <button type="button" (click)="viewMemberDetails(member)" class="text-blue-600 hover:text-blue-800 font-medium mr-3">
+                      <button type="button" (click)="viewMemberDetails(member)" class="text-primary hover:text-primaryPressed font-medium mr-3">
                         View
                       </button>
                       <button type="button" (click)="editMember(member)" class="text-green-600 hover:text-green-800 font-medium">
@@ -250,7 +250,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                   (ngModelChange)="memberLookup$.next($event)"
                   aria-label="Find a member"
                   placeholder="Find a member by name, phone or member number..."
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
                 <ul *ngIf="memberLookupResults().length" role="listbox" aria-label="Matching members"
                     class="absolute z-10 mt-1 w-full bg-surface border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-auto">
                   <li *ngFor="let m of memberLookupResults()" role="option">
@@ -262,7 +262,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                 </ul>
               </div>
 
-              <div *ngIf="selectedMember() as member; else noMemberSelected" class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-6 text-white">
+              <div *ngIf="selectedMember() as member; else noMemberSelected" class="bg-gradient-to-r from-primary to-purple-600 rounded-lg p-6 text-white">
                 <div class="flex justify-between items-start">
                   <div>
                     <p class="text-sm opacity-90">Available Points</p>
@@ -293,7 +293,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                 <button type="button" [disabled]="!canChangePoints" (click)="openRedeem(null)" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
                   - Redeem Points
                 </button>
-                <button type="button" [disabled]="!selectedMember()" (click)="loadTransactions()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-medium transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
+                <button type="button" [disabled]="!selectedMember()" (click)="loadTransactions()" class="w-full bg-primary hover:bg-primary text-white py-3 rounded-lg font-medium transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
                   Refresh History
                 </button>
               </div>
@@ -375,7 +375,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
 
             <div *ngFor="let reward of rewards()" class="bg-surface rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
               <div [ngClass]="{
-                'bg-blue-500': reward.category === 'discount',
+                'bg-primary': reward.category === 'discount',
                 'bg-green-500': reward.category === 'service',
                 'bg-purple-500': reward.category === 'product',
                 'bg-orange-500': reward.category === 'voucher'
@@ -396,13 +396,13 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                 </div>
                 <p class="text-sm text-gray-600 mb-4">{{ reward.description }}</p>
                 <div class="flex justify-between items-center">
-                  <span class="text-2xl font-bold text-blue-600">{{ reward.pointsRequired | number }} pts</span>
+                  <span class="text-2xl font-bold text-primary">{{ reward.pointsRequired | number }} pts</span>
                   <button
                     type="button"
                     [disabled]="redeemBlockReason(reward) !== null"
                     [attr.title]="redeemBlockReason(reward)"
                     (click)="openRedeem(reward)"
-                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+                    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
                     Redeem
                   </button>
                 </div>
@@ -429,7 +429,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                 </label>
                 <div *ngIf="selectedPatient() as patient; else patientSearch" class="flex items-center justify-between px-4 py-2 border border-gray-300 rounded-lg bg-gray-50">
                   <span class="text-sm text-gray-900">{{ patient.fullName }} · {{ patient.patientNumber }}</span>
-                  <button type="button" (click)="clearPatient()" class="text-sm text-blue-600 hover:text-blue-800">Change</button>
+                  <button type="button" (click)="clearPatient()" class="text-sm text-primary hover:text-primaryPressed">Change</button>
                 </div>
                 <ng-template #patientSearch>
                   <input
@@ -439,7 +439,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                     [(ngModel)]="patientQuery"
                     (ngModelChange)="patientLookup$.next($event)"
                     placeholder="Search by name, phone or patient number..."
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
                   <ul *ngIf="patientResults().length" role="listbox" aria-label="Matching patients"
                       class="absolute z-10 mt-1 w-full bg-surface border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-auto">
                     <li *ngFor="let p of patientResults()" role="option">
@@ -461,7 +461,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                   [(ngModel)]="enrollTier"
                   name="membershipType"
                   required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
                   <option value="">Select membership</option>
                   <option *ngFor="let tier of tiers" [value]="tier">{{ tier }}</option>
                 </select>
@@ -470,7 +470,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
 
             <div class="mt-6">
               <label class="flex items-center">
-                <input type="checkbox" [(ngModel)]="enrollAgreeTerms" name="agreeTerms" required class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <input type="checkbox" [(ngModel)]="enrollAgreeTerms" name="agreeTerms" required class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
                 <span class="ml-2 text-sm text-gray-700">The patient agrees to the loyalty programme terms and conditions <span class="text-red-500">*</span></span>
               </label>
             </div>
@@ -485,7 +485,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
               <button
                 type="submit"
                 [disabled]="!canEnroll || isSubmitting"
-                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+                class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primaryHover disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
                 {{ isSubmitting ? 'Enrolling...' : 'Enroll Member' }}
               </button>
             </div>
@@ -571,7 +571,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                 <button type="button" (click)="removeMember(member)" [disabled]="isSubmitting" class="text-sm text-red-600 hover:text-red-800 disabled:opacity-50">Remove member</button>
                 <div class="space-x-3">
                   <button type="button" (click)="closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
-                  <button type="submit" [disabled]="isSubmitting" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                  <button type="submit" [disabled]="isSubmitting" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryHover disabled:bg-gray-400 disabled:cursor-not-allowed">
                     {{ isSubmitting ? 'Saving...' : 'Save' }}
                   </button>
                 </div>

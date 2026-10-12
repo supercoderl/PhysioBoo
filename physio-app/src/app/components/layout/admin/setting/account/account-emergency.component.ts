@@ -14,7 +14,7 @@ import { BooInputComponent } from "../../../../input/boo-input/boo-input.compone
         <div class="flex flex-col gap-4" [formGroup]="form">
             <div class="w-full">
                 <p class="font-semibold text-base m-0">Emergency Contact</p>
-                <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
+                <p class="m-0 text-[13px] leading-[1.5] text-[#71606A]">
                     Trusted contacts we can reach out to in urgent situations.
                 </p>
             </div>

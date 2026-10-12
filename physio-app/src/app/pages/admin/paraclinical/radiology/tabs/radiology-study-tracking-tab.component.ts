@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
@@ -21,10 +20,10 @@ const STAGE_LABELS: Record<StudyTimelineStage, string> = {
 @Component({
   selector: 'radiology-study-tracking-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !studies().length">
@@ -41,7 +40,7 @@ const STAGE_LABELS: Record<StudyTimelineStage, string> = {
             [ngClass]="selected()?.id === s.id ? 'bg-primary/5' : ''">
             <div class="flex items-center justify-between gap-2">
               <span class="text-sm font-medium text-gray-800 truncate">{{ s.patientName }}</span>
-              <boo-icon *ngIf="s.isCritical" name="alert-triangle" [size]="14" iconClass="text-red-500"></boo-icon>
+              <physio-icon *ngIf="s.isCritical" name="alert-triangle" [size]="14" class="text-red-500"></physio-icon>
             </div>
             <div class="text-xs text-gray-500">{{ s.examinationName }} · {{ s.modalityName }}</div>
             <div class="text-xs text-gray-400">{{ s.orderNumber }}</div>
@@ -84,14 +83,14 @@ const STAGE_LABELS: Record<StudyTimelineStage, string> = {
           <h4 class="text-xs font-semibold text-gray-600 uppercase mb-2">Image Preview</h4>
           <div class="grid grid-cols-4 gap-2">
             <div *ngFor="let i of thumbnailPlaceholders" class="aspect-square bg-gray-100 border border-gray-200 rounded flex items-center justify-center">
-              <boo-icon name="image" [size]="20" iconClass="text-gray-300"></boo-icon>
+              <physio-icon name="image" [size]="20" class="text-gray-300"></physio-icon>
             </div>
           </div>
         </div>
 
         <!-- PACS placeholder -->
         <div class="border border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center text-center bg-gray-50">
-          <boo-icon name="monitor" [size]="28" iconClass="text-gray-400 mb-2"></boo-icon>
+          <physio-icon name="monitor" [size]="28" [class]="'text-gray-400 mb-2'"></physio-icon>
           <p class="text-sm font-medium text-gray-600">PACS Viewer — integration pending</p>
           <p class="text-xs text-gray-400 mt-1">No DICOM viewer is implemented in this module. This panel marks where a PACS viewer will be embedded.</p>
         </div>

@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { Severity } from "../../../../../shared/enums/severity";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PatientContext, RiskFlag } from "../../../../../shared/types/medical-record.types";
@@ -7,7 +6,7 @@ import { PatientContext, RiskFlag } from "../../../../../shared/types/medical-re
 @Component({
   selector: 'mr-patient-context-header',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div *ngIf="patient" class="bg-surface border-b border-gray-200">
       <div class="px-6 py-4 flex items-start gap-5">
@@ -54,7 +53,7 @@ import { PatientContext, RiskFlag } from "../../../../../shared/types/medical-re
               class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium"
               [ngClass]="flagClass(f)"
               [title]="f.note || ''">
-              <boo-icon [name]="flagIcon(f.key)" iconClass="w-3 h-3"></boo-icon>
+              <physio-icon [name]="flagIcon(f.key)" class="w-3 h-3"></physio-icon>
               {{ f.label }}
             </span>
           </div>
@@ -63,30 +62,30 @@ import { PatientContext, RiskFlag } from "../../../../../shared/types/medical-re
         <!-- Quick actions -->
         <div class="shrink-0 flex items-center gap-1.5 flex-wrap justify-end">
           <button (click)="action.emit('encounter')" class="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded hover:opacity-90 flex items-center gap-1.5">
-            <boo-icon name="plus" iconClass="w-3.5 h-3.5"></boo-icon>
+            <physio-icon name="plus" class="w-3.5 h-3.5"></physio-icon>
             New Encounter
           </button>
           <button (click)="action.emit('note')" class="px-3 py-1.5 text-xs font-medium border border-gray-200 text-primary rounded hover:bg-gray-50 flex items-center gap-1.5">
-            <boo-icon name="file-text" iconClass="w-3.5 h-3.5"></boo-icon>
+            <physio-icon name="file-text" class="w-3.5 h-3.5"></physio-icon>
             Add Note
           </button>
           <button (click)="action.emit('prescribe')" class="px-3 py-1.5 text-xs font-medium border border-gray-200 text-primary rounded hover:bg-gray-50 flex items-center gap-1.5">
-            <boo-icon name="pill" iconClass="w-3.5 h-3.5"></boo-icon>
+            <physio-icon name="pill" class="w-3.5 h-3.5"></physio-icon>
             Prescribe
           </button>
           <button (click)="action.emit('lab')" class="px-3 py-1.5 text-xs font-medium border border-gray-200 text-primary rounded hover:bg-gray-50 flex items-center gap-1.5">
-            <boo-icon name="flask-conical" iconClass="w-3.5 h-3.5"></boo-icon>
+            <physio-icon name="flask-conical" class="w-3.5 h-3.5"></physio-icon>
             Order Lab
           </button>
           <button (click)="action.emit('imaging')" class="px-3 py-1.5 text-xs font-medium border border-gray-200 text-primary rounded hover:bg-gray-50 flex items-center gap-1.5">
-            <boo-icon name="scan" iconClass="w-3.5 h-3.5"></boo-icon>
+            <physio-icon name="scan" class="w-3.5 h-3.5"></physio-icon>
             Order Imaging
           </button>
           <button (click)="action.emit('print')" class="px-2 py-1.5 text-xs text-secondary border border-gray-200 rounded hover:bg-gray-50" title="Print medical record">
-            <boo-icon name="printer" iconClass="w-3.5 h-3.5"></boo-icon>
+            <physio-icon name="printer" class="w-3.5 h-3.5"></physio-icon>
           </button>
           <button (click)="action.emit('discharge')" class="px-2 py-1.5 text-xs text-red-600 border border-red-200 rounded hover:bg-red-50" title="Discharge patient">
-            <boo-icon name="log-out" iconClass="w-3.5 h-3.5"></boo-icon>
+            <physio-icon name="log-out" class="w-3.5 h-3.5"></physio-icon>
           </button>
         </div>
       </div>
@@ -107,7 +106,7 @@ export class PatientContextHeaderComponent {
       case 'ICU': return 'bg-red-50 text-red-700';
       case 'Admitted': return 'bg-amber-50 text-amber-700';
       case 'ED': return 'bg-orange-50 text-orange-700';
-      case 'Observation': return 'bg-blue-50 text-blue-700';
+      case 'Observation': return 'bg-primarySoft text-primaryHover';
       case 'Discharged': return 'bg-gray-100 text-gray-600';
       default: return 'bg-emerald-50 text-emerald-700';
     }
@@ -117,7 +116,7 @@ export class PatientContextHeaderComponent {
     switch (f.severity) {
       case Severity.Critical: return 'bg-red-50 text-red-700 border border-red-200';
       case Severity.Moderate: return 'bg-amber-50 text-amber-700 border border-amber-200';
-      default: return 'bg-blue-50 text-blue-700 border border-blue-200';
+      default: return 'bg-primarySoft text-primaryHover border border-primary/25';
     }
   }
 

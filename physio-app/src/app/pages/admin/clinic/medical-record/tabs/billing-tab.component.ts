@@ -1,12 +1,11 @@
 import { Component, Input } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { BillingSummary, PaymentStatus } from "../../../../../shared/types/medical-record.types";
 
 @Component({
   selector: 'mr-billing-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div *ngIf="summary" class="space-y-4">
       <!-- KPI cards -->
@@ -21,7 +20,7 @@ import { BillingSummary, PaymentStatus } from "../../../../../shared/types/medic
         </div>
         <div class="bg-surface border border-gray-200 rounded-lg px-4 py-3">
           <div class="text-xs text-secondary uppercase tracking-wider mb-1">Insurance covered</div>
-          <div class="text-xl font-semibold text-blue-600">{{ money(summary.insurancePaid) }}</div>
+          <div class="text-xl font-semibold text-primary">{{ money(summary.insurancePaid) }}</div>
         </div>
         <div class="bg-surface border border-gray-200 rounded-lg px-4 py-3">
           <div class="text-xs text-secondary uppercase tracking-wider mb-1">Outstanding</div>
@@ -54,7 +53,7 @@ import { BillingSummary, PaymentStatus } from "../../../../../shared/types/medic
                 <td class="px-5 py-2.5 text-secondary">{{ b.billDate | date:'mediumDate' }}</td>
                 <td class="px-5 py-2.5 text-primary hidden md:table-cell">{{ b.type }}</td>
                 <td class="px-5 py-2.5 text-right text-primary font-medium">{{ moneyOf(b.totalAmount, b.currency) }}</td>
-                <td class="px-5 py-2.5 text-right text-blue-600 hidden lg:table-cell">{{ moneyOf(b.insurancePaidAmount, b.currency) }}</td>
+                <td class="px-5 py-2.5 text-right text-primary hidden lg:table-cell">{{ moneyOf(b.insurancePaidAmount, b.currency) }}</td>
                 <td class="px-5 py-2.5 text-right" [ngClass]="b.outstandingAmount > 0 ? 'text-red-600 font-medium' : 'text-secondary'">{{ moneyOf(b.outstandingAmount, b.currency) }}</td>
                 <td class="px-5 py-2.5">
                   <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium" [ngClass]="statusClass(b.paymentStatus)">
@@ -75,7 +74,7 @@ import { BillingSummary, PaymentStatus } from "../../../../../shared/types/medic
         <ul class="divide-y divide-gray-100 m-0 p-0 list-none">
           <li *ngFor="let p of summary.recentPayments" class="px-5 py-3 flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
-              <boo-icon name="check" iconClass="w-4 h-4 text-emerald-600"></boo-icon>
+              <physio-icon name="check" class="w-4 h-4 text-emerald-600"></physio-icon>
             </div>
             <div class="min-w-0 flex-1">
               <div class="text-sm text-primary font-medium">{{ money(p.amount) }} via {{ p.method }}</div>
@@ -105,7 +104,7 @@ export class BillingTabComponent {
     switch (s) {
       case 'Paid': return 'bg-emerald-50 text-emerald-700';
       case 'Partial': return 'bg-amber-50 text-amber-700';
-      case 'Pending': return 'bg-blue-50 text-blue-700';
+      case 'Pending': return 'bg-primarySoft text-primaryHover';
       case 'Overdue': return 'bg-red-50 text-red-700';
       case 'Cancelled':
       case 'Refunded':

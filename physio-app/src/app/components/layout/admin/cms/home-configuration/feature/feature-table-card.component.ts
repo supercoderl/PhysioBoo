@@ -4,7 +4,6 @@ import { ColumnDefDirective } from "../../../../../../shared/directives/column-d
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { Feature } from "../../../../../../shared/types/feature.types";
 import { ActionItem, PaginationData } from "../../../../../../shared/types/common";
-import { BooIconComponent } from "../../../../../icon/boo-icon/boo-icon.component";
 import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo-table-admin.component";
 
@@ -16,7 +15,6 @@ import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo
     BooTableAdminComponent,
     ColumnDefDirective,
     BooActionAdminComponent,
-    BooIconComponent
   ],
   host: { class: 'block h-full min-h-0' },
   template: `
@@ -34,8 +32,8 @@ import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
 
         <ng-template appColumnDef="icon" headerLabel="Icon" headerClass="text-left" width="56px" let-item>
-          <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
-            <boo-icon [name]="item.icon || 'circle'" [size]="18" class="text-primary"></boo-icon>
+          <div class="w-9 h-9 bg-primarySoft rounded-lg flex items-center justify-center">
+            <physio-icon [name]="item.icon || 'circle'" [size]="18" class="text-primary"></physio-icon>
           </div>
         </ng-template>
 

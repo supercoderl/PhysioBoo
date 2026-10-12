@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from "@angular/core";
 import { Subject, debounceTime } from "rxjs";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { STOCK_TAKE_REASONS, StockTakeItem } from "../../../../shared/types/stock-take.types";
@@ -8,19 +7,19 @@ import { STOCK_TAKE_REASONS, StockTakeItem } from "../../../../shared/types/stoc
 @Component({
     selector: 'stock-take-counting-table',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, EmptyStateComponent],
+    imports: [SharedModule,EmptyStateComponent],
     template: `
     <div class="h-full flex flex-col bg-surface border border-borderGray/60 rounded-2 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex items-center gap-3">
         <div class="relative flex-1 max-w-xs">
-          <boo-icon name="scan-barcode" [size]="15" iconClass="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></boo-icon>
+          <physio-icon name="scan-barcode" [size]="15" [class]="'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
           <input #barcodeInput type="text" [(ngModel)]="barcode" (keyup.enter)="onScan()"
             placeholder="Scan or type barcode, then Enter"
             class="w-full pl-8 pr-3 h-9 border border-gray-300 rounded-1.5 text-[13px] focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" />
         </div>
         <div class="flex-1"></div>
         <span class="text-[11px] font-medium flex items-center gap-1.5" [ngClass]="saving ? 'text-amber-600' : 'text-emerald-600'">
-          <boo-icon [name]="saving ? 'loader-circle' : 'check'" [size]="12" [iconClass]="saving ? 'animate-spin' : ''"></boo-icon>
+          <physio-icon [name]="saving ? 'loader-circle' : 'check'" [size]="12" [class]="saving ? 'animate-spin' : ''"></physio-icon>
           {{ saving ? 'Saving…' : (lastSavedLabel) }}
         </span>
       </div>
@@ -82,7 +81,7 @@ import { STOCK_TAKE_REASONS, StockTakeItem } from "../../../../shared/types/stoc
       <div class="flex-none p-3 border-t border-gray-100 bg-gray-50 flex justify-end sticky bottom-0">
         <button type="button" (click)="saveNow.emit()"
           class="px-4 py-2 rounded-1.5 bg-primary text-white text-sm font-semibold hover:opacity-90 flex items-center gap-1.5">
-          <boo-icon name="save" [size]="15"></boo-icon> Save Progress
+          <physio-icon name="save" [size]="15"></physio-icon> Save Progress
         </button>
       </div>
     </div>

@@ -1,80 +1,93 @@
-<div class="space-y-5">
-
-  <!-- Page header -->
-  <div class="flex items-center justify-between flex-wrap gap-3">
-    <div>
-      <h2 class="text-xl font-bold text-brandDark mb-0.5">Roles</h2>
-      <p class="text-sm text-secondary m-0">System and custom roles for access control</p>
-    </div>
+<div class="h-full flex flex-col gap-5">
+  <superadmin-page-header
+    title="Roles"
+    description="System and custom roles for access control."
+  >
     <boo-button-admin
-      [icon]="{ name: 'plus', size: 14, color: '#fff' }"
+      [icon]="{ name: 'plus', size: 14 }"
       textColor="white"
       (click)="openNewRole()"
     >
       Create Role
     </boo-button-admin>
-  </div>
+  </superadmin-page-header>
 
   <!-- Stats -->
-  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-    <div class="bg-surface rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-        <boo-icon name="shield-check" [size]="16" class="text-primary"></boo-icon>
-      </div>
-      <div>
-        <div class="text-lg font-bold text-primary leading-none">{{ tableData()?.totalCount ?? 0 }}</div>
-        <div class="text-[11px] text-secondary mt-0.5">Total Roles</div>
-      </div>
-    </div>
-    <div class="bg-surface rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
-        <boo-icon name="circle-check" [size]="16" class="text-green-600"></boo-icon>
-      </div>
-      <div>
-        <div class="text-lg font-bold text-primary leading-none">{{ totalActive }}</div>
-        <div class="text-[11px] text-secondary mt-0.5">Active</div>
-      </div>
-    </div>
-    <div class="bg-surface rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-        <boo-icon name="key" [size]="16" class="text-amber-600"></boo-icon>
-      </div>
-      <div>
-        <div class="text-lg font-bold text-primary leading-none">{{ totalSystem }}</div>
-        <div class="text-[11px] text-secondary mt-0.5">System Roles</div>
-      </div>
-    </div>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <ng-container *ngIf="stats() || statsFailed(); else statsPending">
+      <boo-stat-card
+        label="Total roles"
+        [value]="stats()?.total ?? '—'"
+        icon="shield-check"
+        tone="primary"
+      />
+      <boo-stat-card
+        label="Active"
+        [value]="stats()?.active ?? '—'"
+        icon="circle-check"
+        tone="success"
+      />
+      <boo-stat-card
+        label="System roles"
+        [value]="stats()?.system ?? '—'"
+        icon="key"
+        tone="warning"
+      />
+    </ng-container>
+    <ng-template #statsPending>
+      <div
+        *ngFor="let _ of [1, 2, 3]"
+        class="h-[70px] rounded-2 border border-borderGray/60 bg-surface animate-pulse motion-reduce:animate-none"
+        aria-hidden="true"
+      ></div>
+    </ng-template>
   </div>
 
   <!-- Toolbar -->
   <div class="flex items-center justify-between flex-wrap gap-3">
     <boo-input label="Search roles..." size="small" (search)="onSearch($event)">
-      <boo-icon
+      <physio-icon
         [class.animate-spin]="loadingSrv.isLoading('search')"
         [name]="loadingSrv.isLoading('search') ? 'loader-circle' : 'search'"
-        color="#64748B"
         endfix
+        class="text-[#85757D]"
       />
     </boo-input>
     <div class="flex items-center gap-2">
       <boo-button-admin
-        [icon]="{ name: 'refresh-cw', size: 14, color: '#6C7688' }"
+        [icon]="{ name: 'refresh', size: 14, iconClass: 'text-secondary' }"
         buttonClass="!bg-surface"
-        [border]="{ width: 1, color: '#e3e3e3' }"
-        (click)="loadRoles()"
+        [border]="{ width: 1, color: '#EFE3E7' }"
+        (click)="reload()"
       >
         <span class="text-placeholder">Reload</span>
       </boo-button-admin>
-      <boo-filter-admin [filters]="filter_configs" (apply)="onFilterApply($event)" />
-      <boo-sort-admin [(value)]="params.sort" (change)="onSortChange($event)" [options]="sort_options" />
+      <boo-filter-admin
+        [filters]="filter_configs"
+        (apply)="onFilterApply($event)"
+      />
+      <boo-sort-admin
+        [(value)]="params.sort"
+        (change)="onSortChange($event)"
+        [options]="sort_options"
+      />
     </div>
   </div>
 
-  <!-- Card grid -->
-  <div *ngIf="loadingSrv.isLoading('search')" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-    <div *ngFor="let _ of [1,2,3,4,5,6]" class="bg-surface rounded-xl border border-gray-200 p-4 animate-pulse">
+  <!-- Cards scroll inside the page; the pagination below stays pinned -->
+  <div class="flex-1 min-h-[320px]" custom-scrollbar>
+  <!-- Loading -->
+  <div
+    *ngIf="loadingSrv.isLoading('search')"
+    class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"
+    aria-busy="true"
+  >
+    <div
+      *ngFor="let _ of [1, 2, 3, 4, 5, 6]"
+      class="bg-surface rounded-2 border border-borderGray/60 p-4 animate-pulse motion-reduce:animate-none"
+    >
       <div class="flex items-center gap-3 mb-3">
-        <div class="w-10 h-10 rounded-lg bg-gray-200"></div>
+        <div class="w-10 h-10 rounded-1.5 bg-gray-200"></div>
         <div class="space-y-1.5 flex-1">
           <div class="h-4 bg-gray-200 rounded w-3/4"></div>
           <div class="h-3 bg-gray-100 rounded w-1/3"></div>
@@ -84,35 +97,63 @@
     </div>
   </div>
 
-  <div *ngIf="!loadingSrv.isLoading('search') && (!tableData() || tableData()!.items.length === 0)"
-    class="flex flex-col items-center justify-center py-20 bg-surface rounded-xl border border-gray-200">
-    <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-      <boo-icon name="shield-check" [size]="24" class="text-gray-400"></boo-icon>
-    </div>
-    <p class="text-sm font-medium text-primary mb-0.5">No roles found</p>
-    <p class="text-xs text-secondary">Try adjusting your filters or search query.</p>
+  <!-- Empty -->
+  <div
+    *ngIf="
+      !loadingSrv.isLoading('search') &&
+      (!tableData() || tableData()!.items.length === 0)
+    "
+    class="bg-surface rounded-2 border border-borderGray/60"
+    role="status"
+  >
+    <boo-empty-state
+      icon="shield-check"
+      title="No roles found"
+      description="Try adjusting your filters or search query, or create a new role."
+    />
   </div>
 
-  <div *ngIf="!loadingSrv.isLoading('search') && tableData() && tableData()!.items.length > 0"
-    class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-    <div *ngFor="let role of tableData()!.items"
-      class="bg-surface rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-gray-300 transition-all group">
-
+  <!-- Card grid -->
+  <div
+    *ngIf="
+      !loadingSrv.isLoading('search') &&
+      tableData() &&
+      tableData()!.items.length > 0
+    "
+    class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"
+  >
+    <div
+      *ngFor="let role of tableData()!.items"
+      class="bg-surface rounded-2 border border-borderGray/60 p-4 overflow-hidden transition-shadow duration-200 hover:shadow-card"
+    >
       <!-- Color accent -->
-      <div class="h-1 -mx-4 -mt-4 mb-4 rounded-t-xl"
-        [style.background-color]="role.color || ColorUtils.generateFromText(role.name)"></div>
+      <div
+        class="h-1 -mx-4 -mt-4 mb-4"
+        [style.background-color]="
+          role.color || ColorUtils.generateFromText(role.name)
+        "
+      ></div>
 
       <!-- Header -->
       <div class="flex items-start gap-3">
-        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-white font-bold"
-          [style.background-color]="role.color || ColorUtils.generateFromText(role.name)">
-          <boo-icon [name]="role.icon || 'shield-check'" [size]="16"></boo-icon>
+        <div
+          class="w-10 h-10 rounded-1.5 flex items-center justify-center shrink-0 text-white font-bold"
+          [style.background-color]="
+            role.color || ColorUtils.generateFromText(role.name)
+          "
+        >
+          <physio-icon [name]="role.icon || 'shield-check'" [size]="16"></physio-icon>
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex items-start justify-between gap-2">
-            <div>
-              <h3 class="text-sm font-bold text-primary leading-snug">{{ role.name }}</h3>
-              <span class="text-[10px] font-mono bg-gray-100 text-secondary px-1.5 py-0.5 rounded mt-0.5 inline-block">{{ role.code }}</span>
+            <div class="min-w-0">
+              <h3 class="text-sm font-bold text-regular leading-snug m-0 truncate">
+                {{ role.name }}
+              </h3>
+              <span
+                class="text-[11px] font-mono bg-gray-100 text-secondary px-1.5 py-0.5 rounded mt-0.5 inline-block"
+                >{{ role.code }}</span
+              >
             </div>
             <boo-action-admin [items]="tableActions" [data]="role" />
           </div>
@@ -120,58 +161,86 @@
       </div>
 
       <!-- Description -->
-      <p *ngIf="role.description" class="text-xs text-secondary mt-2.5 mb-0 line-clamp-2">{{ role.description }}</p>
+      <p
+        *ngIf="role.description"
+        class="text-[13px] text-secondary mt-2.5 mb-0 line-clamp-2"
+      >
+        {{ role.description }}
+      </p>
 
       <!-- Footer badges -->
-      <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
-        <span *ngIf="role.isSystemRole"
-          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700">
-          <boo-icon name="key" [size]="10"></boo-icon>
-          System
-        </span>
-        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold"
-          [ngClass]="role.isActive ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'">
-          {{ role.isActive ? 'Active' : 'Inactive' }}
-        </span>
-        <span class="text-[11px] text-secondary ml-auto">
-          {{ role.createdAt | date:'mediumDate' }}
+      <div class="flex items-center gap-2 mt-3 pt-3 border-t border-borderGray/60">
+        <boo-status-badge *ngIf="role.isSystemRole" label="System" tone="warning" />
+        <boo-status-badge
+          [label]="role.isActive ? 'Active' : 'Inactive'"
+          [tone]="role.isActive ? 'success' : 'neutral'"
+          dotted
+        />
+        <span class="text-[12px] text-secondary ml-auto tabular-nums">
+          {{ role.createdAt | date: "mediumDate" }}
         </span>
       </div>
     </div>
   </div>
 
+  </div>
+
   <!-- Pagination -->
-  <div *ngIf="tableData() && tableData()!.totalCount > 0"
-    class="flex items-center justify-between pt-1">
-    <span class="text-xs text-secondary">
-      Showing {{ (tableData()!.pageNumber - 1) * tableData()!.pageSize + 1 }}–{{ min(tableData()!.pageNumber * tableData()!.pageSize, tableData()!.totalCount) }} of {{ tableData()!.totalCount }} roles
+  <nav
+    *ngIf="tableData() && tableData()!.totalCount > 0"
+    class="shrink-0 flex items-center justify-between flex-wrap gap-2"
+    aria-label="Roles pagination"
+  >
+    <span class="text-xs text-secondary tabular-nums">
+      Showing {{ (tableData()!.pageNumber - 1) * tableData()!.pageSize + 1 }}–{{
+        min(
+          tableData()!.pageNumber * tableData()!.pageSize,
+          tableData()!.totalCount
+        )
+      }}
+      of {{ tableData()!.totalCount }} roles
     </span>
     <div class="flex items-center gap-1">
       <button
-        class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-secondary hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        type="button"
+        class="w-9 h-9 flex items-center justify-center rounded-1.5 border border-borderGray text-secondary hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        aria-label="Previous page"
         [disabled]="!tableData()!.hasPrevious"
-        (click)="onPageClick(tableData()!.pageNumber - 1)">
-        <boo-icon name="chevron-left" [size]="14"></boo-icon>
+        (click)="onPageClick(tableData()!.pageNumber - 1)"
+      >
+        <physio-icon name="chevron-left" [size]="14"></physio-icon>
       </button>
-      <ng-container *ngFor="let page of getPages(tableData()!.pageNumber, tableData()!.totalPages)">
+      <ng-container
+        *ngFor="
+          let page of getPages(tableData()!.pageNumber, tableData()!.totalPages)
+        "
+      >
         <button
-          class="w-8 h-8 flex items-center justify-center rounded-lg border text-xs font-medium transition-colors"
-          [ngClass]="page === tableData()!.pageNumber
-            ? 'border-primary bg-primary text-white'
-            : 'border-gray-200 text-secondary hover:bg-gray-50'"
-          (click)="onPageClick(page)">
+          type="button"
+          class="w-9 h-9 flex items-center justify-center rounded-1.5 border text-xs font-medium tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors cursor-pointer"
+          [ngClass]="
+            page === tableData()!.pageNumber
+              ? 'border-primary bg-primary text-white'
+              : 'border-borderGray text-secondary hover:bg-black/5'
+          "
+          [attr.aria-current]="page === tableData()!.pageNumber ? 'page' : null"
+          [attr.aria-label]="'Page ' + page"
+          (click)="onPageClick(page)"
+        >
           {{ page }}
         </button>
       </ng-container>
       <button
-        class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-secondary hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        type="button"
+        class="w-9 h-9 flex items-center justify-center rounded-1.5 border border-borderGray text-secondary hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        aria-label="Next page"
         [disabled]="!tableData()!.hasNext"
-        (click)="onPageClick(tableData()!.pageNumber + 1)">
-        <boo-icon name="chevron-right" [size]="14"></boo-icon>
+        (click)="onPageClick(tableData()!.pageNumber + 1)"
+      >
+        <physio-icon name="chevron-right" [size]="14"></physio-icon>
       </button>
     </div>
-  </div>
-
+  </nav>
 </div>
 
 <user-permission-role-drawer

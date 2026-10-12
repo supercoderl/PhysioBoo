@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { DepartmentService } from "../../../../services/admin/department.service";
@@ -11,7 +10,7 @@ import { StockTakeFilter } from "../../../../shared/types/stock-take.types";
 @Component({
     selector: 'stock-take-filter-bar',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, BooSelectComponent, BooDatepickerComponent],
+    imports: [SharedModule,BooSelectComponent, BooDatepickerComponent],
     template: `
     <div class="bg-surface border border-borderGray/60 rounded-2 p-3.5">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
@@ -30,14 +29,14 @@ import { StockTakeFilter } from "../../../../shared/types/stock-take.types";
 
         <div class="flex items-center gap-2">
           <div class="flex-1 relative">
-            <boo-icon name="search" [size]="14" iconClass="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></boo-icon>
+            <physio-icon name="search" [size]="14" [class]="'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
             <input type="text" [(ngModel)]="search" (ngModelChange)="onSearchChange()"
               placeholder="Search stock take no..."
               class="w-full pl-8 pr-3 h-8 border border-gray-300 rounded-1.5 text-[13px] focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" />
           </div>
           <button type="button" (click)="onReset()" title="Reset filters"
             class="w-8 h-8 shrink-0 rounded-1.5 border border-gray-200 flex items-center justify-center hover:bg-gray-50" aria-label="Reset filters">
-            <boo-icon name="rotate-ccw" [size]="14" iconClass="text-gray-500"></boo-icon>
+            <physio-icon name="rotate-ccw" [size]="14" class="text-gray-500"></physio-icon>
           </button>
         </div>
       </div>

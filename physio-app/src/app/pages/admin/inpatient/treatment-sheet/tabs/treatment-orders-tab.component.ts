@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
@@ -20,7 +19,7 @@ function nextQuarterHour(): string {
 @Component({
   selector: 'treatment-orders-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div class="flex flex-wrap items-center gap-3 mb-4">
       <boo-input label="Search orders..." size="small" (search)="onSearch($event)"></boo-input>
@@ -67,7 +66,7 @@ function nextQuarterHour(): string {
     </div>
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !filtered().length"><boo-empty-state icon="clipboard-list" title="No matching orders"></boo-empty-state></div>

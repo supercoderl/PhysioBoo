@@ -2,9 +2,12 @@ import { Component, OnInit, computed, signal } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { firstValueFrom } from "rxjs";
 import { BooButtonAdminComponent } from "../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
 import { UserPermissionRoleDrawerComponent } from "../../../components/layout/admin/system/user-permission/role-drawer.component";
+import { SuperadminPageHeaderComponent } from "../../../components/layout/superadmin/shared/superadmin-page-header.component";
+import { EmptyStateComponent } from "../../../components/ui/empty-state.component";
+import { StatCardComponent } from "../../../components/ui/stat-card.component";
+import { StatusBadgeComponent } from "../../../components/ui/status-badge.component";
 import { BooActionAdminComponent } from "../../../components/table/boo-table-admin/boo-action-admin.component";
 import { BooFilterAdminComponent } from "../../../components/table/boo-table-admin/boo-filter-admin.component";
 import { BooSortAdminComponent } from "../../../components/table/boo-table-admin/boo-sort-admin.component";
@@ -18,6 +21,7 @@ import { SharedModule } from "../../../shared/shared-imports";
 import { ActionItem, PaginationData } from "../../../shared/types/common";
 import { FilterConfig } from "../../../shared/types/filter.types";
 import { Permission } from "../../../shared/types/permission.types";
+import { RoleStats } from "../../../shared/types/platform.types";
 import { Role } from "../../../shared/types/role.types";
 import { SortOption } from "../../../shared/types/sort";
 import { ColorUtils } from "../../../shared/utils/color.utils";
@@ -29,14 +33,18 @@ import { IconUtils } from "../../../shared/utils/icon.utils";
     imports: [
         SharedModule,
         BooButtonAdminComponent,
-        BooIconComponent,
         BooInputComponent,
         BooFilterAdminComponent,
         BooSortAdminComponent,
         BooActionAdminComponent,
+        SuperadminPageHeaderComponent,
+        StatCardComponent,
+        StatusBadgeComponent,
+        EmptyStateComponent,
         UserPermissionRoleDrawerComponent
     ],
-    templateUrl: './list.component.html'
+    templateUrl: './list.component.html',
+    host: { class: 'block h-full min-h-0' }
 })
 export class SuperadminRoleListComponent implements OnInit {
     // #region Inputs, Outputs, Properties
@@ -88,13 +96,8 @@ export class SuperadminRoleListComponent implements OnInit {
     ColorUtils = ColorUtils;
     IconUtils = IconUtils;
 
-    get totalActive(): number {
-        return this.tableData()?.items.filter(r => r.isActive).length ?? 0;
-    }
-
-    get totalSystem(): number {
-        return this.tableData()?.items.filter(r => r.isSystemRole).length ?? 0;
-    }
+    stats = signal<RoleStats | null>(null);
+    statsFailed = signal(false);
 
     // Drawer state
     permissionsData = signal<PaginationData<Permission> | null>(null);
@@ -132,11 +135,27 @@ export class SuperadminRoleListComponent implements OnInit {
 
     ngOnInit() {
         this.loadRoles();
+        this.loadStats();
         this.loadPermissions();
     }
     // #endregion
 
     // #region Methods
+    loadStats() {
+        this.roleSrv.getStats().subscribe({
+            next: stats => {
+                this.statsFailed.set(false);
+                this.stats.set(stats);
+            },
+            error: () => this.statsFailed.set(true)
+        });
+    }
+
+    reload() {
+        this.loadRoles();
+        this.loadStats();
+    }
+
     loadRoles() {
         this.roleSrv.search({
             pageNumber: this.params.pageNumber,
@@ -291,7 +310,7 @@ export class SuperadminRoleListComponent implements OnInit {
 
             this.toastSrv.success(this.selectedRoleId() ? 'Role updated' : 'Role created');
             this.closeRoleDrawer();
-            this.loadRoles();
+            this.reload();
         } catch {
             this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
         }
@@ -317,7 +336,7 @@ export class SuperadminRoleListComponent implements OnInit {
                 next: () => {
                     this.toastSrv.success('Role deleted');
                     if (this.selectedRoleId() === role.id) this.closeRoleDrawer();
-                    this.loadRoles();
+                    this.reload();
                 },
                 error: () => this.toastSrv.error('Failed to delete role')
             });

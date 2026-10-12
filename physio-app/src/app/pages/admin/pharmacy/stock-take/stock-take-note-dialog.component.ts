@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 
@@ -9,7 +8,7 @@ export type NoteDialogMode = 'approve' | 'reject' | 'cancel';
 @Component({
     selector: 'stock-take-note-dialog',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, BooTextareaComponent, BooButtonAdminComponent],
+    imports: [SharedModule,BooTextareaComponent, BooButtonAdminComponent],
     template: `
     <div *ngIf="isOpen" class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="onClose()"></div>
@@ -17,7 +16,7 @@ export type NoteDialogMode = 'approve' | 'reject' | 'cancel';
       <div class="relative bg-surface rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100">
         <div class="px-6 py-5 border-b border-gray-100 flex items-start gap-4">
           <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" [ngClass]="iconBg">
-            <boo-icon [name]="iconName" [iconClass]="iconColor" [size]="20"></boo-icon>
+            <physio-icon [name]="iconName" [size]="20" [class]="iconColor"></physio-icon>
           </div>
           <div class="flex-1">
             <h3 class="text-lg font-semibold text-gray-900">{{ title }}</h3>

@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angu
 import { Router } from "@angular/router";
 import { forkJoin } from "rxjs";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { LaboratoryService } from "../../../../services/admin/laboratory.service";
@@ -14,7 +13,7 @@ import { LabOrderRow, LabPatientResultSummary, LabVerificationStatus } from "../
 @Component({
   selector: 'laboratory-patient-result-drawer',
   standalone: true,
-  imports: [SharedModule, DrawerComponent, BooIconComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule, DrawerComponent,StatusBadgeComponent, EmptyStateComponent],
   template: `
     <drawer [isOpen]="isOpen" [width]="720" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
@@ -24,13 +23,13 @@ import { LabOrderRow, LabPatientResultSummary, LabVerificationStatus } from "../
             <p class="text-sm text-secondary m-0">{{ summary()?.fullName ?? 'Loading patient...' }}</p>
           </div>
           <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-            <boo-icon name="x" [size]="20"></boo-icon>
+            <physio-icon name="x" [size]="20"></physio-icon>
           </button>
         </div>
 
         <div class="flex-1 overflow-y-auto bg-surface" custom-scrollbar>
           <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-            <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+            <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
           </div>
 
           <ng-container *ngIf="!isLoading() && summary()">
@@ -46,13 +45,13 @@ import { LabOrderRow, LabPatientResultSummary, LabVerificationStatus } from "../
             <!-- Quick actions -->
             <div class="px-6 py-4 border-b border-gray-100 flex flex-wrap gap-2">
               <button (click)="viewEmr()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <boo-icon name="file-text" [size]="14"></boo-icon> View EMR
+                <physio-icon name="file-text" [size]="14"></physio-icon> View EMR
               </button>
               <button (click)="printReport()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <boo-icon name="printer" [size]="14"></boo-icon> Print Report
+                <physio-icon name="printer" [size]="14"></physio-icon> Print Report
               </button>
               <button (click)="exportPdf()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <boo-icon name="file-down" [size]="14"></boo-icon> Export PDF
+                <physio-icon name="file-down" [size]="14"></physio-icon> Export PDF
               </button>
             </div>
 

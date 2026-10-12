@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
@@ -11,7 +10,7 @@ import { BatchLifecycleStatus, WarehouseBatch } from "../../../../shared/types/i
 @Component({
     selector: 'inventory-batch-panel',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, EmptyStateComponent, StatusBadgeComponent],
+    imports: [SharedModule,EmptyStateComponent, StatusBadgeComponent],
     template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex items-center justify-between">
@@ -26,7 +25,7 @@ import { BatchLifecycleStatus, WarehouseBatch } from "../../../../shared/types/i
         class="flex-1 flex items-center justify-center"></boo-empty-state>
 
       <div *ngIf="medicineId && loading()" class="flex-1 flex items-center justify-center">
-        <boo-icon name="loader-circle" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+        <physio-icon name="loader-circle" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
       </div>
 
       <div *ngIf="medicineId && !loading()" class="flex-1 overflow-y-auto p-3 space-y-2">
@@ -49,16 +48,16 @@ import { BatchLifecycleStatus, WarehouseBatch } from "../../../../shared/types/i
           <p class="text-[11px] text-secondary mb-2">{{ b.supplier }} · {{ '$' + b.purchasePrice.toFixed(2) }} · {{ b.storageLocation }}</p>
           <div class="flex items-center gap-1">
             <button type="button" (click)="transfer.emit(b)" title="Transfer" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-gray-100">
-              <boo-icon name="repeat" [size]="13" iconClass="text-gray-500"></boo-icon>
+              <physio-icon name="repeat" [size]="13" class="text-gray-500"></physio-icon>
             </button>
             <button type="button" (click)="lock(b)" title="Lock Batch" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-gray-100">
-              <boo-icon name="lock" [size]="13" iconClass="text-gray-500"></boo-icon>
+              <physio-icon name="lock" [size]="13" class="text-gray-500"></physio-icon>
             </button>
             <button type="button" (click)="dispose(b)" title="Dispose Batch" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-rose-50">
-              <boo-icon name="trash-2" [size]="13" iconClass="text-rose-500"></boo-icon>
+              <physio-icon name="trash-2" [size]="13" class="text-rose-500"></physio-icon>
             </button>
             <button type="button" (click)="printBarcode.emit(b)" title="Print Barcode" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-gray-100">
-              <boo-icon name="qr-code" [size]="13" iconClass="text-gray-500"></boo-icon>
+              <physio-icon name="qr-code" [size]="13" class="text-gray-500"></physio-icon>
             </button>
           </div>
         </div>

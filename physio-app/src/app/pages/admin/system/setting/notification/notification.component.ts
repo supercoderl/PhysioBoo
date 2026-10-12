@@ -1,7 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { finalize } from 'rxjs';
 import { AdminBreadcrumbComponent } from "../../../../../components/breadcrumb/admin-breadcrumb.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { SwitchComponent } from "../../../../../components/switch/switch.component";
 import { PreferenceService } from '../../../../../services/common/preference.service';
 import { ToastService } from '../../../../../services/common/toast.service';
@@ -45,7 +44,6 @@ const DEFAULTS: Record<string, boolean> = {
     SharedModule,
     AdminBreadcrumbComponent,
     SwitchComponent,
-    BooIconComponent
   ],
   templateUrl: './notification.component.html'
 })

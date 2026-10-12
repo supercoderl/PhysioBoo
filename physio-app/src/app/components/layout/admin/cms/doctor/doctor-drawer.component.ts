@@ -15,7 +15,6 @@ import { Doctor } from "../../../../../shared/types/medical-staff.types";
 import { convertEnumToSelection, generateUUID } from "../../../../../shared/utils/common";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooJsonInputComponent } from "../../../../input/boo-json-input/boo-json-input.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
@@ -36,8 +35,7 @@ interface StepConfig {
     imports: [
         SharedModule,
         DrawerComponent,
-        BooInputComponent,
-        BooIconComponent,
+        BooInputComponent,
         BooTextareaComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
@@ -59,7 +57,7 @@ interface StepConfig {
                     </div>
                     <button (click)="onClose()"
                         class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
                 <div class="flex-none px-6 py-4 bg-gray-50 border-b border-gray-100">
@@ -80,7 +78,7 @@ interface StepConfig {
                                         'bg-gray-100 text-gray-500': currentStep !== step.id && !isStepCompleted(step.id),
                                         'bg-emerald-100 text-emerald-600': currentStep !== step.id && isStepCompleted(step.id)
                                     }">
-                                    <boo-icon *ngIf="isStepCompleted(step.id) && currentStep !== step.id" name="check" [size]="12"></boo-icon>
+                                    <physio-icon *ngIf="isStepCompleted(step.id) && currentStep !== step.id" name="check" [size]="12"></physio-icon>
                                     <span *ngIf="!isStepCompleted(step.id) || currentStep === step.id">{{ step.id }}</span>
                                 </div>
                                 <div class="text-left hidden sm:block">
@@ -100,8 +98,8 @@ interface StepConfig {
                     <div *ngIf="currentStep === 1" [formGroup]="userForm" class="p-6 space-y-6 animate-fadeIn">
                         <div>
                             <div class="flex items-center gap-2 mb-1">
-                                <div class="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center">
-                                    <boo-icon name="user" [size]="14" class="text-blue-600"></boo-icon>
+                                <div class="w-7 h-7 rounded-lg bg-primarySoft flex items-center justify-center">
+                                    <physio-icon name="user" [size]="14" class="text-primary"></physio-icon>
                                 </div>
                                 <h3 class="text-sm font-bold text-primary">Account Credentials</h3>
                             </div>
@@ -128,9 +126,9 @@ interface StepConfig {
                                 placeholder="Min. 8 characters">
                             </boo-input>
                         </div>
-                        <div class="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl p-4">
-                            <boo-icon name="info" [size]="16" class="text-blue-500 flex-shrink-0 mt-0.5"></boo-icon>
-                            <p class="text-xs text-blue-700 m-0 leading-relaxed">
+                        <div class="flex items-start gap-3 bg-primarySoft border border-primary/25 rounded-xl p-4">
+                            <physio-icon name="info" [size]="16" [class]="'text-primary flex-shrink-0 mt-0.5'"></physio-icon>
+                            <p class="text-xs text-primaryHover m-0 leading-relaxed">
                                 The doctor will receive a welcome email with their login credentials. They can change their password after the first login.
                             </p>
                         </div>
@@ -140,7 +138,7 @@ interface StepConfig {
                         <div>
                             <div class="flex items-center gap-2 mb-1">
                                 <div class="w-7 h-7 rounded-lg bg-violet-100 flex items-center justify-center">
-                                    <boo-icon name="id-card" [size]="14" class="text-violet-600"></boo-icon>
+                                    <physio-icon name="id-card" [size]="14" class="text-violet-600"></physio-icon>
                                 </div>
                                 <h3 class="text-sm font-bold text-primary">Personal Information</h3>
                             </div>
@@ -163,7 +161,7 @@ interface StepConfig {
                         <div>
                             <div class="flex items-center gap-2 mb-1">
                                 <div class="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center">
-                                    <boo-icon name="file-badge" [size]="14" class="text-amber-600"></boo-icon>
+                                    <physio-icon name="file-badge" [size]="14" class="text-amber-600"></physio-icon>
                                 </div>
                                 <h3 class="text-sm font-bold text-primary">Identification</h3>
                             </div>
@@ -180,7 +178,7 @@ interface StepConfig {
                         <div>
                             <div class="flex items-center gap-2 mb-1">
                                 <div class="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center">
-                                    <boo-icon name="phone-call" [size]="14" class="text-red-500"></boo-icon>
+                                    <physio-icon name="phone-call" [size]="14" class="text-red-500"></physio-icon>
                                 </div>
                                 <h3 class="text-sm font-bold text-primary">Emergency Contact</h3>
                             </div>
@@ -197,7 +195,7 @@ interface StepConfig {
                         <div>
                             <div class="flex items-center gap-2 mb-1">
                                 <div class="w-7 h-7 rounded-lg bg-teal-100 flex items-center justify-center">
-                                    <boo-icon name="stethoscope" [size]="14" class="text-teal-600"></boo-icon>
+                                    <physio-icon name="stethoscope" [size]="14" class="text-teal-600"></physio-icon>
                                 </div>
                                 <h3 class="text-sm font-bold text-primary">Professional Summary</h3>
                             </div>
@@ -228,8 +226,8 @@ interface StepConfig {
                         <div class="h-px bg-gray-100"></div>
                         <div>
                             <div class="flex items-center gap-2 mb-1">
-                                <div class="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center">
-                                    <boo-icon name="shield-check" [size]="14" class="text-blue-600"></boo-icon>
+                                <div class="w-7 h-7 rounded-lg bg-primarySoft flex items-center justify-center">
+                                    <physio-icon name="shield-check" [size]="14" class="text-primary"></physio-icon>
                                 </div>
                                 <h3 class="text-sm font-bold text-primary">Medical License</h3>
                             </div>
@@ -246,7 +244,7 @@ interface StepConfig {
                         <div>
                             <div class="flex items-center gap-2 mb-1">
                                 <div class="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center">
-                                    <boo-icon name="landmark" [size]="14" class="text-green-600"></boo-icon>
+                                    <physio-icon name="landmark" [size]="14" class="text-green-600"></physio-icon>
                                 </div>
                                 <h3 class="text-sm font-bold text-primary">Financial & HR</h3>
                             </div>
@@ -272,7 +270,7 @@ interface StepConfig {
                             buttonClass="hover:!bg-gray-200"
                             background="transparent"
                             (click)="prevStep()">
-                            <boo-icon name="arrow-left" [size]="14" class="mr-1"></boo-icon>
+                            <physio-icon name="arrow-left" [size]="14" [class]="'mr-1'"></physio-icon>
                             Back
                         </boo-button-admin>
  
@@ -288,7 +286,7 @@ interface StepConfig {
                             textColor="white"
                             (click)="nextStep()">
                             Continue
-                            <boo-icon name="arrow-right" [size]="14" color="white" class="ml-1"></boo-icon>
+                            <physio-icon name="arrow-right" [size]="14" [class]="'ml-1 text-white'"></physio-icon>
                         </boo-button-admin>
  
                         <boo-button-admin
@@ -296,7 +294,7 @@ interface StepConfig {
                             textColor="white"
                             (click)="onSave()"
                             [loading]="loadingSrv.isLoading('create')">
-                            <boo-icon name="check" [size]="14" color="white" class="mr-1"></boo-icon>
+                            <physio-icon name="check" [size]="14" [class]="'mr-1 text-white'"></physio-icon>
                             Create Doctor
                         </boo-button-admin>
                     </div>

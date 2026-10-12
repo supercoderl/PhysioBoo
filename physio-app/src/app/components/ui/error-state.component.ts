@@ -1,15 +1,14 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { SharedModule } from "../../shared/shared-imports";
-import { BooIconComponent } from "../icon/boo-icon/boo-icon.component";
 
 @Component({
     selector: 'boo-error-state',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
         <div class="flex flex-col items-center justify-center text-center py-10 px-6">
             <div class="flex items-center justify-center w-14 h-14 rounded-2 bg-danger/5 mb-4">
-                <boo-icon [name]="icon" [size]="26" iconClass="text-danger"></boo-icon>
+                <physio-icon [name]="icon" [size]="26" class="text-danger"></physio-icon>
             </div>
             <p class="text-sm font-semibold text-regular mb-1">{{ title }}</p>
             <p class="text-xs15 text-secondary max-w-[280px] mb-5" *ngIf="description">{{ description }}</p>
@@ -20,7 +19,7 @@ import { BooIconComponent } from "../icon/boo-icon/boo-icon.component";
                 class="inline-flex items-center gap-1.5 text-xs15 font-semibold text-primary hover:opacity-80"
                 (click)="retry.emit()"
             >
-                <boo-icon name="refresh-cw" [size]="14"></boo-icon>
+                <physio-icon name="refresh" [size]="14"></physio-icon>
                 {{ retryLabel }}
             </button>
         </div>

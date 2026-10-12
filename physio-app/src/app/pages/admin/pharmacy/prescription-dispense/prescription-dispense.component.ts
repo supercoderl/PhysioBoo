@@ -1,5 +1,4 @@
 import { Component, HostListener, OnInit, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { DispensingService } from "../../../../services/admin/dispensing.service";
 import { DialogService } from "../../../../services/common/dialog.service";
@@ -24,7 +23,6 @@ import { DispenseSummaryPanelComponent } from "./dispense-summary-panel.componen
     standalone: true,
     imports: [
         SharedModule,
-        BooIconComponent,
         ErrorStateComponent,
         DispenseQueuePanelComponent,
         DispensePickingPanelComponent,
@@ -39,7 +37,7 @@ import { DispenseSummaryPanelComponent } from "./dispense-summary-panel.componen
         <p class="text-xs text-secondary">Clinical dispensing workspace · Pharmacist: Current Pharmacist</p>
       </div>
       <div class="flex items-center gap-2 text-xs text-secondary">
-        <boo-icon name="clock" [size]="14"></boo-icon>
+        <physio-icon name="clock" [size]="14"></physio-icon>
         <span>{{ now | date:'mediumTime' }}</span>
       </div>
     </div>

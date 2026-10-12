@@ -1,13 +1,11 @@
 import { Component } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SETTINGS_MANAGEMENT } from "../../../../shared/data/dummy";
 import { SharedModule } from "../../../../shared/shared-imports";
 
 @Component({
     selector: 'admin-system-setting',
     standalone: true,
-    imports: [
-        BooIconComponent, 
+    imports: [
         SharedModule
     ],
     template: `
@@ -42,7 +40,7 @@ import { SharedModule } from "../../../../shared/shared-imports";
                                             #rla="routerLinkActive" 
                                             [class.bg-[#0000000d]]="rla.isActive"
                                         >
-                                            <boo-icon [name]="setting.icon" ></boo-icon>
+                                            <physio-icon [name]="setting.icon" ></physio-icon>
                                             <div
                                                 class="flex min-w-0 flex-auto flex-col items-start gap-1"
                                             >

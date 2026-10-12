@@ -70,25 +70,25 @@ export type CurrentPatientAction = 'complete' | 'transfer' | 'record' | 'print';
                     <div class="flex flex-wrap items-center gap-2 pt-1">
                         <boo-button-admin
                             background="rgb(var(--twc-primary))" textColor="#fff" padding="9px 16px"
-                            [icon]="{ name: 'circle-check-big', size: 15, color: '#fff' }"
+                            [icon]="{ name: 'circle-check-big', size: 15 }"
                             (click)="action.emit('complete')"
                         >Complete Consultation</boo-button-admin>
                         <boo-button-admin
-                            background="transparent" textColor="#374151"
+                            background="transparent" textColor="#55434B"
                             [border]="{ width: 1, color: 'rgb(var(--twc-border))' }" padding="9px 14px"
-                            [icon]="{ name: 'redo-2', size: 15, color: '#374151' }"
+                            [icon]="{ name: 'redo-2', size: 15 }"
                             (click)="action.emit('transfer')"
                         >Transfer</boo-button-admin>
                         <boo-button-admin
-                            background="transparent" textColor="#374151"
+                            background="transparent" textColor="#55434B"
                             [border]="{ width: 1, color: 'rgb(var(--twc-border))' }" padding="9px 14px"
-                            [icon]="{ name: 'file-text', size: 15, color: '#374151' }"
+                            [icon]="{ name: 'file-text', size: 15 }"
                             (click)="action.emit('record')"
                         >Medical Record</boo-button-admin>
                         <boo-button-admin
-                            background="transparent" textColor="#374151"
+                            background="transparent" textColor="#55434B"
                             [border]="{ width: 1, color: 'rgb(var(--twc-border))' }" padding="9px 14px"
-                            [icon]="{ name: 'printer', size: 15, color: '#374151' }"
+                            [icon]="{ name: 'printer', size: 15 }"
                             (click)="action.emit('print')"
                         >Print Prescription</boo-button-admin>
                     </div>
@@ -103,7 +103,7 @@ export type CurrentPatientAction = 'complete' | 'transfer' | 'record' | 'print';
             >
                 <boo-button-admin
                     background="rgb(var(--twc-primary))" textColor="#fff" padding="10px 20px"
-                    [icon]="{ name: 'phone-call', size: 15, color: '#fff' }"
+                    [icon]="{ name: 'phone-call', size: 15 }"
                     (click)="callNext.emit()"
                 >Call Next Patient</boo-button-admin>
             </boo-empty-state>

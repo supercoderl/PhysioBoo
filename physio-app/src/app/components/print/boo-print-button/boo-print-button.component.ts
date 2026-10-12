@@ -1,21 +1,20 @@
 import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { PrintService } from '../../../services/common/print.service';
 import { SharedModule } from '../../../shared/shared-imports';
-import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
 
 @Component({
   selector: 'boo-print-button',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <button type="button"
       (click)="onClick()"
       [disabled]="disabled || loading()"
       [class]="resolvedClass()"
       [title]="title || 'Print'">
-      <boo-icon
+      <physio-icon
         [name]="loading() ? 'loader-circle' : icon"
-        [iconClass]="loading() ? 'w-4 h-4 animate-spin' : 'w-4 h-4'" />
+        [class]="loading() ? 'w-4 h-4 animate-spin' : 'w-4 h-4'" />
       <span *ngIf="label">{{ loading() ? 'Loading…' : label }}</span>
     </button>
   `

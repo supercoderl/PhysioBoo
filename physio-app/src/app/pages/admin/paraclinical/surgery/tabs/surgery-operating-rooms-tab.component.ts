@@ -1,5 +1,4 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
@@ -9,10 +8,10 @@ import { OperatingRoom, OperatingRoomStatus } from "../../../../../shared/types/
 @Component({
   selector: 'surgery-operating-rooms-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !rooms().length"><boo-empty-state icon="hospital" title="No operating rooms configured"></boo-empty-state></div>
@@ -38,7 +37,7 @@ import { OperatingRoom, OperatingRoomStatus } from "../../../../../shared/types/
 
         <div class="flex items-center justify-between">
           <span class="inline-flex items-center gap-1.5 text-xs font-medium" [ngClass]="r.equipmentReady ? 'text-emerald-600' : 'text-amber-600'">
-            <boo-icon [name]="r.equipmentReady ? 'circle-check' : 'alert-triangle'" [size]="14"></boo-icon>
+            <physio-icon [name]="r.equipmentReady ? 'circle-check' : 'alert-triangle'" [size]="14"></physio-icon>
             {{ r.equipmentReady ? 'Equipment Ready' : 'Equipment Not Ready' }}
           </span>
           <button *ngIf="r.currentSurgeryId" (click)="viewCase.emit(r.currentSurgeryId!)" class="text-primary text-xs font-semibold hover:underline">View Case</button>
@@ -75,7 +74,7 @@ export class SurgeryOperatingRoomsTabComponent implements OnInit {
   borderClass(status: OperatingRoomStatus): string {
     switch (status) {
       case 'Available': case 'Ready': return 'border-emerald-200';
-      case 'Preparing': case 'Cleaning': return 'border-indigo-200';
+      case 'Preparing': case 'Cleaning': return 'border-primary/25';
       case 'InSurgery': return 'border-amber-300';
       case 'Maintenance': return 'border-rose-300';
       default: return 'border-gray-200';

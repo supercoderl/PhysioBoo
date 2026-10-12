@@ -9,16 +9,16 @@ import { SharedModule } from "../../../../shared/shared-imports";
     ],
     template: `
         <div
-            class="shadow-xs p-2 border border-solid rounded-[12px] w-28 h-28 relative border-[#E5E7EB]"
+            class="shadow-xs p-2 border border-solid rounded-[12px] w-28 h-28 relative border-[#EFE3E7]"
         >
             <button
-                class="w-4 min-h-4 h-4 m-1.5 z-20 right-0 top-0 absolute inlineFlex-center-center bg-transparent align-middle text-center text-[22px] text-[#4B5563] max-h-8 outline-none p-2 rounded-[8px]"
+                class="w-4 min-h-4 h-4 m-1.5 z-20 right-0 top-0 absolute inlineFlex-center-center bg-transparent align-middle text-center text-[22px] text-[#71606A] max-h-8 outline-none p-2 rounded-[8px]"
                 [style.transition]="'background-color 150ms cubic-bezier(0.4, 0, 0.2, 1)'"
                 tabindex="0"
                 type="button"
                 *ngIf="fileInfo.isFolder"
             >
-                <lucide-icon name="info" class="w-4 h-4"></lucide-icon>
+                <physio-icon name="info" class="w-4 h-4"/>
             </button>
             <a
                 role="button"
@@ -27,7 +27,7 @@ import { SharedModule } from "../../../../shared/shared-imports";
                 data-discover="true"
             >
             <div class="relative">
-                <lucide-icon [name]="fileInfo.isFolder ? 'folder' : 'file-text'" class="w-10 h-10 stroke-[#BFC4CC]"></lucide-icon>
+                <physio-icon [name]="fileInfo.isFolder ? 'folder' : 'file-text'" class="w-10 h-10 stroke-[#BFC4CC]"/>
                   <div
                     class="absolute bottom-0 left-0 rounded-[4px] px-1 text-xs leading-normal font-semibold text-white"
                     [style.background-color]="fileInfo.type | colorByFileType"
@@ -43,7 +43,7 @@ import { SharedModule } from "../../../../shared/shared-imports";
                       {{fileInfo.name}}
                     </p>
                     <p
-                      class="font-medium text-[9px] truncate m-0 leading-[1.3] text-[#4B5563]"
+                      class="font-medium text-[9px] truncate m-0 leading-[1.3] text-[#71606A]"
                     >
                       {{totalFiles}}
                     </p>

@@ -37,7 +37,7 @@ Board:    Title ✎                                  [Delete board]
 ```
 
 ## 7. Component Hierarchy
-`ListScrumboardComponent` (tiles + create dialog) · `BoardScrumboardComponent` (header, columns, card dialog, add list). Both use `AdminBreadcrumbComponent`, `BooIconComponent`, `EmptyStateComponent`; drag and drop uses the CDK `DragDropModule` already in `SharedModule`.
+`ListScrumboardComponent` (tiles + create dialog) · `BoardScrumboardComponent` (header, columns, card dialog, add list). Both use `AdminBreadcrumbComponent`, `IconComponent` (physio-icon), `EmptyStateComponent`; drag and drop uses the CDK `DragDropModule` already in `SharedModule`.
 
 ## 8. UI Specification
 Columns `#F6F7F8`, cards white with a 1px `#E5E7EB` border; overdue due dates in red; the primary colour for actions.

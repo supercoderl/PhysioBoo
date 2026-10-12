@@ -33,7 +33,7 @@ export class BooButtonComponent {
   @Input() type: string = 'submit';
   @Input() disabled: boolean = false;
   @Input() radius: number = 0;
-  @Input() background: string = 'linear-gradient(90.08deg,#0e82fd 0.09%,#06aed4 70.28%)';
+  @Input() background: string = 'linear-gradient(90.08deg,#E11D48 0.09%,#06aed4 70.28%)';
   @Input() size: 'small' | 'medium' | 'large' = 'medium';
   @Input() classname: string = '';
   @Input() loading: boolean | null = false;

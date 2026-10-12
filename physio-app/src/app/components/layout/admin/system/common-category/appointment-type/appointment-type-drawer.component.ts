@@ -10,7 +10,6 @@ import { AppointmentType } from "../../../../../../shared/types/operation.types"
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../input/boo-input/boo-input.component";
 import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";
 import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-input.component";
@@ -22,7 +21,7 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
         SharedModule,
         DrawerComponent,
         BooInputComponent,
-        BooIconComponent,
+
         BooTextareaComponent,
         BooButtonAdminComponent,
         BooCheckboxComponent,
@@ -44,7 +43,7 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
                         <p class="text-sm text-secondary m-0">Configure appointment type details and settings</p>
                     </div>
                     <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
@@ -52,7 +51,7 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
                     <boo-json-editor [targetForms]="form"></boo-json-editor>
                     
                     <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <boo-icon name="loader" class="animate-spin text-primary" [size]="32"></boo-icon>
+                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
                     </div>
                     
                     <div class="p-6">
@@ -101,7 +100,7 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
                             >
                                 <div class="flex items-center gap-2">
                                     <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                                        <boo-icon name="triangle-alert" [size]="16" color="#ef4444"></boo-icon>
+                                        <physio-icon name="triangle-alert" [size]="16" class="text-[#ef4444]"></physio-icon>
                                     </div>
                                     <span class="text-sm font-medium text-gray-700">Emergency</span>
                                 </div>
@@ -114,8 +113,8 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
                                 (click)="toggleCheck('isFollowUp')"
                             >
                                 <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                                        <boo-icon name="refresh-cw" [size]="16" class="text-primary"></boo-icon>
+                                    <div class="w-8 h-8 rounded-full bg-primarySoft flex items-center justify-center shrink-0">
+                                        <physio-icon name="refresh" [size]="16" class="text-primary"></physio-icon>
                                     </div>
                                     <span class="text-sm font-medium text-gray-700">Follow Up</span>
                                 </div>
@@ -129,7 +128,7 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
                             >
                                 <div class="flex items-center gap-2">
                                     <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
-                                        <boo-icon name="clipboard" [size]="16" color="#f97316"></boo-icon>
+                                        <physio-icon name="clipboard" [size]="16" class="text-[#f97316]"></physio-icon>
                                     </div>
                                     <span class="text-sm font-medium text-gray-700">Requires Preparation before Appointment</span>
                                 </div>
@@ -165,12 +164,11 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
                             *ngIf="currentId" class="group flex items-center gap-1.5 text-red-500 hover:text-red-700 px-2 py-1.5 rounded-md hover:bg-red-50 transition-all text-sm font-medium"
                             (click)="onDelete()"
                         >
-                            <boo-icon 
+                            <physio-icon 
                                 name="trash-2" 
-                                [size]="16" 
-                                class="transition-transform group-hover:scale-110"
-                                color="#ef4444"
-                            ></boo-icon> 
+                                [size]="16"
+                            [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
+                            ></physio-icon> 
                             <span>Delete</span>
                         </button>
                     </div>
@@ -332,7 +330,7 @@ export class CommonCategoryAppointmentTypeDrawerComponent implements OnChanges {
             defaultDuration: 30,
             bufferTime: 0,
             consultationFee: 0,
-            colorCode: '#3B82F6',
+            colorCode: '#FB7185',
             isEmergency: false,
             requiresPreparation: false,
             isFollowUp: false

@@ -77,7 +77,7 @@ Refund Dialog (modal) — capped amount, method, required reason
 
 ## 4. Reused Frontend Infrastructure (already wired, not being changed)
 
-`BooTableAdminComponent`/`ColumnDefDirective`/`BooActionAdminComponent`, `BooIconComponent`,
+`BooTableAdminComponent`/`ColumnDefDirective`/`BooActionAdminComponent`, `IconComponent` (physio-icon),
 `ErrorStateComponent`, `DialogService`, `LocalLoadingService`, `ToastService`, `PaginationData`
 helpers, `LoadingKeys.CASHIER.*`. Not currently wired but available: `PrintService` (for
 `printInvoice`/`printReceipt`, currently unimplemented service stubs), `DrawerComponent` (not needed

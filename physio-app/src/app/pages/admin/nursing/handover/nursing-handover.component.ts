@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { NursingService } from "../../../../services/admin/nursing.service";
@@ -13,7 +12,7 @@ type SbarKey = 'situation' | 'background' | 'assessment' | 'recommendation';
 @Component({
     selector: 'admin-nursing-handover',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, BooSelectComponent, ErrorStateComponent],
+    imports: [SharedModule,BooSelectComponent, ErrorStateComponent],
     template: `
     <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div class="max-w-5xl mx-auto">
@@ -26,7 +25,7 @@ type SbarKey = 'situation' | 'background' | 'assessment' | 'recommendation';
         </div>
 
         <div *ngIf="loadingSrv.isLoading('handover')" class="flex flex-col items-center justify-center py-24 gap-3">
-          <boo-icon name="loader" [size]="32" class="animate-spin text-primary"></boo-icon>
+          <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
           <span class="text-gray-500 text-sm">Loading handover...</span>
         </div>
 
@@ -35,7 +34,7 @@ type SbarKey = 'situation' | 'background' | 'assessment' | 'recommendation';
         </div>
 
         <div *ngIf="!loadingSrv.isLoading('handover') && !error() && cards.length === 0" class="bg-surface rounded-lg shadow-md p-12 flex flex-col items-center justify-center text-center">
-          <boo-icon name="inbox" [size]="36" class="text-gray-300 mb-3"></boo-icon>
+          <physio-icon name="inbox" [size]="36" [class]="'text-gray-300 mb-3'"></physio-icon>
           <p class="text-gray-500 text-sm">No handover cards for this shift.</p>
         </div>
 
@@ -47,7 +46,7 @@ type SbarKey = 'situation' | 'background' | 'assessment' | 'recommendation';
                 <span class="text-xs text-gray-500 ml-2">Bed {{ c.bedNumber }} · {{ c.outgoingShift }} → {{ c.incomingShift }}</span>
               </div>
               <span *ngIf="c.acknowledged" class="text-xs font-semibold text-emerald-600 flex items-center gap-1">
-                <boo-icon name="check-circle" [size]="14"></boo-icon> Acknowledged
+                <physio-icon name="check-circle" [size]="14"></physio-icon> Acknowledged
               </span>
             </div>
             <dl *ngIf="editingId() !== c.id" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">

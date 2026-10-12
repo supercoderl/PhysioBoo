@@ -7,7 +7,6 @@ import { ImagingModality } from "../../../../../../shared/types/laboratory-imagi
 import { SortOption } from "../../../../../../shared/types/sort";
 import { BulkAction, GroupableColumn, SavedView, TableComment } from "../../../../../../shared/types/table.types";
 import { ColorUtils } from "../../../../../../shared/utils/color.utils";
-import { BooIconComponent } from "../../../../../icon/boo-icon/boo-icon.component";
 import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent, FilterConfig } from "../../../../../table/boo-table-admin/boo-table-admin.component";
 
@@ -18,8 +17,7 @@ import { BooTableAdminComponent, FilterConfig } from "../../../../../table/boo-t
     SharedModule,
     BooTableAdminComponent,
     ColumnDefDirective,
-    BooActionAdminComponent,
-    BooIconComponent
+    BooActionAdminComponent,
   ],
   host: { class: 'block h-full min-h-0' },
   template: `
@@ -86,7 +84,7 @@ import { BooTableAdminComponent, FilterConfig } from "../../../../../table/boo-t
         </ng-template>
 
         <ng-template appColumnDef="requiresContrast" headerLabel="Requires Contrast" cellClass="text-center justify-center" let-item>
-          <boo-icon name="circle-check" *ngIf="item.requiresContrast"  />
+          <physio-icon name="circle-check" *ngIf="item.requiresContrast"  />
         </ng-template>
 
         <ng-template appColumnDef="averageDurationMinutes" headerLabel="Avg Duration" headerClass="text-right" cellClass="text-right" let-item>

@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
@@ -12,7 +11,7 @@ import { TreatmentProcedureRow } from "../../../../../shared/types/treatment-she
 @Component({
   selector: 'treatment-procedures-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, BooInputComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooInputComponent, StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div class="flex items-center justify-between mb-3">
       <h3 class="text-sm font-semibold text-primary m-0">Procedures</h3>
@@ -33,7 +32,7 @@ import { TreatmentProcedureRow } from "../../../../../shared/types/treatment-she
     </form>
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !procedures().length"><boo-empty-state icon="stethoscope" title="No procedures recorded"></boo-empty-state></div>

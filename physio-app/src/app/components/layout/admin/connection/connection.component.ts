@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { MessageSquareText, X } from 'lucide-angular';
 import { SharedModule } from '../../../../shared/shared-imports';
 
 @Component({
@@ -12,8 +11,6 @@ import { SharedModule } from '../../../../shared/shared-imports';
   styleUrl: './connection.component.css'
 })
 export class AdminConnectionComponent {
-  messageSquareText = MessageSquareText;
-  x = X;
   users = new Array(20);
   isOpen: boolean = false;
 

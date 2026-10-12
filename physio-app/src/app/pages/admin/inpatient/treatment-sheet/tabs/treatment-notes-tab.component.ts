@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
@@ -13,7 +12,7 @@ import { ProgressNoteType, TreatmentProgressNote } from "../../../../../shared/t
 @Component({
   selector: 'treatment-notes-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, BooSelectComponent, BooTextareaComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooSelectComponent, BooTextareaComponent, StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg p-4 mb-4">
       <h3 class="text-sm font-semibold text-primary mb-3">Add Progress Note</h3>
@@ -29,7 +28,7 @@ import { ProgressNoteType, TreatmentProgressNote } from "../../../../../shared/t
     </div>
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !notes().length"><boo-empty-state icon="file-text" title="No progress notes"></boo-empty-state></div>

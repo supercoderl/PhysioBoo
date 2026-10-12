@@ -2,7 +2,6 @@ import { Component, signal } from "@angular/core";
 import { catchError, of } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { CmsDoctorDrawerComponent } from "../../../../../components/layout/admin/cms/doctor/doctor-drawer.component";
 import { CmsDoctorTableCardComponent } from "../../../../../components/layout/admin/cms/doctor/doctor-table-card.component";
@@ -32,8 +31,7 @@ import { SortOption } from "../../../../../shared/types/sort";
     AdminContentHeaderComponent,
     BooSelectComponent,
     ButtonIconComponent,
-    BooInputComponent,
-    BooIconComponent,
+    BooInputComponent,
     BooDateAdminComponent,
     BooButtonAdminComponent,
     BooFilterAdminComponent,

@@ -38,8 +38,7 @@
               "src/theme.less",
               "src/styles.scss",
               "node_modules/slick-carousel/slick/slick.scss",
-              "node_modules/slick-carousel/slick/slick-theme.scss",
-              "node_modules/ng-zorro-antd/ng-zorro-antd.less"
+              "node_modules/slick-carousel/slick/slick-theme.scss"
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",

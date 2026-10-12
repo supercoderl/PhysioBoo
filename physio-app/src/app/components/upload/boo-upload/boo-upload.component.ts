@@ -6,12 +6,11 @@ import { CloudinaryService } from '../../../services/common/cloudinary.service';
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
 import { ToastService } from '../../../services/common/toast.service';
 import { SharedModule } from '../../../shared/shared-imports'; // Chứa CommonModule, Icon...
-import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
 
 @Component({
   selector: 'boo-upload',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -30,7 +29,7 @@ import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
         class="
           relative overflow-hidden group cursor-pointer transition-all duration-200
           border-2 border-dashed border-gray-300 bg-gray-50
-          hover:border-primary hover:bg-blue-50
+          hover:border-primary hover:bg-primarySoft
           flex items-center justify-center
         "
         [class]="containerClass"
@@ -39,7 +38,7 @@ import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
         [style.border-radius.px]="radius"
       >
         <div *ngIf="loadingSrv.isLoading('upload')" class="absolute inset-0 bg-surface/80 z-20 flex flex-col items-center justify-center backdrop-blur-[1px]">
-          <boo-icon name="loader" class="animate-spin text-primary" [size]="24"></boo-icon>
+          <physio-icon name="loader" [size]="24" [class]="'animate-spin text-primary'"></physio-icon>
         </div>
         <ng-container *ngIf="previewUrl; else emptyState">
           <img *ngIf="!isSvgString" [src]="previewUrl" class="w-full h-full object-cover">
@@ -47,7 +46,7 @@ import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
           
           <div *ngIf="!loadingSrv.isLoading('upload')" class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity z-10">
             <div class="flex flex-col items-center text-white">
-              <boo-icon name="pencil" [size]="20" color="white"></boo-icon>
+              <physio-icon name="pencil" [size]="20" class="text-white"></physio-icon>
               <span class="text-[10px] font-medium mt-1">Change</span>
             </div>
           </div>
@@ -55,7 +54,7 @@ import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
 
         <ng-template #emptyState>
           <div class="flex flex-col items-center gap-1 text-gray-400 group-hover:text-primary transition-colors">
-            <boo-icon name="upload" [size]="20" color="#9ca3af"></boo-icon>
+            <physio-icon name="upload" [size]="20" class="text-[#A1A1AA]"></physio-icon>
             <span class="text-[10px] font-medium uppercase tracking-wide">Upload</span>
           </div>
         </ng-template>

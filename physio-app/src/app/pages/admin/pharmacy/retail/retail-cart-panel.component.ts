@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailCart, RetailCartLineItem } from "../../../../shared/types/retail-pos.types";
@@ -7,7 +6,7 @@ import { RetailCart, RetailCartLineItem } from "../../../../shared/types/retail-
 @Component({
   selector: 'retail-cart-panel',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, EmptyStateComponent],
+  imports: [SharedModule,EmptyStateComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg flex flex-col h-full">
       <div class="p-3 border-b border-gray-200 flex items-center justify-between">
@@ -29,7 +28,7 @@ import { RetailCart, RetailCartLineItem } from "../../../../shared/types/retail-
               <p class="text-xs text-gray-500 truncate">{{ item.genericName }} · {{ item.strength }} · {{ item.packageLabel }}</p>
             </div>
             <button type="button" (click)="removeItem.emit(item.id)" class="text-gray-400 hover:text-rose-600 shrink-0" aria-label="Remove item">
-              <boo-icon name="x" [size]="16"></boo-icon>
+              <physio-icon name="x" [size]="16"></physio-icon>
             </button>
           </div>
 

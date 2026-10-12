@@ -2,40 +2,38 @@ import { Component, Input } from '@angular/core';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { ToastService } from '../../../../services/common/toast.service';
 import { SharedModule } from '../../../../shared/shared-imports';
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 
 @Component({
     selector: 'boo-json-editor',
     standalone: true,
     imports: [
         SharedModule,
-        FormsModule,
-        BooIconComponent
+        FormsModule,
     ],
     template: `
-        <div class="m-6 mb-0 p-4 border border-dashed border-blue-400 bg-blue-50/50 rounded-xl transition-all">
+        <div class="m-6 mb-0 p-4 border border-dashed border-primary/70 bg-primarySoft/50 rounded-xl transition-all">
             <div 
                 class="flex justify-between items-center cursor-pointer select-none" 
                 (click)="isExpanded = !isExpanded"
             >
                 <div class="flex items-center gap-2">
-                    <div class="w-6 h-6 rounded bg-blue-100 flex items-center justify-center">
-                        <boo-icon name="code" [size]="14" class="text-blue-600"></boo-icon>
+                    <div class="w-6 h-6 rounded bg-primarySoft flex items-center justify-center">
+                        <physio-icon name="code" [size]="14" class="text-primary"></physio-icon>
                     </div>
-                    <span class="text-sm font-bold text-blue-700">DevTool: Auto-fill JSON</span>
+                    <span class="text-sm font-bold text-primaryHover">DevTool: Auto-fill JSON</span>
                 </div>
-                <boo-icon 
+                <physio-icon 
                     [name]="isExpanded ? 'chevron-up' : 'chevron-down'" 
-                    [size]="18" 
-                    class="text-blue-500 transition-transform"
-                ></boo-icon>
+                    [size]="18"
+                [class]="'text-primary transition-transform'"
+                ></physio-icon>
             </div>
 
             <div *ngIf="isExpanded" class="mt-4 animate-fade-in-down">
                 <textarea 
                     [(ngModel)]="jsonText" 
                     rows="6" 
-                    class="w-full text-[13px] font-mono p-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-slate-700 custom-scrollbar" 
+                    class="w-full text-[13px] font-mono p-3 border border-primary/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/70 bg-white text-slate-700 custom-scrollbar" 
                     placeholder='Paste your raw JSON here... &#10;{&#10;  "name": "example",&#10;  "code": "EX-01"&#10;}'
                 ></textarea>
                 
@@ -48,9 +46,9 @@ import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
                     </button>
                     <button 
                         (click)="applyJson()" 
-                        class="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1.5"
+                        class="px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primaryHover transition-colors shadow-sm flex items-center gap-1.5"
                     >
-                        <boo-icon name="zap" [size]="14" color="white"></boo-icon>
+                        <physio-icon name="zap" [size]="14" class="text-white"></physio-icon>
                         Apply to Form
                     </button>
                 </div>

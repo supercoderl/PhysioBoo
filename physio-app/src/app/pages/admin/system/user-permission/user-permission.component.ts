@@ -1,7 +1,6 @@
 import { Component, OnInit, computed, signal } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { firstValueFrom } from "rxjs";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
 import { UserPermissionPermissionDrawerComponent } from "../../../../components/layout/admin/system/user-permission/permission-drawer.component";
 import { UserPermissionRoleDrawerComponent } from "../../../../components/layout/admin/system/user-permission/role-drawer.component";
@@ -45,8 +44,7 @@ interface TabDef {
     AdminUserPermissionPermissionTabComponent,
     UserPermissionUserDrawerComponent,
     UserPermissionRoleDrawerComponent,
-    UserPermissionPermissionDrawerComponent,
-    BooIconComponent
+    UserPermissionPermissionDrawerComponent,
 ],
     templateUrl: './user-permission.component.html',
     host: { class: 'block h-full min-h-0' }

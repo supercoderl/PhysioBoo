@@ -23,7 +23,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
         <div class="flex flex-col gap-4" [formGroup]="form">
             <div class="w-full">
               <p class="font-semibold text-base m-0">Profile</p>
-              <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
+              <p class="m-0 text-[13px] leading-[1.5] text-[#71606A]">
                 Manage your name, date of birth, and other personal identity details.
               </p>
             </div>

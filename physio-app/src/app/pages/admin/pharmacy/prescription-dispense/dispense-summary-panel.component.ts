@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DispenseWorkspace } from "../../../../shared/types/dispensing.types";
@@ -7,7 +6,7 @@ import { DispenseWorkspace } from "../../../../shared/types/dispensing.types";
 @Component({
     selector: 'dispense-summary-panel',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, EmptyStateComponent],
+    imports: [SharedModule,EmptyStateComponent],
     template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60">
@@ -39,7 +38,7 @@ import { DispenseWorkspace } from "../../../../shared/types/dispensing.types";
           </div>
 
           <div *ngIf="blockReason" class="px-3 py-2 rounded-1.5 bg-amber-50 text-amber-800 text-[11px] flex items-start gap-2">
-            <boo-icon name="info" [size]="13" iconClass="mt-0.5 shrink-0"></boo-icon>
+            <physio-icon name="info" [size]="13" [class]="'mt-0.5 shrink-0'"></physio-icon>
             <span>{{ blockReason }}</span>
           </div>
         </div>

@@ -1,6 +1,5 @@
 import { Component, HostListener, OnInit, ViewChild, signal } from "@angular/core";
 import { forkJoin } from "rxjs";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { RetailPosService, nextLineItemId } from "../../../../services/admin/retail-pos.service";
@@ -27,7 +26,6 @@ import { RetailProductDetailDrawerComponent } from "./retail-product-detail-draw
   standalone: true,
   imports: [
     SharedModule,
-    BooIconComponent,
     ErrorStateComponent,
     StatCardComponent,
     RetailCatalogPanelComponent,
@@ -49,10 +47,10 @@ import { RetailProductDetailDrawerComponent } from "./retail-product-detail-draw
         <div class="flex items-center gap-2">
           <button type="button" (click)="showInsight.set(!showInsight())"
             class="px-3 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 flex items-center gap-1.5">
-            <boo-icon name="gauge" [size]="14"></boo-icon> {{ showInsight() ? 'Hide' : 'Show' }} Insight
+            <physio-icon name="gauge" [size]="14"></physio-icon> {{ showInsight() ? 'Hide' : 'Show' }} Insight
           </button>
           <button type="button" (click)="newSale()" class="px-3 py-2 bg-primary text-white rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1.5">
-            <boo-icon name="plus-circle" [size]="14"></boo-icon> New Sale
+            <physio-icon name="plus-circle" [size]="14"></physio-icon> New Sale
           </button>
         </div>
       </div>
@@ -67,7 +65,7 @@ import { RetailProductDetailDrawerComponent } from "./retail-product-detail-draw
           <span class="text-[11px] text-gray-400">({{ c.items.length }})</span>
         </button>
         <button type="button" (click)="newCart()" class="px-3 py-2.5 text-xs font-semibold text-primary hover:underline flex items-center gap-1">
-          <boo-icon name="plus" [size]="12"></boo-icon> New Cart
+          <physio-icon name="plus" [size]="12"></physio-icon> New Cart
         </button>
       </div>
     </div>
@@ -109,17 +107,17 @@ import { RetailProductDetailDrawerComponent } from "./retail-product-detail-draw
     <!-- Floating quick actions -->
     <div class="fixed bottom-6 right-6 flex flex-col gap-2 z-30">
       <button type="button" (click)="newSale()" title="New Sale (F2)" class="w-11 h-11 rounded-full bg-primary text-white shadow-lg flex items-center justify-center hover:opacity-90">
-        <boo-icon name="plus" [size]="18"></boo-icon>
+        <physio-icon name="plus" [size]="18"></physio-icon>
       </button>
       <button type="button" (click)="suspendActiveCart()" title="Suspend Sale" class="w-11 h-11 rounded-full bg-surface border border-gray-300 shadow-lg flex items-center justify-center hover:bg-gray-50">
-        <boo-icon name="pause" [size]="18" iconClass="text-gray-700"></boo-icon>
+        <physio-icon name="pause" [size]="18" class="text-gray-700"></physio-icon>
       </button>
       <button type="button" (click)="toggleHeldQueue()" title="Hold Queue" class="relative w-11 h-11 rounded-full bg-surface border border-gray-300 shadow-lg flex items-center justify-center hover:bg-gray-50">
-        <boo-icon name="list" [size]="18" iconClass="text-gray-700"></boo-icon>
+        <physio-icon name="list" [size]="18" class="text-gray-700"></physio-icon>
         <span *ngIf="heldCarts().length" class="absolute -top-1 -right-1 bg-amber-500 text-white text-[10px] font-bold rounded-full w-4.5 h-4.5 flex items-center justify-center">{{ heldCarts().length }}</span>
       </button>
       <button type="button" title="Print Receipt" (click)="printBill()" class="w-11 h-11 rounded-full bg-surface border border-gray-300 shadow-lg flex items-center justify-center hover:bg-gray-50">
-        <boo-icon name="printer" [size]="18" iconClass="text-gray-700"></boo-icon>
+        <physio-icon name="printer" [size]="18" class="text-gray-700"></physio-icon>
       </button>
     </div>
 

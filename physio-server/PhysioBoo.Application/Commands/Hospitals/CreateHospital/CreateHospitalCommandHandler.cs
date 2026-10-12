@@ -70,7 +70,9 @@ namespace PhysioBoo.Application.Commands.Hospitals.CreateHospital
                 request.NewHospital.VisionStatement
             );
 
-            newHospital.SetTenantId(request.NewHospital.HospitalGroupId);
+            // A tenant admin does not send a group: the branch belongs to the admin's own tenant.
+            Guid tenantId = request.NewHospital.HospitalGroupId != Guid.Empty ? request.NewHospital.HospitalGroupId : _user.GetTenantId();
+            newHospital.SetTenantId(tenantId);
             newHospital.SetCreatedBy(_user.GetUserId());
 
             SharedKernel.Results.DbResult<Guid> result = await _hospitalRepository.InsertAsync<Hospital, Guid>(newHospital);

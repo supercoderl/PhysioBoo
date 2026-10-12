@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { NursingService } from "../../../../../services/admin/nursing.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -9,10 +8,10 @@ import { NursingTask } from "../../../../../shared/types/nursing.types";
 @Component({
   selector: 'nursing-tasks-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading()" class="space-y-4">

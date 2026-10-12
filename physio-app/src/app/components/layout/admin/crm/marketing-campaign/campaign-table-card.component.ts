@@ -52,7 +52,7 @@ const CAMPAIGN_TYPE_LABELS: Record<CampaignType, string> = {
                     <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium"
                         [ngClass]="{
                             'bg-gray-100 text-gray-700': item.status === CampaignStatus.Draft,
-                            'bg-blue-100 text-blue-700': item.status === CampaignStatus.Scheduled,
+                            'bg-primarySoft text-primaryHover': item.status === CampaignStatus.Scheduled,
                             'bg-green-100 text-green-700': item.status === CampaignStatus.Active,
                             'bg-amber-100 text-amber-700': item.status === CampaignStatus.Paused,
                             'bg-purple-100 text-purple-700': item.status === CampaignStatus.Completed,

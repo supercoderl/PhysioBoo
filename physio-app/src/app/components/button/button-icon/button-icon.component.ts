@@ -8,13 +8,13 @@ import { LoadingSpinnerComponent } from "../../loading/spinner/spinner.component
   imports: [
     SharedModule,
     LoadingSpinnerComponent
-],
+  ],
   template: `
     <button
       tabindex="0"
       type="button"
       [ngClass]="{
-        'border border-solid inlineFlex-center-center relative bg-transparent cursor-pointer align-middle text-center text-[#4B5563] outline-none rounded-md hover:bg-gray-200 transition-background duration-300 ease-in-out': true,
+        'border border-solid inlineFlex-center-center relative bg-transparent cursor-pointer align-middle text-center text-[#71606A] outline-none rounded-md hover:bg-gray-200 transition-background duration-300 ease-in-out': true,
         'w-8 h-8 p-2': !hasContent,
         'px-3 py-2 gap-2': hasContent
       }"
@@ -23,13 +23,12 @@ import { LoadingSpinnerComponent } from "../../loading/spinner/spinner.component
       [attr.aria-label]="ariaLabel"
       (click)="onClick.emit()"
     >
-      <lucide-icon 
+      <physio-icon 
         *ngIf="icon && !loading"
         [name]="icon.name" 
         [size]="icon.size || 16"
         [class]="icon.class"
-        [color]="icon.color || 'black'"
-      ></lucide-icon>
+      />
       <loading-spinner 
         *ngIf="loading" 
         position="relative"
@@ -46,7 +45,7 @@ export class ButtonIconComponent implements AfterContentInit {
   // #region Inputs, Outputs, Properties
   hasContent = false;
 
-  private _icon?: { name: string; size?: number; class?: string, color?: string };
+  private _icon?: { name: string; size?: number; class?: string };
   @Input() buttonClass: string = '';
   @Input() loading?: boolean = false;
   @Input() disabled?: boolean = false;
@@ -54,7 +53,7 @@ export class ButtonIconComponent implements AfterContentInit {
   @Output() onClick: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('contentWrapper', { static: true }) content!: ElementRef;
   @Input()
-  set icon(value: { name: string; size?: number; class?: string, color?: string } | undefined) {
+  set icon(value: { name: string; size?: number; class?: string } | undefined) {
     if (value) {
       this._icon = {
         ...value,

@@ -12,7 +12,7 @@ import { FOOTER_MENUS } from '../../../../shared/data/dummy';
   templateUrl: './footer.component.html',
   styles: `
     button {
-      background: linear-gradient(90.08deg,#0e82fd .09%,#06aed4 70.28%);
+      background: linear-gradient(90.08deg,#E11D48 .09%,#06aed4 70.28%);
     }
   `
 })

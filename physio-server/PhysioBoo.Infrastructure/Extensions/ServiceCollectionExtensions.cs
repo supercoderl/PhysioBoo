@@ -11,6 +11,7 @@ using PhysioBoo.Domain.Notifications;
 using PhysioBoo.Infrastructure.BackgroundJobs;
 using PhysioBoo.Infrastructure.Caching;
 using PhysioBoo.Infrastructure.Database;
+using PhysioBoo.Infrastructure.Database.DevData;
 using PhysioBoo.Infrastructure.Database.Seeding;
 using PhysioBoo.Infrastructure.Email;
 using PhysioBoo.Infrastructure.EventSourcing;
@@ -256,6 +257,10 @@ namespace PhysioBoo.Infrastructure.Extensions
         public static IServiceCollection AddSeedingSerivce(this IServiceCollection services)
         {
             services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
+
+            // Development-only fake data generator (Super Admin > Platform > Dev data); one module per entity group.
+            services.AddScoped<IDevDataService, DevDataService>();
+            services.AddScoped<IDevDataModule, HospitalStructureModule>();
             return services;
         }
 

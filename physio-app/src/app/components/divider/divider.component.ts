@@ -9,7 +9,7 @@ import { SharedModule } from '../../shared/shared-imports';
   ],
   template: `
     <hr 
-      class="m-0 border-b border-solid border-[#E5E7EB]" 
+      class="m-0 border-b border-solid border-[#EFE3E7]" 
       [ngClass]="classname"
     />`
 })

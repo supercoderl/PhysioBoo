@@ -3,7 +3,6 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AnimationOptions } from 'ngx-lottie';
 import { BooButtonComponent } from "../../../components/button/boo-button/boo-button.component";
-import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
 import { SharedModule } from '../../../shared/shared-imports';
@@ -15,8 +14,7 @@ import { PagedResponse } from '../../../shared/types/common';
   imports: [
     SharedModule,
     BooInputComponent,
-    BooButtonComponent,
-    BooIconComponent
+    BooButtonComponent,
   ],
   templateUrl: './forgot.component.html'
 })

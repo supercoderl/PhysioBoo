@@ -19,7 +19,7 @@ import { SharedModule } from "../../../shared/shared-imports";
             </div>
             <div class="grid md:grid-cols-4">
                 <div class="flex px-3">
-                    <div class="rounded-[8px] transition-smooth border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 w-full relative flex">
+                    <div class="rounded-[8px] transition-smooth border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 w-full relative flex">
                         <div class="p-6.25 flex-1">
                             <div class="pb-5">
                                 <span class="w-20 h-20 rounded-full text-white bg-secondary flex-center-center">
@@ -41,7 +41,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                     </div>
                 </div>
                 <div class="flex px-3">
-                    <div class="rounded-[8px] transition-smooth border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 w-full relative flex">
+                    <div class="rounded-[8px] transition-smooth border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 w-full relative flex">
                         <div class="p-6.25 flex-1">
                             <div class="pb-5">
                                 <span class="w-20 h-20 rounded-full text-white bg-secondary flex-center-center">
@@ -63,7 +63,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                     </div>
                 </div>
                 <div class="flex px-3">
-                    <div class="rounded-[8px] transition-smooth border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 w-full relative flex">
+                    <div class="rounded-[8px] transition-smooth border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 w-full relative flex">
                         <div class="p-6.25 flex-1">
                             <div class="pb-5">
                                 <span class="w-20 h-20 rounded-full text-white bg-secondary flex-center-center">
@@ -85,7 +85,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                     </div>
                 </div>
                 <div class="flex px-3">
-                    <div class="rounded-[8px] transition-smooth border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 w-full relative flex">
+                    <div class="rounded-[8px] transition-smooth border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 w-full relative flex">
                         <div class="p-6.25 flex-1">
                             <div class="pb-5">
                                 <span class="w-20 h-20 rounded-full text-white bg-secondary flex-center-center">

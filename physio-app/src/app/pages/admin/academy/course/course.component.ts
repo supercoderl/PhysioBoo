@@ -1,7 +1,6 @@
 import { Component, HostListener, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminBreadcrumbComponent } from "../../../../components/breadcrumb/admin-breadcrumb.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { AcademyService } from '../../../../services/admin/academy.service';
 import { AuthService } from '../../../../services/auth/auth.service';
@@ -20,7 +19,6 @@ interface LessonDraft { id: string | null; title: string; content: string; durat
   imports: [
     AdminBreadcrumbComponent,
     SharedModule,
-    BooIconComponent,
     EmptyStateComponent
   ],
   templateUrl: './course.component.html'

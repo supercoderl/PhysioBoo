@@ -1,7 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
+import { map, Observable } from "rxjs";
 import { BASE_API } from "../../shared/api/base";
 import {
+    BillingSummary,
     ChangeSubscriptionRequest,
     SaveSubscriptionPlanRequest,
     SubscriptionPlan,
@@ -35,6 +37,29 @@ export class BillingService {
         if (params.search) query['search'] = params.search;
         if (params.status) query['status'] = params.status;
         return this.http.get<PagedResponse<PaginationData<TenantSubscription>>>(BASE_API.BILLING.SUBSCRIPTIONS, { params: query });
+    }
+
+    /**
+     * Placeholder until `GET /api/billing/summary` exists (see docs/superadmin-billing-redesign.md §12):
+     * sums the first page of up to 100 tenants, so `partial` flags when more tenants exist.
+     */
+    getSummary(): Observable<BillingSummary> {
+        return this.searchSubscriptions({ pageNumber: 1, pageSize: 100 }).pipe(
+            map(res => {
+                const data = res.success ? res.data : null;
+                const items = data?.items ?? [];
+                const tenants = data?.totalCount ?? 0;
+                return {
+                    tenants,
+                    monthlyRecurring: items
+                        .filter(t => t.status === 'Active' || t.status === 'PastDue')
+                        .reduce((sum, t) => sum + t.monthlyPrice, 0),
+                    pastDue: items.filter(t => t.status === 'PastDue').length,
+                    outstanding: items.reduce((sum, t) => sum + t.outstandingAmount, 0),
+                    partial: tenants > items.length
+                };
+            })
+        );
     }
 
     getSubscription(hospitalGroupId: string) {

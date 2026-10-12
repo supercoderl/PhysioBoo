@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { LaboratoryService } from "../../../../../services/admin/laboratory.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { LabDashboardTrend } from "../../../../../shared/types/laboratory.types";
@@ -7,10 +6,10 @@ import { LabDashboardTrend } from "../../../../../shared/types/laboratory.types"
 @Component({
   selector: 'laboratory-dashboard-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && trend()" class="grid grid-cols-1 lg:grid-cols-2 gap-4">

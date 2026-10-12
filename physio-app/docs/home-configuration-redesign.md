@@ -178,7 +178,7 @@ export interface HomeSettings {
 | Inactive | bg-gray-100 text-gray-800   |
 
 ### Feature Icon Picker
-`BooSelectComponent` bound to a fixed lucide icon list (`hospital`, `stethoscope`, `ambulance`, `pill`, `microscope`, `smartphone`, `heart-pulse`, `shield-check`), rendered via `<boo-icon>` in both the select and the table/drawer preview — replaces the emoji field entirely.
+`BooSelectComponent` bound to a fixed lucide icon list (`hospital`, `stethoscope`, `ambulance`, `pill`, `microscope`, `smartphone`, `heart-pulse`, `shield-check`), rendered via `<physio-icon>` in both the select and the table/drawer preview — replaces the emoji field entirely.
 
 ## Interaction Design
 - Row / edit action → `onOpenDrawer(id)` per entity
@@ -195,7 +195,7 @@ export interface HomeSettings {
 - Settings form: 2-column grid collapses to 1 column below `md`
 
 ## Accessibility
-- Banner/feature images and icons have descriptive `alt`/`aria-label`; feature icons are semantic SVGs (`boo-icon`), not emoji
+- Banner/feature images and icons have descriptive `alt`/`aria-label`; feature icons are semantic SVGs (`physio-icon`), not emoji
 - Status communicated via badge text, not color alone
 - Star rating rendered with `aria-label="{{rating}} out of 5"` in addition to the visual stars
 - Drawer form fields use `BooInputComponent`/`BooSelectComponent`/`BooTextareaComponent`/`BooCheckboxComponent` labels (WCAG-compliant per shared component library)

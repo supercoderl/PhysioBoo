@@ -4,23 +4,21 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { LoadingKeys } from "../../../../../shared/types/loading";
 import { MenuItem } from "../../../../../shared/types/menu.types";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 
 @Component({
     selector: 'setting-admin-menu-tree-card',
     standalone: true,
     imports: [
         SharedModule,
-        BooIconComponent
     ],
     template: `
         <div class="bg-surface rounded-[6px] border border-gray-200 overflow-hidden">
             <div *ngIf="loadingSrv.isLoading(LoadingKeys.ADMIN_MENU.SEARCH)" class="p-8 flex items-center justify-center">
-                <boo-icon name="loader-circle" [size]="28" class="animate-spin text-primary"></boo-icon>
+                <physio-icon name="loader-circle" [size]="28" [class]="'animate-spin text-primary'"></physio-icon>
             </div>
             <div *ngIf="!loadingSrv.isLoading(LoadingKeys.ADMIN_MENU.SEARCH) && treeNodes.length === 0" class="p-12 flex flex-col items-center gap-3 text-center">
                 <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-                    <boo-icon name="layout-list" [size]="22" color="#94a3b8"></boo-icon>
+                    <physio-icon name="layout-list" [size]="22" class="text-[#A1A1AA]"></physio-icon>
                 </div>
                 <p class="text-sm text-secondary m-0">No menu items yet. Click <strong>New Item</strong> to get started.</p>
             </div>
@@ -37,7 +35,7 @@ import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
                 <div class="group flex items-center justify-between w-full py-2 px-3 rounded-lg">
                     <div class="flex items-center gap-3 min-w-0 flex-1">
                         <div class="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-                            <boo-icon [name]="origin['icon'] || 'layout-list'" [size]="14" class="text-primary"></boo-icon>
+                            <physio-icon [name]="origin['icon'] || 'layout-list'" [size]="14" class="text-primary"></physio-icon>
                         </div>
                         <div class="min-w-0 flex-1">
                             <span class="text-sm font-semibold text-primary truncate block">{{ node.title }}</span>
@@ -61,21 +59,21 @@ import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
                             class="w-6 h-6 flex items-center justify-center rounded hover:bg-primary/10 text-primary transition-colors"
                             (click)="$event.stopPropagation(); onAddChild(origin)"
                         >
-                            <boo-icon name="plus" [size]="13"></boo-icon>
+                            <physio-icon name="plus" [size]="13"></physio-icon>
                         </button>
                         <button
                             nz-tooltip nzTooltipTitle="Edit"
                             class="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-200 text-secondary transition-colors"
                             (click)="$event.stopPropagation(); onEdit(origin)"
                         >
-                            <boo-icon name="pencil" [size]="13"></boo-icon>
+                            <physio-icon name="pencil" [size]="13"></physio-icon>
                         </button>
                         <button
                             nz-tooltip nzTooltipTitle="Delete"
                             class="w-6 h-6 flex items-center justify-center rounded hover:bg-red-100 text-red-500 transition-colors"
                             (click)="$event.stopPropagation(); onDelete(origin)"
                         >
-                            <boo-icon name="trash-2" [size]="13"></boo-icon>
+                            <physio-icon name="trash-2" [size]="13"></physio-icon>
                         </button>
                     </div>
                 </div>

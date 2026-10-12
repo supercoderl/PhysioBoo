@@ -1,12 +1,11 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { CashierInvoice, CashierPaymentMethod, CashierPaymentSplit } from "../../../../shared/types/cashier.types";
 
 @Component({
     selector: 'cashier-payment-dialog',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div *ngIf="isOpen && invoice" class="fixed inset-0 z-[10000] flex items-center justify-center">
       <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" (click)="close.emit()" aria-hidden="true"></div>
@@ -18,7 +17,7 @@ import { CashierInvoice, CashierPaymentMethod, CashierPaymentSplit } from "../..
             <p class="text-xs text-slate-400">{{ invoice.invoiceNo }} · {{ invoice.patientName }}</p>
           </div>
           <button type="button" (click)="close.emit()" class="text-slate-400 hover:text-white" aria-label="Close payment dialog">
-            <boo-icon name="x" [size]="18"></boo-icon>
+            <physio-icon name="x" [size]="18"></physio-icon>
           </button>
         </div>
 
@@ -30,7 +29,7 @@ import { CashierInvoice, CashierPaymentMethod, CashierPaymentSplit } from "../..
               <button *ngFor="let m of methods" type="button" (click)="selectMethod(m.key)"
                 class="px-2 py-2.5 rounded-xl border text-[11px] font-semibold flex flex-col items-center gap-1 transition-colors"
                 [ngClass]="method === m.key ? 'bg-amber-50 border-amber-400 text-amber-800' : 'bg-surface border-slate-200 text-slate-600 hover:border-slate-300'">
-                <boo-icon [name]="m.icon" [size]="16"></boo-icon>
+                <physio-icon [name]="m.icon" [size]="16"></physio-icon>
                 {{ m.label }}
               </button>
             </div>
@@ -54,10 +53,10 @@ import { CashierInvoice, CashierPaymentMethod, CashierPaymentSplit } from "../..
                   <option value="Corporate">Corporate</option>
                 </select>
                 <input type="number" [(ngModel)]="split.amount" min="0" step="0.01" class="flex-1 px-2 py-1.5 border border-slate-300 rounded-lg text-xs" />
-                <button type="button" (click)="removeSplit(i)" class="text-slate-400 hover:text-rose-600" aria-label="Remove split"><boo-icon name="x" [size]="14"></boo-icon></button>
+                <button type="button" (click)="removeSplit(i)" class="text-slate-400 hover:text-rose-600" aria-label="Remove split"><physio-icon name="x" [size]="14"></physio-icon></button>
               </div>
               <button type="button" (click)="addSplit()" class="text-xs font-semibold text-amber-700 hover:underline flex items-center gap-1">
-                <boo-icon name="plus" [size]="12"></boo-icon> Add payment line
+                <physio-icon name="plus" [size]="12"></physio-icon> Add payment line
               </button>
               <p class="text-xs mt-2" [ngClass]="remainingSplit() === 0 ? 'text-emerald-600' : 'text-amber-600'" aria-live="polite">
                 Remaining: \${{ remainingSplit().toFixed(2) }}
@@ -82,7 +81,7 @@ import { CashierInvoice, CashierPaymentMethod, CashierPaymentSplit } from "../..
             </div>
 
             <div class="mt-4 pt-3 border-t border-slate-200 flex items-center gap-2 text-[11px] text-slate-500">
-              <boo-icon name="shield-check" [size]="13" iconClass="text-emerald-500"></boo-icon>
+              <physio-icon name="shield-check" [size]="13" class="text-emerald-500"></physio-icon>
               Receipt will be available for print or reprint after confirmation.
             </div>
           </div>

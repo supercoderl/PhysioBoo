@@ -1,7 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
 import { AdminBreadcrumbComponent } from "../../../../components/breadcrumb/admin-breadcrumb.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { AcademyService } from '../../../../services/admin/academy.service';
 import { AuthService } from '../../../../services/auth/auth.service';
@@ -18,7 +17,6 @@ const SEARCH_DEBOUNCE_MS = 300;
   imports: [
     AdminBreadcrumbComponent,
     SharedModule,
-    BooIconComponent,
     EmptyStateComponent
   ],
   templateUrl: './list.component.html'

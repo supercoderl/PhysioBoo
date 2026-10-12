@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { CashierService } from "../../../../services/admin/cashier.service";
 import { DialogService } from "../../../../services/common/dialog.service";
@@ -29,7 +28,6 @@ type LeftTab = 'invoices' | 'activity';
   standalone: true,
   imports: [
     SharedModule,
-    BooIconComponent,
     ErrorStateComponent,
     CashierSearchPanelComponent,
     CashierInvoiceTableComponent,
@@ -51,11 +49,11 @@ type LeftTab = 'invoices' | 'activity';
         <div class="flex items-center gap-2">
           <button type="button" (click)="exportTransactions()"
             class="px-3 py-2 border border-white/15 rounded-lg text-xs font-semibold text-slate-200 hover:bg-white/5 flex items-center gap-1.5">
-            <boo-icon name="download" [size]="14"></boo-icon> Export
+            <physio-icon name="download" [size]="14"></physio-icon> Export
           </button>
           <button type="button" (click)="refreshAll()"
             class="px-3 py-2 rounded-lg text-xs font-semibold text-slate-900 bg-amber-400 hover:bg-amber-300 flex items-center gap-1.5">
-            <boo-icon name="refresh-cw" [size]="14" [class.animate-spin]="loadingSrv.isLoading('cashier-dashboard')"></boo-icon> Refresh
+            <physio-icon name="refresh" [size]="14" [class.animate-spin]="loadingSrv.isLoading('cashier-dashboard')"></physio-icon> Refresh
           </button>
         </div>
       </div>
@@ -72,7 +70,7 @@ type LeftTab = 'invoices' | 'activity';
         </div>
         <div class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5">
           <p class="text-[10px] text-slate-400 uppercase tracking-wide">Card Payments</p>
-          <p class="text-sky-300 font-bold text-lg mt-0.5">\${{ (stats()?.cardPayments ?? 0) | number:'1.0-0' }}</p>
+          <p class="text-primary/70 font-bold text-lg mt-0.5">\${{ (stats()?.cardPayments ?? 0) | number:'1.0-0' }}</p>
         </div>
         <div class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5">
           <p class="text-[10px] text-slate-400 uppercase tracking-wide">Insurance Claims</p>

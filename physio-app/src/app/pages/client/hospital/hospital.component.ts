@@ -15,7 +15,7 @@ import { SharedModule } from "../../../shared/shared-imports";
         <breadcrumb title="Hospital"></breadcrumb>
         <div class="py-12.5 md:py-15 bg-surface min-h-50">
             <div class="container mx-auto px-3">
-                <div class="border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 rounded-[10px] flex">
+                <div class="border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 rounded-[10px] flex">
                     <div class="p-5 flex-1">
                         <div
                             class="flex-center-between flex-wrap gap-4"
@@ -183,7 +183,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                 <div class="block">
                     <div class="grid md:grid-cols-4 -mx-3">
                         <div *ngFor="let item of hospitals" class="px-3">
-                            <div class="border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 rounded-[10px] relative flex flex-col">
+                            <div class="border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 rounded-[10px] relative flex flex-col">
                                 <div class="p-5 text-center flex-1">
                                     <a
                                         class="block mb-5 text-neutral transition-smooth"
@@ -213,7 +213,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                     </div>
                     <div class="mt-4 text-center flex justify-center">
                         <a
-                            class="py-2.25 px-4 bg-[linear-gradient(90.08deg,_#0e82fd_0.09%,_#06aed4_70.28%)] text-white text-xs14 rounded-[44px] relative overflow-hidden z-[1] bg-secondary border border-solid border-secondary transition-smooth font-medium flex items-center w-fit"
+                            class="py-2.25 px-4 bg-[linear-gradient(90.08deg,_#E11D48_0.09%,_#06aed4_70.28%)] text-white text-xs14 rounded-[44px] relative overflow-hidden z-[1] bg-secondary border border-solid border-secondary transition-smooth font-medium flex items-center w-fit"
                             href="/react/template/pages/hospitals"
                         >
                             <lucide-angular [img]="ScanQrCode" class="w-3.5 mr-2" />

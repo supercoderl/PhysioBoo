@@ -5,7 +5,6 @@ import { ArticleCategory, ArticleStatus } from "../../../../../shared/enums/arti
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { Article } from "../../../../../shared/types/article.types";
 import { ActionItem, PaginationData } from "../../../../../shared/types/common";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { BooActionAdminComponent } from "../../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-table-admin.component";
 
@@ -17,7 +16,6 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
     BooTableAdminComponent,
     ColumnDefDirective,
     BooActionAdminComponent,
-    BooIconComponent
   ],
   template: `
     <div class="bg-surface rounded-[6px] border border-gray-200 h-full overflow-hidden">
@@ -42,7 +40,7 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
           />
           <ng-template #noCover>
             <div class="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center">
-              <boo-icon name="image" [size]="16" color="#9ca3af"></boo-icon>
+              <physio-icon name="image" [size]="16" class="text-[#A1A1AA]"></physio-icon>
             </div>
           </ng-template>
         </ng-template>
@@ -76,9 +74,8 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
           <span
             class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium"
             [ngClass]="{
-              'bg-blue-100 text-blue-700': item.category === ArticleCategory.Medical,
+              'bg-primarySoft text-primaryHover': (item.category === ArticleCategory.Medical) || (item.category === ArticleCategory.Technology),
               'bg-purple-100 text-purple-700': item.category === ArticleCategory.Research,
-              'bg-indigo-100 text-indigo-700': item.category === ArticleCategory.Technology,
               'bg-emerald-100 text-emerald-700': item.category === ArticleCategory.Wellness,
               'bg-amber-100 text-amber-700': item.category === ArticleCategory.Community
             }"

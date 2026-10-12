@@ -29,7 +29,7 @@ interface Doctor {
         <h5 class="font-bold text-lg mb-0 text-regular">Doctors</h5>
         <boo-button-admin
             background="transparent"
-            [border]="{ width: 1, color: '#e3e3e3' }"
+            [border]="{ width: 1, color: '#EFE3E7' }"
             textColor="#000000"
             padding="4px 8px"
             buttonClass="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"

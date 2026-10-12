@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, Input, OnChanges, PLATFORM_ID, inject } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { SharedModule } from '../shared-imports';
 
 const ICON_BASE_PATH = 'assets/icons';
 const svgCache = new Map<string, Promise<string>>();
@@ -8,17 +9,27 @@ const svgCache = new Map<string, Promise<string>>();
 @Component({
   selector: 'physio-icon',
   standalone: true,
-  template: `<span class="physio-icon" [style.width.px]="size" [style.height.px]="height" [style.--physio-icon-stroke-width]="strokeWidth" [innerHTML]="safeMarkup"></span>`,
+  imports: [SharedModule],
+  template: `
+    <span 
+      class="physio-icon" 
+      [style.width.px]="size" 
+      [style.height.px]="height" 
+      [style.--physio-icon-stroke-width]="strokeWidth" 
+      [innerHTML]="safeMarkup"
+      [ngClass]="class"
+    ></span>`,
   styles: [`
     :host { display: inline-block; line-height: 0; }
-    .physio-icon { display: inline-block; line-height: 0; }
-    .physio-icon ::ng-deep svg { width: 100%; height: 100%; display: block; }
+    .physio-icon { display: inline-block; line-height: 0; color: inherit; }
+    .physio-icon ::ng-deep svg { width: 100%; height: 100%; display: block; color: inherit; }
     .physio-icon ::ng-deep svg [stroke-width] { stroke-width: var(--physio-icon-stroke-width, 2); }
   `]
 })
 export class IconComponent implements OnChanges {
   @Input({ required: true }) name!: string;
   @Input() size = 16;
+  @Input() class?: string;
   @Input() strokeWidth?: number;
 
   safeMarkup: SafeHtml = '';

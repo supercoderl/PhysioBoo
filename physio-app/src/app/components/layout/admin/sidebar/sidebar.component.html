@@ -5,7 +5,7 @@
       'min-w-0 w-0 max-w-0 md:min-w-[280px] md:w-[280px] md:max-w-[280px]':
         !isCollapsed,
       'min-w-[280px] w-[280px] max-w-[280px] shadow-lg md:shadow-none md:min-w-0 md:w-0 md:max-w-0':
-        isCollapsed
+        isCollapsed,
     }"
   >
     <div
@@ -28,7 +28,9 @@
           position: relative;
           overscroll-behavior: contain;
           background-repeat: no-repeat;
-          background-size: 100% 40px, 100% 10px;
+          background-size:
+            100% 40px,
+            100% 10px;
           background-attachment: local, scroll;
         "
       >
@@ -38,10 +40,10 @@
             class="px-3 flex-1 max-h-[calc(100%_-_80px)] overflow-y-auto"
             custom-scrollbar
           >
-            <div *ngFor="let menu of menus" class="mb-1">
+            <div *ngFor="let menu of menus(); let last = last" class="mb-1">
               <!-- Section Header -->
               <p
-                class="px-2.5 mb-1.5 leading-none truncate max-w-full font-semibold text-[11px] uppercase tracking-wide text-secondary/70"
+                class="px-2.5 mb-1.5 leading-none truncate max-w-full font-medium text-xs text-sidebarGroup"
               >
                 {{ menu.label }}
               </p>
@@ -54,10 +56,7 @@
                 ></sidebar-item>
               </ng-container>
 
-              <div
-                class="h-4"
-                *ngIf="menus.indexOf(menu) < menus.length - 1"
-              ></div>
+              <div class="h-4" *ngIf="!last"></div>
             </div>
           </div>
         </div>
@@ -75,8 +74,10 @@
                 [allowBorder]="true"
               />
               <div class="flex flex-auto flex-col gap-1 min-w-0">
-                <span class="flex truncate leading-none font-semibold text-sm text-regular m-0">
-                  {{ (userInfo$ | async)?.fullName || 'Guest' }}
+                <span
+                  class="flex truncate leading-none font-semibold text-sm text-regular m-0"
+                >
+                  {{ (userInfo$ | async)?.fullName || "Guest" }}
                 </span>
                 <p
                   class="flex truncate leading-none font-normal text-xs text-secondary m-0"
@@ -85,8 +86,14 @@
                 </p>
               </div>
               <div class="flex shrink-0 items-center gap-2">
-                <lucide-icon [name]="info" class="w-4 h-4 stroke-regular"></lucide-icon>
-                <lucide-icon [name]="chevronUp" class="w-4 h-4 stroke-regular"></lucide-icon>
+                <lucide-icon
+                  [name]="info"
+                  class="w-4 h-4 stroke-regular"
+                ></lucide-icon>
+                <lucide-icon
+                  [name]="chevronUp"
+                  class="w-4 h-4 stroke-regular"
+                ></lucide-icon>
               </div>
             </button>
             <div content class="min-w-32 max-w-32 bg-surface rounded-[8px]">
@@ -104,7 +111,7 @@
                 Inbox
               </button-icon>
               <button-icon
-                [icon]="{ name: 'circle-power', color: '#a2b223' }"
+                [icon]="{ name: 'circle-power' }"
                 buttonClass="border-0 w-full text-[#a2b223] !justify-start"
                 (onClick)="logout()"
                 [loading]="loadingSrv.isLoading('logout')"

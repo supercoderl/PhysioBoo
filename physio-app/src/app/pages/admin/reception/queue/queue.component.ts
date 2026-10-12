@@ -24,16 +24,16 @@ interface QueueDisplay {
     <admin-content-header>
       <!-- Current Number Display -->
       <div class="mb-8">
-        <div class="bg-surface rounded-3xl p-12 border-4 border-blue-500">
+        <div class="bg-surface rounded-3xl p-12 border-4 border-primary">
           <div class="text-center">
             <h2 class="text-4xl font-bold text-gray-700 mb-6">NOW SERVING</h2>
-            <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl py-16 px-8 mb-6">
+            <div class="bg-gradient-to-r from-primary to-primaryHover rounded-2xl py-16 px-8 mb-6">
               <div class="text-9xl font-bold text-white tracking-wider animate-pulse">
                 {{ currentQueue.queueNumber }}
               </div>
             </div>
             <div class="flex items-center justify-center gap-4 text-3xl font-semibold text-gray-700">
-              <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-12 h-12 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -94,8 +94,8 @@ interface QueueDisplay {
       <div class="bg-surface rounded-2xl p-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
-            <div class="bg-blue-100 rounded-full p-3">
-              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-primarySoft rounded-full p-3">
+              <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
@@ -106,7 +106,7 @@ interface QueueDisplay {
           </div>
           <div class="text-right">
             <p class="text-lg text-gray-600 mb-0">{{ currentTime }}</p>
-            <p class="text-2xl font-bold text-blue-600 mb-0">{{ currentDate }}</p>
+            <p class="text-2xl font-bold text-primary mb-0">{{ currentDate }}</p>
           </div>
         </div>
       </div>

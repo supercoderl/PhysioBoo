@@ -1,19 +1,18 @@
 import { Component, Input, OnChanges } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 import { FinancialClinicalSnapshot } from "../../../../shared/types/dashboard-overview.types";
 
 @Component({
     selector: 'admin-financial-clinical-strip',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div class="grid xl:grid-cols-5 md:grid-cols-3 grid-cols-2 gap-3" *ngIf="financial; else skeletonTpl">
         <!-- Revenue -->
         <div class="bg-surface border border-borderGray rounded-lg p-3.5 hover:shadow-card transition-shadow">
             <div class="flex items-center justify-between mb-1.5">
                 <span class="text-[10px] text-gray-500 font-semibold uppercase tracking-wide">Revenue Today</span>
-                <boo-icon name="trending-up" [size]="13" color="#10b981"></boo-icon>
+                <physio-icon name="trending-up" [size]="13" class="text-[#10b981]"></physio-icon>
             </div>
             <div class="text-[23px] font-extrabold text-gray-900 tabular-nums mb-1.5">{{ formatCurrency(financial.revenue.today) }}</div>
             <div class="h-[3.5px] bg-gray-100 rounded-full overflow-hidden mb-1">
@@ -33,13 +32,13 @@ import { FinancialClinicalSnapshot } from "../../../../shared/types/dashboard-ov
         <div class="bg-surface border border-borderGray rounded-lg p-3.5 hover:shadow-card transition-shadow">
             <div class="flex items-center justify-between mb-2">
                 <span class="text-[10px] text-gray-500 font-semibold uppercase tracking-wide">Insurance Claims</span>
-                <boo-icon name="shield-check" [size]="13" color="#0e82fd"></boo-icon>
+                <physio-icon name="shield-check" [size]="13" class="text-[#E11D48]"></physio-icon>
             </div>
             <div class="flex items-center gap-2.5">
                 <svg viewBox="0 0 60 60" class="w-[52px] h-[52px] shrink-0">
-                    <circle cx="30" cy="30" r="22" fill="none" stroke="#f1f5f9" stroke-width="7"></circle>
-                    <circle cx="30" cy="30" r="22" fill="none" stroke="#0e82fd" stroke-width="7" [attr.stroke-dasharray]="insDash" stroke-linecap="round" transform="rotate(-90 30 30)"></circle>
-                    <text x="30" y="33" text-anchor="middle" font-size="10" font-weight="700" fill="#0f172a">{{ financial.insuranceClaims.approvedPct }}%</text>
+                    <circle cx="30" cy="30" r="22" fill="none" stroke="#FAF1F3" stroke-width="7"></circle>
+                    <circle cx="30" cy="30" r="22" fill="none" stroke="#E11D48" stroke-width="7" [attr.stroke-dasharray]="insDash" stroke-linecap="round" transform="rotate(-90 30 30)"></circle>
+                    <text x="30" y="33" text-anchor="middle" font-size="10" font-weight="700" fill="#26141A">{{ financial.insuranceClaims.approvedPct }}%</text>
                 </svg>
                 <div>
                     <div class="text-xl font-extrabold text-gray-900 tabular-nums mb-0.5">{{ financial.insuranceClaims.pending }}</div>
@@ -54,7 +53,7 @@ import { FinancialClinicalSnapshot } from "../../../../shared/types/dashboard-ov
         <div class="bg-surface border border-borderGray rounded-lg p-3.5 hover:shadow-card transition-shadow">
             <div class="flex items-center justify-between mb-1.5">
                 <span class="text-[10px] text-gray-500 font-semibold uppercase tracking-wide">Pharmacy</span>
-                <boo-icon name="pill" [size]="13" color="#8b5cf6"></boo-icon>
+                <physio-icon name="pill" [size]="13" class="text-[#8b5cf6]"></physio-icon>
             </div>
             <div class="text-[23px] font-extrabold text-gray-900 tabular-nums mb-0.5">{{ financial.pharmacy.dispensedToday | number }}</div>
             <div class="text-[10.5px] text-gray-500 mb-2">dispensed today</div>
@@ -65,7 +64,7 @@ import { FinancialClinicalSnapshot } from "../../../../shared/types/dashboard-ov
                 <span class="text-[9.5px] text-gray-400">{{ pharmacyPct }}% of {{ financial.pharmacy.target | number }} target</span>
             </div>
             <div *ngIf="financial.pharmacy.lowStockCount > 0" class="flex items-center gap-1.5 px-2 py-1 bg-amber-50 rounded">
-                <boo-icon name="alert-triangle" [size]="11" color="#f59e0b"></boo-icon>
+                <physio-icon name="alert-triangle" [size]="11" class="text-[#f59e0b]"></physio-icon>
                 <span class="text-[10.5px] text-amber-800">{{ financial.pharmacy.lowStockCount }} items low stock</span>
             </div>
         </div>
@@ -74,7 +73,7 @@ import { FinancialClinicalSnapshot } from "../../../../shared/types/dashboard-ov
         <div class="bg-surface border border-borderGray rounded-lg p-3.5 hover:shadow-card transition-shadow">
             <div class="flex items-center justify-between mb-1.5">
                 <span class="text-[10px] text-gray-500 font-semibold uppercase tracking-wide">Laboratory</span>
-                <boo-icon name="flask-conical" [size]="13" color="#06b6d4"></boo-icon>
+                <physio-icon name="flask-conical" [size]="13" class="text-[#06b6d4]"></physio-icon>
             </div>
             <div class="flex gap-3 mb-2">
                 <div>
@@ -97,7 +96,7 @@ import { FinancialClinicalSnapshot } from "../../../../shared/types/dashboard-ov
         <div class="bg-surface border border-borderGray rounded-lg p-3.5 hover:shadow-card transition-shadow">
             <div class="flex items-center justify-between mb-1.5">
                 <span class="text-[10px] text-gray-500 font-semibold uppercase tracking-wide">Radiology</span>
-                <boo-icon name="scan-line" [size]="13" color="#f97316"></boo-icon>
+                <physio-icon name="scan-line" [size]="13" class="text-[#f97316]"></physio-icon>
             </div>
             <div class="flex gap-3 mb-2">
                 <div>
@@ -111,7 +110,7 @@ import { FinancialClinicalSnapshot } from "../../../../shared/types/dashboard-ov
                 </div>
             </div>
             <div *ngIf="financial.radiology.urgentReadsPending > 0" class="flex items-center gap-1.5 px-2 py-1 bg-orange-50 rounded">
-                <boo-icon name="zap" [size]="11" color="#f97316"></boo-icon>
+                <physio-icon name="zap" [size]="11" class="text-[#f97316]"></physio-icon>
                 <span class="text-[10.5px] text-orange-800">{{ financial.radiology.urgentReadsPending }} urgent reads pending</span>
             </div>
         </div>

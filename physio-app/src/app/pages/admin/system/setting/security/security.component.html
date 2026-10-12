@@ -23,7 +23,7 @@
           <label class="flex flex-col gap-1.5">
             <span class="text-xs font-medium text-gray-600">Current password</span>
             <div class="inline-flex items-center gap-2 h-10 px-3 border border-gray-200 rounded-md bg-surface focus-within:border-primary transition-colors">
-              <boo-icon name="lock" iconClass="w-4 h-4 text-gray-400" />
+              <physio-icon name="lock" class="w-4 h-4 text-gray-400" />
               <input [type]="showCurrent() ? 'text' : 'password'"
                 placeholder="Enter your current password"
                 class="flex-1 min-w-0 text-sm bg-transparent outline-none border-0"
@@ -33,7 +33,7 @@
                 autocomplete="current-password" />
               <button type="button" (click)="showCurrent.set(!showCurrent())"
                 class="text-gray-400 hover:text-gray-600 p-0.5">
-                <boo-icon [name]="showCurrent() ? 'eye-off' : 'eye'" iconClass="w-4 h-4" />
+                <physio-icon [name]="showCurrent() ? 'eye-off' : 'eye'" class="w-4 h-4" />
               </button>
             </div>
           </label>
@@ -41,7 +41,7 @@
           <label class="flex flex-col gap-1.5">
             <span class="text-xs font-medium text-gray-600">New password</span>
             <div class="inline-flex items-center gap-2 h-10 px-3 border border-gray-200 rounded-md bg-surface focus-within:border-primary transition-colors">
-              <boo-icon name="key" iconClass="w-4 h-4 text-gray-400" />
+              <physio-icon name="key" class="w-4 h-4 text-gray-400" />
               <input [type]="showNew() ? 'text' : 'password'"
                 placeholder="At least 8 characters"
                 class="flex-1 min-w-0 text-sm bg-transparent outline-none border-0"
@@ -51,7 +51,7 @@
                 autocomplete="new-password" />
               <button type="button" (click)="showNew.set(!showNew())"
                 class="text-gray-400 hover:text-gray-600 p-0.5">
-                <boo-icon [name]="showNew() ? 'eye-off' : 'eye'" iconClass="w-4 h-4" />
+                <physio-icon [name]="showNew() ? 'eye-off' : 'eye'" class="w-4 h-4" />
               </button>
             </div>
             <div *ngIf="newPassword()" class="flex items-center gap-2 mt-1">
@@ -68,7 +68,7 @@
             <div class="inline-flex items-center gap-2 h-10 px-3 border rounded-md bg-surface focus-within:border-primary transition-colors"
               [class.border-red-300]="!passwordsMatch()"
               [class.border-gray-200]="passwordsMatch()">
-              <boo-icon name="key" iconClass="w-4 h-4 text-gray-400" />
+              <physio-icon name="key" class="w-4 h-4 text-gray-400" />
               <input [type]="showConfirm() ? 'text' : 'password'"
                 placeholder="Re-enter your new password"
                 class="flex-1 min-w-0 text-sm bg-transparent outline-none border-0"
@@ -78,7 +78,7 @@
                 autocomplete="new-password" />
               <button type="button" (click)="showConfirm.set(!showConfirm())"
                 class="text-gray-400 hover:text-gray-600 p-0.5">
-                <boo-icon [name]="showConfirm() ? 'eye-off' : 'eye'" iconClass="w-4 h-4" />
+                <physio-icon [name]="showConfirm() ? 'eye-off' : 'eye'" class="w-4 h-4" />
               </button>
             </div>
             <span *ngIf="!passwordsMatch()" class="text-[11px] text-red-500">Passwords don't match.</span>
@@ -88,7 +88,7 @@
             <button type="submit"
               [disabled]="!canSavePassword() || savingPassword()"
               class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              <boo-icon *ngIf="savingPassword()" name="loader-circle" iconClass="w-4 h-4 animate-spin" />
+              <physio-icon *ngIf="savingPassword()" name="loader-circle" [class]="'w-4 h-4 animate-spin'" />
               <span>{{ savingPassword() ? 'Updating…' : 'Update password' }}</span>
             </button>
           </div>
@@ -141,7 +141,7 @@
             (click)="onSavePrefs()"
             [disabled]="savingPrefs() || !isPrefsDirty()"
             class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-            <boo-icon *ngIf="savingPrefs()" name="loader-circle" iconClass="w-4 h-4 animate-spin" />
+            <physio-icon *ngIf="savingPrefs()" name="loader-circle" [class]="'w-4 h-4 animate-spin'" />
             <span>{{ savingPrefs() ? 'Saving…' : 'Save preferences' }}</span>
           </button>
         </div>
@@ -167,9 +167,9 @@
           <div *ngFor="let s of sessions()"
             class="flex items-center gap-4 px-5 py-3 hover:bg-gray-50/60 transition-colors">
             <div class="w-9 h-9 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center shrink-0">
-              <boo-icon
+              <physio-icon
                 [name]="s.device.toLowerCase().includes('iphone') || s.device.toLowerCase().includes('android') ? 'smartphone' : 'monitor'"
-                iconClass="w-4 h-4" />
+                class="w-4 h-4" />
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2">

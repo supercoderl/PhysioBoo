@@ -8,7 +8,6 @@ import { TreatmentSheetService } from "../../../../services/admin/treatment-shee
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DrawerComponent } from "../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 
 export type ClinicalAction = 'lab' | 'imaging' | 'note';
 type Priority = 'Routine' | 'Urgent' | 'Stat';
@@ -20,7 +19,7 @@ type Priority = 'Routine' | 'Urgent' | 'Stat';
 @Component({
     selector: 'clinical-action-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooIconComponent],
+    imports: [SharedModule, DrawerComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="520" (close)="close.emit()">
             <div class="flex flex-col h-full bg-surface">
@@ -30,7 +29,7 @@ type Priority = 'Routine' | 'Urgent' | 'Stat';
                         <p class="text-sm text-secondary m-0">{{ patientName }}</p>
                     </div>
                     <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100" aria-label="Close">
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 

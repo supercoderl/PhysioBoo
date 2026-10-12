@@ -18,7 +18,7 @@ import { PatientInfo } from "../../../../shared/types/patient.types";
   <div class="no-print mb-6 flex justify-end">
     <button 
       (click)="print()" 
-      class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition-colors">
+      class="bg-primary hover:bg-primaryHover text-white px-6 py-2 rounded-lg shadow-md transition-colors">
       Print Document
     </button>
   </div>
@@ -189,16 +189,16 @@ import { PatientInfo } from "../../../../shared/types/patient.types";
 
     <!-- Appointment Template -->
     <div *ngIf="templateType === 'appointment'" class="template-content">
-      <div class="mb-6 text-center bg-blue-50 p-6 rounded-lg">
-        <h2 class="text-2xl font-bold text-blue-800 mb-4">Appointment Confirmation</h2>
+      <div class="mb-6 text-center bg-primarySoft p-6 rounded-lg">
+        <h2 class="text-2xl font-bold text-primaryPressed mb-4">Appointment Confirmation</h2>
         <div class="text-lg">
           <p class="mb-2">
             <span class="font-semibold text-gray-700">Date:</span>
-            <span class="ml-2 text-blue-600 font-bold">{{ appointmentDate }}</span>
+            <span class="ml-2 text-primary font-bold">{{ appointmentDate }}</span>
           </p>
           <p>
             <span class="font-semibold text-gray-700">Time:</span>
-            <span class="ml-2 text-blue-600 font-bold">{{ appointmentTime }}</span>
+            <span class="ml-2 text-primary font-bold">{{ appointmentTime }}</span>
           </p>
         </div>
       </div>

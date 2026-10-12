@@ -2,7 +2,6 @@ import { Component } from "@angular/core";
 import { ColumnDefDirective } from "../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 import { BooTableAdminComponent } from "../../../table/boo-table-admin/boo-table-admin.component";
 import { BooTagComponent } from "../../../tag/boo-tag/boo-tag/boo-tag.component";
 
@@ -24,8 +23,7 @@ interface PatientVisit {
         SharedModule,
         BooButtonAdminComponent,
         BooTableAdminComponent,
-        ColumnDefDirective,
-        BooIconComponent,
+        ColumnDefDirective,
         BooTagComponent
     ],
     template: `
@@ -34,7 +32,7 @@ interface PatientVisit {
             <h5 class="font-bold text-lg mb-0 text-regular">Patient Visits</h5>
             <boo-button-admin
                 background="transparent"
-                [border]="{ width: 1, color: '#e3e3e3' }"
+                [border]="{ width: 1, color: '#EFE3E7' }"
                 textColor="#000000"
                 padding="4px 8px"
                 buttonClass="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -58,7 +56,7 @@ interface PatientVisit {
                         <div class="font-semibold text-gray-900">{{ item.name }}</div>
                         <div class="flex items-center gap-4 text-sm text-gray-600 mt-1">
                             <span class="flex items-center gap-1">
-                                <boo-icon name="clock" [size]="12"></boo-icon>
+                                <physio-icon name="clock" [size]="12"></physio-icon>
                                 {{ item.time }}
                             </span>
                             <span>{{ item.reason }}</span>
@@ -96,7 +94,7 @@ export class AdminPatientVisitTableCardComponent {
             reason: 'Follow-up',
             time: '10:40 AM',
             status: 'In Progress',
-            statusColor: '#1F6DB2',
+            statusColor: '#E11D48',
             statusBackground: '#EBF2F9'
         },
         {

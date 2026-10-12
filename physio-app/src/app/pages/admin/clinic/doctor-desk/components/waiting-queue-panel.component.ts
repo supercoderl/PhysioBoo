@@ -41,7 +41,7 @@ import { QueuePatient } from "../../../../../shared/types/doctor-desk.types";
                         *ngIf="i === 0"
                         background="rgb(var(--twc-primary))" textColor="#fff" padding="7px 12px"
                         buttonClass="w-full mt-2.5"
-                        [icon]="{ name: 'phone-call', size: 14, color: '#fff' }"
+                        [icon]="{ name: 'phone-call', size: 14 }"
                         (click)="call.emit(p); $event.stopPropagation()"
                     >Call Patient</boo-button-admin>
                 </button>

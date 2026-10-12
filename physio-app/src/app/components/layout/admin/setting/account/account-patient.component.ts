@@ -24,7 +24,7 @@ import { AdminAccountPatientConsentComponent } from "./patient/consent.component
         <div class="flex flex-col gap-4">
             <div class="w-full">
                 <p class="font-semibold text-base m-0">Patient Information</p>
-                <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
+                <p class="m-0 text-[13px] leading-[1.5] text-[#71606A]">
                     Overview of medical history and current health records.
                 </p>
             </div>

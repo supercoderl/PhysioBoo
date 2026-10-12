@@ -16,7 +16,7 @@
       <div
         class="px-3 py-2 rounded-lg bg-surface border border-gray-200 flex items-center gap-2"
       >
-        <boo-icon name="users" iconClass="w-4 h-4 text-primary"></boo-icon>
+        <physio-icon name="users" class="w-4 h-4 text-primary"></physio-icon>
         <span class="text-xs text-secondary uppercase tracking-wider"
           >Users</span
         >
@@ -27,7 +27,7 @@
       <div
         class="px-3 py-2 rounded-lg bg-surface border border-gray-200 flex items-center gap-2"
       >
-        <boo-icon name="shield" iconClass="w-4 h-4 text-primary"></boo-icon>
+        <physio-icon name="shield" class="w-4 h-4 text-primary"></physio-icon>
         <span class="text-xs text-secondary uppercase tracking-wider"
           >Roles</span
         >
@@ -38,7 +38,7 @@
       <div
         class="px-3 py-2 rounded-lg bg-surface border border-gray-200 flex items-center gap-2"
       >
-        <boo-icon name="key" iconClass="w-4 h-4 text-primary"></boo-icon>
+        <physio-icon name="key" class="w-4 h-4 text-primary"></physio-icon>
         <span class="text-xs text-secondary uppercase tracking-wider"
           >Permissions</span
         >
@@ -62,7 +62,7 @@
           : 'text-secondary hover:text-primary'
       "
     >
-      <boo-icon [name]="t.icon" iconClass="w-4 h-4"></boo-icon>
+      <physio-icon [name]="t.icon" class="w-4 h-4"></physio-icon>
       {{ t.label }}
     </button>
   </div>
@@ -78,7 +78,7 @@
         (click)="openNewUser()"
         class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 flex items-center gap-2 whitespace-nowrap"
       >
-        <boo-icon name="user-plus" iconClass="w-4 h-4"></boo-icon>
+        <physio-icon name="user-plus" class="w-4 h-4"></physio-icon>
         New User
       </button>
     </div>
@@ -101,7 +101,7 @@
         (click)="openNewRole()"
         class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 flex items-center gap-2 whitespace-nowrap"
       >
-        <boo-icon name="plus" iconClass="w-4 h-4"></boo-icon>
+        <physio-icon name="plus" class="w-4 h-4"></physio-icon>
         New Role
       </button>
     </div>
@@ -125,7 +125,7 @@
         (click)="openNewPermission()"
         class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 flex items-center gap-2 whitespace-nowrap"
       >
-        <boo-icon name="plus" iconClass="w-4 h-4"></boo-icon>
+        <physio-icon name="plus" class="w-4 h-4"></physio-icon>
         New Permission
       </button>
     </div>

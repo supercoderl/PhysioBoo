@@ -1,12 +1,11 @@
 import { Component, Input } from "@angular/core";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { OutstandingAgingSummary, OutstandingInvoice } from "../../../../../shared/types/revenue.types";
 
 @Component({
     selector: 'revenue-outstanding-card',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div class="bg-surface rounded-2 border border-borderGray/60 p-4 h-full">
       <h2 class="text-sm font-semibold text-regular mb-3">Outstanding Revenue (Aging)</h2>
@@ -24,7 +23,7 @@ import { OutstandingAgingSummary, OutstandingInvoice } from "../../../../../shar
       </div>
 
       <div *ngIf="!loading && (invoices?.length ?? 0) === 0" class="h-[100px] flex flex-col items-center justify-center text-center gap-2">
-        <boo-icon name="file-clock" [size]="24" iconClass="text-gray-300"></boo-icon>
+        <physio-icon name="file-clock" [size]="24" class="text-gray-300"></physio-icon>
         <p class="text-sm text-secondary">No outstanding invoices in range.</p>
       </div>
 

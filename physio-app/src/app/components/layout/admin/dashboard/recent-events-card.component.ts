@@ -1,17 +1,16 @@
 import { Component, Input } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 import { DashboardEvent, DashboardEventCategory } from "../../../../shared/types/dashboard-overview.types";
 
 @Component({
     selector: 'admin-recent-events-card',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div class="bg-surface border border-borderGray rounded-lg overflow-hidden flex-1 flex flex-col">
         <div class="px-3.5 pt-2.5 pb-2 border-b border-gray-100 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-[7px]">
-                <boo-icon name="activity" [size]="13" color="#64748b"></boo-icon>
+                <physio-icon name="activity" [size]="13" class="text-[#85757D]"></physio-icon>
                 <h2 class="text-[12.5px] font-bold text-gray-900 m-0">Recent Events</h2>
             </div>
         </div>
@@ -33,13 +32,13 @@ export class AdminRecentEventsCardComponent {
 
     dotColor(category: DashboardEventCategory): string {
         switch (category) {
-            case 'admission': return '#0e82fd';
+            case 'admission': return '#E11D48';
             case 'discharge': return '#10b981';
             case 'billing': return '#f59e0b';
             case 'surgery': return '#8b5cf6';
-            case 'lab': return '#0e82fd';
+            case 'lab': return '#E11D48';
             case 'pharmacy': return '#f59e0b';
-            default: return '#94a3b8';
+            default: return '#A1A1AA';
         }
     }
 }

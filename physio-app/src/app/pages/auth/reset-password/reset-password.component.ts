@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BooButtonComponent } from "../../../components/button/boo-button/boo-button.component";
 import { FormWrapperComponent } from "../../../components/form/boo-form/boo-form.component";
-import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
 import { SharedModule } from '../../../shared/shared-imports';
@@ -12,8 +11,7 @@ import { SharedModule } from '../../../shared/shared-imports';
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [
-    BooIconComponent,
+  imports: [
     BooButtonComponent,
     BooInputComponent,
     SharedModule,

@@ -13,7 +13,7 @@ import { SharedModule } from "../../../shared/shared-imports";
     ],
     template: `
             <section
-                class="py-12.5 md:py-15 rounded-b-7.5 bg-[#000f28] border border-solid border-[#000f28] text-white block"
+                class="py-12.5 md:py-15 rounded-b-7.5 bg-[#26141A] border border-solid border-[#26141A] text-white block"
             >
                 <div class="container mx-auto">
                     <div class="mb-10 text-center">

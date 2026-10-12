@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { CATEGORIES_MANAGEMENT } from "../../../../shared/data/dummy";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { Category } from "../../../../shared/types/category.types";
@@ -8,8 +7,7 @@ import { Category } from "../../../../shared/types/category.types";
   selector: 'admin-common-category',
   standalone: true,
   imports: [
-    SharedModule,
-    BooIconComponent 
+    SharedModule,
   ],
   template: `
       <div class="z-10 flex h-full flex-auto flex-col">
@@ -32,9 +30,9 @@ import { Category } from "../../../../shared/types/category.types";
                       #rla="routerLinkActive" 
                       [class.bg-[#0000000d]]="rla.isActive"
                     >
-                      <boo-icon 
+                      <physio-icon 
                         [name]="category.icon" 
-                      ></boo-icon>
+                      ></physio-icon>
                       <div class="flex min-w-0 flex-auto flex-col items-start gap-1">
                         <p 
                           class="leading-none truncate max-w-full m-0 text-[13px] text-primary"
@@ -87,7 +85,7 @@ export class AdminCommonCategoryComponent {
     type: '',
     status: 'active',
     icon: '📋',
-    color: '#3B82F6',
+    color: '#FB7185',
   };
   // #endregion
 
@@ -106,7 +104,7 @@ export class AdminCommonCategoryComponent {
       type: this.selectedType !== 'all' ? this.selectedType : '',
       status: 'active',
       icon: '📋',
-      color: '#3B82F6',
+      color: '#FB7185',
     };
     this.showModal = true;
   }

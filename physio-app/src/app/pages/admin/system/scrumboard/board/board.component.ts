@@ -2,7 +2,6 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { Component, HostListener, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminBreadcrumbComponent } from "../../../../../components/breadcrumb/admin-breadcrumb.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { ScrumboardService } from '../../../../../services/admin/scrumboard.service';
 import { DialogService } from '../../../../../services/common/dialog.service';
@@ -23,8 +22,7 @@ interface CardDraft {
   standalone: true,
   imports: [
     AdminBreadcrumbComponent,
-    SharedModule,
-    BooIconComponent,
+    SharedModule,
     EmptyStateComponent
   ],
   templateUrl: './board.component.html'

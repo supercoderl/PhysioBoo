@@ -1,12 +1,11 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { CashierInvoice, CashierPaymentMethod } from "../../../../shared/types/cashier.types";
 
 @Component({
     selector: 'cashier-refund-dialog',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div *ngIf="isOpen && invoice" class="fixed inset-0 z-[10000] flex items-center justify-center">
       <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" (click)="close.emit()" aria-hidden="true"></div>
@@ -15,19 +14,19 @@ import { CashierInvoice, CashierPaymentMethod } from "../../../../shared/types/c
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
           <div>
             <h2 class="text-base font-semibold text-slate-900 flex items-center gap-2">
-              <boo-icon name="undo-2" [size]="16" iconClass="text-rose-600"></boo-icon>
+              <physio-icon name="undo-2" [size]="16" class="text-rose-600"></physio-icon>
               Refund Payment
             </h2>
             <p class="text-xs text-slate-400 mt-0.5">{{ invoice.invoiceNo }} · {{ invoice.patientName }}</p>
           </div>
           <button type="button" (click)="close.emit()" class="text-slate-400 hover:text-slate-600" aria-label="Close refund dialog">
-            <boo-icon name="x" [size]="18"></boo-icon>
+            <physio-icon name="x" [size]="18"></physio-icon>
           </button>
         </div>
 
         <div class="p-5 space-y-4">
           <div class="bg-rose-50 rounded-lg px-3 py-2 text-xs text-rose-700 flex items-start gap-2">
-            <boo-icon name="alert-triangle" [size]="14" iconClass="mt-0.5 shrink-0"></boo-icon>
+            <physio-icon name="alert-triangle" [size]="14" [class]="'mt-0.5 shrink-0'"></physio-icon>
             Refunds are final and will be recorded in the payment history.
           </div>
 

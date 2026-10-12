@@ -1,12 +1,11 @@
 import { GoogleSigninButtonModule, SocialAuthService } from '@abacritt/angularx-social-login';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { take } from 'rxjs';
+import { firstValueFrom, take } from 'rxjs';
 import { BooCheckboxComponent } from 'src/app/components/checkbox/boo-checkbox/boo-checkbox.component';
 import { BooButtonComponent } from "../../../components/button/boo-button/boo-button.component";
 import { FormWrapperComponent } from '../../../components/form/boo-form/boo-form.component';
-import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
 import { AuthService } from '../../../services/auth/auth.service';
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
@@ -22,7 +21,7 @@ import { AppValidators } from '../../../shared/validator/validator-config.valida
   imports: [
     SharedModule,
     BooInputComponent,
-    BooIconComponent,
+
     BooButtonComponent,
     BooCheckboxComponent,
     FormWrapperComponent,
@@ -36,6 +35,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   type: 'text' | 'password' = 'password';
   isFirstTime: boolean = true;
+  isLoggingIn = signal(false);
   countdown: number = 0;
   private timer: any;
   LoadingKeys = LoadingKeys;
@@ -85,25 +85,28 @@ export class LoginComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.isLoggingIn.set(true);
     this.authSrv.login(data).subscribe({
-      next: _ => {
-        this.loadingSrv.clear(LoadingKeys.USER.LOGIN.CREDENTIAL);
-        this.redirectByRole();
-      },
+      next: async () => {
+        try {
+          await this.redirectByRole();
+        } finally {
+          this.isLoggingIn.set(false);
+        }
+      }
     })
   }
 
-  private redirectByRole() {
-    this.authSrv.role$.pipe(take(1)).subscribe(raw => {
-      const roles = raw ?? [];
-      if (roles.includes(Role.SUPER_ADMIN.toString())) {
-        this.router.navigate(['/superadmin']);
-      } else if (roles.some(r => r !== Role.PATIENT.toString())) {
-        this.router.navigate(['/admin']);
-      } else {
-        this.router.navigate(['/']);
-      }
-    });
+  private async redirectByRole(): Promise<boolean> {
+    const raw = await firstValueFrom(this.authSrv.role$.pipe(take(1)));
+    const roles = raw ?? [];
+    if (roles.includes(Role.SUPER_ADMIN.toString())) {
+      return this.router.navigate(['/superadmin']);
+    }
+    if (roles.some(r => r !== Role.PATIENT.toString())) {
+      return this.router.navigate(['/admin']);
+    }
+    return this.router.navigate(['/']);
   }
 
   onChangeState = (newState: string) => {

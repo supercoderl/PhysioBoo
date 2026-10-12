@@ -2,14 +2,12 @@ import { Component, ElementRef, forwardRef, HostListener, Input, ViewChild } fro
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared-imports';
 import { Size } from '../../../shared/types/common';
-import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
 
 @Component({
   selector: 'boo-select',
   standalone: true,
   imports: [
-    SharedModule,
-    BooIconComponent
+    SharedModule,
   ],
   providers: [
     {
@@ -26,7 +24,7 @@ import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
         [style.height.px.important]="height"
         [style.border-radius.px]="radius"
         [style.border-width.px]="borderWidth"
-        [style.border-color]="isOpen ? '#60A5FA' : borderColor" 
+        [style.border-color]="isOpen ? '#FB7185' : borderColor" 
         tabindex="0"
         (blur)="onTouched()"
       >
@@ -41,7 +39,7 @@ import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
           class="flex-none text-slate-400 flex items-center pointer-events-none transition-transform duration-200"
           [class.rotate-180]="isOpen"
         >
-          <boo-icon name="chevron-down" iconClass="stroke-regular" [size]="16" />
+          <physio-icon name="chevron-down" [size]="16" class="stroke-regular" />
         </div>
       </div>
 
@@ -68,14 +66,14 @@ import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
                     *ngFor="let opt of options"
                     (click)="selectOption(opt)"
                     class="px-4 py-2.5 text-sm cursor-pointer transition-colors flex items-center justify-between group/item hover:bg-borderGray hover:text-slate-900"
-                    [class.bg-blue-50]="opt[bindValue] === model"
-                    [class.text-blue-600]="opt[bindValue] === model"
+                    [class.bg-primarySoft]="opt[bindValue] === model"
+                    [class.text-primary]="opt[bindValue] === model"
                     [class.font-medium]="opt[bindValue] === model"
                     [class.text-slate-600]="opt[bindValue] !== model"
                 >
                     <span class="text-regular group-hover/item:text-regular">{{ opt[bindLabel] }}</span>
                     
-                    <span *ngIf="opt[bindValue] === model" class="text-blue-500">
+                    <span *ngIf="opt[bindValue] === model" class="text-primary">
                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </span>
                 </li>
@@ -110,7 +108,7 @@ import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
 
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #E3D5DA; border-radius: 20px; }
   `],
   host: {
     'class': 'block w-full relative mb-0',
@@ -146,7 +144,7 @@ export class BooSelectComponent implements ControlValueAccessor {
   }
 
   get labelClasses(): string {
-    const base = 'flex items-center justify-between w-full transition-all focus:outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer border-solid';
+    const base = 'flex items-center justify-between w-full transition-all focus:outline-none focus:ring-2 focus:ring-primary/25 cursor-pointer border-solid';
     const focusEffect = 'group-focus-within:translate-x-4 group-focus-within:opacity-0 group-focus-within:invisible';
 
     let sizeClass = '';
@@ -161,7 +159,7 @@ export class BooSelectComponent implements ControlValueAccessor {
 
   get inputClasses(): string {
     const base =
-      'bg-surface flex items-center w-full text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer border-solid';
+      'bg-surface flex items-center w-full text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary/25 cursor-pointer border-solid';
 
     let sizeClass = '';
     switch (this.size) {

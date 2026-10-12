@@ -9,7 +9,6 @@ import { SharedModule } from "../../../../../shared/shared-imports";
 import { Bed } from "../../../../../shared/types/bed.types";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
@@ -21,7 +20,6 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
         SharedModule,
         DrawerComponent,
         BooInputComponent,
-        BooIconComponent,
         BooTextareaComponent,
         BooButtonAdminComponent,
         BooSelectComponent
@@ -35,13 +33,13 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                         <p class="text-sm text-secondary m-0" *ngIf="bed">Bed {{ bed.number }} &middot; {{ bed.wardName }}</p>
                     </div>
                     <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
                 <div class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
                     <div *ngIf="loadingSrv.isLoading('bed-assign-patients')" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <boo-icon name="loader" class="animate-spin text-primary" [size]="32"></boo-icon>
+                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
                     </div>
 
                     <div class="p-6 space-y-4">

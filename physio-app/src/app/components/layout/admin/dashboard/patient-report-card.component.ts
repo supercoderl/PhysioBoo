@@ -3,7 +3,6 @@ import { ColumnDefDirective } from "../../../../shared/directives/column-def.dir
 import { SharedModule } from "../../../../shared/shared-imports";
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../button/button-icon/button-icon.component";
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 import { BooTableAdminComponent } from "../../../table/boo-table-admin/boo-table-admin.component";
 
 interface PatientReport {
@@ -23,8 +22,7 @@ interface PatientReport {
         SharedModule,
         BooButtonAdminComponent,
         BooTableAdminComponent,
-        ColumnDefDirective,
-        BooIconComponent,
+        ColumnDefDirective,
         ButtonIconComponent
     ],
     template: `
@@ -33,7 +31,7 @@ interface PatientReport {
         <h5 class="font-bold text-lg mb-0 text-regular">Patient Reports</h5>
         <boo-button-admin
             background="transparent"
-            [border]="{ width: 1, color: '#e3e3e3' }"
+            [border]="{ width: 1, color: '#EFE3E7' }"
             textColor="#000000"
             padding="4px 8px"
             buttonClass="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -56,7 +54,7 @@ interface PatientReport {
                 class="p-2.5 rounded-full inlineFlex-center-center"
                 [style.backgroundColor]="item.background"
             >
-                <boo-icon [name]="item.icon" [color]="item.color" [size]="20"></boo-icon>
+                <physio-icon [name]="item.icon" [size]="20" [style.color]="item.color"></physio-icon>
             </div>
             <div>
               <div class="font-semibold text-gray-900">{{ item.name }}</div>
@@ -96,7 +94,7 @@ export class AdminPatientReportTableCardComponent {
         {
             id: 1,
             icon: 'droplet',
-            color: '#1F6DB2',
+            color: '#E11D48',
             background: '#EBF2F9',
             name: 'David Marshall',
             reportType: 'Hemoglobin',

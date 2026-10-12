@@ -3,7 +3,6 @@ import { FormsModule } from '@angular/forms';
 import { finalize, forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AdminBreadcrumbComponent } from "../../../../../components/breadcrumb/admin-breadcrumb.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { InviteService } from '../../../../../services/admin/invite.service';
 import { RoleService } from '../../../../../services/admin/role.service';
 import { UserService } from '../../../../../services/admin/user.service';
@@ -33,8 +32,7 @@ const INVITABLE_ROLE_CODES = [
   imports: [
     SharedModule,
     FormsModule,
-    AdminBreadcrumbComponent,
-    BooIconComponent
+    AdminBreadcrumbComponent,
   ],
   templateUrl: './team.component.html'
 })

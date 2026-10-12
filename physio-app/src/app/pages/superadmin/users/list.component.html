@@ -1,77 +1,40 @@
-<div class="space-y-5">
-  <div class="flex items-center justify-between flex-wrap gap-3">
-    <div>
-      <h2 class="text-xl font-bold text-brandDark mb-0.5">Users</h2>
-      <p class="text-sm text-brandDark m-0">
-        All registered users across the platform
-      </p>
-    </div>
+<div class="h-full flex flex-col gap-5">
+  <superadmin-page-header
+    title="Users"
+    description="All registered accounts across the platform."
+  />
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <ng-container *ngIf="stats() || statsFailed(); else statsPending">
+      <boo-stat-card
+        label="Total users"
+        [value]="stats()?.total ?? '—'"
+        icon="user"
+        tone="primary"
+      />
+      <boo-stat-card
+        label="Active"
+        [value]="stats()?.active ?? '—'"
+        icon="circle-check"
+        tone="success"
+      />
+      <boo-stat-card
+        label="Inactive"
+        [value]="stats()?.inactive ?? '—'"
+        icon="shield-check"
+        tone="neutral"
+      />
+    </ng-container>
+    <ng-template #statsPending>
+      <div
+        *ngFor="let _ of [1, 2, 3]"
+        class="h-[70px] rounded-2 border border-borderGray/60 bg-surface animate-pulse motion-reduce:animate-none"
+        aria-hidden="true"
+      ></div>
+    </ng-template>
   </div>
 
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-    <div
-      class="bg-surface rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3"
-    >
-      <div
-        class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"
-      >
-        <physio-icon name="user" />
-      </div>
-      <div>
-        <div class="text-lg font-bold text-brandDark leading-none">
-          {{ tableData()?.totalCount ?? 0 }}
-        </div>
-        <div class="text-[11px] text-brandDark mt-0.5">Total Users</div>
-      </div>
-    </div>
-    <div
-      class="bg-surface rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3"
-    >
-      <div
-        class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center shrink-0"
-      >
-        <physio-icon name="circle-check" />
-      </div>
-      <div>
-        <div class="text-lg font-bold text-brandDark leading-none">
-          {{ totalActive }}
-        </div>
-        <div class="text-[11px] text-brandDark mt-0.5">Active</div>
-      </div>
-    </div>
-    <div
-      class="bg-surface rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3"
-    >
-      <div
-        class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0"
-      >
-        <boo-icon name="badge-check" />
-      </div>
-      <div>
-        <div class="text-lg font-bold text-brandDark leading-none">
-          {{ totalVerified }}
-        </div>
-        <div class="text-[11px] text-brandDark mt-0.5">Verified</div>
-      </div>
-    </div>
-    <div
-      class="bg-surface rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3"
-    >
-      <div
-        class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0"
-      >
-        <physio-icon name="shield-check" />
-      </div>
-      <div>
-        <div class="text-lg font-bold text-brandDark leading-none">
-          {{ (tableData()?.totalCount ?? 0) - totalActive }}
-        </div>
-        <div class="text-[11px] text-brandDark mt-0.5">Inactive</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="flex-1 min-h-0">
+  <div class="flex-1 min-h-[320px]">
     <superadmin-user-table-card
       [data]="tableData()"
       [filter]="{ pageNumber: params.pageNumber, pageSize: params.pageSize }"

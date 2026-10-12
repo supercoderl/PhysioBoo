@@ -1,3 +1,4 @@
+import { IconComponent } from 'physioboo-icons';
 import { Component } from '@angular/core';
 import { delay, finalize, tap } from 'rxjs';
 import { LocalLoadingService } from '../../../../services/common/local-loading.service';
@@ -5,13 +6,12 @@ import { hardReload$ } from "../../../../shared/utils/common";
 import { ButtonIconComponent } from "../../../button/button-icon/button-icon.component";
 import { ClockComponent } from "../../../clock/clock.component";
 import { DividerComponent } from "../../../divider/divider.component";
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 import { SwitchComponent } from "../../../switch/switch.component";
 
 @Component({
   selector: 'admin-cloud',
   standalone: true,
-  imports: [DividerComponent, SwitchComponent, ClockComponent, ButtonIconComponent, BooIconComponent],
+  imports: [DividerComponent, SwitchComponent, ClockComponent, ButtonIconComponent, IconComponent],
   templateUrl: './cloud.component.html'
 })
 export class AdminCloudComponent {

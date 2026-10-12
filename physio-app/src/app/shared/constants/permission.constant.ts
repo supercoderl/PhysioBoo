@@ -178,6 +178,7 @@ export const Permissions = {
         ResourceImport: "system:resource:import",
         SecurityBlockIp: "system:security:block-ip",
         SecurityUnblockIp: "system:security:unblock-ip",
+        AuditLogRead: "system:audit-log:read",
         DevAccess: "system:dev:access",
     },
     Academy: {

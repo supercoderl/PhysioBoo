@@ -10,7 +10,6 @@ import { SharedModule } from "../../../../../shared/shared-imports";
 import { Complaint, CreateComplaintRequest, UpdateComplaintRequest } from "../../../../../shared/types/complaint.types";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
@@ -22,7 +21,6 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
         SharedModule,
         DrawerComponent,
         BooInputComponent,
-        BooIconComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
         BooTextareaComponent
@@ -40,7 +38,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                         <p class="text-sm text-secondary m-0">Patient complaint and support ticket details</p>
                     </div>
                     <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors" aria-label="Close drawer">
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
@@ -50,7 +48,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                     <!-- Loading overlay while fetching detail -->
                     <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId"
                         class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <boo-icon name="loader" class="animate-spin text-primary" [size]="32"></boo-icon>
+                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
                     </div>
 
                     <!-- Status (edit-only) — prominent at top -->
@@ -64,7 +62,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                                     [ngClass]="form.get('status')?.value === opt.value
                                         ? opt.activeClass
                                         : 'border-gray-200 text-gray-500 hover:border-gray-300'">
-                                    <boo-icon [name]="opt.icon" [size]="16"></boo-icon>
+                                    <physio-icon [name]="opt.icon" [size]="16"></physio-icon>
                                     {{ opt.label }}
                                 </button>
                             </div>
@@ -113,7 +111,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                     <button *ngIf="currentId" (click)="onDelete()"
                         class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1.5 transition-colors"
                         aria-label="Delete complaint">
-                        <boo-icon name="trash-2" [size]="16"></boo-icon>
+                        <physio-icon name="trash-2" [size]="16"></physio-icon>
                         Delete
                     </button>
                     <div class="flex gap-3 ml-auto">
@@ -140,7 +138,7 @@ export class CrmComplaintDrawerComponent implements OnChanges {
 
     readonly statusOptions = [
         { label: 'Pending', value: ComplaintStatus.Pending, icon: 'clock', activeClass: 'border-gray-400 bg-gray-50 text-gray-700' },
-        { label: 'In Progress', value: ComplaintStatus.InProgress, icon: 'loader', activeClass: 'border-blue-400 bg-blue-50 text-blue-700' },
+        { label: 'In Progress', value: ComplaintStatus.InProgress, icon: 'loader', activeClass: 'border-primary/70 bg-primarySoft text-primaryHover' },
         { label: 'Resolved', value: ComplaintStatus.Resolved, icon: 'check-circle', activeClass: 'border-green-400 bg-green-50 text-green-700' },
         { label: 'Closed', value: ComplaintStatus.Closed, icon: 'archive', activeClass: 'border-purple-400 bg-purple-50 text-purple-700' },
     ];

@@ -4,12 +4,11 @@ import { catchError, of } from 'rxjs';
 import { PrintTemplateService } from '../../../services/admin/print-template.service';
 import { SharedModule } from '../../../shared/shared-imports';
 import { PrintTemplate } from '../../../shared/types/print-template.types';
-import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
 
 @Component({
   selector: 'print-template-picker',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   animations: [
     trigger('overlayAnim', [
       transition(':enter', [style({ opacity: 0 }), animate('120ms', style({ opacity: 1 }))]),
@@ -34,7 +33,7 @@ import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
         <header class="flex items-center justify-between px-5 h-14 border-b border-gray-200">
           <div class="flex items-center gap-3 min-w-0">
             <div class="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center">
-              <boo-icon name="file-text" iconClass="w-4 h-4" />
+              <physio-icon name="file-text" class="w-4 h-4" />
             </div>
             <div class="min-w-0">
               <div class="text-sm font-semibold text-gray-900">Choose template</div>
@@ -43,20 +42,20 @@ import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
           </div>
           <button type="button" (click)="onClose()"
             class="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-900">
-            <boo-icon name="x" iconClass="w-4 h-4" />
+            <physio-icon name="x" class="w-4 h-4" />
           </button>
         </header>
 
         <div class="flex-1 max-h-[60vh] overflow-y-auto">
           <div *ngIf="loading()" class="p-8 flex items-center justify-center text-sm text-gray-400">
-            <boo-icon name="loader-circle" iconClass="w-5 h-5 mr-2 animate-spin" />
+            <physio-icon name="loader-circle" [class]="'w-5 h-5 mr-2 animate-spin'" />
             Loading templates…
           </div>
 
           <div *ngIf="!loading() && !templates().length"
             class="p-10 flex flex-col items-center text-center">
             <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-              <boo-icon name="file-x" iconClass="w-6 h-6 text-gray-400" />
+              <physio-icon name="file-x" class="w-6 h-6 text-gray-400" />
             </div>
             <p class="text-sm font-medium text-gray-700 mb-1">No templates configured</p>
             <p class="text-xs text-gray-500">Create one in System → Print Templates.</p>
@@ -67,7 +66,7 @@ import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
               (click)="onPick(t)"
               class="w-full flex items-center gap-3 px-5 py-3 hover:bg-gray-50 text-left transition-colors">
               <div class="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                <boo-icon name="file-text" iconClass="w-4 h-4" />
+                <physio-icon name="file-text" class="w-4 h-4" />
               </div>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
@@ -79,7 +78,7 @@ import { BooIconComponent } from '../../icon/boo-icon/boo-icon.component';
                 </div>
                 <div class="text-xs text-gray-500 truncate">{{ t.code }}</div>
               </div>
-              <boo-icon name="chevron-right" iconClass="w-4 h-4 text-gray-300" />
+              <physio-icon name="chevron-right" class="w-4 h-4 text-gray-300" />
             </button>
           </div>
         </div>

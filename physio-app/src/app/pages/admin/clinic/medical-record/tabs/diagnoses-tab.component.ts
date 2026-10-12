@@ -1,5 +1,4 @@
 import { Component, Input, computed, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { Severity } from "../../../../../shared/enums/severity";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { CurrentStatus, DiagnosisRow } from "../../../../../shared/types/medical-record.types";
@@ -7,12 +6,12 @@ import { CurrentStatus, DiagnosisRow } from "../../../../../shared/types/medical
 @Component({
   selector: 'mr-diagnoses-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
       <div class="px-5 py-3 border-b border-gray-200 flex items-center gap-3 flex-wrap">
         <div class="relative flex-1 min-w-[200px]">
-          <boo-icon name="search" iconClass="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></boo-icon>
+          <physio-icon name="search" [class]="'w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2'"></physio-icon>
           <input type="text" [ngModel]="search()" (ngModelChange)="search.set($event)"
             placeholder="Search ICD-10, condition, category…"
             class="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
@@ -105,7 +104,7 @@ export class DiagnosesTabComponent {
   statusClass(s: CurrentStatus) {
     switch (s) {
       case 'Active': return 'bg-red-50 text-red-700';
-      case 'Managed': return 'bg-blue-50 text-blue-700';
+      case 'Managed': return 'bg-primarySoft text-primaryHover';
       case 'InRemission': return 'bg-violet-50 text-violet-700';
       default: return 'bg-gray-100 text-gray-600';
     }

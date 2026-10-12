@@ -2,7 +2,7 @@
 
 **Path:** `admin/paraclinical/surgery`
 **Current implementation:** `src/app/pages/admin/paraclinical/surgery/surgery.component.ts` — a single demo component bound to a flat `Surgery[]` array populated by `initializeSampleData()`. 6 static stat cards, 4 hardcoded operating-room cards, a category quick-filter row, a single filter bar (search/status/priority/date), one flat table, and a static pagination footer. All actions (`viewDetails`, `editSurgery`, `printSchedule`, `cancelSurgery`, `openScheduleSurgeryModal`) call `alert()`/`confirm()`. No service, no drawer, no workflow beyond "list of surgeries."
-**Scope:** Frontend UI/UX only. No backend implementation — see §13 for the proposed API contract. Reuses the conventions already established by the Laboratory module (`docs/laboratory-redesign.md`) and Treatment Sheet module: standalone components, Angular signals, `DrawerComponent`, `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `BooIcon`, `BooSelect`, `BooInput`, `LocalLoadingService`, `ToastService`, `DialogService`, Tailwind, mock-fallback services.
+**Scope:** Frontend UI/UX only. No backend implementation — see §13 for the proposed API contract. Reuses the conventions already established by the Laboratory module (`docs/laboratory-redesign.md`) and Treatment Sheet module: standalone components, Angular signals, `DrawerComponent`, `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `physio-icon`, `BooSelect`, `BooInput`, `LocalLoadingService`, `ToastService`, `DialogService`, Tailwind, mock-fallback services.
 
 ---
 
@@ -146,7 +146,7 @@ services/admin/surgery.service.ts        (SurgeryService — mock-fallback patte
                                            LaboratoryService / TreatmentSheetService)
 ```
 
-**Reused without modification:** `DrawerComponent`, `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `BooIconComponent`, `BooSelectComponent`, `BooInputComponent`, `LocalLoadingService`, `ToastService`, `DialogService`.
+**Reused without modification:** `DrawerComponent`, `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `IconComponent` (physio-icon), `BooSelectComponent`, `BooInputComponent`, `LocalLoadingService`, `ToastService`, `DialogService`.
 
 **New (this feature):** everything under `paraclinical/surgery/` above, the drawer component, `surgery.ts` types (full rewrite of the existing 16-field `Surgery` interface), and `surgery.service.ts`.
 

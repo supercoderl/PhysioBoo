@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { CashierInvoiceStatus } from "../../../../shared/types/cashier.types";
 
@@ -11,37 +10,37 @@ interface StatusChip {
 @Component({
     selector: 'cashier-search-panel',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div class="bg-surface rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-          <boo-icon name="search" [size]="15" iconClass="text-amber-600"></boo-icon>
+          <physio-icon name="search" [size]="15" class="text-amber-600"></physio-icon>
           Find a Bill
         </h2>
         <button type="button" (click)="advancedOpen.set(!advancedOpen())"
           class="text-xs font-semibold text-amber-700 hover:text-amber-800 flex items-center gap-1">
           {{ advancedOpen() ? 'Hide Filters' : 'Advanced Filters' }}
-          <boo-icon [name]="advancedOpen() ? 'chevron-up' : 'chevron-down'" [size]="12"></boo-icon>
+          <physio-icon [name]="advancedOpen() ? 'chevron-up' : 'chevron-down'" [size]="12"></physio-icon>
         </button>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div class="lg:col-span-2 relative">
-          <boo-icon name="user-round-search" [size]="14" iconClass="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></boo-icon>
+          <physio-icon name="user-round-search" [size]="14" [class]="'absolute left-3 top-1/2 -translate-y-1/2 text-slate-400'"></physio-icon>
           <input type="text" [(ngModel)]="query" (ngModelChange)="onQueryChange($event)"
             placeholder="Patient name, MRN, invoice no. or phone"
             class="w-full pl-9 pr-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 outline-none transition-colors" />
         </div>
         <div class="relative">
-          <boo-icon name="scan-barcode" [size]="14" iconClass="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></boo-icon>
+          <physio-icon name="scan-barcode" [size]="14" [class]="'absolute left-3 top-1/2 -translate-y-1/2 text-slate-400'"></physio-icon>
           <input type="text" [(ngModel)]="barcode" (keydown.enter)="onBarcodeSubmit()"
             placeholder="Scan barcode…"
             class="w-full pl-9 pr-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 outline-none transition-colors" />
         </div>
         <button type="button" (click)="onQueryChange(query)"
           class="px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors flex items-center justify-center gap-1.5">
-          <boo-icon name="search" [size]="14"></boo-icon> Search
+          <physio-icon name="search" [size]="14"></physio-icon> Search
         </button>
       </div>
 

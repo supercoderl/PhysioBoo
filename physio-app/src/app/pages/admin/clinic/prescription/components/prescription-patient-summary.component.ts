@@ -1,21 +1,20 @@
 import { Component, Input } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { RxPatientSummary } from "../../../../../shared/types/prescription-rx.types";
 import { calcBmi } from "../prescription-rx.util";
 
 interface WarningBadge {
-    label: string;
-    tone: 'danger' | 'warning' | 'primary';
-    detail: string;
+  label: string;
+  tone: 'danger' | 'warning' | 'primary';
+  detail: string;
 }
 
 @Component({
-    selector: 'rx-patient-summary',
-    standalone: true,
-    imports: [SharedModule, BooIconComponent, StatusBadgeComponent],
-    template: `
+  selector: 'rx-patient-summary',
+  standalone: true,
+  imports: [SharedModule,StatusBadgeComponent],
+  template: `
     <div class="bg-surface border border-gray-200 rounded-lg" *ngIf="patient">
       <div class="px-5 py-4 flex flex-wrap items-start gap-6" *ngIf="!collapsed">
         <!-- Identity -->
@@ -42,9 +41,9 @@ interface WarningBadge {
 
         <!-- Contact / insurance -->
         <div class="text-xs min-w-[180px] space-y-1">
-          <div class="flex items-center gap-1.5 text-secondary"><boo-icon name="phone" [size]="13"></boo-icon> {{ patient.phone || '—' }}</div>
+          <div class="flex items-center gap-1.5 text-secondary"><physio-icon name="phone" [size]="13"></physio-icon> {{ patient.phone || '—' }}</div>
           <div class="flex items-center gap-1.5">
-            <boo-icon name="shield-check" [size]="13" [color]="patient.insuranceCovered ? '#059669' : '#94a3b8'"></boo-icon>
+            <physio-icon name="shield-check" [size]="13" class="patient.insuranceCovered ? 'text-emerald-700' : 'text-secondary'"></physio-icon>
             <span [ngClass]="patient.insuranceCovered ? 'text-emerald-700' : 'text-secondary'">{{ patient.insuranceProvider || 'No insurance' }}</span>
           </div>
         </div>
@@ -67,7 +66,7 @@ interface WarningBadge {
         </div>
 
         <button type="button" (click)="collapsed = true" class="text-secondary hover:text-primary self-start">
-          <boo-icon name="chevron-up" [size]="16"></boo-icon>
+          <physio-icon name="chevron-up" [size]="16"></physio-icon>
         </button>
       </div>
 
@@ -75,41 +74,41 @@ interface WarningBadge {
       <div *ngIf="collapsed" class="px-5 py-2 flex items-center gap-3 cursor-pointer" (click)="collapsed = false">
         <span class="font-semibold text-primary text-sm">{{ patient.fullName }}</span>
         <boo-status-badge *ngFor="let b of warningBadges()" [label]="b.label" [tone]="b.tone" [dotted]="true"></boo-status-badge>
-        <boo-icon name="chevron-down" [size]="16" class="ml-auto text-secondary"></boo-icon>
+        <physio-icon name="chevron-down" [size]="16" [class]="'ml-auto text-secondary'"></physio-icon>
       </div>
     </div>
   `,
 })
 export class PrescriptionPatientSummaryComponent {
-    @Input() patient: RxPatientSummary | null = null;
-    collapsed = false;
+  @Input() patient: RxPatientSummary | null = null;
+  collapsed = false;
 
-    bmi(): number | null {
-        return calcBmi(this.patient?.heightCm, this.patient?.weightKg);
-    }
+  bmi(): number | null {
+    return calcBmi(this.patient?.heightCm, this.patient?.weightKg);
+  }
 
-    bmiClass(): string {
-        const v = this.bmi();
-        if (v === null) return 'text-secondary';
-        if (v < 18.5 || v >= 30) return 'text-amber-600';
-        return 'text-primary';
-    }
+  bmiClass(): string {
+    const v = this.bmi();
+    if (v === null) return 'text-secondary';
+    if (v < 18.5 || v >= 30) return 'text-amber-600';
+    return 'text-primary';
+  }
 
-    initialsOf(name?: string | null): string {
-        if (!name) return '';
-        return name.split(' ').filter(Boolean).slice(-2).map(p => p[0]).join('').toUpperCase();
-    }
+  initialsOf(name?: string | null): string {
+    if (!name) return '';
+    return name.split(' ').filter(Boolean).slice(-2).map(p => p[0]).join('').toUpperCase();
+  }
 
-    warningBadges(): WarningBadge[] {
-        if (!this.patient) return [];
-        const { flags, allergies, chronicConditions } = this.patient;
-        const out: WarningBadge[] = [];
-        if (flags.drugAllergy) out.push({ label: 'Drug Allergy', tone: 'danger', detail: allergies.join(', ') || 'See allergy record' });
-        if (flags.pregnancy) out.push({ label: 'Pregnancy', tone: 'warning', detail: 'Adjust dosing for pregnancy' });
-        if (flags.pediatric) out.push({ label: 'Pediatric', tone: 'primary', detail: 'Pediatric dosing applies' });
-        if (flags.elderly) out.push({ label: 'Elderly', tone: 'primary', detail: 'Consider age-related dose adjustment' });
-        if (flags.highRisk) out.push({ label: 'High Risk', tone: 'danger', detail: chronicConditions.join(', ') || 'High risk patient' });
-        if (flags.controlledRestricted) out.push({ label: 'Controlled Med. Restriction', tone: 'warning', detail: 'Restricted from controlled substances' });
-        return out;
-    }
+  warningBadges(): WarningBadge[] {
+    if (!this.patient) return [];
+    const { flags, allergies, chronicConditions } = this.patient;
+    const out: WarningBadge[] = [];
+    if (flags.drugAllergy) out.push({ label: 'Drug Allergy', tone: 'danger', detail: allergies.join(', ') || 'See allergy record' });
+    if (flags.pregnancy) out.push({ label: 'Pregnancy', tone: 'warning', detail: 'Adjust dosing for pregnancy' });
+    if (flags.pediatric) out.push({ label: 'Pediatric', tone: 'primary', detail: 'Pediatric dosing applies' });
+    if (flags.elderly) out.push({ label: 'Elderly', tone: 'primary', detail: 'Consider age-related dose adjustment' });
+    if (flags.highRisk) out.push({ label: 'High Risk', tone: 'danger', detail: chronicConditions.join(', ') || 'High risk patient' });
+    if (flags.controlledRestricted) out.push({ label: 'Controlled Med. Restriction', tone: 'warning', detail: 'Restricted from controlled substances' });
+    return out;
+  }
 }

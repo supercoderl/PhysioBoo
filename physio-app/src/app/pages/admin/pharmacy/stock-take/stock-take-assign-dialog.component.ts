@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from "@angular/core";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { StockTakeService } from "../../../../services/admin/stock-take.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -11,7 +10,7 @@ import { AssignCounterPayload } from "../../../../shared/types/stock-take.types"
 @Component({
     selector: 'stock-take-assign-dialog',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, BooSelectComponent, BooDatepickerComponent, BooButtonAdminComponent],
+    imports: [SharedModule,BooSelectComponent, BooDatepickerComponent, BooButtonAdminComponent],
     template: `
     <div *ngIf="isOpen" class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="close.emit()"></div>
@@ -19,7 +18,7 @@ import { AssignCounterPayload } from "../../../../shared/types/stock-take.types"
       <div class="relative bg-surface rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100">
         <div class="px-6 py-5 border-b border-gray-100 flex items-start gap-4">
           <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <boo-icon name="user-plus" iconClass="text-primary" [size]="20"></boo-icon>
+            <physio-icon name="user-plus" [size]="20" class="text-primary"></physio-icon>
           </div>
           <div class="flex-1">
             <h3 class="text-lg font-semibold text-gray-900">Assign Counter</h3>

@@ -1,12 +1,11 @@
-import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom } from '@angular/core';
-import { provideRouter } from '@angular/router';
-
 import { registerLocaleData } from '@angular/common';
 import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import en from '@angular/common/locales/en';
+import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { PreloadAllModules, provideRouter, withPreloading } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
 import { provideLottieOptions } from 'ngx-lottie';
@@ -26,7 +25,7 @@ function initializeApp(initService: InitService): () => Promise<void> {
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
+    provideRouter(routes, withPreloading(PreloadAllModules)),
     provideClientHydration(),
     provideNzI18n(en_US),
     importProvidersFrom([FormsModule, LucideAngularModule.pick(SHARED_LUCIDE_ICONS)]),

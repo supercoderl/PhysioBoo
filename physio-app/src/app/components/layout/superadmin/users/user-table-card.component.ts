@@ -8,6 +8,7 @@ import { SortOption } from "../../../../shared/types/sort";
 import { ColorUtils } from "../../../../shared/utils/color.utils";
 import { BooActionAdminComponent } from "../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent, FilterConfig } from "../../../table/boo-table-admin/boo-table-admin.component";
+import { StatusBadgeComponent } from "../../../ui/status-badge.component";
 
 @Component({
   selector: 'superadmin-user-table-card',
@@ -16,11 +17,12 @@ import { BooTableAdminComponent, FilterConfig } from "../../../table/boo-table-a
     SharedModule,
     BooTableAdminComponent,
     ColumnDefDirective,
-    BooActionAdminComponent
+    BooActionAdminComponent,
+    StatusBadgeComponent
   ],
   host: { class: 'block h-full min-h-0' },
   template: `
-    <div class="bg-surface rounded-[6px] border border-gray-200 h-full overflow-hidden">
+    <div class="bg-surface rounded-2 border border-borderGray/60 h-full overflow-hidden">
       <boo-table-admin
         [data]="data?.items ?? []"
         tdClass="px-4 py-3"
@@ -40,31 +42,34 @@ import { BooTableAdminComponent, FilterConfig } from "../../../table/boo-table-a
         [loading]="loadingSrv.isLoading('search')"
       >
         <ng-template appColumnDef="user" headerLabel="User" headerClass="text-left" let-item>
-          <div class="flex items-center gap-3 overflow-hidden" (click)="onEditClick(item.id)">
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-3">
-                <div
-                    *ngIf="!item.profilePicture"
-                    class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-primary text-sm"
-                >
-                  {{ userInitial(item) }}
-                </div>
-                <img
-                  *ngIf="item.profilePicture"
-                  [src]="item.profilePicture"
-                  class="w-9 h-9 rounded-full object-cover"
-                />
-                <div class="min-w-0">
-                  <div class="font-medium text-primary truncate">
-                    {{ item.email }}
-                  </div>
-                  <div class="text-xs text-secondary">
-                    {{ item.id.slice(0, 8) }}…
-                  </div>
-                </div>
+          <button
+            type="button"
+            class="flex items-center gap-3 min-w-0 max-w-full text-left rounded-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
+            [attr.aria-label]="'Edit user ' + item.email"
+            (click)="onEditClick(item.id)"
+          >
+            <div
+              *ngIf="!item.profilePicture"
+              class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-primary text-sm shrink-0"
+              aria-hidden="true"
+            >
+              {{ userInitial(item) }}
+            </div>
+            <img
+              *ngIf="item.profilePicture"
+              [src]="item.profilePicture"
+              alt=""
+              class="w-9 h-9 rounded-full object-cover shrink-0"
+            />
+            <div class="min-w-0">
+              <div class="font-medium text-primary truncate">
+                {{ item.email }}
+              </div>
+              <div class="text-xs text-secondary tabular-nums">
+                {{ item.id.slice(0, 8) }}…
               </div>
             </div>
-          </div>
+          </button>
         </ng-template>
 
         <ng-template appColumnDef="contact" headerLabel="Contact" headerClass="text-left" let-item>
@@ -82,7 +87,7 @@ import { BooTableAdminComponent, FilterConfig } from "../../../table/boo-table-a
             {{ h.name }}
           </span>
           <ng-template #noTenant>
-            <span class="text-xs text-gray-400 italic">Unassigned</span>
+            <span class="text-xs text-secondary italic">Unassigned</span>
           </ng-template>
         </ng-template>
 
@@ -98,23 +103,18 @@ import { BooTableAdminComponent, FilterConfig } from "../../../table/boo-table-a
             </span>
             <span
               *ngIf="!item.roles?.length"
-              class="text-xs text-gray-400 italic"
+              class="text-xs text-secondary italic"
               >No roles</span
             >
           </div>
         </ng-template>
 
         <ng-template appColumnDef="status" headerLabel="Status" headerClass="text-left" let-item>
-          <span
-            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium"
-            [ngClass]="item.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'"
-          >
-            <span
-              class="w-1.5 h-1.5 rounded-full"
-              [ngClass]="item.isActive ? 'bg-emerald-500' : 'bg-gray-400'"
-            ></span>
-            {{ item.isActive ? "Active" : "Inactive" }}
-          </span>
+          <boo-status-badge
+            [label]="item.isActive ? 'Active' : 'Inactive'"
+            [tone]="item.isActive ? 'success' : 'neutral'"
+            dotted
+          />
         </ng-template>
 
         <ng-template appColumnDef="lastLogin" headerLabel="Last Login" headerClass="text-left" let-item>

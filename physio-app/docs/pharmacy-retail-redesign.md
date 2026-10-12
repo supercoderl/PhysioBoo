@@ -2,7 +2,7 @@
 
 **Path:** `admin/pharmacy/retail`
 **Current implementation:** `src/app/pages/admin/pharmacy/retail/retail.component.ts` — a single 444-line component with hardcoded mock medicines, `ngModel`-bound search/filter, a plain HTML table for the catalog, and a billing sidebar. No services, no drawers, no payment flow; `processSale()`/`printBill()` only call `alert()`/`console.log()`. Built like a dashboard sub-page, not a point of sale.
-**Scope:** Frontend UI/UX only. No backend implementation — see §13 for the proposed API contract. Reuses conventions already established by the Laboratory / Treatment Sheet / Nursing modules (`docs/laboratory-redesign.md`): standalone components, Angular signals, `DrawerComponent`, `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `BooIconComponent`, `BooSelectComponent`, `BooInputComponent`, `LocalLoadingService`, `ToastService`, `DialogService`, Tailwind, mock-fallback services. Unlike those modules, this page is intentionally **not** a multi-tab dashboard — it is a single always-on workspace, because the entire point of a POS is that the cashier never navigates away mid-sale.
+**Scope:** Frontend UI/UX only. No backend implementation — see §13 for the proposed API contract. Reuses conventions already established by the Laboratory / Treatment Sheet / Nursing modules (`docs/laboratory-redesign.md`): standalone components, Angular signals, `DrawerComponent`, `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `IconComponent` (physio-icon), `BooSelectComponent`, `BooInputComponent`, `LocalLoadingService`, `ToastService`, `DialogService`, Tailwind, mock-fallback services. Unlike those modules, this page is intentionally **not** a multi-tab dashboard — it is a single always-on workspace, because the entire point of a POS is that the cashier never navigates away mid-sale.
 
 ---
 
@@ -144,7 +144,7 @@ services/admin/retail-pos.service.ts        (RetailPosService — mock-fallback 
                                               as LaboratoryService)
 ```
 
-**Reused without modification:** `DrawerComponent`, `DialogComponent`, `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `BooIconComponent`, `BooSelectComponent`, `BooInputComponent`, `LocalLoadingService`, `ToastService`, `DialogService`, `Patient` type (for the attached-customer summary), `MedicineCategory` service (Quick Category rail).
+**Reused without modification:** `DrawerComponent`, `DialogComponent`, `StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `IconComponent` (physio-icon), `BooSelectComponent`, `BooInputComponent`, `LocalLoadingService`, `ToastService`, `DialogService`, `Patient` type (for the attached-customer summary), `MedicineCategory` service (Quick Category rail).
 
 **New (this feature):** everything under `pharmacy/retail/` above, the types file, and the service. The legacy `Medicine` / `CartItem` / `Billing` types in `shared/types/medicine.ts` / `cart.ts` / `bill.ts` are superseded by `RetailMedicineCard` / `RetailCartLineItem` / `RetailTransaction` for this module — they are left untouched since `cashier.component.ts` (Finance → Cashier) still references the old `Medicine`/`CartItem` pair for an unrelated billing screen.
 

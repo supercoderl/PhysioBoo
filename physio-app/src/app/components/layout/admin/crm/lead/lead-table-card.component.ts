@@ -48,7 +48,7 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
                 <ng-template appColumnDef="status" headerLabel="Status" headerClass="text-left" let-item>
                     <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium"
                         [ngClass]="{
-                            'bg-blue-100 text-blue-700':   item.status === LeadStatus.New,
+                            'bg-primarySoft text-primaryHover':   item.status === LeadStatus.New,
                             'bg-amber-100 text-amber-700': item.status === LeadStatus.Contacted,
                             'bg-purple-100 text-purple-700': item.status === LeadStatus.Qualified,
                             'bg-green-100 text-green-700': item.status === LeadStatus.Converted,

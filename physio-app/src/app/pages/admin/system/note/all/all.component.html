@@ -3,7 +3,7 @@
     <div class="flex min-w-0 flex-auto flex-col sm:flex-row sm:items-center">
       <div class="flex flex-auto flex-col">
         <p class="tracking-tight font-extrabold leading-none text-[22px] m-0">Notes</p>
-        <p class="tracking-tight font-medium m-0 text-[13px] leading-[1.5] text-[#4B5563]">
+        <p class="tracking-tight font-medium m-0 text-[13px] leading-[1.5] text-[#71606A]">
           Capture and organize your thoughts and ideas
         </p>
       </div>
@@ -13,13 +13,13 @@
           (click)="toggleArchived()"
           [attr.aria-pressed]="showArchived"
           class="flex items-center gap-1.5 rounded-lg border px-3 min-h-10 text-[13px] font-medium transition-colors"
-          [ngClass]="showArchived ? 'bg-primary text-white border-primary' : 'bg-surface text-[#4B5563] border-[#E5E7EB] hover:bg-gray-50'"
+          [ngClass]="showArchived ? 'bg-primary text-white border-primary' : 'bg-surface text-[#71606A] border-[#EFE3E7] hover:bg-gray-50'"
         >
-          <boo-icon name="archive" [size]="16"></boo-icon>
+          <physio-icon name="archive" [size]="16"></physio-icon>
           Archived
         </button>
-        <label class="flex flex-auto sm:grow-0 items-center gap-2 rounded-lg border border-[#E5E7EB] bg-surface px-3 min-h-10">
-          <boo-icon name="search" [size]="16" iconClass="text-gray-400"></boo-icon>
+        <label class="flex flex-auto sm:grow-0 items-center gap-2 rounded-lg border border-[#EFE3E7] bg-surface px-3 min-h-10">
+          <physio-icon name="search" [size]="16" class="text-gray-400"></physio-icon>
           <input
             type="search"
             [(ngModel)]="search"
@@ -42,9 +42,9 @@
         <button
           type="button"
           (click)="openNew()"
-          class="border border-solid rounded-lg flex items-center gap-2 shrink-0 max-w-128 w-full min-h-10 bg-surface border-[#E5E7EB] px-3 text-left text-[14px] leading-[1.5] text-[#4B5563] hover:border-gray-300"
+          class="border border-solid rounded-lg flex items-center gap-2 shrink-0 max-w-128 w-full min-h-10 bg-surface border-[#EFE3E7] px-3 text-left text-[14px] leading-[1.5] text-[#71606A] hover:border-gray-300"
         >
-          <boo-icon name="plus" [size]="16"></boo-icon>
+          <physio-icon name="plus" [size]="16"></physio-icon>
           Take a note...
         </button>
       </div>
@@ -57,7 +57,7 @@
           (click)="selectLabel(l.label)"
           [attr.aria-pressed]="activeLabel === l.label"
           class="rounded-full border px-3 py-1 text-[12px] font-medium transition-colors"
-          [ngClass]="activeLabel === l.label ? 'bg-primary text-white border-primary' : 'bg-surface text-[#1F232B] border-[#E5E7EB] hover:bg-gray-50'"
+          [ngClass]="activeLabel === l.label ? 'bg-primary text-white border-primary' : 'bg-surface text-[#1F232B] border-[#EFE3E7] hover:bg-gray-50'"
         >
           {{ l.label }} <span class="opacity-70">· {{ l.count }}</span>
         </button>
@@ -65,7 +65,7 @@
 
       <!-- Loading skeleton -->
       <div *ngIf="isLoading()" class="w-full columns-1 sm:columns-2 lg:columns-3 gap-4" aria-busy="true">
-        <div *ngFor="let i of [1, 2, 3, 4, 5, 6]" class="break-inside-avoid mb-4 rounded-lg border border-[#E5E7EB] bg-surface p-4 animate-pulse">
+        <div *ngFor="let i of [1, 2, 3, 4, 5, 6]" class="break-inside-avoid mb-4 rounded-lg border border-[#EFE3E7] bg-surface p-4 animate-pulse">
           <div class="h-4 w-2/3 rounded bg-gray-200"></div>
           <div class="mt-3 h-3 w-full rounded bg-gray-100"></div>
           <div class="mt-2 h-3 w-4/5 rounded bg-gray-100"></div>
@@ -90,7 +90,7 @@
             (click)="openNote(note)"
             (keydown.enter)="openNote(note)"
             [attr.aria-label]="'Open note ' + (note.title || note.content)"
-            class="group border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#E5E7EB] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary"
+            class="group border border-solid rounded-lg cursor-pointer w-full text-[#1F232B] bg-[#F6F7F8] overflow-hidden border-[#EFE3E7] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <div class="flex items-start justify-between gap-2 px-4 pt-3">
               <p class="m-0 font-semibold text-[14px] leading-[1.5] break-words">{{ note.title }}</p>
@@ -102,7 +102,7 @@
                 class="shrink-0 rounded p-1 hover:bg-gray-200"
                 [ngClass]="note.isPinned ? 'text-primary' : 'text-gray-400'"
               >
-                <boo-icon name="pin" [size]="16"></boo-icon>
+                <physio-icon name="pin" [size]="16"></physio-icon>
               </button>
             </div>
 
@@ -119,18 +119,18 @@
                   class="shrink-0 rounded p-1"
                   [ngClass]="item.done ? 'text-primary' : 'text-gray-400'"
                 >
-                  <boo-icon [name]="item.done ? 'circle-check' : 'circle'" [size]="16"></boo-icon>
+                  <physio-icon [name]="item.done ? 'circle-check' : 'circle'" [size]="16"></physio-icon>
                 </button>
                 <span
                   class="text-[12px] leading-[1.5] truncate mx-1"
-                  [ngClass]="item.done ? 'line-through text-[#4B5563]' : ''"
+                  [ngClass]="item.done ? 'line-through text-[#71606A]' : ''"
                 >{{ item.text }}</span>
               </li>
             </ul>
 
             <div class="-mx-0.5 my-3 flex w-full flex-wrap px-4">
-              <span *ngIf="note.reminderAt" class="max-w-full mt-1 mx-0.5 flex items-center text-[#4B5563]">
-                <boo-icon name="clock" [size]="14"></boo-icon>
+              <span *ngIf="note.reminderAt" class="max-w-full mt-1 mx-0.5 flex items-center text-[#71606A]">
+                <physio-icon name="clock" [size]="14"></physio-icon>
                 <span class="text-[11px] leading-[1.4] truncate px-1">{{ note.reminderAt | date:'MMM d, y, h:mm a' }}</span>
               </span>
               <span
@@ -146,7 +146,7 @@
                 [attr.aria-label]="note.isArchived ? 'Restore note' : 'Archive note'"
                 class="rounded p-1.5 text-gray-500 hover:bg-gray-200"
               >
-                <boo-icon [name]="note.isArchived ? 'archive-restore' : 'archive'" [size]="16"></boo-icon>
+                <physio-icon [name]="note.isArchived ? 'archive-restore' : 'archive'" [size]="16"></physio-icon>
               </button>
               <button
                 type="button"
@@ -154,7 +154,7 @@
                 aria-label="Delete note"
                 class="rounded p-1.5 text-gray-500 hover:bg-gray-200 hover:text-red-600"
               >
-                <boo-icon name="trash-2" [size]="16"></boo-icon>
+                <physio-icon name="trash-2" [size]="16"></physio-icon>
               </button>
             </div>
           </div>
@@ -177,7 +177,7 @@
     class="flex max-h-[90vh] w-full sm:max-w-lg flex-col rounded-t-xl sm:rounded-xl bg-surface shadow-xl"
     (click)="$event.stopPropagation()"
   >
-    <div class="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-3">
+    <div class="flex items-center justify-between border-b border-[#EFE3E7] px-4 py-3">
       <h2 class="m-0 text-[16px] font-semibold">{{ d.id ? 'Edit note' : 'New note' }}</h2>
       <button
         type="button"
@@ -187,7 +187,7 @@
         class="rounded p-1.5 hover:bg-gray-100"
         [ngClass]="d.isPinned ? 'text-primary' : 'text-gray-400'"
       >
-        <boo-icon name="pin" [size]="18"></boo-icon>
+        <physio-icon name="pin" [size]="18"></physio-icon>
       </button>
     </div>
 
@@ -199,7 +199,7 @@
         placeholder="Title"
         aria-label="Title"
         autofocus
-        class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
+        class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
       />
       <textarea
         [(ngModel)]="d.content"
@@ -207,12 +207,12 @@
         rows="5"
         placeholder="Take a note..."
         aria-label="Content"
-        class="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-[14px] outline-none focus:border-primary"
+        class="w-full rounded-lg border border-[#EFE3E7] px-3 py-2 text-[14px] outline-none focus:border-primary"
       ></textarea>
 
       <!-- Checklist -->
       <div>
-        <p class="m-0 mb-1 text-[12px] font-semibold text-[#4B5563]">Checklist</p>
+        <p class="m-0 mb-1 text-[12px] font-semibold text-[#71606A]">Checklist</p>
         <ul class="list-none p-0 m-0 space-y-1">
           <li *ngFor="let item of d.checklist; let i = index" class="flex items-center gap-2">
             <input type="checkbox" [(ngModel)]="item.done" [attr.aria-label]="'Done: ' + item.text" class="h-4 w-4" />
@@ -221,11 +221,11 @@
               [(ngModel)]="item.text"
               maxlength="200"
               aria-label="Checklist item"
-              class="flex-1 rounded border border-transparent px-2 min-h-8 text-[13px] outline-none hover:border-[#E5E7EB] focus:border-primary"
-              [ngClass]="item.done ? 'line-through text-[#4B5563]' : ''"
+              class="flex-1 rounded border border-transparent px-2 min-h-8 text-[13px] outline-none hover:border-[#EFE3E7] focus:border-primary"
+              [ngClass]="item.done ? 'line-through text-[#71606A]' : ''"
             />
             <button type="button" (click)="removeItem(i)" [attr.aria-label]="'Remove ' + item.text" class="rounded p-1 text-gray-400 hover:text-red-600">
-              <boo-icon name="x" [size]="14"></boo-icon>
+              <physio-icon name="x" [size]="14"></physio-icon>
             </button>
           </li>
         </ul>
@@ -236,18 +236,18 @@
           maxlength="200"
           placeholder="Add an item and press Enter"
           aria-label="New checklist item"
-          class="mt-1 w-full rounded-lg border border-[#E5E7EB] px-3 min-h-9 text-[13px] outline-none focus:border-primary"
+          class="mt-1 w-full rounded-lg border border-[#EFE3E7] px-3 min-h-9 text-[13px] outline-none focus:border-primary"
         />
       </div>
 
       <!-- Labels -->
       <div>
-        <p class="m-0 mb-1 text-[12px] font-semibold text-[#4B5563]">Labels</p>
+        <p class="m-0 mb-1 text-[12px] font-semibold text-[#71606A]">Labels</p>
         <div class="flex flex-wrap gap-1 pb-1">
           <span *ngFor="let label of d.labels; let i = index" class="flex items-center gap-1 rounded-full bg-gray-200 pl-2 pr-1 text-[12px]">
             {{ label }}
             <button type="button" (click)="removeLabel(i)" [attr.aria-label]="'Remove label ' + label" class="rounded-full p-0.5 hover:bg-gray-300">
-              <boo-icon name="x" [size]="12"></boo-icon>
+              <physio-icon name="x" [size]="12"></physio-icon>
             </button>
           </span>
         </div>
@@ -258,22 +258,22 @@
           maxlength="30"
           placeholder="Add a label and press Enter"
           aria-label="New label"
-          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-9 text-[13px] outline-none focus:border-primary"
+          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-9 text-[13px] outline-none focus:border-primary"
         />
       </div>
 
       <!-- Reminder -->
       <label class="block">
-        <span class="m-0 mb-1 block text-[12px] font-semibold text-[#4B5563]">Reminder</span>
+        <span class="m-0 mb-1 block text-[12px] font-semibold text-[#71606A]">Reminder</span>
         <input
           type="datetime-local"
           [(ngModel)]="d.reminderAt"
-          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-9 text-[13px] outline-none focus:border-primary"
+          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-9 text-[13px] outline-none focus:border-primary"
         />
       </label>
     </div>
 
-    <div class="flex items-center justify-between gap-2 border-t border-[#E5E7EB] px-4 py-3">
+    <div class="flex items-center justify-between gap-2 border-t border-[#EFE3E7] px-4 py-3">
       <button
         *ngIf="d.id"
         type="button"
@@ -284,7 +284,7 @@
       </button>
       <span *ngIf="!d.id"></span>
       <div class="flex items-center gap-2">
-        <button type="button" (click)="closeEditor()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#4B5563] hover:bg-gray-100">
+        <button type="button" (click)="closeEditor()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#71606A] hover:bg-gray-100">
           Cancel
         </button>
         <button

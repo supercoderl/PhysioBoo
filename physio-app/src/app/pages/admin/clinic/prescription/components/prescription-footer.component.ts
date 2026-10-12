@@ -1,15 +1,14 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 
 @Component({
     selector: 'rx-footer',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div class="sticky bottom-0 z-30 bg-surface border-t border-gray-200 shadow-[0_-2px_8px_rgba(0,0,0,0.04)] px-6 py-3 flex items-center justify-end gap-2">
       <span *ngIf="autosaveLabel" class="text-xs text-secondary mr-auto flex items-center gap-1.5">
-        <boo-icon name="cloud" [size]="14"></boo-icon> {{ autosaveLabel }}
+        <physio-icon name="cloud" [size]="14"></physio-icon> {{ autosaveLabel }}
       </span>
       <ng-container *ngIf="editable">
         <button type="button" (click)="saveDraft.emit()" [disabled]="saving"

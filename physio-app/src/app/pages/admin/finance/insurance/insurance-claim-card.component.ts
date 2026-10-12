@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { ClaimPriority, ClaimStatus, InsuranceClaimCard } from "../../../../shared/types/insurance-claims.types";
@@ -40,7 +39,7 @@ const PRIORITY_COLOR: Record<ClaimPriority, string> = {
 @Component({
   selector: 'insurance-claim-card',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, StatusBadgeComponent],
+  imports: [SharedModule,StatusBadgeComponent],
   template: `
     <div
       class="group relative flex gap-0 bg-[var(--ic-ivory)] border rounded-1.5 cursor-pointer transition-all duration-150 overflow-hidden"
@@ -62,7 +61,7 @@ const PRIORITY_COLOR: Record<ClaimPriority, string> = {
         </div>
 
         <div class="flex items-center gap-1.5 text-[11px] text-[var(--ic-warm-gray-700)] mb-1">
-          <boo-icon name="shield" [size]="12" iconClass="text-[var(--ic-olive)]"></boo-icon>
+          <physio-icon name="shield" [size]="12" class="text-[var(--ic-olive)]"></physio-icon>
           <span class="truncate">{{ claim.providerName }}</span>
           <span class="mx-0.5">·</span>
           <span class="font-semibold text-[var(--ic-forest)]">{{ formatAmount(claim.claimAmount) }}</span>
@@ -84,7 +83,7 @@ const PRIORITY_COLOR: Record<ClaimPriority, string> = {
             {{ claim.submissionDate ? ('Submitted ' + (claim.submissionDate | date:'dd/MM/yyyy')) : 'Not submitted' }}
           </span>
           <span *ngIf="claim.missingDocumentsCount > 0" class="inline-flex items-center gap-1 text-[10px] font-semibold text-[var(--ic-amber)]">
-            <boo-icon name="file-warning" [size]="12" iconClass="text-[var(--ic-amber)]"></boo-icon>
+            <physio-icon name="file-warning" [size]="12" class="text-[var(--ic-amber)]"></physio-icon>
             {{ claim.missingDocumentsCount }} missing
           </span>
         </div>
@@ -93,10 +92,10 @@ const PRIORITY_COLOR: Record<ClaimPriority, string> = {
       <!-- Hover quick actions -->
       <div class="absolute top-2 right-2 hidden group-hover:flex items-center gap-1 bg-[var(--ic-ivory)]/95 rounded-1.5 shadow-sm p-0.5" *ngIf="mode !== 'kanban'">
         <button type="button" class="p-1 rounded hover:bg-[var(--ic-warm-gray-200)]" (click)="approve.emit(claim.id); $event.stopPropagation()" aria-label="Approve claim" title="Approve">
-          <boo-icon name="check" [size]="14" iconClass="text-[var(--ic-emerald)]"></boo-icon>
+          <physio-icon name="check" [size]="14" class="text-[var(--ic-emerald)]"></physio-icon>
         </button>
         <button type="button" class="p-1 rounded hover:bg-[var(--ic-warm-gray-200)]" (click)="reject.emit(claim.id); $event.stopPropagation()" aria-label="Reject claim" title="Reject">
-          <boo-icon name="x" [size]="14" iconClass="text-[var(--ic-rose)]"></boo-icon>
+          <physio-icon name="x" [size]="14" class="text-[var(--ic-rose)]"></physio-icon>
         </button>
       </div>
     </div>

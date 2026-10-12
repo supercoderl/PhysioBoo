@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { NursingService } from "../../../../../services/admin/nursing.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
@@ -11,10 +10,10 @@ import { MarEntry } from "../../../../../shared/types/nursing.types";
 @Component({
   selector: 'nursing-mar-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, StatusBadgeComponent],
+  imports: [SharedModule,StatusBadgeComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading()" class="bg-surface border border-gray-200 rounded-lg overflow-hidden">

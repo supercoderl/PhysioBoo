@@ -1,5 +1,4 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
@@ -15,7 +14,7 @@ type ViewMode = 'table' | 'timeline' | 'calendar';
 @Component({
   selector: 'surgery-schedule-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule, BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <div class="flex flex-wrap items-center gap-3">
@@ -33,17 +32,17 @@ type ViewMode = 'table' | 'timeline' | 'calendar';
         <button *ngFor="let v of viewModes" type="button" (click)="viewMode.set(v.key)"
           class="px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1.5"
           [ngClass]="viewMode() === v.key ? 'bg-surface text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'">
-          <boo-icon [name]="v.icon" [size]="14"></boo-icon> {{ v.label }}
+          <physio-icon [name]="v.icon" [size]="14"></physio-icon> {{ v.label }}
         </button>
       </div>
     </div>
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !filtered().length">
-      <boo-empty-state icon="list-filter" title="No surgeries match these filters">
+      <boo-empty-state icon="filter" title="No surgeries match these filters">
         <button (click)="clearFilters()" class="text-primary text-xs font-semibold hover:underline">Clear Filters</button>
       </boo-empty-state>
     </div>
@@ -73,7 +72,7 @@ type ViewMode = 'table' | 'timeline' | 'calendar';
             <td class="px-4 py-3 text-gray-500">{{ s.primarySurgeon }}</td>
             <td class="px-4 py-3">
               <span class="inline-flex items-center gap-1 text-xs font-semibold text-gray-700">{{ s.operatingRoomNumber }}
-                <boo-icon *ngIf="hasConflict(s)" name="alert-triangle" [size]="12" iconClass="text-rose-500"></boo-icon>
+                <physio-icon *ngIf="hasConflict(s)" name="alert-triangle" [size]="12" class="text-rose-500"></physio-icon>
               </span>
             </td>
             <td class="px-4 py-3 text-gray-500">{{ s.scheduledStart | date:'short' }}</td>
@@ -228,7 +227,7 @@ export class SurgeryScheduleTabComponent implements OnInit {
     switch (status) {
       case 'InProgress': return 'rgb(217 119 6)';
       case 'Delayed': case 'Cancelled': return 'rgb(225 29 72)';
-      case 'Recovery': case 'ProcedureCompleted': case 'AnesthesiaStarted': case 'PreOpReady': return 'rgb(99 102 241)';
+      case 'Recovery': case 'ProcedureCompleted': case 'AnesthesiaStarted': case 'PreOpReady': return 'rgb(251 113 133)';
       case 'Discharged': return 'rgb(16 185 129)';
       default: return 'rgb(107 114 128)';
     }

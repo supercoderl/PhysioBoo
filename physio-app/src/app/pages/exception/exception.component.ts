@@ -13,14 +13,14 @@ import { NzResultModule } from 'ng-zorro-antd/result';
     <section class="h-dvh flex-center-center">
       <div class="text-center animate-fade-in bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-2xl p-10 max-w-xl mx-auto shadow-2xl border border-white border-opacity-20">
           <div class="relative mb-6">
-              <span class="text-9xl font-extrabold text-blue-300 block animate-bounce-in leading-none">{{ errorCode }}</span>
+              <span class="text-9xl font-extrabold text-primary/70 block animate-bounce-in leading-none">{{ errorCode }}</span>
           </div>
           <h1 class="text-3xl md:text-4xl font-bold mb-4">{{ getErrorTitle() }}</h1>
           <p class="text-md md:text-xl text-opacity-80 mb-6">
               {{ getErrorSubtitle() }}
           </p>
           <a 
-            class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+            class="inline-block bg-primary hover:bg-primary text-white font-bold py-2 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
             (click)="goHome()"
           >
               Go to Home

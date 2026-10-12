@@ -1,5 +1,4 @@
 import { Component, Input, OnInit, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -20,7 +19,7 @@ const MOVEMENT_ICON: Record<StockMovementType, string> = {
 @Component({
     selector: 'inventory-activity-feed',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, EmptyStateComponent],
+    imports: [SharedModule,EmptyStateComponent],
     template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60">
@@ -29,7 +28,7 @@ const MOVEMENT_ICON: Record<StockMovementType, string> = {
 
       <div class="flex-1 overflow-y-auto p-3">
         <div *ngIf="loading()" class="flex items-center justify-center py-16">
-          <boo-icon name="loader-circle" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+          <physio-icon name="loader-circle" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
         </div>
 
         <boo-empty-state *ngIf="!loading() && !events().length" icon="activity" title="No recent activity"></boo-empty-state>
@@ -37,7 +36,7 @@ const MOVEMENT_ICON: Record<StockMovementType, string> = {
         <div class="space-y-2.5">
           <div *ngFor="let e of events()" class="flex items-start gap-2.5">
             <span class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-              <boo-icon [name]="movementIcon(e.type)" [size]="13" [iconClass]="e.quantity < 0 ? 'text-rose-600' : 'text-emerald-600'"></boo-icon>
+              <physio-icon [name]="movementIcon(e.type)" [size]="13" [class]="e.quantity < 0 ? 'text-rose-600' : 'text-emerald-600'"></physio-icon>
             </span>
             <div class="min-w-0">
               <p class="text-xs text-regular leading-tight">

@@ -8,7 +8,6 @@ import { FilterConfig } from '../../../shared/types/filter.types';
 import { SortOption } from '../../../shared/types/sort';
 import { BulkAction, GroupableColumn, SavedView, TableComment } from '../../../shared/types/table.types';
 import { PHYSIO_BOO_ANIMATION } from '../../../shared/utils/animation.utils';
-import { BooIconComponent } from "../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../input/boo-input/boo-input.component";
 import { PaginationComponent } from "./boo-pagination-admin.component";
 export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
@@ -16,7 +15,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
 @Component({
   selector: 'boo-table-admin',
   standalone: true,
-  imports: [SharedModule, PaginationComponent, BooInputComponent, BooIconComponent],
+  imports: [SharedModule, PaginationComponent, BooInputComponent],
   animations: [
     trigger('rowAnimation', [
       transition(':enter', [
@@ -28,7 +27,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
   styles: [`
     :host { display: block; height: 100%; min-height: 0; }
     .shimmer {
-      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background: linear-gradient(90deg, #f4f4f2 25%, #efe3e7 50%, #f4f4f2 75%);
       background-size: 200% 100%;
       animation: shimmer 1.4s infinite;
     }
@@ -36,16 +35,16 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
-    tr.data-row:hover td { background-color: rgb(239 246 255 / 0.6); }
+    tr.data-row:hover td { background-color: rgb(var(--twc-body)); }
     tr.data-row:hover td:first-child { box-shadow: inset 2px 0 0 0 rgb(var(--twc-primary)); }
     tr.data-row.selected td { background-color: rgb(var(--twc-primary) / 0.08) !important; }
     tr.data-row.selected td:first-child { box-shadow: inset 2px 0 0 0 rgb(var(--twc-primary)); }
-    tbody tr.data-row:nth-child(even) td { background-color: rgb(248 250 252 / 0.5); }
-    tbody tr.data-row:nth-child(even):hover td { background-color: rgb(239 246 255 / 0.6); }
-    tbody tr.padding-row td { border-bottom: 1px solid rgb(241 245 249 / 0.6); pointer-events: none; }
-    tbody tr.padding-row:nth-child(even) td { background-color: rgb(248 250 252 / 0.5); }
+    tbody tr.data-row:nth-child(even) td { background-color: transparent; }
+    tbody tr.data-row:nth-child(even):hover td { background-color: rgb(var(--twc-body)); }
+    tbody tr.padding-row td { border-bottom: 1px solid rgb(var(--twc-row-divider)); pointer-events: none; }
+    tbody tr.padding-row:nth-child(even) td { background-color: transparent; }
     tbody tr.padding-row:last-child td { border-bottom: 0; }
-    thead th { border-bottom: 1.5px solid #e2e8f0; }
+    thead th { border-bottom: 1px solid rgb(var(--twc-border)); }
     .bulk-bar-enter { animation: bulkBarIn 180ms cubic-bezier(0.4, 0, 0.2, 1); }
     @keyframes bulkBarIn {
       from { opacity: 0; transform: translateY(-4px); }
@@ -96,7 +95,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
       background: color-mix(in srgb, rgb(var(--twc-primary)) 80%, black);
     }
     .batch-bar .action-btn:active:not(:disabled) {
-      background: #0a3d8a;
+      background: #9F1239;
     }
     .batch-bar .action-btn:focus-visible {
       outline: 2px solid #fff;
@@ -158,13 +157,13 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
       width: 16px;
       height: 16px;
       border-radius: 4px;
-      border: 1.5px solid #cbd5e1;
+      border: 1.5px solid #E3D5DA;
       background: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
-      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
+      box-shadow: 0 1px 0 rgba(38, 20, 26, 0.02);
     }
     .boo-checkbox:hover .box {
       border-color: rgb(var(--twc-primary));
@@ -203,8 +202,8 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
       opacity: 0;
     }
     .boo-checkbox input:disabled ~ .box {
-      background: #f1f5f9;
-      border-color: #e2e8f0;
+      background: #FAF1F3;
+      border-color: #EFE3E7;
       cursor: not-allowed;
     }
   `],
@@ -212,13 +211,13 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
     <div class="flex flex-col h-full bg-surface overflow-hidden border border-gray-200 shadow-sm">
 
       <!-- ── Toolbar ─────────────────────────────────────────────────── -->
-      <div class="flex-none relative w-full border-b border-gray-100 bg-surface" style="height: 48px;">
+      <div class="flex-none relative w-full border-b border-borderGray bg-surface" style="height: 48px;">
         <!-- Default toolbar (Lark-style) -->
         <div class="flex items-center justify-between h-12 px-3 gap-2">
           <!-- Left: breadcrumb + Add record + tool icons -->
           <div class="flex items-center min-w-0">
             <button *ngIf="showCollapse" [class]="toolBtn" title="Collapse sidebar" (click)="collapseToggle.emit()">
-              <boo-icon name="chevrons-left" iconClass="w-4 h-4" />
+              <physio-icon name="chevrons-left" class="w-4 h-4" />
             </button>
 
             <div *ngIf="title || subtitle" class="inline-flex items-center gap-1.5 text-[13px] text-slate-600 px-1.5">
@@ -226,9 +225,9 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
               <span *ngIf="title && subtitle" class="text-slate-300">/</span>
               <span *ngIf="subtitle"
                 class="inline-flex items-center gap-1 text-slate-900 font-medium px-1.5 py-1 rounded cursor-pointer hover:bg-slate-100">
-                <boo-icon name="table-2" iconClass="w-3.5 h-3.5" />
+                <physio-icon name="table-2" class="w-3.5 h-3.5" />
                 <span>{{ subtitle }}</span>
-                <boo-icon name="chevron-down" iconClass="w-3 h-3" />
+                <physio-icon name="chevron-down" class="w-3 h-3" />
               </span>
             </div>
 
@@ -236,7 +235,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
               class="inline-flex items-center gap-1 h-7 pl-2 pr-2.5 text-[13px] font-medium text-primary rounded transition-colors hover:bg-primary/10"
               (click)="addRecord.emit()"
             >
-              <boo-icon name="plus" iconClass="w-4 h-4" />
+              <physio-icon name="plus" class="w-4 h-4" />
               <span>Add record</span>
             </button>
 
@@ -244,22 +243,22 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
 
             <div class="flex items-center gap-0.5">
               <button *ngIf="availableTools.includes('settings')" [class]="toolBtnCls('settings')" title="View settings" (click)="onToolClick('settings')">
-                <boo-icon name="settings" iconClass="w-4 h-4" />
+                <physio-icon name="settings" class="w-4 h-4" />
               </button>
               <button *ngIf="availableTools.includes('filter')" [class]="toolBtnCls('filter')" title="Filter" (click)="onToolClick('filter')">
-                <boo-icon name="list-filter" iconClass="w-4 h-4" />
+                <physio-icon name="filter" class="w-4 h-4" />
               </button>
               <button *ngIf="availableTools.includes('view')" [class]="toolBtnCls('view')" title="View" (click)="onToolClick('view')">
-                <boo-icon name="rows-4" iconClass="w-4 h-4" />
+                <physio-icon name="grid" class="w-4 h-4" />
               </button>
               <button *ngIf="availableTools.includes('sort')" [class]="toolBtnCls('sort')" title="Sort" (click)="onToolClick('sort')">
-                <boo-icon name="arrow-down-narrow-wide" iconClass="w-4 h-4" />
+                <physio-icon name="arrow-down-narrow-wide" class="w-4 h-4" />
               </button>
               <button *ngIf="availableTools.includes('group')" [class]="toolBtnCls('group')" title="Group" (click)="onToolClick('group')">
-                <boo-icon name="layers" iconClass="w-4 h-4" />
+                <physio-icon name="layers" class="w-4 h-4" />
               </button>
               <button *ngIf="availableTools.includes('comment')" [class]="toolBtnCls('comment')" title="Comment" (click)="onToolClick('comment')">
-                <boo-icon name="message-square" iconClass="w-4 h-4" />
+                <physio-icon name="send-square" class="w-4 h-4" />
                 <span *ngIf="comments.length"
                   class="ml-0.5 text-[10px] font-semibold text-gray-700">{{ comments.length }}</span>
               </button>
@@ -270,21 +269,21 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
           <div class="flex items-center shrink-0">
             <span class="w-px h-[18px] bg-gray-200 mx-1.5"></span>
             <button [class]="toolBtn" title="Reload" (click)="onReload()">
-              <boo-icon
+              <physio-icon
                 [class.animate-spin]="loading"
-                [name]="loading ? 'loader-circle' : 'refresh-cw'"
-                iconClass="w-4 h-4"
+                [name]="loading ? 'loader-circle' : 'refresh'"
+              class="w-4 h-4"
               />
             </button>
 
             <div class="inline-flex items-center overflow-hidden transition-[width] duration-200"
               [class.w-7]="!searchExpanded" [class.w-56]="searchExpanded">
               <button *ngIf="!searchExpanded" [class]="toolBtn" title="Search" (click)="searchExpanded = true">
-                <boo-icon name="search" iconClass="w-4 h-4" />
+                <physio-icon name="search" class="w-4 h-4" />
               </button>
               <div *ngIf="searchExpanded" class="w-full flex items-center pl-1">
                 <boo-input label="Search..." size="small" (search)="onSearch($event)" (blur)="onSearchBlur()">
-                  <boo-icon name="search" color="#64748B" endfix />
+                  <physio-icon name="search" endfix class="text-[#85757D]" />
                 </boo-input>
               </div>
             </div>
@@ -307,7 +306,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
               (click)="runBulkAction(action)"
             >
               <span>{{ action.label }}</span>
-              <boo-icon *ngIf="action.icon" [name]="action.icon" iconClass="w-4 h-4" color="#fff" />
+              <physio-icon *ngIf="action.icon" [name]="action.icon" class="w-4 h-4 text-white" />
             </button>
             <button class="action-btn cancel-btn" (click)="clearSelection()">
               <span>Cancel</span>
@@ -330,7 +329,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                 [class.font-medium]="currentSort === opt.value"
                 (click)="applySort(opt)">
                 <span>{{ opt.label }}</span>
-                <boo-icon *ngIf="currentSort === opt.value" name="check" iconClass="w-4 h-4" />
+                <physio-icon *ngIf="currentSort === opt.value" name="check" class="w-4 h-4" />
               </button>
             </ng-container>
             <ng-template #emptySort>
@@ -366,7 +365,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
             <div class="border-t border-gray-100 mt-1 pt-1">
               <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50"
                 (click)="onResetView()">
-                <boo-icon name="rotate-ccw" iconClass="w-4 h-4" />
+                <physio-icon name="rotate-ccw" class="w-4 h-4" />
                 <span>Reset view</span>
               </button>
             </div>
@@ -381,7 +380,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                 class="group flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50 cursor-pointer"
                 (click)="pickView(v)">
                 <div class="flex items-center gap-2 min-w-0">
-                  <boo-icon [name]="v.icon || 'rows-4'" iconClass="w-3.5 h-3.5 text-slate-400" />
+                  <physio-icon [name]="v.icon || 'rows-4'" class="w-3.5 h-3.5 text-placeholder" />
                   <span class="truncate" [class.text-primary]="currentViewId === v.id"
                     [class.font-medium]="currentViewId === v.id">{{ v.name }}</span>
                   <span *ngIf="v.isDefault" class="text-[10px] text-slate-400 uppercase">default</span>
@@ -389,7 +388,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                 <button *ngIf="!v.isDefault"
                   class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 p-0.5 rounded"
                   (click)="$event.stopPropagation(); deleteView(v)">
-                  <boo-icon name="trash-2" iconClass="w-3.5 h-3.5" />
+                  <physio-icon name="trash-2" class="w-3.5 h-3.5" />
                 </button>
               </div>
             </ng-container>
@@ -399,7 +398,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
             <div class="border-t border-gray-100 mt-1 pt-1">
               <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-primary/5"
                 (click)="onSaveAsNewView()">
-                <boo-icon name="plus" iconClass="w-4 h-4" />
+                <physio-icon name="plus" class="w-4 h-4" />
                 <span>Save current view as…</span>
               </button>
             </div>
@@ -412,7 +411,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
             <button class="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50"
               (click)="pickGroup(null)">
               <span>No grouping</span>
-              <boo-icon *ngIf="!currentGroupBy" name="check" iconClass="w-4 h-4 text-primary" />
+              <physio-icon *ngIf="!currentGroupBy" name="check" class="w-4 h-4 text-primary" />
             </button>
             <ng-container *ngIf="groupableColumns.length; else emptyGroups">
               <button *ngFor="let col of groupableColumns"
@@ -421,7 +420,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                 [class.font-medium]="currentGroupBy === col.key"
                 (click)="pickGroup(col.key)">
                 <span>{{ col.label }}</span>
-                <boo-icon *ngIf="currentGroupBy === col.key" name="check" iconClass="w-4 h-4" />
+                <physio-icon *ngIf="currentGroupBy === col.key" name="check" class="w-4 h-4" />
               </button>
             </ng-container>
             <ng-template #emptyGroups>
@@ -451,7 +450,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                   </div>
                   <button class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 p-0.5"
                     (click)="commentDelete.emit(c)">
-                    <boo-icon name="trash-2" iconClass="w-3 h-3" />
+                    <physio-icon name="trash-2" class="w-3 h-3" />
                   </button>
                 </div>
               </ng-container>
@@ -485,19 +484,20 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                 <button class="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50"
                   (click)="applyFilter(cfg, null)">
                   <span>All</span>
-                  <boo-icon *ngIf="getFilterValue(cfg.key) === null || getFilterValue(cfg.key) === undefined"
-                    name="check" iconClass="w-4 h-4 text-primary" />
+                  <physio-icon *ngIf="getFilterValue(cfg.key) === null || getFilterValue(cfg.key) === undefined"
+                    name="check"
+                    class="w-4 h-4 text-primary" />
                 </button>
                 <ng-container *ngIf="cfg.type === 'boolean'">
                   <button class="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50"
                     (click)="applyFilter(cfg, true)">
                     <span>{{ cfg.trueLabel || 'True' }}</span>
-                    <boo-icon *ngIf="getFilterValue(cfg.key) === true" name="check" iconClass="w-4 h-4 text-primary" />
+                    <physio-icon *ngIf="getFilterValue(cfg.key) === true" name="check" class="w-4 h-4 text-primary" />
                   </button>
                   <button class="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50"
                     (click)="applyFilter(cfg, false)">
                     <span>{{ cfg.falseLabel || 'False' }}</span>
-                    <boo-icon *ngIf="getFilterValue(cfg.key) === false" name="check" iconClass="w-4 h-4 text-primary" />
+                    <physio-icon *ngIf="getFilterValue(cfg.key) === false" name="check" class="w-4 h-4 text-primary" />
                   </button>
                 </ng-container>
                 <ng-container *ngIf="cfg.type === 'select'">
@@ -505,7 +505,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                     class="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50"
                     (click)="applyFilter(cfg, opt.value)">
                     <span>{{ opt.label }}</span>
-                    <boo-icon *ngIf="getFilterValue(cfg.key) === opt.value" name="check" iconClass="w-4 h-4 text-primary" />
+                    <physio-icon *ngIf="getFilterValue(cfg.key) === opt.value" name="check" class="w-4 h-4 text-primary" />
                   </button>
                 </ng-container>
               </div>
@@ -518,18 +518,18 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
       </div>
 
       <!-- ── Table scroll area ─────────────────────────────────────────── -->
-      <div #scrollArea class="flex-1 min-h-0 w-full overflow-auto relative">
+      <div #scrollArea custom-scrollbar class="flex-1 min-h-0 w-full overflow-auto relative">
         <table class="w-full table-auto border-separate" style="border-spacing: 0;">
 
           <!-- Header -->
           <thead
             *ngIf="showHeader && columnsArray.length > 0"
-            class="bg-gray-50/80 backdrop-blur-sm sticky top-0 z-10"
+            class="bg-surface sticky top-0 z-10"
           >
             <tr cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="drop($event)">
               <th
                 *ngFor="let col of columnsArray; let i = index"
-                class="group p-0 h-12 bg-slate-50 border-b border-gray-200 border-r border-slate-100/70 select-none"
+                class="group p-0 h-12 bg-surface border-b border-borderGray select-none"
                 [ngClass]="col.headerClass"
                 [style.width]="col.width"
                 [style.min-width]="col.width"
@@ -553,42 +553,42 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                   </label>
                 </div>
 
-                <div *ngIf="col.type !== 'checkbox'" class="flex items-center gap-1.5 h-12 px-2.5 text-xs font-medium text-slate-600 normal-case tracking-normal">
-                  <boo-icon
+                <div *ngIf="col.type !== 'checkbox'" class="flex items-center gap-1.5 h-12 px-2.5 text-xs font-medium text-placeholder normal-case tracking-normal">
+                  <physio-icon
                     *ngIf="col.typeIcon"
                     [name]="col.typeIcon"
-                    iconClass="w-3.5 h-3.5 text-slate-400"
+                  class="w-3.5 h-3.5 text-placeholder"
                   />
                   <span class="flex-1 min-w-0 truncate">{{ col.headerLabel }}</span>
                   <button
                     *ngIf="col.sortable"
                     (click)="handleSort(col.name)"
-                    class="p-0.5 rounded text-slate-400 hover:bg-slate-200 transition-opacity opacity-0 group-hover:opacity-100"
+                    class="p-0.5 rounded text-placeholder hover:bg-rowDivider transition-opacity opacity-0 group-hover:opacity-100"
                     [class.!opacity-100]="sortConfig.key === col.name"
                     [title]="sortConfig.key === col.name ? (sortConfig.direction === 'asc' ? 'Sort desc' : 'Sort asc') : 'Sort'"
                   >
-                    <boo-icon
+                    <physio-icon
                       [name]="sortConfig.key === col.name ? (sortConfig.direction === 'asc' ? 'arrow-up' : 'arrow-down') : 'chevron-down'"
-                      iconClass="w-3 h-3"
+                    class="w-3 h-3"
                     />
                   </button>
                 </div>
               </th>
               <th
                 *ngIf="showAddColumn"
-                class="w-10 h-12 p-0 bg-slate-50 border-b border-gray-200 cursor-pointer hover:bg-slate-100 transition-colors"
+                class="w-10 h-12 p-0 bg-surface border-b border-borderGray cursor-pointer hover:bg-rowDivider transition-colors"
                 (click)="addColumn.emit()"
                 title="Add column"
               >
-                <div class="flex items-center justify-center h-12 text-slate-400">
-                  <boo-icon name="plus" iconClass="w-4 h-4" />
+                <div class="flex items-center justify-center h-12 text-placeholder">
+                  <physio-icon name="plus" class="w-4 h-4" />
                 </div>
               </th>
             </tr>
           </thead>
 
           <!-- Body -->
-          <tbody class="bg-surface relative divide-y divide-gray-100">
+          <tbody class="bg-surface relative divide-y divide-rowDivider">
             <!-- Skeleton -->
             @if (loading) {
               @for (item of skeletonRows; track $index) {
@@ -611,7 +611,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                     <td [attr.colspan]="columnsArray.length + (showAddColumn ? 1 : 0)"
                       class="px-3 py-1.5 text-xs font-semibold text-slate-700 border-b border-gray-200">
                       <div class="flex items-center gap-1.5">
-                        <boo-icon [name]="collapsedGroups.has(group.key) ? 'chevron-right' : 'chevron-down'" iconClass="w-3.5 h-3.5 text-slate-500" />
+                        <physio-icon [name]="collapsedGroups.has(group.key) ? 'chevron-right' : 'chevron-down'" class="w-3.5 h-3.5 text-slate-500" />
                         <span>{{ group.label }}</span>
                         <span class="text-slate-400 font-normal">({{ group.rows.length }})</span>
                       </div>
@@ -698,7 +698,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
         <div *ngIf="!loading && data.length === 0"
           class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6">
           <div class="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
-            <boo-icon name="rows-4"></boo-icon>
+            <physio-icon name="grid"></physio-icon>
           </div>
           <div>
             <p class="text-sm font-semibold text-gray-500 mb-0.5">No records found</p>

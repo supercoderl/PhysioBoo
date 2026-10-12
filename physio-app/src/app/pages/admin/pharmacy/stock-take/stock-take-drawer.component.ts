@@ -4,7 +4,6 @@ import { firstValueFrom } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
@@ -25,7 +24,6 @@ import { LoadingKeys } from "../../../../shared/types/loading";
         SharedModule,
         DrawerComponent,
         BooInputComponent,
-        BooIconComponent,
         BooTextareaComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
@@ -40,7 +38,7 @@ import { LoadingKeys } from "../../../../shared/types/loading";
             <p class="text-sm text-secondary m-0">Define the scope and schedule for this inventory count</p>
           </div>
           <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors" aria-label="Close">
-            <boo-icon name="x" [size]="20"></boo-icon>
+            <physio-icon name="x" [size]="20"></physio-icon>
           </button>
         </div>
 

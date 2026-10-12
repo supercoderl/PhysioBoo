@@ -26,7 +26,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                         <div class="mb-4 text-center">
                             <button 
                                 type="button" 
-                                class="group left-[45%] md:left-[48%] -translate-x-1/2 w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth flex-center-center hover:bg-blue-500"
+                                class="group left-[45%] md:left-[48%] -translate-x-1/2 w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth flex-center-center hover:bg-primary"
                                   (click)="slickModal.slickPrev()"
                             >
                                 <lucide-angular [img]="ChevronLeft" class="font-black group-hover:stroke-white" />
@@ -44,7 +44,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 @for (slide of slides; track slide.img) {
                                     <div ngxSlickItem class="px-3">
                                         <div
-                                            class="w-full inline-block border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 rounded-2.5 relative"
+                                            class="w-full inline-block border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 rounded-2.5 relative"
                                         >
                                             <div class="transition-smooth overflow-hidden rounded-t-2.5 rounded-r-2.5 w-full">
                                                 <a
@@ -73,10 +73,10 @@ import { SharedModule } from "../../../shared/shared-imports";
                                             </div>
                                             <div>
                                                 <div
-                                                    class="flex-center-between relative p-4 after:bg-[#110efd] after:content-[''] after:w-[2px] after:h-7.5 after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2"
+                                                    class="flex-center-between relative p-4 after:bg-[#E11D48] after:content-[''] after:w-[2px] after:h-7.5 after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2"
                                                 >
                                                     <a
-                                                        class="text-[#3538cd] text-[0.875rem] font-medium transition-smooth"
+                                                        class="text-[#E11D48] text-[0.875rem] font-medium transition-smooth"
                                                         href="https://doccure.dreamstechnologies.com/react/template/index"
                                                     >
                                                         Pediatrician
@@ -130,7 +130,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                         <div class="mt-4 text-center">
                             <button 
                                 type="button" 
-                                class="group left-[55%] md:left-[52%] -translate-x-1/2 ml-3 w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary m-0 absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth flex-center-center hover:bg-blue-500"
+                                class="group left-[55%] md:left-[52%] -translate-x-1/2 ml-3 w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary m-0 absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth flex-center-center hover:bg-primary"
                                 (click)="slickModal.slickNext()"
                             >
                                 <lucide-angular [img]="ChevronRight" class="font-black group-hover:stroke-white" />

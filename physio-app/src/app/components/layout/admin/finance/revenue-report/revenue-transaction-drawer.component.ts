@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { RevenueTransactionDetail } from "../../../../../shared/types/revenue.types";
@@ -7,7 +6,7 @@ import { RevenueTransactionDetail } from "../../../../../shared/types/revenue.ty
 @Component({
     selector: 'revenue-transaction-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooIconComponent],
+    imports: [SharedModule, DrawerComponent],
     template: `
     <drawer [isOpen]="isOpen" [isShowDialog]="false" [width]="440" (close)="close.emit()">
       <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
@@ -16,7 +15,7 @@ import { RevenueTransactionDetail } from "../../../../../shared/types/revenue.ty
           <p class="text-xs text-secondary" *ngIf="detail as d">{{ d.billNo }}</p>
         </div>
         <button type="button" (click)="close.emit()" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center">
-          <boo-icon name="x" [size]="16" iconClass="text-gray-500"></boo-icon>
+          <physio-icon name="x" [size]="16" class="text-gray-500"></physio-icon>
         </button>
       </div>
 
@@ -28,7 +27,7 @@ import { RevenueTransactionDetail } from "../../../../../shared/types/revenue.ty
 
       <div class="p-5" *ngIf="!loading && !detail">
         <div class="h-[200px] flex flex-col items-center justify-center text-center gap-2">
-          <boo-icon name="file-search" [size]="28" iconClass="text-gray-300"></boo-icon>
+          <physio-icon name="file-search" [size]="28" class="text-gray-300"></physio-icon>
           <p class="text-sm text-secondary">Select a transaction to view details.</p>
         </div>
       </div>

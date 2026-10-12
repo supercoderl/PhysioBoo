@@ -1,12 +1,11 @@
 import { Component, Input, computed, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PrescriptionRow, PrescriptionStatus } from "../../../../../shared/types/medical-record.types";
 
 @Component({
   selector: 'mr-prescriptions-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div class="space-y-3">
       <!-- Filter chips -->
@@ -32,7 +31,7 @@ import { PrescriptionRow, PrescriptionStatus } from "../../../../../shared/types
               </span>
               <span *ngIf="rx.items[0]?.isControlledSubstance"
                 class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-red-50 text-red-700 inline-flex items-center gap-1">
-                <boo-icon name="alert-triangle" iconClass="w-3 h-3"></boo-icon>
+                <physio-icon name="alert-triangle" class="w-3 h-3"></physio-icon>
                 Controlled
               </span>
             </div>
@@ -64,7 +63,7 @@ import { PrescriptionRow, PrescriptionStatus } from "../../../../../shared/types
                   <div class="font-medium text-primary">{{ i.medicineName }}<span *ngIf="i.strength" class="text-secondary font-normal"> · {{ i.strength }}</span></div>
                   <div *ngIf="i.genericName && i.genericName !== i.medicineName" class="text-xs text-secondary italic">{{ i.genericName }}</div>
                   <div *ngIf="i.specialInstructions" class="text-xs text-amber-700 mt-0.5 inline-flex items-center gap-1">
-                    <boo-icon name="info" iconClass="w-3 h-3"></boo-icon>
+                    <physio-icon name="info" class="w-3 h-3"></physio-icon>
                     {{ i.specialInstructions }}
                   </div>
                 </td>
@@ -117,7 +116,7 @@ export class PrescriptionsTabComponent {
   statusClass(s: PrescriptionStatus) {
     switch (s) {
       case 'Active': return 'bg-emerald-50 text-emerald-700';
-      case 'Dispensed': return 'bg-blue-50 text-blue-700';
+      case 'Dispensed': return 'bg-primarySoft text-primaryHover';
       case 'PartiallyDispensed': return 'bg-amber-50 text-amber-700';
       case 'Expired': return 'bg-gray-100 text-gray-500';
       case 'Cancelled': return 'bg-red-50 text-red-600';

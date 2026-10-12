@@ -1,5 +1,4 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
@@ -14,7 +13,7 @@ type ResultMode = 'All' | 'Favorites' | 'Recent';
 @Component({
     selector: 'inventory-explorer-panel',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, EmptyStateComponent, StatusBadgeComponent, WarehouseHeatMapComponent],
+    imports: [SharedModule,EmptyStateComponent, StatusBadgeComponent, WarehouseHeatMapComponent],
     template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 space-y-2">
@@ -33,12 +32,12 @@ type ResultMode = 'All' | 'Favorites' | 'Recent';
 
         <div class="flex items-center gap-2">
           <div class="flex-1 relative">
-            <boo-icon name="search" [size]="14" iconClass="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"></boo-icon>
+            <physio-icon name="search" [size]="14" [class]="'absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
             <input #searchInput type="text" [(ngModel)]="query" placeholder="Search medicine or generic name..."
               class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary" />
           </div>
           <div class="relative">
-            <boo-icon name="scan-barcode" [size]="14" iconClass="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"></boo-icon>
+            <physio-icon name="scan-barcode" [size]="14" [class]="'absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
             <input #barcodeInput type="text" [(ngModel)]="barcode" (keyup.enter)="scanBarcode()" placeholder="Scan barcode"
               class="pl-8 pr-2 py-1.5 w-32 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary" />
           </div>
@@ -48,7 +47,7 @@ type ResultMode = 'All' | 'Favorites' | 'Recent';
           <button type="button" *ngFor="let c of categories()" (click)="activeCategory.set(c.value)"
             class="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold border flex items-center gap-1"
             [ngClass]="activeCategory() === c.value ? 'bg-primary/10 border-primary text-primary' : 'border-gray-200 text-gray-600 hover:border-gray-300'">
-            <boo-icon [name]="c.icon" [size]="12"></boo-icon> {{ c.label }}
+            <physio-icon [name]="c.icon" [size]="12"></physio-icon> {{ c.label }}
           </button>
         </div>
 
@@ -62,7 +61,7 @@ type ResultMode = 'All' | 'Favorites' | 'Recent';
 
       <div class="flex-1 overflow-y-auto p-3">
         <div *ngIf="loading()" class="flex items-center justify-center py-16">
-          <boo-icon name="loader-circle" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+          <physio-icon name="loader-circle" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
         </div>
 
         <warehouse-heatmap *ngIf="!loading() && view() === 'HeatMap'" [zones]="zones()" (selectZone)="onSelectZone($event)"></warehouse-heatmap>
@@ -78,7 +77,7 @@ type ResultMode = 'All' | 'Favorites' | 'Recent';
               [ngClass]="selectedId === med.id ? 'border-primary bg-primary/5' : 'border-borderGray/60'">
               <div class="flex items-center justify-between">
                 <p class="text-xs font-semibold text-regular leading-tight">{{ med.name }}</p>
-                <boo-icon *ngIf="med.isFavorite" name="star" [size]="12" iconClass="text-amber-500"></boo-icon>
+                <physio-icon *ngIf="med.isFavorite" name="star" [size]="12" class="text-amber-500"></physio-icon>
               </div>
               <p class="text-[11px] text-secondary">{{ med.genericName }}</p>
               <div class="flex items-center justify-between">
@@ -89,7 +88,7 @@ type ResultMode = 'All' | 'Favorites' | 'Recent';
               <div class="flex items-center justify-between text-[10px] text-secondary">
                 <span>{{ med.batchCount }} batch(es)</span>
                 <span *ngIf="med.isNearExpiry" class="text-amber-600 font-semibold flex items-center gap-0.5">
-                  <boo-icon name="calendar-clock" [size]="10"></boo-icon> Exp {{ med.soonestExpiryDate }}
+                  <physio-icon name="calendar-clock" [size]="10"></physio-icon> Exp {{ med.soonestExpiryDate }}
                 </span>
               </div>
               <p class="text-[10px] text-secondary truncate">{{ med.storageLocation }}</p>

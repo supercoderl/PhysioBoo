@@ -22,13 +22,13 @@ export function htmlTable(headers: string[], rows: unknown[][]): string {
 
 const BASE_STYLES = `
   * { box-sizing: border-box; }
-  body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: #111827; margin: 24px; font-size: 12px; }
+  body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: #26141A; margin: 24px; font-size: 12px; }
   h1 { font-size: 18px; margin: 0 0 4px; }
-  h2 { font-size: 14px; margin: 20px 0 6px; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; }
-  .muted { color: #6b7280; }
+  h2 { font-size: 14px; margin: 20px 0 6px; border-bottom: 1px solid #EFE3E7; padding-bottom: 4px; }
+  .muted { color: #85757D; }
   table { width: 100%; border-collapse: collapse; margin-top: 4px; }
-  th, td { text-align: left; padding: 5px 6px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
-  th { background: #f9fafb; font-weight: 600; }
+  th, td { text-align: left; padding: 5px 6px; border-bottom: 1px solid #EFE3E7; vertical-align: top; }
+  th { background: #FDF8F9; font-weight: 600; }
   .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 24px; }
   @page { margin: 14mm; }
 `;

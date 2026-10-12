@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -8,12 +7,12 @@ import { RxDiagnosisEntry } from "../../../../../shared/types/prescription-rx.ty
 @Component({
     selector: 'rx-diagnosis-section',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, BooInputComponent, BooTextareaComponent],
+    imports: [SharedModule,BooInputComponent, BooTextareaComponent],
     template: `
     <div class="bg-surface border border-gray-200 rounded-lg">
       <button type="button" class="w-full px-5 py-3 flex items-center justify-between" (click)="expanded = !expanded">
         <h2 class="text-sm font-bold text-primary uppercase tracking-wider">Diagnosis</h2>
-        <boo-icon [name]="expanded ? 'chevron-up' : 'chevron-down'" [size]="16" class="text-secondary"></boo-icon>
+        <physio-icon [name]="expanded ? 'chevron-up' : 'chevron-down'" [size]="16" class="text-secondary"></physio-icon>
       </button>
 
       <div *ngIf="expanded" class="px-5 pb-5 space-y-4">
@@ -24,7 +23,7 @@ import { RxDiagnosisEntry } from "../../../../../shared/types/prescription-rx.ty
             <span class="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-3 py-1.5 rounded-lg">
               {{ primaryDiagnosis.code }} — {{ primaryDiagnosis.description }}
               <button *ngIf="editable" type="button" (click)="removePrimary()" class="text-primary/60 hover:text-primary">
-                <boo-icon name="x" [size]="14"></boo-icon>
+                <physio-icon name="x" [size]="14"></physio-icon>
               </button>
             </span>
           </div>
@@ -44,7 +43,7 @@ import { RxDiagnosisEntry } from "../../../../../shared/types/prescription-rx.ty
             <span *ngFor="let d of secondaryDiagnoses; let i = index" class="inline-flex items-center gap-2 bg-gray-100 text-secondary text-sm px-3 py-1.5 rounded-lg">
               {{ d.code }} — {{ d.description }}
               <button *ngIf="editable" type="button" (click)="removeSecondary(i)" class="text-secondary/70 hover:text-secondary">
-                <boo-icon name="x" [size]="14"></boo-icon>
+                <physio-icon name="x" [size]="14"></physio-icon>
               </button>
             </span>
           </div>

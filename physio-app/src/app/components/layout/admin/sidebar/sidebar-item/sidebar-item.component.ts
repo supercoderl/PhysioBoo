@@ -13,13 +13,12 @@ import { MenuItem } from '../../../../../shared/types/menu.types';
   template: `
     <a
       class="group mb-0.5 flex w-full items-center justify-start gap-2.5 rounded-1.5 px-2.5 py-2 relative cursor-pointer text-[13px] transition-all duration-200"
-      [class.bg-primary]="isActive && !item.children"
-      [class.bg-opacity-10]="isActive && !item.children"
-      [class.text-primary]="isActive"
-      [class.font-medium]="isActive"
-      [class.text-regular]="!isActive"
-      [class.hover:bg-gray-100]="!isActive"
-      [routerLink]="item.children ? null : (['/admin'].concat(item.route.split('/') || []))"
+      [class.bg-sidebarActive]="isActive && !item.children"
+      [class.text-primaryHover]="isActive"
+      [class.font-semibold]="isActive"
+      [class.text-brandDark]="!isActive"
+      [class.hover:bg-sidebarHover]="!isActive"
+      [routerLink]="item.children ? null : linkFor(item.route)"
       routerLinkActive
       #rla="routerLinkActive"
       (isActiveChange)="onActiveChange($event)"
@@ -32,8 +31,8 @@ import { MenuItem } from '../../../../../shared/types/menu.types';
       <lucide-icon
         *ngIf="item.icon"
         [name]="item.icon"
-        [class.stroke-primary]="isActive"
-        [class.stroke-regular]="!isActive"
+        [class.stroke-primaryHover]="isActive"
+        [class.stroke-brandDark]="!isActive"
         class="w-4 h-4 shrink-0"
       ></lucide-icon>
       <div class="flex min-w-0 flex-auto flex-col items-start gap-1">
@@ -52,7 +51,7 @@ import { MenuItem } from '../../../../../shared/types/menu.types';
     <div
         *ngIf="item.children"
         [ngClass]="{
-            'ml-3.5 pl-2 border-l border-borderGray/60 flex flex-col transition-all duration-300 overflow-hidden': true,
+            'ml-3.5 pl-2 border-l border-sidebarDivider flex flex-col transition-all duration-300 overflow-hidden': true,
             'max-h-0 opacity-0': !expanded,
             'max-h-[1000px] opacity-100 mt-0.5': expanded
         }"
@@ -79,6 +78,11 @@ export class SidebarItemComponent implements OnInit {
     if (this.item.children) {
       this.expanded = this.hasActiveDescendant(this.item.children);
     }
+  }
+
+  /** Superadmin routes are absolute; admin routes are stored relative to `/admin`. */
+  linkFor(route: string): string | string[] {
+    return route.startsWith('/superadmin') ? route : ['/admin'].concat(route.split('/') || []);
   }
 
   toggle(event: Event): void {

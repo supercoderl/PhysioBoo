@@ -11,7 +11,7 @@ import { Search } from "lucide-angular";
     template: `
         <div class="px-3">
             <div class="sticky top-0">
-                <div class="border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 rounded-[10px] flex relative">
+                <div class="border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 rounded-[10px] flex relative">
                     <div class="p-5 flex-1">
                         <form>
                             <div class="border border-solid border-borderGray rounded-[10px] min-h-14 p-2 relative flex flex-wrap items-stretch w-full">
@@ -20,14 +20,14 @@ import { Search } from "lucide-angular";
                                     class="pl-2 relative flex-1 w-[1%] text-primary min-h-9.5 bg-surface text-xs14 leading-[1.6] rounded-[5px] py-1.75 px-3.75 transition-smooth block"
                                     type="text"
                                 />
-                                <button type="submit" class="w-10 h-10 text-base rounded-[5px] flex-center-center bg-[linear-gradient(90.08deg,#0e82fd_.09%,#06aed4_70.28%)] text-white relative overflow-hidden z-[1] bg-secondary border border-solid border-secondary cursor-pointer font-medium transition-smooth">
+                                <button type="submit" class="w-10 h-10 text-base rounded-[5px] flex-center-center bg-[linear-gradient(90.08deg,#E11D48_.09%,#06aed4_70.28%)] text-white relative overflow-hidden z-[1] bg-secondary border border-solid border-secondary cursor-pointer font-medium transition-smooth">
                                     <lucide-angular [img]="Search" class="w-4 stroke-white" />
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
-                <div class="border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 rounded-[10px] flex relative">
+                <div class="border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 rounded-[10px] flex relative">
                     <div class="p-5 flex-1">
                         <h5 class="mb-4 text-[20px] font-semibold text-primary leading-[1.2]">Latest News</h5>
                         <ul class="m-0">
@@ -110,7 +110,7 @@ import { Search } from "lucide-angular";
                         </ul>
                     </div>
                 </div>
-                <div class="border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 rounded-[10px] flex relative">
+                <div class="border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 rounded-[10px] flex relative">
                     <div class="p-5 flex-1">
                         <h5 class="mb-4 text-[20px] font-semibold leading-[1.2] text-primary">Categories</h5>
                         <ul class="m-0">
@@ -142,7 +142,7 @@ import { Search } from "lucide-angular";
                         </ul>
                     </div>
                 </div>
-                <div class="border border-solid border-borderGray shadow-[0_4px_14px_#e2edff40] mb-6 rounded-[10px] flex relative">
+                <div class="border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 rounded-[10px] flex relative">
                     <div class="p-5 flex-1">
                         <h5 class="mb-4 text-[20px] font-semibold text-primary leading-[1.2]">Tags</h5>
                         <ul class="overflow-hidden m-0 gap-4 flex flex-wrap">

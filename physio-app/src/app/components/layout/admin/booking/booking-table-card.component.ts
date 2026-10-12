@@ -9,11 +9,11 @@ import { ButtonIconComponent } from "../../../button/button-icon/button-icon.com
 import { BooTableAdminComponent } from "../../../table/boo-table-admin/boo-table-admin.component";
 
 const STATUS_BADGE: Record<string, { label: string; color: string }> = {
-  Scheduled: { label: 'Scheduled', color: '#3B82F6' },
-  Confirmed: { label: 'Confirmed', color: '#6366F1' },
+  Scheduled: { label: 'Scheduled', color: '#FB7185' },
+  Confirmed: { label: 'Confirmed', color: '#FB7185' },
   CheckedIn: { label: 'Checked-in', color: '#22C55E' },
   InProgress: { label: 'In Progress', color: '#F59E0B' },
-  Completed: { label: 'Completed', color: '#64748B' },
+  Completed: { label: 'Completed', color: '#85757D' },
   Cancelled: { label: 'Cancelled', color: '#EF4444' },
   NoShow: { label: 'No Show', color: '#EF4444' },
   Rescheduled: { label: 'Rescheduled', color: '#A855F7' },
@@ -121,7 +121,7 @@ export class AdminBookingTableCardComponent {
   }
 
   statusBadge(status: string) {
-    return STATUS_BADGE[status] ?? { label: status, color: '#64748B' };
+    return STATUS_BADGE[status] ?? { label: status, color: '#85757D' };
   }
 
   canCheckIn(status: string): boolean {

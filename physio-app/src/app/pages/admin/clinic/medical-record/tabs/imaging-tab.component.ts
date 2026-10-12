@@ -1,19 +1,18 @@
 import { Component, Input } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ImagingOrderStatus, ImagingStudyRow } from "../../../../../shared/types/medical-record.types";
 
 @Component({
   selector: 'mr-imaging-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div *ngIf="data?.length" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
       <article *ngFor="let s of data" class="bg-surface border border-gray-200 rounded-lg overflow-hidden flex flex-col">
         <!-- Thumbnail / modality strip -->
         <div class="relative aspect-[4/3] bg-gradient-to-br from-gray-800 to-gray-700 flex items-center justify-center overflow-hidden">
           <img *ngIf="s.imagesUrl" [src]="s.imagesUrl" class="absolute inset-0 w-full h-full object-cover opacity-90" />
-          <boo-icon *ngIf="!s.imagesUrl" name="scan" iconClass="w-12 h-12 text-white/40"></boo-icon>
+          <physio-icon *ngIf="!s.imagesUrl" name="scan" class="w-12 h-12 text-white/40"></physio-icon>
           <div class="absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-black/60 text-white">
             {{ s.modalityName }}
           </div>
@@ -21,7 +20,7 @@ import { ImagingOrderStatus, ImagingStudyRow } from "../../../../../shared/types
             {{ s.imagesCount }} img
           </div>
           <div *ngIf="s.isCritical" class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold tracking-wider uppercase inline-flex items-center gap-1">
-            <boo-icon name="alert-triangle" iconClass="w-3 h-3"></boo-icon>
+            <physio-icon name="alert-triangle" class="w-3 h-3"></physio-icon>
             Critical
           </div>
           <div *ngIf="s.isNormal && !s.isCritical" class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold tracking-wider uppercase">
@@ -51,10 +50,10 @@ import { ImagingOrderStatus, ImagingStudyRow } from "../../../../../shared/types
             <span class="font-mono text-secondary">{{ s.orderNumber }}</span>
             <div class="ml-auto flex items-center gap-1">
               <button *ngIf="s.reportPdfUrl" class="px-2 py-1 text-primary hover:bg-gray-100 rounded inline-flex items-center gap-1">
-                <boo-icon name="file-text" iconClass="w-3 h-3"></boo-icon> Report
+                <physio-icon name="file-text" class="w-3 h-3"></physio-icon> Report
               </button>
               <button *ngIf="s.imagesUrl || s.dicomStudyUid" class="px-2 py-1 text-primary hover:bg-gray-100 rounded inline-flex items-center gap-1">
-                <boo-icon name="image" iconClass="w-3 h-3"></boo-icon> Images
+                <physio-icon name="image" class="w-3 h-3"></physio-icon> Images
               </button>
             </div>
           </div>
@@ -75,7 +74,7 @@ export class ImagingTabComponent {
       case 'Completed': return 'bg-emerald-50 text-emerald-700';
       case 'InProgress': return 'bg-amber-50 text-amber-700';
       case 'Scheduled':
-      case 'ReportPending': return 'bg-blue-50 text-blue-700';
+      case 'ReportPending': return 'bg-primarySoft text-primaryHover';
       case 'Cancelled': return 'bg-red-50 text-red-600';
       default: return 'bg-gray-100 text-gray-600';
     }

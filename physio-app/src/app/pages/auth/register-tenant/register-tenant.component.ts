@@ -3,7 +3,6 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
 import { FormWrapperComponent } from "../../../components/form/boo-form/boo-form.component";
-import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from '../../../components/input/boo-input/boo-input.component';
 import { BooSelectComponent } from "../../../components/select/boo-select/boo-select.component";
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
@@ -21,8 +20,7 @@ import { RegisterTenantRequest } from '../../../shared/types/tenant.types';
     FormWrapperComponent,
     BooButtonComponent,
     BooInputComponent,
-    BooSelectComponent,
-    BooIconComponent
+    BooSelectComponent,
   ],
   template: `
     <div class="bg-surface">
@@ -82,7 +80,7 @@ import { RegisterTenantRequest } from '../../../shared/types/tenant.types';
                         (click)="removeBranch(i)"
                         class="text-red-500 hover:text-red-700"
                       >
-                        <boo-icon name="trash-2" [size]="16"></boo-icon>
+                        <physio-icon name="trash-2" [size]="16"></physio-icon>
                       </button>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mb-4">
@@ -122,12 +120,12 @@ import { RegisterTenantRequest } from '../../../shared/types/tenant.types';
                       [type]="passwordType"
                       booError
                     >
-                      <boo-icon
+                      <physio-icon
                         [name]="passwordType === 'text' ? 'eye' : 'eye-off'"
-                        class="leading-none absolute top-1/2 -translate-y-1/2 right-2.5 stroke-brandDark cursor-pointer"
                         endfix
                         (click)="onTogglePassword()"
-                      ></boo-icon>
+                      [class]="'leading-none absolute top-1/2 -translate-y-1/2 right-2.5 stroke-brandDark cursor-pointer'"
+                      ></physio-icon>
                     </boo-input>
                   </div>
                 </div>

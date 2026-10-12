@@ -1,30 +1,29 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import {
-    ClinicalWarningSeverity,
-    FavoriteMedication,
-    PrescriptionTemplate,
-    RecentPrescriptionSummary,
-    RxDiagnosisEntry,
-    RxMedicationItem,
+  ClinicalWarningSeverity,
+  FavoriteMedication,
+  PrescriptionTemplate,
+  RecentPrescriptionSummary,
+  RxDiagnosisEntry,
+  RxMedicationItem,
 } from "../../../../../shared/types/prescription-rx.types";
 import { severityIcon, severityRank } from "../prescription-rx.util";
 
 interface AlertEntry {
-    itemId: string;
-    medicationName: string;
-    severity: ClinicalWarningSeverity;
-    message: string;
+  itemId: string;
+  medicationName: string;
+  severity: ClinicalWarningSeverity;
+  message: string;
 }
 
 @Component({
-    selector: 'rx-sidebar',
-    standalone: true,
-    imports: [SharedModule, BooIconComponent, BooTextareaComponent, StatusBadgeComponent],
-    template: `
+  selector: 'rx-sidebar',
+  standalone: true,
+  imports: [SharedModule,BooTextareaComponent, StatusBadgeComponent],
+  template: `
     <div class="space-y-4 sticky top-[72px]">
       <!-- Diagnosis recap -->
       <div class="bg-surface border border-gray-200 rounded-lg p-4" *ngIf="primaryDiagnosis">
@@ -45,7 +44,7 @@ interface AlertEntry {
         <div *ngIf="!alerts().length" class="text-xs text-secondary">No active clinical warnings.</div>
         <button *ngFor="let a of alerts()" type="button" (click)="scrollToRow.emit(a.itemId)"
           class="w-full text-left flex items-start gap-2 py-1.5 border-b border-gray-50 last:border-0 hover:bg-gray-50 rounded px-1 -mx-1">
-          <boo-icon [name]="severityIcon(a.severity)" [size]="14" [color]="alertColor(a.severity)" class="mt-0.5 shrink-0"></boo-icon>
+          <physio-icon [name]="severityIcon(a.severity)" [size]="14" [class]="'mt-0.5 shrink-0'" [style.color]="alertColor(a.severity)"></physio-icon>
           <div class="text-xs">
             <span class="font-medium text-primary">{{ a.medicationName }}</span>
             <span class="text-secondary"> — {{ a.message }}</span>
@@ -74,10 +73,10 @@ interface AlertEntry {
           <button type="button" (click)="applyFavorite.emit(f)"
             class="flex-1 text-left flex items-center justify-between hover:bg-gray-50 rounded px-1 -mx-1">
             <span class="text-xs text-primary">{{ f.name }} <span class="text-secondary">{{ f.strength }}</span></span>
-            <boo-icon name="plus-circle" [size]="14" class="text-primary"></boo-icon>
+            <physio-icon name="plus-circle" [size]="14" class="text-primary"></physio-icon>
           </button>
           <button type="button" (click)="removeFavorite.emit(f)" class="text-secondary hover:text-rose-600 p-0.5" title="Remove from favorites" aria-label="Remove from favorites">
-            <boo-icon name="x" [size]="12"></boo-icon>
+            <physio-icon name="x" [size]="12"></physio-icon>
           </button>
         </div>
       </div>
@@ -93,10 +92,10 @@ interface AlertEntry {
               <span class="font-medium text-primary">{{ t.name }}</span>
               <span class="text-secondary"> · {{ t.itemCount }} items</span>
             </span>
-            <boo-icon name="layers" [size]="14" class="text-primary"></boo-icon>
+            <physio-icon name="layers" [size]="14" class="text-primary"></physio-icon>
           </button>
           <button type="button" (click)="deleteTemplate.emit(t)" class="text-secondary hover:text-rose-600 p-0.5" title="Delete template" aria-label="Delete template">
-            <boo-icon name="x" [size]="12"></boo-icon>
+            <physio-icon name="x" [size]="12"></physio-icon>
           </button>
         </div>
 
@@ -122,52 +121,52 @@ interface AlertEntry {
   `,
 })
 export class PrescriptionSidebarComponent {
-    @Input() items: RxMedicationItem[] = [];
-    @Input() primaryDiagnosis: RxDiagnosisEntry | null = null;
-    @Input() secondaryDiagnoses: RxDiagnosisEntry[] = [];
-    @Input() recent: RecentPrescriptionSummary[] = [];
-    @Input() favorites: FavoriteMedication[] = [];
-    @Input() templates: PrescriptionTemplate[] = [];
-    @Input() doctorNotes = '';
-    @Input() editable = true;
+  @Input() items: RxMedicationItem[] = [];
+  @Input() primaryDiagnosis: RxDiagnosisEntry | null = null;
+  @Input() secondaryDiagnoses: RxDiagnosisEntry[] = [];
+  @Input() recent: RecentPrescriptionSummary[] = [];
+  @Input() favorites: FavoriteMedication[] = [];
+  @Input() templates: PrescriptionTemplate[] = [];
+  @Input() doctorNotes = '';
+  @Input() editable = true;
 
-    @Output() scrollToRow = new EventEmitter<string>();
-    @Output() applyFavorite = new EventEmitter<FavoriteMedication>();
-    @Output() applyTemplate = new EventEmitter<PrescriptionTemplate>();
-    @Output() removeFavorite = new EventEmitter<FavoriteMedication>();
-    @Output() deleteTemplate = new EventEmitter<PrescriptionTemplate>();
-    @Output() saveTemplate = new EventEmitter<string>();
+  @Output() scrollToRow = new EventEmitter<string>();
+  @Output() applyFavorite = new EventEmitter<FavoriteMedication>();
+  @Output() applyTemplate = new EventEmitter<PrescriptionTemplate>();
+  @Output() removeFavorite = new EventEmitter<FavoriteMedication>();
+  @Output() deleteTemplate = new EventEmitter<PrescriptionTemplate>();
+  @Output() saveTemplate = new EventEmitter<string>();
 
-    savingTemplate = false;
-    templateName = '';
+  savingTemplate = false;
+  templateName = '';
 
-    submitTemplate(): void {
-        const name = this.templateName.trim();
-        if (!name) return;
-        this.saveTemplate.emit(name);
-        this.savingTemplate = false;
-        this.templateName = '';
+  submitTemplate(): void {
+    const name = this.templateName.trim();
+    if (!name) return;
+    this.saveTemplate.emit(name);
+    this.savingTemplate = false;
+    this.templateName = '';
+  }
+  @Output() doctorNotesChange = new EventEmitter<string>();
+
+  readonly severityIcon = severityIcon;
+
+  alerts(): AlertEntry[] {
+    const out: AlertEntry[] = [];
+    for (const item of this.items) {
+      for (const w of item.warnings) {
+        if (!w.acknowledged) out.push({ itemId: item.id, medicationName: item.name, severity: w.severity, message: w.message });
+      }
     }
-    @Output() doctorNotesChange = new EventEmitter<string>();
+    return out.sort((a, b) => severityRank(b.severity as any) - severityRank(a.severity as any));
+  }
 
-    readonly severityIcon = severityIcon;
-
-    alerts(): AlertEntry[] {
-        const out: AlertEntry[] = [];
-        for (const item of this.items) {
-            for (const w of item.warnings) {
-                if (!w.acknowledged) out.push({ itemId: item.id, medicationName: item.name, severity: w.severity, message: w.message });
-            }
-        }
-        return out.sort((a, b) => severityRank(b.severity as any) - severityRank(a.severity as any));
+  alertColor(sev: string): string {
+    switch (sev) {
+      case 'Critical': return '#dc2626';
+      case 'High': return '#ea580c';
+      case 'Medium': return '#d97706';
+      default: return '#E11D48';
     }
-
-    alertColor(sev: string): string {
-        switch (sev) {
-            case 'Critical': return '#dc2626';
-            case 'High': return '#ea580c';
-            case 'Medium': return '#d97706';
-            default: return '#2563eb';
-        }
-    }
+  }
 }

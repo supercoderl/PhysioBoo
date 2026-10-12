@@ -4,7 +4,6 @@ import { ColumnDefDirective } from "../../../../../../shared/directives/column-d
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { Testimonial } from "../../../../../../shared/types/testimonial.types";
 import { ActionItem, PaginationData } from "../../../../../../shared/types/common";
-import { BooIconComponent } from "../../../../../icon/boo-icon/boo-icon.component";
 import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo-table-admin.component";
 
@@ -16,7 +15,6 @@ import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo
     BooTableAdminComponent,
     ColumnDefDirective,
     BooActionAdminComponent,
-    BooIconComponent
   ],
   host: { class: 'block h-full min-h-0' },
   template: `
@@ -44,12 +42,12 @@ import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo
 
         <ng-template appColumnDef="rating" headerLabel="Rating" headerClass="text-left" [sortable]="true" let-item>
           <div class="flex items-center gap-0.5" [attr.aria-label]="item.rating + ' out of 5'">
-            <boo-icon
+            <physio-icon
               *ngFor="let star of [1,2,3,4,5]"
               name="star"
               [size]="14"
-              [color]="star <= item.rating ? '#facc15' : '#d1d5db'"
-            ></boo-icon>
+            [style.color]="star <= item.rating ? '#facc15' : '#E3D5DA'"
+            ></physio-icon>
           </div>
         </ng-template>
 

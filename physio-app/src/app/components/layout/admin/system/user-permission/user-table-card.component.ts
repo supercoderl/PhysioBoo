@@ -121,7 +121,7 @@ import { BooTableAdminComponent, FilterConfig } from "../../../../table/boo-tabl
           </span>
           <span
             *ngIf="item.twoFactorEnabled"
-            class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-50 text-indigo-700"
+            class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primarySoft text-primaryHover"
             title="2FA enabled"
           >
             2FA

@@ -24,13 +24,13 @@ export class TabComponent {
           <button
             (click)="selectTab(i)"
             class="px-6 py-3 font-medium text-sm transition-colors duration-300 relative overflow-hidden"
-            [class.text-blue-600]="activeIndex() === i"
+            [class.text-primary]="activeIndex() === i"
             [class.text-gray-600]="activeIndex() !== i"
           >
             {{ tab.label }}
             @if (activeIndex() === i) {
               <div 
-                class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                 [class.animate-slide-left]="slideDirection() === 'left'"
                 [class.animate-slide-right]="slideDirection() === 'right'"
               ></div>

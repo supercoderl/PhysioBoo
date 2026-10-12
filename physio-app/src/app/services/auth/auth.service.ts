@@ -1,15 +1,13 @@
 import { SocialAuthService } from '@abacritt/angularx-social-login';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { BehaviorSubject, catchError, finalize, firstValueFrom, forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, firstValueFrom, forkJoin, map, Observable, of, shareReplay, switchMap, tap, throwError } from 'rxjs';
 import { BASE_API } from '../../shared/api/base';
 import { createHttpContext } from '../../shared/contexts/option.context';
-import { MENU_CACHE_KEY } from '../../shared/data/cache';
-import { PagedResponse, PaginationData, PaginationDataWithInit } from '../../shared/types/common';
+import { PagedResponse } from '../../shared/types/common';
 import { UserProfileBase, UserProfileSummary } from '../../shared/types/core.types';
 import { LoadingKeys } from '../../shared/types/loading';
 import { MenuItem } from '../../shared/types/menu.types';
-import { LocalStorage } from '../../shared/utils/storage';
 import { MenuService } from '../admin/menu.service';
 import { PreferenceService } from '../common/preference.service';
 import { ThemeConfigService } from '../common/theme-config.service';
@@ -19,8 +17,8 @@ import { ThemeConfigService } from '../common/theme-config.service';
 })
 export class AuthService {
     // #region Inputs, Outputs, Properties
-    /** null = profile not fetched yet; [] = fetched, user genuinely has none. */
     private permissionsSubject = new BehaviorSubject<string[] | null>(null);
+    private profile$: Observable<PagedResponse<UserProfileSummary>> | null = null;
     private userInfoSubject = new BehaviorSubject<UserProfileBase | null>(null);
     private roleSubject = new BehaviorSubject<string[] | null>(null);
     private oauthService = inject(SocialAuthService);
@@ -83,17 +81,19 @@ export class AuthService {
         );
     }
 
-    /** Clear local session state without making an HTTP call. Safe to call from interceptor. */
     clearSession(): void {
         this.userInfoSubject.next(null);
         this.permissionsSubject.next(null);
         this.roleSubject.next(null);
         this.isAuthenticated.set(false);
-        LocalStorage.remove(MENU_CACHE_KEY);
+        this.profile$ = null;
+        this.menuSrv.clear();
     }
 
-    getProfile() {
-        return this.http.get<PagedResponse<UserProfileSummary>>(BASE_API.PROFILE).pipe(
+    getProfile(): Observable<PagedResponse<UserProfileSummary>> {
+        if (this.profile$) return this.profile$;
+
+        this.profile$ = this.http.get<PagedResponse<UserProfileSummary>>(BASE_API.PROFILE).pipe(
             tap((res) => {
                 if (res.success && res.data) {
                     const { roles, permissions, ...userInfo } = res.data;
@@ -101,45 +101,47 @@ export class AuthService {
                     this.roleSubject.next(roles);
                     this.permissionsSubject.next(permissions);
                     this.isAuthenticated.set(true);
+                    this.loadPostLoginData();
                 } else {
                     this.checkSession();
                 }
             }),
-            switchMap((res) => {
-                if (!res.success || !res.data) return [res];
-                return forkJoin([
-                    this.prefSrv.loadAll(),
-                    this.menuSrv.getMine(),
-                ]).pipe(
-                    tap(([, menuRes]) => {
-                        this.themeSrv.hydrateFromCache();
-                        this.cacheMenus(menuRes.success ? menuRes.data : []);
-                    }),
-                    map(() => res),
-                    catchError(() => {
-                        this.themeSrv.hydrateFromCache();
-                        return [res];
-                    })
-                );
-            }),
             catchError((err) => {
                 this.clearSession();
                 return throwError(() => err);
-            })
+            }),
+            finalize(() => {
+                this.profile$ = null;
+            }),
+            shareReplay(1)
         );
+
+        return this.profile$;
+    }
+
+    private loadPostLoginData(): void {
+        this.themeSrv.hydrateFromCache();
+
+        forkJoin([
+            this.prefSrv.loadAll(),
+            this.menuSrv.getMine(),
+        ]).pipe(
+            catchError(() => of(null))
+        ).subscribe((result) => {
+            if (!result) {
+                this.menuSrv.markLoaded();
+                return;
+            }
+            const [, menuRes] = result;
+            this.themeSrv.hydrateFromCache();
+            this.cacheMenus(menuRes.success ? menuRes.data : []);
+        });
     }
 
     private cacheMenus(items: MenuItem[]): void {
-        const cache: PaginationData<MenuItem> = {
-            ...PaginationDataWithInit<MenuItem>(),
-            items,
-            totalCount: items.length
-        };
-        LocalStorage.save(MENU_CACHE_KEY, cache);
+        this.menuSrv.publish(items);
     }
 
-
-    /** Fetches permission codes and caches them in permissionsSubject; used both standalone and as part of getProfile(). */
     private fetchPermissions() {
         return this.http.get<any>(`/api/users/user-permission`).pipe(
             tap((permissions) => this.permissionsSubject.next(permissions.value.permission_code)),

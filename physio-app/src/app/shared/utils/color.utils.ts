@@ -2,9 +2,9 @@ import { Role } from "../types/role.types";
 
 export class ColorUtils {
   static readonly roleColors = [
-    { label: 'Slate', value: '#64748b' },
-    { label: 'Blue', value: '#3b82f6' },
-    { label: 'Indigo', value: '#6366f1' },
+    { label: 'Slate', value: '#85757D' },
+    { label: 'Rose', value: '#E11D48' },
+    { label: 'Stone', value: '#78716c' },
     { label: 'Purple', value: '#a855f7' },
     { label: 'Pink', value: '#ec4899' },
     { label: 'Red', value: '#ef4444' },
@@ -25,9 +25,9 @@ export class ColorUtils {
   }
 
   static roleColorFor(role: Role | string | null | undefined): string {
-    if (!role) return '#64748b';
-    if (typeof role === 'string') return role || '#64748b';
-    return role.color || '#64748b';
+    if (!role) return '#85757D';
+    if (typeof role === 'string') return role || '#85757D';
+    return role.color || '#85757D';
   }
 
   /** Returns a soft (15%) background tint of the given hex color. */

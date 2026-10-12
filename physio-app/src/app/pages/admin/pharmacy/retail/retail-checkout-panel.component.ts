@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailCart } from "../../../../shared/types/retail-pos.types";
 
@@ -8,7 +7,7 @@ const VAT_RATE = 0.05;
 @Component({
   selector: 'retail-checkout-panel',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg flex flex-col h-full">
       <!-- Customer card -->
@@ -18,7 +17,7 @@ const VAT_RATE = 0.05;
         <div *ngIf="!cart?.customer" class="flex gap-2">
           <button type="button" (click)="openCustomerLookup.emit()"
             class="flex-1 px-3 py-2 border border-dashed border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-1.5">
-            <boo-icon name="search" [size]="14"></boo-icon> Search Patient
+            <physio-icon name="search" [size]="14"></physio-icon> Search Patient
           </button>
           <span class="text-xs text-gray-400 self-center">or</span>
           <button type="button" (click)="useWalkIn.emit()"
@@ -42,7 +41,7 @@ const VAT_RATE = 0.05;
             <span *ngIf="cart!.customer!.loyaltyPoints" class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[11px] font-medium">{{ cart!.customer!.loyaltyPoints }} pts</span>
             <span *ngIf="cart!.customer!.prescriptionReference" class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-[11px] font-medium">Rx {{ cart!.customer!.prescriptionReference }}</span>
             <span *ngIf="cart!.customer!.allergyInformation" class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 text-[11px] font-medium flex items-center gap-1">
-              <boo-icon name="alert-triangle" [size]="11"></boo-icon> {{ cart!.customer!.allergyInformation }}
+              <physio-icon name="alert-triangle" [size]="11"></physio-icon> {{ cart!.customer!.allergyInformation }}
             </span>
           </div>
         </div>

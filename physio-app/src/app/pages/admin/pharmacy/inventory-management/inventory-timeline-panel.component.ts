@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -25,7 +24,7 @@ interface DayGroup {
 @Component({
     selector: 'inventory-timeline-panel',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, EmptyStateComponent],
+    imports: [SharedModule,EmptyStateComponent],
     template: `
     <div class="bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex flex-wrap items-center justify-between gap-2">
@@ -36,7 +35,7 @@ interface DayGroup {
             <option *ngFor="let t of movementTypes" [value]="t">{{ t }}</option>
           </select>
           <div class="relative">
-            <boo-icon name="search" [size]="13" iconClass="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"></boo-icon>
+            <physio-icon name="search" [size]="13" [class]="'absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
             <input type="text" [(ngModel)]="query" (ngModelChange)="apply()" placeholder="Filter by medicine, zone, or user..."
               class="pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg w-64" />
           </div>
@@ -45,7 +44,7 @@ interface DayGroup {
 
       <div class="p-3">
         <div *ngIf="loading()" class="flex items-center justify-center py-12">
-          <boo-icon name="loader-circle" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+          <physio-icon name="loader-circle" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
         </div>
 
         <boo-empty-state *ngIf="!loading() && !groups().length" icon="clock" title="No movements match these filters"></boo-empty-state>
@@ -55,7 +54,7 @@ interface DayGroup {
           <div class="space-y-2 border-l-2 border-gray-100 pl-3">
             <div *ngFor="let e of group.events" class="flex items-start gap-2.5">
               <span class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center shrink-0 -ml-[27px] ring-4 ring-surface">
-                <boo-icon [name]="movementIcon(e.type)" [size]="13" [iconClass]="e.quantity < 0 ? 'text-rose-600' : 'text-emerald-600'"></boo-icon>
+                <physio-icon [name]="movementIcon(e.type)" [size]="13" [class]="e.quantity < 0 ? 'text-rose-600' : 'text-emerald-600'"></physio-icon>
               </span>
               <div class="min-w-0">
                 <p class="text-xs text-regular">

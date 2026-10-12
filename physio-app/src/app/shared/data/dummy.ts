@@ -16,7 +16,7 @@ export const CATEGORIES = [
         title: 'Talk to Doctors',
         href: "",
         icon: "https://doccure.dreamstechnologies.com//react/template/src/assets/img/icons/list-icon-02.svg",
-        color: "#0e82fd"
+        color: "#E11D48"
     },
     {
         id: 3,
@@ -909,7 +909,7 @@ export const MENUS: MenuItem[] = [
                 id: "leads",
                 label: "Lead Management",
                 route: "crm/lead-management",
-                icon: "list-filter",
+                icon: "filter",
                 isActive: false,
                 order: 0,
                 permissionCode: [],
@@ -1040,7 +1040,7 @@ export const MEDICAL_CATEGORIES = [
     {
         id: 1,
         name: "All Patient",
-        color: "#1F6DB2",
+        color: "#E11D48",
         background: "#EBF2F9",
         icon: "users"
     },

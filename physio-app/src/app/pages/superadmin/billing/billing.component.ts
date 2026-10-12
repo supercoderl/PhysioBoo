@@ -1,253 +1,228 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { AdminBreadcrumbComponent } from "../../../components/breadcrumb/admin-breadcrumb.component";
-import { BooIconComponent } from "../../../components/icon/boo-icon/boo-icon.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../components/ui/status-badge.component";
-import { BillingService } from "../../../services/admin/billing.service";
-import { DialogService } from "../../../services/common/dialog.service";
-import { ToastService } from "../../../services/common/toast.service";
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { finalize, take } from 'rxjs';
+import { BooButtonAdminComponent } from '../../../components/button/boo-button-admin/boo-button-admin.component';
+import { SuperadminPlanDrawerComponent } from '../../../components/layout/superadmin/billing/plan-drawer.component';
+import { SuperadminSubscriptionTableCardComponent } from '../../../components/layout/superadmin/billing/subscription-table-card.component';
+import { SuperadminTenantSubscriptionDrawerComponent } from '../../../components/layout/superadmin/billing/tenant-subscription-drawer.component';
+import { SuperadminPageHeaderComponent } from '../../../components/layout/superadmin/shared/superadmin-page-header.component';
+import { SuperadminTab, SuperadminTabsComponent } from '../../../components/layout/superadmin/shared/superadmin-tabs.component';
+import { EmptyStateComponent } from '../../../components/ui/empty-state.component';
+import { ErrorStateComponent } from '../../../components/ui/error-state.component';
+import { StatCardComponent } from '../../../components/ui/stat-card.component';
+import { StatusBadgeComponent } from '../../../components/ui/status-badge.component';
+import { BillingService } from '../../../services/admin/billing.service';
 import { SharedModule } from '../../../shared/shared-imports';
-import {
-  SaveSubscriptionPlanRequest,
-  SubscriptionAction,
-  SubscriptionInvoice,
-  SubscriptionPlan,
-  TenantSubscription,
-  TenantSubscriptionDetail,
-} from "../../../shared/types/billing.types";
+import { BillingSummary, SubscriptionPlan, SubscriptionStatus, TenantSubscription } from '../../../shared/types/billing.types';
+import { PaginationData } from '../../../shared/types/common';
+import { FilterConfig } from '../../../shared/types/filter.types';
+import { billingStatusLabel, formatMoney } from '../../../shared/utils/billing.utils';
+
+type BillingTab = 'subscriptions' | 'plans';
+
+const STATUS_OPTIONS: SubscriptionStatus[] = ['Trial', 'Active', 'PastDue', 'Cancelled', 'None'];
 
 /**
  * Super-admin SaaS billing: manage the plan catalog, each tenant's subscription, and
  * subscription invoices. Payments are recorded manually — no card data is collected here.
  */
 @Component({
-  selector: 'setting-billing',
+  selector: 'superadmin-billing',
   standalone: true,
   imports: [
-    AdminBreadcrumbComponent,
-    BooIconComponent,
+    SharedModule,
+    BooButtonAdminComponent,
+    SuperadminPageHeaderComponent,
+    SuperadminTabsComponent,
+    SuperadminSubscriptionTableCardComponent,
+    SuperadminTenantSubscriptionDrawerComponent,
+    SuperadminPlanDrawerComponent,
+    StatCardComponent,
     StatusBadgeComponent,
-    SharedModule
+    EmptyStateComponent,
+    ErrorStateComponent
   ],
-  templateUrl: './billing.component.html'
+  templateUrl: './billing.component.html',
+  host: { class: 'block h-full min-h-0' }
 })
 export class BillingComponent implements OnInit {
   // #region Inject Services
   private readonly billingSrv = inject(BillingService);
-  private readonly toastSrv = inject(ToastService);
-  private readonly dialogSrv = inject(DialogService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   // #endregion
 
   // #region State
-  plans = signal<SubscriptionPlan[]>([]);
-  tenants = signal<TenantSubscription[]>([]);
-  totalTenants = signal(0);
+  readonly money = formatMoney;
+  activeTab = signal<BillingTab>('subscriptions');
+
+  summary = signal<BillingSummary | null>(null);
+  summaryFailed = signal(false);
+
+  /** `null` = still loading. */
+  plans = signal<SubscriptionPlan[] | null>(null);
+  plansFailed = signal(false);
+
+  tableData = signal<PaginationData<TenantSubscription> | null>(null);
   loading = signal(false);
-  search = '';
-  statusFilter = '';
-  pageNumber = 1;
-  readonly pageSize = 20;
+  loadFailed = signal(false);
 
-  selected = signal<TenantSubscriptionDetail | null>(null);
-  selectedPlanId = '';
-  billingEmail = '';
-  notes = '';
-  paymentReference: Record<string, string> = {};
+  params = { pageNumber: 1, pageSize: 20, search: '', status: '' };
 
-  /** Plan being edited (or created when id is null). */
-  editingPlan = signal<(SaveSubscriptionPlanRequest & { id: string | null }) | null>(null);
+  readonly filter_configs: FilterConfig[] = [
+    {
+      key: 'status',
+      label: 'Status',
+      type: 'select',
+      value: null,
+      options: STATUS_OPTIONS.map(status => ({ label: billingStatusLabel(status), value: status }))
+    }
+  ];
 
-  readonly statusOptions = ['Trial', 'Active', 'PastDue', 'Cancelled', 'None'];
+  isTenantDrawerOpen = signal(false);
+  selectedTenantId = signal<string | null>(null);
+  isPlanDrawerOpen = signal(false);
+  editingPlan = signal<SubscriptionPlan | null>(null);
 
-  activePlans = computed(() => this.plans().filter(p => p.isActive));
-  monthlyRecurring = computed(() => this.tenants()
-    .filter(t => t.status === 'Active' || t.status === 'PastDue')
-    .reduce((sum, t) => sum + t.monthlyPrice, 0));
-  pastDueCount = computed(() => this.tenants().filter(t => t.status === 'PastDue').length);
-  outstanding = computed(() => this.tenants().reduce((sum, t) => sum + t.outstandingAmount, 0));
+  tabs = computed<SuperadminTab[]>(() => [
+    { id: 'subscriptions', label: 'Subscriptions', count: this.summary()?.tenants ?? null },
+    { id: 'plans', label: 'Plans', count: this.plans()?.length ?? null },
+  ]);
+
+  monthlyRecurringLabel = computed(() => this.summary()?.partial ? 'Monthly recurring (first 100)' : 'Monthly recurring');
+  monthlyRecurringText = computed(() => this.moneyOrDash(this.summary()?.monthlyRecurring));
+  outstandingText = computed(() => this.moneyOrDash(this.summary()?.outstanding));
+  pastDueTone = computed<'warning' | 'neutral'>(() => (this.summary()?.pastDue ?? 0) > 0 ? 'warning' : 'neutral');
+  outstandingTone = computed<'warning' | 'neutral'>(() => (this.summary()?.outstanding ?? 0) > 0 ? 'warning' : 'neutral');
   // #endregion
 
+  // #region Init (Lifecycle + Setup)
   ngOnInit(): void {
+    this.loadAll();
+
+    // Deep link from a tenant page: /superadmin/billing?tenant=<hospitalGroupId>
+    this.route.queryParamMap.pipe(take(1)).subscribe(params => {
+      const tenant = params.get('tenant');
+      if (tenant) this.openTenant(tenant);
+    });
+  }
+  // #endregion
+
+  // #region Loading
+  loadAll(): void {
+    this.loadSummary();
     this.loadPlans();
     this.loadTenants();
   }
 
-  // #region Loading
+  loadSummary(): void {
+    this.billingSrv.getSummary().subscribe({
+      next: summary => {
+        this.summaryFailed.set(false);
+        this.summary.set(summary);
+      },
+      error: () => this.summaryFailed.set(true)
+    });
+  }
+
   loadPlans(): void {
-    this.billingSrv.getPlans(true).subscribe(res => {
-      if (res.success) this.plans.set(res.data);
+    this.plansFailed.set(false);
+    this.billingSrv.getPlans(true).subscribe({
+      next: res => {
+        if (res.success) this.plans.set(res.data ?? []);
+        else this.plansFailed.set(true);
+      },
+      error: () => this.plansFailed.set(true)
     });
   }
 
   loadTenants(): void {
     this.loading.set(true);
-    this.billingSrv.searchSubscriptions({ search: this.search.trim(), status: this.statusFilter, pageNumber: this.pageNumber, pageSize: this.pageSize })
-      .subscribe({
-        next: res => {
-          if (res.success) {
-            this.tenants.set(res.data.items);
-            this.totalTenants.set(res.data.totalCount);
-          }
-          this.loading.set(false);
-        },
-        error: () => this.loading.set(false),
-      });
+    this.loadFailed.set(false);
+    this.billingSrv.searchSubscriptions({
+      search: this.params.search.trim(),
+      status: this.params.status,
+      pageNumber: this.params.pageNumber,
+      pageSize: this.params.pageSize
+    }).pipe(
+      finalize(() => this.loading.set(false))
+    ).subscribe({
+      next: res => {
+        if (res.success) this.tableData.set(res.data);
+        else this.loadFailed.set(true);
+      },
+      error: () => this.loadFailed.set(true)
+    });
   }
 
-  onSearch(): void {
-    this.pageNumber = 1;
-    this.loadTenants();
-  }
-
-  changePage(delta: number): void {
-    const next = this.pageNumber + delta;
-    if (next < 1 || (next - 1) * this.pageSize >= this.totalTenants()) return;
-    this.pageNumber = next;
-    this.loadTenants();
+  reload(): void {
+    this.loadAll();
   }
   // #endregion
 
-  // #region Tenant subscription
-  openTenant(row: TenantSubscription): void {
-    this.billingSrv.getSubscription(row.hospitalGroupId).subscribe(res => {
-      if (res.success) this.applyDetail(res.data);
-    });
+  // #region Subscriptions list
+  onSearch(value: string): void {
+    this.params = { ...this.params, pageNumber: 1, search: value };
+    this.loadTenants();
+  }
+
+  onFilterApply(event: { key: string; value: any }): void {
+    if (event.key !== 'status') return;
+    this.params = { ...this.params, pageNumber: 1, status: event.value ?? '' };
+    this.loadTenants();
+  }
+
+  onPageClick(page: number): void {
+    this.params.pageNumber = page;
+    this.loadTenants();
+  }
+
+  viewTenant(id: string): void {
+    this.router.navigate(['/superadmin/tenants/hospital-group', id]);
+  }
+  // #endregion
+
+  // #region Drawers
+  onTabChange(id: string): void {
+    this.activeTab.set(id as BillingTab);
+  }
+
+  openTenant(id: string): void {
+    this.selectedTenantId.set(id);
+    this.isTenantDrawerOpen.set(true);
   }
 
   closeTenant(): void {
-    this.selected.set(null);
-  }
+    this.isTenantDrawerOpen.set(false);
+    this.selectedTenantId.set(null);
 
-  private applyDetail(detail: TenantSubscriptionDetail | null): void {
-    if (!detail) return;
-    this.selected.set(detail);
-    this.selectedPlanId = detail.planId ?? this.activePlans()[0]?.id ?? '';
-    this.billingEmail = detail.billingEmail ?? '';
-    this.notes = detail.notes ?? '';
-    this.paymentReference = {};
-    this.loadTenants();
-    this.loadPlans();
-  }
-
-  change(action: SubscriptionAction): void {
-    const tenant = this.selected();
-    if (!tenant) return;
-
-    const run = () => this.billingSrv.changeSubscription(tenant.hospitalGroupId, {
-      action,
-      planId: action === 'ChangePlan' ? this.selectedPlanId : null,
-      billingEmail: this.billingEmail,
-      notes: this.notes,
-    }).subscribe(res => {
-      if (!res.success) return;
-      this.applyDetail(res.data);
-      this.toastSrv.success(this.actionMessage(action, tenant.tenantName));
-    });
-
-    if (action === 'Cancel' || action === 'MarkPastDue') {
-      this.dialogSrv.confirm(
-        action === 'Cancel' ? `Cancel ${tenant.tenantName}'s subscription?` : `Mark ${tenant.tenantName} as past due?`,
-        run,
-        action === 'Cancel' ? 'Cancel Subscription' : 'Mark Past Due',
-        'warning',
-        'Confirm',
-        'Back',
-      );
-      return;
-    }
-    run();
-  }
-
-  issueInvoice(): void {
-    const tenant = this.selected();
-    if (!tenant) return;
-    this.billingSrv.issueInvoice(tenant.hospitalGroupId).subscribe(res => {
-      if (!res.success) return;
-      this.applyDetail(res.data);
-      this.toastSrv.success('Invoice issued for the current period');
-    });
-  }
-
-  payInvoice(invoice: SubscriptionInvoice): void {
-    this.billingSrv.payInvoice(invoice.id, this.paymentReference[invoice.id]?.trim() || null).subscribe(res => {
-      if (!res.success) return;
-      this.toastSrv.success(`${invoice.invoiceNumber} marked as paid`);
-      this.refreshSelected();
-    });
-  }
-
-  voidInvoice(invoice: SubscriptionInvoice): void {
-    this.dialogSrv.confirm(`Void invoice ${invoice.invoiceNumber}?`, () => {
-      this.billingSrv.voidInvoice(invoice.id).subscribe(res => {
-        if (!res.success) return;
-        this.toastSrv.info(`${invoice.invoiceNumber} voided`);
-        this.refreshSelected();
-      });
-    }, 'Void Invoice', 'warning', 'Void', 'Back');
-  }
-
-  private refreshSelected(): void {
-    const tenant = this.selected();
-    if (tenant) this.billingSrv.getSubscription(tenant.hospitalGroupId).subscribe(res => res.success && this.applyDetail(res.data));
-  }
-
-  private actionMessage(action: SubscriptionAction, tenant: string): string {
-    switch (action) {
-      case 'ChangePlan': return `${tenant} moved to the selected plan`;
-      case 'Activate': return `${tenant}'s subscription is active`;
-      case 'MarkPastDue': return `${tenant} marked as past due`;
-      case 'Cancel': return `${tenant}'s subscription cancelled`;
-      default: return 'Billing details saved';
-    }
-  }
-  // #endregion
-
-  // #region Plans
-  newPlan(): void {
-    this.editingPlan.set({ id: null, code: '', name: '', description: null, monthlyPrice: 0, currency: 'USD', maxUsers: null, maxBranches: null, isActive: true, sortOrder: this.plans().length + 1 });
-  }
-
-  editPlan(plan: SubscriptionPlan): void {
-    const { id, code, name, description, monthlyPrice, currency, maxUsers, maxBranches, isActive, sortOrder } = plan;
-    this.editingPlan.set({ id, code, name, description, monthlyPrice, currency, maxUsers, maxBranches, isActive, sortOrder });
-  }
-
-  savePlan(): void {
-    const plan = this.editingPlan();
-    if (!plan) return;
-    const { id, ...payload } = plan;
-    const body: SaveSubscriptionPlanRequest = {
-      ...payload,
-      maxUsers: payload.maxUsers || null,
-      maxBranches: payload.maxBranches || null,
-      monthlyPrice: Number(payload.monthlyPrice) || 0,
-    };
-    const request = id ? this.billingSrv.updatePlan(id, body) : this.billingSrv.createPlan(body);
-    request.subscribe(res => {
-      if (!res.success) return;
-      this.editingPlan.set(null);
-      this.loadPlans();
-      this.toastSrv.success(`Plan "${body.name}" saved`);
-    });
-  }
-  // #endregion
-
-  // #region View helpers
-  statusTone(status: string): BadgeTone {
-    switch (status) {
-      case 'Active': case 'Paid': return 'success';
-      case 'Trial': return 'primary';
-      case 'PastDue': case 'Open': return 'warning';
-      case 'Cancelled': case 'Void': return 'danger';
-      default: return 'neutral';
+    if (this.route.snapshot.queryParamMap.has('tenant')) {
+      this.router.navigate([], { relativeTo: this.route, queryParams: { tenant: null }, queryParamsHandling: 'merge', replaceUrl: true });
     }
   }
 
-  statusLabel(status: string): string {
-    return status === 'PastDue' ? 'Past due' : status === 'None' ? 'No plan' : status;
+  openPlan(plan: SubscriptionPlan | null): void {
+    this.editingPlan.set(plan);
+    this.isPlanDrawerOpen.set(true);
   }
 
-  money(amount: number, currency: string): string {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'USD' }).format(amount ?? 0);
+  closePlan(): void {
+    this.isPlanDrawerOpen.set(false);
+    this.editingPlan.set(null);
+  }
+
+  /** A subscription changed: refresh the list, the stats and the plans' subscriber counts. */
+  onSubscriptionChanged(): void {
+    this.loadAll();
+  }
+
+  onPlanSaved(): void {
+    this.closePlan();
+    this.loadAll();
   }
   // #endregion
+
+  private moneyOrDash(amount: number | null | undefined): string {
+    return amount === null || amount === undefined ? '—' : formatMoney(amount, 'USD');
+  }
 }

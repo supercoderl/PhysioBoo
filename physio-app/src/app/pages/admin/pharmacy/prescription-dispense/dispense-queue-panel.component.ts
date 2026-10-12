@@ -1,26 +1,25 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DispenseQueueItem, DispenseQueueStatus } from "../../../../shared/types/dispensing.types";
 
 @Component({
-    selector: 'dispense-queue-panel',
-    standalone: true,
-    imports: [SharedModule, BooIconComponent, StatusBadgeComponent, EmptyStateComponent],
-    template: `
+  selector: 'dispense-queue-panel',
+  standalone: true,
+  imports: [SharedModule, StatusBadgeComponent, EmptyStateComponent],
+  template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex flex-col gap-2">
         <div class="flex items-center justify-between">
           <h2 class="text-sm font-semibold text-regular">Prescription Queue</h2>
           <button type="button" (click)="autoRefreshChange.emit(!autoRefresh)" [title]="autoRefresh ? 'Auto-refresh on' : 'Auto-refresh off'"
             class="w-7 h-7 rounded-1.5 flex items-center justify-center" [ngClass]="autoRefresh ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-400'">
-            <boo-icon name="refresh-cw" [size]="14"></boo-icon>
+            <physio-icon name="refresh" [size]="14"></physio-icon>
           </button>
         </div>
         <div class="relative">
-          <boo-icon name="search" [size]="14" iconClass="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"></boo-icon>
+          <physio-icon name="search" [size]="14" [class]="'absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
           <input type="text" [ngModel]="search" (ngModelChange)="searchChange.emit($event)" placeholder="Search patient, MRN, RX number..."
             class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary" />
         </div>
@@ -56,41 +55,41 @@ import { DispenseQueueItem, DispenseQueueStatus } from "../../../../shared/types
   `,
 })
 export class DispenseQueuePanelComponent {
-    @Input() items: DispenseQueueItem[] = [];
-    @Input() selectedQueueId: string | null = null;
-    @Input() search = '';
-    @Input() statusFilter: DispenseQueueStatus | null = null;
-    @Input() autoRefresh = true;
+  @Input() items: DispenseQueueItem[] = [];
+  @Input() selectedQueueId: string | null = null;
+  @Input() search = '';
+  @Input() statusFilter: DispenseQueueStatus | null = null;
+  @Input() autoRefresh = true;
 
-    @Output() select = new EventEmitter<DispenseQueueItem>();
-    @Output() searchChange = new EventEmitter<string>();
-    @Output() statusFilterChange = new EventEmitter<DispenseQueueStatus | null>();
-    @Output() autoRefreshChange = new EventEmitter<boolean>();
+  @Output() select = new EventEmitter<DispenseQueueItem>();
+  @Output() searchChange = new EventEmitter<string>();
+  @Output() statusFilterChange = new EventEmitter<DispenseQueueStatus | null>();
+  @Output() autoRefreshChange = new EventEmitter<boolean>();
 
-    readonly filters: { label: string; value: DispenseQueueStatus | null }[] = [
-        { label: 'All', value: null },
-        { label: 'Waiting', value: 'Waiting' },
-        { label: 'Verifying', value: 'Verifying' },
-        { label: 'On Hold', value: 'OnHold' },
-        { label: 'Completed', value: 'Completed' },
-    ];
+  readonly filters: { label: string; value: DispenseQueueStatus | null }[] = [
+    { label: 'All', value: null },
+    { label: 'Waiting', value: 'Waiting' },
+    { label: 'Verifying', value: 'Verifying' },
+    { label: 'On Hold', value: 'OnHold' },
+    { label: 'Completed', value: 'Completed' },
+  ];
 
-    priorityDotClass(priority: string): string {
-        if (priority === 'Critical') return 'bg-rose-500';
-        if (priority === 'High') return 'bg-amber-500';
-        return 'bg-gray-300';
+  priorityDotClass(priority: string): string {
+    if (priority === 'Critical') return 'bg-rose-500';
+    if (priority === 'High') return 'bg-amber-500';
+    return 'bg-gray-300';
+  }
+
+  statusTone(status: DispenseQueueStatus): BadgeTone {
+    switch (status) {
+      case 'Waiting': return 'neutral';
+      case 'Verifying': return 'primary';
+      case 'Preparing':
+      case 'Dispensing': return 'warning';
+      case 'Completed': return 'success';
+      case 'Cancelled': return 'danger';
+      case 'OnHold': return 'warning';
+      default: return 'neutral';
     }
-
-    statusTone(status: DispenseQueueStatus): BadgeTone {
-        switch (status) {
-            case 'Waiting': return 'neutral';
-            case 'Verifying': return 'primary';
-            case 'Preparing':
-            case 'Dispensing': return 'warning';
-            case 'Completed': return 'success';
-            case 'Cancelled': return 'danger';
-            case 'OnHold': return 'warning';
-            default: return 'neutral';
-        }
-    }
+  }
 }

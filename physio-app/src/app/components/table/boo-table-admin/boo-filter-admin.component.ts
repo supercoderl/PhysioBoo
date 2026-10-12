@@ -7,19 +7,19 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
     selector: 'boo-filter-admin',
     standalone: true,
     imports: [
-    SharedModule,
-    BooButtonAdminComponent
-],
+        SharedModule,
+        BooButtonAdminComponent
+    ],
     template: `
-<div class="relative inline-block text-left">
+    <div class="relative inline-block text-left">
       <boo-button-admin
         (click)="toggle()"
-        [icon]="{ name: 'funnel', size: 14, color: hasActiveFilter ? '#3b82f6' : '#6C7688' }"
+        [icon]="{ name: 'funnel', size: 14, iconClass: hasActiveFilter ? 'text-primary' : 'text-gray-500' }"
         buttonClass="!bg-surface h-full"
-        [border]="{ width: 1, color: hasActiveFilter ? '#3b82f6' : '#e3e3e3' }"
+        [border]="{ width: 1, color: hasActiveFilter ? '#FB7185' : '#EFE3E7' }"
       >
         <span class="text-placeholder">Filter</span> 
-        <span *ngIf="hasActiveFilter" class="ml-1 w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
+        <span *ngIf="hasActiveFilter" class="ml-1 w-2 h-2 rounded-full bg-primary inline-block"></span>
       </boo-button-admin>
 
       <div *ngIf="isOpen" class="absolute right-0 mt-2 w-80 bg-surface rounded-lg shadow-xl border border-gray-200 z-50 p-4 animate-in fade-in zoom-in-95 duration-200">
@@ -30,9 +30,9 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
             <label class="text-xs font-bold text-slate-500 uppercase mb-2 block">{{ config.label }}</label>
 
             <div *ngIf="config.type === 'range-number'" class="flex items-center gap-2">
-               <input type="number" [(ngModel)]="config.value.min" [placeholder]="'Min'" class="w-1/2 border border-gray-300 rounded px-2 py-1.5 text-sm focus:border-blue-500 outline-none">
+               <input type="number" [(ngModel)]="config.value.min" [placeholder]="'Min'" class="w-1/2 border border-gray-300 rounded px-2 py-1.5 text-sm focus:border-primary outline-none">
                <span class="text-gray-400">-</span>
-               <input type="number" [(ngModel)]="config.value.max" [placeholder]="'Max'" class="w-1/2 border border-gray-300 rounded px-2 py-1.5 text-sm focus:border-blue-500 outline-none">
+               <input type="number" [(ngModel)]="config.value.max" [placeholder]="'Max'" class="w-1/2 border border-gray-300 rounded px-2 py-1.5 text-sm focus:border-primary outline-none">
             </div>
 
             <div *ngIf="config.type === 'boolean'" class="bg-surface border border-borderGray p-1 rounded-md flex gap-1">
@@ -77,7 +77,7 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
                 class="w-6 h-6 rounded-full border border-gray-200 hover:scale-110 transition-transform relative"
                 [class.ring-2]="config.value === opt.value"
                 [class.ring-offset-1]="config.value === opt.value"
-                [class.ring-blue-500]="config.value === opt.value"
+                [class.ring-primary]="config.value === opt.value"
                 [title]="opt.label">
               </button>
               <button (click)="config.value = null" *ngIf="config.value" class="text-xs text-gray-400 underline ml-auto">Clear</button>
@@ -88,7 +88,7 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
 
         <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-100">
           <button (click)="reset()" class="text-xs text-red-500 font-medium hover:underline">Reset All</button>
-          <button (click)="applyFilter()" class="bg-primary text-white text-[13px] font-semibold px-4 py-2 rounded-md hover:bg-blue-700 transition-colors shadow-sm">
+          <button (click)="applyFilter()" class="bg-primary text-white text-[13px] font-semibold px-4 py-2 rounded-md hover:bg-primaryHover transition-colors shadow-sm">
             Apply Filter
           </button>
         </div>

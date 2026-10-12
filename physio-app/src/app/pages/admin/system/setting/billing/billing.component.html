@@ -91,7 +91,7 @@
               <li *ngFor="let f of plan.features" class="flex items-start gap-2 text-xs"
                 [class.text-white]="currentPlanId() === plan.id"
                 [class.text-gray-700]="currentPlanId() !== plan.id">
-                <boo-icon name="check" iconClass="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                <physio-icon name="check" [class]="'w-3.5 h-3.5 mt-0.5 shrink-0'" />
                 <span>{{ f }}</span>
               </li>
             </ul>
@@ -104,8 +104,8 @@
               [class.text-primary]="currentPlanId() === plan.id"
               [class.bg-primary]="currentPlanId() !== plan.id"
               [class.text-white]="currentPlanId() !== plan.id"
-              [class.hover:bg-primary/90]="currentPlanId() !== plan.id">
-              <boo-icon *ngIf="changingPlan() === plan.id" name="loader-circle" iconClass="w-4 h-4 animate-spin" />
+              [class.hover:bg-primaryHover]="currentPlanId() !== plan.id">
+              <physio-icon *ngIf="changingPlan() === plan.id" name="loader-circle" [class]="'w-4 h-4 animate-spin'" />
               <span>
                 {{ changingPlan() === plan.id ? 'Switching…' : currentPlanId() === plan.id ? 'Current plan' : 'Switch to ' + plan.name }}
               </span>
@@ -121,7 +121,7 @@
         </div>
         <div class="p-5 flex items-center gap-3">
           <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-            <boo-icon name="landmark" iconClass="w-5 h-5 text-gray-500" />
+            <physio-icon name="landmark" class="w-5 h-5 text-gray-500" />
           </div>
           <div *ngIf="outstanding() > 0; else allPaid">
             <div class="text-sm font-medium text-gray-900">{{ outstanding() | number:'1.2-2' }} {{ currentPlan().currency }} outstanding</div>
@@ -160,7 +160,7 @@
             <button type="button" (click)="downloadInvoice(inv)"
               class="p-1.5 rounded-md text-gray-400 hover:text-primary hover:bg-primary/5 transition-colors"
               title="Download invoice">
-              <boo-icon name="download" iconClass="w-4 h-4" />
+              <physio-icon name="download" class="w-4 h-4" />
             </button>
           </div>
         </div>

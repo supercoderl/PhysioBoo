@@ -37,15 +37,15 @@ export const routes: Routes = [
                     },
                     {
                         path: 'hospital-group',
-                        loadComponent: () => import('../admin/system/common-category/hospital-group/list.component').then(m => m.CommonCategoryHospitalGroupListComponent),
+                        loadComponent: () => import('./tenants/hospital-group/list.component').then(m => m.SuperadminTenantListComponent),
                         data: { breadcrumb: ['hospital groups'] },
                         canActivate: [permissionGuard(Permissions.Admin.HospitalGroupRead)]
                     },
                     {
-                        path: 'hospital',
-                        loadComponent: () => import('../admin/system/common-category/hospital/list.component').then(m => m.CommonCategoryHospitalListComponent),
-                        data: { breadcrumb: ['hospitals'] },
-                        canActivate: [permissionGuard(Permissions.Admin.HospitalRead)]
+                        path: 'hospital-group/:id',
+                        loadComponent: () => import('./tenants/hospital-group/detail.component').then(m => m.SuperadminTenantDetailComponent),
+                        data: { breadcrumb: ['hospital groups', 'detail'] },
+                        canActivate: [permissionGuard(Permissions.Admin.HospitalGroupRead)]
                     }
                 ]
             },
@@ -53,6 +53,22 @@ export const routes: Routes = [
                 path: 'billing',
                 data: { breadcrumb: ['billing'] },
                 loadComponent: () => import('./billing/billing.component').then(m => m.BillingComponent)
+            },
+            {
+                path: 'master-data',
+                children: [
+                    {
+                        path: '',
+                        data: { breadcrumb: ['master data'] },
+                        loadComponent: () => import('./master-data/master-data-hub.component').then(m => m.SuperadminMasterDataHubComponent)
+                    },
+                    {
+                        // Catalog, permission and drawer are resolved from MasterDataRegistry by the :catalog slug.
+                        path: ':catalog',
+                        data: { breadcrumb: ['master data', 'catalog'] },
+                        loadComponent: () => import('./master-data/master-data-list.component').then(m => m.SuperadminMasterDataListComponent)
+                    }
+                ]
             },
             {
                 path: 'users',
@@ -65,6 +81,55 @@ export const routes: Routes = [
                 loadComponent: () => import('./roles/list.component').then(m => m.SuperadminRoleListComponent),
                 data: { breadcrumb: ['roles'] },
                 canActivate: [permissionGuard(Permissions.Iam.RoleRead)]
+            },
+            {
+                path: 'platform',
+                children: [
+                    {
+                        path: 'sequence-rules',
+                        data: { breadcrumb: ['platform', 'sequence rules'], catalog: 'sequence-rules' },
+                        loadComponent: () => import('./master-data/master-data-list.component').then(m => m.SuperadminMasterDataListComponent)
+                    },
+                    {
+                        path: 'dev-data',
+                        data: { breadcrumb: ['platform', 'dev data'] },
+                        loadComponent: () => import('./platform/dev-data/dev-data.component').then(m => m.SuperadminDevDataComponent)
+                    },
+                    {
+                        path: 'localization',
+                        data: { breadcrumb: ['platform', 'localization'] },
+                        loadComponent: () => import('./platform/localization/localization.component').then(m => m.SuperadminLocalizationComponent),
+                        canActivate: [permissionGuard(Permissions.System.ResourceRead)]
+                    }
+                ]
+            },
+            {
+                path: 'security',
+                children: [
+                    {
+                        path: '',
+                        redirectTo: 'audit-logs',
+                        pathMatch: 'full'
+                    },
+                    {
+                        path: 'audit-logs',
+                        loadComponent: () => import('./security/audit-logs/audit-logs.component').then(m => m.SuperadminAuditLogsComponent),
+                        data: { breadcrumb: ['security', 'audit logs'] },
+                        canActivate: [permissionGuard(Permissions.System.AuditLogRead)]
+                    },
+                    {
+                        path: 'ip-access',
+                        loadComponent: () => import('./security/ip-access/ip-access.component').then(m => m.SuperadminIpAccessComponent),
+                        data: { breadcrumb: ['security', 'ip access'] },
+                        canActivate: [permissionGuard(Permissions.System.SecurityBlockIp)]
+                    }
+                ]
+            },
+            {
+                path: 'menus',
+                loadComponent: () => import('./menus/menu-management.component').then(m => m.SuperadminMenuManagementComponent),
+                data: { breadcrumb: ['menu management'] },
+                canActivate: [permissionGuard(Permissions.Admin.AdminMenuRead)]
             }
         ]
     }

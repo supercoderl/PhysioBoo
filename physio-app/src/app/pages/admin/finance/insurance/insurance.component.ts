@@ -1,6 +1,5 @@
 import { Component, OnInit, computed, signal } from "@angular/core";
 import { finalize, forkJoin } from "rxjs";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { InsuranceClaimsService } from "../../../../services/admin/insurance-claims.service";
@@ -31,8 +30,7 @@ const LOADING_KEY = 'insurance-claims-workspace';
   selector: 'admin-insurance',
   standalone: true,
   imports: [
-    SharedModule,
-    BooIconComponent,
+    SharedModule,
     EmptyStateComponent,
     ErrorStateComponent,
     InsuranceProvidersTreeComponent,
@@ -66,7 +64,7 @@ const LOADING_KEY = 'insurance-claims-workspace';
   template: `
     <!-- Loading -->
     <div *ngIf="loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center h-full gap-3">
-      <boo-icon name="loader" [size]="28" iconClass="animate-spin text-[var(--ic-forest)]"></boo-icon>
+      <physio-icon name="loader" [size]="28" [class]="'animate-spin text-[var(--ic-forest)]'"></physio-icon>
       <span class="text-[var(--ic-warm-gray-600)] text-xs">Loading claim workspace…</span>
     </div>
 
@@ -79,7 +77,7 @@ const LOADING_KEY = 'insurance-claims-workspace';
       <!-- Top toolbar -->
       <header class="h-14 shrink-0 flex items-center gap-3 px-3 border-b border-[var(--ic-warm-gray-200)]">
         <div class="relative w-64 shrink-0">
-          <boo-icon name="search" [size]="14" iconClass="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--ic-warm-gray-500)]"></boo-icon>
+          <physio-icon name="search" [size]="14" [class]="'absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--ic-warm-gray-500)]'"></physio-icon>
           <input
             type="text"
             [ngModel]="searchQuery()"
@@ -121,7 +119,7 @@ const LOADING_KEY = 'insurance-claims-workspace';
             <span class="text-[10px] text-[var(--ic-warm-gray-600)] leading-tight">Risk</span>
           </div>
           <div class="flex items-center gap-1 text-[var(--ic-amber)]" title="Claims with missing documents">
-            <boo-icon name="file-warning" [size]="14" iconClass="text-[var(--ic-amber)]"></boo-icon>
+            <physio-icon name="file-warning" [size]="14" class="text-[var(--ic-amber)]"></physio-icon>
             <span class="text-xs font-bold">{{ s.missingDocumentsCount }}</span>
           </div>
           <div class="flex items-end gap-[2px] h-6" title="Approval velocity (last 7 submissions, days)">
@@ -134,12 +132,12 @@ const LOADING_KEY = 'insurance-claims-workspace';
             class="px-2 py-1 text-[10px] font-semibold rounded transition-colors"
             [ngClass]="density() === d.key ? 'bg-[var(--ic-ivory)] text-[var(--ic-forest)] shadow-sm' : 'text-[var(--ic-warm-gray-600)]'"
             [title]="d.label">
-            <boo-icon [name]="d.icon" [size]="13"></boo-icon>
+            <physio-icon [name]="d.icon" [size]="13"></physio-icon>
           </button>
         </div>
 
         <button type="button" class="px-3 py-1.5 bg-[var(--ic-forest)] text-[var(--ic-ivory)] rounded-1.5 text-xs font-semibold hover:bg-[var(--ic-forest-dark)] transition-colors flex items-center gap-1.5" (click)="openDialog('create')">
-          <boo-icon name="circle-plus" [size]="14"></boo-icon> New Claim
+          <physio-icon name="circle-plus" [size]="14"></physio-icon> New Claim
         </button>
       </header>
 
@@ -230,7 +228,7 @@ const LOADING_KEY = 'insurance-claims-workspace';
           ></insurance-claim-detail-panel>
         </div>
         <button *ngIf="rightCollapsed()" type="button" class="shrink-0 w-8 border-l border-[var(--ic-warm-gray-200)] hover:bg-[var(--ic-warm-gray-100)] flex items-center justify-center" (click)="rightCollapsed.set(false)" aria-label="Open detail panel">
-          <boo-icon name="panel-right-open" [size]="16" iconClass="text-[var(--ic-warm-gray-500)]"></boo-icon>
+          <physio-icon name="panel-right-open" [size]="16" class="text-[var(--ic-warm-gray-500)]"></physio-icon>
         </button>
       </div>
     </div>

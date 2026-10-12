@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output, Signal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { Permission } from "../../../../shared/types/permission.types";
 import { ColorUtils } from "../../../../shared/utils/color.utils";
@@ -8,8 +7,7 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
     selector: 'admin-user-permission-permission-tab',
     standalone: true,
     imports: [
-        SharedModule,
-        BooIconComponent
+        SharedModule,
     ],
     template: `
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -21,10 +19,10 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
           class="px-5 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50"
         >
           <div class="flex items-center gap-2">
-            <boo-icon
+            <physio-icon
               name="folder"
-              iconClass="w-4 h-4 text-secondary"
-            ></boo-icon>
+            class="w-4 h-4 text-secondary"
+            ></physio-icon>
             <h3 class="text-sm font-semibold text-primary m-0">
               {{ g.category }}
             </h3>
@@ -40,10 +38,10 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
               <div
                 class="w-8 h-8 rounded-md bg-primary/5 flex items-center justify-center flex-shrink-0 mt-0.5"
               >
-                <boo-icon
+                <physio-icon
                   name="key"
-                  iconClass="w-4 h-4 text-primary"
-                ></boo-icon>
+                class="w-4 h-4 text-primary"
+                ></physio-icon>
               </div>
               <div class="min-w-0">
                 <div class="text-sm font-medium text-primary">{{ p.name }}</div>
@@ -63,14 +61,14 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
                 class="p-1.5 hover:bg-primary/10 rounded text-primary"
                 title="Edit"
               >
-                <boo-icon name="pencil" iconClass="w-3.5 h-3.5"></boo-icon>
+                <physio-icon name="pencil" class="w-3.5 h-3.5"></physio-icon>
               </button>
               <button
                 (click)="onDeleteClick(p)"
                 class="p-1.5 hover:bg-red-50 rounded text-red-500"
                 title="Delete"
               >
-                <boo-icon name="trash-2" iconClass="w-3.5 h-3.5"></boo-icon>
+                <physio-icon name="trash-2" class="w-3.5 h-3.5"></physio-icon>
               </button>
             </div>
           </div>
@@ -85,7 +83,7 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
       <div
         class="w-12 h-12 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-3"
       >
-        <boo-icon name="key" iconClass="w-6 h-6 text-gray-400"></boo-icon>
+        <physio-icon name="key" class="w-6 h-6 text-gray-400"></physio-icon>
       </div>
       <div class="text-sm font-medium text-primary mb-1">
         No permissions defined

@@ -4,7 +4,6 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { switchMap, timer } from "rxjs";
 import { AppointmentService } from "src/app/services/admin/appointment.service";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { DoctorDeskService } from "../../../../services/admin/doctor-desk.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
@@ -23,7 +22,6 @@ import { WaitingQueuePanelComponent } from "./components/waiting-queue-panel.com
     standalone: true,
     imports: [
         SharedModule,
-        BooIconComponent,
         StatCardComponent,
         DeskHeaderComponent,
         CurrentPatientPanelComponent,

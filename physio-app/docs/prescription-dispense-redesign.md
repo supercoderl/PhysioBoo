@@ -137,14 +137,14 @@ Received ─ Clinical Verification ─ Inventory Picking ─ Barcode Validation 
 AdminPrescriptionDispenseComponent (shell)
 ├── DispenseQueuePanelComponent           (left)
 ├── DispensePickingPanelComponent         (center)
-│   ├── uses StatusBadgeComponent, BooIconComponent
+│   ├── uses StatusBadgeComponent, IconComponent (physio-icon)
 │   └── DispenseProgressStepperComponent  (8-stage stepper, reusable)
 ├── DispenseSummaryPanelComponent         (right)
 └── DispenseMedicationDrawerComponent     (overlay, wraps shared DrawerComponent)
 ```
 
 Shared components reused as-is: `DrawerComponent`, `DialogService`, `ToastService`,
-`StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `BooIconComponent`,
+`StatusBadgeComponent`, `StatCardComponent`, `EmptyStateComponent`, `IconComponent` (physio-icon),
 `BooInputComponent`, `BooSelectComponent`.
 
 ## 8. UI Specification

@@ -50,6 +50,23 @@ export const BASE_API = {
     BASE: '/api/sequence-trackers',
     SEARCH: '/api/sequence-trackers/search'
   },
+  AUDIT_LOG: {
+    BASE: '/api/audit-logs',
+    SEARCH: '/api/audit-logs/search'
+  },
+  SYSTEM: {
+    BLOCK_IP: '/api/systems/block-ip',
+    UNBLOCK_IP: '/api/systems/unblock-ip'
+  },
+  DEVDATA: {
+    BASE: '/api/superadmin/dev-data',
+    MODULES: '/api/superadmin/dev-data/modules'
+  },
+  RESOURCE: {
+    SEARCH: '/api/resources/search',
+    IMPORT_LOCAL: '/api/resources/import-local',
+    IMPORT_REMOTE: '/api/resources/import-remote'
+  },
   DOCTOR: {
     BASE: '/api/doctors',
     SEARCH: '/api/doctors/search'

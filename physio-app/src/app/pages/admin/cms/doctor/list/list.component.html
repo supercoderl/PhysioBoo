@@ -15,7 +15,7 @@
           [options]="[
             { label: 'Xlsx', value: 'xlsx' },
             { label: 'Pdf', value: 'pdf' },
-            { label: 'Csv', value: 'csv' }
+            { label: 'Csv', value: 'csv' },
           ]"
         />
         <ng-template #menuExportRef>
@@ -57,13 +57,13 @@
                 size="small"
                 (search)="onSearch($event)"
               >
-                <boo-icon
+                <physio-icon
                   [class.animate-spin]="loadingSrv.isLoading('search')"
                   [name]="
                     loadingSrv.isLoading('search') ? 'loader-circle' : 'search'
                   "
-                  color="#64748B"
                   endfix
+                  class="text-[#85757D]"
                 />
               </boo-input>
             </div>
@@ -78,13 +78,11 @@
       />
     </div>
 
-    <div
-      class="flex table-dropdown right-content items-center flex-wrap gap-3"
-    >
+    <div class="flex table-dropdown right-content items-center flex-wrap gap-3">
       <boo-button-admin
-        [icon]="{ name: 'refresh-cw', size: 14, color: '#6C7688' }"
-        buttonClass="!bg-surface h-full"
-        [border]="{ width: 1, color: '#e3e3e3' }"
+        [icon]="{ name: 'refresh', size: 14 }"
+        buttonClass="!bg-surface h-full text-secondary"
+        [border]="{ width: 1, color: '#EFE3E7' }"
         (click)="loadDoctors()"
       >
         <span class="text-placeholder">Reload</span>
@@ -93,9 +91,9 @@
         [filters]="filter_configs"
         (apply)="onFilterApply($event)"
       />
-      <boo-sort-admin 
-        [(value)]="params.sort" 
-        (change)="onSortChange($event)" 
+      <boo-sort-admin
+        [(value)]="params.sort"
+        (change)="onSortChange($event)"
         [options]="sort_options"
       />
     </div>

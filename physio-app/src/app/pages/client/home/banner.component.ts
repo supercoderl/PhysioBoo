@@ -15,7 +15,7 @@ import { SharedModule } from '../../../shared/shared-imports';
                     <div class="md:col-span-7 px-3">
                         <div class="py-12.5 md:py-30 text-center md:text-left z-[1] relative">
                             <div
-                                class="bg-surface shadow-[0_4px_14px_#e2edff40] rounded-7.5 p-2 mb-4 gap-2 inline-flex items-center"
+                                class="bg-surface shadow-[0_4px_14px_#FFE9EE40] rounded-7.5 p-2 mb-4 gap-2 inline-flex items-center"
                             >
                                 <div class="p-0">
                                     <span class="w-11.252 h-11.252 -mr-3.5 border border-solid border-[rgba(0,_0,_0,_0.05)] align-middle transition-transform duration-200 ease rounded-full relative inline-block overflow-hidden hover:-translate-y-0.75 hover:z-[10]">
@@ -59,7 +59,7 @@ import { SharedModule } from '../../../shared/shared-imports';
                                 <span class="text-secondary">Doctors</span>
                                 Today
                             </h1>
-                            <div class="search-box w-full md:w-auto border border-solid rounded-2.5 md:rounded-17.5 p-2 relative shadow-[0_4px_14px_#e2edff40] table z-[1]">
+                            <div class="search-box w-full md:w-auto border border-solid rounded-2.5 md:rounded-17.5 p-2 relative shadow-[0_4px_14px_#FFE9EE40] table z-[1]">
                                 <form class="float-left w-full">
                                     <div class="table-cell float-left w-full md:w-[35%] align-middle relative before:absolute before:top-1/2 before:right-0 before:-translate-y-1/2 before:w-[1px] before:h-11 before:bg-[#e3e4e8] before:content-[''] before:z-[1]">
                                         <lucide-angular [img]="Hospital" class="w-4.5 stroke-primary left-1.25 absolute top-1/2 -translate-y-1/2" />
@@ -114,14 +114,14 @@ import { SharedModule } from '../../../shared/shared-imports';
                                 alt="patient-image"
                                 src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/banner/banner-doctor.svg"
                             />
-                            <div class="shadow-[0_4px_24px_#dddcff] p-4 rounded-2.5 text-center bg-surface absolute right-0 top-1/2 translate-y-1/2 animate-mover">
+                            <div class="shadow-[0_4px_24px_#FFE9EE] p-4 rounded-2.5 text-center bg-surface absolute right-0 top-1/2 translate-y-1/2 animate-mover">
                                 <h6 class="text-lg font-semibold text-primary">1K</h6>
                                 <p class="text-xs m-0 text-brandDark">
                                     Appointments
                                 <span class="block">Completed</span>
                                 </p>
                             </div>
-                            <div class="bg-[#000f28] p-2.5 rounded-1.25 animate-mover text-center absolute left-0 bottom-25">
+                            <div class="bg-[#26141A] p-2.5 rounded-1.25 animate-mover text-center absolute left-0 bottom-25">
                                 <div class="mb-2">
                                     <span class="w-6 h-6 -mr-3.5 border border-solid border-[rgba(0,_0,_0,_0.5)] align-middle transition-transform duration-200 ease rounded-full relative inline-block overflow-hidden hover:-translate-y-0.75 hover:z-[10]">
                                         <img
@@ -188,7 +188,7 @@ import { SharedModule } from '../../../shared/shared-imports';
             background: url('https://doccure.dreamstechnologies.com/react/template/assets/home-banner-bg-Bke3qugk.png');
         
             .search-box {
-                background: linear-gradient(#fff,#fff),linear-gradient(90.08deg,#0e82fd .09%,#06aed4 70.28%)
+                background: linear-gradient(#fff,#fff),linear-gradient(90.08deg,#E11D48 .09%,#06aed4 70.28%)
             }  
 
             .banner::before {
@@ -197,7 +197,7 @@ import { SharedModule } from '../../../shared/shared-imports';
             }
 
             form button {
-                background: linear-gradient(90.08deg,#0e82fd .09%,#06aed4 70.28%);
+                background: linear-gradient(90.08deg,#E11D48 .09%,#06aed4 70.28%);
             }
         }
     `

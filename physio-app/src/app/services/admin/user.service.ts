@@ -1,10 +1,12 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { forkJoin, map, Observable } from "rxjs";
 import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
 import { User } from "../../shared/types/core.types";
 import { UserFilter } from "../../shared/types/filter.types";
 import { AssignRoleRequest } from "../../shared/types/permission.types";
+import { UserStats } from "../../shared/types/platform.types";
 import { UserSession } from "../../shared/types/session.types";
 import { MyAccount, UpdateMyAccountRequest } from "../../shared/types/account.types";
 
@@ -14,6 +16,24 @@ export class UserService {
 
     search(request: PagedRequest<UserFilter>) {
         return this.http.post<PagedResponse<PaginationData<User>>>(BASE_API.USER.SEARCH, request);
+    }
+
+    /**
+     * Placeholder until `GET /api/users/stats` exists (see docs/superadmin-redesign.md §17):
+     * reads `totalCount` from two single-row searches instead of counting the visible page.
+     */
+    getStats(): Observable<UserStats> {
+        const count = (isActive: boolean | null) => this.search({
+            pageNumber: 1,
+            pageSize: 1,
+            search: '',
+            sort: 'createdAt:desc',
+            filter: { isActive }
+        }).pipe(map(res => res.success ? res.data?.totalCount ?? 0 : 0));
+
+        return forkJoin({ total: count(null), active: count(true) }).pipe(
+            map(({ total, active }) => ({ total, active, inactive: Math.max(total - active, 0) }))
+        );
     }
 
     search_by_id(id: string) {

@@ -3,7 +3,9 @@
     class="flex items-center md:flex-column gap-2 pb-3 mb-2 border-1 border-bottom"
   >
     <div class="flex-1">
-      <h4 class="text-[22px] text-primary font-semibold mb-0">Article & News</h4>
+      <h4 class="text-[22px] text-primary font-semibold mb-0">
+        Article & News
+      </h4>
     </div>
     <div class="text-right flex">
       <button-icon
@@ -26,13 +28,13 @@
                 size="small"
                 (search)="onSearch($event)"
               >
-                <boo-icon
+                <physio-icon
                   [class.animate-spin]="loadingSrv.isLoading('search')"
                   [name]="
                     loadingSrv.isLoading('search') ? 'loader-circle' : 'search'
                   "
-                  color="#64748B"
                   endfix
+                class="text-[#85757D]"
                 />
               </boo-input>
             </div>
@@ -47,13 +49,11 @@
       />
     </div>
 
-    <div
-      class="flex table-dropdown right-content items-center flex-wrap gap-3"
-    >
+    <div class="flex table-dropdown right-content items-center flex-wrap gap-3">
       <boo-button-admin
-        [icon]="{ name: 'refresh-cw', size: 14, color: '#6C7688' }"
-        buttonClass="!bg-surface h-full"
-        [border]="{ width: 1, color: '#e3e3e3' }"
+        [icon]="{ name: 'refresh', size: 14 }"
+        buttonClass="!bg-surface h-full text-secondary"
+        [border]="{ width: 1, color: '#EFE3E7' }"
         (click)="loadArticles()"
       >
         <span class="text-placeholder">Reload</span>

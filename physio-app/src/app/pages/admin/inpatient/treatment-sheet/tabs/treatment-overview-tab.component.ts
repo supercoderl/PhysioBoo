@@ -1,6 +1,5 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { forkJoin } from "rxjs";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -9,10 +8,10 @@ import { ClinicalAlert, TreatmentOrder, TreatmentTimelineEntry } from "../../../
 @Component({
   selector: 'treatment-overview-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, EmptyStateComponent],
+  imports: [SharedModule,EmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading()" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -46,7 +45,7 @@ import { ClinicalAlert, TreatmentOrder, TreatmentTimelineEntry } from "../../../
         <div *ngIf="!alerts().length"><boo-empty-state icon="shield-check" title="No active clinical alerts"></boo-empty-state></div>
         <ul class="space-y-2" *ngIf="alerts().length">
           <li *ngFor="let a of alerts()" class="text-sm text-gray-700 flex items-center gap-2">
-            <boo-icon name="alert-triangle" [size]="14" iconClass="text-amber-500"></boo-icon>
+            <physio-icon name="alert-triangle" [size]="14" class="text-amber-500"></physio-icon>
             {{ a.message }}
           </li>
         </ul>

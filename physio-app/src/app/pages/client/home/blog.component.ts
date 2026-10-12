@@ -19,7 +19,7 @@ import { SharedModule } from "../../../shared/shared-imports";
             </div>
             <div class="grid md:grid-cols-2 gap-6">
                 <div class="mt-6 px-3" *ngFor="let index of arr">
-                    <div class="rounded-2.5 shadow-[0_4px_14px_#e2edff40] overflow-hidden block md:flex items-center">
+                    <div class="rounded-2.5 shadow-[0_4px_14px_#FFE9EE40] overflow-hidden block md:flex items-center">
                         <div class="relative w-full h-full overflow-hidden rounded-2.5">
                             <a href="/react/template/blog/blog-details" class="overflow-hidden w-full h-full">
                                 <img

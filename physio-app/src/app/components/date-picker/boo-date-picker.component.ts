@@ -2,7 +2,6 @@ import { AfterViewInit, Component, ElementRef, HostListener, Input, NgZone, OnDe
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MONTH_NAMES, SHORT_WEEKDAY_NAMES } from '../../shared/constants/value.constant';
 import { SharedModule } from '../../shared/shared-imports';
-import { BooIconComponent } from "../icon/boo-icon/boo-icon.component";
 
 type CalendarView = 'days' | 'months' | 'years';
 type Size = 'small' | 'medium' | 'large';
@@ -11,7 +10,7 @@ export type DateFilterFn = (date: Date) => boolean;
 @Component({
   selector: 'boo-datepicker',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -57,7 +56,7 @@ export type DateFilterFn = (date: Date) => boolean;
       >
         <span class="flex-1 text-left">{{ displayValue() }}</span>
         <span class="pl-2 text-slate-400">
-          <boo-icon name="calendar" />
+          <physio-icon name="calendar" />
         </span>
       </button>
 
@@ -69,7 +68,7 @@ export type DateFilterFn = (date: Date) => boolean;
         <div class="flex items-center justify-between px-3 py-2 border-b border-gray-100">
           <button type="button" (click)="prev()"
             class="w-7 h-7 rounded hover:bg-gray-100 inline-flex items-center justify-center text-gray-500">
-            <boo-icon name="chevron-left" />
+            <physio-icon name="chevron-left" />
           </button>
 
           <button type="button" (click)="cycleView()"
@@ -83,7 +82,7 @@ export type DateFilterFn = (date: Date) => boolean;
 
           <button type="button" (click)="next()"
             class="w-7 h-7 rounded hover:bg-gray-100 inline-flex items-center justify-center text-gray-500">
-            <boo-icon name="chevron-right" />
+            <physio-icon name="chevron-right" />
           </button>
         </div>
         <div *ngIf="view() === 'days'" class="p-2">
@@ -163,7 +162,7 @@ export class BooDatepickerComponent implements ControlValueAccessor, AfterViewIn
   @Input() backgroundColor = 'white';
   @Input() borderWidth = 1;
   @Input() borderColor = '#e6e8ee';
-  @Input() placeholderColor = '#64748B';
+  @Input() placeholderColor = '#85757D';
 
   /** Min selectable date (inclusive). Accepts Date or 'yyyy-MM-dd'. */
   @Input() set min(v: Date | string | null | undefined) { this._min.set(this.parse(v)); }

@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
@@ -9,7 +8,7 @@ import { TimelineCategory, TimelineRangeKey, TreatmentTimelineEntry } from "../.
 @Component({
   selector: 'treatment-timeline-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, BooSelectComponent, EmptyStateComponent],
+  imports: [SharedModule,BooSelectComponent, EmptyStateComponent],
   template: `
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <h3 class="text-sm font-semibold text-primary m-0">Treatment Timeline</h3>
@@ -17,7 +16,7 @@ import { TimelineCategory, TimelineRangeKey, TreatmentTimelineEntry } from "../.
     </div>
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !entries().length"><boo-empty-state icon="history" title="No timeline entries" description="Nothing recorded for this range yet."></boo-empty-state></div>
@@ -26,7 +25,7 @@ import { TimelineCategory, TimelineRangeKey, TreatmentTimelineEntry } from "../.
       <li *ngFor="let e of entries()" class="ml-4">
         <span class="absolute -left-[5px] w-2.5 h-2.5 rounded-full bg-primary mt-1.5"></span>
         <div class="flex items-center gap-2 mb-0.5">
-          <boo-icon [name]="categoryIcon(e.category)" [size]="14" iconClass="text-primary"></boo-icon>
+          <physio-icon [name]="categoryIcon(e.category)" [size]="14" class="text-primary"></physio-icon>
           <span class="text-sm font-medium text-gray-800">{{ e.title }}</span>
         </div>
         <p class="text-xs text-secondary">{{ e.occurredAt | date:'medium' }} · {{ e.actorName }} <span *ngIf="e.status"> · {{ e.status }}</span></p>

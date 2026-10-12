@@ -1,5 +1,4 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
@@ -23,7 +22,7 @@ type ViewMode = 'table' | 'timeline';
 @Component({
   selector: 'treatment-medications-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-sm font-semibold text-primary m-0">Medication Administration Record</h3>
@@ -64,7 +63,7 @@ type ViewMode = 'table' | 'timeline';
     </div>
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !entries().length"><boo-empty-state icon="pill" title="No medications scheduled"></boo-empty-state></div>

@@ -79,7 +79,7 @@ import { DoctorCardComponent } from "../../../components/layout/client/doctor/do
                     <input id="status" class="block m-0 p-0 w-0 h-0 visibility-hidden opacity-0 absolute transition-smooth" type="checkbox" />
                     <label
                         for="status"
-                        class="h-7 w-12.5 rounded-full bg-[#f3f4f6] border-[#f3f4f6] border border-solid cursor-pointer block m-0 relative text-[0px] before:content-[' '] before:block before:absolute before:top-1/2 before:right-0 before:w-5 before:h-5 before:translate-x-0.75 before:-translate-y-1/2 after:w-6 after:h-6 after:translate-x-[1px] after:-translate-y-1/2 after:bg-center after:shadow-[0_1px_2px_#0000001a,_0_1px_1px_#0000000f] after:block after:bg-[#91a0b3] after:transition-[left_0.3s_ease,_transform_0.3s_ease] after:rounded-full after:absolute after:top-1/2 after:left-0"
+                        class="h-7 w-12.5 rounded-full bg-[#FAF1F3] border-[#FAF1F3] border border-solid cursor-pointer block m-0 relative text-[0px] before:content-[' '] before:block before:absolute before:top-1/2 before:right-0 before:w-5 before:h-5 before:translate-x-0.75 before:-translate-y-1/2 after:w-6 after:h-6 after:translate-x-[1px] after:-translate-y-1/2 after:bg-center after:shadow-[0_1px_2px_#0000001a,_0_1px_1px_#0000000f] after:block after:bg-[#91a0b3] after:transition-[left_0.3s_ease,_transform_0.3s_ease] after:rounded-full after:absolute after:top-1/2 after:left-0"
                     >
                         checkbox
                     </label>
@@ -129,7 +129,7 @@ import { DoctorCardComponent } from "../../../components/layout/client/doctor/do
         }
 
         .load-btn {
-            background: linear-gradient(90.08deg,#0e82fd .09%,#06aed4 70.28%);
+            background: linear-gradient(90.08deg,#E11D48 .09%,#06aed4 70.28%);
         }
     `
 })

@@ -1,6 +1,5 @@
 import { CdkDragDrop, transferArrayItem } from "@angular/cdk/drag-drop";
 import { Component, OnInit, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
@@ -11,10 +10,10 @@ import { ScheduleSlot } from "../../../../../shared/types/radiology.types";
 @Component({
   selector: 'radiology-scheduling-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, EmptyStateComponent],
+  imports: [SharedModule,EmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !rooms().length">
@@ -25,7 +24,7 @@ import { ScheduleSlot } from "../../../../../shared/types/radiology.types";
       <div *ngFor="let room of rooms()" class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
         <div class="px-4 py-3 bg-gray-100 text-xs font-semibold text-gray-600 uppercase flex items-center justify-between">
           <span>{{ room }}</span>
-          <boo-icon name="door-open" [size]="14" iconClass="text-gray-400"></boo-icon>
+          <physio-icon name="door-open" [size]="14" class="text-gray-400"></physio-icon>
         </div>
         <div
           cdkDropList

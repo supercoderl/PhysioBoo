@@ -40,7 +40,7 @@ import { Headphones, LucideAngularModule, MessageSquare } from "lucide-angular";
     styles: `
         .contact-info
         {
-            background: linear-gradient(90.08deg,#0e82fd .09%,#06aed4 70.28%);
+            background: linear-gradient(90.08deg,#E11D48 .09%,#06aed4 70.28%);
         }
     `,
     imports: [LucideAngularModule]

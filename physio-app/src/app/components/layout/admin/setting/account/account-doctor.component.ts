@@ -24,7 +24,7 @@ import { AdminAccountDoctorPerformanceComponent } from "./doctor/performance.com
         <div class="flex flex-col gap-4">
             <div class="w-full">
                 <p class="font-semibold text-base m-0">Doctor Information</p>
-                <p class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">
+                <p class="m-0 text-[13px] leading-[1.5] text-[#71606A]">
                     Professional credentials and medical specialty details.
                 </p>
             </div>

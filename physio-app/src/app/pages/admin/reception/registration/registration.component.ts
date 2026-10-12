@@ -9,7 +9,6 @@ import { Gender } from "src/app/shared/enums/gender";
 import { MaritalStatus } from "src/app/shared/enums/marital-status";
 import { LoadingKeys } from "src/app/shared/types/loading";
 import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
 import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
@@ -42,7 +41,6 @@ interface Step {
     BooInputComponent,
     BooDatepickerComponent,
     BooSelectComponent,
-    BooIconComponent
   ],
   host: { class: 'block h-full min-h-0' },
   templateUrl: './registration.component.html'

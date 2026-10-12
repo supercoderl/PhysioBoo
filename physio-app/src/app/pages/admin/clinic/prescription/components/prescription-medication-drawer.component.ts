@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup } from "@angular/forms";
 import { Subject, debounceTime, switchMap } from "rxjs";
 import { BooCheckboxComponent } from "../../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../../components/drawer/drawer.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { PrescriptionService } from "../../../../../services/admin/prescription.service";
@@ -14,7 +13,7 @@ import { severityIcon } from "../prescription-rx.util";
 @Component({
     selector: 'rx-medication-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooInputComponent, BooTextareaComponent, BooCheckboxComponent, BooIconComponent],
+    imports: [SharedModule, DrawerComponent, BooInputComponent, BooTextareaComponent, BooCheckboxComponent],
     template: `
     <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" [width]="640" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
@@ -24,7 +23,7 @@ import { severityIcon } from "../prescription-rx.util";
             <p class="text-sm text-secondary m-0">Search the catalog or enter a custom medication</p>
           </div>
           <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">
-            <boo-icon name="x" [size]="20"></boo-icon>
+            <physio-icon name="x" [size]="20"></physio-icon>
           </button>
         </div>
 
@@ -55,7 +54,7 @@ import { severityIcon } from "../prescription-rx.util";
             <!-- Inline CDS feedback -->
             <div *ngFor="let w of liveWarnings" class="rounded-lg px-3 py-2 text-sm flex items-start gap-2"
               [ngClass]="w.severity === 'Critical' || w.severity === 'High' ? 'bg-rose-50 text-rose-800' : 'bg-amber-50 text-amber-800'">
-              <boo-icon [name]="severityIcon(w.severity)" [size]="16" class="mt-0.5 shrink-0"></boo-icon>
+              <physio-icon [name]="severityIcon(w.severity)" [size]="16" [class]="'mt-0.5 shrink-0'"></physio-icon>
               <div class="flex-1">
                 <div><strong>{{ w.severity }}:</strong> {{ w.message }}</div>
                 <div *ngIf="w.recommendation" class="text-xs opacity-80 mt-0.5">{{ w.recommendation }}</div>

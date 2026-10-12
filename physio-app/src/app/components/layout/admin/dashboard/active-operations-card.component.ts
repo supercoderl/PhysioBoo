@@ -1,17 +1,16 @@
 import { Component, Input } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 import { OperationTheatre } from "../../../../shared/types/dashboard-overview.types";
 
 @Component({
     selector: 'admin-active-operations-card',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div class="bg-surface border border-borderGray rounded-lg overflow-hidden h-full">
         <div class="px-3.5 pt-[13px] pb-2.5 border-b border-gray-100 flex items-center gap-2">
             <span class="w-7 h-7 rounded-md bg-violet-50 flex items-center justify-center shrink-0">
-                <boo-icon name="scissors" [size]="13" color="#8b5cf6"></boo-icon>
+                <physio-icon name="scissors" [size]="13" class="text-[#8b5cf6]"></physio-icon>
             </span>
             <div>
                 <h2 class="text-[12.5px] font-bold text-gray-900 m-0">Active Operations</h2>
@@ -51,7 +50,7 @@ export class AdminActiveOperationsCardComponent {
         switch (status) {
             case 'ongoing': return 'bg-emerald-500/10 text-emerald-600';
             case 'closing': return 'bg-violet-500/10 text-violet-600';
-            default: return 'bg-blue-500/10 text-blue-600';
+            default: return 'bg-primary/10 text-primary';
         }
     }
 
@@ -59,7 +58,7 @@ export class AdminActiveOperationsCardComponent {
         switch (status) {
             case 'ongoing': return '#10b981';
             case 'closing': return '#8b5cf6';
-            default: return '#0e82fd';
+            default: return '#E11D48';
         }
     }
 }

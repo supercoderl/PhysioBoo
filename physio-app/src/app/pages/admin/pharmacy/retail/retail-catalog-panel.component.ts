@@ -1,5 +1,4 @@
 import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { RetailPosService } from "../../../../services/admin/retail-pos.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -11,20 +10,20 @@ type ResultMode = 'Search' | RetailSuggestionMode;
 @Component({
   selector: 'retail-catalog-panel',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, EmptyStateComponent],
+  imports: [SharedModule,EmptyStateComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg flex flex-col h-full">
       <!-- Search + barcode -->
       <div class="p-3 border-b border-gray-200 space-y-2">
         <div class="flex items-center gap-2">
           <div class="flex-1 relative">
-            <boo-icon name="search" [size]="16" iconClass="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></boo-icon>
+            <physio-icon name="search" [size]="16" [class]="'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
             <input #searchInput type="text" [(ngModel)]="query" (ngModelChange)="onSearchChange()"
               placeholder="Search medicine by name, generic, or batch..."
               class="w-full pl-9 pr-3 h-10 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" />
           </div>
           <div class="relative">
-            <boo-icon name="scan-barcode" [size]="16" iconClass="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></boo-icon>
+            <physio-icon name="scan-barcode" [size]="16" [class]="'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
             <input #barcodeInput type="text" [(ngModel)]="barcode" (keyup.enter)="scanBarcode()"
               placeholder="Scan barcode (Ctrl+B)"
               class="pl-9 pr-3 h-10 w-44 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" />
@@ -36,7 +35,7 @@ type ResultMode = 'Search' | RetailSuggestionMode;
           <button *ngFor="let c of categories()" type="button" (click)="setCategory(c.value)"
             class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border flex items-center gap-1.5 transition-colors"
             [ngClass]="activeCategory() === c.value ? 'bg-primary/10 border-primary text-primary' : 'bg-surface border-gray-200 text-gray-600 hover:border-gray-300'">
-            <boo-icon [name]="c.icon" [size]="14"></boo-icon>
+            <physio-icon [name]="c.icon" [size]="14"></physio-icon>
             {{ c.label }}
           </button>
         </div>
@@ -54,7 +53,7 @@ type ResultMode = 'Search' | RetailSuggestionMode;
       <!-- Product grid -->
       <div class="flex-1 overflow-y-auto p-3">
         <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-          <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+          <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
         </div>
 
         <boo-empty-state *ngIf="!isLoading() && !displayedMedicines().length" icon="search-x" title="No medicines match your search">
@@ -68,7 +67,7 @@ type ResultMode = 'Search' | RetailSuggestionMode;
             <span *ngIf="med.promotionLabel" class="absolute -top-2 -right-2 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">{{ med.promotionLabel }}</span>
 
             <button type="button" (click)="viewDetail.emit(med.id)" class="absolute top-2 right-2 text-gray-400 hover:text-primary" aria-label="View details">
-              <boo-icon name="info" [size]="14"></boo-icon>
+              <physio-icon name="info" [size]="14"></physio-icon>
             </button>
 
             <div class="pr-5">
@@ -80,7 +79,7 @@ type ResultMode = 'Search' | RetailSuggestionMode;
             <div class="flex items-center justify-between text-xs mt-1">
               <span [ngClass]="stockClass(med.stock)">{{ med.stock === 0 ? 'Out of stock' : med.stock + ' units' }}</span>
               <span *ngIf="med.insuranceCovered" class="text-primary font-medium flex items-center gap-0.5">
-                <boo-icon name="shield-check" [size]="12"></boo-icon> Insured
+                <physio-icon name="shield-check" [size]="12"></physio-icon> Insured
               </span>
             </div>
 

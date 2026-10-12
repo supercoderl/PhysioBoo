@@ -48,11 +48,11 @@ import { Toast, ToastType } from '../../shared/types/toast.types';
                 [ngClass]="getClasses(toast.type)"
             >
                 <div class="w-6 h-6 flex-shrink-0 flex items-center justify-center">
-                    <lucide-icon 
+                    <physio-icon 
                         [name]="getIconName(toast.type)" 
                         [class]="getIconColor(toast.type)"
                         [size]="24"
-                    ></lucide-icon>
+                    />
                 </div>
 
                 <div class="flex-1 pr-7">
@@ -74,7 +74,7 @@ import { Toast, ToastType } from '../../shared/types/toast.types';
                 (click)="toastService.remove(toast.id)" 
                 class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                    <lucide-icon name="x" [size]="16"></lucide-icon>
+                    <physio-icon name="x" [size]="16"/>
                 </button>
             </div>
         </div>
@@ -96,7 +96,7 @@ export class ToastComponent {
             case 'error': return 'border-red-500';
             case 'warning': return 'border-yellow-500';
             case 'confirm': return 'border-orange-500';
-            case 'info': return 'border-blue-500';
+            case 'info': return 'border-primary';
             default: return 'border-gray-500';
         }
     }
@@ -107,7 +107,7 @@ export class ToastComponent {
             case 'error': return 'text-red-500';
             case 'warning': return 'text-yellow-500';
             case 'confirm': return 'text-orange-500';
-            case 'info': return 'text-blue-500';
+            case 'info': return 'text-primary';
             default: return 'text-gray-500';
         }
     }
@@ -125,7 +125,7 @@ export class ToastComponent {
 
     getActionClass(customClass?: string): string {
         if (customClass === 'btn-confirm') {
-            return 'bg-blue-600 text-white border-transparent hover:bg-blue-700';
+            return 'bg-primary text-white border-transparent hover:bg-primaryHover';
         }
         if (customClass === 'btn-cancel') {
             return 'bg-surface text-gray-700 border-gray-300 hover:bg-gray-50';

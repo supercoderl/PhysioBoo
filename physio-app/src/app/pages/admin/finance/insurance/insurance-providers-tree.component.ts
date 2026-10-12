@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { InsuranceProviderNode, SavedSearch, SmartFolder } from "../../../../shared/types/insurance-claims.types";
 
@@ -12,7 +11,7 @@ interface SmartFolderDef {
 @Component({
   selector: 'insurance-providers-tree',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <aside
       class="shrink-0 h-full bg-[var(--ic-ivory)] border-r border-[var(--ic-warm-gray-200)] flex flex-col transition-all duration-150"
@@ -21,7 +20,7 @@ interface SmartFolderDef {
       <div class="flex items-center justify-between px-2 py-2 border-b border-[var(--ic-warm-gray-200)]">
         <span *ngIf="!collapsed" class="text-[11px] font-bold tracking-wide uppercase text-[var(--ic-warm-gray-600)]">Workspace</span>
         <button type="button" class="p-1 rounded hover:bg-[var(--ic-warm-gray-200)] ml-auto" (click)="collapsedChange.emit(!collapsed)" aria-label="Toggle panel">
-          <boo-icon [name]="collapsed ? 'panel-left-open' : 'panel-left-close'" [size]="16" iconClass="text-[var(--ic-warm-gray-600)]"></boo-icon>
+          <physio-icon [name]="collapsed ? 'panel-left-open' : 'panel-left-close'" [size]="16" class="text-[var(--ic-warm-gray-600)]"></physio-icon>
         </button>
       </div>
 
@@ -36,7 +35,7 @@ interface SmartFolderDef {
             [ngClass]="selectedProviderId === p.id ? 'bg-[var(--ic-forest)]/10 text-[var(--ic-forest)] font-semibold' : 'text-[var(--ic-warm-gray-700)] hover:bg-[var(--ic-warm-gray-100)]'"
             (click)="providerSelected.emit(selectedProviderId === p.id ? null : p.id)"
           >
-            <boo-icon name="building" [size]="14" iconClass="shrink-0"></boo-icon>
+            <physio-icon name="building" [size]="14" [class]="'shrink-0'"></physio-icon>
             <span class="flex-1 truncate">{{ p.name }}</span>
             <span class="text-[10px] text-[var(--ic-warm-gray-500)]">{{ p.claimCount }}</span>
           </button>
@@ -52,7 +51,7 @@ interface SmartFolderDef {
             [ngClass]="selectedFolder === f.key ? 'bg-[var(--ic-forest)]/10 text-[var(--ic-forest)] font-semibold' : 'text-[var(--ic-warm-gray-700)] hover:bg-[var(--ic-warm-gray-100)]'"
             (click)="folderSelected.emit(selectedFolder === f.key ? null : f.key)"
           >
-            <boo-icon [name]="f.icon" [size]="14" iconClass="shrink-0"></boo-icon>
+            <physio-icon [name]="f.icon" [size]="14" [class]="'shrink-0'"></physio-icon>
             <span class="flex-1 truncate">{{ f.label }}</span>
           </button>
         </div>
@@ -66,7 +65,7 @@ interface SmartFolderDef {
             class="w-full flex items-center gap-2 px-2 py-1.5 rounded-1.5 text-xs text-left text-[var(--ic-warm-gray-700)] hover:bg-[var(--ic-warm-gray-100)] transition-colors"
             (click)="savedSearchSelected.emit(s)"
           >
-            <boo-icon name="bookmark" [size]="14" iconClass="shrink-0"></boo-icon>
+            <physio-icon name="bookmark" [size]="14" [class]="'shrink-0'"></physio-icon>
             <span class="flex-1 truncate">{{ s.name }}</span>
           </button>
         </div>
@@ -74,9 +73,9 @@ interface SmartFolderDef {
 
       <!-- Collapsed icon rail -->
       <div class="flex-1 flex flex-col items-center gap-2 py-2" *ngIf="collapsed">
-        <boo-icon name="building" [size]="16" iconClass="text-[var(--ic-warm-gray-500)]"></boo-icon>
-        <boo-icon name="star" [size]="16" iconClass="text-[var(--ic-warm-gray-500)]"></boo-icon>
-        <boo-icon name="bookmark" [size]="16" iconClass="text-[var(--ic-warm-gray-500)]"></boo-icon>
+        <physio-icon name="building" [size]="16" class="text-[var(--ic-warm-gray-500)]"></physio-icon>
+        <physio-icon name="star" [size]="16" class="text-[var(--ic-warm-gray-500)]"></physio-icon>
+        <physio-icon name="bookmark" [size]="16" class="text-[var(--ic-warm-gray-500)]"></physio-icon>
       </div>
     </aside>
   `,

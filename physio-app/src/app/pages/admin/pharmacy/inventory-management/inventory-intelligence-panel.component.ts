@@ -1,7 +1,6 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges, signal } from "@angular/core";
 import { Color, ScaleType } from '@swimlane/ngx-charts';
 import { curveCatmullRom } from 'd3-shape';
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -10,7 +9,7 @@ import { StockInsight } from "../../../../shared/types/inventory-management.type
 @Component({
     selector: 'inventory-intelligence-panel',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, EmptyStateComponent],
+    imports: [SharedModule,EmptyStateComponent],
     template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60">
@@ -20,7 +19,7 @@ import { StockInsight } from "../../../../shared/types/inventory-management.type
 
       <div class="flex-1 overflow-y-auto p-3 space-y-2.5">
         <div *ngIf="loading()" class="flex items-center justify-center py-16">
-          <boo-icon name="loader-circle" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+          <physio-icon name="loader-circle" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
         </div>
 
         <boo-empty-state *ngIf="!loading() && !insights().length" icon="info" title="No insights right now"></boo-empty-state>
@@ -28,7 +27,7 @@ import { StockInsight } from "../../../../shared/types/inventory-management.type
         <div *ngFor="let i of insights()" class="rounded-1.5 border p-3" [ngClass]="toneBorderClass(i.tone)">
           <div class="flex items-start gap-2.5">
             <span class="w-7 h-7 rounded-1.5 flex items-center justify-center shrink-0" [ngClass]="toneBgClass(i.tone)">
-              <boo-icon [name]="i.icon" [size]="14" [iconClass]="toneIconClass(i.tone)"></boo-icon>
+              <physio-icon [name]="i.icon" [size]="14" [class]="toneIconClass(i.tone)"></physio-icon>
             </span>
             <div class="min-w-0">
               <p class="text-xs font-semibold text-regular leading-tight">{{ i.message }}</p>
@@ -89,7 +88,7 @@ export class InventoryIntelligencePanelComponent implements OnInit, OnChanges {
 
     colorScheme(tone: StockInsight['tone']): Color {
         const domain: Record<StockInsight['tone'], string> = {
-            primary: '#4f46e5', success: '#10b981', warning: '#f59e0b', danger: '#ef4444', neutral: '#9ca3af',
+            primary: '#FB7185', success: '#10b981', warning: '#f59e0b', danger: '#ef4444', neutral: '#A1A1AA',
         };
         return { name: 'custom', selectable: true, group: ScaleType.Ordinal, domain: [domain[tone]] };
     }

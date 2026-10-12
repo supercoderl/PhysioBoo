@@ -1,25 +1,24 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 import { AlertItem, AlertsSnapshot, AlertSeverity } from "../../../../shared/types/dashboard-overview.types";
 
 @Component({
     selector: 'admin-alerts-card',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div class="bg-surface border border-borderGray rounded-lg overflow-hidden h-full flex flex-col">
         <div class="px-3.5 pt-[13px] pb-2.5 border-b border-gray-100 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-2">
                 <span class="w-7 h-7 rounded-md bg-red-50 flex items-center justify-center shrink-0">
-                    <boo-icon name="bell-ring" [size]="13" color="#ef4444"></boo-icon>
+                    <physio-icon name="bell-ring" [size]="13" class="text-[#ef4444]"></physio-icon>
                 </span>
                 <div>
                     <h2 class="text-[12.5px] font-bold text-gray-900 m-0">Alerts</h2>
                     <p class="text-[10.5px] text-gray-400 m-0">{{ totalCount }} unresolved</p>
                 </div>
             </div>
-            <button type="button" class="text-[10.5px] text-blue-500 bg-transparent border-0 cursor-pointer p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded" (click)="markAllRead()">Mark read</button>
+            <button type="button" class="text-[10.5px] text-primary bg-transparent border-0 cursor-pointer p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded" (click)="markAllRead()">Mark read</button>
         </div>
 
         <div class="flex-1 overflow-y-auto">
@@ -32,7 +31,7 @@ import { AlertItem, AlertsSnapshot, AlertSeverity } from "../../../../shared/typ
                         <span class="text-[11.5px] font-bold text-red-500 uppercase tracking-wide">Critical</span>
                         <span class="bg-red-50 text-red-500 text-[9.5px] font-bold px-1.5 rounded-full">{{ critical.length }}</span>
                     </span>
-                    <boo-icon [name]="open.critical ? 'chevron-up' : 'chevron-down'" [size]="12" color="#9ca3af"></boo-icon>
+                    <physio-icon [name]="open.critical ? 'chevron-up' : 'chevron-down'" [size]="12" class="text-[#A1A1AA]"></physio-icon>
                 </button>
                 <div *ngIf="open.critical" class="px-3.5 pb-2.5 flex flex-col gap-[7px]">
                     <div *ngFor="let al of critical" class="p-2.5 bg-red-50 rounded-md border-l-[3px] border-red-500">
@@ -59,7 +58,7 @@ import { AlertItem, AlertsSnapshot, AlertSeverity } from "../../../../shared/typ
                         <span class="text-[11.5px] font-bold text-amber-500 uppercase tracking-wide">Warning</span>
                         <span class="bg-amber-50 text-amber-500 text-[9.5px] font-bold px-1.5 rounded-full">{{ warning.length }}</span>
                     </span>
-                    <boo-icon [name]="open.warning ? 'chevron-up' : 'chevron-down'" [size]="12" color="#9ca3af"></boo-icon>
+                    <physio-icon [name]="open.warning ? 'chevron-up' : 'chevron-down'" [size]="12" class="text-[#A1A1AA]"></physio-icon>
                 </button>
                 <div *ngIf="open.warning" class="px-3.5 pb-2.5 flex flex-col gap-1.5">
                     <div *ngFor="let al of warning" class="p-2.5 bg-amber-50 rounded-md border-l-[3px] border-amber-500">
@@ -78,16 +77,16 @@ import { AlertItem, AlertsSnapshot, AlertSeverity } from "../../../../shared/typ
                 <button type="button" class="w-full flex items-center justify-between px-3.5 py-2.5 bg-transparent border-0 cursor-pointer hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     [attr.aria-expanded]="open.info" (click)="open.info = !open.info">
                     <span class="flex items-center gap-[7px]">
-                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                        <span class="text-[11.5px] font-bold text-blue-500 uppercase tracking-wide">Info</span>
-                        <span class="bg-blue-100 text-blue-500 text-[9.5px] font-bold px-1.5 rounded-full">{{ info.length }}</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                        <span class="text-[11.5px] font-bold text-primary uppercase tracking-wide">Info</span>
+                        <span class="bg-primarySoft text-primary text-[9.5px] font-bold px-1.5 rounded-full">{{ info.length }}</span>
                     </span>
-                    <boo-icon [name]="open.info ? 'chevron-up' : 'chevron-down'" [size]="12" color="#9ca3af"></boo-icon>
+                    <physio-icon [name]="open.info ? 'chevron-up' : 'chevron-down'" [size]="12" class="text-[#A1A1AA]"></physio-icon>
                 </button>
                 <div *ngIf="open.info" class="px-3.5 pb-2.5 flex flex-col gap-1.5">
-                    <div *ngFor="let al of info" class="p-2.5 bg-blue-50 rounded-md border-l-[3px] border-blue-500">
+                    <div *ngFor="let al of info" class="p-2.5 bg-primarySoft rounded-md border-l-[3px] border-primary">
                         <div class="flex items-center justify-between mb-1">
-                            <span class="text-[9.5px] font-bold text-blue-500 uppercase tracking-wide">{{ al.department }}</span>
+                            <span class="text-[9.5px] font-bold text-primary uppercase tracking-wide">{{ al.department }}</span>
                             <span class="text-[9.5px] text-gray-400 tabular-nums">{{ al.occurredAt }}</span>
                         </div>
                         <p class="text-[11px] text-gray-700 m-0 leading-[1.4]">{{ al.message }}</p>

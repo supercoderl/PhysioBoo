@@ -1,7 +1,6 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { finalize, forkJoin } from "rxjs";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
@@ -28,8 +27,7 @@ const LOADING_KEY = 'treatment-sheet';
   selector: 'admin-treatment-sheet',
   standalone: true,
   imports: [
-    SharedModule,
-    BooIconComponent,
+    SharedModule,
     ErrorStateComponent,
     StatusBadgeComponent,
     StatCardComponent,
@@ -46,7 +44,7 @@ const LOADING_KEY = 'treatment-sheet';
   template: `
     <!-- Loading -->
     <div *ngIf="loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3">
-      <boo-icon name="loader" [size]="32" iconClass="animate-spin text-primary"></boo-icon>
+      <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
       <span class="text-gray-500 text-sm">Loading treatment sheet...</span>
     </div>
 
@@ -80,10 +78,10 @@ const LOADING_KEY = 'treatment-sheet';
           </div>
           <div class="flex items-center gap-2 shrink-0">
             <button (click)="printSheet()" class="px-3 py-2 bg-surface border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2 text-sm">
-              <boo-icon name="printer" [size]="16"></boo-icon> Print Sheet
+              <physio-icon name="printer" [size]="16"></physio-icon> Print Sheet
             </button>
             <button (click)="exportPdf()" class="px-3 py-2 bg-surface border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2 text-sm">
-              <boo-icon name="file-down" [size]="16"></boo-icon> Export PDF
+              <physio-icon name="file-down" [size]="16"></physio-icon> Export PDF
             </button>
           </div>
         </div>
@@ -93,7 +91,7 @@ const LOADING_KEY = 'treatment-sheet';
           <button *ngFor="let t of tabs" type="button" (click)="setTab(t.key)" [attr.aria-selected]="activeTab() === t.key" role="tab"
             class="px-4 py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 -mb-px whitespace-nowrap"
             [ngClass]="activeTab() === t.key ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
-            <boo-icon [name]="t.icon" iconClass="w-4 h-4"></boo-icon>
+            <physio-icon [name]="t.icon" class="w-4 h-4"></physio-icon>
             {{ t.label }}
           </button>
         </nav>
@@ -104,7 +102,7 @@ const LOADING_KEY = 'treatment-sheet';
         <div *ngIf="alerts().length > 0" class="mb-6 flex gap-3 overflow-x-auto pb-1" aria-live="polite">
           <div *ngFor="let a of alertsBySeverity()" class="shrink-0 min-w-[280px] bg-surface border rounded-lg p-3 flex items-start gap-2"
             [ngClass]="alertBorderClass(a.severity)">
-            <boo-icon [name]="alertIcon(a.type)" [size]="18" [ngClass]="alertIconClass(a.severity)"></boo-icon>
+            <physio-icon [name]="alertIcon(a.type)" [size]="18" [ngClass]="alertIconClass(a.severity)"></physio-icon>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2">
                 <boo-status-badge [label]="a.severity" [tone]="alertTone(a.severity)"></boo-status-badge>
@@ -112,7 +110,7 @@ const LOADING_KEY = 'treatment-sheet';
               <p class="text-xs text-gray-700 mt-1">{{ a.message }}</p>
             </div>
             <button (click)="acknowledgeAlert(a)" class="text-gray-400 hover:text-gray-600" aria-label="Acknowledge alert">
-              <boo-icon name="x" [size]="16"></boo-icon>
+              <physio-icon name="x" [size]="16"></physio-icon>
             </button>
           </div>
         </div>
@@ -131,16 +129,16 @@ const LOADING_KEY = 'treatment-sheet';
         <!-- Quick actions -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           <button (click)="setTab('orders')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
-            <boo-icon name="plus-circle" [size]="18" iconClass="text-primary"></boo-icon> Add Order
+            <physio-icon name="plus-circle" [size]="18" class="text-primary"></physio-icon> Add Order
           </button>
           <button (click)="setTab('notes')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
-            <boo-icon name="file-plus" [size]="18" iconClass="text-primary"></boo-icon> Add Progress Note
+            <physio-icon name="file-plus" [size]="18" class="text-primary"></physio-icon> Add Progress Note
           </button>
           <button (click)="setTab('laboratory')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
-            <boo-icon name="flask-conical" [size]="18" iconClass="text-primary"></boo-icon> View Laboratory
+            <physio-icon name="flask-conical" [size]="18" class="text-primary"></physio-icon> View Laboratory
           </button>
           <button (click)="setTab('imaging')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
-            <boo-icon name="scan" [size]="18" iconClass="text-primary"></boo-icon> View Imaging
+            <physio-icon name="scan" [size]="18" class="text-primary"></physio-icon> View Imaging
           </button>
         </div>
 

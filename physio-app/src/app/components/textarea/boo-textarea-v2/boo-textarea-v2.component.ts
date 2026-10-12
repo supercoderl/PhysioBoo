@@ -11,7 +11,7 @@ import { SharedModule } from '../../../shared/shared-imports';
     <div class="w-full inline-flex flex-col relative min-w-0 p-0 m-0 border-0">
       <label
         *ngIf="label"
-        class="z-[99] text-[#4B5563] relative p-0 text-[12px] font-medium leading-[2]"
+        class="z-[99] text-[#71606A] relative p-0 text-[12px] font-medium leading-[2]"
         [for]="label.htmlFor || ''"
       >
         {{label.text}}

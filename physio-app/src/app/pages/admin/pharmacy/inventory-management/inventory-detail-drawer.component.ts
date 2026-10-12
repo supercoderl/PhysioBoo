@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signa
 import { Color, ScaleType } from '@swimlane/ngx-charts';
 import { curveCatmullRom } from 'd3-shape';
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -14,7 +13,7 @@ type DrawerTab = 'Summary' | 'Batches' | 'Trends' | 'Purchase' | 'Dispensing' | 
 @Component({
     selector: 'inventory-detail-drawer',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, DrawerComponent, EmptyStateComponent],
+    imports: [SharedModule,DrawerComponent, EmptyStateComponent],
     template: `
     <drawer [isOpen]="isOpen" [width]="560" (close)="close.emit()">
       <div class="flex flex-col h-full" *ngIf="detail">
@@ -24,7 +23,7 @@ type DrawerTab = 'Summary' | 'Batches' | 'Trends' | 'Purchase' | 'Dispensing' | 
             <p class="text-xs text-secondary">{{ detail.genericName }} · {{ detail.manufacturer }}</p>
           </div>
           <button type="button" (click)="close.emit()" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100">
-            <boo-icon name="x" [size]="16"></boo-icon>
+            <physio-icon name="x" [size]="16"></physio-icon>
           </button>
         </div>
 
@@ -142,7 +141,7 @@ export class InventoryDetailDrawerComponent implements OnChanges {
     curve = curveCatmullRom;
     inventoryTrendSeries: any[] = [];
     consumptionTrendSeries: any[] = [];
-    trendScheme: Color = { name: 'inventory', selectable: true, group: ScaleType.Ordinal, domain: ['#4f46e5'] };
+    trendScheme: Color = { name: 'inventory', selectable: true, group: ScaleType.Ordinal, domain: ['#FB7185'] };
     consumptionScheme: Color = { name: 'consumption', selectable: true, group: ScaleType.Ordinal, domain: ['#ef4444'] };
 
     constructor(private srv: InventoryManagementService, private toastSrv: ToastService) { }

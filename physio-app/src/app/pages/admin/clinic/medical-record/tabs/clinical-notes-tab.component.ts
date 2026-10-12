@@ -1,12 +1,11 @@
 import { Component, Input, computed, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ClinicalNoteRow, RecordType } from "../../../../../shared/types/medical-record.types";
 
 @Component({
   selector: 'mr-clinical-notes-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4">
       <!-- Note list -->
@@ -38,7 +37,7 @@ import { ClinicalNoteRow, RecordType } from "../../../../../shared/types/medical
             <span class="font-mono text-xs text-secondary bg-gray-100 px-2 py-0.5 rounded">{{ n.recordNumber }}</span>
             <span class="px-2 py-0.5 rounded-full text-xs font-medium" [ngClass]="typeClass(n.recordType)">{{ n.recordType }}</span>
             <span *ngIf="n.isConfidential" class="px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 inline-flex items-center gap-1">
-              <boo-icon name="lock" iconClass="w-3 h-3"></boo-icon>
+              <physio-icon name="lock" class="w-3 h-3"></physio-icon>
               Confidential · {{ n.accessLevel }}
             </span>
             <span *ngIf="n.appointmentNumber" class="text-xs text-secondary ml-auto">↔ {{ n.appointmentNumber }}</span>
@@ -96,7 +95,7 @@ export class ClinicalNotesTabComponent {
 
   typeClass(t: RecordType): string {
     switch (t) {
-      case 'Consultation': return 'bg-blue-50 text-blue-700';
+      case 'Consultation': return 'bg-primarySoft text-primaryHover';
       case 'Diagnosis': return 'bg-violet-50 text-violet-700';
       case 'Treatment': return 'bg-emerald-50 text-emerald-700';
       case 'Surgery': return 'bg-orange-50 text-orange-700';

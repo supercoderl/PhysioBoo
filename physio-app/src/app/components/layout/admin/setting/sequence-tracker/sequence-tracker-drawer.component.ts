@@ -9,7 +9,6 @@ import { SharedModule } from "../../../../../shared/shared-imports";
 import { SequenceTracker } from "../../../../../shared/types/system.types";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 
@@ -19,8 +18,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
     imports: [
         SharedModule,
         DrawerComponent,
-        BooInputComponent,
-        BooIconComponent,
+        BooInputComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
     ],
@@ -40,13 +38,13 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                         <p class="text-sm text-secondary m-0">Configure auto-generated codes for system entities</p>
                     </div>
                     <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
                 <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
                     <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <boo-icon name="loader" class="animate-spin text-primary" [size]="32"></boo-icon>
+                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
                     </div>
 
                     <div class="p-6">
@@ -115,7 +113,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                             <div class="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-xl">
                                 <p class="text-xs text-primary font-semibold mb-1 uppercase tracking-wider">Format Preview</p>
                                 <p class="text-lg font-mono text-gray-800">
-                                    {{ form.get('prefix')?.value || 'PREFIX-' }}<span class="text-gray-400">{{ form.get('useDateFormating')?.value ? 'DATE-' : '' }}</span><span class="text-blue-600">{{ previewSequence }}</span>{{ form.get('suffix')?.value || '' }}
+                                    {{ form.get('prefix')?.value || 'PREFIX-' }}<span class="text-gray-400">{{ form.get('useDateFormating')?.value ? 'DATE-' : '' }}</span><span class="text-primary">{{ previewSequence }}</span>{{ form.get('suffix')?.value || '' }}
                                 </p>
                             </div>
                         </div>
@@ -128,12 +126,11 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                             *ngIf="currentId" class="group flex items-center gap-1.5 text-red-500 hover:text-red-700 px-2 py-1.5 rounded-md hover:bg-red-50 transition-all text-sm font-medium"
                             (click)="onDelete()"
                         >
-                            <boo-icon 
+                            <physio-icon 
                                 name="trash-2" 
-                                [size]="16" 
-                                class="transition-transform group-hover:scale-110"
-                                color="#ef4444"
-                            ></boo-icon> 
+                                [size]="16"
+                            [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
+                            ></physio-icon> 
                             <span>Delete</span>
                         </button>
                     </div>

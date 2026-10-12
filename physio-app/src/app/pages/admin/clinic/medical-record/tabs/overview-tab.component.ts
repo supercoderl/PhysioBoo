@@ -1,5 +1,4 @@
 import { Component, Input } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { Severity } from "../../../../../shared/enums/severity";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import {
@@ -12,7 +11,7 @@ import {
 @Component({
   selector: 'mr-overview-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent],
+  imports: [SharedModule],
   template: `
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
       <!-- LEFT — Patient + Contacts + Care Team -->
@@ -21,7 +20,7 @@ import {
         <section class="bg-surface border border-gray-200 rounded-lg">
           <header class="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
             <h3 class="text-sm font-semibold text-primary m-0 flex items-center gap-2">
-              <boo-icon name="user" iconClass="w-4 h-4 text-secondary"></boo-icon>
+              <physio-icon name="user" class="w-4 h-4 text-secondary"></physio-icon>
               Demographics
             </h3>
           </header>
@@ -42,7 +41,7 @@ import {
         <section class="bg-surface border border-gray-200 rounded-lg">
           <header class="px-5 py-3 border-b border-gray-100">
             <h3 class="text-sm font-semibold text-primary m-0 flex items-center gap-2">
-              <boo-icon name="phone" iconClass="w-4 h-4 text-secondary"></boo-icon>
+              <physio-icon name="phone" class="w-4 h-4 text-secondary"></physio-icon>
               Emergency contact
             </h3>
           </header>
@@ -57,7 +56,7 @@ import {
         <section *ngIf="patient" class="bg-surface border border-gray-200 rounded-lg">
           <header class="px-5 py-3 border-b border-gray-100">
             <h3 class="text-sm font-semibold text-primary m-0 flex items-center gap-2">
-              <boo-icon name="shield-check" iconClass="w-4 h-4 text-secondary"></boo-icon>
+              <physio-icon name="shield-check" class="w-4 h-4 text-secondary"></physio-icon>
               Insurance
             </h3>
           </header>
@@ -72,7 +71,7 @@ import {
         <section *ngIf="patient" class="bg-surface border border-gray-200 rounded-lg">
           <header class="px-5 py-3 border-b border-gray-100">
             <h3 class="text-sm font-semibold text-primary m-0 flex items-center gap-2">
-              <boo-icon name="users" iconClass="w-4 h-4 text-secondary"></boo-icon>
+              <physio-icon name="users" class="w-4 h-4 text-secondary"></physio-icon>
               Care team
             </h3>
           </header>
@@ -97,7 +96,7 @@ import {
         <section class="bg-surface border border-gray-200 rounded-lg">
           <header class="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
             <h3 class="text-sm font-semibold text-primary m-0 flex items-center gap-2">
-              <boo-icon name="alert-triangle" iconClass="w-4 h-4 text-red-600"></boo-icon>
+              <physio-icon name="alert-triangle" class="w-4 h-4 text-red-600"></physio-icon>
               Allergies
               <span class="text-xs text-secondary font-normal">({{ allergies?.length || 0 }})</span>
             </h3>
@@ -124,7 +123,7 @@ import {
         <section *ngFor="let h of historySections()" class="bg-surface border border-gray-200 rounded-lg">
           <header class="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
             <h3 class="text-sm font-semibold text-primary m-0 flex items-center gap-2">
-              <boo-icon [name]="h.icon" iconClass="w-4 h-4 text-secondary"></boo-icon>
+              <physio-icon [name]="h.icon" class="w-4 h-4 text-secondary"></physio-icon>
               {{ h.label }}
             </h3>
           </header>

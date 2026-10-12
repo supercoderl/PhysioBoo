@@ -52,7 +52,7 @@ export class BooCheckboxComponent implements ControlValueAccessor {
   @Input() name: string = '';
   @Input() size: Size = "middle";
   @Input() radius: number = 4;
-  @Input() borderColor: string = '#D1D5DB';
+  @Input() borderColor: string = '#E3D5DA';
 
   model: boolean = false;
   disabled: boolean = false;
@@ -66,7 +66,7 @@ export class BooCheckboxComponent implements ControlValueAccessor {
   }
 
   get labelTextClasses(): string {
-    const base = 'inline-block text-[#1d3349] select-none pt-0.5';
+    const base = 'inline-block text-[#26141A] select-none pt-0.5';
 
     let sizeClass = '';
     switch (this.size) {

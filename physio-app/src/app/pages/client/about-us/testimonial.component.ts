@@ -31,7 +31,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                 <div class="px-3 relative w-full">
                     <button 
                         type="button" 
-                        class="group block w-7.5 h-7.5 text-primary bg-borderGray shadow-[0_4px_14px_#e2edff40] cursor-pointer transition-smooth absolute top-1/2 -translate-y-1/2 rounded-full left-0 z-[1] flex-center-center hover:bg-secondary" 
+                        class="group block w-7.5 h-7.5 text-primary bg-borderGray shadow-[0_4px_14px_#FFE9EE40] cursor-pointer transition-smooth absolute top-1/2 -translate-y-1/2 rounded-full left-0 z-[1] flex-center-center hover:bg-secondary" 
                         (click)="slickModal.slickPrev()"
                     > 
                         <lucide-angular [img]="ChevronLeft" class="w-4 stroke-[#383838] stroke-[2] group-hover:stroke-white" />
@@ -86,7 +86,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                     </ngx-slick-carousel>
                     <button 
                         type="button" 
-                        class="group block w-7.5 h-7.5 text-primary bg-borderGray shadow-[0_4px_14px_#e2edff40] cursor-pointer transition-smooth absolute top-1/2 -translate-y-1/2 rounded-full right-0 z-[1] flex-center-center hover:bg-secondary" 
+                        class="group block w-7.5 h-7.5 text-primary bg-borderGray shadow-[0_4px_14px_#FFE9EE40] cursor-pointer transition-smooth absolute top-1/2 -translate-y-1/2 rounded-full right-0 z-[1] flex-center-center hover:bg-secondary" 
                         (click)="slickModal.slickNext()"
                     > 
                         <lucide-angular [img]="ChevronRight" class="w-4 stroke-[#383838] stroke-[2] group-hover:stroke-white" />

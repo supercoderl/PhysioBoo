@@ -10,7 +10,6 @@ import { LoadingKeys } from "../../../../../shared/types/loading";
 import { MenuItem } from "../../../../../shared/types/menu.types";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 
@@ -21,7 +20,6 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
         SharedModule,
         DrawerComponent,
         BooInputComponent,
-        BooIconComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
     ],
@@ -44,13 +42,13 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                         </p>
                     </div>
                     <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
                 <!-- Loading overlay when fetching detail -->
                 <div *ngIf="loadingSrv.isLoading('search-by-id') && currentItem" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                    <boo-icon name="loader-circle" class="animate-spin text-primary" [size]="32"></boo-icon>
+                    <physio-icon name="loader-circle" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
                 </div>
 
                 <!-- Form body -->
@@ -110,7 +108,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                         >
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                                    <boo-icon name="circle-check" [size]="16" color="#16a34a"></boo-icon>
+                                    <physio-icon name="circle-check" [size]="16" class="text-[#16a34a]"></physio-icon>
                                 </div>
                                 <div>
                                     <span class="text-sm font-medium text-gray-700 block">Active</span>
@@ -140,7 +138,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                             class="group flex items-center gap-1.5 text-red-500 hover:text-red-700 px-2 py-1.5 rounded-md hover:bg-red-50 transition-all text-sm font-medium"
                             (click)="onDelete()"
                         >
-                            <boo-icon name="trash-2" [size]="16" color="#ef4444" class="transition-transform group-hover:scale-110"></boo-icon>
+                            <physio-icon name="trash-2" [size]="16" [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"></physio-icon>
                             <span>Delete</span>
                         </button>
                     </div>

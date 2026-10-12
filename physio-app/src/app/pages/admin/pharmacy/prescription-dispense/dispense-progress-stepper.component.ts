@@ -1,12 +1,11 @@
 import { Component, Input } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DISPENSE_PROGRESS_STAGES, DispenseProgressStage } from "../../../../shared/types/dispensing.types";
 
 @Component({
     selector: 'dispense-progress-stepper',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div class="flex items-center overflow-x-auto py-1" role="list" aria-label="Dispensing progress">
       <ng-container *ngFor="let s of stages; let last = last; let i = index">
@@ -17,7 +16,7 @@ import { DISPENSE_PROGRESS_STAGES, DispenseProgressStage } from "../../../../sha
               [ngClass]="stageClass(i)"
               [attr.aria-current]="s.stage === currentStage ? 'step' : null"
             >
-              <boo-icon *ngIf="i < currentIndex" name="check" [size]="14" iconClass="text-white"></boo-icon>
+              <physio-icon *ngIf="i < currentIndex" name="check" [size]="14" class="text-white"></physio-icon>
               <span *ngIf="i >= currentIndex">{{ i + 1 }}</span>
             </div>
             <span class="text-[10px] font-medium whitespace-nowrap" [ngClass]="i <= currentIndex ? 'text-regular' : 'text-gray-400'">{{ s.label }}</span>

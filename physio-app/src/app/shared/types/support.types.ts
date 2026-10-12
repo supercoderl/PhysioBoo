@@ -104,25 +104,47 @@ export interface HospitalGroup {
     createdAt: Date;
 }
 
+/** Mirrors `HospitalViewModel` of `api/hospitals`; enums travel as numbers. */
 export interface Hospital {
     id: string;
     name: string;
-    code: string | null;
-    hospitalGroupId: string;
-    hospitalGroupName: string | null;
-    type: HospitalType;
-    address: string | null;
-    city: string | null;
-    country: string | null;
+    hospitalCode: string | null;
+    hospitalType: HospitalType;
+    bedCapacity: number;
+    icuCapacity: number;
+    emergencyCapacity: number;
+    operationTheaters: number;
+    address: string;
+    city: string;
+    stateProvince: string;
+    postalCode: string | null;
+    country: string;
     phone: string | null;
+    fax: string | null;
     email: string | null;
     website: string | null;
-    totalBeds: number;
-    operatingRooms: number;
-    hasEmergencyServices: boolean;
-    hasIcu: boolean;
-    accreditationNumber: string | null;
+    emergencyPhone: string | null;
+    ambulancePhone: string | null;
+    latitude: number | null;
+    longtitude: number | null;
+    establishedDate: string | null;
     licenseNumber: string | null;
+    licenseExpiry: string | null;
+    accreditationBody: string;
+    accreditationExpiry: string | null;
+    insuranceAccepted: string[];
+    languagesSupported: string[];
+    facilities: string | null;
+    operatingHours: string | null;
+    is24Hours: boolean;
     isActive: boolean;
-    createdAt: Date;
+    logoUrl: string | null;
+    images: string | null;
+    description: string | null;
+    missionStatement: string | null;
+    visionStatement: string | null;
+    createdAt: string;
 }
+
+/** Body of `PATCH api/hospitals/{id}` (`UpdateHospitalViewModel`); Create takes the same minus bed / ICU capacity, `is24Hours` and `isActive`. */
+export type SaveHospitalRequest = Omit<Hospital, 'id' | 'hospitalCode' | 'createdAt'>;

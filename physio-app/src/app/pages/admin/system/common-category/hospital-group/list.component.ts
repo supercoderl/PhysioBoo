@@ -2,7 +2,6 @@ import { Component, OnInit, signal } from "@angular/core";
 import { catchError, of } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
 import { CommonCategoryHospitalGroupDrawerComponent } from "../../../../../components/layout/admin/system/common-category/hospital-group/hospital-group-drawer.component";
@@ -30,7 +29,6 @@ import { HospitalGroup } from "../../../../../shared/types/support.types";
         SharedModule,
         AdminContentHeaderComponent,
         BooButtonAdminComponent,
-        BooIconComponent,
         ButtonIconComponent,
         BooInputComponent,
         CommonCategoryHospitalGroupTableCardComponent,

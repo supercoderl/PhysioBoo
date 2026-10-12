@@ -2,7 +2,6 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { AdminBreadcrumbComponent } from '../../../../../components/breadcrumb/admin-breadcrumb.component';
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { AdminAccountContactComponent } from "../../../../../components/layout/admin/setting/account/account-contact.componen";
 import { AdminAccountDoctorComponent } from "../../../../../components/layout/admin/setting/account/account-doctor.component";
 import { AdminAccountEmergencyComponent } from "../../../../../components/layout/admin/setting/account/account-emergency.component";
@@ -19,8 +18,7 @@ import { MyAccount, UpdateMyAccountRequest } from '../../../../../shared/types/a
   standalone: true,
   imports: [
     SharedModule,
-    AdminBreadcrumbComponent,
-    BooIconComponent,
+    AdminBreadcrumbComponent,
     AdminAccountProfileComponent,
     AdminAccountContactComponent,
     AdminAccountEmergencyComponent,

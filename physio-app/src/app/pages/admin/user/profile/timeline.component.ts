@@ -56,7 +56,7 @@ import { PostareaComponent } from "../../../../components/textarea/postarea/post
                                         </div>
                                     </span>
                                     <p
-                                        class="m-0 leading-[1.43] text-[13px] text-[#4B5563] block"
+                                        class="m-0 leading-[1.43] text-[13px] text-[#71606A] block"
                                     >
                                         13 mins. ago
                                     </p>

@@ -10,7 +10,6 @@ import { ImagingModality } from "../../../../../../shared/types/laboratory-imagi
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { BooCheckboxComponent } from "../../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../../input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";
@@ -21,8 +20,7 @@ import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-t
     imports: [
         SharedModule,
         DrawerComponent,
-        BooInputComponent,
-        BooIconComponent,
+        BooInputComponent,
         BooTextareaComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
@@ -44,13 +42,13 @@ import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-t
                         <p class="text-sm text-secondary m-0">Configure imaging modality details and parameters</p>
                     </div>
                     <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
                 <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
                     <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <boo-icon name="loader" class="animate-spin text-primary" [size]="32"></boo-icon>
+                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
                     </div>
 
                     <div class="p-6">
@@ -106,7 +104,7 @@ import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-t
                             >
                                 <div class="flex items-center gap-2">
                                     <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                                        <boo-icon name="droplet" [size]="16" color="#a855f7"></boo-icon>
+                                        <physio-icon name="droplet" [size]="16" class="text-[#a855f7]"></physio-icon>
                                     </div>
                                     <span class="text-sm font-medium text-gray-700">Requires Contrast</span>
                                 </div>
@@ -120,7 +118,7 @@ import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-t
                             >
                                 <div class="flex items-center gap-2">
                                     <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
-                                        <boo-icon name="clipboard-list" [size]="16" color="#f97316"></boo-icon>
+                                        <physio-icon name="clipboard-list" [size]="16" class="text-[#f97316]"></physio-icon>
                                     </div>
                                     <span class="text-sm font-medium text-gray-700">Preparation Needed</span>
                                 </div>
@@ -155,12 +153,11 @@ import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-t
                             *ngIf="currentId" class="group flex items-center gap-1.5 text-red-500 hover:text-red-700 px-2 py-1.5 rounded-md hover:bg-red-50 transition-all text-sm font-medium"
                             (click)="onDelete()"
                         >
-                            <boo-icon 
+                            <physio-icon 
                                 name="trash-2" 
-                                [size]="16" 
-                                class="transition-transform group-hover:scale-110"
-                                color="#ef4444"
-                            ></boo-icon> 
+                                [size]="16"
+                            [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
+                            ></physio-icon> 
                             <span>Delete</span>
                         </button>
                     </div>

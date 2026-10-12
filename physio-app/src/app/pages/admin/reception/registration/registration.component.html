@@ -1,74 +1,125 @@
 <admin-content-header>
   <div class="max-w-2xl mx-auto py-12">
-      <div class="bg-surface rounded-2xl border border-gray-200 p-10 text-center shadow-sm">
-        <div class="w-20 h-20 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-4">
-          <physio-animation name="registration" size="64px" />
-        </div>
-        <h2 class="text-2xl font-bold text-gray-900 m-0 mb-1">Registration complete</h2>
-        <p class="text-sm text-gray-500 mb-6">
-          <span class="font-medium text-gray-800">asdasd</span> is now in the system.
-        </p>
+    <div
+      class="bg-surface rounded-2xl border border-gray-200 p-10 text-center shadow-sm"
+    >
+      <div
+        class="w-20 h-20 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-4"
+      >
+        <physio-animation name="registration" size="64px" />
+      </div>
+      <h2 class="text-2xl font-bold text-gray-900 m-0 mb-1">
+        Registration complete
+      </h2>
+      <p class="text-sm text-gray-500 mb-6">
+        <span class="font-medium text-gray-800">asdasd</span> is now in the
+        system.
+      </p>
 
-        <div class="bg-primary/5 border border-primary/20 rounded-lg p-4 inline-flex items-center gap-3 mb-6">
-          <physio-icon name="badge" iconClass="w-5 h-5 text-primary" />
-          <div class="text-left">
-            <div class="text-[11px] uppercase tracking-wider text-primary/70 font-semibold">Patient ID</div>
-            <div class="font-mono text-base font-bold text-primary">asdasd</div>
+      <div
+        class="bg-primary/5 border border-primary/20 rounded-lg p-4 inline-flex items-center gap-3 mb-6"
+      >
+        <physio-icon name="badge" [class]="'w-5 h-5 text-primary'" />
+        <div class="text-left">
+          <div
+            class="text-[11px] uppercase tracking-wider text-primary/70 font-semibold"
+          >
+            Patient ID
           </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row gap-2 justify-center">
-          <button type="button" (click)="printIntakeForm()"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
-            <physio-icon name="printer" />
-            Print intake form
-          </button>
-          <button type="button" (click)="goToPatient()"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
-            <physio-icon name="external-link" />
-            Open patient record
-          </button>
-          <button type="button" (click)="registerAnother()"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors">
-            <physio-icon name="user-plus" color="white" />
-            Register another patient
-          </button>
+          <div class="font-mono text-base font-bold text-primary">asdasd</div>
         </div>
       </div>
+
+      <div class="flex flex-col sm:flex-row gap-2 justify-center">
+        <button
+          type="button"
+          (click)="printIntakeForm()"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+        >
+          <physio-icon name="printer" />
+          Print intake form
+        </button>
+        <button
+          type="button"
+          (click)="goToPatient()"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+        >
+          <physio-icon name="external-link" />
+          Open patient record
+        </button>
+        <button
+          type="button"
+          (click)="registerAnother()"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors"
+        >
+          <physio-icon name="user-plus" />
+          Register another patient
+        </button>
+      </div>
     </div>
-  <ng-container *ngIf="(registeredPatientNumber() || registeredPatientId()) as id; else wizard">
+  </div>
+  <ng-container
+    *ngIf="
+      registeredPatientNumber() || registeredPatientId() as id;
+      else wizard
+    "
+  >
     <div class="max-w-2xl mx-auto py-12">
-      <div class="bg-surface rounded-2xl border border-gray-200 p-10 text-center shadow-sm">
-        <div class="w-16 h-16 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+      <div
+        class="bg-surface rounded-2xl border border-gray-200 p-10 text-center shadow-sm"
+      >
+        <div
+          class="w-16 h-16 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-4"
+        >
           <physio-animation name="registration" size="64px" />
         </div>
-        <h2 class="text-2xl font-bold text-gray-900 m-0 mb-1">Registration complete</h2>
+        <h2 class="text-2xl font-bold text-gray-900 m-0 mb-1">
+          Registration complete
+        </h2>
         <p class="text-sm text-gray-500 mb-6">
-          <span class="font-medium text-gray-800">{{ fullName() }}</span> is now in the system.
+          <span class="font-medium text-gray-800">{{ fullName() }}</span> is now
+          in the system.
         </p>
 
-        <div class="bg-primary/5 border border-primary/20 rounded-lg p-4 inline-flex items-center gap-3 mb-6">
-          <physio-icon name="badge" iconClass="w-5 h-5 text-primary" />
+        <div
+          class="bg-primary/5 border border-primary/20 rounded-lg p-4 inline-flex items-center gap-3 mb-6"
+        >
+          <physio-icon name="badge" [class]="'w-5 h-5 text-primary'" />
           <div class="text-left">
-            <div class="text-[11px] uppercase tracking-wider text-primary/70 font-semibold">Patient ID</div>
-            <div class="font-mono text-base font-bold text-primary">{{ id }}</div>
+            <div
+              class="text-[11px] uppercase tracking-wider text-primary/70 font-semibold"
+            >
+              Patient ID
+            </div>
+            <div class="font-mono text-base font-bold text-primary">
+              {{ id }}
+            </div>
           </div>
         </div>
 
         <div class="flex flex-col sm:flex-row gap-2 justify-center">
-          <button type="button" (click)="printIntakeForm()"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
+          <button
+            type="button"
+            (click)="printIntakeForm()"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+          >
             <physio-icon name="printer" />
             Print intake form
           </button>
-          <button type="button" (click)="goToPatient()"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
+          <button
+            type="button"
+            (click)="goToPatient()"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+          >
             <physio-icon name="external-link" />
             Open patient record
           </button>
-          <button type="button" (click)="registerAnother()"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors">
-            <physio-icon name="user-plus" color="white" />
+          <button
+            type="button"
+            (click)="registerAnother()"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors"
+          >
+            <physio-icon name="user-plus" />
             Register another patient
           </button>
         </div>
@@ -79,229 +130,482 @@
     <div class="flex flex-col mb-6">
       <div class="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <p class="tracking-tight font-bold leading-none text-[22px] m-0">Patient Registration</p>
-          <p class="text-sm text-gray-500 mt-1">Collect intake information across {{ steps.length }} short steps.</p>
+          <p class="tracking-tight font-bold leading-none text-[22px] m-0">
+            Patient Registration
+          </p>
+          <p class="text-sm text-gray-500 mt-1">
+            Collect intake information across {{ steps.length }} short steps.
+          </p>
         </div>
-        <button type="button" (click)="resetForm()"
-          class="text-sm text-gray-500 hover:text-red-600 hover:underline transition-colors">
+        <button
+          type="button"
+          (click)="resetForm()"
+          class="text-sm text-gray-500 hover:text-red-600 hover:underline transition-colors"
+        >
           Discard
         </button>
       </div>
       <div class="mt-5 grid grid-cols-4 gap-2">
         <ng-container *ngFor="let s of steps; let i = index">
-          <button type="button" (click)="goTo(i)"
+          <button
+            type="button"
+            (click)="goTo(i)"
             class="flex flex-col items-start gap-1 text-left p-3 rounded-lg border transition-all"
-            [ngClass]="i === currentStepIdx()
-              ? 'border-primary bg-primary/5'
-              : 'border-gray-200 bg-surface'">
+            [ngClass]="
+              i === currentStepIdx()
+                ? 'border-primary bg-primary/5'
+                : 'border-gray-200 bg-surface'
+            "
+          >
             <div class="flex items-center gap-2 w-full">
-              <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
+              <span
+                class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
                 [class.bg-primary]="i <= currentStepIdx()"
                 [class.text-white]="i <= currentStepIdx()"
                 [class.bg-gray-100]="i > currentStepIdx()"
-                [class.text-gray-400]="i > currentStepIdx()">
-                <physio-icon *ngIf="i < currentStepIdx()" [size]="14" [strokeWidth]="2" name="check" class="text-white" />
+                [class.text-gray-400]="i > currentStepIdx()"
+              >
+                <physio-icon
+                  *ngIf="i < currentStepIdx()"
+                  [size]="14"
+                  [strokeWidth]="2"
+                  name="check"
+                  class="text-white"
+                />
                 <span *ngIf="i >= currentStepIdx()">{{ i + 1 }}</span>
               </span>
-              <span class="text-sm font-medium truncate"
+              <span
+                class="text-sm font-medium truncate"
                 [class.text-primary]="i === currentStepIdx()"
                 [class.text-gray-900]="i < currentStepIdx()"
-                [class.text-gray-500]="i > currentStepIdx()">
+                [class.text-gray-500]="i > currentStepIdx()"
+              >
                 {{ s.label }}
               </span>
             </div>
-            <span class="text-[11px] text-gray-500 truncate w-full">{{ s.description }}</span>
+            <span class="text-[11px] text-gray-500 truncate w-full">{{
+              s.description
+            }}</span>
           </button>
         </ng-container>
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="bg-surface rounded-lg border border-gray-200">
+      <form
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+        class="bg-surface rounded-lg border border-gray-200"
+      >
         <div *ngIf="currentStep().id === 'personal'">
           <div class="p-5 border-b border-gray-100">
-            <h2 class="text-base font-semibold text-gray-900 mb-1">Personal information</h2>
-            <p class="text-sm text-gray-500">Basic identity details. Required to create the patient record.</p>
+            <h2 class="text-base font-semibold text-gray-900 mb-1">
+              Personal information
+            </h2>
+            <p class="text-sm text-gray-500">
+              Basic identity details. Required to create the patient record.
+            </p>
           </div>
           <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
             <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700">First name <span class="text-red-500">*</span></span>
-              <boo-input label="Enter first name" formControlName="firstName" booError />
+              <span class="text-xs font-medium text-gray-700"
+                >First name <span class="text-red-500">*</span></span
+              >
+              <boo-input
+                label="Enter first name"
+                formControlName="firstName"
+                booError
+              />
             </label>
             <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700">Last name <span class="text-red-500">*</span></span>
-              <boo-input label="Enter last name" formControlName="lastName" booError />
+              <span class="text-xs font-medium text-gray-700"
+                >Last name <span class="text-red-500">*</span></span
+              >
+              <boo-input
+                label="Enter last name"
+                formControlName="lastName"
+                booError
+              />
             </label>
             <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700">Date of birth <span class="text-red-500">*</span></span>
-              <boo-datepicker label="Select date" disableFuture formControlName="dateOfBirth" />
-              <span *ngIf="ageFromDob() !== null" class="text-[11px] text-gray-500">Age: {{ ageFromDob() }} years</span>
+              <span class="text-xs font-medium text-gray-700"
+                >Date of birth <span class="text-red-500">*</span></span
+              >
+              <boo-datepicker
+                label="Select date"
+                disableFuture
+                formControlName="dateOfBirth"
+              />
+              <span
+                *ngIf="ageFromDob() !== null"
+                class="text-[11px] text-gray-500"
+                >Age: {{ ageFromDob() }} years</span
+              >
             </label>
             <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700">Gender <span class="text-red-500">*</span></span>
-              <boo-select label="Select gender" formControlName="gender" [options]="genderOptions" />
+              <span class="text-xs font-medium text-gray-700"
+                >Gender <span class="text-red-500">*</span></span
+              >
+              <boo-select
+                label="Select gender"
+                formControlName="gender"
+                [options]="genderOptions"
+              />
             </label>
             <label class="flex flex-col gap-1">
               <span class="text-xs font-medium text-gray-700">Blood group</span>
-              <boo-select label="Optional" formControlName="bloodGroup" [options]="bloodGroupOptions" />
+              <boo-select
+                label="Optional"
+                formControlName="bloodGroup"
+                [options]="bloodGroupOptions"
+              />
             </label>
             <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700">Marital status</span>
-              <boo-select label="Optional" formControlName="maritalStatus" [options]="maritalOptions" />
+              <span class="text-xs font-medium text-gray-700"
+                >Marital status</span
+              >
+              <boo-select
+                label="Optional"
+                formControlName="maritalStatus"
+                [options]="maritalOptions"
+              />
             </label>
           </div>
         </div>
 
         <div *ngIf="currentStep().id === 'contact'">
           <div class="p-5 border-b border-gray-100">
-            <h2 class="text-base font-semibold text-gray-900 mb-1">Contact information</h2>
-            <p class="text-sm text-gray-500">How we reach the patient and their emergency contact.</p>
+            <h2 class="text-base font-semibold text-gray-900 mb-1">
+              Contact information
+            </h2>
+            <p class="text-sm text-gray-500">
+              How we reach the patient and their emergency contact.
+            </p>
           </div>
           <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
             <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700">Email <span class="text-red-500">*</span></span>
-              <boo-input label="patient@example.com" formControlName="email" booError />
-              <span *ngIf="ctrl('email')?.errors?.['email'] && ctrl('email')?.touched"
-                class="text-[11px] text-red-500">Enter a valid email address</span>
+              <span class="text-xs font-medium text-gray-700"
+                >Email <span class="text-red-500">*</span></span
+              >
+              <boo-input
+                label="patient@example.com"
+                formControlName="email"
+                booError
+              />
+              <span
+                *ngIf="
+                  ctrl('email')?.errors?.['email'] && ctrl('email')?.touched
+                "
+                class="text-[11px] text-red-500"
+                >Enter a valid email address</span
+              >
             </label>
             <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700">Phone <span class="text-red-500">*</span></span>
-              <boo-input label="+84 123 456 789" formControlName="phone" booError />
-              <span *ngIf="ctrl('phone')?.errors?.['pattern'] && ctrl('phone')?.touched"
-                class="text-[11px] text-red-500">Enter a valid phone number</span>
+              <span class="text-xs font-medium text-gray-700"
+                >Phone <span class="text-red-500">*</span></span
+              >
+              <boo-input
+                label="+84 123 456 789"
+                formControlName="phone"
+                booError
+              />
+              <span
+                *ngIf="
+                  ctrl('phone')?.errors?.['pattern'] && ctrl('phone')?.touched
+                "
+                class="text-[11px] text-red-500"
+                >Enter a valid phone number</span
+              >
             </label>
-            <label class="flex flex-col gap-1 md:col-span-2 pt-2 border-t border-gray-100 mt-2">
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Emergency contact</span>
+            <label
+              class="flex flex-col gap-1 md:col-span-2 pt-2 border-t border-gray-100 mt-2"
+            >
+              <span
+                class="text-[11px] font-semibold uppercase tracking-wider text-gray-400"
+                >Emergency contact</span
+              >
             </label>
             <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700">Name <span class="text-red-500">*</span></span>
-              <boo-input label="Full name" formControlName="emergencyContactName" booError />
+              <span class="text-xs font-medium text-gray-700"
+                >Name <span class="text-red-500">*</span></span
+              >
+              <boo-input
+                label="Full name"
+                formControlName="emergencyContactName"
+                booError
+              />
             </label>
             <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700">Phone <span class="text-red-500">*</span></span>
-              <boo-input label="+84 …" formControlName="emergencyContactPhone" booError />
+              <span class="text-xs font-medium text-gray-700"
+                >Phone <span class="text-red-500">*</span></span
+              >
+              <boo-input
+                label="+84 …"
+                formControlName="emergencyContactPhone"
+                booError
+              />
             </label>
 
-            <label class="flex flex-col gap-1 md:col-span-2 pt-2 border-t border-gray-100 mt-2">
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Address</span>
+            <label
+              class="flex flex-col gap-1 md:col-span-2 pt-2 border-t border-gray-100 mt-2"
+            >
+              <span
+                class="text-[11px] font-semibold uppercase tracking-wider text-gray-400"
+                >Address</span
+              >
             </label>
             <label class="flex flex-col gap-1 md:col-span-2">
-              <span class="text-xs font-medium text-gray-700">Street address <span class="text-red-500">*</span></span>
-              <textarea rows="2" formControlName="address" placeholder="Street, ward, district"
-                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"></textarea>
+              <span class="text-xs font-medium text-gray-700"
+                >Street address <span class="text-red-500">*</span></span
+              >
+              <textarea
+                rows="2"
+                formControlName="address"
+                placeholder="Street, ward, district"
+                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
+              ></textarea>
             </label>
             <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700">City <span class="text-red-500">*</span></span>
+              <span class="text-xs font-medium text-gray-700"
+                >City <span class="text-red-500">*</span></span
+              >
               <boo-input label="City" formControlName="city" booError />
             </label>
             <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700">Postal code <span class="text-red-500">*</span></span>
-              <boo-input label="Postal code" formControlName="postalCode" booError />
+              <span class="text-xs font-medium text-gray-700"
+                >Postal code <span class="text-red-500">*</span></span
+              >
+              <boo-input
+                label="Postal code"
+                formControlName="postalCode"
+                booError
+              />
             </label>
           </div>
         </div>
 
         <div *ngIf="currentStep().id === 'medical'">
           <div class="p-5 border-b border-gray-100">
-            <h2 class="text-base font-semibold text-gray-900 mb-1">Medical, insurance &amp; care</h2>
-            <p class="text-sm text-gray-500">Primary doctor is required; everything else is optional but recommended.</p>
+            <h2 class="text-base font-semibold text-gray-900 mb-1">
+              Medical, insurance &amp; care
+            </h2>
+            <p class="text-sm text-gray-500">
+              Primary doctor is required; everything else is optional but
+              recommended.
+            </p>
           </div>
           <div class="p-5 grid grid-cols-1 gap-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Primary doctor <span class="text-red-500">*</span></span>
-                <boo-input label="Doctor ID" formControlName="primaryDoctorId" booError />
-                <span *ngIf="isFieldInvalid('primaryDoctorId')" class="text-[11px] text-red-500">Required</span>
+                <span class="text-xs font-medium text-gray-700"
+                  >Primary doctor <span class="text-red-500">*</span></span
+                >
+                <boo-input
+                  label="Doctor ID"
+                  formControlName="primaryDoctorId"
+                  booError
+                />
+                <span
+                  *ngIf="isFieldInvalid('primaryDoctorId')"
+                  class="text-[11px] text-red-500"
+                  >Required</span
+                >
               </label>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Referred by</span>
-                <boo-input label="Referring doctor ID" formControlName="referredBy" />
+                <span class="text-xs font-medium text-gray-700"
+                  >Referred by</span
+                >
+                <boo-input
+                  label="Referring doctor ID"
+                  formControlName="referredBy"
+                />
               </label>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Referral hospital</span>
-                <boo-input label="Hospital ID" formControlName="referralHospitalId" />
+                <span class="text-xs font-medium text-gray-700"
+                  >Referral hospital</span
+                >
+                <boo-input
+                  label="Hospital ID"
+                  formControlName="referralHospitalId"
+                />
               </label>
             </div>
             <div class="border-t border-gray-100 pt-4 grid grid-cols-1 gap-3">
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Medical history</span>
+              <span
+                class="text-[11px] font-semibold uppercase tracking-wider text-gray-400"
+                >Medical history</span
+              >
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Known allergies</span>
-                <textarea rows="2" formControlName="allergyInformation" placeholder="Medications, food, latex, etc."
-                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"></textarea>
+                <span class="text-xs font-medium text-gray-700"
+                  >Known allergies</span
+                >
+                <textarea
+                  rows="2"
+                  formControlName="allergyInformation"
+                  placeholder="Medications, food, latex, etc."
+                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
+                ></textarea>
               </label>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Medical history</span>
-                <textarea rows="3" formControlName="medicalHistory" placeholder="Chronic conditions, prior diagnoses…"
-                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"></textarea>
+                <span class="text-xs font-medium text-gray-700"
+                  >Medical history</span
+                >
+                <textarea
+                  rows="3"
+                  formControlName="medicalHistory"
+                  placeholder="Chronic conditions, prior diagnoses…"
+                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
+                ></textarea>
               </label>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <label class="flex flex-col gap-1">
-                  <span class="text-xs font-medium text-gray-700">Family history</span>
-                  <textarea rows="2" formControlName="familyHistory" placeholder="Hereditary conditions…"
-                    class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"></textarea>
+                  <span class="text-xs font-medium text-gray-700"
+                    >Family history</span
+                  >
+                  <textarea
+                    rows="2"
+                    formControlName="familyHistory"
+                    placeholder="Hereditary conditions…"
+                    class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
+                  ></textarea>
                 </label>
                 <label class="flex flex-col gap-1">
-                  <span class="text-xs font-medium text-gray-700">Surgical history</span>
-                  <textarea rows="2" formControlName="surgicalHistory" placeholder="Past surgeries, year…"
-                    class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"></textarea>
+                  <span class="text-xs font-medium text-gray-700"
+                    >Surgical history</span
+                  >
+                  <textarea
+                    rows="2"
+                    formControlName="surgicalHistory"
+                    placeholder="Past surgeries, year…"
+                    class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
+                  ></textarea>
                 </label>
               </div>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Current medications</span>
-                <textarea rows="2" formControlName="currentMedications" placeholder="Drug · dosage · frequency"
-                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"></textarea>
+                <span class="text-xs font-medium text-gray-700"
+                  >Current medications</span
+                >
+                <textarea
+                  rows="2"
+                  formControlName="currentMedications"
+                  placeholder="Drug · dosage · frequency"
+                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
+                ></textarea>
               </label>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Lifestyle notes</span>
-                <textarea rows="2" formControlName="lifestyleNotes" placeholder="Smoker, alcohol use, exercise…"
-                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"></textarea>
+                <span class="text-xs font-medium text-gray-700"
+                  >Lifestyle notes</span
+                >
+                <textarea
+                  rows="2"
+                  formControlName="lifestyleNotes"
+                  placeholder="Smoker, alcohol use, exercise…"
+                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
+                ></textarea>
               </label>
             </div>
-            <div class="border-t border-gray-100 pt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-              <span class="md:col-span-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Insurance</span>
+            <div
+              class="border-t border-gray-100 pt-4 grid grid-cols-1 md:grid-cols-2 gap-3"
+            >
+              <span
+                class="md:col-span-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400"
+                >Insurance</span
+              >
               <label class="flex flex-col gap-1">
                 <span class="text-xs font-medium text-gray-700">Provider</span>
-                <boo-input label="Optional" formControlName="insuranceProvider" />
+                <boo-input
+                  label="Optional"
+                  formControlName="insuranceProvider"
+                />
               </label>
               <label class="flex flex-col gap-1">
                 <span class="text-xs font-medium text-gray-700">Policy #</span>
-                <boo-input label="Optional" formControlName="insurancePolicyNumber" />
+                <boo-input
+                  label="Optional"
+                  formControlName="insurancePolicyNumber"
+                />
               </label>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Expiry date</span>
-                <boo-datepicker label="Select date" formControlName="insuranceExpiryDate" />
+                <span class="text-xs font-medium text-gray-700"
+                  >Expiry date</span
+                >
+                <boo-datepicker
+                  label="Select date"
+                  formControlName="insuranceExpiryDate"
+                />
               </label>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Coverage amount</span>
-                <input type="number" formControlName="insuranceCoverageAmount" placeholder="0"
-                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary" />
+                <span class="text-xs font-medium text-gray-700"
+                  >Coverage amount</span
+                >
+                <input
+                  type="number"
+                  formControlName="insuranceCoverageAmount"
+                  placeholder="0"
+                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary"
+                />
               </label>
             </div>
-            <div class="border-t border-gray-100 pt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-              <span class="md:col-span-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Demographics &amp; preferences</span>
+            <div
+              class="border-t border-gray-100 pt-4 grid grid-cols-1 md:grid-cols-2 gap-3"
+            >
+              <span
+                class="md:col-span-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400"
+                >Demographics &amp; preferences</span
+              >
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Occupation</span>
+                <span class="text-xs font-medium text-gray-700"
+                  >Occupation</span
+                >
                 <boo-input label="e.g. Teacher" formControlName="occupation" />
               </label>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Annual income range</span>
-                <boo-select label="Prefer not to say" formControlName="annualIncomeRange" [options]="incomeRangeOptions" />
+                <span class="text-xs font-medium text-gray-700"
+                  >Annual income range</span
+                >
+                <boo-select
+                  label="Prefer not to say"
+                  formControlName="annualIncomeRange"
+                  [options]="incomeRangeOptions"
+                />
               </label>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Preferred hospital</span>
-                <boo-input label="Hospital ID" formControlName="preferredHospitalId" />
+                <span class="text-xs font-medium text-gray-700"
+                  >Preferred hospital</span
+                >
+                <boo-input
+                  label="Hospital ID"
+                  formControlName="preferredHospitalId"
+                />
               </label>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Preferred doctor</span>
-                <boo-input label="Doctor ID" formControlName="preferredDoctorId" />
+                <span class="text-xs font-medium text-gray-700"
+                  >Preferred doctor</span
+                >
+                <boo-input
+                  label="Doctor ID"
+                  formControlName="preferredDoctorId"
+                />
               </label>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Preferred appointment time</span>
-                <boo-select label="Select" formControlName="preferredAppointmentTime" [options]="appointmentTimeOptions" />
+                <span class="text-xs font-medium text-gray-700"
+                  >Preferred appointment time</span
+                >
+                <boo-select
+                  label="Select"
+                  formControlName="preferredAppointmentTime"
+                  [options]="appointmentTimeOptions"
+                />
               </label>
               <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Communication preferences</span>
-                <boo-select label="Select" formControlName="communicationPreferences" [options]="communicationOptions" />
+                <span class="text-xs font-medium text-gray-700"
+                  >Communication preferences</span
+                >
+                <boo-select
+                  label="Select"
+                  formControlName="communicationPreferences"
+                  [options]="communicationOptions"
+                />
               </label>
             </div>
           </div>
@@ -309,64 +613,164 @@
 
         <div *ngIf="currentStep().id === 'review'">
           <div class="p-5 border-b border-gray-100">
-            <h2 class="text-base font-semibold text-gray-900 mb-1">Review &amp; confirm</h2>
-            <p class="text-sm text-gray-500">Double-check before creating the patient record.</p>
+            <h2 class="text-base font-semibold text-gray-900 mb-1">
+              Review &amp; confirm
+            </h2>
+            <p class="text-sm text-gray-500">
+              Double-check before creating the patient record.
+            </p>
           </div>
           <div class="p-5 space-y-5">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+            <div
+              class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm"
+            >
               <div class="md:col-span-2 mb-1">
-                <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Personal</span>
+                <span
+                  class="text-[11px] font-semibold uppercase tracking-wider text-gray-400"
+                  >Personal</span
+                >
               </div>
-              <div><span class="text-gray-500">Name:</span> <b class="text-gray-900">{{ fullName() }}</b></div>
-              <div><span class="text-gray-500">Age:</span> {{ ageFromDob() !== null ? ageFromDob() + ' years' : '—' }}</div>
-              <div><span class="text-gray-500">Gender:</span> {{ formValue().gender || '—' }}</div>
-              <div><span class="text-gray-500">Blood:</span> {{ formValue().bloodGroup || '—' }}</div>
+              <div>
+                <span class="text-gray-500">Name:</span>
+                <b class="text-gray-900">{{ fullName() }}</b>
+              </div>
+              <div>
+                <span class="text-gray-500">Age:</span>
+                {{ ageFromDob() !== null ? ageFromDob() + " years" : "—" }}
+              </div>
+              <div>
+                <span class="text-gray-500">Gender:</span>
+                {{ formValue().gender || "—" }}
+              </div>
+              <div>
+                <span class="text-gray-500">Blood:</span>
+                {{ formValue().bloodGroup || "—" }}
+              </div>
 
-              <div class="md:col-span-2 mt-2 mb-1 pt-2 border-t border-gray-100">
-                <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Contact</span>
+              <div
+                class="md:col-span-2 mt-2 mb-1 pt-2 border-t border-gray-100"
+              >
+                <span
+                  class="text-[11px] font-semibold uppercase tracking-wider text-gray-400"
+                  >Contact</span
+                >
               </div>
-              <div><span class="text-gray-500">Email:</span> {{ formValue().email }}</div>
-              <div><span class="text-gray-500">Phone:</span> {{ formValue().phone }}</div>
-              <div class="md:col-span-2"><span class="text-gray-500">Address:</span> {{ formValue().address }}, {{ formValue().city }} {{ formValue().postalCode }}</div>
-              <div><span class="text-gray-500">Emergency:</span> {{ formValue().emergencyContactName }}</div>
-              <div><span class="text-gray-500">Emergency phone:</span> {{ formValue().emergencyContactPhone }}</div>
+              <div>
+                <span class="text-gray-500">Email:</span>
+                {{ formValue().email }}
+              </div>
+              <div>
+                <span class="text-gray-500">Phone:</span>
+                {{ formValue().phone }}
+              </div>
+              <div class="md:col-span-2">
+                <span class="text-gray-500">Address:</span>
+                {{ formValue().address }}, {{ formValue().city }}
+                {{ formValue().postalCode }}
+              </div>
+              <div>
+                <span class="text-gray-500">Emergency:</span>
+                {{ formValue().emergencyContactName }}
+              </div>
+              <div>
+                <span class="text-gray-500">Emergency phone:</span>
+                {{ formValue().emergencyContactPhone }}
+              </div>
 
-              <div class="md:col-span-2 mt-2 mb-1 pt-2 border-t border-gray-100">
-                <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Medical &amp; insurance</span>
+              <div
+                class="md:col-span-2 mt-2 mb-1 pt-2 border-t border-gray-100"
+              >
+                <span
+                  class="text-[11px] font-semibold uppercase tracking-wider text-gray-400"
+                  >Medical &amp; insurance</span
+                >
               </div>
-              <div><span class="text-gray-500">Primary doctor:</span> {{ formValue().primaryDoctorId || '—' }}</div>
-              <div><span class="text-gray-500">Referred by:</span> {{ formValue().referredBy || '—' }}</div>
-              <div class="md:col-span-2"><span class="text-gray-500">Allergies:</span> {{ formValue().allergyInformation || '—' }}</div>
-              <div class="md:col-span-2"><span class="text-gray-500">Medical history:</span> {{ formValue().medicalHistory || '—' }}</div>
-              <div class="md:col-span-2"><span class="text-gray-500">Family history:</span> {{ formValue().familyHistory || '—' }}</div>
-              <div class="md:col-span-2"><span class="text-gray-500">Surgical history:</span> {{ formValue().surgicalHistory || '—' }}</div>
-              <div class="md:col-span-2"><span class="text-gray-500">Medications:</span> {{ formValue().currentMedications || '—' }}</div>
-              <div class="md:col-span-2"><span class="text-gray-500">Lifestyle:</span> {{ formValue().lifestyleNotes || '—' }}</div>
-              <div><span class="text-gray-500">Insurance:</span> {{ formValue().insuranceProvider || '—' }}</div>
-              <div><span class="text-gray-500">Policy #:</span> {{ formValue().insurancePolicyNumber || '—' }}</div>
-              <div><span class="text-gray-500">Occupation:</span> {{ formValue().occupation || '—' }}</div>
-              <div><span class="text-gray-500">Pref. time:</span> {{ formValue().preferredAppointmentTime || '—' }}</div>
+              <div>
+                <span class="text-gray-500">Primary doctor:</span>
+                {{ formValue().primaryDoctorId || "—" }}
+              </div>
+              <div>
+                <span class="text-gray-500">Referred by:</span>
+                {{ formValue().referredBy || "—" }}
+              </div>
+              <div class="md:col-span-2">
+                <span class="text-gray-500">Allergies:</span>
+                {{ formValue().allergyInformation || "—" }}
+              </div>
+              <div class="md:col-span-2">
+                <span class="text-gray-500">Medical history:</span>
+                {{ formValue().medicalHistory || "—" }}
+              </div>
+              <div class="md:col-span-2">
+                <span class="text-gray-500">Family history:</span>
+                {{ formValue().familyHistory || "—" }}
+              </div>
+              <div class="md:col-span-2">
+                <span class="text-gray-500">Surgical history:</span>
+                {{ formValue().surgicalHistory || "—" }}
+              </div>
+              <div class="md:col-span-2">
+                <span class="text-gray-500">Medications:</span>
+                {{ formValue().currentMedications || "—" }}
+              </div>
+              <div class="md:col-span-2">
+                <span class="text-gray-500">Lifestyle:</span>
+                {{ formValue().lifestyleNotes || "—" }}
+              </div>
+              <div>
+                <span class="text-gray-500">Insurance:</span>
+                {{ formValue().insuranceProvider || "—" }}
+              </div>
+              <div>
+                <span class="text-gray-500">Policy #:</span>
+                {{ formValue().insurancePolicyNumber || "—" }}
+              </div>
+              <div>
+                <span class="text-gray-500">Occupation:</span>
+                {{ formValue().occupation || "—" }}
+              </div>
+              <div>
+                <span class="text-gray-500">Pref. time:</span>
+                {{ formValue().preferredAppointmentTime || "—" }}
+              </div>
             </div>
 
-            <label class="flex items-start gap-2 pt-3 border-t border-gray-100 cursor-pointer">
-              <input type="checkbox" formControlName="agreeToTerms"
-                class="mt-0.5 w-4 h-4 accent-primary cursor-pointer" />
+            <label
+              class="flex items-start gap-2 pt-3 border-t border-gray-100 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                formControlName="agreeToTerms"
+                class="mt-0.5 w-4 h-4 accent-primary cursor-pointer"
+              />
               <span class="text-sm text-gray-700">
-                I confirm the information above is accurate and the patient has agreed to our
+                I confirm the information above is accurate and the patient has
+                agreed to our
                 <a class="text-primary hover:underline" href="#">terms</a> and
-                <a class="text-primary hover:underline" href="#">privacy policy</a>.
+                <a class="text-primary hover:underline" href="#"
+                  >privacy policy</a
+                >.
                 <span class="text-red-500">*</span>
               </span>
             </label>
-            <span *ngIf="isFieldInvalid('agreeToTerms')" class="block text-[11px] text-red-500 -mt-2">
+            <span
+              *ngIf="isFieldInvalid('agreeToTerms')"
+              class="block text-[11px] text-red-500 -mt-2"
+            >
               You must confirm before registering
             </span>
           </div>
         </div>
 
-        <div class="px-5 py-4 border-t border-gray-100 flex items-center justify-between gap-2 bg-gray-50/50 rounded-b-lg">
-          <button type="button" (click)="prev()" [disabled]="currentStepIdx() === 0"
-            class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        <div
+          class="px-5 py-4 border-t border-gray-100 flex items-center justify-between gap-2 bg-gray-50/50 rounded-b-lg"
+        >
+          <button
+            type="button"
+            (click)="prev()"
+            [disabled]="currentStepIdx() === 0"
+            class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
             <physio-icon name="arrow-left" />
             Previous
           </button>
@@ -375,17 +779,38 @@
             Step {{ currentStepIdx() + 1 }} of {{ steps.length }}
           </span>
 
-          <button *ngIf="currentStep().id !== 'review'" type="button" (click)="next()"
-            class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors">
+          <button
+            *ngIf="currentStep().id !== 'review'"
+            type="button"
+            (click)="next()"
+            class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors"
+          >
             Next
             <physio-icon name="arrow-right" class="text-white" />
           </button>
-          <button *ngIf="currentStep().id === 'review'" type="submit"
-            [disabled]="loadingSrv.isLoading(LoadingKeys.PATIENT.CREATE) || form.invalid"
-            class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-            <physio-icon *ngIf="loadingSrv.isLoading(LoadingKeys.PATIENT.CREATE)" name="loader-circle" color="white" iconClass="w-4 h-4 animate-spin" />
-            <physio-icon *ngIf="!loadingSrv.isLoading(LoadingKeys.PATIENT.CREATE)" name="user-plus" color="white" />
-            <span>{{ loadingSrv.isLoading(LoadingKeys.PATIENT.CREATE) ? 'Registering…' : 'Register patient' }}</span>
+          <button
+            *ngIf="currentStep().id === 'review'"
+            type="submit"
+            [disabled]="
+              loadingSrv.isLoading(LoadingKeys.PATIENT.CREATE) || form.invalid
+            "
+            class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <physio-icon
+              *ngIf="loadingSrv.isLoading(LoadingKeys.PATIENT.CREATE)"
+              name="loader-circle"
+              [class]="'w-4 h-4 animate-spin text-white'"
+            />
+            <physio-icon
+              *ngIf="!loadingSrv.isLoading(LoadingKeys.PATIENT.CREATE)"
+              name="user-plus"
+              class="text-white"
+            />
+            <span>{{
+              loadingSrv.isLoading(LoadingKeys.PATIENT.CREATE)
+                ? "Registering…"
+                : "Register patient"
+            }}</span>
           </button>
         </div>
       </form>
@@ -393,11 +818,15 @@
       <aside class="bg-surface rounded-lg border border-gray-200 sticky top-4">
         <div class="p-5 border-b border-gray-100">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-base font-bold shrink-0">
+            <div
+              class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-base font-bold shrink-0"
+            >
               {{ initials() }}
             </div>
             <div class="min-w-0">
-              <div class="text-sm font-semibold text-gray-900 truncate">{{ fullName() }}</div>
+              <div class="text-sm font-semibold text-gray-900 truncate">
+                {{ fullName() }}
+              </div>
             </div>
           </div>
         </div>
@@ -405,40 +834,61 @@
         <div class="p-5 space-y-3 text-xs">
           <div class="flex items-center justify-between">
             <span class="text-gray-500">Age</span>
-            <span class="font-medium text-gray-900">{{ ageFromDob() !== null ? ageFromDob() + ' yrs' : '—' }}</span>
+            <span class="font-medium text-gray-900">{{
+              ageFromDob() !== null ? ageFromDob() + " yrs" : "—"
+            }}</span>
           </div>
           <div class="flex items-center justify-between">
             <span class="text-gray-500">Gender</span>
-            <span class="font-medium text-gray-900 capitalize">{{ formValue().gender || '—' }}</span>
+            <span class="font-medium text-gray-900 capitalize">{{
+              formValue().gender || "—"
+            }}</span>
           </div>
           <div class="flex items-center justify-between">
             <span class="text-gray-500">Blood</span>
-            <span class="font-medium text-gray-900">{{ formValue().bloodGroup || '—' }}</span>
+            <span class="font-medium text-gray-900">{{
+              formValue().bloodGroup || "—"
+            }}</span>
           </div>
           <div class="flex items-center justify-between">
             <span class="text-gray-500">Phone</span>
-            <span class="font-medium text-gray-900 truncate ml-2">{{ formValue().phone || '—' }}</span>
+            <span class="font-medium text-gray-900 truncate ml-2">{{
+              formValue().phone || "—"
+            }}</span>
           </div>
           <div class="flex items-center justify-between">
             <span class="text-gray-500">Email</span>
-            <span class="font-medium text-gray-900 truncate ml-2">{{ formValue().email || '—' }}</span>
+            <span class="font-medium text-gray-900 truncate ml-2">{{
+              formValue().email || "—"
+            }}</span>
           </div>
         </div>
 
         <div class="px-5 py-4 border-t border-gray-100">
           <div class="flex items-center justify-between mb-2">
             <span class="text-xs text-gray-500">Progress</span>
-            <span class="text-xs font-medium text-gray-900">{{ progress() | number:'1.0-0' }}%</span>
+            <span class="text-xs font-medium text-gray-900"
+              >{{ progress() | number: "1.0-0" }}%</span
+            >
           </div>
           <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden">
-            <div class="h-full bg-primary transition-all duration-300" [style.width.%]="progress()"></div>
+            <div
+              class="h-full bg-primary transition-all duration-300"
+              [style.width.%]="progress()"
+            ></div>
           </div>
         </div>
 
         <div class="px-5 py-4 border-t border-gray-100">
           <div class="flex items-start gap-2 text-xs text-gray-500">
-            <physio-icon name="info" iconClass="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5" />
-            <p class="m-0">A Patient ID is assigned when registration completes. The preview is approximate.</p>
+            <physio-icon
+              name="info"
+              [class]="'w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5'"
+            />
+            <p class="m-0">
+              A Patient ID is assigned when registration completes. The preview
+              is approximate.
+            </p>
           </div>
         </div>
       </aside>

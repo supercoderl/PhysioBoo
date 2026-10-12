@@ -1,16 +1,13 @@
 import { SocialAuthService } from "@abacritt/angularx-social-login";
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { Router } from "@angular/router";
 import { ChevronUp, FileCheck, Info } from "lucide-angular";
+import { MenuService } from "../../../../services/admin/menu.service";
 import { AuthService } from "../../../../services/auth/auth.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
-import { MENU_CACHE_KEY } from "../../../../shared/data/cache";
 import { AVATAR } from "../../../../shared/data/dummy";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { PaginationData } from "../../../../shared/types/common";
-import { MenuItem } from "../../../../shared/types/menu.types";
-import { LocalStorage } from "../../../../shared/utils/storage";
 import { ButtonIconComponent } from "../../../button/button-icon/button-icon.component";
 import { BooAvatarComponent } from "../../../image/avatar/boo-avatar.component";
 import { PopupComponent } from "../../../popup/popup.component";
@@ -30,12 +27,12 @@ import { SidebarItemComponent } from "./sidebar-item/sidebar-item.component";
     styleUrl: './sidebar.component.scss'
 })
 
-export class AdminLayoutSideBarComponent implements OnInit {
+export class AdminLayoutSideBarComponent {
     // #region Inputs, Outputs, Properties
     fileCheck = FileCheck;
     info = Info;
     chevronUp = ChevronUp;
-    menus: MenuItem[] = [];
+    menus = this.menuSrv.adminMenus;
     userInfo$ = this.authSrv.userInfo$;
     defaultAvatar = AVATAR;
     isOpen: boolean = false;
@@ -46,29 +43,20 @@ export class AdminLayoutSideBarComponent implements OnInit {
     // #region Init (Lifecycle + Setup)
     constructor(
         private authSrv: AuthService,
+        private menuSrv: MenuService,
         private router: Router,
         private toastSrv: ToastService,
         protected loadingSrv: LocalLoadingService,
         private oauthSrv: SocialAuthService
-    ) {
-
-    }
-
-    ngOnInit(): void {
-        const cache = LocalStorage.load<PaginationData<MenuItem>>(MENU_CACHE_KEY);
-        if (cache) {
-            this.menus = cache.items.sort((a, b) => a.order - b.order);
-        }
-    }
+    ) { }
     // #endregion
 
     // #region Events
     logout() {
-        this.oauthSrv.signOut();
-        this.authSrv.logout().subscribe({
-            next: _ => this.router.navigate(['/auth/login']),
-            error: err => this.toastSrv.error(err.message)
-        })
+        this.oauthSrv.signOut().catch(() => { });
+        this.router.navigate(['/auth/login']).then(() => {
+            this.authSrv.logout().subscribe({ error: () => { } });
+        });
     }
     // #endregion
 }

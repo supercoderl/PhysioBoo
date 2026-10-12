@@ -10,7 +10,6 @@ import { SharedModule } from "../../../../../shared/shared-imports";
 import { CreateLeadRequest, Lead, UpdateLeadRequest } from "../../../../../shared/types/lead.types";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooIconComponent } from "../../../../icon/boo-icon/boo-icon.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
@@ -22,7 +21,6 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
         SharedModule,
         DrawerComponent,
         BooInputComponent,
-        BooIconComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
         BooTextareaComponent
@@ -38,13 +36,13 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                         <p class="text-sm text-secondary m-0">Contact details and lead classification</p>
                     </div>
                     <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <boo-icon name="x" [size]="20"></boo-icon>
+                        <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
                 <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
                     <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <boo-icon name="loader" class="animate-spin text-primary" [size]="32"></boo-icon>
+                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
                     </div>
 
                     <!-- Contact Info -->
@@ -84,7 +82,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
 
                 <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0">
                     <button *ngIf="currentId" (click)="onDelete()" class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1.5">
-                        <boo-icon name="trash-2" [size]="16"></boo-icon>
+                        <physio-icon name="trash-2" [size]="16"></physio-icon>
                         Delete
                     </button>
                     <div class="flex gap-3 ml-auto">

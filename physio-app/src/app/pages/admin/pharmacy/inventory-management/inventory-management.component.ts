@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { DialogService } from "../../../../services/common/dialog.service";
@@ -29,7 +28,7 @@ import { InventoryTimelinePanelComponent } from "./inventory-timeline-panel.comp
     standalone: true,
     imports: [
         SharedModule,
-        BooIconComponent,
+
         ErrorStateComponent,
         InventoryKpiStripComponent,
         InventoryExplorerPanelComponent,
@@ -50,7 +49,7 @@ import { InventoryTimelinePanelComponent } from "./inventory-timeline-panel.comp
         <p class="text-xs text-secondary">Warehouse command center · Last sync {{ lastSync | date:'shortTime' }}</p>
       </div>
       <button type="button" (click)="refresh()" class="px-3 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 flex items-center gap-1.5">
-        <boo-icon name="refresh-cw" [size]="14"></boo-icon> Refresh
+        <physio-icon name="refresh" [size]="14"></physio-icon> Refresh
       </button>
     </div>
 

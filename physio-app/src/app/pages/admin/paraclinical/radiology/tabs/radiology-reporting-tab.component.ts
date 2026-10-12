@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, signal } from "@angular/core";
 import { Subject, debounceTime } from "rxjs";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
@@ -14,10 +13,10 @@ import { ImagingOrderRow, RadiologyReport, RadiologyReportTemplate, ReportStatus
 @Component({
   selector: 'radiology-reporting-tab',
   standalone: true,
-  imports: [SharedModule, BooIconComponent, BooSelectComponent, BooTextareaComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooSelectComponent, BooTextareaComponent, StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <boo-icon name="loader" iconClass="w-6 h-6 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && !orders().length">
@@ -55,7 +54,7 @@ import { ImagingOrderRow, RadiologyReport, RadiologyReportTemplate, ReportStatus
               [title]="dictationSupported ? 'Dictate into Findings' : 'Voice dictation needs a browser with speech recognition (Chrome or Edge)'"
               class="px-3 py-2 rounded-lg text-xs font-semibold border flex items-center gap-1.5 disabled:cursor-not-allowed disabled:text-gray-400 disabled:bg-gray-50"
               [ngClass]="dictating() ? 'border-red-300 text-red-600 bg-red-50' : 'border-gray-200 text-gray-600 bg-surface hover:bg-gray-50'">
-              <boo-icon [name]="dictating() ? 'mic-off' : 'mic'" [size]="14"></boo-icon> {{ dictating() ? 'Stop dictation' : 'Voice dictation' }}
+              <physio-icon [name]="dictating() ? 'mic-off' : 'mic'" [size]="14"></physio-icon> {{ dictating() ? 'Stop dictation' : 'Voice dictation' }}
             </button>
           </div>
 

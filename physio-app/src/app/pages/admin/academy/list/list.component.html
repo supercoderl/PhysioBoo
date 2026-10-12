@@ -5,12 +5,12 @@
     <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
       <div>
         <h1 class="m-0 text-[22px] font-extrabold leading-none tracking-tight">Academy</h1>
-        <p class="m-0 mt-1 text-[13px] leading-[1.5] text-[#4B5563]">Training courses for the team</p>
+        <p class="m-0 mt-1 text-[13px] leading-[1.5] text-[#71606A]">Training courses for the team</p>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
-        <label class="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-surface px-3 min-h-10">
-          <boo-icon name="search" [size]="16" iconClass="text-gray-400"></boo-icon>
+        <label class="flex items-center gap-2 rounded-lg border border-[#EFE3E7] bg-surface px-3 min-h-10">
+          <physio-icon name="search" [size]="16" class="text-gray-400"></physio-icon>
           <input
             type="search"
             [(ngModel)]="search"
@@ -26,9 +26,9 @@
           (click)="toggleManage()"
           [attr.aria-pressed]="manageMode"
           class="flex items-center gap-1.5 rounded-lg border px-3 min-h-10 text-[13px] font-medium transition-colors"
-          [ngClass]="manageMode ? 'bg-primary text-white border-primary' : 'bg-surface text-[#4B5563] border-[#E5E7EB] hover:bg-gray-50'"
+          [ngClass]="manageMode ? 'bg-primary text-white border-primary' : 'bg-surface text-[#71606A] border-[#EFE3E7] hover:bg-gray-50'"
         >
-          <boo-icon name="settings-2" [size]="16"></boo-icon>
+          <physio-icon name="settings-2" [size]="16"></physio-icon>
           Manage
         </button>
         <button
@@ -37,7 +37,7 @@
           (click)="openDialog()"
           class="flex items-center gap-1.5 rounded-lg bg-primary px-3 min-h-10 text-[13px] font-medium text-white"
         >
-          <boo-icon name="plus" [size]="16"></boo-icon>
+          <physio-icon name="plus" [size]="16"></physio-icon>
           New course
         </button>
       </div>
@@ -51,7 +51,7 @@
         (click)="selectCategory(c)"
         [attr.aria-pressed]="category === c"
         class="rounded-full border px-3 py-1 text-[12px] font-medium transition-colors"
-        [ngClass]="category === c ? 'bg-primary text-white border-primary' : 'bg-surface text-[#1F232B] border-[#E5E7EB] hover:bg-gray-50'"
+        [ngClass]="category === c ? 'bg-primary text-white border-primary' : 'bg-surface text-[#1F232B] border-[#EFE3E7] hover:bg-gray-50'"
       >{{ c }}</button>
     </div>
 
@@ -85,10 +85,10 @@
           <span *ngIf="!course.isPublished" class="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700">Draft</span>
         </div>
         <p class="m-0 mt-3 text-[15px] font-semibold leading-[1.4]">{{ course.title }}</p>
-        <p *ngIf="course.description" class="line-clamp-2 m-0 mt-1 text-[13px] leading-[1.5] text-[#4B5563]">{{ course.description }}</p>
+        <p *ngIf="course.description" class="line-clamp-2 m-0 mt-1 text-[13px] leading-[1.5] text-[#71606A]">{{ course.description }}</p>
 
         <div class="mt-auto pt-4">
-          <p class="m-0 text-[12px] text-[#4B5563]">
+          <p class="m-0 text-[12px] text-[#71606A]">
             {{ course.lessonCount }} {{ course.lessonCount === 1 ? 'lesson' : 'lessons' }} · {{ course.totalMinutes }} min
           </p>
           <div class="mt-2 flex items-center gap-2">
@@ -113,35 +113,35 @@
 <!-- New course dialog -->
 <div *ngIf="draft() as d" class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4" (click)="closeDialog()">
   <div role="dialog" aria-modal="true" aria-label="New course" class="w-full max-w-md rounded-xl bg-surface shadow-xl" (click)="$event.stopPropagation()">
-    <div class="border-b border-[#E5E7EB] px-4 py-3">
+    <div class="border-b border-[#EFE3E7] px-4 py-3">
       <h2 class="m-0 text-[16px] font-semibold">New course</h2>
     </div>
     <div class="space-y-3 px-4 py-3">
       <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Title</span>
+        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]">Title</span>
         <input type="text" [(ngModel)]="d.title" maxlength="200" autofocus
-          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
+          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
       </label>
       <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Category</span>
+        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]">Category</span>
         <input type="text" [(ngModel)]="d.category" maxlength="60" list="academy-categories"
-          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
+          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
         <datalist id="academy-categories">
           <option *ngFor="let c of categories()" [value]="c"></option>
         </datalist>
       </label>
       <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Description</span>
+        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]">Description</span>
         <textarea [(ngModel)]="d.description" maxlength="2000" rows="3"
-          class="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-[14px] outline-none focus:border-primary"></textarea>
+          class="w-full rounded-lg border border-[#EFE3E7] px-3 py-2 text-[14px] outline-none focus:border-primary"></textarea>
       </label>
       <label class="flex items-center gap-2 text-[13px]">
         <input type="checkbox" [(ngModel)]="d.isPublished" class="h-4 w-4" />
         Publish now (otherwise it stays a draft)
       </label>
     </div>
-    <div class="flex justify-end gap-2 border-t border-[#E5E7EB] px-4 py-3">
-      <button type="button" (click)="closeDialog()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#4B5563] hover:bg-gray-100">Cancel</button>
+    <div class="flex justify-end gap-2 border-t border-[#EFE3E7] px-4 py-3">
+      <button type="button" (click)="closeDialog()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#71606A] hover:bg-gray-100">Cancel</button>
       <button type="button" (click)="createCourse()" [disabled]="!canCreate()"
         class="rounded-lg bg-primary px-4 min-h-10 text-[13px] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50">
         {{ isSaving() ? 'Creating...' : 'Create' }}

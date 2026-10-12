@@ -102,7 +102,7 @@ export class BooInputComponent implements OnInit, OnDestroy, ControlValueAccesso
   }
 
   get inputClasses(): string {
-    const base = 'block bg-surface border-border w-full text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400';
+    const base = 'block bg-surface border-border w-full text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/70';
 
     let sizeClass = '';
     switch (this.size) {

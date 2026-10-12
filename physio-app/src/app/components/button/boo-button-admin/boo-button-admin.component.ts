@@ -13,7 +13,7 @@ import { SharedModule } from "../../../shared/shared-imports";
             [ngClass]="buttonClass"
             tabindex="0"
             type="button"
-            [style.backgroundColor]="active === false ? 'transparent' : isDisabled ? '#D1D5DB' : background"
+            [style.backgroundColor]="active === false ? 'transparent' : isDisabled ? '#E3D5DA' : background"
             [style.borderWidth.px]="border.width"
             [style.borderStyle]="border.style"
             [style.borderColor]="border.color"
@@ -22,7 +22,8 @@ import { SharedModule } from "../../../shared/shared-imports";
             [style.gap.px]="gap"
             [style.borderRadius.px]="radius"
             [style.fontSize.px]="fontSize"
-            [style.color]="active === false ? '#000000' : textColor"
+            [style.color]="active === false ? '#000000' : isDisabled ? '#71606A' : textColor"
+            [attr.data-bordered]="border.width > 0 ? '' : null"
             [disabled]="isDisabled"
         >
             <span 
@@ -30,12 +31,11 @@ import { SharedModule } from "../../../shared/shared-imports";
                 [class.animate-spin]="loading"
                 *ngIf="icon || loading"
             >
-                <lucide-icon 
-                    [name]="loading ? 'loader' : icon?.name" 
+                <physio-icon 
+                    [name]="loading ? 'loader' : icon?.name || ''" 
                     [size]="icon?.size || 16" 
-                    [color]="loading ? 'currentColor' : (icon?.color || '#000000')"
-                    [class]="icon?.iconClass || ''"
-                ></lucide-icon>
+                    [class]="icon?.iconClass"
+                />
             </span>
             <ng-content></ng-content>
         </button>
@@ -45,15 +45,19 @@ import { SharedModule } from "../../../shared/shared-imports";
             display: inline-block;
             height: 100%;  
         }
+        /* Secondary buttons: the border turns rose on hover (inline styles need !important to be overridden). */
+        button[data-bordered]:not(:disabled):hover {
+            border-color: var(--color-primary) !important;
+        }
     `
 })
 
 export class BooButtonAdminComponent {
     // #region Inputs, Outputs, Properties
-    @Input() icon?: { name: string, size: number, color?: string, iconClass?: string };
+    @Input() icon?: { name: string, size: number, iconClass?: string };
     @Input() background: string = "rgb(var(--twc-primary))";
     @Input() border: { width: number, style?: string, color: string } = { width: 0, style: "solid", color: "#000000" }
-    @Input() textColor: string = "#000000";
+    @Input() textColor: string = "var(--color-text)";
     @Input() fontWeight: string = "400";
     @Input() padding: string = "6px 12px";
     @Input() gap: number = 1;

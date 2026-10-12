@@ -195,7 +195,7 @@ pass — see §18).
 ## 16. Components
 
 Reused as-is: `StatCardComponent`, `StatusBadgeComponent`, `EmptyStateComponent`, `DrawerComponent`,
-`DialogService`, `ToastService`, `BooIconComponent`, the Retail catalog-card / category-pill layout
+`DialogService`, `ToastService`, `IconComponent` (physio-icon), the Retail catalog-card / category-pill layout
 pattern, and the `ngx-charts-line-chart` API from `AdminAnalyticCardComponent`.
 
 New, created only because no existing component covers the need:

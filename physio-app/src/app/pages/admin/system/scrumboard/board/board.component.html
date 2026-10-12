@@ -23,20 +23,20 @@
             <div class="flex items-center gap-2">
               <h1 class="m-0 truncate text-[22px] font-extrabold leading-tight tracking-tight">{{ b.title }}</h1>
               <button type="button" (click)="startEditBoard()" aria-label="Edit board" class="rounded p-1.5 text-gray-500 hover:bg-gray-100">
-                <boo-icon name="pencil" [size]="16"></boo-icon>
+                <physio-icon name="pencil" [size]="16"></physio-icon>
               </button>
             </div>
-            <p *ngIf="b.description" class="m-0 text-[13px] leading-[1.5] text-[#4B5563]">{{ b.description }}</p>
+            <p *ngIf="b.description" class="m-0 text-[13px] leading-[1.5] text-[#71606A]">{{ b.description }}</p>
           </ng-container>
 
           <div *ngIf="isEditingBoard" class="flex flex-col gap-2 sm:max-w-md">
             <input type="text" [(ngModel)]="boardTitle" (keydown.enter)="saveBoard()" maxlength="120" aria-label="Board title"
-              class="rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
+              class="rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
             <input type="text" [(ngModel)]="boardDescription" (keydown.enter)="saveBoard()" maxlength="500" placeholder="Description" aria-label="Board description"
-              class="rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
+              class="rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
             <div class="flex gap-2">
               <button type="button" (click)="saveBoard()" [disabled]="!boardTitle.trim()" class="rounded-lg bg-primary px-4 min-h-9 text-[13px] font-medium text-white disabled:opacity-50">Save</button>
-              <button type="button" (click)="cancelInline()" class="rounded-lg px-3 min-h-9 text-[13px] font-medium text-[#4B5563] hover:bg-gray-100">Cancel</button>
+              <button type="button" (click)="cancelInline()" class="rounded-lg px-3 min-h-9 text-[13px] font-medium text-[#71606A] hover:bg-gray-100">Cancel</button>
             </div>
           </div>
         </div>
@@ -47,7 +47,7 @@
           (click)="deleteBoard()"
           class="flex items-center gap-1.5 rounded-lg px-3 min-h-10 text-[13px] font-medium text-red-600 hover:bg-red-50"
         >
-          <boo-icon name="trash-2" [size]="16"></boo-icon>
+          <physio-icon name="trash-2" [size]="16"></physio-icon>
           Delete board
         </button>
       </div>
@@ -80,7 +80,7 @@
             <ng-template #listTitle>
               <button type="button" (click)="startRename(list)" class="min-w-0 flex-auto truncate bg-transparent p-0 text-left text-[14px] font-semibold" [attr.aria-label]="'Rename list ' + list.title">
                 {{ list.title }}
-                <span class="ml-1 text-[12px] font-normal text-[#4B5563]">{{ list.cards.length }}</span>
+                <span class="ml-1 text-[12px] font-normal text-[#71606A]">{{ list.cards.length }}</span>
               </button>
             </ng-template>
             <button
@@ -91,7 +91,7 @@
               [title]="list.cards.length ? 'Move or delete the cards first' : 'Delete list'"
               class="shrink-0 rounded p-1.5 text-gray-500 hover:bg-gray-200 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <boo-icon name="trash-2" [size]="14"></boo-icon>
+              <physio-icon name="trash-2" [size]="14"></physio-icon>
             </button>
           </header>
 
@@ -111,15 +111,15 @@
               tabindex="0"
               (click)="openCard(card)"
               (keydown.enter)="openCard(card)"
-              class="cursor-grab rounded-lg border border-[#E5E7EB] bg-surface px-3 py-2 shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-primary"
+              class="cursor-grab rounded-lg border border-[#EFE3E7] bg-surface px-3 py-2 shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <p class="m-0 break-words text-[13px] leading-[1.5]">{{ card.title }}</p>
-              <div *ngIf="card.dueDate || card.description" class="mt-1 flex items-center gap-2 text-[11px] text-[#4B5563]">
+              <div *ngIf="card.dueDate || card.description" class="mt-1 flex items-center gap-2 text-[11px] text-[#71606A]">
                 <span *ngIf="card.dueDate" class="flex items-center gap-1" [ngClass]="isOverdue(card) ? 'text-red-600 font-medium' : ''">
-                  <boo-icon name="calendar" [size]="12"></boo-icon>
+                  <physio-icon name="calendar" [size]="12"></physio-icon>
                   {{ card.dueDate | date:'MMM d' }}
                 </span>
-                <boo-icon *ngIf="card.description" name="file-text" [size]="12"></boo-icon>
+                <physio-icon *ngIf="card.description" name="file-text" [size]="12"></physio-icon>
               </div>
             </div>
           </div>
@@ -134,16 +134,16 @@
                 placeholder="Card title"
                 aria-label="New card title"
                 autofocus
-                class="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-[13px] outline-none focus:border-primary"
+                class="w-full rounded-lg border border-[#EFE3E7] px-3 py-2 text-[13px] outline-none focus:border-primary"
               ></textarea>
               <div class="flex gap-2">
                 <button type="button" (click)="addCard(list)" [disabled]="!newCardTitle.trim()" class="rounded-lg bg-primary px-3 min-h-8 text-[12px] font-medium text-white disabled:opacity-50">Add card</button>
-                <button type="button" (click)="cancelInline()" class="rounded-lg px-3 min-h-8 text-[12px] font-medium text-[#4B5563] hover:bg-gray-200">Cancel</button>
+                <button type="button" (click)="cancelInline()" class="rounded-lg px-3 min-h-8 text-[12px] font-medium text-[#71606A] hover:bg-gray-200">Cancel</button>
               </div>
             </div>
             <ng-template #addCardButton>
-              <button type="button" (click)="startAddCard(list)" class="flex w-full items-center gap-1.5 rounded-lg px-2 min-h-9 text-[13px] text-[#4B5563] hover:bg-gray-200">
-                <boo-icon name="plus" [size]="14"></boo-icon>
+              <button type="button" (click)="startAddCard(list)" class="flex w-full items-center gap-1.5 rounded-lg px-2 min-h-9 text-[13px] text-[#71606A] hover:bg-gray-200">
+                <physio-icon name="plus" [size]="14"></physio-icon>
                 Add a card
               </button>
             </ng-template>
@@ -151,7 +151,7 @@
         </section>
 
         <!-- Add list -->
-        <div class="w-72 shrink-0 rounded-lg border-2 border-dashed border-[#E5E7EB] p-2">
+        <div class="w-72 shrink-0 rounded-lg border-2 border-dashed border-[#EFE3E7] p-2">
           <input
             type="text"
             [(ngModel)]="newListTitle"
@@ -159,7 +159,7 @@
             maxlength="120"
             placeholder="Add a list"
             aria-label="New list title"
-            class="w-full rounded-lg border border-[#E5E7EB] bg-surface px-3 min-h-10 text-[13px] outline-none focus:border-primary"
+            class="w-full rounded-lg border border-[#EFE3E7] bg-surface px-3 min-h-10 text-[13px] outline-none focus:border-primary"
           />
           <button
             *ngIf="newListTitle.trim()"
@@ -184,30 +184,30 @@
     class="flex max-h-[90vh] w-full sm:max-w-lg flex-col rounded-t-xl sm:rounded-xl bg-surface shadow-xl"
     (click)="$event.stopPropagation()"
   >
-    <div class="border-b border-[#E5E7EB] px-4 py-3">
+    <div class="border-b border-[#EFE3E7] px-4 py-3">
       <h2 class="m-0 text-[16px] font-semibold">Edit card</h2>
     </div>
     <div class="flex-1 space-y-3 overflow-y-auto px-4 py-3">
       <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Title</span>
+        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]">Title</span>
         <input type="text" [(ngModel)]="d.title" maxlength="200" autofocus
-          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
+          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
       </label>
       <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Description</span>
+        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]">Description</span>
         <textarea [(ngModel)]="d.description" maxlength="4000" rows="5"
-          class="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-[14px] outline-none focus:border-primary"></textarea>
+          class="w-full rounded-lg border border-[#EFE3E7] px-3 py-2 text-[14px] outline-none focus:border-primary"></textarea>
       </label>
       <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#4B5563]">Due date</span>
+        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]">Due date</span>
         <input type="date" [(ngModel)]="d.dueDate"
-          class="w-full rounded-lg border border-[#E5E7EB] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
+          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
       </label>
     </div>
-    <div class="flex items-center justify-between gap-2 border-t border-[#E5E7EB] px-4 py-3">
+    <div class="flex items-center justify-between gap-2 border-t border-[#EFE3E7] px-4 py-3">
       <button type="button" (click)="deleteCard()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-red-600 hover:bg-red-50">Delete</button>
       <div class="flex items-center gap-2">
-        <button type="button" (click)="closeCard()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#4B5563] hover:bg-gray-100">Cancel</button>
+        <button type="button" (click)="closeCard()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#71606A] hover:bg-gray-100">Cancel</button>
         <button
           type="button"
           (click)="saveCard()"

@@ -1,6 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { BooIconComponent } from "../../../../components/icon/boo-icon/boo-icon.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { NursingService } from "../../../../services/admin/nursing.service";
@@ -20,7 +19,6 @@ type TabKey = 'overview' | 'vitals' | 'mar' | 'io' | 'tasks' | 'notes';
     standalone: true,
     imports: [
         SharedModule,
-        BooIconComponent,
         ErrorStateComponent,
         StatusBadgeComponent,
         NursingOverviewTabComponent,
@@ -33,7 +31,7 @@ type TabKey = 'overview' | 'vitals' | 'mar' | 'io' | 'tasks' | 'notes';
     host: { class: 'block min-h-screen bg-gray-50' },
     template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-24">
-      <boo-icon name="loader" iconClass="w-8 h-8 text-primary animate-spin"></boo-icon>
+      <physio-icon name="loader" [class]="'w-8 h-8 text-primary animate-spin'"></physio-icon>
     </div>
 
     <div *ngIf="!isLoading() && error()" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
@@ -46,7 +44,7 @@ type TabKey = 'overview' | 'vitals' | 'mar' | 'io' | 'tasks' | 'notes';
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-3 min-w-0">
             <button (click)="back()" class="text-gray-400 hover:text-gray-600">
-              <boo-icon name="arrow-left" [size]="20"></boo-icon>
+              <physio-icon name="arrow-left" [size]="20"></physio-icon>
             </button>
             <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
               {{ initials(patient()?.patientName ?? '') }}
@@ -71,7 +69,7 @@ type TabKey = 'overview' | 'vitals' | 'mar' | 'io' | 'tasks' | 'notes';
           <button *ngFor="let t of tabs" type="button" (click)="setTab(t.key)" [attr.aria-selected]="activeTab() === t.key" role="tab"
             class="px-4 py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 -mb-px whitespace-nowrap"
             [ngClass]="activeTab() === t.key ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
-            <boo-icon [name]="t.icon" iconClass="w-4 h-4"></boo-icon>
+            <physio-icon [name]="t.icon" class="w-4 h-4"></physio-icon>
             {{ t.label }}
           </button>
         </nav>

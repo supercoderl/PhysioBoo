@@ -2,7 +2,7 @@
 
 **Path:** `admin/finance/insurance`
 **Current implementation:** `src/app/pages/admin/finance/insurance/insurance.component.ts` — a single demo component with 4 tabs (Policy Verification, New Claim, Claims List, Providers), inline Tailwind forms, a flat `InsuranceClaim[]` array, native `alert()` for every action, no service layer, no drawer, no workflow. Structurally identical to the pre-redesign Surgery/Laboratory pages: a generic CRUD admin page bolted onto insurance data.
-**Scope:** Frontend UI/UX only. No backend implementation — see §9 for the proposed API contract. Reuses the conventions established by the Surgery module (`docs/surgery-redesign.md`): standalone Angular components, signals, `LocalLoadingService`, `ToastService`, `BooIconComponent`, `StatusBadgeComponent`, `HttpService.getOr/postOr/patchOr` mock-fallback pattern, Tailwind. Deliberately **does not** reuse the surgery/laboratory *layout* (sticky header + stat-card row + tab bar + table) — see §2 for why.
+**Scope:** Frontend UI/UX only. No backend implementation — see §9 for the proposed API contract. Reuses the conventions established by the Surgery module (`docs/surgery-redesign.md`): standalone Angular components, signals, `LocalLoadingService`, `ToastService`, `IconComponent` (physio-icon), `StatusBadgeComponent`, `HttpService.getOr/postOr/patchOr` mock-fallback pattern, Tailwind. Deliberately **does not** reuse the surgery/laboratory *layout* (sticky header + stat-card row + tab bar + table) — see §2 for why.
 
 ---
 
@@ -133,7 +133,7 @@ AdminInsuranceComponent (admin-insurance)                — orchestrator, works
     (Create / Submit / Upload / Approve / Reject / Appeal / Settlement)
 ```
 
-Shared components reused as-is: `BooIconComponent`, `StatusBadgeComponent`, `EmptyStateComponent`, `DrawerComponent` (hosts the action dialog), `LocalLoadingService`, `ToastService`, `DialogService`, `SharedModule`.
+Shared components reused as-is: `IconComponent` (physio-icon), `StatusBadgeComponent`, `EmptyStateComponent`, `DrawerComponent` (hosts the action dialog), `LocalLoadingService`, `ToastService`, `DialogService`, `SharedModule`.
 
 ---
 

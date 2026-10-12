@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooIconComponent } from "../../../../../components/icon/boo-icon/boo-icon.component";
 import { StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PrescriptionDraft, PrescriptionRxStatus } from "../../../../../shared/types/prescription-rx.types";
@@ -7,7 +6,7 @@ import { PrescriptionDraft, PrescriptionRxStatus } from "../../../../../shared/t
 @Component({
     selector: 'rx-action-bar',
     standalone: true,
-    imports: [SharedModule, BooIconComponent, StatusBadgeComponent],
+    imports: [SharedModule,StatusBadgeComponent],
     template: `
     <div class="sticky top-0 z-30 bg-surface border-b border-gray-200 shadow-sm">
       <div class="px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
@@ -36,20 +35,20 @@ import { PrescriptionDraft, PrescriptionRxStatus } from "../../../../../shared/t
           <ng-container *ngIf="editable">
             <button type="button" (click)="saveDraft.emit()" [disabled]="saving"
               class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-secondary hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50">
-              <boo-icon name="save" [size]="16"></boo-icon> Save Draft
+              <physio-icon name="save" [size]="16"></physio-icon> Save Draft
             </button>
             <button type="button" (click)="preview.emit()"
               class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-secondary hover:bg-gray-100 rounded-lg transition-colors">
-              <boo-icon name="eye" [size]="16"></boo-icon> Preview
+              <physio-icon name="eye" [size]="16"></physio-icon> Preview
             </button>
             <button type="button" (click)="print.emit()"
               class="hidden md:inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-secondary hover:bg-gray-100 rounded-lg transition-colors">
-              <boo-icon name="printer" [size]="16"></boo-icon> Print
+              <physio-icon name="printer" [size]="16"></physio-icon> Print
             </button>
             <button type="button" (click)="issue.emit()" [disabled]="!canIssue"
               [title]="!canIssue ? 'Add at least one medication before issuing' : ''"
               class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              <boo-icon name="check-circle-2" [size]="16"></boo-icon> Issue Prescription
+              <physio-icon name="check-circle-2" [size]="16"></physio-icon> Issue Prescription
             </button>
             <button type="button" (click)="cancel.emit()" class="text-rose-600 hover:text-rose-700 text-sm font-medium px-2">
               Cancel
@@ -57,10 +56,10 @@ import { PrescriptionDraft, PrescriptionRxStatus } from "../../../../../shared/t
           </ng-container>
           <ng-container *ngIf="!editable">
             <button type="button" (click)="preview.emit()" class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-secondary hover:bg-gray-100 rounded-lg transition-colors">
-              <boo-icon name="eye" [size]="16"></boo-icon> Preview
+              <physio-icon name="eye" [size]="16"></physio-icon> Preview
             </button>
             <button type="button" (click)="print.emit()" class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-secondary hover:bg-gray-100 rounded-lg transition-colors">
-              <boo-icon name="printer" [size]="16"></boo-icon> Print
+              <physio-icon name="printer" [size]="16"></physio-icon> Print
             </button>
           </ng-container>
         </div>

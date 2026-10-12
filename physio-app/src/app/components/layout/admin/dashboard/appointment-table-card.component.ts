@@ -3,7 +3,6 @@ import { ColumnDefDirective } from "../../../../shared/directives/column-def.dir
 import { SharedModule } from "../../../../shared/shared-imports";
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../button/button-icon/button-icon.component";
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 import { BooTableAdminComponent } from "../../../table/boo-table-admin/boo-table-admin.component";
 
 interface Appointment {
@@ -23,8 +22,7 @@ interface Appointment {
     SharedModule,
     BooButtonAdminComponent,
     BooTableAdminComponent,
-    ColumnDefDirective,
-    BooIconComponent,
+    ColumnDefDirective,
     ButtonIconComponent
 ],
     template: `
@@ -33,7 +31,7 @@ interface Appointment {
         <h5 class="font-bold text-lg mb-0 text-regular">Appointment Request</h5>
         <boo-button-admin
             background="transparent"
-            [border]="{ width: 1, color: '#e3e3e3' }"
+            [border]="{ width: 1, color: '#EFE3E7' }"
             textColor="#000000"
             padding="4px 8px"
             buttonClass="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -56,11 +54,11 @@ interface Appointment {
               <div class="font-semibold text-gray-900">{{ item.name }}</div>
               <div class="flex items-center gap-4 text-sm text-gray-600 mt-1">
                 <span class="flex items-center gap-1">
-                  <boo-icon name="calendar" [size]="12"></boo-icon>
+                  <physio-icon name="calendar" [size]="12"></physio-icon>
                   {{ item.date }}
                 </span>
                 <span class="flex items-center gap-1">
-                  <boo-icon name="clock" [size]="12"></boo-icon>
+                  <physio-icon name="clock" [size]="12"></physio-icon>
                   {{ item.time }}
                 </span>
               </div>
@@ -122,7 +120,7 @@ export class AdminAppointmentTableCardComponent {
             date: '06 Aug 2025',
             time: '09:58 AM',
             specialty: 'Cardiology',
-            specialtyColor: '#3B82F6'
+            specialtyColor: '#FB7185'
         },
         {
             id: 3,
@@ -149,7 +147,7 @@ export class AdminAppointmentTableCardComponent {
             date: '23 Jul 2025',
             time: '10:30 AM',
             specialty: 'Radiology',
-            specialtyColor: '#3B82F6'
+            specialtyColor: '#FB7185'
         }
     ];
     // #endregion

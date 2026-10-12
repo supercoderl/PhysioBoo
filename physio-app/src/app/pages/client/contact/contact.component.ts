@@ -52,12 +52,12 @@ import { SharedModule } from '../../../shared/shared-imports';
                   class="relative text-left"
                 >
                   <h6
-                    class="text-[#0D59F2] text-[10px] uppercase bg-[#F0F5FF] py-1.75 px-2 inline-block"
+                    class="text-[#E11D48] text-[10px] uppercase bg-[#FFE9EE] py-1.75 px-2 inline-block"
                   >
                     Contact Us
                   </h6>
                   <h2 class="font-semibold mb-3 transition-all duration-300 text-[40px]">
-                    We’re <span class="text-[#0D59F2]">here</span> for you
+                    We’re <span class="text-[#E11D48]">here</span> for you
                   </h2>
                   <div class="max-w-[400px] inline-block w-full text-[16px] leading-[24px]">
                     <p class="mb-1.25">

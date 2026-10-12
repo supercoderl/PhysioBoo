@@ -1,18 +1,17 @@
 import { Component, Input } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { BooIconComponent } from "../../../icon/boo-icon/boo-icon.component";
 import { AppointmentFlowSummary } from "../../../../shared/types/dashboard-overview.types";
 
 @Component({
     selector: 'admin-appointment-flow-card',
     standalone: true,
-    imports: [SharedModule, BooIconComponent],
+    imports: [SharedModule],
     template: `
     <div class="bg-surface border border-borderGray rounded-lg overflow-hidden h-full">
         <div class="flex items-center justify-between px-4 pt-[13px] pb-2.5 border-b border-gray-100">
             <div class="flex items-center gap-2.5">
-                <span class="w-7 h-7 rounded-md bg-blue-50 flex items-center justify-center shrink-0">
-                    <boo-icon name="calendar-clock" [size]="13" color="#0e82fd"></boo-icon>
+                <span class="w-7 h-7 rounded-md bg-primarySoft flex items-center justify-center shrink-0">
+                    <physio-icon name="calendar-clock" [size]="13" class="text-[#E11D48]"></physio-icon>
                 </span>
                 <div>
                     <h2 class="text-[12.5px] font-bold text-gray-900 m-0">Appointment Flow · Today</h2>
@@ -21,7 +20,7 @@ import { AppointmentFlowSummary } from "../../../../shared/types/dashboard-overv
             </div>
             <div class="flex items-center gap-2.5">
                 <span class="flex items-center gap-1"><span class="w-[9px] h-[9px] bg-red-500 rounded-sm"></span><span class="text-[10.5px] text-gray-500">≥95%</span></span>
-                <span class="flex items-center gap-1"><span class="w-[9px] h-[9px] bg-blue-500 rounded-sm"></span><span class="text-[10.5px] text-gray-500">70–94%</span></span>
+                <span class="flex items-center gap-1"><span class="w-[9px] h-[9px] bg-primary rounded-sm"></span><span class="text-[10.5px] text-gray-500">70–94%</span></span>
                 <span class="flex items-center gap-1"><span class="w-[9px] h-[9px] bg-emerald-500 rounded-sm"></span><span class="text-[10.5px] text-gray-500">&lt;70%</span></span>
             </div>
         </div>
@@ -73,6 +72,6 @@ export class AdminAppointmentFlowCardComponent {
     }
 
     barColor(pct: number): string {
-        return pct >= 95 ? '#ef4444' : pct >= 80 ? '#0e82fd' : '#10b981';
+        return pct >= 95 ? '#ef4444' : pct >= 80 ? '#E11D48' : '#10b981';
     }
 }

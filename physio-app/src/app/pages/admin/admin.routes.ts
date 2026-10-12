@@ -440,6 +440,12 @@ export const routes: Routes = [
                         ]
                     },
                     {
+                        path: 'hospital',
+                        data: { breadcrumb: ['hospital'] },
+                        loadComponent: () => import('./system/hospital/list.component').then(m => m.AdminHospitalListComponent),
+                        canActivate: [permissionGuard(Permissions.Admin.HospitalRead)]
+                    },
+                    {
                         path: 'settings',
                         data: { breadcrumb: ['settings'] },
                         loadChildren: () => import('./system/setting/setting.routes').then(r => r.routes)

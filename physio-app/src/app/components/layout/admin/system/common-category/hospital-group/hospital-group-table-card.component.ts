@@ -76,14 +76,9 @@ export class CommonCategoryHospitalGroupTableCardComponent {
   @Input() filter!: { pageNumber: number, pageSize: number };
   @Output() pageChange = new EventEmitter<number>();
   @Output() editClick = new EventEmitter<string>();
-  @Output() deleteClick = new EventEmitter<string>();
 
   readonly tableActions: ActionItem[] = [
-    {
-      label: 'Delete',
-      isDanger: true,
-      onClick: (item: any) => this.onDeleteClick(item.id)
-    }
+    { label: 'Edit', onClick: (item: any) => this.onEditClick(item.id) }
   ];
   // #endregion
 
@@ -94,6 +89,5 @@ export class CommonCategoryHospitalGroupTableCardComponent {
   // #region Methods
   onPageClick(page: number) { this.pageChange.emit(page); }
   onEditClick(id: string) { this.editClick.emit(id); }
-  onDeleteClick(id: string) { this.deleteClick.emit(id); }
   // #endregion
 }

@@ -1,18 +1,23 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { finalize, firstValueFrom } from "rxjs";
+import { environment } from "../../../../../../../environments/environment.development";
+import { BillingService } from "../../../../../../services/admin/billing.service";
 import { HospitalGroupService } from "../../../../../../services/admin/hospital-group.service";
 import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
-import { SubscriptionPlan } from "../../../../../../shared/enums/subscription-plan";
 import { SharedModule } from "../../../../../../shared/shared-imports";
+import { SubscriptionPlan } from "../../../../../../shared/types/billing.types";
+import { EMPTY_LOCATION_VALUE } from "../../../../../../shared/types/location.types";
 import { HospitalGroup } from "../../../../../../shared/types/support.types";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
 import { BooInputComponent } from "../../../../../input/boo-input/boo-input.component";
+import { BooLocationSelectComponent } from "../../../../../select/boo-location-select/boo-location-select.component";
 import { BooSelectComponent } from "../../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";
+import { BooUploadComponent } from "../../../../../upload/boo-upload/boo-upload.component";
 
 @Component({
     selector: 'common-category-hospital-group-drawer',
@@ -23,7 +28,9 @@ import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-t
         BooInputComponent,
         BooTextareaComponent,
         BooButtonAdminComponent,
-        BooSelectComponent
+        BooSelectComponent,
+        BooLocationSelectComponent,
+        BooUploadComponent
     ],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="720" (close)="onClose()">
@@ -46,9 +53,20 @@ import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-t
                     </div>
 
                     <div class="p-6 space-y-4">
+                        <div class="flex items-center gap-4">
+                            <boo-upload
+                                formControlName="logoUrl"
+                                width="8rem"
+                                height="8rem"
+                                [radius]="12"
+                                [folder]="logoFolder"
+                                accept="image/*"
+                                aria-label="Upload group logo"
+                            />
+                        </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <boo-input label="Group Name" formControlName="name" placeholder="Ex: MediCare Group"></boo-input>
-                            <boo-input label="Code" formControlName="code" placeholder="Ex: MCG-001"></boo-input>
+                            <boo-input label="Group Name" [required]="true" formControlName="name" placeholder="Ex: MediCare Group"></boo-input>
+                            <boo-input label="Code" [required]="true" formControlName="code" placeholder="Ex: MCG-001"></boo-input>
                         </div>
                         <boo-textarea label="Description" formControlName="description"></boo-textarea>
                     </div>
@@ -58,40 +76,30 @@ import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-t
                     <div class="p-6">
                         <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Contact Information</h3>
                         <div class="grid grid-cols-2 gap-4 mb-4">
-                            <boo-input label="Contact Person" formControlName="contactPerson" placeholder="Ex: John Doe"></boo-input>
-                            <boo-input label="Email" formControlName="email" placeholder="group@example.com"></boo-input>
+                            <boo-input label="Contact Person" [required]="true" formControlName="contactPerson" placeholder="Ex: John Doe"></boo-input>
+                            <boo-input label="Email" [required]="true" formControlName="email" placeholder="group@example.com"></boo-input>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <boo-input label="Phone" formControlName="phone" placeholder="+1..."></boo-input>
-                            <boo-input label="Logo URL" formControlName="logoUrl" placeholder="https://..."></boo-input>
-                        </div>
+                        <boo-input label="Phone" [required]="true" formControlName="phone" placeholder="+1..."></boo-input>
                     </div>
 
                     <div class="h-px bg-gray-100 mx-6"></div>
 
                     <div class="p-6">
                         <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Location</h3>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <boo-input label="City" formControlName="city" placeholder="Ex: New York"></boo-input>
-                            <boo-input label="Country" formControlName="country" placeholder="Ex: United States"></boo-input>
-                        </div>
-                        <boo-input label="Address" formControlName="address" placeholder="Full address"></boo-input>
+                        <boo-location-select formControlName="location" [required]="true" class="mb-4"></boo-location-select>
+                        <boo-input label="Address" [required]="true" formControlName="address" placeholder="Full address"></boo-input>
                     </div>
 
                     <div class="h-px bg-gray-100 mx-6"></div>
 
                     <div class="p-6 pb-10">
                         <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Subscription</h3>
-                        <boo-select label="Subscription Plan" formControlName="subscriptionPlan" [options]="subscriptionPlanOptions"></boo-select>
+                        <boo-select label="Subscription Plan" [required]="true" formControlName="subscriptionPlanId" [options]="subscriptionPlanOptions"></boo-select>
                     </div>
                 </div>
 
-                <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0">
-                    <button *ngIf="currentId" (click)="onDelete()" class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1.5">
-                        <physio-icon name="trash-2" [size]="16"></physio-icon>
-                        Delete
-                    </button>
-                    <div class="flex gap-3 ml-auto">
+                <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end z-20 sticky bottom-0">
+                    <div class="flex gap-3">
                         <boo-button-admin background="transparent" (click)="onClose()">Cancel</boo-button-admin>
                         <boo-button-admin textColor="white" (click)="onSave()" [loading]="loadingSrv.isLoading('update')">
                             Save Changes
@@ -108,16 +116,13 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
     @Input() currentId: string | null = null;
     @Output() close = new EventEmitter<void>();
     @Output() saveSuccess = new EventEmitter<HospitalGroup>();
-    @Output() delete = new EventEmitter<string>();
     @ViewChild('scrollContainer') scrollContainer!: ElementRef;
     form: FormGroup;
+    readonly logoFolder = `${environment.CLOUDINARY.BASE_FOLDER}/hospital-groups`;
 
-    readonly subscriptionPlanOptions = [
-        { label: 'Free', value: SubscriptionPlan.Free },
-        { label: 'Basic', value: SubscriptionPlan.Basic },
-        { label: 'Professional', value: SubscriptionPlan.Professional },
-        { label: 'Enterprise', value: SubscriptionPlan.Enterprise },
-    ];
+    /** Active plans from `GET api/billing/plans`; loaded the first time the drawer opens. */
+    subscriptionPlanOptions: { label: string; value: string }[] = [];
+    private currentPlanId: string | null = null;
     // #endregion
 
     // #region Init (Lifecycle + Setup)
@@ -125,6 +130,7 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
         private fb: FormBuilder,
         private toastSrv: ToastService,
         private hospitalGroupSrv: HospitalGroupService,
+        private billingSrv: BillingService,
         protected loadingSrv: LocalLoadingService
     ) {
         this.form = this.initForm();
@@ -132,6 +138,8 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges): void {
         if (!this.isOpen) return;
+
+        if (!this.subscriptionPlanOptions.length) this.loadPlans();
 
         if (changes['currentId'] && this.currentId) {
             this.loadDetail(this.currentId);
@@ -145,16 +153,28 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
     private initForm(): FormGroup {
         return this.fb.group({
             name: ['', [Validators.required, Validators.maxLength(100)]],
-            code: [''],
+            code: ['', [Validators.required, Validators.maxLength(50)]],
             description: [''],
             logoUrl: [''],
-            contactPerson: [''],
-            email: ['', [Validators.email]],
-            phone: [''],
-            address: [''],
-            city: [''],
-            country: [''],
-            subscriptionPlan: [SubscriptionPlan.Free]
+            contactPerson: ['', [Validators.required, Validators.maxLength(100)]],
+            email: ['', [Validators.required, Validators.email]],
+            phone: ['', [Validators.required, Validators.maxLength(20)]],
+            address: ['', [Validators.required, Validators.maxLength(255)]],
+            location: [{ ...EMPTY_LOCATION_VALUE }],
+            subscriptionPlanId: [null, [Validators.required]]
+        });
+    }
+
+    private loadPlans() {
+        this.billingSrv.getPlans().subscribe({
+            next: res => {
+                if (!res.success) return;
+                this.subscriptionPlanOptions = res.data
+                    .filter((plan: SubscriptionPlan) => plan.isActive)
+                    .sort((a: SubscriptionPlan, b: SubscriptionPlan) => a.sortOrder - b.sortOrder)
+                    .map((plan: SubscriptionPlan) => ({ label: plan.name, value: plan.id }));
+            },
+            error: () => this.toastSrv.error('Could not load subscription plans')
         });
     }
 
@@ -173,12 +193,26 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
                         email: _res.data?.email,
                         phone: _res.data?.phone,
                         address: _res.data?.address,
-                        city: _res.data?.city,
-                        country: _res.data?.country,
-                        subscriptionPlan: _res.data?.subscriptionPlan
+                        location: {
+                            countryId: _res.data?.countryId ?? null,
+                            cityId: _res.data?.cityId ?? null,
+                            districtId: _res.data?.districtId ?? null,
+                            wardId: _res.data?.wardId ?? null
+                        },
                     });
+                    this.loadCurrentPlan(id);
                 }
             });
+    }
+
+    private loadCurrentPlan(hospitalGroupId: string) {
+        this.billingSrv.getSubscription(hospitalGroupId).subscribe({
+            next: res => {
+                this.currentPlanId = res.success ? res.data?.planId ?? null : null;
+                this.form.patchValue({ subscriptionPlanId: this.currentPlanId });
+            },
+            error: () => this.currentPlanId = null
+        });
     }
 
     async onSave() {
@@ -188,7 +222,8 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
             return;
         }
 
-        const formData = { ...this.form.getRawValue() };
+        const { location, subscriptionPlanId, ...fields } = this.form.getRawValue();
+        const formData = { ...fields, ...location };
 
         try {
             let id: string;
@@ -204,6 +239,8 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
                 id = createRes.data;
             }
 
+            await this.applySubscriptionPlan(id, subscriptionPlanId);
+
             const response = await firstValueFrom(this.hospitalGroupSrv.search_by_id(id));
             if (response.success && response.data) {
                 this.saveSuccess.emit(response.data);
@@ -214,7 +251,20 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
         }
     }
 
+    /** The plan lives in the billing module, so it is assigned through the subscription endpoint once the group is saved. */
+    private async applySubscriptionPlan(hospitalGroupId: string, planId: string | null) {
+        if (!planId || planId === this.currentPlanId) return;
+
+        try {
+            await firstValueFrom(this.billingSrv.changeSubscription(hospitalGroupId, { action: 'ChangePlan', planId }));
+            this.currentPlanId = planId;
+        } catch {
+            this.toastSrv.error('Hospital group saved, but the subscription plan could not be changed');
+        }
+    }
+
     resetForm() {
+        this.currentPlanId = null;
         this.form.reset({
             name: '',
             code: '',
@@ -224,9 +274,8 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
             email: '',
             phone: '',
             address: '',
-            city: '',
-            country: '',
-            subscriptionPlan: SubscriptionPlan.Free
+            location: { ...EMPTY_LOCATION_VALUE },
+            subscriptionPlanId: null
         });
     }
 
@@ -235,10 +284,6 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
             this.scrollContainer.nativeElement.scrollTop = 0;
         }
         this.close.emit();
-    }
-
-    onDelete() {
-        if (this.currentId) this.delete.emit(this.currentId);
     }
     // #endregion
 }

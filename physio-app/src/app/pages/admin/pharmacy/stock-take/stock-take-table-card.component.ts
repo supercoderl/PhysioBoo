@@ -1,18 +1,18 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { BooActionAdminComponent } from "../../../../components/table/boo-table-admin/boo-action-admin.component";
+import { BooTableAdminComponent } from "../../../../components/table/boo-table-admin/boo-table-admin.component";
+import { StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { ColumnDefDirective } from "../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { ActionItem, PaginationData } from "../../../../shared/types/common";
 import { StockTake, StockTakeStatus, stockTakeStatusLabel, stockTakeStatusTone } from "../../../../shared/types/stock-take.types";
-import { BooActionAdminComponent } from "../../../../components/table/boo-table-admin/boo-action-admin.component";
-import { BooTableAdminComponent } from "../../../../components/table/boo-table-admin/boo-table-admin.component";
-import { StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 
 @Component({
-    selector: 'stock-take-table-card',
-    standalone: true,
-    imports: [SharedModule, BooTableAdminComponent, ColumnDefDirective, BooActionAdminComponent, StatusBadgeComponent],
-    host: { class: 'block h-full min-h-0' },
-    template: `
+  selector: 'stock-take-table-card',
+  standalone: true,
+  imports: [SharedModule, BooTableAdminComponent, ColumnDefDirective, BooActionAdminComponent, StatusBadgeComponent],
+  host: { class: 'block h-full min-h-0' },
+  template: `
     <div class="bg-surface rounded-2 border border-borderGray/60 h-full overflow-hidden">
       <boo-table-admin
         [data]="data?.items ?? []"
@@ -82,66 +82,66 @@ import { StatusBadgeComponent } from "../../../../components/ui/status-badge.com
   `,
 })
 export class StockTakeTableCardComponent {
-    @Input() data: PaginationData<StockTake> | null = null;
-    @Input() loading: boolean = false;
+  @Input() data: PaginationData<StockTake> | null = null;
+  @Input() loading: boolean = false;
 
-    @Output() pageChange = new EventEmitter<number>();
-    @Output() rowClick = new EventEmitter<StockTake>();
-    @Output() editClick = new EventEmitter<StockTake>();
-    @Output() startClick = new EventEmitter<StockTake>();
-    @Output() continueClick = new EventEmitter<StockTake>();
-    @Output() assignClick = new EventEmitter<StockTake>();
-    @Output() completeClick = new EventEmitter<StockTake>();
-    @Output() approveClick = new EventEmitter<StockTake>();
-    @Output() rejectClick = new EventEmitter<StockTake>();
-    @Output() cancelClick = new EventEmitter<StockTake>();
-    @Output() deleteClick = new EventEmitter<StockTake>();
-    @Output() historyClick = new EventEmitter<StockTake>();
-    @Output() printClick = new EventEmitter<StockTake>();
-    @Output() differenceClick = new EventEmitter<StockTake>();
+  @Output() pageChange = new EventEmitter<number>();
+  @Output() rowClick = new EventEmitter<StockTake>();
+  @Output() editClick = new EventEmitter<StockTake>();
+  @Output() startClick = new EventEmitter<StockTake>();
+  @Output() continueClick = new EventEmitter<StockTake>();
+  @Output() assignClick = new EventEmitter<StockTake>();
+  @Output() completeClick = new EventEmitter<StockTake>();
+  @Output() approveClick = new EventEmitter<StockTake>();
+  @Output() rejectClick = new EventEmitter<StockTake>();
+  @Output() cancelClick = new EventEmitter<StockTake>();
+  @Output() deleteClick = new EventEmitter<StockTake>();
+  @Output() historyClick = new EventEmitter<StockTake>();
+  @Output() printClick = new EventEmitter<StockTake>();
+  @Output() differenceClick = new EventEmitter<StockTake>();
 
-    statusLabel = stockTakeStatusLabel;
-    statusTone = stockTakeStatusTone;
+  statusLabel = stockTakeStatusLabel;
+  statusTone = stockTakeStatusTone;
 
-    actionsFor(item: StockTake): ActionItem[] {
-        const status: StockTakeStatus = item.status;
-        const common: ActionItem[] = [
-            { label: 'View History', icon: 'history', onClick: (d) => this.historyClick.emit(d) },
-            { label: 'Print', icon: 'printer', onClick: (d) => this.printClick.emit(d) },
-        ];
+  actionsFor(item: StockTake): ActionItem[] {
+    const status: StockTakeStatus = item.status;
+    const common: ActionItem[] = [
+      { label: 'View History', icon: 'history', onClick: (d) => this.historyClick.emit(d) },
+      { label: 'Print', icon: 'printer', onClick: (d) => this.printClick.emit(d) },
+    ];
 
-        if (status === 'Draft') {
-            return [
-                { label: 'Edit Draft', icon: 'pencil', onClick: (d) => this.editClick.emit(d) },
-                { label: 'Start Counting', icon: 'play', onClick: (d) => this.startClick.emit(d) },
-                ...common,
-                { label: 'Delete', icon: 'trash-2', isDanger: true, onClick: (d) => this.deleteClick.emit(d) },
-            ];
-        }
-        if (status === 'Counting') {
-            return [
-                { label: 'Continue Counting', icon: 'square-pen', onClick: (d) => this.continueClick.emit(d) },
-                { label: 'Assign Counter', icon: 'user-plus', onClick: (d) => this.assignClick.emit(d) },
-                { label: 'Complete Counting', icon: 'circle-check', onClick: (d) => this.completeClick.emit(d) },
-                ...common,
-                { label: 'Cancel', icon: 'ban', isDanger: true, onClick: (d) => this.cancelClick.emit(d) },
-            ];
-        }
-        if (status === 'PendingApproval') {
-            return [
-                { label: 'View Difference Detail', icon: 'scale', onClick: (d) => this.differenceClick.emit(d) },
-                { label: 'Approve', icon: 'circle-check-big', onClick: (d) => this.approveClick.emit(d) },
-                { label: 'Reject', icon: 'circle-x', isDanger: true, onClick: (d) => this.rejectClick.emit(d) },
-                ...common,
-            ];
-        }
-        if (status === 'Rejected') {
-            return [
-                { label: 'Continue Counting', icon: 'square-pen', onClick: (d) => this.continueClick.emit(d) },
-                { label: 'View Difference Detail', icon: 'scale', onClick: (d) => this.differenceClick.emit(d) },
-                ...common,
-            ];
-        }
-        return common;
+    if (status === 'Draft') {
+      return [
+        { label: 'Edit Draft', icon: 'pencil', onClick: (d) => this.editClick.emit(d) },
+        { label: 'Start Counting', icon: 'play', onClick: (d) => this.startClick.emit(d) },
+        ...common,
+        { label: 'Delete', icon: 'trash', isDanger: true, onClick: (d) => this.deleteClick.emit(d) },
+      ];
     }
+    if (status === 'Counting') {
+      return [
+        { label: 'Continue Counting', icon: 'square-pen', onClick: (d) => this.continueClick.emit(d) },
+        { label: 'Assign Counter', icon: 'user-plus', onClick: (d) => this.assignClick.emit(d) },
+        { label: 'Complete Counting', icon: 'circle-check', onClick: (d) => this.completeClick.emit(d) },
+        ...common,
+        { label: 'Cancel', icon: 'ban', isDanger: true, onClick: (d) => this.cancelClick.emit(d) },
+      ];
+    }
+    if (status === 'PendingApproval') {
+      return [
+        { label: 'View Difference Detail', icon: 'scale', onClick: (d) => this.differenceClick.emit(d) },
+        { label: 'Approve', icon: 'circle-check-big', onClick: (d) => this.approveClick.emit(d) },
+        { label: 'Reject', icon: 'circle-x', isDanger: true, onClick: (d) => this.rejectClick.emit(d) },
+        ...common,
+      ];
+    }
+    if (status === 'Rejected') {
+      return [
+        { label: 'Continue Counting', icon: 'square-pen', onClick: (d) => this.continueClick.emit(d) },
+        { label: 'View Difference Detail', icon: 'scale', onClick: (d) => this.differenceClick.emit(d) },
+        ...common,
+      ];
+    }
+    return common;
+  }
 }

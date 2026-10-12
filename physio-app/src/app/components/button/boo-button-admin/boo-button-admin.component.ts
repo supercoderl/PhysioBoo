@@ -45,6 +45,20 @@ import { SharedModule } from "../../../shared/shared-imports";
             display: inline-block;
             height: 100%;  
         }
+        /* Hover feedback independent of the inline background, so transparent buttons get one too. */
+        button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: currentColor;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        button:not(:disabled):hover::after {
+            opacity: 0.1;
+        }
         /* Secondary buttons: the border turns rose on hover (inline styles need !important to be overridden). */
         button[data-bordered]:not(:disabled):hover {
             border-color: var(--color-primary) !important;

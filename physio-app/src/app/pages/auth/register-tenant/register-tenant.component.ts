@@ -5,9 +5,9 @@ import { BooButtonComponent } from '../../../components/button/boo-button/boo-bu
 import { FormWrapperComponent } from "../../../components/form/boo-form/boo-form.component";
 import { BooInputComponent } from '../../../components/input/boo-input/boo-input.component';
 import { BooSelectComponent } from "../../../components/select/boo-select/boo-select.component";
+import { TenantOnboardingService } from '../../../services/admin/tenant-onboarding.service';
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
 import { ToastService } from '../../../services/common/toast.service';
-import { TenantOnboardingService } from '../../../services/admin/tenant-onboarding.service';
 import { HospitalType } from '../../../shared/enums/hospital-type';
 import { SharedModule } from '../../../shared/shared-imports';
 import { RegisterTenantRequest } from '../../../shared/types/tenant.types';
@@ -20,7 +20,8 @@ import { RegisterTenantRequest } from '../../../shared/types/tenant.types';
     FormWrapperComponent,
     BooButtonComponent,
     BooInputComponent,
-    BooSelectComponent,
+    BooSelectComponent,
+
   ],
   template: `
     <div class="bg-surface">
@@ -79,7 +80,7 @@ import { RegisterTenantRequest } from '../../../shared/types/tenant.types';
                         type="button"
                         (click)="removeBranch(i)"
                         class="text-red-500 hover:text-red-700"
-                      >
+                      >trash
                         <physio-icon name="trash-2" [size]="16"></physio-icon>
                       </button>
                     </div>

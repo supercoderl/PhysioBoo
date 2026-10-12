@@ -139,7 +139,7 @@ export class CommonCategoryInsuranceCompanyTableCardComponent {
 
   readonly bulkActions: BulkAction[] = [
     { key: 'export', label: 'Export', icon: 'download', variant: 'default' },
-    { key: 'delete', label: 'Delete', icon: 'trash-2', variant: 'danger', requireConfirm: true },
+    { key: 'delete', label: 'Delete', icon: 'trash', variant: 'danger', requireConfirm: true },
   ];
 
   readonly tableActions: ActionItem[] = [

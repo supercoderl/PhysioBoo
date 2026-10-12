@@ -21,7 +21,8 @@ import { BooUploadComponent } from "../../../../../upload/boo-upload/boo-upload.
     imports: [
         SharedModule,
         DrawerComponent,
-        BooInputComponent,
+        BooInputComponent,
+
         BooTextareaComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
@@ -150,9 +151,9 @@ import { BooUploadComponent } from "../../../../../upload/boo-upload/boo-upload.
                             (click)="onDelete()"
                         >
                             <physio-icon 
-                                name="trash-2" 
+                                name="trash" 
                                 [size]="16"
-                            [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
+                                [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
                             ></physio-icon> 
                             <span>Delete</span>
                         </button>

@@ -114,7 +114,6 @@ export class SuperadminTenantTableCardComponent {
   @Output() searchChange = new EventEmitter<string>();
   @Output() viewClick = new EventEmitter<string>();
   @Output() editClick = new EventEmitter<string>();
-  @Output() deleteClick = new EventEmitter<string>();
   @Output() reloadClick = new EventEmitter<void>();
   @Output() sortApply = new EventEmitter<SortOption>();
   @Output() filterApply = new EventEmitter<{ key: string; value: any }>();
@@ -123,8 +122,7 @@ export class SuperadminTenantTableCardComponent {
 
   readonly tableActions: ActionItem[] = [
     { label: 'View', onClick: (item: any) => this.viewClick.emit(item.id) },
-    { label: 'Edit', onClick: (item: any) => this.editClick.emit(item.id) },
-    { label: 'Delete', isDanger: true, onClick: (item: any) => this.deleteClick.emit(item.id) }
+    { label: 'Edit', onClick: (item: any) => this.editClick.emit(item.id) }
   ];
   // #endregion
 

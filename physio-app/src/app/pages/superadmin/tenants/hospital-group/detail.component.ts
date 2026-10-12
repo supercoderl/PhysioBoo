@@ -12,8 +12,6 @@ import { StatusBadgeComponent } from "../../../../components/ui/status-badge.com
 import { BillingService } from "../../../../services/admin/billing.service";
 import { HospitalGroupService } from "../../../../services/admin/hospital-group.service";
 import { HospitalService } from "../../../../services/admin/hospital.service";
-import { DialogService } from "../../../../services/common/dialog.service";
-import { ToastService } from "../../../../services/common/toast.service";
 import { hospitalTypeLabel } from "../../../../shared/enums/hospital-type";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { SubscriptionPlan as BillingPlan, TenantSubscriptionDetail } from "../../../../shared/types/billing.types";
@@ -30,7 +28,6 @@ interface DetailRow {
 }
 
 const OUTLINE_BUTTON = 'inline-flex items-center gap-1.5 h-9 px-3.5 rounded-1.5 border border-borderGray bg-surface text-[13px] font-medium text-regular hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors cursor-pointer';
-const DANGER_BUTTON = 'inline-flex items-center gap-1.5 h-9 px-3.5 rounded-1.5 border border-danger/30 bg-surface text-[13px] font-medium text-danger hover:bg-danger/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40 transition-colors cursor-pointer';
 const CARD = 'bg-surface rounded-2 border border-borderGray/60';
 
 @Component({
@@ -124,9 +121,6 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
                             <button type="button" [class]="outlineButton" (click)="openDrawer()">
                                 <lucide-icon name="pencil" class="w-3.5 h-3.5"></lucide-icon>
                                 Edit
-                            </button>
-                            <button type="button" [class]="dangerButton" (click)="onDelete()">
-                                Delete
                             </button>
                         </div>
                     </div>
@@ -362,7 +356,6 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
             [currentId]="drawerId()"
             (close)="closeDrawer()"
             (saveSuccess)="onSaved()"
-            (delete)="onDelete()"
         />
     `
 })
@@ -374,14 +367,11 @@ export class SuperadminTenantDetailComponent implements OnInit {
     private readonly hospitalGroupSrv = inject(HospitalGroupService);
     private readonly hospitalSrv = inject(HospitalService);
     private readonly billingSrv = inject(BillingService);
-    private readonly dialogSrv = inject(DialogService);
-    private readonly toastSrv = inject(ToastService);
     // #endregion
 
     // #region Inputs, Outputs, Properties
     readonly card = CARD;
     readonly outlineButton = OUTLINE_BUTTON;
-    readonly dangerButton = DANGER_BUTTON;
     readonly statusTone = billingStatusTone;
     readonly statusLabel = billingStatusLabel;
     readonly money = formatMoney;
@@ -545,22 +535,6 @@ export class SuperadminTenantDetailComponent implements OnInit {
     onSaved() {
         this.closeDrawer();
         this.load();
-    }
-
-    onDelete() {
-        const id = this.tenantId;
-        if (!id) return;
-
-        this.dialogSrv.confirmDelete(() => {
-            this.hospitalGroupSrv.delete(id).subscribe({
-                next: () => {
-                    this.toastSrv.success('Hospital group deleted');
-                    this.closeDrawer();
-                    this.router.navigate(['/superadmin/tenants/hospital-group']);
-                },
-                error: () => this.toastSrv.error('Failed to delete hospital group')
-            });
-        });
     }
 
     initial(name: string | null | undefined): string {

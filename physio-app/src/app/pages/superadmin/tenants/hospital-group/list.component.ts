@@ -8,8 +8,6 @@ import { SuperadminTenantTableCardComponent } from "../../../../components/layou
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { HospitalGroupService } from "../../../../services/admin/hospital-group.service";
-import { DialogService } from "../../../../services/common/dialog.service";
-import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { PaginationData } from "../../../../shared/types/common";
 import { FilterConfig } from "../../../../shared/types/filter.types";
@@ -82,7 +80,6 @@ import { HospitalGroup } from "../../../../shared/types/support.types";
                         (searchChange)="onSearch($event)"
                         (viewClick)="openDetail($event)"
                         (editClick)="openDrawer($event)"
-                        (deleteClick)="onDelete($event)"
                         (reloadClick)="reload()"
                         (sortApply)="onSortChange($event)"
                         (filterApply)="onFilterApply($event)"
@@ -96,15 +93,12 @@ import { HospitalGroup } from "../../../../shared/types/support.types";
             [currentId]="selectedId()"
             (close)="closeDrawer()"
             (saveSuccess)="onSaved()"
-            (delete)="onDelete($event)"
         />
     `
 })
 export class SuperadminTenantListComponent implements OnInit {
     // #region Inject Services
     private readonly hospitalGroupSrv = inject(HospitalGroupService);
-    private readonly dialogSrv = inject(DialogService);
-    private readonly toastSrv = inject(ToastService);
     private readonly router = inject(Router);
     // #endregion
 
@@ -227,26 +221,6 @@ export class SuperadminTenantListComponent implements OnInit {
     onSaved() {
         this.closeDrawer();
         this.reload();
-    }
-
-    onDelete(id: string | null) {
-        if (!id) return;
-
-        this.dialogSrv.confirmDelete(() => {
-            this.hospitalGroupSrv.delete(id).subscribe({
-                next: () => {
-                    this.toastSrv.success('Hospital group deleted');
-                    if (this.selectedId() === id) this.closeDrawer();
-
-                    const data = this.tableData();
-                    if (data && data.items.length === 1 && data.pageNumber > 1) {
-                        this.params.pageNumber = data.pageNumber - 1;
-                    }
-                    this.reload();
-                },
-                error: () => this.toastSrv.error('Failed to delete hospital group')
-            });
-        });
     }
     // #endregion
 }

@@ -18,7 +18,8 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
     imports: [
         SharedModule,
         DrawerComponent,
-        BooInputComponent,
+        BooInputComponent,
+
         BooButtonAdminComponent,
         BooSelectComponent,
     ],
@@ -127,9 +128,9 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                             (click)="onDelete()"
                         >
                             <physio-icon 
-                                name="trash-2" 
+                                name="trash" 
                                 [size]="16"
-                            [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
+                                [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
                             ></physio-icon> 
                             <span>Delete</span>
                         </button>

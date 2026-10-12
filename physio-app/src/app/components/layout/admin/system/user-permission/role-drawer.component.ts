@@ -13,9 +13,10 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
     selector: 'user-permission-role-drawer',
     standalone: true,
     imports: [
-        DrawerComponent, 
-        BooButtonAdminComponent, 
-        BooInputComponent, 
+        DrawerComponent,
+        BooButtonAdminComponent,
+
+        BooInputComponent,
         BooTextareaComponent,
         SharedModule
     ],
@@ -218,7 +219,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                         *ngIf="selectedRole() && !selectedRole()!.isSystemRole"
                         (click)="onDeleteRole(selectedRole()!)"
                     class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1.5"
-                    >
+                    >trash
                         <physio-icon name="trash-2" [size]="16"></physio-icon>
                         Delete Role
                     </button>
@@ -238,7 +239,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
 
 export class UserPermissionRoleDrawerComponent {
     // #region Inputs, Outputs, Properties
-    @Input({ required: true }) isOpen: boolean = false; 
+    @Input({ required: true }) isOpen: boolean = false;
     @Input({ required: true }) form!: FormGroup;
     @Input({ required: true }) selectedRoleId!: WritableSignal<string | null>;
     @Input({ required: true }) selectedRole!: WritableSignal<Role | null>;

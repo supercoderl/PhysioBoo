@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { catchError, of } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
@@ -12,9 +11,7 @@ import { BooFilterAdminComponent } from "../../../../../components/table/boo-tab
 import { BooSortAdminComponent } from "../../../../../components/table/boo-table-admin/boo-sort-admin.component";
 import { HospitalGroupService } from "../../../../../services/admin/hospital-group.service";
 import { DateService } from "../../../../../services/common/date.service";
-import { DialogService } from "../../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PaginationData } from "../../../../../shared/types/common";
 import { DateRange } from "../../../../../shared/types/date.types";
@@ -59,7 +56,6 @@ import { HospitalGroup } from "../../../../../shared/types/support.types";
                     [data]="tableData()"
                     (pageChange)="onPageChanged($event)"
                     (editClick)="onOpenDrawer($event)"
-                    (deleteClick)="onDelete($event)"
                     [filter]="params"
                 />
             </div>
@@ -69,7 +65,6 @@ import { HospitalGroup } from "../../../../../shared/types/support.types";
                 [currentId]="selectedId"
                 (close)="onCloseDrawer()"
                 (saveSuccess)="onSaveSuccess($event)"
-                (delete)="onDelete($event)"
             />
         </admin-content-header>
     `
@@ -116,8 +111,6 @@ export class CommonCategoryHospitalGroupListComponent implements OnInit {
     // #region Init (Lifecycle + Setup)
     constructor(
         private hospitalGroupSrv: HospitalGroupService,
-        private dialogSrv: DialogService,
-        private toastSrv: ToastService,
         protected loadingSrv: LocalLoadingService,
         private dateSrv: DateService
     ) { }
@@ -189,57 +182,6 @@ export class CommonCategoryHospitalGroupListComponent implements OnInit {
                 items: [result, ...currentData.items],
                 totalPages: Math.ceil((currentData.totalCount + 1) / currentData.pageSize)
             };
-        });
-    }
-
-    onDelete(id: string | null) {
-        if (!id) return;
-
-        this.dialogSrv.confirmDelete(() => {
-            const currentData = this.tableData();
-            if (!currentData) return;
-
-            const isLastItemOnPage = currentData.items.length === 1;
-            const isNotFirstPage = currentData.pageNumber > 1;
-
-            if (isLastItemOnPage && isNotFirstPage) {
-                this.toastSrv.success("Deleted 1 item.");
-                this.hospitalGroupSrv.delete(id).subscribe({
-                    next: () => {
-                        this.params.pageNumber = currentData.pageNumber - 1;
-                        this.loadHospitalGroups();
-                    },
-                    error: () => this.toastSrv.error("System error occurred.")
-                });
-                this.isDrawerOpen && this.onCloseDrawer();
-                return;
-            }
-
-            const backupItems = [...currentData.items];
-            const backupCount = currentData.totalCount;
-
-            this.tableData.update(data => {
-                if (!data) return null;
-                return {
-                    ...data,
-                    items: data.items.filter(item => item.id !== id),
-                    totalCount: data.totalCount - 1
-                };
-            });
-
-            this.toastSrv.success("Deleted 1 item.");
-            this.hospitalGroupSrv.delete(id)
-                .pipe(
-                    catchError(_ => {
-                        this.toastSrv.error("System error occurred. Rolling back data...");
-                        this.tableData.update(data => {
-                            if (!data) return null;
-                            return { ...data, items: backupItems, totalCount: backupCount };
-                        });
-                        return of(null);
-                    })
-                )
-                .subscribe({ next: _ => this.isDrawerOpen && this.onCloseDrawer() });
         });
     }
 

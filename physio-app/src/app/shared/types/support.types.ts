@@ -98,6 +98,10 @@ export interface HospitalGroup {
     address: string | null;
     city: string | null;
     country: string | null;
+    countryId?: string | null;
+    cityId?: string | null;
+    districtId?: string | null;
+    wardId?: string | null;
     subscriptionPlan: SubscriptionPlan;
     hospitalCount: number;
     isActive: boolean;

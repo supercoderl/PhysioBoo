@@ -107,7 +107,7 @@ import { SidebarItemComponent } from '../admin/sidebar/sidebar-item/sidebar-item
                     </a>
                 </header>
 
-                <main id="superadmin-main" tabindex="-1" class="flex-1 min-h-0 min-w-0 overflow-auto p-4 md:p-9 lg:p-10 focus:outline-none" custom-scrollbar>
+                <main id="superadmin-main" tabindex="-1" class="flex-1 min-h-0 min-w-0 overflow-auto p-4 focus:outline-none" custom-scrollbar>
                     <router-outlet *ngIf="!loaded() || menus().length"></router-outlet>
                     <div
                         *ngIf="loaded() && !menus().length"

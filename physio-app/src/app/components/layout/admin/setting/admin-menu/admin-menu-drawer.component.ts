@@ -138,7 +138,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                             class="group flex items-center gap-1.5 text-red-500 hover:text-red-700 px-2 py-1.5 rounded-md hover:bg-red-50 transition-all text-sm font-medium"
                             (click)="onDelete()"
                         >
-                            <physio-icon name="trash-2" [size]="16" [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"></physio-icon>
+                            <physio-icon name="trash" [size]="16" [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"></physio-icon>
                             <span>Delete</span>
                         </button>
                     </div>

@@ -73,7 +73,7 @@ import { MenuItem } from "../../../../../shared/types/menu.types";
                             class="w-6 h-6 flex items-center justify-center rounded hover:bg-red-100 text-red-500 transition-colors"
                             (click)="$event.stopPropagation(); onDelete(origin)"
                         >
-                            <physio-icon name="trash-2" [size]="13"></physio-icon>
+                            <physio-icon name="trash" [size]="13"></physio-icon>
                         </button>
                     </div>
                 </div>

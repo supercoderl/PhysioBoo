@@ -4,12 +4,13 @@ import { Permission } from "../../../../shared/types/permission.types";
 import { ColorUtils } from "../../../../shared/utils/color.utils";
 
 @Component({
-    selector: 'admin-user-permission-permission-tab',
-    standalone: true,
-    imports: [
-        SharedModule,
-    ],
-    template: `
+  selector: 'admin-user-permission-permission-tab',
+  standalone: true,
+  imports: [
+    SharedModule,
+
+  ],
+  template: `
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div
         *ngFor="let g of permissionGroups()"
@@ -67,7 +68,7 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
                 (click)="onDeleteClick(p)"
                 class="p-1.5 hover:bg-red-50 rounded text-red-500"
                 title="Delete"
-              >
+              >trash
                 <physio-icon name="trash-2" class="w-3.5 h-3.5"></physio-icon>
               </button>
             </div>
@@ -96,24 +97,24 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
 })
 
 export class AdminUserPermissionPermissionTabComponent {
-    // #region Inputs, Outputs, Properties
-    @Input({ required: true }) permissionGroups!: Signal<{
-        category: string;
-        items: Permission[];
-    }[]>;
-    @Output() editClick = new EventEmitter<Permission>();
-    @Output() deleteClick = new EventEmitter<Permission>();
+  // #region Inputs, Outputs, Properties
+  @Input({ required: true }) permissionGroups!: Signal<{
+    category: string;
+    items: Permission[];
+  }[]>;
+  @Output() editClick = new EventEmitter<Permission>();
+  @Output() deleteClick = new EventEmitter<Permission>();
 
-    ColorUtils = ColorUtils;
-    // #endregion
+  ColorUtils = ColorUtils;
+  // #endregion
 
-    // #region Methods
-    onEditClick(permission: Permission) {
-        this.editClick.emit(permission);
-    }
+  // #region Methods
+  onEditClick(permission: Permission) {
+    this.editClick.emit(permission);
+  }
 
-    onDeleteClick(permission: Permission) {
-        this.deleteClick.emit(permission);
-    }
-    // #endregion
+  onDeleteClick(permission: Permission) {
+    this.deleteClick.emit(permission);
+  }
+  // #endregion
 }

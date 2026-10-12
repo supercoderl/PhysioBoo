@@ -1,9 +1,10 @@
-import { Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Component, ElementRef, EventEmitter, forwardRef, inject, Injector, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
 import { SharedModule } from '../../../shared/shared-imports';
 import { Size } from '../../../shared/types/common';
+import { validationMessage } from '../../../shared/utils/validation-message';
 
 @Component({
   selector: 'boo-input',
@@ -42,6 +43,7 @@ import { Size } from '../../../shared/types/common';
           (blur)="onTouched()"
           
           [class]="inputClasses"
+          [attr.aria-invalid]="errorText ? true : null"
           [class.empty-date]="type === 'date' && !hasValue"
           [style.border-radius.px]="radius"
           [style.border-width.px]="borderWidth"
@@ -54,6 +56,7 @@ import { Size } from '../../../shared/types/common';
         </div>
       </div>
     </div>
+    <p *ngIf="errorText" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ errorText }}</p>
   `,
   styles: [`
     input[type="date"].empty-date:not(:focus)::-webkit-datetime-edit {
@@ -80,8 +83,14 @@ export class BooInputComponent implements OnInit, OnDestroy, ControlValueAccesso
 
   model: any = '';
   disabled: boolean = false;
+  private readonly injector = inject(Injector);
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
+
+  /** Validation message of the bound form control, shown once it has been touched (e.g. by a failed save). */
+  get errorText(): string | null {
+    return validationMessage(this.injector.get(NgControl, null, { self: true, optional: true })?.control, this.label);
+  }
 
   get hasValue(): boolean {
     return this.model !== null && this.model !== undefined && this.model !== '';
@@ -112,8 +121,9 @@ export class BooInputComponent implements OnInit, OnDestroy, ControlValueAccesso
     }
 
     const disabledClass = this.disabled ? '!bg-gray-100 dark:!bg-zinc-800/50 cursor-not-allowed opacity-70' : '';
+    const errorClass = this.errorText ? '!border-danger focus:ring-danger/25' : '';
 
-    return `${base} ${sizeClass} ${disabledClass}`;
+    return `${base} ${sizeClass} ${disabledClass} ${errorClass}`;
   }
   // #endregion
 

@@ -64,7 +64,7 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
                             <lucide-icon name="pencil" class="w-4 h-4"></lucide-icon>
                         </button>
                         <button type="button" [class]="iconButton + ' hover:!text-danger'" [attr.aria-label]="'Delete section ' + section.label" title="Delete" (click)="remove.emit({ item: section, parent: null })">
-                            <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
+                            <lucide-icon name="trash" class="w-4 h-4"></lucide-icon>
                         </button>
                     </div>
                 </div>
@@ -95,7 +95,7 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
                                 <lucide-icon name="pencil" class="w-4 h-4"></lucide-icon>
                             </button>
                             <button type="button" [class]="iconButton + ' hover:!text-danger'" [attr.aria-label]="'Delete page ' + child.label" title="Delete" (click)="remove.emit({ item: child, parent: section })">
-                                <lucide-icon name="trash-2" class="w-4 h-4"></lucide-icon>
+                                <lucide-icon name="trash" class="w-4 h-4"></lucide-icon>
                             </button>
                         </div>
                     </li>

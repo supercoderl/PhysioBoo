@@ -5,27 +5,27 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { StockMovementEvent, StockMovementType } from "../../../../shared/types/inventory-management.types";
 
 const MOVEMENT_ICON: Record<StockMovementType, string> = {
-    Purchase: 'shopping-cart',
-    Receiving: 'truck',
-    Transfer: 'repeat',
-    Dispense: 'pill',
-    RetailSale: 'receipt',
-    Return: 'undo-2',
-    Adjustment: 'settings-2',
-    Disposal: 'trash-2',
-    Expiry: 'calendar-clock',
+  Purchase: 'shopping-cart',
+  Receiving: 'truck',
+  Transfer: 'repeat',
+  Dispense: 'pill',
+  RetailSale: 'receipt',
+  Return: 'undo-2',
+  Adjustment: 'settings-2',
+  Disposal: 'trash',
+  Expiry: 'calendar-clock',
 };
 
 interface DayGroup {
-    label: string;
-    events: StockMovementEvent[];
+  label: string;
+  events: StockMovementEvent[];
 }
 
 @Component({
-    selector: 'inventory-timeline-panel',
-    standalone: true,
-    imports: [SharedModule,EmptyStateComponent],
-    template: `
+  selector: 'inventory-timeline-panel',
+  standalone: true,
+  imports: [SharedModule, EmptyStateComponent],
+  template: `
     <div class="bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex flex-wrap items-center justify-between gap-2">
         <h2 class="text-sm font-semibold text-regular">Warehouse Timeline</h2>
@@ -72,40 +72,40 @@ interface DayGroup {
   `,
 })
 export class InventoryTimelinePanelComponent implements OnInit {
-    loading = signal(true);
-    allEvents = signal<StockMovementEvent[]>([]);
-    groups = signal<DayGroup[]>([]);
+  loading = signal(true);
+  allEvents = signal<StockMovementEvent[]>([]);
+  groups = signal<DayGroup[]>([]);
 
-    query = '';
-    typeFilter: StockMovementType | '' = '';
+  query = '';
+  typeFilter: StockMovementType | '' = '';
 
-    readonly movementTypes: StockMovementType[] = ['Purchase', 'Receiving', 'Transfer', 'Dispense', 'RetailSale', 'Return', 'Adjustment', 'Disposal', 'Expiry'];
+  readonly movementTypes: StockMovementType[] = ['Purchase', 'Receiving', 'Transfer', 'Dispense', 'RetailSale', 'Return', 'Adjustment', 'Disposal', 'Expiry'];
 
-    constructor(private srv: InventoryManagementService) { }
+  constructor(private srv: InventoryManagementService) { }
 
-    ngOnInit(): void {
-        this.srv.getMovements().subscribe({
-            next: res => { if (res.success) this.allEvents.set(res.data.items); this.apply(); this.loading.set(false); },
-            error: () => this.loading.set(false),
-        });
+  ngOnInit(): void {
+    this.srv.getMovements().subscribe({
+      next: res => { if (res.success) this.allEvents.set(res.data.items); this.apply(); this.loading.set(false); },
+      error: () => this.loading.set(false),
+    });
+  }
+
+  movementIcon(type: StockMovementType): string {
+    return MOVEMENT_ICON[type];
+  }
+
+  apply(): void {
+    let list = this.allEvents();
+    if (this.typeFilter) list = list.filter(e => e.type === this.typeFilter);
+    if (this.query) {
+      const q = this.query.toLowerCase();
+      list = list.filter(e => e.medicineName.toLowerCase().includes(q) || e.warehouseZone.toLowerCase().includes(q) || e.performedBy.toLowerCase().includes(q));
     }
-
-    movementIcon(type: StockMovementType): string {
-        return MOVEMENT_ICON[type];
+    const byDay = new Map<string, StockMovementEvent[]>();
+    for (const e of list) {
+      const label = new Date(e.occurredAt).toDateString();
+      byDay.set(label, [...(byDay.get(label) ?? []), e]);
     }
-
-    apply(): void {
-        let list = this.allEvents();
-        if (this.typeFilter) list = list.filter(e => e.type === this.typeFilter);
-        if (this.query) {
-            const q = this.query.toLowerCase();
-            list = list.filter(e => e.medicineName.toLowerCase().includes(q) || e.warehouseZone.toLowerCase().includes(q) || e.performedBy.toLowerCase().includes(q));
-        }
-        const byDay = new Map<string, StockMovementEvent[]>();
-        for (const e of list) {
-            const label = new Date(e.occurredAt).toDateString();
-            byDay.set(label, [...(byDay.get(label) ?? []), e]);
-        }
-        this.groups.set(Array.from(byDay.entries()).map(([label, events]) => ({ label, events })));
-    }
+    this.groups.set(Array.from(byDay.entries()).map(([label, events]) => ({ label, events })));
+  }
 }

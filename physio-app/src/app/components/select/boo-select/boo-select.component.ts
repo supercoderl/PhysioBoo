@@ -1,7 +1,8 @@
-import { Component, ElementRef, forwardRef, HostListener, Input, ViewChild } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Component, ElementRef, forwardRef, HostListener, inject, Injector, Input, ViewChild } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared-imports';
 import { Size } from '../../../shared/types/common';
+import { validationMessage } from '../../../shared/utils/validation-message';
 
 @Component({
   selector: 'boo-select',
@@ -24,7 +25,8 @@ import { Size } from '../../../shared/types/common';
         [style.height.px.important]="height"
         [style.border-radius.px]="radius"
         [style.border-width.px]="borderWidth"
-        [style.border-color]="isOpen ? '#FB7185' : borderColor" 
+        [style.border-color]="isOpen ? '#FB7185' : errorText ? 'rgb(var(--twc-danger))' : borderColor"
+        [attr.aria-invalid]="errorText ? true : null"
         tabindex="0"
         (blur)="onTouched()"
       >
@@ -53,6 +55,18 @@ import { Size } from '../../../shared/types/common';
         }"
         [style.border-radius.px]="radius"
       >
+        <div *ngIf="showSearch" class="p-2 border-b border-slate-100">
+          <input
+            #searchInput
+            type="text"
+            [(ngModel)]="searchTerm"
+            [ngModelOptions]="{ standalone: true }"
+            placeholder="Search..."
+            aria-label="Search options"
+            autocomplete="off"
+            class="w-full h-8 px-3 text-xs rounded-md border border-border bg-surface text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/70"
+          />
+        </div>
         <ul class="max-h-60 overflow-y-auto py-1 m-0" custom-scrollbar>
             <li 
               *ngIf="!required && label"
@@ -61,9 +75,9 @@ import { Size } from '../../../shared/types/common';
             >
               <span>-- {{ label }} --</span>
             </li>
-            <ng-container *ngIf="options && options.length > 0; else emptyData">
+            <ng-container *ngIf="filteredOptions.length > 0; else emptyData">
                 <li 
-                    *ngFor="let opt of options"
+                    *ngFor="let opt of filteredOptions"
                     (click)="selectOption(opt)"
                     class="px-4 py-2.5 text-sm cursor-pointer transition-colors flex items-center justify-between group/item hover:bg-borderGray hover:text-slate-900"
                     [class.bg-primarySoft]="opt[bindValue] === model"
@@ -81,12 +95,13 @@ import { Size } from '../../../shared/types/common';
 
             <ng-template #emptyData>
                 <li class="px-4 py-3 text-sm text-slate-400 text-center italic">
-                    Empty data
+                    {{ searchTerm ? 'No results found' : 'Empty data' }}
                 </li>
             </ng-template>
         </ul>
       </div>
     </div>
+    <p *ngIf="errorText" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ errorText }}</p>
   `,
   styles: [`
     .animate-fade-in-down {
@@ -117,6 +132,10 @@ import { Size } from '../../../shared/types/common';
 export class BooSelectComponent implements ControlValueAccessor {
   // #region Inputs
   @ViewChild('container') containerRef!: ElementRef<HTMLDivElement>;
+  /** The search box only exists while the dropdown is open, so focusing it here puts the cursor in it on open. */
+  @ViewChild('searchInput') set searchInput(input: ElementRef<HTMLInputElement> | undefined) {
+    input?.nativeElement.focus();
+  }
   @Input() label: string = '';
   @Input({ transform: (v: unknown) => v === '' || v === true || v === 'true' }) required: boolean = false;
   @Input() height?: number;
@@ -126,21 +145,48 @@ export class BooSelectComponent implements ControlValueAccessor {
   @Input() borderColor: string = '#e6e8ee';
   @Input() fitLabel: boolean = false;
   @Input() options: any[] = [];
+  /** `auto` shows the search box only when the list is long enough to need it. */
+  @Input() searchable: boolean | 'auto' = 'auto';
+  @Input() searchThreshold: number = 8;
   @Input() bindLabel: string = 'label';
   @Input() bindValue: string = 'value';
 
   model: any = null;
+  searchTerm: string = '';
   isOpen: boolean = false;
   disabled: boolean = false;
   dropUp: boolean = false;
 
+  private readonly injector = inject(Injector);
+
   constructor(private _elementRef: ElementRef) { }
+
+  /** Validation message of the bound form control, shown once it has been touched (e.g. by a failed save). */
+  get errorText(): string | null {
+    return validationMessage(this.injector.get(NgControl, null, { self: true, optional: true })?.control, this.label);
+  }
 
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
     if (!this._elementRef.nativeElement.contains(event.target)) {
       this.isOpen = false;
+      this.searchTerm = '';
     }
+  }
+
+  get showSearch(): boolean {
+    return this.searchable === 'auto' ? (this.options?.length ?? 0) >= this.searchThreshold : this.searchable;
+  }
+
+  get filteredOptions(): any[] {
+    const term = this.fold(this.searchTerm.trim());
+    if (!term) return this.options ?? [];
+    return (this.options ?? []).filter(opt => this.fold(String(opt[this.bindLabel] ?? '')).includes(term));
+  }
+
+  /** Case- and accent-insensitive, so "ha noi" finds "Hà Nội". */
+  private fold(text: string): string {
+    return text.replace(/đ/g, 'd').replace(/Đ/g, 'D').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   }
 
   get labelClasses(): string {
@@ -193,6 +239,7 @@ export class BooSelectComponent implements ControlValueAccessor {
     if (!this.isOpen) {
       this.calculateDropdownPosition();
     }
+    this.searchTerm = '';
 
     this.isOpen = !this.isOpen;
   }
@@ -217,6 +264,7 @@ export class BooSelectComponent implements ControlValueAccessor {
     this.model = value;
     this.onChange(value);
     this.isOpen = false;
+    this.searchTerm = '';
   }
 
   hasValidSelection(): boolean {

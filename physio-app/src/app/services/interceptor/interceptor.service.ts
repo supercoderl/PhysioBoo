@@ -26,8 +26,8 @@ export class InterceptorService implements HttpInterceptor {
   ) { }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // 1. External absolute URLs bypass everything
-    if (/^https?:\/\//i.test(request.url)) {
+    // 1. External absolute URLs and the app's own static assets bypass everything
+    if (/^https?:\/\//i.test(request.url) || /^\/?assets\//i.test(request.url)) {
       return next.handle(request);
     }
 

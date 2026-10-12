@@ -4,7 +4,7 @@ import { finalize, firstValueFrom } from "rxjs";
 import { HospitalService } from "../../../../../services/admin/hospital.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../shared/constants/error.constant";
-import { HospitalType, HOSPITAL_TYPE_LABELS } from "../../../../../shared/enums/hospital-type";
+import { HOSPITAL_TYPE_LABELS, HospitalType } from "../../../../../shared/enums/hospital-type";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { Hospital, SaveHospitalRequest } from "../../../../../shared/types/support.types";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
@@ -152,7 +152,7 @@ const toCount = (value: unknown): number => Math.max(0, Math.trunc(Number(value)
 
                 <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0">
                     <button *ngIf="currentId" type="button" (click)="onDelete()" class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1.5">
-                        <physio-icon name="trash-2" [size]="16"></physio-icon>
+                        <physio-icon name="trash" [size]="16"></physio-icon>
                         Delete
                     </button>
                     <div class="flex gap-3 ml-auto">

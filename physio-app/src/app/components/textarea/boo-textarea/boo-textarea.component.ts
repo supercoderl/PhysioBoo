@@ -1,6 +1,7 @@
-import { Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Component, ElementRef, forwardRef, inject, Injector, Input, ViewChild } from '@angular/core';
+import { NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared-imports';
+import { validationMessage } from '../../../shared/utils/validation-message';
 
 @Component({
   selector: 'boo-textarea',
@@ -44,7 +45,8 @@ import { SharedModule } from '../../../shared/shared-imports';
           [style.border-radius.px]="radius"
           [style.background-color]="backgroundColor"
           [style.border-width.px]="borderWidth"
-          [style.border-color]="borderColor"
+          [style.border-color]="errorText ? 'rgb(var(--twc-danger))' : borderColor"
+          [attr.aria-invalid]="errorText ? true : null"
           
           autocomplete="off"
         ></textarea>
@@ -54,6 +56,7 @@ import { SharedModule } from '../../../shared/shared-imports';
         </div>
       </div>
     </div>
+    <p *ngIf="errorText" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ errorText }}</p>
   `,
   host: {
     'class': 'block w-full relative group mb-0',
@@ -76,8 +79,15 @@ export class BooTextareaComponent {
   @Input() placeholderColor: string = '#85757D'; // Slate-500
   @ViewChild('textareaElement') textareaElement!: ElementRef;
 
+  private readonly injector = inject(Injector);
   model: string = '';
   disabled: boolean = false;
+
+  /** Validation message of the bound form control, shown once it has been touched (e.g. by a failed save). */
+  get errorText(): string | null {
+    return validationMessage(this.injector.get(NgControl, null, { self: true, optional: true })?.control, this.label);
+  }
+
 
   get labelClasses(): string {
     const base = 'absolute left-0 top-0 z-[1] flex items-center transition-all duration-300 cursor-text truncate pointer-events-none';

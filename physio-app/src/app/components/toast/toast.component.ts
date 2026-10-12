@@ -115,7 +115,7 @@ export class ToastComponent {
     getIconName(type: ToastType): string {
         const icons: Record<string, string> = {
             success: 'smile',
-            error: 'frown',
+            error: 'sad',
             warning: 'annoyed',
             confirm: 'message-circle-question-mark',
             info: 'meh'

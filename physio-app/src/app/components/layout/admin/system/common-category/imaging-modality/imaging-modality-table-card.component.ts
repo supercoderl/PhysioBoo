@@ -17,7 +17,8 @@ import { BooTableAdminComponent, FilterConfig } from "../../../../../table/boo-t
     SharedModule,
     BooTableAdminComponent,
     ColumnDefDirective,
-    BooActionAdminComponent,
+    BooActionAdminComponent,
+
   ],
   host: { class: 'block h-full min-h-0' },
   template: `
@@ -144,7 +145,7 @@ export class CommonCategoryImagingModalityTableCardComponent {
   ColorUtils = ColorUtils;
 
   readonly bulkActions: BulkAction[] = [
-    { key: 'export', label: 'Export', icon: 'download', variant: 'default' },
+    { key: 'export', label: 'Export', icon: 'trashd', variant: 'default' },
     { key: 'delete', label: 'Delete', icon: 'trash-2', variant: 'danger', requireConfirm: true },
   ];
 

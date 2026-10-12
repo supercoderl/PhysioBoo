@@ -84,6 +84,11 @@ export const BASE_API = {
     BASE: '/api/hospital-groups',
     SEARCH: '/api/hospital-groups/search'
   },
+  LOCATION: {
+    COUNTRIES: '/api/locations/countries',
+    CITIES: '/api/locations/cities',
+    DISTRICTS: '/api/locations/districts'
+  },
   TENANT: {
     REGISTER: '/api/tenants/register'
   },

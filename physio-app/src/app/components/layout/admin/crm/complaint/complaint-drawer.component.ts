@@ -111,7 +111,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                     <button *ngIf="currentId" (click)="onDelete()"
                         class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1.5 transition-colors"
                         aria-label="Delete complaint">
-                        <physio-icon name="trash-2" [size]="16"></physio-icon>
+                        <physio-icon name="trash" [size]="16"></physio-icon>
                         Delete
                     </button>
                     <div class="flex gap-3 ml-auto">

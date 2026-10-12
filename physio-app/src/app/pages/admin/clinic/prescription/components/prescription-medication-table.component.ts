@@ -10,7 +10,7 @@ type EditableField = 'dose' | 'frequency' | 'durationDays' | 'quantity' | 'instr
 @Component({
   selector: 'rx-medication-table',
   standalone: true,
-  imports: [SharedModule,BooInputComponent, StatusBadgeComponent],
+  imports: [SharedModule, BooInputComponent, StatusBadgeComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg flex flex-col">
       <!-- Toolbar -->
@@ -177,7 +177,7 @@ type EditableField = 'dose' | 'frequency' | 'durationDays' | 'quantity' | 'instr
                   <physio-icon name="copy" [size]="15"></physio-icon>
                 </button>
                 <button *ngIf="editable" type="button" (click)="removeItem(item)" class="text-secondary hover:text-rose-600 p-1" title="Remove">
-                  <physio-icon name="trash-2" [size]="15"></physio-icon>
+                  <physio-icon name="trash" [size]="15"></physio-icon>
                 </button>
               </td>
             </tr>

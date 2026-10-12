@@ -141,15 +141,15 @@ export class CmsServiceTableCardComponent {
   readonly bulkActions: BulkAction[] = [
     { key: 'archive', label: 'Archive', icon: 'archive', variant: 'default', requireConfirm: true },
     { key: 'export', label: 'Export', icon: 'download', variant: 'default' },
-    { key: 'delete', label: 'Delete', icon: 'trash-2', variant: 'danger', requireConfirm: true },
+    { key: 'delete', label: 'Delete', icon: 'trash', variant: 'danger', requireConfirm: true },
   ];
 
   readonly tableActions: ActionItem[] = [
-    { label: 'View details', icon: 'eye',     onClick: (s) => this.viewClick.emit(s as MedicalService) },
-    { label: 'Edit',         icon: 'pencil',  onClick: (s) => this.editClick.emit(s as MedicalService) },
-    { label: 'Duplicate',    icon: 'copy',    onClick: (s) => this.duplicateClick.emit(s as MedicalService) },
-    { label: 'Archive',      icon: 'archive', onClick: (s) => this.archiveClick.emit(s as MedicalService) },
-    { label: 'Delete',       icon: 'trash-2', isDanger: true, onClick: (s) => this.deleteClick.emit(s as MedicalService) },
+    { label: 'View details', icon: 'eye', onClick: (s) => this.viewClick.emit(s as MedicalService) },
+    { label: 'Edit', icon: 'pencil', onClick: (s) => this.editClick.emit(s as MedicalService) },
+    { label: 'Duplicate', icon: 'copy', onClick: (s) => this.duplicateClick.emit(s as MedicalService) },
+    { label: 'Archive', icon: 'archive', onClick: (s) => this.archiveClick.emit(s as MedicalService) },
+    { label: 'Delete', icon: 'trash', isDanger: true, onClick: (s) => this.deleteClick.emit(s as MedicalService) },
   ];
   // #endregion
 
@@ -170,8 +170,8 @@ export class CmsServiceTableCardComponent {
 
   statusClass(s: ServiceStatus): string {
     switch (s) {
-      case 'Active':   return 'bg-emerald-50 text-emerald-700';
-      case 'Draft':    return 'bg-amber-50 text-amber-700';
+      case 'Active': return 'bg-emerald-50 text-emerald-700';
+      case 'Draft': return 'bg-amber-50 text-amber-700';
       case 'Inactive': return 'bg-gray-100 text-gray-600';
       case 'Archived': return 'bg-zinc-100 text-zinc-500';
     }
@@ -179,8 +179,8 @@ export class CmsServiceTableCardComponent {
 
   statusDotClass(s: ServiceStatus): string {
     switch (s) {
-      case 'Active':   return 'bg-emerald-500';
-      case 'Draft':    return 'bg-amber-500';
+      case 'Active': return 'bg-emerald-500';
+      case 'Draft': return 'bg-amber-500';
       case 'Inactive': return 'bg-gray-400';
       case 'Archived': return 'bg-zinc-400';
     }
@@ -188,16 +188,16 @@ export class CmsServiceTableCardComponent {
 
   availabilityClass(a: ServiceAvailability): string {
     switch (a) {
-      case 'Available':   return 'bg-emerald-50 text-emerald-700';
-      case 'Limited':     return 'bg-amber-50 text-amber-700';
+      case 'Available': return 'bg-emerald-50 text-emerald-700';
+      case 'Limited': return 'bg-amber-50 text-amber-700';
       case 'Unavailable': return 'bg-red-50 text-red-700';
     }
   }
 
   availabilityDotClass(a: ServiceAvailability): string {
     switch (a) {
-      case 'Available':   return 'bg-emerald-500';
-      case 'Limited':     return 'bg-amber-500';
+      case 'Available': return 'bg-emerald-500';
+      case 'Limited': return 'bg-amber-500';
       case 'Unavailable': return 'bg-red-500';
     }
   }

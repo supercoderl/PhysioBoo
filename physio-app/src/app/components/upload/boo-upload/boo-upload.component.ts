@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, forwardRef, Input, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, forwardRef, Input, NgZone, OnDestroy, Output, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
@@ -25,6 +25,7 @@ import { SharedModule } from '../../../shared/shared-imports'; // Chứa CommonM
       </label>
 
       <div 
+        #box
         (click)="triggerUpload()"
         class="
           relative overflow-hidden group cursor-pointer transition-all duration-200
@@ -38,24 +39,24 @@ import { SharedModule } from '../../../shared/shared-imports'; // Chứa CommonM
         [style.border-radius.px]="radius"
       >
         <div *ngIf="loadingSrv.isLoading('upload')" class="absolute inset-0 bg-surface/80 z-20 flex flex-col items-center justify-center backdrop-blur-[1px]">
-          <physio-icon name="loader" [size]="24" [class]="'animate-spin text-primary'"></physio-icon>
+          <physio-icon name="loader" [size]="iconSize" [class]="'animate-spin text-primary'"></physio-icon>
         </div>
         <ng-container *ngIf="previewUrl; else emptyState">
-          <img *ngIf="!isSvgString" [src]="previewUrl" class="w-full h-full object-cover">
+          <img *ngIf="!isSvgString" [src]="previewUrl" (error)="onImageError()" class="w-full h-full object-cover">
           <div *ngIf="isSvgString" [innerHtml]="previewUrl | safeHtml" class="w-full h-full object-cover"></div>
           
           <div *ngIf="!loadingSrv.isLoading('upload')" class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity z-10">
             <div class="flex flex-col items-center text-white">
-              <physio-icon name="pencil" [size]="20" class="text-white"></physio-icon>
-              <span class="text-[10px] font-medium mt-1">Change</span>
+              <physio-icon name="pencil" [size]="iconSize"></physio-icon>
+              <span class="font-medium mt-1" [style.font-size.px]="fontSize">Change</span>
             </div>
           </div>
         </ng-container>
 
         <ng-template #emptyState>
-          <div class="flex flex-col items-center gap-1 text-gray-400 group-hover:text-primary transition-colors">
-            <physio-icon name="upload" [size]="20" class="text-[#A1A1AA]"></physio-icon>
-            <span class="text-[10px] font-medium uppercase tracking-wide">Upload</span>
+          <div class="flex flex-col items-center gap-2 text-gray-400 group-hover:text-primary transition-colors">
+            <physio-icon name="upload" [size]="iconSize"></physio-icon>
+            <span class="font-medium uppercase tracking-wide" [style.font-size.px]="fontSize">Upload</span>
           </div>
         </ng-template>
 
@@ -70,7 +71,7 @@ import { SharedModule } from '../../../shared/shared-imports'; // Chứa CommonM
     </div>
   `
 })
-export class BooUploadComponent implements ControlValueAccessor {
+export class BooUploadComponent implements ControlValueAccessor, AfterViewInit, OnDestroy {
   // #region Inputs, Outputs, Properties
   @Input() label = '';
   @Input() required = false;
@@ -81,11 +82,15 @@ export class BooUploadComponent implements ControlValueAccessor {
   @Input() accept = 'image/*';
   @Input() folder = `${environment.CLOUDINARY.BASE_FOLDER}/others`;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('box', { static: true }) box!: ElementRef<HTMLElement>;
   @Output() uploadSuccess = new EventEmitter<{ url: string; publicId: string }>();
 
   previewUrl: string | null = null;
   isSvgString: boolean = false;
   disabled = false;
+  iconSize = 20;
+  fontSize = 10;
+  private resizeObserver?: ResizeObserver;
 
   get containerClass() {
     return {
@@ -98,8 +103,28 @@ export class BooUploadComponent implements ControlValueAccessor {
   constructor(
     private cloudinarySrv: CloudinaryService,
     private toastSrv: ToastService,
-    protected loadingSrv: LocalLoadingService
+    protected loadingSrv: LocalLoadingService,
+    private zone: NgZone
   ) { }
+
+  /** Icon and label scale with the rendered box, so the parent only has to set width/height. */
+  ngAfterViewInit(): void {
+    if (typeof ResizeObserver === 'undefined') return;
+    this.resizeObserver = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      const side = Math.min(width, height);
+      if (!side) return;
+      this.zone.run(() => {
+        this.iconSize = Math.round(Math.min(Math.max(side * 0.163, 8), 28));
+        this.fontSize = Math.round(Math.min(Math.max(side * 0.1005, 7), 10));
+      });
+    });
+    this.resizeObserver.observe(this.box.nativeElement);
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+  }
   // #endregion
 
   // #region Methods
@@ -108,6 +133,11 @@ export class BooUploadComponent implements ControlValueAccessor {
 
   triggerUpload() {
     if (!this.disabled && !this.loadingSrv.isLoading('upload')) this.fileInput.nativeElement.click();
+  }
+
+  /** A stored URL that no longer loads falls back to the empty "Upload" state; the form value is left untouched. */
+  onImageError() {
+    this.previewUrl = null;
   }
 
   onFileSelected(event: Event) {

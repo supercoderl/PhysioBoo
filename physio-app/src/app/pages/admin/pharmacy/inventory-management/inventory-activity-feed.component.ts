@@ -5,22 +5,22 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { StockMovementEvent, StockMovementType } from "../../../../shared/types/inventory-management.types";
 
 const MOVEMENT_ICON: Record<StockMovementType, string> = {
-    Purchase: 'shopping-cart',
-    Receiving: 'truck',
-    Transfer: 'repeat',
-    Dispense: 'pill',
-    RetailSale: 'receipt',
-    Return: 'undo-2',
-    Adjustment: 'settings-2',
-    Disposal: 'trash-2',
-    Expiry: 'calendar-clock',
+  Purchase: 'shopping-cart',
+  Receiving: 'truck',
+  Transfer: 'repeat',
+  Dispense: 'pill',
+  RetailSale: 'receipt',
+  Return: 'undo-2',
+  Adjustment: 'settings-2',
+  Disposal: 'trash',
+  Expiry: 'calendar-clock',
 };
 
 @Component({
-    selector: 'inventory-activity-feed',
-    standalone: true,
-    imports: [SharedModule,EmptyStateComponent],
-    template: `
+  selector: 'inventory-activity-feed',
+  standalone: true,
+  imports: [SharedModule, EmptyStateComponent],
+  template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60">
         <h2 class="text-sm font-semibold text-regular">Warehouse Activity</h2>
@@ -52,21 +52,21 @@ const MOVEMENT_ICON: Record<StockMovementType, string> = {
   `,
 })
 export class InventoryActivityFeedComponent implements OnInit {
-    @Input() limit = 6;
+  @Input() limit = 6;
 
-    loading = signal(true);
-    events = signal<StockMovementEvent[]>([]);
+  loading = signal(true);
+  events = signal<StockMovementEvent[]>([]);
 
-    constructor(private srv: InventoryManagementService) { }
+  constructor(private srv: InventoryManagementService) { }
 
-    ngOnInit(): void {
-        this.srv.getMovements().subscribe({
-            next: res => { if (res.success) this.events.set(res.data.items.slice(0, this.limit)); this.loading.set(false); },
-            error: () => this.loading.set(false),
-        });
-    }
+  ngOnInit(): void {
+    this.srv.getMovements().subscribe({
+      next: res => { if (res.success) this.events.set(res.data.items.slice(0, this.limit)); this.loading.set(false); },
+      error: () => this.loading.set(false),
+    });
+  }
 
-    movementIcon(type: StockMovementType): string {
-        return MOVEMENT_ICON[type];
-    }
+  movementIcon(type: StockMovementType): string {
+    return MOVEMENT_ICON[type];
+  }
 }

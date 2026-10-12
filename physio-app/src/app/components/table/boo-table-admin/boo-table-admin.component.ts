@@ -388,7 +388,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                 <button *ngIf="!v.isDefault"
                   class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 p-0.5 rounded"
                   (click)="$event.stopPropagation(); deleteView(v)">
-                  <physio-icon name="trash-2" class="w-3.5 h-3.5" />
+                  <physio-icon name="trash" class="w-3.5 h-3.5" />
                 </button>
               </div>
             </ng-container>
@@ -450,7 +450,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                   </div>
                   <button class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 p-0.5"
                     (click)="commentDelete.emit(c)">
-                    <physio-icon name="trash-2" class="w-3 h-3" />
+                    <physio-icon name="trash" class="w-3 h-3" />
                   </button>
                 </div>
               </ng-container>

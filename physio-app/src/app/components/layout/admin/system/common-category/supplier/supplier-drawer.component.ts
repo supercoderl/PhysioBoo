@@ -23,7 +23,8 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
     imports: [
         SharedModule,
         DrawerComponent,
-        BooInputComponent,
+        BooInputComponent,
+
         BooTextareaComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
@@ -188,9 +189,9 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
                             (click)="onDelete()"
                         >
                             <physio-icon 
-                                name="trash-2" 
+                                name="trash" 
                                 [size]="16"
-                            [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
+                                [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
                             ></physio-icon> 
                             <span>Delete</span>
                         </button>

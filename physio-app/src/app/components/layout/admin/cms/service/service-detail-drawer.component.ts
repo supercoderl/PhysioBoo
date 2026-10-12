@@ -145,7 +145,7 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
                             Archive
                         </button>
                         <button (click)="deleteClick.emit(s)" class="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-1.5">
-                            <physio-icon name="trash-2" class="w-3.5 h-3.5"></physio-icon>
+                            <physio-icon name="trash" class="w-3.5 h-3.5"></physio-icon>
                             Delete
                         </button>
                     </div>
@@ -208,8 +208,8 @@ export class CmsServiceDetailDrawerComponent implements OnChanges {
     // #region Methods
     statusClass(s: ServiceStatus): string {
         switch (s) {
-            case 'Active':   return 'bg-emerald-50 text-emerald-700';
-            case 'Draft':    return 'bg-amber-50 text-amber-700';
+            case 'Active': return 'bg-emerald-50 text-emerald-700';
+            case 'Draft': return 'bg-amber-50 text-amber-700';
             case 'Inactive': return 'bg-gray-100 text-gray-600';
             case 'Archived': return 'bg-zinc-100 text-zinc-500';
         }
@@ -217,8 +217,8 @@ export class CmsServiceDetailDrawerComponent implements OnChanges {
 
     statusDotClass(s: ServiceStatus): string {
         switch (s) {
-            case 'Active':   return 'bg-emerald-500';
-            case 'Draft':    return 'bg-amber-500';
+            case 'Active': return 'bg-emerald-500';
+            case 'Draft': return 'bg-amber-500';
             case 'Inactive': return 'bg-gray-400';
             case 'Archived': return 'bg-zinc-400';
         }
@@ -226,16 +226,16 @@ export class CmsServiceDetailDrawerComponent implements OnChanges {
 
     availabilityClass(a: ServiceAvailability): string {
         switch (a) {
-            case 'Available':   return 'bg-emerald-50 text-emerald-700';
-            case 'Limited':     return 'bg-amber-50 text-amber-700';
+            case 'Available': return 'bg-emerald-50 text-emerald-700';
+            case 'Limited': return 'bg-amber-50 text-amber-700';
             case 'Unavailable': return 'bg-red-50 text-red-700';
         }
     }
 
     availabilityDotClass(a: ServiceAvailability): string {
         switch (a) {
-            case 'Available':   return 'bg-emerald-500';
-            case 'Limited':     return 'bg-amber-500';
+            case 'Available': return 'bg-emerald-500';
+            case 'Limited': return 'bg-amber-500';
             case 'Unavailable': return 'bg-red-500';
         }
     }

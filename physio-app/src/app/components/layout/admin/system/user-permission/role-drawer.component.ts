@@ -24,7 +24,6 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
         <drawer
             [isOpen]="isOpen"
             [isShowDialog]="true"
-            [width]="780"
             (close)="onClose()"
         >
             <div class="flex flex-col h-full bg-surface" [formGroup]="form">

@@ -1,5 +1,5 @@
-import { ActivatedRoute } from "@angular/router";
 import { Component, OnInit, signal } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
 import { finalize, forkJoin } from "rxjs";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
@@ -26,7 +26,8 @@ const LOADING_KEY = 'radiology';
   selector: 'admin-radiology',
   standalone: true,
   imports: [
-    SharedModule,
+    SharedModule,
+
     ErrorStateComponent,
     StatusBadgeComponent,
     StatCardComponent,
@@ -133,7 +134,7 @@ export class AdminRadiologyComponent implements OnInit {
 
   readonly tabs: { key: TabKey; label: string; icon: string }[] = [
     { key: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
-    { key: 'orders', label: 'Imaging Orders', icon: 'clipboard-list' },
+    { key: 'orders', label: 'Imaging Orders', icon: 'clipboard' },
     { key: 'scheduling', label: 'Scheduling', icon: 'calendar-clock' },
     { key: 'queue', label: 'Examination Queue', icon: 'list-ordered' },
     { key: 'study-tracking', label: 'Study Tracking & Image Review', icon: 'scan' },

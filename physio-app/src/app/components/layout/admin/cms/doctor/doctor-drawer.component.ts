@@ -35,7 +35,8 @@ interface StepConfig {
     imports: [
         SharedModule,
         DrawerComponent,
-        BooInputComponent,
+        BooInputComponent,
+
         BooTextareaComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
@@ -46,7 +47,6 @@ interface StepConfig {
         <drawer
             [isOpen]="isOpen"
             [isShowDialog]="true"
-            [width]="720"
             (close)="onClose()"
         >
             <div class="flex flex-col h-full bg-surface relative">
@@ -540,4 +540,4 @@ export class CmsDoctorDrawerComponent implements OnChanges {
     onClose() {
         this.close.emit();
     }
-}
+}

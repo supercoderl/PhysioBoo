@@ -9,7 +9,7 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
     standalone: true,
     imports: [SharedModule, DrawerComponent],
     template: `
-        <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="720" (close)="close.emit()">
+        <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="close.emit()">
             <div *ngIf="loading" class="flex items-center justify-center h-full">
                 <physio-icon name="loader" [size]="24" [class]="'animate-spin text-secondary'"></physio-icon>
             </div>

@@ -8,7 +8,7 @@ import { BatchOption, DispenseMedicationItem, DispenseMedicineAlternative, Dispe
     standalone: true,
     imports: [SharedModule,DrawerComponent],
     template: `
-    <drawer [isOpen]="isOpen" [width]="480" (close)="close.emit()">
+    <drawer [isOpen]="isOpen" (close)="close.emit()">
       <div class="flex flex-col h-full" *ngIf="item">
         <div class="p-4 border-b border-borderGray/60 flex items-start justify-between">
           <div>

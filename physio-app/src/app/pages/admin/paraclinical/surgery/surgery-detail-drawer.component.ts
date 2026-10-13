@@ -6,9 +6,9 @@ import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/statu
 import { SurgeryService } from "../../../../services/admin/surgery.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
-import { escapeHtml, printHtmlDocument } from "../../../../shared/utils/print.utils";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { EquipmentStatus, SurgeryCase, SurgeryTimelineStage } from "../../../../shared/types/surgery.types";
+import { escapeHtml, printHtmlDocument } from "../../../../shared/utils/print.utils";
 
 const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
   Scheduled: 'Scheduled', PatientArrived: 'Patient Arrived', PreOpCompleted: 'Pre-op Completed',
@@ -19,9 +19,9 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
 @Component({
   selector: 'surgery-detail-drawer',
   standalone: true,
-  imports: [SharedModule, DrawerComponent,StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule, DrawerComponent, StatusBadgeComponent, EmptyStateComponent],
   template: `
-    <drawer [isOpen]="isOpen" [width]="760" (close)="onClose()">
+    <drawer [isOpen]="isOpen" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
         <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
           <div>
@@ -68,7 +68,7 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
                 <physio-icon name="image" [size]="14"></physio-icon> View Images
               </button>
               <button (click)="openTreatmentSheet()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <physio-icon name="clipboard-list" [size]="14"></physio-icon> Open Treatment Sheet
+                <physio-icon name="clipboard" [size]="14"></physio-icon> Open Treatment Sheet
               </button>
             </div>
 

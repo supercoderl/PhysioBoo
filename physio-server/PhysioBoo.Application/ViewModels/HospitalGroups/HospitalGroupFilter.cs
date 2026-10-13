@@ -1,4 +1,4 @@
-﻿namespace PhysioBoo.Application.ViewModels.HospitalGroups
+namespace PhysioBoo.Application.ViewModels.HospitalGroups
 {
     /// <summary>
     /// Represents filter criteria when querying hospital groups.
@@ -6,6 +6,7 @@
     public sealed record HospitalGroupFilter
     (
         string Start,
-        string End
+        string End,
+        bool? IsActive = null
     );
 }

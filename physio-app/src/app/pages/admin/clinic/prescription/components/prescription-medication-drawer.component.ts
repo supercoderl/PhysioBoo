@@ -15,7 +15,7 @@ import { severityIcon } from "../prescription-rx.util";
     standalone: true,
     imports: [SharedModule, DrawerComponent, BooInputComponent, BooTextareaComponent, BooCheckboxComponent],
     template: `
-    <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" [width]="640" (close)="onClose()">
+    <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
         <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-surface z-10">
           <div>

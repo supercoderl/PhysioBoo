@@ -32,6 +32,12 @@ namespace PhysioBoo.Application.Queries.HospitalGroups.GetAll
             // Apply filter
             if (q.Request.Filter != null)
             {
+                if (q.Request.Filter.IsActive.HasValue)
+                {
+                    bool isActive = q.Request.Filter.IsActive.Value;
+                    Query.Where(x => x.IsActive == isActive);
+                }
+
                 if (!string.IsNullOrEmpty(q.Request.Filter.Start) && !string.IsNullOrEmpty(q.Request.Filter.End))
                 {
                     if (DateOnly.TryParse(q.Request.Filter.Start, out DateOnly startDate) &&

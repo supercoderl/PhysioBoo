@@ -20,7 +20,7 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
         <span class="text-placeholder mr-1">Sort By:</span>
         <span class="font-medium text-regular">{{ selectedLabel }}</span>
         
-        <physio-icon name="chevronDown" class="w-3 h-3 ml-2 text-gray-400"/>
+        <physio-icon name="chevron-down" class="w-3 h-3 ml-2 text-gray-400"/>
       </boo-button-admin>
     </div>
 

@@ -14,7 +14,7 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
     <div class="relative inline-block text-left">
       <boo-button-admin
         (click)="toggle()"
-        [icon]="{ name: 'funnel', size: 14, iconClass: hasActiveFilter ? 'text-primary' : 'text-gray-500' }"
+        [icon]="{ name: 'filter', size: 14, iconClass: hasActiveFilter ? 'text-primary' : 'text-gray-500' }"
         buttonClass="!bg-surface h-full"
         [border]="{ width: 1, color: hasActiveFilter ? '#FB7185' : '#EFE3E7' }"
       >

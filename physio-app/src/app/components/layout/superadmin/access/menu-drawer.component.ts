@@ -22,7 +22,7 @@ const knownIconValidator = (control: AbstractControl): ValidationErrors | null =
     standalone: true,
     imports: [SharedModule, DrawerComponent, BooSelectComponent],
     template: `
-        <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" [width]="width" (close)="close.emit()">
+        <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" (close)="close.emit()">
             <div
                 class="flex flex-col h-svh bg-surface"
                 role="dialog"
@@ -172,7 +172,6 @@ export class SuperadminMenuDrawerComponent implements OnChanges {
     readonly field = FIELD;
     readonly prefix = SUPERADMIN_ROUTE_PREFIX;
     readonly iconNames = MENU_ICON_NAMES;
-    readonly width = typeof window === 'undefined' ? 520 : Math.min(520, window.innerWidth);
     placementOptions: { label: string; value: string }[] = [];
     permissionOptions: { label: string; value: string }[] = [];
     saving = signal(false);

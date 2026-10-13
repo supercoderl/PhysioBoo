@@ -1,5 +1,5 @@
-import { ActivatedRoute } from "@angular/router";
 import { Component, OnInit, signal } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
 import { finalize, forkJoin } from "rxjs";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
@@ -24,7 +24,8 @@ const LOADING_KEY = 'laboratory';
   selector: 'admin-laboratory',
   standalone: true,
   imports: [
-    SharedModule,
+    SharedModule,
+
     ErrorStateComponent,
     StatusBadgeComponent,
     StatCardComponent,
@@ -126,7 +127,7 @@ export class AdminLaboratoryComponent implements OnInit {
 
   readonly tabs: { key: TabKey; label: string; icon: string }[] = [
     { key: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
-    { key: 'orders', label: 'Orders', icon: 'clipboard-list' },
+    { key: 'orders', label: 'Orders', icon: 'clipboard' },
     { key: 'sample-tracking', label: 'Sample Collection & Tracking', icon: 'test-tube' },
     { key: 'result-verification', label: 'Result Entry & Verification', icon: 'clipboard-check' },
     { key: 'critical-alerts', label: 'Critical Alerts', icon: 'alert-triangle' },

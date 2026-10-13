@@ -15,7 +15,7 @@ import { LabOrderRow, LabPatientResultSummary, LabVerificationStatus } from "../
   standalone: true,
   imports: [SharedModule, DrawerComponent,StatusBadgeComponent, EmptyStateComponent],
   template: `
-    <drawer [isOpen]="isOpen" [width]="720" (close)="onClose()">
+    <drawer [isOpen]="isOpen" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
         <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
           <div>

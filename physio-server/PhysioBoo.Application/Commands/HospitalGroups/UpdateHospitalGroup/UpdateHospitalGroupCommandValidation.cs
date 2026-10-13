@@ -39,6 +39,13 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.UpdateHospitalGroup
             RuleFor(cmd => cmd.HospitalGroup.Website).MaxLen(255, "Website").OptionalUrl("Website");
             RuleFor(cmd => cmd.HospitalGroup.LogoUrl).MaxLen(500, "Logo URL");
             RuleFor(cmd => cmd.HospitalGroup.LicenseNumber).MaxLen(100, "License number");
+            RuleFor(cmd => cmd.HospitalGroup.Code).MaxLen(50, "Code");
+            RuleFor(cmd => cmd.HospitalGroup.ContactPerson).MaxLen(100, "Contact person");
+
+            RuleFor(cmd => cmd.HospitalGroup.AccreditationDetails)
+                .Must(HospitalGroupJson.IsValidOrEmpty)
+                .WithErrorCode(DomainErrorCodes.HospitalGroup.InvalidAccreditationDetails)
+                .WithMessage("Accreditation details must be valid JSON.");
         }
 
         public void RuleForEstablishedDate()

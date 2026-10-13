@@ -7,7 +7,7 @@ import { UserService } from "./user.service";
 
 const SINGLE_ROW_QUERY = { pageNumber: 1, pageSize: 1, search: '', sort: 'createdAt:desc' };
 
-const HOSPITAL_GROUP_FILTER = { start: '', end: '', isActive: null, subscriptionPlan: null };
+const HOSPITAL_GROUP_FILTER = { start: '', end: '', isActive: null };
 
 /** Platform-level read model for the Super Admin dashboard: the newest tenants and users. */
 @Injectable({ providedIn: 'root' })

@@ -23,7 +23,7 @@ const svgCache = new Map<string, Promise<string>>();
     :host { display: inline-block; line-height: 0; }
     .physio-icon { display: inline-block; line-height: 0; color: inherit; }
     .physio-icon ::ng-deep svg { width: 100%; height: 100%; display: block; color: inherit; }
-    .physio-icon ::ng-deep svg [stroke-width] { stroke-width: var(--physio-icon-stroke-width, 2); }
+    .physio-icon ::ng-deep svg[stroke-width], .physio-icon ::ng-deep svg [stroke-width] { stroke-width: var(--physio-icon-stroke-width, 2); }
   `]
 })
 export class IconComponent implements OnChanges {

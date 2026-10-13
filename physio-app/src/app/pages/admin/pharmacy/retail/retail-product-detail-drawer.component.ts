@@ -9,7 +9,7 @@ import { RetailMedicineDetail } from "../../../../shared/types/retail-pos.types"
   standalone: true,
   imports: [SharedModule,DrawerComponent],
   template: `
-    <drawer [isOpen]="isOpen" [width]="480" (close)="close.emit()">
+    <drawer [isOpen]="isOpen" (close)="close.emit()">
       <div class="p-5" *ngIf="detail">
         <div class="flex items-start justify-between mb-4">
           <div>

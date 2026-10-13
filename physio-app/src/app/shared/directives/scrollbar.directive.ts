@@ -5,6 +5,8 @@ import {
     ElementRef,
     HostListener,
     Inject,
+    Input,
+    NgZone,
     OnDestroy,
     PLATFORM_ID,
     Renderer2
@@ -15,6 +17,9 @@ import {
     standalone: true
 })
 export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
+    /** Keep the thumb visible while the content overflows, instead of only on hover. */
+    @Input() alwaysVisible = false;
+
     private thumb!: HTMLElement;
     private track!: HTMLElement;
     private trackWrapper!: HTMLElement;
@@ -27,11 +32,14 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
     private scrollStartTop = 0;
 
     private observer!: ResizeObserver;
+    private mutationObserver!: MutationObserver;
+    private frameId = 0;
     private isBrowser: boolean;
 
     constructor(
         private el: ElementRef<HTMLElement>,
         private renderer: Renderer2,
+        private zone: NgZone,
         @Inject(PLATFORM_ID) platformId: Object
     ) {
         this.isBrowser = isPlatformBrowser(platformId);
@@ -75,7 +83,7 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
         this.renderer.setStyle(this.track, 'transform', 'translateX(-100%)');
         this.renderer.setStyle(this.track, 'background', 'transparent');
         this.renderer.setStyle(this.track, 'transition', 'background-color 0.2s linear, opacity 0.2s linear, width 0.2s ease-in-out');
-        this.renderer.setStyle(this.track, 'opacity', '0');
+        this.renderer.setStyle(this.track, 'opacity', this.restingOpacity);
         this.renderer.setStyle(this.track, 'pointer-events', 'none');
 
         // Thumb
@@ -103,7 +111,7 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
 
         this.renderer.listen(container, 'mouseleave', () => {
             if (!this.dragging) {
-                this.renderer.setStyle(this.track, 'opacity', '0');
+                this.renderer.setStyle(this.track, 'opacity', this.restingOpacity);
                 this.renderer.setStyle(this.track, 'width', '6px');
             }
         });
@@ -126,6 +134,13 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
             this.updateThumb();
         });
         this.observer.observe(container);
+
+        // Content can grow without the container resizing (async data replacing a skeleton), so re-measure on DOM changes too.
+        // Outside the Angular zone: measuring must never trigger change detection.
+        this.zone.runOutsideAngular(() => {
+            this.mutationObserver = new MutationObserver(() => this.scheduleUpdate());
+            this.mutationObserver.observe(container, { childList: true, subtree: true });
+        });
 
         // Handle window resize
         window.addEventListener('resize', () => {
@@ -176,10 +191,23 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
     onMouseUp() {
         if (this.dragging) {
             this.dragging = false;
-            this.renderer.setStyle(this.track, 'opacity', '0');
+            this.renderer.setStyle(this.track, 'opacity', this.restingOpacity);
             this.renderer.setStyle(this.track, 'width', '6px');
             this.renderer.setStyle(this.thumb, 'background', '#aaa');
         }
+    }
+
+    private get restingOpacity() {
+        return this.alwaysVisible ? '0.6' : '0';
+    }
+
+    private scheduleUpdate() {
+        if (this.frameId) return;
+        this.frameId = requestAnimationFrame(() => {
+            this.frameId = 0;
+            this.updateTrackPosition();
+            this.updateThumb();
+        });
     }
 
     private updateTrackPosition() {
@@ -226,6 +254,8 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
     ngOnDestroy() {
         if (this.isBrowser && this.observer) {
             this.observer.disconnect();
+            this.mutationObserver?.disconnect();
+            if (this.frameId) cancelAnimationFrame(this.frameId);
         }
     }
 }

@@ -31,7 +31,6 @@ import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-t
         <drawer
             [isOpen]="isOpen"
             [isShowDialog]="true"
-            [width]="720"
             (close)="onClose()"
         >
             <div class="flex flex-col h-full bg-surface relative">
@@ -119,7 +118,7 @@ import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-t
                             >
                                 <div class="flex items-center gap-2">
                                     <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
-                                        <physio-icon name="clipboard-list" [size]="16" class="text-[#f97316]"></physio-icon>
+                                        <physio-icon name="clipboard" [size]="16" class="text-[#f97316]"></physio-icon>
                                     </div>
                                     <span class="text-sm font-medium text-gray-700">Preparation Needed</span>
                                 </div>

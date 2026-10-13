@@ -15,7 +15,7 @@ const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface t
     standalone: true,
     imports: [SharedModule, DrawerComponent],
     template: `
-        <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" [width]="width" (close)="close.emit()">
+        <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" (close)="close.emit()">
             <div
                 class="flex flex-col h-svh bg-surface"
                 role="dialog"
@@ -134,7 +134,6 @@ export class SuperadminPlanDrawerComponent implements OnChanges {
     @Output() saved = new EventEmitter<void>();
 
     readonly field = FIELD;
-    readonly width = typeof window === 'undefined' ? 520 : Math.min(520, window.innerWidth);
     saving = signal(false);
     form: FormGroup;
     // #endregion

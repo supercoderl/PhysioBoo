@@ -7,16 +7,16 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { StockTake, StockTakeActivity, StockTakeActivityType, stockTakeStatusLabel, stockTakeStatusTone } from "../../../../shared/types/stock-take.types";
 
 const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
-    Created: 'plus-circle', Assigned: 'user-plus', Started: 'play', ItemCounted: 'clipboard-list',
-    Completed: 'circle-check', Approved: 'circle-check-big', Rejected: 'circle-x', Cancelled: 'ban',
+  Created: 'plus-circle', Assigned: 'user-plus', Started: 'play', ItemCounted: 'clipboard',
+  Completed: 'circle-check', Approved: 'circle-check-big', Rejected: 'circle-x', Cancelled: 'ban',
 };
 
 @Component({
-    selector: 'stock-take-history-drawer',
-    standalone: true,
-    imports: [SharedModule, DrawerComponent,EmptyStateComponent, StatusBadgeComponent],
-    template: `
-    <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="460" (close)="close.emit()">
+  selector: 'stock-take-history-drawer',
+  standalone: true,
+  imports: [SharedModule, DrawerComponent, EmptyStateComponent, StatusBadgeComponent],
+  template: `
+    <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="close.emit()">
       <div class="flex flex-col h-full bg-surface">
         <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-surface z-10">
           <div>
@@ -56,31 +56,31 @@ const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
   `,
 })
 export class StockTakeHistoryDrawerComponent implements OnChanges {
-    @Input() isOpen = false;
-    @Input() stockTake: StockTake | null = null;
-    @Output() close = new EventEmitter<void>();
+  @Input() isOpen = false;
+  @Input() stockTake: StockTake | null = null;
+  @Output() close = new EventEmitter<void>();
 
-    activities: StockTakeActivity[] = [];
-    loading = false;
+  activities: StockTakeActivity[] = [];
+  loading = false;
 
-    statusLabel = stockTakeStatusLabel;
-    statusTone = stockTakeStatusTone;
+  statusLabel = stockTakeStatusLabel;
+  statusTone = stockTakeStatusTone;
 
-    constructor(private srv: StockTakeService) { }
+  constructor(private srv: StockTakeService) { }
 
-    ngOnChanges(): void {
-        if (this.isOpen && this.stockTake) this.load(this.stockTake.id);
-    }
+  ngOnChanges(): void {
+    if (this.isOpen && this.stockTake) this.load(this.stockTake.id);
+  }
 
-    private load(id: string): void {
-        this.loading = true;
-        this.srv.getHistory(id).subscribe({
-            next: res => { if (res.success) this.activities = res.data; this.loading = false; },
-            error: () => this.loading = false,
-        });
-    }
+  private load(id: string): void {
+    this.loading = true;
+    this.srv.getHistory(id).subscribe({
+      next: res => { if (res.success) this.activities = res.data; this.loading = false; },
+      error: () => this.loading = false,
+    });
+  }
 
-    icon(type: StockTakeActivityType): string {
-        return ACTIVITY_ICON[type] ?? 'circle';
-    }
+  icon(type: StockTakeActivityType): string {
+    return ACTIVITY_ICON[type] ?? 'circle';
+  }
 }

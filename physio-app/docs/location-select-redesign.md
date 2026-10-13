@@ -119,7 +119,7 @@ shared/types/location.types.ts LocationOption, LocationValue
 
 The control only knows `LocationOption { id, name }`, so adding a level (e.g. street) or another country is a data / API change, not a component change.
 
-## 16. Proposed API Contract (not implemented; the frontend uses a placeholder until it exists)
+## 16. API Contract (implemented as the read-only `api/locations/*` endpoints; see `location-api-contract.md`)
 
 All endpoints are `GET`, authenticated, read-only, and return `ResponseMessage<LocationOption[]>`. Countries and cities are sorted by name (ignoring the "Tỉnh" / "Thành phố" prefix); districts and wards by administrative `code`, which keeps "Quận 1, Quận 2, …, Quận 10" in natural order.
 
@@ -145,7 +145,7 @@ Record endpoints (hospital group, hospital, …) should store `countryId`, `city
 ## 18. Implementation Status
 
 - **Dataset:** `docs/sql/locations-seed.sql` (PostgreSQL, idempotent, UTF-8) creates `Countries`, `Cities`, `Districts`, `Wards` and loads 249 countries (ISO 3166-1), Viet Nam's 63 provinces/cities, 696 districts and 10,051 wards, plus state/province and city data for 8 other countries (314 cities and 4,509 districts in total). Ids are deterministic UUIDv5 values, so every environment gets the same ids. Run: `psql -v ON_ERROR_STOP=1 -f docs/sql/locations-seed.sql <connection>`.
-- **Frontend placeholder:** `LocationService` reads `assets/data/locations/{countries,cities,districts,wards}.json`, generated from the same data with the same ids. Flip `USE_PLACEHOLDER_DATA` to `false` once the endpoints in §16 exist; no id migration is needed.
+- **Frontend data:** `LocationService` calls the `api/locations/*` endpoints (§16) and caches each URL for the session. The earlier static JSON and placeholder flag were removed; the data is seeded by `seed-geography.sql`.
 - **Hospital group drawer:** City / Country text inputs replaced by `boo-location-select` (required). On save the four ids (`countryId`, `cityId`, `districtId`, `wardId`) are sent flat next to `address`; the backend does not store them yet (see §16), and `HospitalGroup` has optional matching fields for when it returns them.
 - **Not yet migrated:** hospital, supplier, manufacturer and doctor drawers.
 - **Not done (backend):** EF entities / configuration / migration for the four tables and the four endpoints.

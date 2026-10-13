@@ -10,6 +10,7 @@ namespace PhysioBoo.Application.SortProviders
         private static readonly Dictionary<string, Expression<Func<HospitalGroup, object>>> s_expressions = new()
         {
             { "name", hospitalGroup => hospitalGroup.Name },
+            { "code", hospitalGroup => hospitalGroup.Code! },
             { "createdat", hospitalGroup => hospitalGroup.CreatedAt }
         };
 

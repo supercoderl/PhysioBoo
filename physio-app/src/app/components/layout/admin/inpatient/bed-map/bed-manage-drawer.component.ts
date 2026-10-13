@@ -19,7 +19,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
     standalone: true,
     imports: [SharedModule, DrawerComponent,BooSelectComponent],
     template: `
-        <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="560" (close)="close.emit()">
+        <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="close.emit()">
             <div class="flex flex-col h-full bg-surface">
                 <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                     <div>

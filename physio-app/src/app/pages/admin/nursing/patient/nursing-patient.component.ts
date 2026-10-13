@@ -15,21 +15,21 @@ import { NursingVitalsTabComponent } from "./tabs/nursing-vitals-tab.component";
 type TabKey = 'overview' | 'vitals' | 'mar' | 'io' | 'tasks' | 'notes';
 
 @Component({
-    selector: 'admin-nursing-patient',
-    standalone: true,
-    imports: [
-        SharedModule,
-        ErrorStateComponent,
-        StatusBadgeComponent,
-        NursingOverviewTabComponent,
-        NursingVitalsTabComponent,
-        NursingMarTabComponent,
-        NursingIoTabComponent,
-        NursingTasksTabComponent,
-        NursingNotesTabComponent,
-    ],
-    host: { class: 'block min-h-screen bg-gray-50' },
-    template: `
+  selector: 'admin-nursing-patient',
+  standalone: true,
+  imports: [
+    SharedModule,
+    ErrorStateComponent,
+    StatusBadgeComponent,
+    NursingOverviewTabComponent,
+    NursingVitalsTabComponent,
+    NursingMarTabComponent,
+    NursingIoTabComponent,
+    NursingTasksTabComponent,
+    NursingNotesTabComponent,
+  ],
+  host: { class: 'block min-h-screen bg-gray-50' },
+  template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-24">
       <physio-icon name="loader" [class]="'w-8 h-8 text-primary animate-spin'"></physio-icon>
     </div>
@@ -88,57 +88,57 @@ type TabKey = 'overview' | 'vitals' | 'mar' | 'io' | 'tasks' | 'notes';
     `
 })
 export class AdminNursingPatientComponent implements OnInit {
-    patientId!: string;
-    patient = signal<NursingPatient | null>(null);
-    isLoading = signal(true);
-    error = signal<string | null>(null);
-    activeTab = signal<TabKey>('overview');
+  patientId!: string;
+  patient = signal<NursingPatient | null>(null);
+  isLoading = signal(true);
+  error = signal<string | null>(null);
+  activeTab = signal<TabKey>('overview');
 
-    readonly tabs: { key: TabKey; label: string; icon: string }[] = [
-        { key: 'overview', label: 'Overview', icon: 'layout-dashboard' },
-        { key: 'vitals', label: 'Vitals', icon: 'activity' },
-        { key: 'mar', label: 'MAR', icon: 'pill' },
-        { key: 'io', label: 'Intake & Output', icon: 'droplets' },
-        { key: 'tasks', label: 'Tasks', icon: 'clipboard-list' },
-        { key: 'notes', label: 'Notes', icon: 'file-text' },
-    ];
+  readonly tabs: { key: TabKey; label: string; icon: string }[] = [
+    { key: 'overview', label: 'Overview', icon: 'layout-dashboard' },
+    { key: 'vitals', label: 'Vitals', icon: 'activity' },
+    { key: 'mar', label: 'MAR', icon: 'pill' },
+    { key: 'io', label: 'Intake & Output', icon: 'droplets' },
+    { key: 'tasks', label: 'Tasks', icon: 'clipboard' },
+    { key: 'notes', label: 'Notes', icon: 'file-text' },
+  ];
 
-    constructor(
-        private srv: NursingService,
-        private route: ActivatedRoute,
-        private router: Router,
-    ) { }
+  constructor(
+    private srv: NursingService,
+    private route: ActivatedRoute,
+    private router: Router,
+  ) { }
 
-    ngOnInit(): void {
-        this.patientId = this.route.snapshot.paramMap.get('patientId') ?? '';
-        this.loadPatient();
-    }
+  ngOnInit(): void {
+    this.patientId = this.route.snapshot.paramMap.get('patientId') ?? '';
+    this.loadPatient();
+  }
 
-    retryLoad(): void {
-        if (this.patientId) this.loadPatient();
-    }
+  retryLoad(): void {
+    if (this.patientId) this.loadPatient();
+  }
 
-    private loadPatient(): void {
-        this.isLoading.set(true);
-        this.error.set(null);
-        this.srv.getPatient(this.patientId).subscribe({
-            next: (res) => {
-                if (res.success) this.patient.set(res.data);
-                this.isLoading.set(false);
-            },
-            error: () => {
-                this.isLoading.set(false);
-                this.error.set('Failed to load the patient. Please try again.');
-            },
-        });
-    }
+  private loadPatient(): void {
+    this.isLoading.set(true);
+    this.error.set(null);
+    this.srv.getPatient(this.patientId).subscribe({
+      next: (res) => {
+        if (res.success) this.patient.set(res.data);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.error.set('Failed to load the patient. Please try again.');
+      },
+    });
+  }
 
-    setTab(key: TabKey): void { this.activeTab.set(key); }
+  setTab(key: TabKey): void { this.activeTab.set(key); }
 
-    back(): void { this.router.navigate(['/admin/nursing/dashboard']); }
+  back(): void { this.router.navigate(['/admin/nursing/dashboard']); }
 
-    initials(name: string): string {
-        const p = name.trim().split(/\s+/);
-        return ((p[0]?.[0] ?? '') + (p.at(-1)?.[0] ?? '')).toUpperCase();
-    }
+  initials(name: string): string {
+    const p = name.trim().split(/\s+/);
+    return ((p[0]?.[0] ?? '') + (p.at(-1)?.[0] ?? '')).toUpperCase();
+  }
 }

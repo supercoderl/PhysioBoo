@@ -8,7 +8,7 @@ import { ClinicalAlert, TreatmentOrder, TreatmentTimelineEntry } from "../../../
 @Component({
   selector: 'treatment-overview-tab',
   standalone: true,
-  imports: [SharedModule,EmptyStateComponent],
+  imports: [SharedModule, EmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -31,7 +31,7 @@ import { ClinicalAlert, TreatmentOrder, TreatmentTimelineEntry } from "../../../
 
       <div class="bg-surface border border-gray-200 rounded-lg p-4">
         <h3 class="text-sm font-semibold text-primary mb-3">Open Orders by Type</h3>
-        <div *ngIf="!openOrderCounts().length"><boo-empty-state icon="clipboard-list" title="No open orders"></boo-empty-state></div>
+        <div *ngIf="!openOrderCounts().length"><boo-empty-state icon="clipboard" title="No open orders"></boo-empty-state></div>
         <ul class="space-y-2" *ngIf="openOrderCounts().length">
           <li *ngFor="let o of openOrderCounts()" class="flex items-center justify-between text-sm">
             <span class="text-gray-700">{{ o.type }}</span>

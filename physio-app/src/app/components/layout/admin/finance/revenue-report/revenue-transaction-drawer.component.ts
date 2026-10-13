@@ -8,7 +8,7 @@ import { RevenueTransactionDetail } from "../../../../../shared/types/revenue.ty
     standalone: true,
     imports: [SharedModule, DrawerComponent],
     template: `
-    <drawer [isOpen]="isOpen" [isShowDialog]="false" [width]="440" (close)="close.emit()">
+    <drawer [isOpen]="isOpen" [isShowDialog]="false" (close)="close.emit()">
       <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
         <div>
           <h3 class="text-base font-semibold text-regular">Transaction Detail</h3>

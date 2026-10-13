@@ -8,7 +8,7 @@ import { IntakeOutputEntry, NursingTask, VitalsReading } from "../../../../../sh
 @Component({
   selector: 'nursing-overview-tab',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent],
+  imports: [SharedModule, StatusBadgeComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -19,7 +19,7 @@ import { IntakeOutputEntry, NursingTask, VitalsReading } from "../../../../../sh
       <section class="bg-surface border border-gray-200 rounded-lg">
         <header class="px-5 py-3 border-b border-gray-100">
           <h3 class="text-sm font-semibold text-primary m-0 flex items-center gap-2">
-            <physio-icon name="clipboard-list" class="w-4 h-4 text-secondary"></physio-icon>
+            <physio-icon name="clipboard" class="w-4 h-4 text-secondary"></physio-icon>
             Open Tasks
           </h3>
         </header>

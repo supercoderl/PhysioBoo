@@ -187,7 +187,7 @@ type EditableField = 'dose' | 'frequency' | 'durationDays' | 'quantity' | 'instr
 
       <!-- Empty state -->
       <div *ngIf="!filtered().length" class="py-14 text-center">
-        <physio-icon name="clipboard-list" [size]="40" [class]="'text-gray-300 mx-auto mb-3'"></physio-icon>
+        <physio-icon name="clipboard" [size]="40" [class]="'text-gray-300 mx-auto mb-3'"></physio-icon>
         <p class="text-secondary text-sm mb-3">{{ itemsSignal().length ? 'No medications match the current filters.' : 'No medications added yet.' }}</p>
         <button *ngIf="editable && !itemsSignal().length" type="button" (click)="addMedication.emit()" class="bg-primary text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-primary/90">
           Add First Medication

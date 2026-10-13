@@ -14,7 +14,7 @@ import { StatusBadgeComponent } from "../../../ui/status-badge.component";
     standalone: true,
     imports: [SharedModule, DrawerComponent, StatusBadgeComponent, ErrorStateComponent],
     template: `
-        <drawer [isOpen]="isOpen" [width]="width" (close)="close.emit()">
+        <drawer [isOpen]="isOpen" (close)="close.emit()">
             <div
                 class="flex flex-col h-svh bg-surface"
                 role="dialog"
@@ -119,7 +119,6 @@ export class SuperadminAuditLogDrawerComponent implements OnChanges {
     @Output() close = new EventEmitter<void>();
 
     readonly tone = auditActionTone;
-    readonly width = typeof window === 'undefined' ? 640 : Math.min(640, window.innerWidth);
 
     log = signal<AuditLog | null>(null);
     loading = signal(false);

@@ -33,7 +33,7 @@ import { BooUploadComponent } from "../../../../../upload/boo-upload/boo-upload.
         BooUploadComponent
     ],
     template: `
-        <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="720" (close)="onClose()">
+        <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="onClose()">
             <div class="flex flex-col h-full bg-surface relative">
                 <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
                     <div>
@@ -87,7 +87,7 @@ import { BooUploadComponent } from "../../../../../upload/boo-upload/boo-upload.
                     <div class="p-6">
                         <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Location</h3>
                         <boo-location-select formControlName="location" [required]="true" class="mb-4"></boo-location-select>
-                        <boo-input label="Address" [required]="true" formControlName="address" placeholder="Full address"></boo-input>
+                        <boo-input label="Address" [required]="true" formControlName="headquartersAddress" placeholder="Full address"></boo-input>
                     </div>
 
                     <div class="h-px bg-gray-100 mx-6"></div>
@@ -159,7 +159,7 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
             contactPerson: ['', [Validators.required, Validators.maxLength(100)]],
             email: ['', [Validators.required, Validators.email]],
             phone: ['', [Validators.required, Validators.maxLength(20)]],
-            address: ['', [Validators.required, Validators.maxLength(255)]],
+            headquartersAddress: ['', [Validators.required, Validators.maxLength(255)]],
             location: [{ ...EMPTY_LOCATION_VALUE }],
             subscriptionPlanId: [null, [Validators.required]]
         });
@@ -192,7 +192,7 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
                         contactPerson: _res.data?.contactPerson,
                         email: _res.data?.email,
                         phone: _res.data?.phone,
-                        address: _res.data?.address,
+                        headquartersAddress: _res.data?.headquartersAddress,
                         location: {
                             countryId: _res.data?.countryId ?? null,
                             cityId: _res.data?.cityId ?? null,
@@ -228,7 +228,11 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
         try {
             let id: string;
             if (this.currentId) {
-                await firstValueFrom(this.hospitalGroupSrv.update(this.currentId, formData));
+                const updateRes = await firstValueFrom(this.hospitalGroupSrv.update(this.currentId, formData));
+                if (!updateRes.success) {
+                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+                    return;
+                }
                 id = this.currentId;
             } else {
                 const createRes = await firstValueFrom(this.hospitalGroupSrv.create(formData));
@@ -243,6 +247,7 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
 
             const response = await firstValueFrom(this.hospitalGroupSrv.search_by_id(id));
             if (response.success && response.data) {
+                this.toastSrv.success(this.currentId ? 'Hospital group updated' : 'Hospital group created');
                 this.saveSuccess.emit(response.data);
             } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
         } catch (err) {
@@ -273,7 +278,7 @@ export class CommonCategoryHospitalGroupDrawerComponent implements OnChanges {
             contactPerson: '',
             email: '',
             phone: '',
-            address: '',
+            headquartersAddress: '',
             location: { ...EMPTY_LOCATION_VALUE },
             subscriptionPlanId: null
         });

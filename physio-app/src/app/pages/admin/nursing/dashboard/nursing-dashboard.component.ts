@@ -85,7 +85,7 @@ import { AcuityLevel, AlertSeverity, NursingAlert, NursingAssignmentFilter, Nurs
             <div class="bg-surface rounded-lg shadow-md p-6">
               <div class="flex items-center justify-between">
                 <div><p class="text-sm text-gray-600 mb-1">Open Tasks</p><p class="text-3xl font-bold text-gray-800">{{ stats?.openTasks ?? 0 }}</p></div>
-                <div class="w-12 h-12 bg-primarySoft rounded-full flex items-center justify-center"><physio-icon name="clipboard-list" [size]="24" class="text-primary"></physio-icon></div>
+                <div class="w-12 h-12 bg-primarySoft rounded-full flex items-center justify-center"><physio-icon name="clipboard" [size]="24" class="text-primary"></physio-icon></div>
               </div>
             </div>
             <div class="bg-surface rounded-lg shadow-md p-6">

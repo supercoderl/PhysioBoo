@@ -359,6 +359,7 @@ namespace PhysioBoo.Presentation
                 app.MapRoleEndpoints();
                 app.MapConfigEndpoints();
                 app.MapAdminMenuEndpoints();
+                app.MapLocationEndpoints();
                 app.MapPermissionEndpoints();
             }
             void MapSystemEndpoints(WebApplication app)
@@ -414,8 +415,7 @@ namespace PhysioBoo.Presentation
             {
                 IDatabaseSeeder seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
                 await seeder.MigrateAsync();
-                await seeder.SeedAsync();
-                Console.WriteLine("Seeding complete. Exiting.");
+                Console.WriteLine("Migrations applied. Exiting.");
                 return;
             }
         }

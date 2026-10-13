@@ -42,8 +42,9 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
         ErrorStateComponent,
         CommonCategoryHospitalGroupDrawerComponent
     ],
+    host: { class: 'block h-full min-h-0' },
     template: `
-        <div class="space-y-5">
+        <div class="h-full overflow-y-auto space-y-5" custom-scrollbar [alwaysVisible]="true">
             <a
                 routerLink="/superadmin/tenants/hospital-group"
                 class="inline-flex items-center gap-1.5 -ml-1 px-1 py-1 rounded-1.5 text-xs text-secondary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors"
@@ -449,9 +450,7 @@ export class SuperadminTenantDetailComponent implements OnInit {
             { label: 'Contact person', value: g.contactPerson || '—' },
             { label: 'Email', value: g.email || '—', href: g.email ? `mailto:${g.email}` : undefined },
             { label: 'Phone', value: g.phone || '—', href: g.phone ? `tel:${g.phone}` : undefined },
-            { label: 'Address', value: g.address || '—' },
-            { label: 'City', value: g.city || '—' },
-            { label: 'Country', value: g.country || '—' },
+            { label: 'Address', value: g.headquartersAddress || '—' },
         ];
     });
     // #endregion

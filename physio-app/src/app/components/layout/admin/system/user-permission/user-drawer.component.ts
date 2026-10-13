@@ -15,13 +15,14 @@ import { BooInputComponent } from "../../../../input/boo-input/boo-input.compone
     standalone: true,
     imports: [
         SharedModule,
-        DrawerComponent,
+        DrawerComponent,
+
         BooButtonAdminComponent,
         BooInputComponent,
         BooCheckboxComponent
     ],
     template: `
-        <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="720" (close)="onClose()">
+        <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="onClose()">
             <div class="flex flex-col h-full bg-surface" [formGroup]="form">
                 <div
                     class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between"
@@ -224,4 +225,4 @@ export class UserPermissionUserDrawerComponent {
         this.toggle.emit(roleId);
     }
     // #endregion
-}
+}

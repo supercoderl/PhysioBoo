@@ -103,7 +103,7 @@ const LOADING_KEY = 'surgery';
 
         <!-- Stats strip -->
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-9 gap-3 mb-6">
-          <boo-stat-card label="Total Scheduled" [value]="stats()?.totalScheduled ?? 0" icon="clipboard-list" tone="primary"></boo-stat-card>
+          <boo-stat-card label="Total Scheduled" [value]="stats()?.totalScheduled ?? 0" icon="clipboard" tone="primary"></boo-stat-card>
           <boo-stat-card label="Ongoing" [value]="stats()?.ongoing ?? 0" icon="activity" tone="warning"></boo-stat-card>
           <boo-stat-card label="Completed" [value]="stats()?.completed ?? 0" icon="circle-check" tone="success"></boo-stat-card>
           <boo-stat-card label="Delayed" [value]="stats()?.delayed ?? 0" icon="clock" tone="danger"></boo-stat-card>

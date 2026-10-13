@@ -10,7 +10,7 @@ import { RetailCustomer } from "../../../../shared/types/retail-pos.types";
   standalone: true,
   imports: [SharedModule,DrawerComponent, EmptyStateComponent],
   template: `
-    <drawer [isOpen]="isOpen" [width]="420" (close)="close.emit()">
+    <drawer [isOpen]="isOpen" (close)="close.emit()">
       <div class="p-5">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-base font-semibold text-gray-900">Find Customer</h2>

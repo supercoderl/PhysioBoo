@@ -187,7 +187,7 @@ export class SuperadminDevDataComponent implements OnInit {
                 pageSize: TENANT_PAGE_SIZE,
                 search: '',
                 sort: 'name:asc',
-                filter: { start: '', end: '', isActive: null, subscriptionPlan: null }
+                filter: { start: '', end: '', isActive: null }
             })
         }).pipe(
             finalize(() => this.loading.set(false))

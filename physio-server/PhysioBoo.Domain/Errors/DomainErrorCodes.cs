@@ -232,6 +232,8 @@
             // Hospital Group Validation
             public const string EmptyId = "HOSPITAL_GROUP_EMPTY_ID";
             public const string EmptyName = "HOSPITAL_GROUP_EMPTY_NAME";
+            public const string CodeAlreadyExists = "HOSPITAL_GROUP_CODE_ALREADY_EXISTS";
+            public const string InvalidAccreditationDetails = "HOSPITAL_GROUP_INVALID_ACCREDITATION_DETAILS";
         }
 
         public static class Hospital

@@ -7,9 +7,9 @@ import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/statu
 import { TreatmentSheetService } from "../../../../services/admin/treatment-sheet.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
-import { escapeHtml, htmlTable, printHtmlDocument } from "../../../../shared/utils/print.utils";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { AlertSeverityLevel, ClinicalAlert, TreatmentPatientSummary, TreatmentStats } from "../../../../shared/types/treatment-sheet.types";
+import { escapeHtml, htmlTable, printHtmlDocument } from "../../../../shared/utils/print.utils";
 import { TreatmentImagingTabComponent } from "./tabs/treatment-imaging-tab.component";
 import { TreatmentLaboratoryTabComponent } from "./tabs/treatment-laboratory-tab.component";
 import { TreatmentMedicationsTabComponent } from "./tabs/treatment-medications-tab.component";
@@ -27,7 +27,8 @@ const LOADING_KEY = 'treatment-sheet';
   selector: 'admin-treatment-sheet',
   standalone: true,
   imports: [
-    SharedModule,
+    SharedModule,
+
     ErrorStateComponent,
     StatusBadgeComponent,
     StatCardComponent,
@@ -116,7 +117,7 @@ const LOADING_KEY = 'treatment-sheet';
         </div>
 
         <!-- Stats strip -->
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">clipboard
           <boo-stat-card label="Active Orders" [value]="stats()?.activeOrders ?? 0" icon="clipboard-list" tone="primary"></boo-stat-card>
           <boo-stat-card label="Completed Orders" [value]="stats()?.completedOrders ?? 0" icon="circle-check" tone="success"></boo-stat-card>
           <boo-stat-card label="Pending Orders" [value]="stats()?.pendingOrders ?? 0" icon="clock" tone="neutral"></boo-stat-card>
@@ -169,7 +170,7 @@ export class AdminTreatmentSheetComponent implements OnInit {
 
   readonly tabs: { key: TabKey; label: string; icon: string }[] = [
     { key: 'overview', label: 'Overview', icon: 'layout-dashboard' },
-    { key: 'timeline', label: 'Timeline', icon: 'history' },
+    { key: 'timeline', label: 'Timeline', icon: 'clipboard' },
     { key: 'orders', label: 'Orders', icon: 'clipboard-list' },
     { key: 'medications', label: 'Medications', icon: 'pill' },
     { key: 'procedures', label: 'Procedures', icon: 'stethoscope' },
@@ -314,13 +315,13 @@ export class AdminTreatmentSheetComponent implements OnInit {
           </div>
           <h2>Orders</h2>
           ${htmlTable(['Order', 'Type', 'Priority', 'Frequency', 'Start', 'Status', 'Ordered by'],
-            (orders.success ? orders.data.items : []).map(o => [o.orderName, o.orderType, o.priority, o.frequency ?? '', when(o.startTime), o.status, o.orderingDoctorName]))}
+          (orders.success ? orders.data.items : []).map(o => [o.orderName, o.orderType, o.priority, o.frequency ?? '', when(o.startTime), o.status, o.orderingDoctorName]))}
           <h2>Medication administration record</h2>
           ${htmlTable(['Medication', 'Dose', 'Route', 'Frequency', 'Scheduled', 'Status', 'Given by', 'Notes'],
             (meds.success ? meds.data.items : []).map(m => [m.medicationName, m.dose, m.route, m.frequency, when(m.scheduledTime), m.status, m.administeredByName ?? '', m.notes ?? '']))}
           <h2>Progress notes</h2>
           ${htmlTable(['Written', 'Type', 'Author', 'Note'],
-            (notes.success ? notes.data.items : []).map(n => [when(n.writtenAt), n.type, n.authorName, n.content]))}`;
+              (notes.success ? notes.data.items : []).map(n => [when(n.writtenAt), n.type, n.authorName, n.content]))}`;
         printHtmlDocument(`Treatment sheet ${p.mrn}`, body);
       },
       error: () => this.toastSrv.error('Unable to load the treatment sheet for export')

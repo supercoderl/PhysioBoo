@@ -11,7 +11,8 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
     selector: "user-permission-permission-drawer",
     standalone: true,
     imports: [
-        DrawerComponent, 
+        DrawerComponent, 
+
         BooInputComponent, 
         BooTextareaComponent, 
         BooCheckboxComponent, 
@@ -22,7 +23,6 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
         <drawer
             [isOpen]="isOpen"
             [isShowDialog]="true"
-            [width]="540"
             (close)="onClose()"
         >
             <div class="flex flex-col h-full bg-surface" [formGroup]="form">
@@ -116,4 +116,4 @@ export class UserPermissionPermissionDrawerComponent {
         this.savePermission.emit();
     }
     // #endregion
-}
+}

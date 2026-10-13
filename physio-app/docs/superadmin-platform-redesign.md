@@ -149,3 +149,4 @@ New catalog / platform collection = one `MasterDataRegistry` entry + one menu ro
 | Print templates, Articles | Planned — existing admin pages hard-link to `/admin/...`, need a rebuild |
 | Login history, blocked-IP list, Platform settings, App releases | Blocked on API (§12) |
 | Remove / read-only the old admin catalog pages | Waiting for the server-side write restriction |
+| Locations (country / city / district / ward) | Read API built + frontend switched (`location-api-contract.md` §10: needs migration + `seed-geography.sql`); management endpoints and Master Data pages still open |

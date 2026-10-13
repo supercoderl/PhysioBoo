@@ -41,7 +41,28 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.UpdateHospitalGroup
                 return;
             }
 
+            string? code = string.IsNullOrWhiteSpace(request.HospitalGroup.Code) ? null : request.HospitalGroup.Code.Trim();
+
+            if (code != null && await _hospitalGroupRepository.ExistsAsync(hg => hg.Code == code && hg.Id != request.Id, ct))
+            {
+                await NotifyAsync(new DomainNotification(
+                    request.MessageType,
+                    $"Code '{code}' is already used by another hospital group.",
+                    DomainErrorCodes.HospitalGroup.CodeAlreadyExists
+                ));
+
+                return;
+            }
+
             hospitalGroup.SetName(request.HospitalGroup.Name);
+            hospitalGroup.SetCode(code);
+            hospitalGroup.SetContactPerson(request.HospitalGroup.ContactPerson);
+            hospitalGroup.SetLocation(
+                request.HospitalGroup.CountryId,
+                request.HospitalGroup.CityId,
+                request.HospitalGroup.DistrictId,
+                request.HospitalGroup.WardId
+            );
             hospitalGroup.SetDescription(request.HospitalGroup.Description);
             hospitalGroup.SetHeadquartersAddress(request.HospitalGroup.HeadquartersAddress);
             hospitalGroup.SetWebsite(request.HospitalGroup.Website);
@@ -50,6 +71,7 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.UpdateHospitalGroup
             hospitalGroup.SetLogoUrl(request.HospitalGroup.LogoUrl);
             hospitalGroup.SetEstablishedDate(request.HospitalGroup.EstablishedDate);
             hospitalGroup.SetLicenseNumber(request.HospitalGroup.LicenseNumber);
+            hospitalGroup.SetAccreditationDetails(string.IsNullOrWhiteSpace(request.HospitalGroup.AccreditationDetails) ? null : request.HospitalGroup.AccreditationDetails);
             hospitalGroup.SetUpdatedAt(TimeZoneHelper.GetLocalTimeNow());
             hospitalGroup.SetUpdatedBy(_user.GetUserId());
 

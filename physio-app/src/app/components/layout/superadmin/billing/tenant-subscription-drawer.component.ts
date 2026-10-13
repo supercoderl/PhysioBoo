@@ -29,7 +29,7 @@ const BTN_DANGER = `h-9 px-3.5 rounded-1.5 border border-danger/30 bg-surface te
     standalone: true,
     imports: [SharedModule, DrawerComponent, BooSelectComponent, StatusBadgeComponent, ErrorStateComponent],
     template: `
-        <drawer [isOpen]="isOpen" [width]="width" (close)="close.emit()">
+        <drawer [isOpen]="isOpen" (close)="close.emit()">
             <div
                 class="flex flex-col h-svh bg-surface"
                 role="dialog"
@@ -257,7 +257,6 @@ export class SuperadminTenantSubscriptionDrawerComponent implements OnChanges {
     readonly money = formatMoney;
     readonly statusTone = billingStatusTone;
     readonly statusLabel = billingStatusLabel;
-    readonly width = typeof window === 'undefined' ? 520 : Math.min(520, window.innerWidth);
 
     detail = signal<TenantSubscriptionDetail | null>(null);
     loading = signal(false);

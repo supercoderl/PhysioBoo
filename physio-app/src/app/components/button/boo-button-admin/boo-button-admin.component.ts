@@ -32,7 +32,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                 *ngIf="icon || loading"
             >
                 <physio-icon 
-                    [name]="loading ? 'loader' : icon?.name || ''" 
+                    [name]="loading ? 'loader-circle' : icon?.name || ''" 
                     [size]="icon?.size || 16" 
                     [class]="icon?.iconClass"
                 />
@@ -45,19 +45,19 @@ import { SharedModule } from "../../../shared/shared-imports";
             display: inline-block;
             height: 100%;  
         }
-        /* Hover feedback independent of the inline background, so transparent buttons get one too. */
+        /* Hover feedback independent of the inline background: a dark veil works on transparent, light and filled buttons alike. */
         button::after {
             content: '';
             position: absolute;
             inset: 0;
             border-radius: inherit;
-            background: currentColor;
+            background: #000000;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.2s;
         }
         button:not(:disabled):hover::after {
-            opacity: 0.1;
+            opacity: 0.12;
         }
         /* Secondary buttons: the border turns rose on hover (inline styles need !important to be overridden). */
         button[data-bordered]:not(:disabled):hover {

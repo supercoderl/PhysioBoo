@@ -735,7 +735,7 @@ export const MENUS: MenuItem[] = [
                 id: "treatment-sheet",
                 label: "Treatment Sheet",
                 route: "inpatient/treatment-sheet",
-                icon: "clipboard-list",
+                icon: "clipboard",
                 isActive: false,
                 order: 0,
                 permissionCode: [],

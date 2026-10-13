@@ -162,7 +162,7 @@ export class SuperadminTenantListComponent implements OnInit {
             pageSize: this.params.pageSize,
             search: this.params.search,
             sort: this.params.sort,
-            filter: { start: '', end: '', isActive: this.params.filter.isActive, subscriptionPlan: null }
+            filter: { start: '', end: '', isActive: this.params.filter.isActive }
         }).pipe(
             finalize(() => this.loading.set(false))
         ).subscribe({

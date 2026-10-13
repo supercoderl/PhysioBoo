@@ -3,15 +3,15 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { StockTakeSummary } from "../../../../shared/types/stock-take.types";
 
 @Component({
-    selector: 'stock-take-summary-panel',
-    standalone: true,
-    imports: [SharedModule],
-    template: `
+  selector: 'stock-take-summary-panel',
+  standalone: true,
+  imports: [SharedModule],
+  template: `
     <div class="fixed bottom-5 right-5 z-[500] w-72 bg-surface border border-borderGray/60 rounded-2 shadow-2xl overflow-hidden">
       <button type="button" (click)="collapsed.set(!collapsed())"
         class="w-full flex items-center justify-between px-4 py-3 bg-slate-900 text-white">
         <span class="text-sm font-semibold flex items-center gap-2">
-          <physio-icon name="clipboard-list" [size]="15"></physio-icon> Count Summary
+          <physio-icon name="clipboard" [size]="15"></physio-icon> Count Summary
         </span>
         <physio-icon [name]="collapsed() ? 'chevron-up' : 'chevron-down'" [size]="15"></physio-icon>
       </button>
@@ -64,6 +64,6 @@ import { StockTakeSummary } from "../../../../shared/types/stock-take.types";
   `,
 })
 export class StockTakeSummaryPanelComponent {
-    @Input() summary: StockTakeSummary | null = null;
-    collapsed = signal(false);
+  @Input() summary: StockTakeSummary | null = null;
+  collapsed = signal(false);
 }

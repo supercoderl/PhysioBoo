@@ -26,8 +26,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
     template: `
         <drawer
             [isOpen]="isOpen"
-            [isShowDialog]="true"
-            [width]="720" 
+            [isShowDialog]="true" 
             (close)="onClose()"
         >
             <div class="flex flex-col h-full bg-surface relative">

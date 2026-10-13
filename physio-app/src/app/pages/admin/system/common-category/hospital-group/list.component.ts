@@ -80,8 +80,7 @@ export class CommonCategoryHospitalGroupListComponent implements OnInit {
         filter: {
             start: null as Date | null,
             end: null as Date | null,
-            isActive: null as boolean | null,
-            subscriptionPlan: null as number | null
+            isActive: null as boolean | null
         }
     };
     isDrawerOpen: boolean = false;

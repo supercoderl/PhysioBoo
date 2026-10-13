@@ -26,7 +26,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
         BooTextareaComponent
     ],
     template: `
-        <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="720" (close)="onClose()">
+        <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="onClose()">
             <div class="flex flex-col h-full bg-surface relative">
 
                 <!-- Sticky header -->

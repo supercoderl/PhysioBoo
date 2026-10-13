@@ -5,21 +5,21 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { StockTakeActivity, StockTakeActivityType, StockTakeKpis } from "../../../../shared/types/stock-take.types";
 
 const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
-    Created: 'plus-circle',
-    Assigned: 'user-plus',
-    Started: 'play',
-    ItemCounted: 'clipboard-list',
-    Completed: 'circle-check',
-    Approved: 'circle-check-big',
-    Rejected: 'circle-x',
-    Cancelled: 'ban',
+  Created: 'plus-circle',
+  Assigned: 'user-plus',
+  Started: 'play',
+  ItemCounted: 'clipboard',
+  Completed: 'circle-check',
+  Approved: 'circle-check-big',
+  Rejected: 'circle-x',
+  Cancelled: 'ban',
 };
 
 @Component({
-    selector: 'stock-take-activity-rail',
-    standalone: true,
-    imports: [SharedModule,EmptyStateComponent],
-    template: `
+  selector: 'stock-take-activity-rail',
+  standalone: true,
+  imports: [SharedModule, EmptyStateComponent],
+  template: `
     <div class="sticky top-4 space-y-3">
       <div class="bg-surface border border-borderGray/60 rounded-2 p-3.5">
         <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-3">Difference Summary</h3>
@@ -68,21 +68,21 @@ const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
   `,
 })
 export class StockTakeActivityRailComponent implements OnInit {
-    @Input() kpis: StockTakeKpis | null = null;
+  @Input() kpis: StockTakeKpis | null = null;
 
-    activities: StockTakeActivity[] = [];
-    loading = true;
+  activities: StockTakeActivity[] = [];
+  loading = true;
 
-    constructor(private srv: StockTakeService) { }
+  constructor(private srv: StockTakeService) { }
 
-    ngOnInit(): void {
-        this.srv.getRecentActivities(8).subscribe({
-            next: res => { if (res.success) this.activities = res.data; this.loading = false; },
-            error: () => this.loading = false,
-        });
-    }
+  ngOnInit(): void {
+    this.srv.getRecentActivities(8).subscribe({
+      next: res => { if (res.success) this.activities = res.data; this.loading = false; },
+      error: () => this.loading = false,
+    });
+  }
 
-    icon(type: StockTakeActivityType): string {
-        return ACTIVITY_ICON[type] ?? 'circle';
-    }
+  icon(type: StockTakeActivityType): string {
+    return ACTIVITY_ICON[type] ?? 'circle';
+  }
 }

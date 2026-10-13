@@ -25,9 +25,9 @@ import { SharedModule } from '../../shared/shared-imports';
 
       <div
         class="transition-transform duration-300 ease-in-out bg-surface text-black flex flex-col h-full fixed top-0 right-0"
-        style="transform: translateX(100%);"
+        style="transform: translateX(100%); max-width: 100vw;"
         [style.transform]="isOpen ? 'translateX(0)' : 'translateX(100%)'"
-        [style.width.px]="width"
+        [style.width.px]="DRAWER_WIDTH"
       >
         <div class="relative overscroll-contain min-h-full">
           <ng-content></ng-content>
@@ -41,7 +41,8 @@ export class DrawerComponent {
   @Output() close: EventEmitter<void> = new EventEmitter<void>();
   @Input() isOpen: boolean = false;
   @Input() isShowDialog: boolean = false;
-  @Input() width: number = 280;
+  /** Every drawer shares one width so detail and form panels line up; clamped to the viewport on small screens. */
+  readonly DRAWER_WIDTH = 640;
   // #endregion
 
   // #region Init (Lifecycle + Setup)

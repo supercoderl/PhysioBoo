@@ -109,7 +109,6 @@ export interface HospitalGroupFilter {
     start: string,
     end: string,
     isActive: boolean | null,
-    subscriptionPlan: number | null,
 }
 
 export interface HospitalFilter {

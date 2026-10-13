@@ -29,6 +29,19 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup
         {
             if (!await TestValidityAsync(request)) return;
 
+            string? code = string.IsNullOrWhiteSpace(request.NewHospitalGroup.Code) ? null : request.NewHospitalGroup.Code.Trim();
+
+            if (code != null && await _hospitalGroupRepository.ExistsAsync(hg => hg.Code == code, ct))
+            {
+                await NotifyAsync(new DomainNotification(
+                    request.MessageType,
+                    $"Code '{code}' is already used by another hospital group.",
+                    DomainErrorCodes.HospitalGroup.CodeAlreadyExists
+                ));
+
+                return;
+            }
+
             HospitalGroup newHospitalGroup = new HospitalGroup(
                 request.NewId,
                 request.NewHospitalGroup.Name,
@@ -41,6 +54,15 @@ namespace PhysioBoo.Application.Commands.HospitalGroups.CreateHospitalGroup
                 request.NewHospitalGroup.EstablishedDate,
                 request.NewHospitalGroup.LicenseNumber,
                 request.NewHospitalGroup.AccreditationDetails
+            );
+
+            newHospitalGroup.SetCode(code);
+            newHospitalGroup.SetContactPerson(request.NewHospitalGroup.ContactPerson);
+            newHospitalGroup.SetLocation(
+                request.NewHospitalGroup.CountryId,
+                request.NewHospitalGroup.CityId,
+                request.NewHospitalGroup.DistrictId,
+                request.NewHospitalGroup.WardId
             );
 
             newHospitalGroup.SetCreatedBy(_user.GetUserId());

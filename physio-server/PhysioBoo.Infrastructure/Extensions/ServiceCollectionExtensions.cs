@@ -118,6 +118,10 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
             services.AddScoped<IOutboxRepository, OutboxRepository>();
             services.AddScoped<IAdminMenuRepository, AdminMenuRepository>();
+            services.AddScoped<ICountryRepository, CountryRepository>();
+            services.AddScoped<ICityRepository, CityRepository>();
+            services.AddScoped<IDistrictRepository, DistrictRepository>();
+            services.AddScoped<IGeoWardRepository, GeoWardRepository>();
             services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
             services.AddScoped<IUserLoginRepository, UserLoginRepository>();
             services.AddScoped<ISys_MediaFileRepository, Sys_MediaFileRepository>();

@@ -1,5 +1,6 @@
 ﻿
 
+using PhysioBoo.Domain.Entities.Geography;
 using PhysioBoo.Domain.Entities.Operation;
 
 namespace PhysioBoo.Infrastructure.Configuration
@@ -17,7 +18,16 @@ namespace PhysioBoo.Infrastructure.Configuration
             // Indexes
             builder.HasIndex(hg => hg.Name);
 
+            builder.HasIndex(hg => hg.Code)
+                   .IsUnique()
+                   .HasFilter("\"Code\" IS NOT NULL AND \"DeletedAt\" IS NULL");
+
             // Relationships
+            builder.HasOne<Country>().WithMany().HasForeignKey(hg => hg.CountryId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne<City>().WithMany().HasForeignKey(hg => hg.CityId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne<District>().WithMany().HasForeignKey(hg => hg.DistrictId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne<GeoWard>().WithMany().HasForeignKey(hg => hg.WardId).OnDelete(DeleteBehavior.Restrict);
+
             builder.HasOne(hg => hg.Creator)
                    .WithMany(u => u.CreatedHospitalGroups)
                    .HasForeignKey(hg => hg.CreatedBy)
@@ -32,6 +42,12 @@ namespace PhysioBoo.Infrastructure.Configuration
             builder.Property(hg => hg.Name)
                    .IsRequired()
                    .HasMaxLength(255);
+
+            builder.Property(hg => hg.Code)
+                   .HasMaxLength(50);
+
+            builder.Property(hg => hg.ContactPerson)
+                   .HasMaxLength(100);
 
             builder.Property(hg => hg.Description);
 

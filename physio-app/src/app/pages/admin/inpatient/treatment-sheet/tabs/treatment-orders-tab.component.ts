@@ -19,7 +19,7 @@ function nextQuarterHour(): string {
 @Component({
   selector: 'treatment-orders-tab',
   standalone: true,
-  imports: [SharedModule,BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule, BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div class="flex flex-wrap items-center gap-3 mb-4">
       <boo-input label="Search orders..." size="small" (search)="onSearch($event)"></boo-input>
@@ -69,7 +69,7 @@ function nextQuarterHour(): string {
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
-    <div *ngIf="!isLoading() && !filtered().length"><boo-empty-state icon="clipboard-list" title="No matching orders"></boo-empty-state></div>
+    <div *ngIf="!isLoading() && !filtered().length"><boo-empty-state icon="clipboard" title="No matching orders"></boo-empty-state></div>
 
     <ng-container *ngIf="!isLoading() && filtered().length">
       <div *ngFor="let group of groupedOrders()" class="bg-surface border border-gray-200 rounded-lg overflow-hidden mb-4">

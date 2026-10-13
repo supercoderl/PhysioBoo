@@ -12,17 +12,17 @@ import { ClinicalWarning } from "../../../../shared/types/prescription-rx.types"
 import { DispenseProgressStepperComponent } from "./dispense-progress-stepper.component";
 
 interface FlatWarning extends ClinicalWarning {
-    itemId: string;
-    itemName: string;
+  itemId: string;
+  itemName: string;
 }
 
 @Component({
-    selector: 'dispense-picking-panel',
-    standalone: true,
-    imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent, DispenseProgressStepperComponent],
-    template: `
+  selector: 'dispense-picking-panel',
+  standalone: true,
+  imports: [SharedModule, StatusBadgeComponent, EmptyStateComponent, DispenseProgressStepperComponent],
+  template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
-      <boo-empty-state *ngIf="!workspace" icon="clipboard-list" title="Select a prescription from the queue to begin verification"
+      <boo-empty-state *ngIf="!workspace" icon="clipboard" title="Select a prescription from the queue to begin verification"
         class="flex-1 flex items-center justify-center"></boo-empty-state>
 
       <ng-container *ngIf="workspace">
@@ -142,60 +142,60 @@ interface FlatWarning extends ClinicalWarning {
   `,
 })
 export class DispensePickingPanelComponent {
-    @Input() workspace: DispenseWorkspace | null = null;
+  @Input() workspace: DispenseWorkspace | null = null;
 
-    @Output() openDrawer = new EventEmitter<DispenseMedicationItem>();
-    @Output() qtyChange = new EventEmitter<{ itemId: string; qty: number }>();
-    @Output() pickItem = new EventEmitter<DispenseMedicationItem>();
-    @Output() acknowledgeAlert = new EventEmitter<{ itemId: string; alertId: string }>();
-    @Output() replaceItem = new EventEmitter<DispenseMedicationItem>();
-    @Output() reserveItem = new EventEmitter<DispenseMedicationItem>();
-    @Output() cancelItem = new EventEmitter<DispenseMedicationItem>();
-    @Output() notesChange = new EventEmitter<string>();
-    @Output() barcodeScan = new EventEmitter<string>();
+  @Output() openDrawer = new EventEmitter<DispenseMedicationItem>();
+  @Output() qtyChange = new EventEmitter<{ itemId: string; qty: number }>();
+  @Output() pickItem = new EventEmitter<DispenseMedicationItem>();
+  @Output() acknowledgeAlert = new EventEmitter<{ itemId: string; alertId: string }>();
+  @Output() replaceItem = new EventEmitter<DispenseMedicationItem>();
+  @Output() reserveItem = new EventEmitter<DispenseMedicationItem>();
+  @Output() cancelItem = new EventEmitter<DispenseMedicationItem>();
+  @Output() notesChange = new EventEmitter<string>();
+  @Output() barcodeScan = new EventEmitter<string>();
 
-    get flatWarnings(): FlatWarning[] {
-        if (!this.workspace) return [];
-        return this.workspace.items
-            .flatMap(item => item.warnings.map(w => ({ ...w, itemId: item.id, itemName: item.name })))
-            .sort((a, b) => severityRank(b.severity) - severityRank(a.severity));
+  get flatWarnings(): FlatWarning[] {
+    if (!this.workspace) return [];
+    return this.workspace.items
+      .flatMap(item => item.warnings.map(w => ({ ...w, itemId: item.id, itemName: item.name })))
+      .sort((a, b) => severityRank(b.severity) - severityRank(a.severity));
+  }
+
+  hasUnacknowledgedCritical(item: DispenseMedicationItem): boolean {
+    return item.warnings.some(w => w.severity === 'Critical' && !w.acknowledged);
+  }
+
+  togglePick(item: DispenseMedicationItem): void {
+    this.pickItem.emit(item);
+  }
+
+  onBarcode(input: HTMLInputElement): void {
+    const value = input.value.trim();
+    if (!value) return;
+    this.barcodeScan.emit(value);
+    input.value = '';
+  }
+
+  severityTone(severity: string): BadgeTone {
+    switch (severity) {
+      case 'Critical': return 'danger';
+      case 'High': return 'danger';
+      case 'Medium': return 'warning';
+      case 'Low': return 'neutral';
+      default: return 'primary';
     }
+  }
 
-    hasUnacknowledgedCritical(item: DispenseMedicationItem): boolean {
-        return item.warnings.some(w => w.severity === 'Critical' && !w.acknowledged);
+  itemStatusTone(status: DispenseItemStatus): BadgeTone {
+    switch (status) {
+      case 'NotPicked': return 'neutral';
+      case 'Picked': return 'primary';
+      case 'Verified': return 'primary';
+      case 'Dispensed': return 'success';
+      case 'OnHold': return 'warning';
+      case 'Replaced': return 'warning';
+      case 'Reserved': return 'warning';
+      default: return 'neutral';
     }
-
-    togglePick(item: DispenseMedicationItem): void {
-        this.pickItem.emit(item);
-    }
-
-    onBarcode(input: HTMLInputElement): void {
-        const value = input.value.trim();
-        if (!value) return;
-        this.barcodeScan.emit(value);
-        input.value = '';
-    }
-
-    severityTone(severity: string): BadgeTone {
-        switch (severity) {
-            case 'Critical': return 'danger';
-            case 'High': return 'danger';
-            case 'Medium': return 'warning';
-            case 'Low': return 'neutral';
-            default: return 'primary';
-        }
-    }
-
-    itemStatusTone(status: DispenseItemStatus): BadgeTone {
-        switch (status) {
-            case 'NotPicked': return 'neutral';
-            case 'Picked': return 'primary';
-            case 'Verified': return 'primary';
-            case 'Dispensed': return 'success';
-            case 'OnHold': return 'warning';
-            case 'Replaced': return 'warning';
-            case 'Reserved': return 'warning';
-            default: return 'neutral';
-        }
-    }
+  }
 }

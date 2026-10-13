@@ -21,6 +21,14 @@ namespace PhysioBoo.Domain.Entities.Operation
         public string? LogoUrl { get; private set; }
         public DateTime? EstablishedDate { get; private set; }
         public string? LicenseNumber { get; private set; }
+        public string? Code { get; private set; }
+        public string? ContactPerson { get; private set; }
+
+        // Headquarters location (Country -> City -> District -> Ward), each level optional.
+        public Guid? CountryId { get; private set; }
+        public Guid? CityId { get; private set; }
+        public Guid? DistrictId { get; private set; }
+        public Guid? WardId { get; private set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public NpgsqlTsVector? SearchVector { get; private set; }
@@ -127,6 +135,16 @@ namespace PhysioBoo.Domain.Entities.Operation
         public void SetLicenseNumber(string? licenseNumber) { LicenseNumber = licenseNumber; }
         public void SetAccreditationDetails(string? accreditationDetails) { AccreditationDetails = accreditationDetails; }
         public void SetIsActive(bool isActive) { IsActive = isActive; }
+        public void SetCode(string? code) { Code = code; }
+        public void SetContactPerson(string? contactPerson) { ContactPerson = contactPerson; }
+
+        public void SetLocation(Guid? countryId, Guid? cityId, Guid? districtId, Guid? wardId)
+        {
+            CountryId = countryId;
+            CityId = cityId;
+            DistrictId = districtId;
+            WardId = wardId;
+        }
         #endregion
     }
 }

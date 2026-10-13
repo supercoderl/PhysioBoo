@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ChevronDown, ChevronRight } from 'lucide-angular';
 import { SharedModule } from '../../../../../shared/shared-imports';
 import { MenuItem } from '../../../../../shared/types/menu.types';
 
@@ -40,12 +39,12 @@ import { MenuItem } from '../../../../../shared/types/menu.types';
           {{ item.label }}
         </p>
       </div>
-      <lucide-icon
+      <physio-icon
         *ngIf="item.children"
-        [name]="expanded ? ChevronDown : ChevronRight"
+        [name]="expanded ? 'chevron-down' : 'chevron-right'"
         class="w-3.5 h-3.5 text-secondary transition-transform duration-200 shrink-0"
         (click)="toggle($event)"
-      ></lucide-icon>
+      ></physio-icon>
     </a>
 
     <div
@@ -64,9 +63,6 @@ import { MenuItem } from '../../../../../shared/types/menu.types';
   `
 })
 export class SidebarItemComponent implements OnInit {
-  ChevronDown = ChevronDown;
-  ChevronRight = ChevronRight;
-
   @Input() item!: MenuItem;
 
   expanded: boolean = false;

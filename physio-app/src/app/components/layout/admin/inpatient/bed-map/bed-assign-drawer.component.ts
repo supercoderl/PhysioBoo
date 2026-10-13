@@ -25,7 +25,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
         BooSelectComponent
     ],
     template: `
-        <drawer [isOpen]="isOpen" [isShowDialog]="true" [width]="480" (close)="onClose()">
+        <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="onClose()">
             <div class="flex flex-col h-full bg-surface relative">
                 <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
                     <div>

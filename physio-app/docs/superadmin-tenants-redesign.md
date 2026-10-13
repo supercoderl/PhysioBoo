@@ -115,6 +115,27 @@ Name cell is a real `<button>` with `aria-label`; tabs per ARIA authoring practi
 
 **Interim (placeholder) behaviour:** stats come from single-row searches (`pageSize: 1`, read `totalCount`); the detail page composes existing endpoints: `hospital-groups/{id}`, `hospitals/search` filtered by `hospitalGroupId`, `billing/subscriptions/{id}`, `billing/plans`. Seat (user) usage is **not shown** until the usage endpoint exists.
 
+### 12.1 Implemented: hospital group CRUD contract
+
+`POST /api/hospital-groups` and `PATCH /api/hospital-groups/{id}` take the same body. The backend ignores unknown JSON properties, so a field missing here is dropped without any error.
+
+| Field | Type | Notes |
+|---|---|---|
+| `name` | string, required, ≤255 | |
+| `code` | string?, ≤50 | Unique among non-deleted groups; blank is stored as null. Duplicate → `HOSPITAL_GROUP_CODE_ALREADY_EXISTS` |
+| `description`, `website`, `licenseNumber`, `logoUrl`, `establishedDate` | optional | |
+| `contactPerson` | string?, ≤100 | |
+| `email`, `phone` | optional, validated | |
+| `headquartersAddress` | string? | The form control is named `headquartersAddress`, not `address` |
+| `countryId`, `cityId`, `districtId`, `wardId` | guid?, each optional | Foreign keys to the geography tables |
+| `accreditationDetails` | string? (JSON) | Must parse as JSON (the column is `jsonb`); written on update as well as create |
+
+`GET /api/hospital-groups/{id}` returns the same fields plus `id`, `isActive`, `createdAt`.
+
+`POST /api/hospital-groups/search` filter: `{ start, end, isActive? }`. Sort keys: `name`, `code`, `createdAt`. Each row also carries `hospitalCount` (grouped count across tenants) and `subscriptionPlan` (plan name, null when the tenant has none), both filled with one query per page.
+
+Migration `20261013160000_HospitalGroupProfile` adds `Code`, `ContactPerson`, `CountryId`, `CityId`, `DistrictId`, `WardId` to `HospitalGroups`. The detail page shows the street address only; names for the location ids are not returned yet.
+
 ## 13. Edge Cases
 
 - Tenant without subscription → plan "No plan", status badge "No plan", Subscription tab empty state with link to Billing.

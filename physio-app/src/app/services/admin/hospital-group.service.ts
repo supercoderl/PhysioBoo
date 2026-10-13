@@ -25,7 +25,7 @@ export class HospitalGroupService {
             pageSize: 1,
             search: '',
             sort: 'createdAt:desc',
-            filter: { start: '', end: '', isActive, subscriptionPlan: null }
+            filter: { start: '', end: '', isActive }
         }).pipe(map(res => res.success ? res.data?.totalCount ?? 0 : 0));
 
         return forkJoin({ total: count(null), active: count(true) }).pipe(

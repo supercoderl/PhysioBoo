@@ -21,7 +21,7 @@ import { MasterDataConfig } from "../../../shared/types/master-data.types";
                 role="note"
                 class="flex items-start gap-3 rounded-2 border border-primary/20 bg-primary/5 px-4 py-3 text-[13px] text-regular"
             >
-                <lucide-icon name="info" class="w-4 h-4 text-primary shrink-0 mt-0.5"></lucide-icon>
+                <physio-icon name="info" [class]="'text-primary shrink-0 mt-0.5'" />
                 <p class="m-0">
                     These catalogs are <strong>platform-wide</strong>: a change here applies to all tenants immediately.
                 </p>
@@ -34,7 +34,7 @@ import { MasterDataConfig } from "../../../shared/types/master-data.types";
                         class="group flex items-start gap-3.5 h-full rounded-2 border border-borderGray/60 bg-surface p-4 transition-shadow duration-200 hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                     >
                         <span class="w-11 h-11 shrink-0 rounded-full bg-primary/10 text-primary flex items-center justify-center transition-colors duration-200 group-hover:bg-primary group-hover:text-white">
-                            <lucide-icon [name]="cfg.icon" class="w-5 h-5"></lucide-icon>
+                            <physio-icon [name]="cfg.icon" [size]="20" />
                         </span>
                         <span class="min-w-0 flex-1">
                             <span class="flex items-center justify-between gap-2">

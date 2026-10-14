@@ -31,7 +31,7 @@ import { PrescriptionRow, PrescriptionStatus } from "../../../../../shared/types
               </span>
               <span *ngIf="rx.items[0]?.isControlledSubstance"
                 class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-red-50 text-red-700 inline-flex items-center gap-1">
-                <physio-icon name="alert-triangle" class="w-3 h-3"></physio-icon>
+                <physio-icon name="triangle-alert" class="w-3 h-3"></physio-icon>
                 Controlled
               </span>
             </div>

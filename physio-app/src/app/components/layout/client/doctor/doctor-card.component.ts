@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
-import { CalendarPlus, CircleCheck } from "lucide-angular";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DateItem } from "../../../../shared/types/date.types";
 
@@ -25,7 +24,7 @@ import { DateItem } from "../../../../shared/types/date.types";
                                         />
                                     </span>
                                     <span class="w-6 h-6 bg-surface rounded-full flex-center-center absolute left-1.25 top-1.25">
-                                        <lucide-angular [img]="CircleCheck" class="w-4 fill-[#00cc52] stroke-white" />
+                                        <physio-icon name="circle-check" class="text-white [&_svg]:fill-[#00cc52]" />
                                     </span>
                                 </div>
                                 <div>
@@ -51,7 +50,7 @@ import { DateItem } from "../../../../shared/types/date.types";
                                     class="bg-primary border-primary text-white border border-solid p-[0.35rem_0.85rem] transition-smooth rounded-full flex-center-center"
                                     href="/react/template/patient/doctor-map-list-availability"
                                 >
-                                    <lucide-angular [img]="CalendarPlus" class="mr-2 w-3.25" />
+                                    <physio-icon name="calendar-plus" [size]="13" [class]="'mr-2'" />
                                     Book Online Consultation
                                 </a>
                                 </div>
@@ -306,8 +305,6 @@ import { DateItem } from "../../../../shared/types/date.types";
 })
 
 export class DoctorCardComponent implements OnInit, AfterViewInit {
-    readonly CircleCheck = CircleCheck;
-    readonly CalendarPlus = CalendarPlus;
 
     @ViewChild('scroller') scrollerRef!: ElementRef<HTMLDivElement>;
 

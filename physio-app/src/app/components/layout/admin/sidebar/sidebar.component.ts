@@ -1,7 +1,6 @@
 import { SocialAuthService } from "@abacritt/angularx-social-login";
 import { Component, Input } from "@angular/core";
 import { Router } from "@angular/router";
-import { ChevronUp, FileCheck, Info } from "lucide-angular";
 import { MenuService } from "../../../../services/admin/menu.service";
 import { AuthService } from "../../../../services/auth/auth.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
@@ -29,9 +28,6 @@ import { SidebarItemComponent } from "./sidebar-item/sidebar-item.component";
 
 export class AdminLayoutSideBarComponent {
     // #region Inputs, Outputs, Properties
-    fileCheck = FileCheck;
-    info = Info;
-    chevronUp = ChevronUp;
     menus = this.menuSrv.adminMenus;
     userInfo$ = this.authSrv.userInfo$;
     defaultAvatar = AVATAR;

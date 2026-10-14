@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { ChevronLeft, ChevronRight } from "lucide-angular";
 import { SlickCarouselModule } from "ngx-slick-carousel";
 import { SharedModule } from "../../../shared/shared-imports";
 
@@ -34,7 +33,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                         class="group block w-7.5 h-7.5 text-primary bg-borderGray shadow-[0_4px_14px_#FFE9EE40] cursor-pointer transition-smooth absolute top-1/2 -translate-y-1/2 rounded-full left-0 z-[1] flex-center-center hover:bg-secondary" 
                         (click)="slickModal.slickPrev()"
                     > 
-                        <lucide-angular [img]="ChevronLeft" class="w-4 stroke-[#383838] stroke-[2] group-hover:stroke-white" />
+                        <physio-icon name="chevron-left" class="text-[#383838] group-hover:text-white" />
                     </button>
 
                     <ngx-slick-carousel class="carousel w-full" 
@@ -89,7 +88,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                         class="group block w-7.5 h-7.5 text-primary bg-borderGray shadow-[0_4px_14px_#FFE9EE40] cursor-pointer transition-smooth absolute top-1/2 -translate-y-1/2 rounded-full right-0 z-[1] flex-center-center hover:bg-secondary" 
                         (click)="slickModal.slickNext()"
                     > 
-                        <lucide-angular [img]="ChevronRight" class="w-4 stroke-[#383838] stroke-[2] group-hover:stroke-white" />
+                        <physio-icon name="chevron-right" class="text-[#383838] group-hover:text-white" />
                     </button>
                 </div>
             </div>
@@ -130,8 +129,6 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class TestimonialAboutUsComponent {
-    readonly ChevronLeft = ChevronLeft;
-    readonly ChevronRight = ChevronRight;
 
     slides = [
         { img: "http://placehold.it/350x150/000000" },

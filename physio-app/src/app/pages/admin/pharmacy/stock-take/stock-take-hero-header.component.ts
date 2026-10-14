@@ -62,7 +62,7 @@ export class StockTakeHeroHeaderComponent {
         return [
             { label: 'Active Sessions', value: k?.activeSessions ?? '—', icon: 'activity', bg: 'bg-primary/10', iconColor: 'text-primary' },
             { label: 'Pending Approval', value: k?.pendingApproval ?? '—', icon: 'clock-alert', bg: 'bg-amber-50', iconColor: 'text-amber-600' },
-            { label: 'Completed This Month', value: k?.completedThisMonth ?? '—', icon: 'circle-check-big', bg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
+            { label: 'Completed This Month', value: k?.completedThisMonth ?? '—', icon: 'check-circle', bg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
             { label: 'Total Variance Value', value: k ? (k.totalDifferenceValue >= 0 ? '+' : '') + '$' + k.totalDifferenceValue.toFixed(2) : '—', icon: 'scale', bg: 'bg-rose-50', iconColor: 'text-rose-600' },
         ];
     }

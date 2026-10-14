@@ -44,7 +44,7 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
                 role="note"
                 class="flex items-start gap-3 rounded-2 border border-primary/20 bg-primary/5 px-4 py-3 text-[13px] text-regular"
             >
-                <lucide-icon name="info" class="w-4 h-4 text-primary shrink-0 mt-0.5"></lucide-icon>
+                <physio-icon name="info" [class]="'text-primary shrink-0 mt-0.5'" />
                 <p class="m-0">
                     Blocks apply to <strong>every tenant</strong> at once. The list of blocked addresses isn't available yet,
                     so keep a note of what you block. Never block your own address.

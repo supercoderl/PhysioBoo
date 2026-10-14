@@ -1,7 +1,6 @@
-import { isPlatformBrowser } from '@angular/common';
+import { NgClass, isPlatformBrowser } from '@angular/common';
 import { Component, Input, OnChanges, PLATFORM_ID, inject } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { SharedModule } from '../shared-imports';
 
 const ICON_BASE_PATH = 'assets/icons';
 const svgCache = new Map<string, Promise<string>>();
@@ -9,7 +8,8 @@ const svgCache = new Map<string, Promise<string>>();
 @Component({
   selector: 'physio-icon',
   standalone: true,
-  imports: [SharedModule],
+  // Not SharedModule: it re-exports this component, and the cycle breaks module load order.
+  imports: [NgClass],
   template: `
     <span 
       class="physio-icon" 

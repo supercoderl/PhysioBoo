@@ -47,7 +47,7 @@ const STEPS: StockTakeStatus[] = ['Draft', 'Counting', 'PendingApproval', 'Appro
 
       <button type="button" (click)="completeOpen.set(true)" [disabled]="stockTake()?.status !== 'Counting'"
         class="px-4 py-2 rounded-1.5 bg-emerald-600 text-white text-sm font-semibold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5">
-        <physio-icon name="circle-check-big" [size]="15"></physio-icon> Complete Counting
+        <physio-icon name="check-circle" [size]="15"></physio-icon> Complete Counting
       </button>
     </div>
 

@@ -40,7 +40,7 @@ const STAGE_LABELS: Record<StudyTimelineStage, string> = {
             [ngClass]="selected()?.id === s.id ? 'bg-primary/5' : ''">
             <div class="flex items-center justify-between gap-2">
               <span class="text-sm font-medium text-gray-800 truncate">{{ s.patientName }}</span>
-              <physio-icon *ngIf="s.isCritical" name="alert-triangle" [size]="14" class="text-red-500"></physio-icon>
+              <physio-icon *ngIf="s.isCritical" name="triangle-alert" [size]="14" class="text-red-500"></physio-icon>
             </div>
             <div class="text-xs text-gray-500">{{ s.examinationName }} · {{ s.modalityName }}</div>
             <div class="text-xs text-gray-400">{{ s.orderNumber }}</div>

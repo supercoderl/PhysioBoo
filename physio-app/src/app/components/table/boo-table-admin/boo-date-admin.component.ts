@@ -57,7 +57,7 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
                             [class.hover:bg-gray-50]="activeType !== 'custom'"
                         >
                         Custom Range
-                        <physio-icon name="chevronRight" class="w-3.5 h-3.5"/>
+                        <physio-icon name="chevron-right" class="w-3.5 h-3.5"/>
                         </button>
                     </li>
                 </ul>

@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { MapPin, ScanQrCode, Search } from "lucide-angular";
 import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.component";
 import { HOSPITALS } from "../../../shared/data/dummy";
 import { SharedModule } from "../../../shared/shared-imports";
@@ -119,7 +118,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                         type="text"
                                     />
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-primary text-xs14">
-                                        <lucide-angular [img]="Search" class="w-3.5" />
+                                        <physio-icon name="search" [size]="14" />
                                     </span>
                                 </div>
                             </div>
@@ -204,7 +203,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                         </a>
                                     </h6>
                                     <p class="inline-flex items-center text-[0.875rem] mb-0 text-brandDark">
-                                        <lucide-angular [img]="MapPin" class="w-3.5 stroke-primary mr-1" />
+                                        <physio-icon name="map-pin" [size]="14" [class]="'text-primary mr-1'" />
                                         {{item.address}}
                                     </p>
                                 </div>
@@ -216,7 +215,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                             class="py-2.25 px-4 bg-[linear-gradient(90.08deg,_#E11D48_0.09%,_#06aed4_70.28%)] text-white text-xs14 rounded-[44px] relative overflow-hidden z-[1] bg-secondary border border-solid border-secondary transition-smooth font-medium flex items-center w-fit"
                             href="/react/template/pages/hospitals"
                         >
-                            <lucide-angular [img]="ScanQrCode" class="w-3.5 mr-2" />
+                            <physio-icon name="scan-qr-code" [size]="14" [class]="'mr-2'" />
                             Load More 425 Hospitals
                         </a>
                     </div>
@@ -227,9 +226,6 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class HospitalComponent {
-    readonly Search = Search;
-    readonly MapPin = MapPin;
-    readonly ScanQrCode = ScanQrCode;
 
     readonly hospitals = HOSPITALS;
 }

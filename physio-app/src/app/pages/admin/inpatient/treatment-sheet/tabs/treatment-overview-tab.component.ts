@@ -45,7 +45,7 @@ import { ClinicalAlert, TreatmentOrder, TreatmentTimelineEntry } from "../../../
         <div *ngIf="!alerts().length"><boo-empty-state icon="shield-check" title="No active clinical alerts"></boo-empty-state></div>
         <ul class="space-y-2" *ngIf="alerts().length">
           <li *ngFor="let a of alerts()" class="text-sm text-gray-700 flex items-center gap-2">
-            <physio-icon name="alert-triangle" [size]="14" class="text-amber-500"></physio-icon>
+            <physio-icon name="triangle-alert" [size]="14" class="text-amber-500"></physio-icon>
             {{ a.message }}
           </li>
         </ul>

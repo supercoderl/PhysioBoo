@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { AlarmClock } from "lucide-angular";
 import { BLOGS } from "../../../shared/data/dummy";
 import { SharedModule } from "../../../shared/shared-imports";
 
@@ -44,7 +43,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                     </div>
                                 </li>
                                 <li class="mr-0 mb-4 inline-block text-xs15 flex items-center">
-                                    <lucide-angular [img]="AlarmClock" class="w-3.75 mr-1" />
+                                    <physio-icon name="alarm-clock" [size]="15" [class]="'mr-1'" />
                                     {{blog.postedAt}}
                                 </li>
                             </ul>
@@ -121,6 +120,5 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class GridBlogComponent {
-    readonly AlarmClock = AlarmClock;
     readonly blogs = BLOGS;
 }

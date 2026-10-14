@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
 
+/**
+ * First-paint theme cache. The real setting is the `theme.mode` preference owned by
+ * `ThemeConfigService`; this only remembers the last applied light/dark state locally so the
+ * app does not flash the wrong theme before preferences load.
+ */
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
     private readonly storageKey = 'theme'; // 'light' | 'dark'
@@ -15,17 +20,10 @@ export class ThemeService {
         }
     }
 
-    isDark(): boolean {
-        if (typeof window === 'undefined') return false;
-        return window.document.documentElement.classList.contains('dark');
-    }
-
-    toggleTheme(): void {
-        if (typeof window !== 'undefined') {
-            const html = window.document.documentElement;
-            html.classList.toggle('dark');
-            const isDark = html.classList.contains('dark');
-            localStorage.setItem(this.storageKey, isDark ? 'dark' : 'light');
-        }
+    remember(isDark: boolean): void {
+        if (typeof window === 'undefined' || !window.localStorage) return;
+        try {
+            window.localStorage.setItem(this.storageKey, isDark ? 'dark' : 'light');
+        } catch { /* storage unavailable (private mode / quota): first paint just uses the default */ }
     }
 }

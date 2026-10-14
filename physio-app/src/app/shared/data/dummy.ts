@@ -919,7 +919,7 @@ export const MENUS: MenuItem[] = [
                 id: "tickets",
                 label: "Support & Complaints",
                 route: "crm/support-complaint",
-                icon: "headphones",
+                icon: "headset",
                 isActive: false,
                 order: 0,
                 permissionCode: [],

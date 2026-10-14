@@ -15,7 +15,7 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
             </div>
 
             <div *ngIf="!loading && loadError" class="flex flex-col items-center justify-center h-full text-center px-6">
-                <physio-icon name="alert-triangle" [size]="28" [class]="'text-red-500 mb-3'"></physio-icon>
+                <physio-icon name="triangle-alert" [size]="28" [class]="'text-red-500 mb-3'"></physio-icon>
                 <p class="text-sm font-semibold text-regular mb-1">Couldn't load this service</p>
                 <p class="text-xs15 text-secondary max-w-[280px] mb-4">The request failed. Please try again.</p>
                 <button (click)="reload()" class="px-3 py-1.5 text-sm font-medium text-red-700 border border-red-300 rounded-md hover:bg-red-100">

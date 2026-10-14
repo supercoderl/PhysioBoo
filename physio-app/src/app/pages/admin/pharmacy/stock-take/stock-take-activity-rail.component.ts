@@ -5,12 +5,12 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { StockTakeActivity, StockTakeActivityType, StockTakeKpis } from "../../../../shared/types/stock-take.types";
 
 const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
-  Created: 'plus-circle',
+  Created: 'circle-plus',
   Assigned: 'user-plus',
   Started: 'play',
   ItemCounted: 'clipboard',
   Completed: 'circle-check',
-  Approved: 'circle-check-big',
+  Approved: 'check-circle',
   Rejected: 'circle-x',
   Cancelled: 'ban',
 };

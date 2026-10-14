@@ -49,7 +49,7 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
                 routerLink="/superadmin/tenants/hospital-group"
                 class="inline-flex items-center gap-1.5 -ml-1 px-1 py-1 rounded-1.5 text-xs text-secondary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors"
             >
-                <lucide-icon name="arrow-left" class="w-3.5 h-3.5"></lucide-icon>
+                <physio-icon name="arrow-left" [size]="14" />
                 Hospital groups
             </a>
 
@@ -120,7 +120,7 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
                         </div>
                         <div class="flex items-center gap-2 flex-wrap">
                             <button type="button" [class]="outlineButton" (click)="openDrawer()">
-                                <lucide-icon name="pencil" class="w-3.5 h-3.5"></lucide-icon>
+                                <physio-icon name="pencil" [size]="14" />
                                 Edit
                             </button>
                         </div>

@@ -219,7 +219,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                         (click)="onDeleteRole(selectedRole()!)"
                     class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1.5"
                     >trash
-                        <physio-icon name="trash-2" [size]="16"></physio-icon>
+                        <physio-icon name="trash" [size]="16"></physio-icon>
                         Delete Role
                     </button>
                     <div class="flex gap-3 ml-auto">

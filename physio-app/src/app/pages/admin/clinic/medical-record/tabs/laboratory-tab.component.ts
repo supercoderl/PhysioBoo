@@ -18,7 +18,7 @@ interface LabPanelGroup {
     <div class="space-y-3">
       <!-- Critical / abnormal banner -->
       <div *ngIf="criticalCount() > 0" class="bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center gap-3">
-        <physio-icon name="alert-triangle" class="w-5 h-5 text-red-600"></physio-icon>
+        <physio-icon name="triangle-alert" class="w-5 h-5 text-red-600"></physio-icon>
         <div class="text-sm">
           <strong class="text-red-700 font-semibold">{{ criticalCount() }} critical value{{ criticalCount() === 1 ? '' : 's' }}</strong>
           <span class="text-red-600 ml-1">require attention. Review highlighted rows below.</span>

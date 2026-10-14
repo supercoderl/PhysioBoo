@@ -1,6 +1,5 @@
 import { Component, HostListener, Input } from '@angular/core';
 import { RouterLink } from "@angular/router";
-import { Facebook, Instagram, Linkedin, LockKeyhole, LucideAngularModule, MessageSquareText, Phone, Search, Sun, Twitter, UserRoundX } from 'lucide-angular';
 import { HEADERS } from '../../../../shared/data/dummy';
 import { SharedModule } from '../../../../shared/shared-imports';
 
@@ -8,23 +7,12 @@ import { SharedModule } from '../../../../shared/shared-imports';
   selector: 'layout-header',
   standalone: true,
   imports: [
-    LucideAngularModule,
     SharedModule,
     RouterLink
 ],
   templateUrl: './header.component.html'
 })
 export class HeaderComponent {
-  readonly MessageSquareText = MessageSquareText;
-  readonly Phone = Phone;
-  readonly Sun = Sun;
-  readonly Facebook = Facebook;
-  readonly Twitter = Twitter;
-  readonly Instagram = Instagram;
-  readonly LinkedIn = Linkedin;
-  readonly LockKeyhole = LockKeyhole;
-  readonly UserRoundX = UserRoundX;
-  readonly Search = Search;
   isSticky = false;
   isOpen = false;
 

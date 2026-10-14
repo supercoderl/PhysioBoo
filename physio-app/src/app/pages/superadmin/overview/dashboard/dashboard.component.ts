@@ -12,7 +12,7 @@ import { HospitalGroup } from "../../../../shared/types/support.types";
 
 interface QuickAction {
     label: string;
-    /** Registered Lucide icon name (kebab-case). */
+    /** `physio-icon` name (kebab-case, see `PHYSIO_ICON_NAMES`). */
     icon: string;
     route: string;
 }
@@ -65,7 +65,7 @@ interface QuickAction {
                                 <span
                                     class="w-14 h-14 rounded-full bg-primarySoft text-primary flex items-center justify-center transition-all duration-200 group-hover:bg-[var(--color-primary-active-soft)] group-hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
                                 >
-                                    <lucide-icon [name]="action.icon" class="w-6 h-6"></lucide-icon>
+                                    <physio-icon [name]="action.icon" [size]="24" />
                                 </span>
                                 <span class="text-[13px] font-medium text-regular leading-tight">{{ action.label }}</span>
                             </a>

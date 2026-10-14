@@ -64,7 +64,7 @@ import { FinancialClinicalSnapshot } from "../../../../shared/types/dashboard-ov
                 <span class="text-[9.5px] text-gray-400">{{ pharmacyPct }}% of {{ financial.pharmacy.target | number }} target</span>
             </div>
             <div *ngIf="financial.pharmacy.lowStockCount > 0" class="flex items-center gap-1.5 px-2 py-1 bg-amber-50 rounded">
-                <physio-icon name="alert-triangle" [size]="11" class="text-[#f59e0b]"></physio-icon>
+                <physio-icon name="triangle-alert" [size]="11" class="text-[#f59e0b]"></physio-icon>
                 <span class="text-[10.5px] text-amber-800">{{ financial.pharmacy.lowStockCount }} items low stock</span>
             </div>
         </div>

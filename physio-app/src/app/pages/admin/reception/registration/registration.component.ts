@@ -66,7 +66,7 @@ export class AdminRegistrationComponent {
       fields: ['firstName', 'lastName', 'dateOfBirth', 'gender']
     },
     {
-      id: 'contact', label: 'Contact', icon: 'mail', description: 'Email, phone, address',
+      id: 'contact', label: 'Contact', icon: 'email', description: 'Email, phone, address',
       fields: ['email', 'phone', 'emergencyContactName', 'emergencyContactPhone', 'address', 'city', 'postalCode']
     },
     {

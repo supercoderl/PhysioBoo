@@ -16,7 +16,7 @@ import { CriticalFindingAlert, RadiologyAlertSeverity } from "../../../../../sha
     </div>
 
     <div *ngIf="!isLoading() && !alerts().length">
-      <boo-empty-state icon="alert-triangle" title="No critical findings recorded"></boo-empty-state>
+      <boo-empty-state icon="triangle-alert" title="No critical findings recorded"></boo-empty-state>
     </div>
 
     <div *ngIf="!isLoading() && alerts().length" class="bg-surface border border-gray-200 rounded-lg overflow-hidden">

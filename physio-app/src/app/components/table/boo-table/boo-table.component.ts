@@ -1,6 +1,5 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component } from '@angular/core';
-import { ArrowDownUp, Columns3Cog, EllipsisVertical, GripVertical, ListFilter, Rows4, Search } from "lucide-angular";
 import { SharedModule } from '../../../shared/shared-imports';
 import { Column, TableRow } from '../../../shared/types/table.types';
 
@@ -14,13 +13,6 @@ import { Column, TableRow } from '../../../shared/types/table.types';
   styleUrl: './boo-table.component.scss'
 })
 export class BooTableComponent {
-  search = Search;
-  listFilter = ListFilter;
-  columns3cog = Columns3Cog;
-  rows4 = Rows4;
-  arrowDownUp = ArrowDownUp;
-  gripVertical = GripVertical;
-  ellipsisVertical = EllipsisVertical;
   columns: Column[] = [
     { id: 'checkbox', label: '', sortable: false, draggable: false, hasActions: false, pinned: true },
     { id: 'image', label: '', sortable: false, draggable: false, hasActions: true, pinned: false },

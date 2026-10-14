@@ -85,7 +85,7 @@ import { PatientContext, RiskFlag } from "../../../../../shared/types/medical-re
             <physio-icon name="printer" class="w-3.5 h-3.5"></physio-icon>
           </button>
           <button (click)="action.emit('discharge')" class="px-2 py-1.5 text-xs text-red-600 border border-red-200 rounded hover:bg-red-50" title="Discharge patient">
-            <physio-icon name="log-out" class="w-3.5 h-3.5"></physio-icon>
+            <physio-icon name="logout" class="w-3.5 h-3.5"></physio-icon>
           </button>
         </div>
       </div>
@@ -122,7 +122,7 @@ export class PatientContextHeaderComponent {
 
   flagIcon(k: RiskFlag['key']): string {
     switch (k) {
-      case 'allergy': return 'alert-triangle';
+      case 'allergy': return 'triangle-alert';
       case 'critical': return 'heart-pulse';
       case 'chronic': return 'activity';
       case 'fall': return 'arrow-down';

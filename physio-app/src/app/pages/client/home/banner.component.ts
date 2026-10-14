@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Calendar, Hospital, MapPin, Search, Star } from 'lucide-angular';
 import { SharedModule } from '../../../shared/shared-imports';
 
 @Component({
@@ -44,10 +43,11 @@ import { SharedModule } from '../../../shared/shared-imports';
                                 <h6 class="mb-1 text-base font-semibold">5K+ Appointments</h6>
                                 <div class="flex items-center">
                                     <div class="flex items-center">
-                                        <lucide-angular 
+                                        <physio-icon 
                                             *ngFor="let index of stars"
-                                            [img]="Star" 
-                                            class="w-3.5 h-3.5 text-danger mr-1 fill-danger" 
+                                            name="star" 
+                                            [size]="14"
+                                            [class]="'text-danger mr-1 [&_svg]:fill-danger'" 
                                         />
                                     </div>
                                     <p class="text-xs14 m-0">5.0 Ratings</p>
@@ -62,7 +62,7 @@ import { SharedModule } from '../../../shared/shared-imports';
                             <div class="search-box w-full md:w-auto border border-solid rounded-2.5 md:rounded-17.5 p-2 relative shadow-[0_4px_14px_#FFE9EE40] table z-[1]">
                                 <form class="float-left w-full">
                                     <div class="table-cell float-left w-full md:w-[35%] align-middle relative before:absolute before:top-1/2 before:right-0 before:-translate-y-1/2 before:w-[1px] before:h-11 before:bg-[#e3e4e8] before:content-[''] before:z-[1]">
-                                        <lucide-angular [img]="Hospital" class="w-4.5 stroke-primary left-1.25 absolute top-1/2 -translate-y-1/2" />
+                                        <physio-icon name="hospital" [size]="18" [class]="'text-primary left-1.25 absolute top-1/2 -translate-y-1/2'" />
                                         <div class="mb-0">
                                             <input
                                                 class="pl-8.25 h-19 pr-2.5 text-primary min-h-9.5 text-xs14 rounded-1.25 transition-smooth block w-full outline-none"
@@ -72,7 +72,7 @@ import { SharedModule } from '../../../shared/shared-imports';
                                         </div>
                                     </div>
                                     <div class="table-cell float-left w-full md:w-[26%] align-middle relative before:absolute before:top-1/2 before:right-0 before:-translate-y-1/2 before:w-[1px] before:h-11 before:bg-[#e3e4e8] before:content-[''] before:z-[1]">
-                                        <lucide-angular [img]="MapPin" class="w-4.5 stroke-primary left-1.25 absolute top-1/2 -translate-y-1/2" />
+                                        <physio-icon name="map-pin" [size]="18" [class]="'text-primary left-1.25 absolute top-1/2 -translate-y-1/2'" />
                                         <div class="mb-0">
                                             <input
                                                 class="pl-8.25 h-19 pr-2.5 text-primary min-h-9.5 text-xs14 rounded-1.25 transition-smooth block w-full outline-none"
@@ -82,7 +82,7 @@ import { SharedModule } from '../../../shared/shared-imports';
                                         </div>
                                     </div>
                                     <div class="table-cell float-left w-full md:w-[21%] align-middle relative">
-                                        <lucide-angular [img]="Calendar" class="w-4.5 stroke-primary left-1.25 absolute top-1/2 -translate-y-1/2" />
+                                        <physio-icon name="calendar" [size]="18" [class]="'text-primary left-1.25 absolute top-1/2 -translate-y-1/2'" />
                                         <div class="mb-0">
                                             <span
                                                 data-pc-name="calendar"
@@ -99,7 +99,7 @@ import { SharedModule } from '../../../shared/shared-imports';
                                     </div>
                                     <div class="table-cell float-left md:float-right pt-0 w-full md:w-auto">
                                         <button class="m-0 text-base font-medium w-full md:min-w-21.5 py-2 px-4.5 transition-smooth rounded-11 relative overflow-hidden z-[1] border border-solid border-secondary cursor-pointer text-center text-white flex items-center justify-center md:justify-start gap-1" type="submit">
-                                            <lucide-angular [img]="Search" class="w-3.5 leading-3 fill-white stroke-white" />
+                                            <physio-icon name="search" [size]="14" [class]="'leading-3 text-white [&_svg]:fill-white'" />
                                             Search
                                         </button>
                                     </div>
@@ -203,10 +203,5 @@ import { SharedModule } from '../../../shared/shared-imports';
     `
 })
 export class BannerHomeComponent {
-    readonly Star = Star;
-    readonly Search = Search;
-    readonly Hospital = Hospital;
-    readonly MapPin = MapPin;
-    readonly Calendar = Calendar;
     readonly stars = new Array(5);
 }

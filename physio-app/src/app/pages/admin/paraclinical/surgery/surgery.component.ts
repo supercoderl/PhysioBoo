@@ -90,7 +90,7 @@ const LOADING_KEY = 'surgery';
         <div *ngIf="alerts().length > 0" class="mb-6 flex gap-3 overflow-x-auto pb-1" aria-live="polite">
           <div *ngFor="let a of alertsBySeverity()" class="shrink-0 min-w-[280px] bg-surface border rounded-lg p-3 flex items-start gap-2"
             [ngClass]="alertBorderClass(a.severity)">
-            <physio-icon name="alert-triangle" [size]="18" [ngClass]="alertIconClass(a.severity)"></physio-icon>
+            <physio-icon name="triangle-alert" [size]="18" [ngClass]="alertIconClass(a.severity)"></physio-icon>
             <div class="flex-1 min-w-0">
               <boo-status-badge [label]="a.severity" [tone]="alertTone(a.severity)"></boo-status-badge>
               <p class="text-xs text-gray-700 mt-1">{{ a.description }}</p>
@@ -148,7 +148,7 @@ export class AdminSurgeryComponent implements OnInit {
     { key: 'queue', label: 'Surgical Queue', icon: 'clipboard-check' },
     { key: 'intraop', label: 'Intra-Operative Tracking', icon: 'activity' },
     { key: 'postop', label: 'Post-Operative Recovery', icon: 'bed' },
-    { key: 'alerts', label: 'Clinical Alerts', icon: 'alert-triangle' },
+    { key: 'alerts', label: 'Clinical Alerts', icon: 'triangle-alert' },
   ];
 
   readonly dateRanges: { key: DateRange; label: string }[] = [

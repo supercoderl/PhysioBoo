@@ -62,7 +62,7 @@ const LOADING_KEY = 'radiology';
             <p class="text-xs text-secondary">Radiology Information System — orders, scheduling, imaging, and reporting</p>
           </div>
           <button class="px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2">
-            <physio-icon name="plus-circle" [size]="16"></physio-icon> New Order
+            <physio-icon name="circle-plus" [size]="16"></physio-icon> New Order
           </button>
         </div>
 
@@ -82,7 +82,7 @@ const LOADING_KEY = 'radiology';
         <div *ngIf="alerts().length > 0" class="mb-6 flex gap-3 overflow-x-auto pb-1" aria-live="polite">
           <div *ngFor="let a of alertsBySeverity()" class="shrink-0 min-w-[280px] bg-surface border rounded-lg p-3 flex items-start gap-2"
             [ngClass]="alertBorderClass(a.severity)">
-            <physio-icon name="alert-triangle" [size]="18" [ngClass]="alertIconClass(a.severity)"></physio-icon>
+            <physio-icon name="triangle-alert" [size]="18" [ngClass]="alertIconClass(a.severity)"></physio-icon>
             <div class="flex-1 min-w-0">
               <boo-status-badge [label]="a.severity" [tone]="alertTone(a.severity)"></boo-status-badge>
               <p class="text-xs text-gray-700 mt-1">{{ a.description }}</p>
@@ -102,7 +102,7 @@ const LOADING_KEY = 'radiology';
           <boo-stat-card label="Pending Reporting" [value]="stats()?.pendingReporting ?? 0" icon="file-edit" tone="warning"></boo-stat-card>
           <boo-stat-card label="Pending Verification" [value]="stats()?.pendingVerification ?? 0" icon="clipboard-check" tone="warning"></boo-stat-card>
           <boo-stat-card label="Completed" [value]="stats()?.completedStudies ?? 0" icon="circle-check" tone="success"></boo-stat-card>
-          <boo-stat-card label="Critical Findings" [value]="stats()?.criticalFindings ?? 0" icon="alert-triangle" tone="danger"></boo-stat-card>
+          <boo-stat-card label="Critical Findings" [value]="stats()?.criticalFindings ?? 0" icon="triangle-alert" tone="danger"></boo-stat-card>
           <boo-stat-card label="Avg TAT (hrs)" [value]="stats()?.averageTatHours ?? 0" icon="timer" tone="neutral"></boo-stat-card>
         </div>
 
@@ -139,7 +139,7 @@ export class AdminRadiologyComponent implements OnInit {
     { key: 'queue', label: 'Examination Queue', icon: 'list-ordered' },
     { key: 'study-tracking', label: 'Study Tracking & Image Review', icon: 'scan' },
     { key: 'reporting', label: 'Radiologist Reporting & Verification', icon: 'file-edit' },
-    { key: 'critical-findings', label: 'Critical Findings', icon: 'alert-triangle' },
+    { key: 'critical-findings', label: 'Critical Findings', icon: 'triangle-alert' },
   ];
 
   constructor(

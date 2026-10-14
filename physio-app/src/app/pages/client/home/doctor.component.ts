@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { ChevronLeft, ChevronRight, Circle, Heart, MapPin, Star } from "lucide-angular";
 import { SlickCarouselModule } from "ngx-slick-carousel";
 import { SharedModule } from "../../../shared/shared-imports";
 
@@ -29,7 +28,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 class="group left-[45%] md:left-[48%] -translate-x-1/2 w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth flex-center-center hover:bg-primary"
                                   (click)="slickModal.slickPrev()"
                             >
-                                <lucide-angular [img]="ChevronLeft" class="font-black group-hover:stroke-white" />
+                                <physio-icon name="chevron-left" [size]="24" class="font-black group-hover:text-white" />
                             </button>
                         </div>
                         <div class="relative block overflow-hidden">
@@ -61,13 +60,13 @@ import { SharedModule } from "../../../shared/shared-imports";
                                                     class="absolute top-5 left-0 right-0 px-5 items-center justify-between flex"
                                                 >
                                                     <span class="bg-danger py-1 px-[0.45rem] font-semibold rounded-[4px] bg-danger text-white text-center flex items-center">
-                                                        <lucide-angular [img]="Star" class="mr-1 w-3.75 fill-white" />4.6
+                                                        <physio-icon name="star" [size]="15" [class]="'mr-1 [&_svg]:fill-white'" />4.6
                                                     </span>
                                                     <a
                                                         class="w-8 h-8 bg-surface flex-center-center rounded-full text-neutral cursor-pointer transition-smooth"
                                                         href="https://doccure.dreamstechnologies.com/react/template/index"
                                                     >
-                                                        <lucide-angular [img]="Heart" class="w-5 text-[#e3e6ec] fill-[#e3e6ec]" />
+                                                        <physio-icon name="heart" [size]="20" class="text-[#e3e6ec] [&_svg]:fill-[#e3e6ec]" />
                                                     </a>
                                                 </div>
                                             </div>
@@ -84,7 +83,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                                     <span
                                                         class="bg-[#edf9f0] text-[#04bd6c] py-[0.25rem] px-[0.45rem] font-semibold rounded-[4px] inline-flex items-center"
                                                     >
-                                                        <lucide-angular [img]="Circle" class="mr-1 w-1.5 fill-[#04bd6c]" />
+                                                        <physio-icon name="circle" [size]="6" [class]="'mr-1 [&_svg]:fill-[#04bd6c]'" />
                                                         Available
                                                     </span>
                                                 </div>
@@ -100,9 +99,9 @@ import { SharedModule } from "../../../shared/shared-imports";
                                                         </h3>
                                                         <div class="flex items-center">
                                                             <p class="flex items-center mb-0 text-[0.875rem] text-brandDark">
-                                                                <lucide-angular [img]="MapPin" class="mr-2 w-[14px]" />Ogden, IA
+                                                                <physio-icon name="map-pin" [size]="14" [class]="'mr-2'" />Ogden, IA
                                                             </p>
-                                                            <lucide-angular [img]="Circle" class="ml-2 mr-1 fill-secondary w-1.5 table" />
+                                                            <physio-icon name="circle" [size]="6" [class]="'ml-2 mr-1 [&_svg]:fill-secondary table'" />
                                                             <span class="text-[0.875rem] font-medium">60 Min</span>
                                                         </div>
                                                     </div>
@@ -133,7 +132,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 class="group left-[55%] md:left-[52%] -translate-x-1/2 ml-3 w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary m-0 absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth flex-center-center hover:bg-primary"
                                 (click)="slickModal.slickNext()"
                             >
-                                <lucide-angular [img]="ChevronRight" class="font-black group-hover:stroke-white" />
+                                <physio-icon name="chevron-right" [size]="24" class="font-black group-hover:text-white" />
                             </button>
                         </div>
                     </div>
@@ -145,12 +144,6 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class DoctorHomeComponent {
-    readonly ChevronLeft = ChevronLeft;
-    readonly ChevronRight = ChevronRight;
-    readonly Star = Star;
-    readonly Heart = Heart;
-    readonly Circle = Circle;
-    readonly MapPin = MapPin;
 
     slides = [
         { img: "http://placehold.it/350x150/000000" },

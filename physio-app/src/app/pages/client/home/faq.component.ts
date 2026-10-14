@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { LucideAngularModule, Plus, SquareMinus } from "lucide-angular";
 import { FAQs } from "../../../shared/data/dummy";
 import { SharedModule } from "../../../shared/shared-imports";
 
@@ -8,7 +7,6 @@ import { SharedModule } from "../../../shared/shared-imports";
     standalone: true,
     imports: [
         SharedModule,
-        LucideAngularModule
     ],
     template: `
         <section class="py-12.5 md:py-15 block">
@@ -36,9 +34,10 @@ import { SharedModule } from "../../../shared/shared-imports";
                                         >
                                             {{item.title}}
 
-                                            <lucide-angular 
-                                                [img]="openFaqIndex === i ? SquareMinus : Plus" 
-                                                class="w-6 h-6 text-secondary transition-transform duration-200" 
+                                            <physio-icon 
+                                                [name]="openFaqIndex === i ? 'square-minus' : 'plus'" 
+                                                [size]="24"
+                                                class="text-secondary transition-transform duration-200" 
                                             />
                                         </a>
                                     </h2>
@@ -68,8 +67,6 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class FaqHomeComponent {
-    readonly SquareMinus = SquareMinus;
-    readonly Plus = Plus;
 
     // Track which FAQ is currently open (null means all closed)
     openFaqIndex: number | null = null;

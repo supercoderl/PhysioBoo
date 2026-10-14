@@ -2,7 +2,7 @@
 
 **Path:** `admin/clinic/prescription`
 **Current implementation:** `src/app/pages/admin/clinic/prescription/prescription.component.ts` (single inline-template component, local state only, no API integration)
-**Scope:** Frontend UI/UX only. No backend, no DB schema, no stack/library recommendations — reuses this app's existing component conventions (`DrawerComponent`, `StatusBadgeComponent`, `BooSelect`, `BooInput`, `DialogService`, `ToastService`, Tailwind, Lucide icons, signals).
+**Scope:** Frontend UI/UX only. No backend, no DB schema, no stack/library recommendations — reuses this app's existing component conventions (`DrawerComponent`, `StatusBadgeComponent`, `BooSelect`, `BooInput`, `DialogService`, `ToastService`, Tailwind, physioboo-icons (`physio-icon`), signals).
 
 ---
 

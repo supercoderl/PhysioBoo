@@ -70,7 +70,7 @@ export type CurrentPatientAction = 'complete' | 'transfer' | 'record' | 'print';
                     <div class="flex flex-wrap items-center gap-2 pt-1">
                         <boo-button-admin
                             background="rgb(var(--twc-primary))" textColor="#fff" padding="9px 16px"
-                            [icon]="{ name: 'circle-check-big', size: 15 }"
+                            [icon]="{ name: 'check-circle', size: 15 }"
                             (click)="action.emit('complete')"
                         >Complete Consultation</boo-button-admin>
                         <boo-button-admin

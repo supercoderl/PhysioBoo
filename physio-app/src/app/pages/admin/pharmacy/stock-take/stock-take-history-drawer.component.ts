@@ -7,8 +7,8 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { StockTake, StockTakeActivity, StockTakeActivityType, stockTakeStatusLabel, stockTakeStatusTone } from "../../../../shared/types/stock-take.types";
 
 const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
-  Created: 'plus-circle', Assigned: 'user-plus', Started: 'play', ItemCounted: 'clipboard',
-  Completed: 'circle-check', Approved: 'circle-check-big', Rejected: 'circle-x', Cancelled: 'ban',
+  Created: 'circle-plus', Assigned: 'user-plus', Started: 'play', ItemCounted: 'clipboard',
+  Completed: 'circle-check', Approved: 'check-circle', Rejected: 'circle-x', Cancelled: 'ban',
 };
 
 @Component({

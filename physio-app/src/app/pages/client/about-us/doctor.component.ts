@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { MapPin } from "lucide-angular";
 import { BEST_DOCTORS } from "../../../shared/data/dummy";
 import { SharedModule } from "../../../shared/shared-imports";
 
@@ -67,7 +66,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                             </div>
                             <div>
                                 <p class="text-xs14 mb-0 flex items-center text-brandDark">
-                                    <lucide-angular [img]="MapPin" class="w-4 stroke-primary mr-1.25" />
+                                    <physio-icon name="map-pin" [class]="'text-primary mr-1.25'" />
                                     {{doctor.address}}
                                 </p>
                             </div>
@@ -81,6 +80,5 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class DoctorAboutUsComponent {
-    readonly MapPin = MapPin;
     readonly bestDoctors = BEST_DOCTORS;
 }

@@ -136,7 +136,7 @@ import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-i
                         >
                             <div class="flex items-center gap-3">
                                 <div class="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center shrink-0">
-                                    <physio-icon name="circle-check-big" [size]="18" class="text-green-600"></physio-icon>
+                                    <physio-icon name="check-circle" [size]="18" class="text-green-600"></physio-icon>
                                 </div>
                                 <span class="text-sm font-medium text-gray-700">GMP Certified</span>
                             </div>

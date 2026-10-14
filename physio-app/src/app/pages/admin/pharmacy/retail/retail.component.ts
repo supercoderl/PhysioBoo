@@ -50,7 +50,7 @@ import { RetailProductDetailDrawerComponent } from "./retail-product-detail-draw
             <physio-icon name="gauge" [size]="14"></physio-icon> {{ showInsight() ? 'Hide' : 'Show' }} Insight
           </button>
           <button type="button" (click)="newSale()" class="px-3 py-2 bg-primary text-white rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1.5">
-            <physio-icon name="plus-circle" [size]="14"></physio-icon> New Sale
+            <physio-icon name="circle-plus" [size]="14"></physio-icon> New Sale
           </button>
         </div>
       </div>

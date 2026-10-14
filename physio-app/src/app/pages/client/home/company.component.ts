@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { Star } from "lucide-angular";
 import { SlickCarouselModule } from "ngx-slick-carousel";
 import { COMPANYLOGOS } from "../../../shared/data/dummy";
 import { SharedModule } from "../../../shared/shared-imports";
@@ -53,7 +52,6 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class CompanyHomeComponent {
-    readonly Star = Star;
     readonly logos = COMPANYLOGOS;
 
     slideConfig = { 

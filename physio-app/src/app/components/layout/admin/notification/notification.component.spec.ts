@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { AdminNotificationComponent } from './notification.component';
 
@@ -8,7 +9,8 @@ describe('AdminNotificationComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdminNotificationComponent]
+      imports: [AdminNotificationComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
     
@@ -19,5 +21,11 @@ describe('AdminNotificationComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('shows an empty state instead of sample notifications', () => {
+    const text: string = fixture.nativeElement.textContent;
+    expect(text).toContain("You're all caught up");
+    expect(text).not.toContain('Fuse');
   });
 });

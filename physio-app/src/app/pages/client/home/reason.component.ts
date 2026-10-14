@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { AudioLines, BriefcaseMedical, SquareUser } from "lucide-angular";
 import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
@@ -19,7 +18,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                     <div class="mx-3">
                         <div class="p-5">
                             <h6 class="mb-2 text-lg font-semibold text-primary flex items-center">
-                                <lucide-angular [img]="SquareUser" class="mr-2 stoke-danger w-4.5" />
+                                <physio-icon name="square-user" [size]="18" [class]="'mr-2 stoke-danger'" />
                                 Follow-Up Care
                             </h6>
                             <p class="text-[0.875rem] mb-0 text-brandDark">
@@ -31,7 +30,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                     <div class="mx-3">
                         <div class="p-5 border-l border-dashed border-[#E3E6EC]">
                             <h6 class="mb-2 text-lg font-semibold text-primary flex items-center">
-                                <lucide-angular [img]="AudioLines" class="mr-2 stroke-[#6938ef] w-4.5" />
+                                <physio-icon name="audio-lines" [size]="18" [class]="'mr-2 text-[#6938ef]'" />
                                 Patient-Centered Approach
                             </h6>
                             <p class="text-[0.875rem] mb-0 text-brandDark">
@@ -43,7 +42,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                     <div class="mx-3">
                         <div class="p-5 border-l border-dashed border-[#E3E6EC]">
                             <h6 class="mb-2 text-lg font-semibold text-primary flex items-center">
-                                <lucide-angular [img]="BriefcaseMedical" class="mr-2 stroke-[#06aed4] w-4.5" />
+                                <physio-icon name="briefcase-medical" [size]="18" [class]="'mr-2 text-[#06aed4]'" />
                                 Convenient Access
                             </h6>
                             <p class="text-[0.875rem] mb-0 text-brandDark">
@@ -64,7 +63,4 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class ReasonHomeComponent {
-    readonly SquareUser = SquareUser;
-    readonly AudioLines = AudioLines;
-    readonly BriefcaseMedical = BriefcaseMedical;
 }

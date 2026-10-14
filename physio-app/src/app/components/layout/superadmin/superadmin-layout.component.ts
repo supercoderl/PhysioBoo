@@ -94,7 +94,7 @@ import { SidebarItemComponent } from '../admin/sidebar/sidebar-item/sidebar-item
                             [attr.aria-expanded]="isNavOpen()"
                             (click)="openNav()"
                         >
-                            <lucide-icon name="menu" class="w-5 h-5"></lucide-icon>
+                            <physio-icon name="menu" [size]="20" />
                         </button>
                         <h1 class="text-sm font-semibold text-regular m-0 truncate">{{ pageTitle }}</h1>
                     </div>
@@ -102,7 +102,7 @@ import { SidebarItemComponent } from '../admin/sidebar/sidebar-item/sidebar-item
                         routerLink="/admin"
                         class="flex items-center gap-1.5 px-2 py-2 -mr-2 rounded-1.5 text-xs text-secondary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors"
                     >
-                        <lucide-icon name="arrow-left" class="w-3.5 h-3.5"></lucide-icon>
+                        <physio-icon name="arrow-left" [size]="14" />
                         Back to Admin
                     </a>
                 </header>

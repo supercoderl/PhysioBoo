@@ -1,6 +1,5 @@
 import { Component } from "@angular/core";
 import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.component";
-import { CalendarHeart, Hospital, MapPin, Search } from "lucide-angular";
 import { TitleDoctorComponent } from "./title.component";
 import { FilterDoctorComponent } from "./filter.component";
 import { SharedModule } from "../../../shared/shared-imports";
@@ -24,7 +23,7 @@ import { MapDoctorComponent } from "./map.component";
                 <div class="p-2 min-w-[800px] w-full bg-surface border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] m-0 table relative z-[1] rounded-full">
                     <form class="flex-center-between float-left w-full">
                         <div class="w-[35%] float-left table-cell align-middle relative before:absolute before:top-1/2 before:-translate-y-1/2 before:right-0 before:w-[1px] before:h-11 before:bg-[#e3e4e8] before:content-[''] before:z-[1]">
-                            <lucide-angular [img]="Hospital" class="w-4.5 stroke-[#8894ae] absolute top-1/2 -translate-y-1/2" />
+                            <physio-icon name="hospital" [size]="18" [class]="'text-[#8894ae] absolute top-1/2 -translate-y-1/2'" />
                             <div class="mb-0">
                                 <input 
                                     class="h-10 pr-2.5 pl-6.25 outline-none border-0 text-primary min-h-9.5 bg-surface text-xs14 rounded-1.25 transition-smooth block w-full" 
@@ -34,7 +33,7 @@ import { MapDoctorComponent } from "./map.component";
                             </div>
                         </div>
                         <div class="w-[26%] float-left table-cell align-middle relative">
-                            <lucide-angular [img]="MapPin" class="w-4.5 stroke-[#8894ae] absolute top-1/2 -translate-y-1/2" />
+                            <physio-icon name="map-pin" [size]="18" [class]="'text-[#8894ae] absolute top-1/2 -translate-y-1/2'" />
                             <div class="mb-0">
                                 <input 
                                     class="h-10 px-9 outline-none border-0 text-primary min-h-9.5 bg-surface text-xs14 rounded-1.25 transition-smooth block w-full" 
@@ -44,7 +43,7 @@ import { MapDoctorComponent } from "./map.component";
                             </div>
                         </div>
                         <div class="w-1/4 float-left table-cell align-middle relative">
-                            <lucide-angular [img]="CalendarHeart" class="w-4.5 stroke-[#8894ae] absolute top-1/2 -translate-y-1/2" />
+                            <physio-icon name="calendar-heart" [size]="18" [class]="'text-[#8894ae] absolute top-1/2 -translate-y-1/2'" />
                             <div class="mb-0">
                                 <div class="px-9">
                                     <div class="ant-picker-input">
@@ -63,7 +62,7 @@ import { MapDoctorComponent } from "./map.component";
                                 class="text-base font-medium min-w-21.5 py-2.25 px-3.75 transition-smooth text-white relative overflow-hidden z-[1] bg-secondary border border-solid border-secondary cursor-pointer rounded-full inline-flex items-center" 
                                 type="submit"
                             >
-                                <lucide-angular [img]="Search" class="mr-2 w-4 fill-white" />Search
+                                <physio-icon name="search" [class]="'mr-2 [&_svg]:fill-white'" />Search
                             </button>
                         </div>
                     </form>
@@ -95,8 +94,4 @@ import { MapDoctorComponent } from "./map.component";
 })
 
 export class DoctorComponent {
-    readonly Search = Search;
-    readonly Hospital = Hospital;
-    readonly MapPin = MapPin;
-    readonly CalendarHeart = CalendarHeart;
 }

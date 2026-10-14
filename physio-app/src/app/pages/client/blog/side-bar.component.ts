@@ -1,6 +1,5 @@
 import { Component } from "@angular/core";
 import { SharedModule } from "../../../shared/shared-imports";
-import { Search } from "lucide-angular";
 
 @Component({
     selector: 'side-bar-blog',
@@ -21,7 +20,7 @@ import { Search } from "lucide-angular";
                                     type="text"
                                 />
                                 <button type="submit" class="w-10 h-10 text-base rounded-[5px] flex-center-center bg-[linear-gradient(90.08deg,#E11D48_.09%,#06aed4_70.28%)] text-white relative overflow-hidden z-[1] bg-secondary border border-solid border-secondary cursor-pointer font-medium transition-smooth">
-                                    <lucide-angular [img]="Search" class="w-4 stroke-white" />
+                                    <physio-icon name="search" class="text-white" />
                                 </button>
                             </div>
                         </form>
@@ -218,5 +217,4 @@ import { Search } from "lucide-angular";
 })
 
 export class SideBarBlogComponent {
-    readonly Search = Search;
 }

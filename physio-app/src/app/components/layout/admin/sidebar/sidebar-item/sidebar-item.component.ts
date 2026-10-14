@@ -27,13 +27,13 @@ import { MenuItem } from '../../../../../shared/types/menu.types';
         *ngIf="isActive && !item.children"
         class="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full bg-primary"
       ></span>
-      <lucide-icon
+      <physio-icon
         *ngIf="item.icon"
         [name]="item.icon"
-        [class.stroke-primaryHover]="isActive"
-        [class.stroke-brandDark]="!isActive"
-        class="w-4 h-4 shrink-0"
-      ></lucide-icon>
+        [class.text-primaryHover]="isActive"
+        [class.text-brandDark]="!isActive"
+        class="shrink-0"
+      />
       <div class="flex min-w-0 flex-auto flex-col items-start gap-1">
         <p class="truncate max-w-full m-0 text-[13px]">
           {{ item.label }}

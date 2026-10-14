@@ -26,7 +26,7 @@ import { CashierInvoice, CashierPaymentMethod } from "../../../../shared/types/c
 
         <div class="p-5 space-y-4">
           <div class="bg-rose-50 rounded-lg px-3 py-2 text-xs text-rose-700 flex items-start gap-2">
-            <physio-icon name="alert-triangle" [size]="14" [class]="'mt-0.5 shrink-0'"></physio-icon>
+            <physio-icon name="triangle-alert" [size]="14" [class]="'mt-0.5 shrink-0'"></physio-icon>
             Refunds are final and will be recorded in the payment history.
           </div>
 

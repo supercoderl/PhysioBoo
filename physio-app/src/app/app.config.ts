@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { PreloadAllModules, provideRouter, withPreloading } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
 import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
 import { provideLottieOptions } from 'ngx-lottie';
 import { routes } from './app.routes';
@@ -15,7 +14,6 @@ import { provideOAuth } from './oauth.config';
 import { InitService } from './services/common/init.service';
 import { InterceptorService } from './services/interceptor/interceptor.service';
 import { HttpLoadingInterceptor } from './services/interceptor/loading-interceptor.service';
-import { SHARED_LUCIDE_ICONS } from './shared/shared-providers';
 
 registerLocaleData(en);
 
@@ -28,7 +26,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideClientHydration(),
     provideNzI18n(en_US),
-    importProvidersFrom([FormsModule, LucideAngularModule.pick(SHARED_LUCIDE_ICONS)]),
+    importProvidersFrom([FormsModule]),
     provideAnimationsAsync(),
     provideHttpClient(withInterceptorsFromDi(), withFetch()),
     provideIcons(),

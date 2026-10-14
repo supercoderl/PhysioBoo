@@ -34,7 +34,7 @@ export interface MasterDataConfig {
     /** Singular, lower-case, e.g. "lab test". */
     singular: string;
     description: string;
-    /** Registered Lucide icon name (kebab-case). */
+    /** `physio-icon` name (kebab-case, see `PHYSIO_ICON_NAMES`). */
     icon: string;
     /** Permission required to open the catalog. */
     permission: string;

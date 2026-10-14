@@ -48,7 +48,7 @@ import { BedMapStats, Ward } from "../../../../shared/types/ward.types";
         <!-- Error State -->
         <div *ngIf="hasError && !loadingSrv.isLoading('bed-map-snapshot')" class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6 flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <physio-icon name="alert-circle" [size]="20" class="text-red-500"></physio-icon>
+            <physio-icon name="warning-circle" [size]="20" class="text-red-500"></physio-icon>
             <span class="text-red-700 text-sm">Unable to load the bed map. Please try again.</span>
           </div>
           <button (click)="refresh()" class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors">Retry</button>

@@ -33,7 +33,7 @@
                 autocomplete="current-password" />
               <button type="button" (click)="showCurrent.set(!showCurrent())"
                 class="text-gray-400 hover:text-gray-600 p-0.5">
-                <physio-icon [name]="showCurrent() ? 'eye-off' : 'eye'" class="w-4 h-4" />
+                <physio-icon [name]="showCurrent() ? 'eye-crossed' : 'eye'" class="w-4 h-4" />
               </button>
             </div>
           </label>
@@ -51,7 +51,7 @@
                 autocomplete="new-password" />
               <button type="button" (click)="showNew.set(!showNew())"
                 class="text-gray-400 hover:text-gray-600 p-0.5">
-                <physio-icon [name]="showNew() ? 'eye-off' : 'eye'" class="w-4 h-4" />
+                <physio-icon [name]="showNew() ? 'eye-crossed' : 'eye'" class="w-4 h-4" />
               </button>
             </div>
             <div *ngIf="newPassword()" class="flex items-center gap-2 mt-1">
@@ -78,7 +78,7 @@
                 autocomplete="new-password" />
               <button type="button" (click)="showConfirm.set(!showConfirm())"
                 class="text-gray-400 hover:text-gray-600 p-0.5">
-                <physio-icon [name]="showConfirm() ? 'eye-off' : 'eye'" class="w-4 h-4" />
+                <physio-icon [name]="showConfirm() ? 'eye-crossed' : 'eye'" class="w-4 h-4" />
               </button>
             </div>
             <span *ngIf="!passwordsMatch()" class="text-[11px] text-red-500">Passwords don't match.</span>

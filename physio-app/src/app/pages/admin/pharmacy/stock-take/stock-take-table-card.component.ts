@@ -130,7 +130,7 @@ export class StockTakeTableCardComponent {
     if (status === 'PendingApproval') {
       return [
         { label: 'View Difference Detail', icon: 'scale', onClick: (d) => this.differenceClick.emit(d) },
-        { label: 'Approve', icon: 'circle-check-big', onClick: (d) => this.approveClick.emit(d) },
+        { label: 'Approve', icon: 'check-circle', onClick: (d) => this.approveClick.emit(d) },
         { label: 'Reject', icon: 'circle-x', isDanger: true, onClick: (d) => this.rejectClick.emit(d) },
         ...common,
       ];

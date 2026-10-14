@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { SharedModule } from '../../../../shared/shared-imports';
-import { Facebook, Instagram, Linkedin, Send, Twitter } from 'lucide-angular';
 import { FOOTER_MENUS } from '../../../../shared/data/dummy';
 
 @Component({
@@ -17,11 +16,6 @@ import { FOOTER_MENUS } from '../../../../shared/data/dummy';
   `
 })
 export class FooterComponent {
-  readonly Send = Send;
-  readonly Facebook = Facebook;
-  readonly Twitter = Twitter;
-  readonly Instagram = Instagram;
-  readonly Linkedin = Linkedin;
 
   readonly menus = FOOTER_MENUS;
 }

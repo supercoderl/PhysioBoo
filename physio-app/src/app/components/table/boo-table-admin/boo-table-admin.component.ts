@@ -1060,7 +1060,7 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
       case 'priority': return 'circle-dot';
       case 'status': return 'circle';
       case 'link': return 'link';
-      case 'email': return 'mail';
+      case 'email': return 'email';
       case 'phone': return 'phone';
       default: return '';
     }

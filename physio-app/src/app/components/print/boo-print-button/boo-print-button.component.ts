@@ -26,7 +26,7 @@ export class BooPrintButtonComponent {
   @Input() data: Record<string, any> = {};
   /** Visible label next to the icon. Pass empty string for icon-only. */
   @Input() label = 'Print';
-  /** Icon name (lucide). */
+  /** Icon name (`physio-icon`). */
   @Input() icon = 'printer';
   /** Tooltip. */
   @Input() title = '';

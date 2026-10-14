@@ -37,7 +37,7 @@ import { OperatingRoom, OperatingRoomStatus } from "../../../../../shared/types/
 
         <div class="flex items-center justify-between">
           <span class="inline-flex items-center gap-1.5 text-xs font-medium" [ngClass]="r.equipmentReady ? 'text-emerald-600' : 'text-amber-600'">
-            <physio-icon [name]="r.equipmentReady ? 'circle-check' : 'alert-triangle'" [size]="14"></physio-icon>
+            <physio-icon [name]="r.equipmentReady ? 'circle-check' : 'triangle-alert'" [size]="14"></physio-icon>
             {{ r.equipmentReady ? 'Equipment Ready' : 'Equipment Not Ready' }}
           </span>
           <button *ngIf="r.currentSurgeryId" (click)="viewCase.emit(r.currentSurgeryId!)" class="text-primary text-xs font-semibold hover:underline">View Case</button>

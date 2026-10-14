@@ -96,6 +96,11 @@ export const routes: Routes = [
                         loadComponent: () => import('./platform/dev-data/dev-data.component').then(m => m.SuperadminDevDataComponent)
                     },
                     {
+                        path: 'icons',
+                        data: { breadcrumb: ['platform', 'icons'] },
+                        loadComponent: () => import('./platform/icons/icon-library.component').then(m => m.SuperadminIconLibraryComponent)
+                    },
+                    {
                         path: 'localization',
                         data: { breadcrumb: ['platform', 'localization'] },
                         loadComponent: () => import('./platform/localization/localization.component').then(m => m.SuperadminLocalizationComponent),

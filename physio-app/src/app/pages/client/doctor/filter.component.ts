@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { MapPin } from "lucide-angular";
 import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
@@ -34,7 +33,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                     class="bg-secondary text-white border-white py-[0.375rem] px-2 w-8 h-8 flex-center-center border border-solid rounded-1.25 text-base transition-smooth" 
                     href="/react/template/patient/doctor-list" 
                 >
-                    <lucide-angular [img]="MapPin" class="w-4" />
+                    <physio-icon name="map-pin" />
                 </a>
             </div>
         </div>
@@ -42,5 +41,4 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class FilterDoctorComponent {
-    readonly MapPin = MapPin;
 }

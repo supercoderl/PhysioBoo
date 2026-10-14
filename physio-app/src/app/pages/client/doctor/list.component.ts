@@ -1,6 +1,5 @@
 import { Component } from "@angular/core";
 import { SharedModule } from "../../../shared/shared-imports";
-import { Group, Rows2 } from "lucide-angular";
 import { DoctorCardComponent } from "../../../components/layout/client/doctor/doctor-card.component";
 
 @Component({
@@ -91,7 +90,7 @@ import { DoctorCardComponent } from "../../../components/layout/client/doctor/do
                     href="/react/template/patient/doctor-list"
                     data-discover="true"
                 >
-                    <lucide-angular [img]="Rows2" class="w-4 stroke-white" />
+                    <physio-icon name="rows-2" class="text-white" />
                 </a>
             </div>
         </div>
@@ -107,7 +106,7 @@ import { DoctorCardComponent } from "../../../components/layout/client/doctor/do
                         class="mx-auto load-btn text-white border-0 relative overflow-hidden z-[1] p-[0.35rem_0.85rem] text-[0.813rem] transition-smooth font-medium flex-center-center w-fit gap-1 rounded-full"
                         href="/react/template/login"
                     >
-                        <lucide-angular [img]="Group" class="w-[13px]" />
+                        <physio-icon name="group" [size]="13" />
                         Load More 425 Doctors
                     </a>
                 </div>
@@ -135,6 +134,4 @@ import { DoctorCardComponent } from "../../../components/layout/client/doctor/do
 })
 
 export class ListDoctorComponent {
-    readonly Rows2 = Rows2;
-    readonly Group = Group;
 }

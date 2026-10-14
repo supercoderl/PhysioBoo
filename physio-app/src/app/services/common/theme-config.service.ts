@@ -1,6 +1,7 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PreferenceService } from './preference.service';
+import { ThemeService } from './theme.service';
 
 export type ThemeMode = 'light' | 'dark' | 'auto';
 export type FontSize = 'small' | 'medium' | 'large';
@@ -19,6 +20,12 @@ const KEYS = {
   ACCENT: 'theme.accentColor',
 } as const;
 
+const KEY_BY_FIELD: Record<keyof ThemeConfig, string> = {
+  mode: KEYS.MODE,
+  fontSize: KEYS.FONT,
+  accentColor: KEYS.ACCENT,
+};
+
 const DEFAULTS: ThemeConfig = {
   mode: 'light',
   fontSize: 'medium',
@@ -36,8 +43,11 @@ const FONT_PX: Record<FontSize, string> = {
 @Injectable({ providedIn: 'root' })
 export class ThemeConfigService {
   private prefSrv = inject(PreferenceService);
+  private themeSrv = inject(ThemeService);
 
   readonly config = signal<ThemeConfig>(DEFAULTS);
+  /** Whether the dark palette is in effect (resolves `auto` against the OS setting). */
+  readonly isDark = computed(() => this.resolveDark(this.config().mode));
 
   hydrateFromCache(): void {
     const cfg: ThemeConfig = {
@@ -65,6 +75,20 @@ export class ThemeConfigService {
     ]);
   }
 
+  /** Applies and saves only the given fields, e.g. a quick toggle from the header. */
+  update(cfg: Partial<ThemeConfig>): Observable<unknown> {
+    const merged = { ...this.config(), ...cfg };
+    this.config.set(merged);
+    this.apply(merged);
+    return this.prefSrv.setMany(
+      (Object.keys(cfg) as (keyof ThemeConfig)[]).map(field => ({
+        key: KEY_BY_FIELD[field],
+        value: merged[field],
+        group: 'theme',
+      }))
+    );
+  }
+
   reset(): Observable<unknown> {
     return this.save(DEFAULTS);
   }
@@ -73,10 +97,9 @@ export class ThemeConfigService {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
 
-    const isDark =
-      cfg.mode === 'dark' ||
-      (cfg.mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const isDark = this.resolveDark(cfg.mode);
     root.classList.toggle('dark', isDark);
+    this.themeSrv.remember(isDark);
     root.dataset['themeMode'] = cfg.mode;
 
     root.style.fontSize = FONT_PX[cfg.fontSize];
@@ -85,6 +108,13 @@ export class ThemeConfigService {
     // The palette lives in styles.scss; clear any inline override left by an older accent choice.
     root.style.removeProperty('--twc-primary');
     root.dataset['accent'] = cfg.accentColor;
+  }
+
+  private resolveDark(mode: ThemeMode): boolean {
+    if (mode === 'dark') return true;
+    return mode === 'auto'
+      && typeof window !== 'undefined'
+      && window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
 
   private knownAccent(value: string): AccentColor {

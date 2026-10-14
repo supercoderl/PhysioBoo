@@ -36,7 +36,7 @@ const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface t
                         aria-label="Close"
                         (click)="close.emit()"
                     >
-                        <lucide-icon name="x" class="w-4 h-4"></lucide-icon>
+                        <physio-icon name="x" />
                     </button>
                 </div>
 

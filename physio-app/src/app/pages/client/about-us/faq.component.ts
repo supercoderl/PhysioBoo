@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { SquareMinus, SquarePlus } from "lucide-angular";
 import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
@@ -58,9 +57,10 @@ import { SharedModule } from "../../../shared/shared-imports";
                                         aria-controls="collapseContent"
                                     >
                                         Can i make an Appointment Online with White Plains Hospital Kendi?
-                                        <lucide-angular 
-                                            [img]="selectedIndex === i ? SquareMinus : SquarePlus" 
-                                            class='w-7  transition-transform duration-500 text-secondary'
+                                        <physio-icon 
+                                            [name]="selectedIndex === i ? 'square-minus' : 'square-plus'" 
+                                            [size]="28"
+                                            class="transition-transform duration-500 text-secondary"
                                             [class.rotate-180]="selectedIndex === i" 
                                         />
                                     </a>
@@ -105,8 +105,6 @@ export class FaqAboutUsComponent {
 
     readonly arr = new Array(5);
 
-    readonly SquareMinus = SquareMinus;
-    readonly SquarePlus = SquarePlus;
 
     toggleCollapse(i: number) {
         this.selectedIndex === i ? this.selectedIndex = -1 : this.selectedIndex = i;

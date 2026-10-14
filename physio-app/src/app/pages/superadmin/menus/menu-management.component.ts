@@ -61,7 +61,7 @@ import { MenuArea, menuAreaOf } from "../../../shared/utils/menu.utils";
                         role="note"
                         class="flex items-start gap-3 rounded-2 border border-amber-300 bg-amber-50 px-4 py-3 text-[13px] text-amber-900"
                     >
-                        <lucide-icon name="triangle-alert" class="w-4 h-4 shrink-0 mt-0.5"></lucide-icon>
+                        <physio-icon name="triangle-alert" [class]="'shrink-0 mt-0.5'" />
                         <p class="m-0">Admin menu changes affect <strong>every tenant's</strong> sidebar.</p>
                     </div>
 

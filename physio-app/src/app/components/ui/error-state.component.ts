@@ -26,7 +26,7 @@ import { SharedModule } from "../../shared/shared-imports";
     `,
 })
 export class ErrorStateComponent {
-    @Input() icon: string = 'alert-triangle';
+    @Input() icon: string = 'triangle-alert';
     @Input({ required: true }) title!: string;
     @Input() description?: string | null;
     @Input() showRetry: boolean = true;

@@ -134,7 +134,7 @@ export interface Banner {
 
 export interface Feature {
     id: string;
-    icon: string;        // lucide icon name, e.g. "hospital", "stethoscope"
+    icon: string;        // physio-icon name, e.g. "hospital", "stethoscope"
     title: string;
     description: string;
     order: number;
@@ -178,7 +178,7 @@ export interface HomeSettings {
 | Inactive | bg-gray-100 text-gray-800   |
 
 ### Feature Icon Picker
-`BooSelectComponent` bound to a fixed lucide icon list (`hospital`, `stethoscope`, `ambulance`, `pill`, `microscope`, `smartphone`, `heart-pulse`, `shield-check`), rendered via `<physio-icon>` in both the select and the table/drawer preview — replaces the emoji field entirely.
+`BooSelectComponent` bound to a fixed physio-icon name list (`hospital`, `stethoscope`, `ambulance`, `pill`, `microscope`, `smartphone`, `heart-pulse`, `shield-check`), rendered via `<physio-icon>` in both the select and the table/drawer preview — replaces the emoji field entirely.
 
 ## Interaction Design
 - Row / edit action → `onOpenDrawer(id)` per entity

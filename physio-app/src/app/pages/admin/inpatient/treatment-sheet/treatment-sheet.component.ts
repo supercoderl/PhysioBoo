@@ -122,7 +122,7 @@ const LOADING_KEY = 'treatment-sheet';
           <boo-stat-card label="Completed Orders" [value]="stats()?.completedOrders ?? 0" icon="circle-check" tone="success"></boo-stat-card>
           <boo-stat-card label="Pending Orders" [value]="stats()?.pendingOrders ?? 0" icon="clock" tone="neutral"></boo-stat-card>
           <boo-stat-card label="Medication Due" [value]="stats()?.medicationDue ?? 0" icon="pill" tone="warning"></boo-stat-card>
-          <boo-stat-card label="Critical Alerts" [value]="stats()?.criticalAlerts ?? 0" icon="alert-triangle" tone="danger"></boo-stat-card>
+          <boo-stat-card label="Critical Alerts" [value]="stats()?.criticalAlerts ?? 0" icon="triangle-alert" tone="danger"></boo-stat-card>
           <boo-stat-card label="Pending Labs" [value]="stats()?.pendingLabs ?? 0" icon="flask-conical" tone="primary"></boo-stat-card>
           <boo-stat-card label="Pending Imaging" [value]="stats()?.pendingImaging ?? 0" icon="scan" tone="primary"></boo-stat-card>
         </div>
@@ -130,7 +130,7 @@ const LOADING_KEY = 'treatment-sheet';
         <!-- Quick actions -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           <button (click)="setTab('orders')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
-            <physio-icon name="plus-circle" [size]="18" class="text-primary"></physio-icon> Add Order
+            <physio-icon name="circle-plus" [size]="18" class="text-primary"></physio-icon> Add Order
           </button>
           <button (click)="setTab('notes')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
             <physio-icon name="file-plus" [size]="18" class="text-primary"></physio-icon> Add Progress Note
@@ -250,7 +250,7 @@ export class AdminTreatmentSheetComponent implements OnInit {
 
   alertIcon(type: ClinicalAlert['type']): string {
     switch (type) {
-      case 'Allergy': return 'alert-triangle';
+      case 'Allergy': return 'triangle-alert';
       case 'DrugInteraction': return 'pill';
       case 'AbnormalLab': return 'flask-conical';
       case 'CriticalVitals': return 'activity';

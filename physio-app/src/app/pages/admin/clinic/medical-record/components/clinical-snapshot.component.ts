@@ -34,7 +34,7 @@ export class ClinicalSnapshotComponent {
     return [
       { label: 'Active diagnoses', value: s.activeDiagnosesCount, sub: null, icon: 'stethoscope', fg: 'text-violet-600', bg: 'bg-violet-50' },
       { label: 'Medications', value: s.activeMedicationsCount, sub: 'Currently active', icon: 'pill', fg: 'text-primary', bg: 'bg-primarySoft' },
-      { label: 'Allergies', value: s.knownAllergiesCount, sub: null, icon: 'alert-triangle', fg: 'text-red-600', bg: 'bg-red-50' },
+      { label: 'Allergies', value: s.knownAllergiesCount, sub: null, icon: 'triangle-alert', fg: 'text-red-600', bg: 'bg-red-50' },
       { label: 'Pending orders', value: s.pendingOrdersCount, sub: 'Lab + imaging', icon: 'clipboard', fg: 'text-amber-600', bg: 'bg-amber-50' },
       { label: 'Lab alerts', value: s.recentLabAlerts.length, sub: criticalLabs ? `${criticalLabs} critical` : 'Last 7 days', icon: 'flask-conical', fg: criticalLabs ? 'text-red-600' : 'text-emerald-600', bg: criticalLabs ? 'bg-red-50' : 'bg-emerald-50' },
       { label: 'Next visit', value: nextAppt ? this.relative(nextAppt.scheduledAt) : '—', sub: nextAppt?.department ?? null, icon: 'calendar', fg: 'text-primary', bg: 'bg-primarySoft' },

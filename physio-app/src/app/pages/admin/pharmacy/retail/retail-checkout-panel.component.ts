@@ -41,7 +41,7 @@ const VAT_RATE = 0.05;
             <span *ngIf="cart!.customer!.loyaltyPoints" class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[11px] font-medium">{{ cart!.customer!.loyaltyPoints }} pts</span>
             <span *ngIf="cart!.customer!.prescriptionReference" class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-[11px] font-medium">Rx {{ cart!.customer!.prescriptionReference }}</span>
             <span *ngIf="cart!.customer!.allergyInformation" class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 text-[11px] font-medium flex items-center gap-1">
-              <physio-icon name="alert-triangle" [size]="11"></physio-icon> {{ cart!.customer!.allergyInformation }}
+              <physio-icon name="triangle-alert" [size]="11"></physio-icon> {{ cart!.customer!.allergyInformation }}
             </span>
           </div>
         </div>

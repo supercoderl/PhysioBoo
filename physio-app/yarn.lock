@@ -171,7 +171,7 @@
     symbol-observable "4.0.0"
     yargs "17.7.2"
 
-"@angular/common@^17.0.0", "@angular/common@^17.0.0 || ^18.0.0", "@angular/common@^17.0.1", "@angular/common@^17.3.0", "@angular/common@>=12.0.0", "@angular/common@>=13.0.0", "@angular/common@>=17.0.0", "@angular/common@13.x - 20.x", "@angular/common@17.3.12":
+"@angular/common@^17.0.0", "@angular/common@^17.0.0 || ^18.0.0", "@angular/common@^17.0.1", "@angular/common@^17.3.0", "@angular/common@>=12.0.0", "@angular/common@>=13.0.0", "@angular/common@>=17.0.0", "@angular/common@17.3.12":
   version "17.3.12"
   resolved "https://registry.npmjs.org/@angular/common/-/common-17.3.12.tgz"
   integrity sha512-vabJzvrx76XXFrm1RJZ6o/CyG32piTB/1sfFfKHdlH1QrmArb8It4gyk9oEjZ1IkAD0HvBWlfWmn+T6Vx3pdUw==
@@ -199,7 +199,7 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/core@^17.0.0", "@angular/core@^17.0.0 || ^18.0.0", "@angular/core@^17.0.1", "@angular/core@^17.3.0", "@angular/core@>=12.0.0", "@angular/core@>=13.0.0", "@angular/core@>=17", "@angular/core@>=17.0.0", "@angular/core@13.x - 20.x", "@angular/core@17.3.12":
+"@angular/core@^17.0.0", "@angular/core@^17.0.0 || ^18.0.0", "@angular/core@^17.0.1", "@angular/core@^17.3.0", "@angular/core@>=12.0.0", "@angular/core@>=13.0.0", "@angular/core@>=17", "@angular/core@>=17.0.0", "@angular/core@17.3.12":
   version "17.3.12"
   resolved "https://registry.npmjs.org/@angular/core/-/core-17.3.12.tgz"
   integrity sha512-MuFt5yKi161JmauUta4Dh0m8ofwoq6Ino+KoOtkYMBGsSx+A7dSm+DUxxNwdj7+DNyg3LjVGCFgBFnq4g8z06A==
@@ -4457,13 +4457,6 @@ lru-cache@^6.0.0:
   integrity sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==
   dependencies:
     yallist "^4.0.0"
-
-lucide-angular@^0.541.0:
-  version "0.541.0"
-  resolved "https://registry.npmjs.org/lucide-angular/-/lucide-angular-0.541.0.tgz"
-  integrity sha512-k41TUQRBoq2x1rTmdnz1n0SIfdZ/HzB7pnJEC28Hn9GWNRLVhEKeee0Fa4fB44aJKwdm0brmue5dq07NB1GnSw==
-  dependencies:
-    tslib "^2.3.0"
 
 luxon@^3.7.1:
   version "3.7.2"

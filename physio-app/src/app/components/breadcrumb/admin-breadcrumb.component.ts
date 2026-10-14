@@ -26,12 +26,13 @@ import { SharedModule } from "../../shared/shared-imports";
           >
             {{ crumb.label }}
           </a>
-          <lucide-icon
+          <physio-icon
             *ngIf="!last"
             name="chevron-right"
-            class="w-5 h-5 inlineFlex-center-center align-middle mx-1"
-            [style.stroke]="theme === 'light' ? '#71606A' : 'white'"
-          ></lucide-icon>
+            [size]="20"
+            [class]="'inlineFlex-center-center align-middle mx-1'"
+            [style.color]="theme === 'light' ? '#71606A' : 'white'"
+          />
         </li>
       </ol>
     </nav>

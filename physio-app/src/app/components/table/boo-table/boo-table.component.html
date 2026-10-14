@@ -19,7 +19,7 @@
                   <div
                     class="min-h-7 px-2 text-[13px] text-[#1F232B] inline-flex items-center rounded-2 relative bg-surface"
                   >
-                    <physio-icon [name]="search" class="w-4 h-4" />
+                    <physio-icon name="search" class="w-4 h-4" />
                     <input
                       aria-invalid="false"
                       autocomplete="off"
@@ -74,7 +74,7 @@
               type="button"
               aria-label="Show/Hide filters"
             >
-              <physio-icon [name]="listFilter" class="w-4 h-4" />
+              <physio-icon name="filter" class="w-4 h-4" />
             </button>
             <button
               class="inlineFlex-center-center relative bg-transparent cursor-pointer text-center text-[#71606A] w-8 h-8 max-h-8 m-0 flex-auto rounded-2"
@@ -82,7 +82,7 @@
               type="button"
               aria-label="Show/Hide columns"
             >
-              <physio-icon [name]="columns3cog" class="w-4 h-4" />
+              <physio-icon name="columns-3-cog" class="w-4 h-4" />
             </button>
             <button
               class="inlineFlex-center-center relative bg-transparent cursor-pointer text-center text-[#71606A] w-8 h-8 max-h-8 m-0 flex-auto rounded-2"
@@ -90,7 +90,7 @@
               type="button"
               aria-label="Toggle density"
             >
-              <physio-icon [name]="rows4" class="w-4 h-4" />
+              <physio-icon name="rows-4" class="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -163,7 +163,7 @@
                       (click)="handleSort(column.id)"
                       class="ml-1 hover:text-gray-700"
                     >
-                      <physio-icon [name]="arrowDownUp" class="w-4 h-4" />
+                      <physio-icon name="arrow-down-up" class="w-4 h-4" />
                     </button>
                   </ng-container>
                 </div>
@@ -176,13 +176,13 @@
                     class="cursor-move p-1 hover:bg-gray-200 rounded"
                     aria-label="Move"
                   >
-                    <physio-icon [name]="gripVertical" class="w-4 h-4" />
+                    <physio-icon name="grip-vertical" class="w-4 h-4" />
                   </button>
                   <button
                     class="p-1 hover:bg-gray-200 rounded"
                     aria-label="Column Actions"
                   >
-                    <physio-icon [name]="ellipsisVertical" class="w-4 h-4" />
+                    <physio-icon name="ellipsis-vertical" class="w-4 h-4" />
                   </button>
                 </div>
               </div>

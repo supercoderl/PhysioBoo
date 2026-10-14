@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { ChevronLeft, ChevronRight } from "lucide-angular";
 import { SlickCarouselModule } from "ngx-slick-carousel";
 import { SharedModule } from "../../../shared/shared-imports";
 
@@ -27,7 +26,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                             class="group left-[45%] md:left-[48%] -translate-x-1/2 flex-center-center w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth hover:bg-primary"
                             (click)="slickModal.slickPrev()"
                         >
-                            <lucide-angular [img]="ChevronLeft" class="font-black group-hover:stroke-white" />
+                            <physio-icon name="chevron-left" [size]="24" class="font-black group-hover:text-white" />
                         </button>
                     </div>
                     <div class="relative block overflow-hidden">
@@ -77,7 +76,7 @@ import { SharedModule } from "../../../shared/shared-imports";
                                 class="group left-[55%] md:left-[52%] -translate-x-1/2 flex-center-center ml-3 w-9 h-9 bg-info2 border border-solid border-info2 rounded-full text-primary absolute bottom-[-60px] z-[99] cursor-pointer transition-smooth hover:bg-primary"
                                 (click)="slickModal.slickNext()"
                             >
-                                <lucide-angular [img]="ChevronRight" class="font-black group-hover:stroke-white" />
+                                <physio-icon name="chevron-right" [size]="24" class="font-black group-hover:text-white" />
                             </button>
                         </div>
                     </div>
@@ -98,8 +97,6 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class SpecialityHomeComponent {
-    readonly ChevronLeft = ChevronLeft;
-    readonly ChevronRight = ChevronRight;
 
     slides = [
         { img: "http://placehold.it/350x150/000000" },

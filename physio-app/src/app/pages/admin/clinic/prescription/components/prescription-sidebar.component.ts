@@ -73,7 +73,7 @@ interface AlertEntry {
           <button type="button" (click)="applyFavorite.emit(f)"
             class="flex-1 text-left flex items-center justify-between hover:bg-gray-50 rounded px-1 -mx-1">
             <span class="text-xs text-primary">{{ f.name }} <span class="text-secondary">{{ f.strength }}</span></span>
-            <physio-icon name="plus-circle" [size]="14" class="text-primary"></physio-icon>
+            <physio-icon name="circle-plus" [size]="14" class="text-primary"></physio-icon>
           </button>
           <button type="button" (click)="removeFavorite.emit(f)" class="text-secondary hover:text-rose-600 p-0.5" title="Remove from favorites" aria-label="Remove from favorites">
             <physio-icon name="x" [size]="12"></physio-icon>

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
-import { Observable, map, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 import { BASE_API } from '../../shared/api/base';
 import { PagedResponse } from '../../shared/types/common';
 import { PreferenceItem } from '../../shared/types/core.types';
@@ -44,13 +44,32 @@ export class PreferenceService {
       group: e.group ?? 'general'
     }));
 
+    const previous = this.cache();
     this.cache.update(c => {
       const next = { ...c };
       for (const p of preferences) next[p.key] = p.value;
       return next;
     });
 
-    return this.http.post(BASE_API.PREFERENCE.BASE, { preferences });
+    return this.http.post(BASE_API.PREFERENCE.BASE, { preferences }).pipe(
+      catchError(err => {
+        this.rollback(previous, preferences);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  /** Undoes an optimistic write that failed, unless a later write already replaced the value. */
+  private rollback(previous: Record<string, string>, written: PreferenceItem[]): void {
+    this.cache.update(c => {
+      const next = { ...c };
+      for (const p of written) {
+        if (next[p.key] !== p.value) continue;
+        if (previous[p.key] === undefined) delete next[p.key];
+        else next[p.key] = previous[p.key];
+      }
+      return next;
+    });
   }
 
 }

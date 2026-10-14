@@ -333,7 +333,7 @@ export class AdminNursingDashboardComponent implements OnInit {
       case 'FallRisk': return 'shield-alert';
       case 'Isolation': return 'biohazard';
       case 'Emergency': return 'siren';
-      case 'Allergy': return 'alert-triangle';
+      case 'Allergy': return 'triangle-alert';
       default: return 'activity';
     }
   }

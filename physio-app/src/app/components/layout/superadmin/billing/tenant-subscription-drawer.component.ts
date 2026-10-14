@@ -58,7 +58,7 @@ const BTN_DANGER = `h-9 px-3.5 rounded-1.5 border border-danger/30 bg-surface te
                             aria-label="Close"
                             (click)="close.emit()"
                         >
-                            <lucide-icon name="x" class="w-4 h-4"></lucide-icon>
+                            <physio-icon name="x" />
                         </button>
                     </div>
                 </div>

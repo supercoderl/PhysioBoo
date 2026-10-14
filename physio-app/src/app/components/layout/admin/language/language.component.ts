@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
-import { CONFIG_CACHE_KEY } from '../../../../shared/data/cache';
+import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
+import { finalize } from 'rxjs';
+import { LanguageService } from '../../../../services/common/language.service';
+import { ToastService } from '../../../../services/common/toast.service';
 import { SharedModule } from '../../../../shared/shared-imports';
-import { AppConfig } from '../../../../shared/types/common';
 import { Language } from '../../../../shared/types/sys-language.types';
-import { LocalStorage } from '../../../../shared/utils/storage';
 
 @Component({
   selector: 'admin-language',
@@ -15,15 +15,29 @@ import { LocalStorage } from '../../../../shared/utils/storage';
 })
 export class AdminLanguageComponent {
   // #region Inputs, Outputs, Properties
-  languages: Language[] = [];
+  @Output() selected: EventEmitter<Language> = new EventEmitter<Language>();
+
+  protected languageSrv = inject(LanguageService);
+  private toastSrv = inject(ToastService);
+
+  saving = signal(false);
   // #endregion
 
-  // #region Init (Lifecycle + Setup)
-  constructor() {
-    const config_data = LocalStorage.load<AppConfig>(CONFIG_CACHE_KEY);
-    if (config_data && config_data.languages) {
-      this.languages = config_data.languages;
+  // #region Events
+  pick(language: Language) {
+    if (this.saving()) return;
+    if (language.code === this.languageSrv.current()?.code) {
+      this.selected.emit(language);
+      return;
     }
+
+    this.saving.set(true);
+    this.languageSrv.select(language.code)
+      .pipe(finalize(() => this.saving.set(false)))
+      .subscribe({
+        next: () => this.selected.emit(language),
+        error: () => this.toastSrv.error('Could not save your language')
+      });
   }
   // #endregion
 }

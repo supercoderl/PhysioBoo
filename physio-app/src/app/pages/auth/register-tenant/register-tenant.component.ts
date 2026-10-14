@@ -81,7 +81,7 @@ import { RegisterTenantRequest } from '../../../shared/types/tenant.types';
                         (click)="removeBranch(i)"
                         class="text-red-500 hover:text-red-700"
                       >trash
-                        <physio-icon name="trash-2" [size]="16"></physio-icon>
+                        <physio-icon name="trash" [size]="16"></physio-icon>
                       </button>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mb-4">
@@ -122,7 +122,7 @@ import { RegisterTenantRequest } from '../../../shared/types/tenant.types';
                       booError
                     >
                       <physio-icon
-                        [name]="passwordType === 'text' ? 'eye' : 'eye-off'"
+                        [name]="passwordType === 'text' ? 'eye' : 'eye-crossed'"
                         endfix
                         (click)="onTogglePassword()"
                       [class]="'leading-none absolute top-1/2 -translate-y-1/2 right-2.5 stroke-brandDark cursor-pointer'"

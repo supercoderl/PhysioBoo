@@ -96,7 +96,7 @@ import {
         <section class="bg-surface border border-gray-200 rounded-lg">
           <header class="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
             <h3 class="text-sm font-semibold text-primary m-0 flex items-center gap-2">
-              <physio-icon name="alert-triangle" class="w-4 h-4 text-red-600"></physio-icon>
+              <physio-icon name="triangle-alert" class="w-4 h-4 text-red-600"></physio-icon>
               Allergies
               <span class="text-xs text-secondary font-normal">({{ allergies?.length || 0 }})</span>
             </h3>

@@ -43,7 +43,7 @@ const knownIconValidator = (control: AbstractControl): ValidationErrors | null =
                         aria-label="Close"
                         (click)="close.emit()"
                     >
-                        <lucide-icon name="x" class="w-4 h-4"></lucide-icon>
+                        <physio-icon name="x" />
                     </button>
                 </div>
 

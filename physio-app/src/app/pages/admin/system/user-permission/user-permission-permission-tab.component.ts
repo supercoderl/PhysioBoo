@@ -69,7 +69,7 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
                 class="p-1.5 hover:bg-red-50 rounded text-red-500"
                 title="Delete"
               >trash
-                <physio-icon name="trash-2" class="w-3.5 h-3.5"></physio-icon>
+                <physio-icon name="trash" class="w-3.5 h-3.5"></physio-icon>
               </button>
             </div>
           </div>

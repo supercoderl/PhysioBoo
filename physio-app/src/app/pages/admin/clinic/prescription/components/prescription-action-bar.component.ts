@@ -48,7 +48,7 @@ import { PrescriptionDraft, PrescriptionRxStatus } from "../../../../../shared/t
             <button type="button" (click)="issue.emit()" [disabled]="!canIssue"
               [title]="!canIssue ? 'Add at least one medication before issuing' : ''"
               class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              <physio-icon name="check-circle-2" [size]="16"></physio-icon> Issue Prescription
+              <physio-icon name="circle-check" [size]="16"></physio-icon> Issue Prescription
             </button>
             <button type="button" (click)="cancel.emit()" class="text-rose-600 hover:text-rose-700 text-sm font-medium px-2">
               Cancel

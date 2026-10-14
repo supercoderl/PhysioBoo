@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { ChevronRight } from "lucide-angular";
 import { SharedModule } from "../../../shared/shared-imports";
 
 @Component({
@@ -68,6 +67,5 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class BlogHomeComponent {
-    readonly ChevronRight = ChevronRight;
     readonly arr = new Array(4);
 }

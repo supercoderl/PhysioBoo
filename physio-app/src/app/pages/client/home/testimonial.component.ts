@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { Star } from "lucide-angular";
 import { SlickCarouselModule } from "ngx-slick-carousel";
 import { TESTIMONIAL_COUNTERS } from "../../../shared/data/dummy";
 import { SharedModule } from "../../../shared/shared-imports";
@@ -38,11 +37,11 @@ import { SharedModule } from "../../../shared/shared-imports";
                                         <div class="p-5 bg-surface w-full inline-block border border-solid border-borderGray rounded-2.5">
                                             <div class="flex items-center mb-6">
                                                 <div class="flex mb-2 w-full">
-                                                    <lucide-angular [img]="Star" class="w-5 fill-[#ffca18] stroke-[#ffca18]" />
-                                                    <lucide-angular [img]="Star" class="w-5 fill-[#ffca18] stroke-[#ffca18]" />
-                                                    <lucide-angular [img]="Star" class="w-5 fill-[#ffca18] stroke-[#ffca18]" />
-                                                    <lucide-angular [img]="Star" class="w-5 fill-[#ffca18] stroke-[#ffca18]" />
-                                                    <lucide-angular [img]="Star" class="w-5 fill-[#ffca18] stroke-[#ffca18]" />
+                                                    <physio-icon name="star" [size]="20" class="text-[#ffca18] [&_svg]:fill-[#ffca18]" />
+                                                    <physio-icon name="star" [size]="20" class="text-[#ffca18] [&_svg]:fill-[#ffca18]" />
+                                                    <physio-icon name="star" [size]="20" class="text-[#ffca18] [&_svg]:fill-[#ffca18]" />
+                                                    <physio-icon name="star" [size]="20" class="text-[#ffca18] [&_svg]:fill-[#ffca18]" />
+                                                    <physio-icon name="star" [size]="20" class="text-[#ffca18] [&_svg]:fill-[#ffca18]" />
                                                 </div>
                                                 <span>
                                                     <img
@@ -117,7 +116,6 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class TestimonialHomeComponent {
-    readonly Star = Star;
     readonly testimonials = TESTIMONIAL_COUNTERS;
 
     slides = [

@@ -86,14 +86,8 @@
                 </p>
               </div>
               <div class="flex shrink-0 items-center gap-2">
-                <lucide-icon
-                  [name]="info"
-                  class="w-4 h-4 stroke-regular"
-                ></lucide-icon>
-                <lucide-icon
-                  [name]="chevronUp"
-                  class="w-4 h-4 stroke-regular"
-                ></lucide-icon>
+                <physio-icon name="info" class="text-regular" />
+                <physio-icon name="chevron-up" class="text-regular" />
               </div>
             </button>
             <div content class="min-w-32 max-w-32 bg-surface rounded-[8px]">
@@ -105,7 +99,7 @@
                 My Profile
               </button-icon>
               <button-icon
-                [icon]="{ name: 'mail' }"
+                [icon]="{ name: 'email' }"
                 buttonClass="border-0 w-full !justify-start"
               >
                 Inbox

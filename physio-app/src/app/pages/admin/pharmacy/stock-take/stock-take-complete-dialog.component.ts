@@ -14,7 +14,7 @@ import { StockTakeSummary } from "../../../../shared/types/stock-take.types";
       <div class="relative bg-surface rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100">
         <div class="px-6 py-5 border-b border-gray-100 flex items-start gap-4">
           <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" [ngClass]="hasRemaining ? 'bg-amber-50' : 'bg-emerald-50'">
-            <physio-icon [name]="hasRemaining ? 'triangle-alert' : 'circle-check-big'" [size]="20" [class]="hasRemaining ? 'text-amber-600' : 'text-emerald-600'"></physio-icon>
+            <physio-icon [name]="hasRemaining ? 'triangle-alert' : 'check-circle'" [size]="20" [class]="hasRemaining ? 'text-amber-600' : 'text-emerald-600'"></physio-icon>
           </div>
           <div class="flex-1">
             <h3 class="text-lg font-semibold text-gray-900">Complete Counting</h3>

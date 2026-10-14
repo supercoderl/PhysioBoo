@@ -72,7 +72,7 @@ type ViewMode = 'table' | 'timeline' | 'calendar';
             <td class="px-4 py-3 text-gray-500">{{ s.primarySurgeon }}</td>
             <td class="px-4 py-3">
               <span class="inline-flex items-center gap-1 text-xs font-semibold text-gray-700">{{ s.operatingRoomNumber }}
-                <physio-icon *ngIf="hasConflict(s)" name="alert-triangle" [size]="12" class="text-rose-500"></physio-icon>
+                <physio-icon *ngIf="hasConflict(s)" name="triangle-alert" [size]="12" class="text-rose-500"></physio-icon>
               </span>
             </td>
             <td class="px-4 py-3 text-gray-500">{{ s.scheduledStart | date:'short' }}</td>

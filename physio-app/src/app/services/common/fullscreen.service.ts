@@ -15,7 +15,7 @@ export class FullscreenService {
 
             // Listen key F11
             window.document.addEventListener('keydown', (e: KeyboardEvent) => {
-                if (e.key === 'F11') {
+                if (e.key === 'F11' && this.isSupported) {
                     e.preventDefault();
                     this.toggleFullScreen();
                 }
@@ -24,11 +24,18 @@ export class FullscreenService {
     }
 
     toggleFullScreen() {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-        } else {
-            document.exitFullscreen();
-        }
+        if (!this.isSupported) return;
+        const request = document.fullscreenElement
+            ? document.exitFullscreen()
+            : document.documentElement.requestFullscreen();
+        // Browsers reject when the request is not allowed (e.g. inside a sandboxed iframe);
+        // the state is driven by `fullscreenchange`, so there is nothing to undo.
+        request?.catch(() => { });
+    }
+
+    /** False on SSR and in browsers or frames where the Fullscreen API is blocked. */
+    get isSupported(): boolean {
+        return typeof document !== 'undefined' && !!document.fullscreenEnabled;
     }
 
     get isFullScreen() {

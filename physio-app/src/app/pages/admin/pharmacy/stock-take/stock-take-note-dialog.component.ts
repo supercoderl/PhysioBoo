@@ -78,7 +78,7 @@ export class StockTakeNoteDialogComponent implements OnChanges {
 
     get iconName(): string {
         switch (this.mode) {
-            case 'approve': return 'circle-check-big';
+            case 'approve': return 'check-circle';
             case 'reject': return 'circle-x';
             case 'cancel': return 'ban';
         }

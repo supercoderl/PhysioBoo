@@ -48,7 +48,7 @@ import { QueuePatient } from "../../../../../shared/types/doctor-desk.types";
 
                 <boo-empty-state
                     *ngIf="patients.length === 0"
-                    icon="circle-check-big"
+                    icon="check-circle"
                     title="Queue is clear"
                     description="No patients are currently waiting."
                 ></boo-empty-state>

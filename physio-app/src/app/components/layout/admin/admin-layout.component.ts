@@ -1,4 +1,7 @@
 import { Component, Input } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { NavigationEnd, Router } from "@angular/router";
+import { filter } from "rxjs";
 import { SharedModule } from "../../../shared/shared-imports";
 import { DrawerProperty, PopoverProperty } from "../../../shared/types/common";
 import { DrawerComponent } from "../../drawer/drawer.component";
@@ -64,7 +67,7 @@ import { AdminSizeComponent } from "./size/size.component";
             [trigger]="popover.data"
         >
             <admin-size *ngIf="popover.type === 'SIZE'" class="w-80"></admin-size>
-            <admin-language *ngIf="popover.type === 'LANGUAGE'" class="w-full"></admin-language>
+            <admin-language *ngIf="popover.type === 'LANGUAGE'" class="w-full" (selected)="handleClosePopover()"></admin-language>
         </popover>
         <drawer
            (close)="handleCloseDrawer()"
@@ -93,6 +96,16 @@ export class AdminLayoutComponent {
         isOpen: false,
         type: null,
         data: null,
+    }
+
+    constructor(router: Router) {
+        // Links inside a drawer or popover navigate away; don't leave the panel over the new page.
+        router.events
+            .pipe(filter(e => e instanceof NavigationEnd), takeUntilDestroyed())
+            .subscribe(() => {
+                if (this.drawer.isOpen) this.handleCloseDrawer();
+                if (this.popover.isOpen) this.handleClosePopover();
+            });
     }
 
     handleCollapse() {

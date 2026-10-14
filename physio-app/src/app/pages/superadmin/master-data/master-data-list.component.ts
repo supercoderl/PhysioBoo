@@ -48,7 +48,7 @@ const SORT_OPTIONS: SortOption[] = [
                 routerLink="/superadmin/master-data"
                 class="inline-flex items-center gap-1.5 -ml-1 px-1 py-1 rounded-1.5 text-xs text-secondary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors"
             >
-                <lucide-icon name="arrow-left" class="w-3.5 h-3.5"></lucide-icon>
+                <physio-icon name="arrow-left" [size]="14" />
                 Master data
             </a>
 

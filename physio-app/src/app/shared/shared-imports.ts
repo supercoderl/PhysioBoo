@@ -6,7 +6,6 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { GoogleMapsModule } from "@angular/google-maps";
 import { RouterModule, RouterOutlet } from "@angular/router";
 import { NgxChartsModule } from "@swimlane/ngx-charts";
-import { LucideAngularModule } from 'lucide-angular';
 import { NzIconModule } from "ng-zorro-antd/icon";
 import { NzLayoutModule } from "ng-zorro-antd/layout";
 import { NzMenuModule } from "ng-zorro-antd/menu";
@@ -31,10 +30,8 @@ export const SharedModule = [
     NzIconModule,
     NzLayoutModule,
     NzMenuModule,
-    LucideAngularModule,
     GoogleMapsModule,
     RouterModule,
-    LucideAngularModule,
     NgxChartsModule,
     OverlayModule,
     ...SHARED_ZORRO_MODULES,

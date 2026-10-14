@@ -33,7 +33,7 @@ import { RetailMedicineDetail } from "../../../../shared/types/retail-pos.types"
         <div class="mb-5" *ngIf="detail.interactionWarnings.length">
           <h3 class="text-xs font-semibold text-gray-500 uppercase mb-2">Interaction Warnings</h3>
           <div *ngFor="let w of detail.interactionWarnings" class="bg-rose-50 text-rose-700 text-xs rounded-lg p-2.5 mb-2 flex items-start gap-2">
-            <physio-icon name="alert-triangle" [size]="14" [class]="'mt-0.5 shrink-0'"></physio-icon>
+            <physio-icon name="triangle-alert" [size]="14" [class]="'mt-0.5 shrink-0'"></physio-icon>
             <span>{{ w }}</span>
           </div>
         </div>

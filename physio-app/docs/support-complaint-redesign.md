@@ -7,7 +7,7 @@
 - **Density**: 8/10 — Dense/Dashboard (8–32px spacing scale, compact table rows, `gap-3.5` cards)
 - **Motion**: 3/10 — Subtle only (drawer slide-in 200–300ms, no decorative animation)
 - **Validation**: `updateOn: 'blur'` — errors shown only after field is touched (Angular guideline)
-- **Icons**: Lucide SVG only via `IconComponent` (physio-icon) — no emoji, no raw inline SVGs
+- **Icons**: physioboo-icons SVG only via `IconComponent` (physio-icon) — no emoji, no raw inline SVGs
 - **Color tokens**: semantic classes (`bg-blue-100 text-blue-700`) — no hardcoded hex
 
 ### UX Domain Findings Applied
@@ -166,7 +166,7 @@ AdminSupportComplaintComponent (page)
 - [x] Drawer close button has `aria-label="Close drawer"`
 - [x] Delete button has `aria-label="Delete complaint"`
 - [x] Color is not the only indicator — badges include text label
-- [x] Lucide SVG icons only — no emoji as structural elements
+- [x] physioboo-icons SVG icons only — no emoji as structural elements
 - [x] Loading state via `LocalLoadingService` — UI stays interactive, spinner shown
 
 ## Responsive Behavior

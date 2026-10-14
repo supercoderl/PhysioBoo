@@ -92,7 +92,7 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
               <div class="space-y-1.5">
                 <div *ngFor="let item of c.checklist" class="flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 rounded-md">
                   <div class="flex items-center gap-2 min-w-0">
-                    <physio-icon [name]="item.status === 'Completed' ? 'check-circle-2' : item.status === 'NotApplicable' ? 'circle-x' : 'clock'"
+                    <physio-icon [name]="item.status === 'Completed' ? 'circle-check' : item.status === 'NotApplicable' ? 'circle-x' : 'clock'"
                       [size]="16" [ngClass]="item.status === 'Completed' ? 'text-emerald-500' : item.status === 'NotApplicable' ? 'text-gray-400' : 'text-amber-500'"></physio-icon>
                     <span class="text-sm text-gray-700 truncate" [attr.aria-label]="item.label + ' — ' + item.status">{{ item.label }}</span>
                   </div>

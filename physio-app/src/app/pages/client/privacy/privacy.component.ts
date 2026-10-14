@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import { CircleCheck } from "lucide-angular";
 import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.component";
 import { SharedModule } from "../../../shared/shared-imports";
 
@@ -46,31 +45,31 @@ import { SharedModule } from "../../../shared/shared-imports";
                             </div>
                             <div class="pb-6 mb-4">
                                 <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
-                                    <lucide-angular [img]="CircleCheck" class="w-5 mr-2 fill-secondary stroke-white" /> At vero eos et accusamus et
+                                    <physio-icon name="circle-check" [size]="20" [class]="'mr-2 text-white [&_svg]:fill-secondary'" /> At vero eos et accusamus et
                                     iusto odio dignissimos ducimus qui blanditiis praesentium
                                     voluptatum deleniti atque corrupti quos dolores et
                                 </p>
                                 <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
-                                    <lucide-angular [img]="CircleCheck" class="w-5 mr-2 fill-secondary stroke-white" /> Sed ut perspiciatis unde omnis
+                                    <physio-icon name="circle-check" [size]="20" [class]="'mr-2 text-white [&_svg]:fill-secondary'" /> Sed ut perspiciatis unde omnis
                                     iste natus error sit voluptatem accusantium doloremque laudantium,
                                 </p>
                                 <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
-                                    <lucide-angular [img]="CircleCheck" class="w-5 mr-2 fill-secondary stroke-white" /> Nemo enim ipsam voluptatem
+                                    <physio-icon name="circle-check" [size]="20" [class]="'mr-2 text-white [&_svg]:fill-secondary'" /> Nemo enim ipsam voluptatem
                                     quia voluptas sit aspernatur aut odit aut fugit, sed quia
                                     consequuntur magni dolores eos qui ratione voluptatem sequi
                                     nesciunt.
                                 </p>
                                 <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
-                                    <lucide-angular [img]="CircleCheck" class="w-5 mr-2 fill-secondary stroke-white" /> At vero eos et accusamus et
+                                    <physio-icon name="circle-check" [size]="20" [class]="'mr-2 text-white [&_svg]:fill-secondary'" /> At vero eos et accusamus et
                                     iusto odio dignissimos ducimus qui blanditiis praesentium
                                     voluptatum deleniti atque corrupti quos dolores et
                                 </p>
                                 <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
-                                    <lucide-angular [img]="CircleCheck" class="w-5 mr-2 fill-secondary stroke-white" /> Sed ut perspiciatis unde omnis
+                                    <physio-icon name="circle-check" [size]="20" [class]="'mr-2 text-white [&_svg]:fill-secondary'" /> Sed ut perspiciatis unde omnis
                                     iste natus error sit voluptatem accusantium doloremque laudantium,
                                 </p>
                                 <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
-                                    <lucide-angular [img]="CircleCheck" class="w-5 mr-2 fill-secondary stroke-white" /> Nemo enim ipsam voluptatem
+                                    <physio-icon name="circle-check" [size]="20" [class]="'mr-2 text-white [&_svg]:fill-secondary'" /> Nemo enim ipsam voluptatem
                                     quia voluptas sit aspernatur aut odit aut fugit, sed quia
                                     consequuntur magni dolores eos qui ratione voluptatem sequi
                                     nesciunt.
@@ -111,5 +110,4 @@ import { SharedModule } from "../../../shared/shared-imports";
 })
 
 export class PrivacyComponent {
-    readonly CircleCheck = CircleCheck;
 }

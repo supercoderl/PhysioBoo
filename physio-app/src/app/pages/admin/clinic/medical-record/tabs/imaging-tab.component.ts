@@ -20,7 +20,7 @@ import { ImagingOrderStatus, ImagingStudyRow } from "../../../../../shared/types
             {{ s.imagesCount }} img
           </div>
           <div *ngIf="s.isCritical" class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold tracking-wider uppercase inline-flex items-center gap-1">
-            <physio-icon name="alert-triangle" class="w-3 h-3"></physio-icon>
+            <physio-icon name="triangle-alert" class="w-3 h-3"></physio-icon>
             Critical
           </div>
           <div *ngIf="s.isNormal && !s.isCritical" class="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold tracking-wider uppercase">

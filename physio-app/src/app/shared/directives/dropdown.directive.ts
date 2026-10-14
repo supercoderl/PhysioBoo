@@ -42,6 +42,12 @@ export class DropdownDirective implements OnDestroy {
         this.overlayRef.attach(portal);
 
         this.overlayRef.backdropClick().subscribe(() => this.close());
+        this.overlayRef.keydownEvents().subscribe(event => {
+            if (event.key === 'Escape') {
+                this.close();
+                this.elementRef.nativeElement.focus?.();
+            }
+        });
 
         this.isDropdownOpen = true;
     }

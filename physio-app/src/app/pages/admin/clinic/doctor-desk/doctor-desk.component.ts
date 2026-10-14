@@ -57,7 +57,7 @@ export class AdminDoctorDeskComponent implements OnInit {
         { label: 'Patients Today', icon: 'users-round', tone: 'primary', value: () => this.snapshot()?.patients.length || 0 },
         { label: 'Waiting', icon: 'clock', tone: 'warning', value: () => this.waitingPatients()?.length || 0 },
         { label: 'In Consultation', icon: 'stethoscope', tone: 'primary', value: () => this.currentPatient() ? 1 : 0 },
-        { label: 'Completed', icon: 'circle-check-big', tone: 'success', value: () => this.completedPatients()?.length || 0 },
+        { label: 'Completed', icon: 'check-circle', tone: 'success', value: () => this.completedPatients()?.length || 0 },
         { label: 'Urgent', icon: 'triangle-alert', tone: 'danger', value: () => this.waitingPatients()?.filter(p => p.priority === 'urgent').length || 0 },
     ];
 

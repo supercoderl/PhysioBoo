@@ -1,20 +1,34 @@
 <li
-  class="min-h-auto bg-transparent outline-none border-0 m-0 cursor-pointer align-middle text-[13px] leading-[1.5] flex justify-start items-center gap-1.5 relative whitespace-nowrap rounded-[4px] py-1.5 px-2 hover:bg-gray-200"
-  *ngFor="let language of languages"
+  *ngFor="let language of languageSrv.languages()"
+  role="menuitemradio"
+  tabindex="0"
+  [attr.aria-checked]="language.code === languageSrv.current()?.code"
+  [attr.aria-disabled]="saving()"
+  [ngClass]="{
+    'min-h-auto bg-transparent outline-none border-0 m-0 align-middle text-[13px] leading-[1.5] flex justify-start items-center gap-1.5 relative whitespace-nowrap rounded-[4px] py-1.5 px-2 hover:bg-gray-200 focus-visible:bg-gray-200': true,
+    'cursor-pointer': !saving(),
+    'cursor-wait': saving()
+  }"
+  (click)="pick(language)"
+  (keydown.enter)="pick(language)"
+  (keydown.space)="$event.preventDefault(); pick(language)"
 >
   <div class="min-w-5 max-w-5 rounded-sm overflow-hidden text-[#71606A]">
-    <img class="w-full" alt="English" [src]="language.flagUrl" />
+    <img *ngIf="language.flagUrl; else noFlag" class="w-full" alt="" [src]="language.flagUrl" />
+    <ng-template #noFlag><physio-icon name="globe" class="w-4 h-4" /></ng-template>
   </div>
   <div class="my-0 flex-1 min-w-0">
-    <span class="block m-0 text-[13px] leading-[1.5]">{{ language.name }}</span>
+    <span class="block m-0 text-[13px] leading-[1.5]">{{ language.nativeName || language.name }}</span>
   </div>
+  <physio-icon
+    *ngIf="language.code === languageSrv.current()?.code"
+    name="check"
+    class="w-4 h-4 shrink-0 text-primary"
+  />
 </li>
 <li
-  class="min-h-auto bg-transparent outline-none border-0 m-0 cursor-pointer align-middle text-[13px] leading-[1.5] flex justify-start items-center relative whitespace-nowrap rounded-[4px] py-1.5 px-2 hover:bg-gray-200"
+  *ngIf="!languageSrv.languages().length"
+  class="m-0 text-[13px] leading-[1.5] py-1.5 px-2 text-secondary whitespace-nowrap"
 >
-  <a href="/documentation/configuration/multi-language">
-    <div class="my-0 flex-1 min-w-0">
-      <span class="block m-0 text-[13px] leading-[1.5]">Learn More</span>
-    </div>
-  </a>
+  No languages are configured.
 </li>

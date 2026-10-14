@@ -20,7 +20,7 @@ import { QueuePatient } from "../../../../../shared/types/doctor-desk.types";
                     class="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-1.5 hover:bg-body transition-colors"
                 >
                     <div class="flex items-center gap-3 min-w-0">
-                        <physio-icon name="circle-check-big" [size]="15" [class]="'text-emerald-500 shrink-0'"></physio-icon>
+                        <physio-icon name="check-circle" [size]="15" [class]="'text-emerald-500 shrink-0'"></physio-icon>
                         <span class="text-xs15 font-semibold text-secondary shrink-0">{{ p.queueNumber }}</span>
                         <span class="text-sm text-regular truncate">{{ p.name }}</span>
                     </div>

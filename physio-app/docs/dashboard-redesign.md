@@ -73,7 +73,7 @@ DashboardComponent (page)
 
 All new components live in `src/app/components/layout/admin/dashboard/` alongside the existing KPI/table cards (which remain in the codebase, unused by this page, since they are still referenced by `revenue-kpi-strip.component.ts` / potentially future pages — not deleted). All components are `@Input()`-driven (no internal mock data), fed by `DashboardOverviewService` from the page component, matching the project's service/component split used elsewhere (e.g. `RevenueReportService` → `revenue-report` page).
 
-Reused as-is: `physio-icon` (lucide icons), design tokens `bg-surface`, `border-borderGray`, `text-primary` (#012047), `secondary` (#0e82fd), `bg-body`, `bg-menu` — the source design's navy/blue/gray palette already matches these 1:1, so no new tokens are introduced.
+Reused as-is: `physio-icon` (physioboo-icons), design tokens `bg-surface`, `border-borderGray`, `text-primary` (#012047), `secondary` (#0e82fd), `bg-body`, `bg-menu` — the source design's navy/blue/gray palette already matches these 1:1, so no new tokens are introduced.
 
 ## 6. UI Specification
 

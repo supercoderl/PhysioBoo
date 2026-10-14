@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { Headphones, LucideAngularModule, MessageSquare } from "lucide-angular";
+import { IconComponent } from "physioboo-icons";
 
 @Component({
     selector: 'info-home',
@@ -15,7 +15,7 @@ import { Headphones, LucideAngularModule, MessageSquare } from "lucide-angular";
                         <div class="flex justify-center md:justify-end items-start md:items-center flex-col md:flex-row gap-3 md:gap-6 w-full md:w-auto">
                             <div class="mb-0 items-center flex">
                                 <span class="w-11 h-11 rounded-full bg-surface flex-center-center">
-                                    <lucide-angular [img]="HeadPhones" class="w-6 stroke-[#06aed4]" />
+                                    <physio-icon name="headset" [size]="24" class="text-[#06aed4]" />
                                 </span>
                                 <div class="ml-2">
                                     <p class="white-space-nowrap text-white mb-1 text-xs15">Customer Support</p>
@@ -24,7 +24,7 @@ import { Headphones, LucideAngularModule, MessageSquare } from "lucide-angular";
                             </div>
                             <div class="flex items-center">
                                 <span class="w-11 h-11 rounded-full bg-surface flex-center-center">
-                                    <lucide-angular [img]="MessageSquare" class="w-6 stroke-[#06aed4]" />
+                                    <physio-icon name="message-square" [size]="24" class="text-[#06aed4]" />
                                 </span>
                                 <div class="ml-2">
                                     <p class="white-space-nowrap text-white mb-1 text-xs15">Drop Us an Email</p>
@@ -43,10 +43,8 @@ import { Headphones, LucideAngularModule, MessageSquare } from "lucide-angular";
             background: linear-gradient(90.08deg,#E11D48 .09%,#06aed4 70.28%);
         }
     `,
-    imports: [LucideAngularModule]
+    imports: [IconComponent]
 })
 
 export class InfoHomeComponent {
-    readonly HeadPhones = Headphones;
-    readonly MessageSquare = MessageSquare;
 }

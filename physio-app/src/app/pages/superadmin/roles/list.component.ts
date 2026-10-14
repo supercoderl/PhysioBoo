@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, signal } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { firstValueFrom } from "rxjs";
+import { finalize, firstValueFrom } from "rxjs";
 import { BooButtonAdminComponent } from "../../../components/button/boo-button-admin/boo-button-admin.component";
 import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
 import { UserPermissionRoleDrawerComponent } from "../../../components/layout/admin/system/user-permission/role-drawer.component";
@@ -14,7 +14,6 @@ import { BooSortAdminComponent } from "../../../components/table/boo-table-admin
 import { PermissionService } from "../../../services/admin/permission.service";
 import { RoleService } from "../../../services/admin/role.service";
 import { DialogService } from "../../../services/common/dialog.service";
-import { LocalLoadingService } from "../../../services/common/local-loading.service";
 import { ToastService } from "../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING } from "../../../shared/constants/error.constant";
 import { SharedModule } from "../../../shared/shared-imports";
@@ -48,19 +47,58 @@ import { IconUtils } from "../../../shared/utils/icon.utils";
 })
 export class SuperadminRoleListComponent implements OnInit {
     // #region Inputs, Outputs, Properties
-    tableData = signal<PaginationData<Role> | null>(null);
-    params = {
-        pageNumber: 1,
-        pageSize: 20,
+    /** The roles API ignores search, sort and the system-role filter, and the role set is small, so the page filters locally. */
+    private readonly pageSize = 20;
+    private readonly allRoles = signal<Role[]>([]);
+    loading = signal(true);
+    loaded = signal(false);
+    statsFailed = signal(false);
+    query = signal({
         search: '',
-        sort: 'createdAt:desc',
-        filter: {
-            start: '',
-            end: '',
-            isActive: null as boolean | null,
-            isSystemRole: null as boolean | null,
-        }
-    };
+        sort: '-createdAt',
+        pageNumber: 1,
+        filter: { isActive: null as boolean | null, isSystemRole: null as boolean | null }
+    });
+
+    private readonly filteredRoles = computed(() => {
+        const { search, sort, filter } = this.query();
+        const term = search.trim().toLowerCase();
+        const dir = sort.startsWith('-') ? -1 : 1;
+        const field = sort.slice(1);
+        return this.allRoles()
+            .filter(r => filter.isActive === null || r.isActive === filter.isActive)
+            .filter(r => filter.isSystemRole === null || r.isSystemRole === filter.isSystemRole)
+            .filter(r => !term || [r.name, r.code, r.description].some(v => v?.toLowerCase().includes(term)))
+            .sort((a, b) => dir * (field === 'name'
+                ? a.name.localeCompare(b.name)
+                : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()));
+    });
+
+    tableData = computed<PaginationData<Role> | null>(() => {
+        if (!this.loaded()) return null;
+        const all = this.filteredRoles();
+        const totalPages = Math.max(1, Math.ceil(all.length / this.pageSize));
+        const pageNumber = Math.min(this.query().pageNumber, totalPages);
+        return {
+            items: all.slice((pageNumber - 1) * this.pageSize, pageNumber * this.pageSize),
+            pageNumber,
+            pageSize: this.pageSize,
+            totalCount: all.length,
+            totalPages,
+            hasPrevious: pageNumber > 1,
+            hasNext: pageNumber < totalPages
+        };
+    });
+
+    stats = computed<RoleStats | null>(() => {
+        if (!this.loaded()) return null;
+        const roles = this.allRoles();
+        return {
+            total: roles.length,
+            active: roles.filter(r => r.isActive).length,
+            system: roles.filter(r => r.isSystemRole).length
+        };
+    });
 
     sort_options: SortOption[] = [
         { label: 'Recent', value: '-createdAt' },
@@ -96,9 +134,6 @@ export class SuperadminRoleListComponent implements OnInit {
     ColorUtils = ColorUtils;
     IconUtils = IconUtils;
 
-    stats = signal<RoleStats | null>(null);
-    statsFailed = signal(false);
-
     // Drawer state
     permissionsData = signal<PaginationData<Permission> | null>(null);
     isRoleDrawerOpen = signal(false);
@@ -120,8 +155,7 @@ export class SuperadminRoleListComponent implements OnInit {
         private roleSrv: RoleService,
         private permSrv: PermissionService,
         private dialogSrv: DialogService,
-        private toastSrv: ToastService,
-        protected loadingSrv: LocalLoadingService
+        private toastSrv: ToastService
     ) {
         this.roleForm = this.fb.group({
             name: ['', [Validators.required]],
@@ -135,36 +169,31 @@ export class SuperadminRoleListComponent implements OnInit {
 
     ngOnInit() {
         this.loadRoles();
-        this.loadStats();
         this.loadPermissions();
     }
     // #endregion
 
     // #region Methods
-    loadStats() {
-        this.roleSrv.getStats().subscribe({
-            next: stats => {
-                this.statsFailed.set(false);
-                this.stats.set(stats);
-            },
-            error: () => this.statsFailed.set(true)
-        });
-    }
-
     reload() {
         this.loadRoles();
-        this.loadStats();
     }
 
     loadRoles() {
+        this.loading.set(true);
         this.roleSrv.search({
-            pageNumber: this.params.pageNumber,
-            pageSize: this.params.pageSize,
-            search: this.params.search,
-            sort: this.params.sort,
-            filter: this.params.filter
-        }).subscribe(res => {
-            if (res.success) this.tableData.set(res.data);
+            pageNumber: 1,
+            pageSize: 200,
+            search: '',
+            sort: '-createdAt',
+            filter: { start: '', end: '', isActive: null, isSystemRole: null }
+        }).pipe(finalize(() => this.loading.set(false))).subscribe({
+            next: res => {
+                if (!res.success) return this.statsFailed.set(true);
+                this.statsFailed.set(false);
+                this.allRoles.set(res.data.items);
+                this.loaded.set(true);
+            },
+            error: () => this.statsFailed.set(true)
         });
     }
 
@@ -181,23 +210,24 @@ export class SuperadminRoleListComponent implements OnInit {
     }
 
     onSearch(val: string) {
-        this.params = { ...this.params, pageNumber: 1, search: val };
-        this.loadRoles();
+        this.query.update(q => ({ ...q, pageNumber: 1, search: val }));
     }
 
     onSortChange(sort: SortOption) {
-        this.params = { ...this.params, pageNumber: 1, sort: sort.value };
-        this.loadRoles();
+        this.query.update(q => ({ ...q, pageNumber: 1, sort: sort.value }));
     }
 
-    onFilterApply(event: any) {
-        this.params = { ...this.params, pageNumber: 1, filter: { ...this.params.filter, ...event } };
-        this.loadRoles();
+    /** Replaces (not merges) the filter, so "Reset All" clears the previous values. */
+    onFilterApply(event: { isActive?: boolean; isSystemRole?: boolean }) {
+        this.query.update(q => ({
+            ...q,
+            pageNumber: 1,
+            filter: { isActive: event.isActive ?? null, isSystemRole: event.isSystemRole ?? null }
+        }));
     }
 
     onPageClick(page: number) {
-        this.params.pageNumber = page;
-        this.loadRoles();
+        this.query.update(q => ({ ...q, pageNumber: page }));
     }
 
     min(a: number, b: number) { return Math.min(a, b); }

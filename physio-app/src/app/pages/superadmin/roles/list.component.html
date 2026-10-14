@@ -45,19 +45,23 @@
 
   <!-- Toolbar -->
   <div class="flex items-center justify-between flex-wrap gap-3">
-    <boo-input label="Search roles..." size="small" (search)="onSearch($event)">
-      <physio-icon
-        [class.animate-spin]="loadingSrv.isLoading('search')"
-        [name]="loadingSrv.isLoading('search') ? 'loader-circle' : 'search'"
-        endfix
-        class="text-[#85757D]"
-      />
-    </boo-input>
-    <div class="flex items-center gap-2">
+    <div class="flex-1 min-w-[240px] max-w-md">
+      <boo-input label="Search roles..." size="small" (search)="onSearch($event)">
+        <physio-icon
+          [class.animate-spin]="loading()"
+          [name]="loading() ? 'loader-circle' : 'search'"
+          endfix
+          class="text-[#85757D]"
+        />
+      </boo-input>
+    </div>
+    <!-- Right-aligned so the filter and sort dropdowns (anchored to their button's right edge) open inside the page -->
+    <div class="flex items-center gap-2 ml-auto">
       <boo-button-admin
         [icon]="{ name: 'refresh', size: 14, iconClass: 'text-secondary' }"
         buttonClass="!bg-surface"
         [border]="{ width: 1, color: '#EFE3E7' }"
+        [loading]="loading()"
         (click)="reload()"
       >
         <span class="text-placeholder">Reload</span>
@@ -67,7 +71,7 @@
         (apply)="onFilterApply($event)"
       />
       <boo-sort-admin
-        [(value)]="params.sort"
+        [value]="query().sort"
         (change)="onSortChange($event)"
         [options]="sort_options"
       />
@@ -78,7 +82,7 @@
   <div class="flex-1 min-h-[320px]" custom-scrollbar>
   <!-- Loading -->
   <div
-    *ngIf="loadingSrv.isLoading('search')"
+    *ngIf="loading()"
     class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"
     aria-busy="true"
   >
@@ -100,7 +104,7 @@
   <!-- Empty -->
   <div
     *ngIf="
-      !loadingSrv.isLoading('search') &&
+      !loading() &&
       (!tableData() || tableData()!.items.length === 0)
     "
     class="bg-surface rounded-2 border border-borderGray/60"
@@ -116,7 +120,7 @@
   <!-- Card grid -->
   <div
     *ngIf="
-      !loadingSrv.isLoading('search') &&
+      !loading() &&
       tableData() &&
       tableData()!.items.length > 0
     "

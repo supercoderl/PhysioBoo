@@ -103,6 +103,8 @@ export class SuperadminUserListComponent implements OnInit {
         this.userForm = this.fb.group({
             email: ['', [Validators.required, Validators.email]],
             phone: [''],
+            // The shared user drawer binds this control while no user is selected; this page only edits users.
+            password: [''],
         });
     }
 
@@ -187,7 +189,7 @@ export class SuperadminUserListComponent implements OnInit {
         this.selectedUserId.set(user.id);
         this.selectedUser.set(user);
         this.userRolesDraft.set(new Set((user.roles ?? []).map(r => r.id)));
-        this.userForm.reset({ email: user.email, phone: user.phone ?? '' });
+        this.userForm.reset({ email: user.email, phone: user.phone ?? '', password: '' });
         this.isDrawerOpen.set(true);
     }
 

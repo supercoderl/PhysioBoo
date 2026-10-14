@@ -16,7 +16,7 @@ interface IconSource {
     html: SafeHtml;
 }
 
-/** Super Admin tool: browse, search and click-to-copy every SVG in `src/assets/icons`. */
+/** Super Admin tool: browse, search and click-to-copy the `<physio-icon>` tag of every SVG in `src/assets/icons`. */
 @Component({
     selector: 'superadmin-icon-library',
     standalone: true,
@@ -27,7 +27,7 @@ interface IconSource {
         <div class="relative space-y-5">
             <superadmin-page-header
                 title="Icons"
-                [description]="total + ' icons from src/assets/icons. Click an icon to copy its SVG.'"
+                [description]="total + ' icons from src/assets/icons. Click an icon to copy its physio-icon tag.'"
             />
 
             <div class="flex flex-col sm:flex-row sm:items-center gap-3">
@@ -65,7 +65,7 @@ interface IconSource {
                                 class="group w-full h-full flex flex-col items-center justify-center gap-3 rounded-[10px] border border-solid bg-surface px-2 pt-4 pb-3 cursor-pointer transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
                                 [class]="copied() === name ? 'border-emerald-500' : 'border-borderGray hover:border-primary'"
                                 [title]="name"
-                                [attr.aria-label]="'Copy ' + name + ' SVG'"
+                                [attr.aria-label]="'Copy physio-icon tag for ' + name"
                                 (click)="copy(name)"
                             >
                                 <span class="icon-preview text-regular group-hover:text-primary transition-colors duration-150">
@@ -173,17 +173,8 @@ export class SuperadminIconLibraryComponent {
     }
 
     async copy(name: string): Promise<void> {
-        const source = this.sources()[name];
-        if (!source) {
-            this.toast.error(
-                this.failed().has(name) ? `Could not load ${name}.svg` : `${name}.svg is still loading, try again in a moment`,
-                'Copy failed'
-            );
-            return;
-        }
-
         try {
-            await writeToClipboard(source.raw);
+            await writeToClipboard(`<physio-icon name="${name}" />`);
         } catch {
             this.toast.error('Your browser blocked clipboard access. Allow it for this site and try again.', 'Copy failed');
             return;

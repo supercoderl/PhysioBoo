@@ -40,6 +40,8 @@ export type DateFilterFn = (date: Date) => boolean;
         (click)="open()"
         [class]="labelClasses"
         [style.color]="placeholderColor"
+        [style.height.px.important]="height"
+        [style.line-height.px]="height"
       >
         {{ label }} <span *ngIf="required" class="text-red-500 ml-0.5">*</span>
       </span>
@@ -49,6 +51,7 @@ export type DateFilterFn = (date: Date) => boolean;
         [disabled]="disabled"
         (click)="toggle()"
         [class]="inputClasses"
+        [style.height.px.important]="height"
         [style.border-radius.px]="radius"
         [style.background-color]="backgroundColor"
         [style.border-width.px]="borderWidth"
@@ -158,6 +161,8 @@ export class BooDatepickerComponent implements ControlValueAccessor, AfterViewIn
   @Input() id = '';
   @Input() name = '';
   @Input() size: Size = 'medium';
+  /** Fixed control height in px; overrides the height of `size` so the picker can sit beside a `boo-select`. */
+  @Input() height?: number;
   @Input() radius = 6;
   @Input() backgroundColor = 'white';
   @Input() borderWidth = 1;

@@ -8,8 +8,9 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
     selector: 'admin-user-permission-role-tab',
     standalone: true,
     imports: [
-    SharedModule,
-],
+        SharedModule,
+
+    ],
     template: `
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div
@@ -24,10 +25,7 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
                             [style.background-color]="ColorUtils.softBg(ColorUtils.roleColorFor(r))"
                             [style.color]="ColorUtils.roleColorFor(r)"
                         >
-                            <physio-icon
-                                [name]="r.icon || 'shield'"
-                            class="w-5 h-5"
-                            ></physio-icon>
+                            <physio-icon [name]="r.icon || 'shield'"></physio-icon>
                         </div>
                         <div class="min-w-0">
                             <div class="font-semibold text-primary truncate">

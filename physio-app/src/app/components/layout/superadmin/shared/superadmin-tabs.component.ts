@@ -4,14 +4,9 @@ import { SharedModule } from '../../../../shared/shared-imports';
 export interface SuperadminTab {
     id: string;
     label: string;
-    /** Optional count shown next to the label. */
     count?: number | null;
 }
 
-/**
- * Accessible tab strip (ARIA tabs pattern with arrow / Home / End keys).
- * The parent renders the panels itself: `id="panel-<tab.id>"`, `role="tabpanel"`, `aria-labelledby="tab-<tab.id>"`.
- */
 @Component({
     selector: 'superadmin-tabs',
     standalone: true,
@@ -20,7 +15,7 @@ export interface SuperadminTab {
         <div
             role="tablist"
             [attr.aria-label]="label"
-            class="flex gap-1 border-b border-borderGray/60 overflow-x-auto"
+            class="flex gap-1 border-b border-borderGray/60 overflow-y-hidden overflow-x-auto"
         >
             <button
                 *ngFor="let tab of tabs; let i = index"

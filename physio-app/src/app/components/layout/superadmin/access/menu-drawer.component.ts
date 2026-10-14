@@ -9,6 +9,7 @@ import { MenuItem } from "../../../../shared/types/menu.types";
 import { Permission } from "../../../../shared/types/permission.types";
 import { isKnownMenuIcon, MENU_ICON_NAMES, MenuArea, menuPermissionOf, SUPERADMIN_ROUTE_PREFIX } from "../../../../shared/utils/menu.utils";
 import { DrawerComponent } from "../../../drawer/drawer.component";
+import { BooIconSelectComponent } from "../../../select/boo-icon-select/boo-icon-select.component";
 import { BooSelectComponent } from "../../../select/boo-select/boo-select.component";
 
 const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
@@ -20,7 +21,7 @@ const knownIconValidator = (control: AbstractControl): ValidationErrors | null =
 @Component({
     selector: 'superadmin-menu-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooSelectComponent],
+    imports: [SharedModule, DrawerComponent, BooSelectComponent, BooIconSelectComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" (close)="close.emit()">
             <div
@@ -70,11 +71,12 @@ const knownIconValidator = (control: AbstractControl): ValidationErrors | null =
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-1">
                             <label for="menu-icon" class="text-[13px] font-medium text-regular">Icon <span class="text-danger" aria-hidden="true">*</span></label>
-                            <input id="menu-icon" type="text" formControlName="icon" list="menu-icon-options" [class]="field" autocomplete="off" placeholder="e.g. users" />
-                            <datalist id="menu-icon-options">
-                                <option *ngFor="let name of iconNames" [value]="name"></option>
-                            </datalist>
-                            <p *ngIf="showError('icon')" class="text-[12px] text-danger m-0">Pick a registered icon from the suggestions.</p>
+                            <boo-icon-select
+                                inputId="menu-icon"
+                                formControlName="icon"
+                                label="Icon"
+                                [icons]="iconNames"
+                            ></boo-icon-select>
                         </div>
                         <div class="space-y-1">
                             <label for="menu-order" class="text-[13px] font-medium text-regular">Order</label>
@@ -218,15 +220,15 @@ export class SuperadminMenuDrawerComponent implements OnChanges {
     }
 
     /**
-     * Options for the two pickers. `boo-select` has no option groups, so permissions carry their category in the label
-     * and are sorted by it. A saved code that is no longer in the permission list stays selectable instead of silently resetting.
+     * Options for the two pickers. The API returns no category for a permission, but codes are `module:resource:action`,
+     * so sorting by code groups each module together. A saved code that is no longer in the permission list stays selectable instead of silently resetting.
      */
     private rebuildOptions(): void {
         this.placementOptions = this.parentOptions.map(s => ({ label: `Inside “${s.label}”`, value: s.id }));
 
         const options = [...this.permissions]
-            .sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name))
-            .map(p => ({ label: `${p.category} · ${p.name} — ${p.code}`, value: p.code }));
+            .sort((a, b) => a.code.localeCompare(b.code))
+            .map(p => ({ label: `${p.code} — ${p.name}`, value: p.code }));
 
         const current = this.form.get('permissionCode')?.value as string;
         if (current && !this.permissions.some(p => p.code === current)) {

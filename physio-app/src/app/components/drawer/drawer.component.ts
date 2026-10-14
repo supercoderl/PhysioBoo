@@ -20,6 +20,7 @@ import { SharedModule } from '../../shared/shared-imports';
         aria-hidden="true"
         (click)="onClose()"
         class="transition-opacity duration-300 ease-in-out fixed inset-0 bg-[rgba(0,_0,_0,_0.5)]"
+        style="opacity: 0;"
         [style.opacity]="isOpen ? '1' : '0'"
       ></div>
 
@@ -27,7 +28,7 @@ import { SharedModule } from '../../shared/shared-imports';
         class="transition-transform duration-300 ease-in-out bg-surface text-black flex flex-col h-full fixed top-0 right-0"
         style="transform: translateX(100%); max-width: 100vw;"
         [style.transform]="isOpen ? 'translateX(0)' : 'translateX(100%)'"
-        [style.width.px]="DRAWER_WIDTH"
+        [style.width.px]="DRAWER_WIDTH"
       >
         <div class="relative overscroll-contain min-h-full">
           <ng-content></ng-content>

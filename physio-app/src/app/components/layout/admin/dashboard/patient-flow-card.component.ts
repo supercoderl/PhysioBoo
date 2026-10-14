@@ -110,9 +110,11 @@ export class AdminPatientFlowCardComponent implements OnChanges {
     }
 
     private path(data: number[], w: number, h: number): string {
-        const mx = Math.max(...data) * 1.1;
+        if (!data.length) return '';
+        // An all-zero series has no scale (0 / 0 = NaN), and a single point has no span to divide by.
+        const mx = Math.max(...data) * 1.1 || 1;
         const pts = data.map((v, i) => [
-            +((i / (data.length - 1)) * w).toFixed(2),
+            +((i / Math.max(data.length - 1, 1)) * w).toFixed(2),
             +(h - (v / mx) * h * 0.88).toFixed(2),
         ]);
         let d = `M${pts[0]}`;
@@ -124,6 +126,7 @@ export class AdminPatientFlowCardComponent implements OnChanges {
     }
 
     private area(data: number[], w: number, h: number): string {
-        return this.path(data, w, h) + ` L${w},${h} L0,${h} Z`;
+        const line = this.path(data, w, h);
+        return line && `${line} L${w},${h} L0,${h} Z`;
     }
 }

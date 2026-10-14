@@ -11,9 +11,11 @@ export interface MenuRowEvent {
     parent: MenuItem | null;
 }
 
+const ROW_GRID = 'grid grid-cols-[minmax(0,1fr)_132px] sm:grid-cols-[minmax(0,1fr)_100px_132px] md:grid-cols-[minmax(0,1fr)_240px_100px_132px]';
+const ORDER_BADGE = 'shrink-0 inline-flex items-center justify-center rounded border border-borderGray/60 bg-gray-100 text-[11px] text-secondary tabular-nums';
 const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-secondary hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors cursor-pointer';
 
-/** Two-level menu: sections (roots) with their items. */
+/** Two-level menu table: sections (roots) with their pages joined by a dashed tree connector. */
 @Component({
     selector: 'superadmin-menu-tree',
     standalone: true,
@@ -39,24 +41,52 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
             </boo-empty-state>
         </div>
 
-        <ul *ngIf="!loading && sections.length" class="list-none p-0 m-0 space-y-3">
-            <li
-                *ngFor="let section of sections"
-                class="bg-surface rounded-2 border border-borderGray/60 overflow-hidden"
-            >
-                <div class="flex items-center gap-3 px-4 py-3 bg-black/[0.02]">
-                    <span class="w-8 h-8 rounded-1.5 bg-primary/10 text-primary flex items-center justify-center shrink-0" aria-hidden="true">
-                        <physio-icon *ngIf="isKnown(section.icon)" [name]="section.icon" />
-                    </span>
-                    <div class="min-w-0 flex-1">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h3 class="text-sm font-semibold text-regular m-0 truncate">{{ section.label }}</h3>
-                            <boo-status-badge *ngIf="!section.isActive" label="Inactive" tone="neutral" />
+        <div *ngIf="!loading && sections.length" role="table" aria-label="Menu structure" class="bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
+            <div role="row" [class]="rowGrid + ' bg-black/[0.03] border-b border-borderGray/60 text-[12px] font-semibold text-regular'">
+                <div role="columnheader" class="px-4 py-3">Menu</div>
+                <div role="columnheader" class="hidden md:block px-3 py-3">Permission</div>
+                <div role="columnheader" class="hidden sm:block px-3 py-3">Status</div>
+                <div role="columnheader" class="px-3 py-3 text-right"><span class="sr-only">Actions</span></div>
+            </div>
+
+            <div *ngFor="let section of sections" role="rowgroup" class="border-b border-borderGray/60 last:border-b-0">
+                <div role="row" [class]="rowGrid + ' items-center hover:bg-black/[0.02] transition-colors cursor-pointer'" (click)="toggle(section)">
+                    <div role="cell" class="flex items-center gap-2 px-3 py-3 min-w-0">
+                        <button
+                            type="button"
+                            class="w-5 h-5 flex items-center justify-center shrink-0 rounded text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
+                            [class.invisible]="!section.children?.length"
+                            [attr.aria-expanded]="isOpen(section)"
+                            [attr.aria-label]="(isOpen(section) ? 'Collapse ' : 'Expand ') + section.label"
+                        >
+                            <physio-icon [name]="isOpen(section) ? 'chevron-down' : 'chevron-right'" [size]="14" />
+                        </button>
+                        <span [class]="orderBadge + ' w-10 h-7'" title="Display order">{{ section.order }}</span>
+                        <span class="w-7 h-7 rounded-1.5 bg-primary/10 text-primary flex items-center justify-center shrink-0" aria-hidden="true">
+                            <physio-icon *ngIf="isKnown(section.icon)" [name]="section.icon" [size]="14" />
+                        </span>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="text-[15px] font-medium text-regular truncate">{{ section.label }}</span>
+                                <span *ngIf="section.children?.length" class="text-[11px] text-secondary shrink-0">{{ section.children!.length }} {{ section.children!.length === 1 ? 'page' : 'pages' }}</span>
+                                <span
+                                    *ngIf="!isKnown(section.icon)"
+                                    class="text-[11px] text-danger shrink-0"
+                                    title="This icon is not registered, so the sidebar cannot draw it."
+                                >Unknown icon “{{ section.icon }}”</span>
+                            </div>
+                            <div class="text-xs text-secondary font-mono truncate">{{ section.route }}</div>
                         </div>
-                        <p class="text-xs text-secondary font-mono m-0 truncate">{{ section.route }}</p>
                     </div>
-                    <span class="hidden sm:inline text-[11px] text-secondary tabular-nums shrink-0">#{{ section.order }}</span>
-                    <div class="flex items-center shrink-0">
+                    <div role="cell" class="hidden md:block px-3 min-w-0">
+                        <span *ngIf="permission(section)" class="px-1.5 py-0.5 rounded bg-gray-100 text-[11px] font-mono text-secondary truncate max-w-full inline-block align-middle" [title]="permission(section)">
+                            {{ permission(section) }}
+                        </span>
+                    </div>
+                    <div role="cell" class="hidden sm:block px-3">
+                        <boo-status-badge [label]="section.isActive ? 'Active' : 'Inactive'" [tone]="section.isActive ? 'success' : 'neutral'" [dotted]="true" />
+                    </div>
+                    <div role="cell" class="flex items-center justify-end px-2" (click)="$event.stopPropagation()">
                         <button type="button" [class]="iconButton" [attr.aria-label]="'Add a page to ' + section.label" title="Add page" (click)="addChild.emit(section)">
                             <physio-icon name="plus" />
                         </button>
@@ -69,41 +99,51 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
                     </div>
                 </div>
 
-                <ul *ngIf="section.children?.length" class="list-none p-0 m-0 divide-y divide-borderGray/60">
-                    <li *ngFor="let child of section.children" class="flex items-center gap-3 pl-8 pr-4 py-2.5">
-                        <span class="w-7 h-7 rounded-1.5 bg-gray-100 text-secondary flex items-center justify-center shrink-0" aria-hidden="true">
-                            <physio-icon *ngIf="isKnown(child.icon)" [name]="child.icon" [size]="14" />
+                <div
+                    *ngFor="let child of (isOpen(section) ? section.children : []); let last = last"
+                    role="row"
+                    [class]="rowGrid + ' items-center relative border-t border-borderGray/40 hover:bg-black/[0.02] transition-colors'"
+                >
+                    <!-- Tree connector: dashed trunk down from the section's order badge, dashed branch into this row. -->
+                    <span aria-hidden="true" class="absolute left-[60px] top-0 w-0 border-l border-dashed border-gray-400" [ngClass]="last ? 'h-1/2' : 'h-full'"></span>
+                    <span aria-hidden="true" class="absolute left-[60px] top-1/2 w-4 border-t border-dashed border-gray-400"></span>
+
+                    <div role="cell" class="flex items-center gap-3 pl-[84px] pr-4 py-2.5 min-w-0">
+                        <span [class]="orderBadge + ' w-10 h-6'" title="Display order">{{ child.order }}</span>
+                        <span class="w-6 h-6 flex items-center justify-center shrink-0 text-regular" aria-hidden="true">
+                            <physio-icon *ngIf="isKnown(child.icon)" [name]="child.icon" [size]="16" />
                         </span>
-                        <div class="min-w-0 flex-1">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="text-[13px] font-medium text-regular truncate">{{ child.label }}</span>
-                                <boo-status-badge *ngIf="!child.isActive" label="Inactive" tone="neutral" />
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="text-[15px] text-regular truncate">{{ child.label }}</span>
                                 <span
                                     *ngIf="!isKnown(child.icon)"
-                                    class="text-[11px] text-danger"
+                                    class="text-[11px] text-danger shrink-0"
                                     title="This icon is not registered, so the sidebar cannot draw it."
                                 >Unknown icon “{{ child.icon }}”</span>
                             </div>
-                            <p class="text-xs text-secondary font-mono m-0 truncate">{{ child.route }}</p>
+                            <div class="text-xs text-secondary font-mono truncate">{{ child.route }}</div>
                         </div>
-                        <span class="hidden md:inline px-1.5 py-0.5 rounded bg-gray-100 text-[11px] font-mono text-secondary truncate max-w-[220px]" [title]="permission(child)">
+                    </div>
+                    <div role="cell" class="hidden md:block px-3 min-w-0">
+                        <span class="px-1.5 py-0.5 rounded bg-gray-100 text-[11px] font-mono text-secondary truncate max-w-full inline-block align-middle" [title]="permission(child)">
                             {{ permission(child) || 'no permission' }}
                         </span>
-                        <span class="hidden sm:inline text-[11px] text-secondary tabular-nums shrink-0">#{{ child.order }}</span>
-                        <div class="flex items-center shrink-0">
-                            <button type="button" [class]="iconButton" [attr.aria-label]="'Edit page ' + child.label" title="Edit" (click)="edit.emit({ item: child, parent: section })">
-                                <physio-icon name="pencil" />
-                            </button>
-                            <button type="button" [class]="iconButton + ' hover:!text-danger'" [attr.aria-label]="'Delete page ' + child.label" title="Delete" (click)="remove.emit({ item: child, parent: section })">
-                                <physio-icon name="trash" />
-                            </button>
-                        </div>
-                    </li>
-                </ul>
-
-                <p *ngIf="!section.children?.length" class="text-[13px] text-secondary m-0 px-4 py-3 pl-8">No pages in this section yet.</p>
-            </li>
-        </ul>
+                    </div>
+                    <div role="cell" class="hidden sm:block px-3">
+                        <boo-status-badge [label]="child.isActive ? 'Active' : 'Inactive'" [tone]="child.isActive ? 'success' : 'neutral'" [dotted]="true" />
+                    </div>
+                    <div role="cell" class="flex items-center justify-end px-2">
+                        <button type="button" [class]="iconButton" [attr.aria-label]="'Edit page ' + child.label" title="Edit" (click)="edit.emit({ item: child, parent: section })">
+                            <physio-icon name="pencil" />
+                        </button>
+                        <button type="button" [class]="iconButton + ' hover:!text-danger'" [attr.aria-label]="'Delete page ' + child.label" title="Delete" (click)="remove.emit({ item: child, parent: section })">
+                            <physio-icon name="trash" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     `
 })
 export class SuperadminMenuTreeComponent {
@@ -114,7 +154,20 @@ export class SuperadminMenuTreeComponent {
     @Output() edit = new EventEmitter<MenuRowEvent>();
     @Output() remove = new EventEmitter<MenuRowEvent>();
 
+    private readonly expanded = new Set<string>();
+
+    readonly rowGrid = ROW_GRID;
+    readonly orderBadge = ORDER_BADGE;
     readonly iconButton = ICON_BUTTON;
     readonly isKnown = isKnownMenuIcon;
     readonly permission = menuPermissionOf;
+
+    isOpen(section: MenuItem): boolean {
+        return this.expanded.has(section.id);
+    }
+
+    toggle(section: MenuItem): void {
+        if (!section.children?.length) return;
+        if (!this.expanded.delete(section.id)) this.expanded.add(section.id);
+    }
 }

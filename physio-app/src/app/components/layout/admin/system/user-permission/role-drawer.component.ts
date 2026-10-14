@@ -5,6 +5,7 @@ import { Role } from "../../../../../shared/types/role.types";
 import { ColorUtils } from "../../../../../shared/utils/color.utils";
 import { IconUtils } from "../../../../../shared/utils/icon.utils";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
+import { BooCheckboxComponent } from "../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
@@ -15,7 +16,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
     imports: [
         DrawerComponent,
         BooButtonAdminComponent,
-
+        BooCheckboxComponent,
         BooInputComponent,
         BooTextareaComponent,
         SharedModule
@@ -36,10 +37,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                             [style.background-color]="ColorUtils.softBg(form.get('color')?.value)"
                             [style.color]="form.get('color')?.value"
                         >
-                            <physio-icon
-                                [name]="form.get('icon')?.value || 'shield'"
-                            class="w-5 h-5"
-                            ></physio-icon>
+                            <physio-icon [name]="form.get('icon')?.value || 'shield'"></physio-icon>
                         </div>
                         <div>
                             <h2 class="text-xl font-bold text-primary leading-none mb-1">
@@ -150,9 +148,19 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                             No permissions defined yet. Add some in the Permissions tab first.
                         </div>
 
+                        <div class="mb-3" *ngIf="permissionsData()?.items?.length">
+                            <boo-input
+                                label="Search permissions..."
+                                size="small"
+                                (search)="onPermissionSearch($event)"
+                            >
+                                <physio-icon name="search" endfix class="text-[#85757D]" />
+                            </boo-input>
+                        </div>
+
                         <div class="space-y-3">
                             <div
-                                *ngFor="let cat of permissionCategories()"
+                                *ngFor="let cat of visibleCategories()"
                                 class="border border-gray-200 rounded-lg overflow-hidden"
                             >
                                 <div
@@ -167,45 +175,47 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                                             cat
                                         }}</span>
                                     </div>
-                                    <label
-                                        class="text-xs text-secondary flex items-center gap-2 cursor-pointer"
+                                    <boo-checkbox
+                                        size="small"
+                                        class="text-secondary"
+                                        [ngModel]="categoryAllSelected(cat)"
+                                        (ngModelChange)="onToggleCategoryAll(cat, $event)"
+                                        [ngModelOptions]="{ standalone: true }"
                                     >
-                                    <input
-                                        type="checkbox"
-                                        [checked]="categoryAllSelected(cat)"
-                                        (change)="onToggleCategoryAll(cat, $any($event.target).checked)"
-                                        class="rounded border-gray-300 text-primary focus:ring-primary"
-                                    />
                                         Select all
-                                    </label>
+                                    </boo-checkbox>
                                 </div>
                                 <div class="divide-y divide-gray-100">
-                                    <label
-                                        *ngFor="let p of permsByCategory(cat)"
-                                        class="px-4 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-50/60"
-                                        (click)="onTogglePermission(p.id)"
+                                    <div
+                                        *ngFor="let p of visiblePermissions(cat)"
+                                        class="px-4 py-2.5 flex items-center justify-between hover:bg-gray-50/60"
                                     >
-                                        <div class="flex items-start gap-3 min-w-0">
-                                            <input
-                                                type="checkbox"
-                                                [checked]="isPermSelected(p.id)"
-                                                (click)="$event.stopPropagation()"
-                                                (change)="onTogglePermission(p.id)"
-                                                class="mt-1 rounded border-gray-300 text-primary focus:ring-primary"
-                                            />
-                                            <div class="min-w-0">
-                                                <div class="text-sm text-primary">{{ p.name }}</div>
-                                                <div class="text-xs text-secondary truncate">
+                                        <boo-checkbox
+                                            class="min-w-0 flex-1"
+                                            [ngModel]="isPermSelected(p.id)"
+                                            (ngModelChange)="onTogglePermission(p.id)"
+                                            [ngModelOptions]="{ standalone: true }"
+                                        >
+                                            <span class="block min-w-0">
+                                                <span class="block text-sm text-primary">{{ p.name }}</span>
+                                                <span class="block text-xs text-secondary">
                                                     {{ p.description || p.code }}
-                                                </div>
-                                            </div>
-                                        </div>
+                                                </span>
+                                            </span>
+                                        </boo-checkbox>
                                         <code
                                             class="text-[10px] text-gray-400 font-mono shrink-0 ml-3"
                                         >{{ p.code }}
                                         </code>
-                                    </label>
+                                    </div>
                                 </div>
+                            </div>
+                            <div
+                                *ngIf="permissionQuery && !visibleCategories().length"
+                                class="text-center py-8 text-xs text-secondary bg-gray-50 rounded-lg"
+                                role="status"
+                            >
+                                No permissions match "{{ permissionQuery }}".
                             </div>
                         </div>
                     </div>
@@ -258,10 +268,28 @@ export class UserPermissionRoleDrawerComponent {
 
     ColorUtils = ColorUtils;
     IconUtils = IconUtils;
+    permissionQuery = '';
     // #endregion
 
-    // #region Methods  
+    // #region Methods
+    onPermissionSearch(query: string) {
+        this.permissionQuery = query.trim();
+    }
+
+    /** Permissions of a category that match the search box (name, code or description). */
+    visiblePermissions(category: string): any[] {
+        const term = this.permissionQuery.toLowerCase();
+        const items = this.permsByCategory(category);
+        if (!term) return items;
+        return items.filter(p => [p.name, p.code, p.description, category].some(v => v?.toLowerCase().includes(term)));
+    }
+
+    visibleCategories(): string[] {
+        return this.permissionCategories().filter(cat => this.visiblePermissions(cat).length > 0);
+    }
+
     onClose() {
+        this.permissionQuery = '';
         this.close.emit();
     }
 

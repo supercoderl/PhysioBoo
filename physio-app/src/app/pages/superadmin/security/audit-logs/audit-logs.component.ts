@@ -1,13 +1,14 @@
 import { Component, inject, OnInit, signal } from "@angular/core";
 import { finalize } from "rxjs";
+import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
 import { SuperadminAuditLogDrawerComponent } from "../../../../components/layout/superadmin/security/audit-log-drawer.component";
 import { SuperadminPageHeaderComponent } from "../../../../components/layout/superadmin/shared/superadmin-page-header.component";
-import { ColumnDefDirective } from "../../../../shared/directives/column-def.directive";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BooTableAdminComponent } from "../../../../components/table/boo-table-admin/boo-table-admin.component";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { AuditLogService } from "../../../../services/admin/audit-log.service";
+import { ColumnDefDirective } from "../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { AuditLog } from "../../../../shared/types/audit-log.types";
 import { PaginationData } from "../../../../shared/types/common";
@@ -16,7 +17,6 @@ import { auditActionTone } from "../../../../shared/utils/audit-log.utils";
 const ACTIONS = ['Create', 'Update', 'Delete', 'SoftDelete'];
 const FIELD = 'h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
-/** Read-only audit trail of every tracked change on the platform. */
 @Component({
     selector: 'superadmin-audit-logs',
     standalone: true,
@@ -25,6 +25,7 @@ const FIELD = 'h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13
         SuperadminPageHeaderComponent,
         SuperadminAuditLogDrawerComponent,
         BooSelectComponent,
+        BooDatepickerComponent,
         BooTableAdminComponent,
         ColumnDefDirective,
         StatusBadgeComponent,
@@ -54,21 +55,39 @@ const FIELD = 'h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13
                         <boo-select
                             name="action"
                             label="All actions"
-                            required
                             [height]="36"
                             [options]="actionOptions"
                             [(ngModel)]="action"
-                            (ngModelChange)="apply()"
                         ></boo-select>
                     </div>
                 </div>
                 <div class="space-y-1">
                     <label for="audit-from" class="block text-[12px] font-medium text-secondary">From</label>
-                    <input id="audit-from" name="dateFrom" type="date" [class]="field" [(ngModel)]="dateFrom" (ngModelChange)="apply()" />
+                    <div class="w-44">
+                        <boo-datepicker
+                            id="audit-from"
+                            name="dateFrom"
+                            label="Any date"
+                            [height]="36"
+                            [max]="dateTo"
+                            disableFuture
+                            [(ngModel)]="dateFrom"
+                        ></boo-datepicker>
+                    </div>
                 </div>
                 <div class="space-y-1">
                     <label for="audit-to" class="block text-[12px] font-medium text-secondary">To</label>
-                    <input id="audit-to" name="dateTo" type="date" [class]="field" [(ngModel)]="dateTo" (ngModelChange)="apply()" />
+                    <div class="w-44">
+                        <boo-datepicker
+                            id="audit-to"
+                            name="dateTo"
+                            label="Any date"
+                            [height]="36"
+                            [min]="dateFrom"
+                            disableFuture
+                            [(ngModel)]="dateTo"
+                        ></boo-datepicker>
+                    </div>
                 </div>
                 <button
                     type="submit"
@@ -155,7 +174,7 @@ export class SuperadminAuditLogsComponent implements OnInit {
 
     // #region Inputs, Outputs, Properties
     readonly field = FIELD;
-    readonly actionOptions = [{ label: 'All actions', value: '' }, ...ACTIONS.map(a => ({ label: a, value: a }))];
+    readonly actionOptions = ACTIONS.map(a => ({ label: a, value: a }));
     readonly tone = auditActionTone;
 
     tableData = signal<PaginationData<AuditLog> | null>(null);
@@ -166,9 +185,9 @@ export class SuperadminAuditLogsComponent implements OnInit {
 
     params = { pageNumber: 1, pageSize: 25, search: '' };
     tableName = '';
-    action = '';
-    dateFrom = '';
-    dateTo = '';
+    action: string | null = null;
+    dateFrom: string | null = null;
+    dateTo: string | null = null;
     // #endregion
 
     // #region Init (Lifecycle + Setup)
@@ -190,8 +209,7 @@ export class SuperadminAuditLogsComponent implements OnInit {
             pageSize: this.params.pageSize,
             search: this.params.search.trim(),
             tableName: this.tableName.trim(),
-            action: this.action,
-            // Date inputs are local calendar days: cover the whole of both ends.
+            action: this.action ?? '',
             dateFrom: this.dateFrom ? new Date(`${this.dateFrom}T00:00:00`).toISOString() : undefined,
             dateTo: this.dateTo ? new Date(`${this.dateTo}T23:59:59.999`).toISOString() : undefined,
         }).pipe(
@@ -212,9 +230,9 @@ export class SuperadminAuditLogsComponent implements OnInit {
 
     clear(): void {
         this.tableName = '';
-        this.action = '';
-        this.dateFrom = '';
-        this.dateTo = '';
+        this.action = null;
+        this.dateFrom = null;
+        this.dateTo = null;
         this.params = { ...this.params, pageNumber: 1, search: '' };
         this.load();
     }

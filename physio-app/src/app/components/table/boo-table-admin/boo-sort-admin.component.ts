@@ -39,13 +39,15 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
             [class.text-slate-600]="opt.value !== value"
             [class.hover:bg-gray-50]="opt.value !== value"
           >
-            <span class="text-regular group-hover:text-surface">{{ opt.label }}</span>
+            <span class="text-regular">{{ opt.label }}</span>
             <physio-icon *ngIf="opt.value === value" name="check" class="w-3.5 h-3.5"/>
           </button>
         </li>
       </ul>
     </div>
-  `
+  `,
+  // Anchors the absolutely positioned menu to the button instead of the nearest positioned ancestor
+  host: { class: 'relative' }
 })
 export class BooSortAdminComponent implements OnInit {
   // #region Inputs, Outputs, Properties
@@ -83,6 +85,7 @@ export class BooSortAdminComponent implements OnInit {
   selectOption(opt: SortOption, emit: boolean = true) {
     this.value = opt.value;
     if (emit) {
+      this.isOpen = false;
       this.valueChange.emit(this.value);
       this.change.emit(opt);
     }

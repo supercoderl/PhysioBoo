@@ -81,26 +81,16 @@
           class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
         />
       </label>
-      <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]">Description</span>
-        <textarea
-          [(ngModel)]="d.description"
-          maxlength="500"
-          rows="3"
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 py-2 text-[14px] outline-none focus:border-primary"
-        ></textarea>
-      </label>
+      <div class="block">
+        <label for="board-description" class="mb-1 block text-[12px] font-semibold text-[#71606A]">Description</label>
+        <boo-textarea [id]="'board-description'" [(ngModel)]="d.description" [maxlength]="500" [rows]="3"></boo-textarea>
+      </div>
     </div>
     <div class="flex justify-end gap-2 border-t border-[#EFE3E7] px-4 py-3">
-      <button type="button" (click)="closeDialog()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#71606A] hover:bg-gray-100">Cancel</button>
-      <button
-        type="button"
-        (click)="createBoard()"
-        [disabled]="!canCreate()"
-        class="rounded-lg bg-primary px-4 min-h-10 text-[13px] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
-      >
+      <boo-button-admin (click)="closeDialog()" background="transparent" textColor="#71606A" padding="10px 12px" [radius]="8" fontWeight="500">Cancel</boo-button-admin>
+      <boo-button-admin (click)="createBoard()" [disabled]="!canCreate()" textColor="white" padding="10px 16px" [radius]="8" fontWeight="500">
         {{ isSaving() ? 'Creating...' : 'Create' }}
-      </button>
+      </boo-button-admin>
     </div>
   </div>
 </div>

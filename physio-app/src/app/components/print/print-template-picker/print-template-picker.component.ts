@@ -4,11 +4,12 @@ import { catchError, of } from 'rxjs';
 import { PrintTemplateService } from '../../../services/admin/print-template.service';
 import { SharedModule } from '../../../shared/shared-imports';
 import { PrintTemplate } from '../../../shared/types/print-template.types';
+import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-button-admin.component';
 
 @Component({
   selector: 'print-template-picker',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonAdminComponent],
   animations: [
     trigger('overlayAnim', [
       transition(':enter', [style({ opacity: 0 }), animate('120ms', style({ opacity: 1 }))]),
@@ -84,10 +85,10 @@ import { PrintTemplate } from '../../../shared/types/print-template.types';
         </div>
 
         <footer class="flex items-center justify-end gap-2 px-5 h-14 border-t border-gray-100">
-          <button type="button" (click)="onClose()"
-            class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50">
+          <boo-button-admin (click)="onClose()"
+            background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" [fontSize]="14" fontWeight="500">
             Cancel
-          </button>
+          </boo-button-admin>
         </footer>
       </div>
     </ng-container>

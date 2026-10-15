@@ -8,6 +8,8 @@ import { StockTakeCategoryTreeComponent } from "./stock-take-category-tree.compo
 import { StockTakeCompleteDialogComponent } from "./stock-take-complete-dialog.component";
 import { StockTakeCountingTableComponent } from "./stock-take-counting-table.component";
 import { StockTakeSummaryPanelComponent } from "./stock-take-summary-panel.component";
+import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 const STEPS: StockTakeStatus[] = ['Draft', 'Counting', 'PendingApproval', 'Approved'];
 
@@ -20,14 +22,14 @@ const STEPS: StockTakeStatus[] = ['Draft', 'Counting', 'PendingApproval', 'Appro
         StockTakeCountingTableComponent,
         StockTakeSummaryPanelComponent,
         StockTakeCompleteDialogComponent,
+        ButtonIconComponent,
+        BooButtonAdminComponent
     ],
     host: { class: 'block h-screen flex flex-col bg-gray-50' },
     template: `
     <div class="flex-none bg-surface border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
       <div class="flex items-center gap-3 min-w-0">
-        <button type="button" (click)="back()" class="w-9 h-9 rounded-1.5 border border-gray-200 flex items-center justify-center hover:bg-gray-50" aria-label="Back to Stock Take list">
-          <physio-icon name="arrow-left" [size]="16"></physio-icon>
-        </button>
+        <button-icon [icon]="{ name: 'arrow-left', size: 16 }" (onClick)="back()" ariaLabel="Back to Stock Take list" buttonClass="!rounded-1.5"></button-icon>
         <div class="min-w-0">
           <p class="text-sm font-bold text-regular truncate">{{ stockTake()?.code ?? 'Loading…' }}</p>
           <p class="text-xs text-secondary truncate">{{ stockTake()?.warehouseName }} · {{ stockTake()?.departmentName }}</p>
@@ -45,10 +47,9 @@ const STEPS: StockTakeStatus[] = ['Draft', 'Counting', 'PendingApproval', 'Appro
         </ng-container>
       </div>
 
-      <button type="button" (click)="completeOpen.set(true)" [disabled]="stockTake()?.status !== 'Counting'"
-        class="px-4 py-2 rounded-1.5 bg-emerald-600 text-white text-sm font-semibold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5">
+      <boo-button-admin (click)="completeOpen.set(true)" [disabled]="stockTake()?.status !== 'Counting'" background="#059669" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="600" [gap]="6">
         <physio-icon name="check-circle" [size]="15"></physio-icon> Complete Counting
-      </button>
+      </boo-button-admin>
     </div>
 
     <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-3 p-3 sm:p-4">

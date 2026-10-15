@@ -13,9 +13,10 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { AuditLog } from "../../../../shared/types/audit-log.types";
 import { PaginationData } from "../../../../shared/types/common";
 import { auditActionTone } from "../../../../shared/utils/audit-log.utils";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
 
 const ACTIONS = ['Create', 'Update', 'Delete', 'SoftDelete'];
-const FIELD = 'h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
 @Component({
     selector: 'superadmin-audit-logs',
@@ -29,7 +30,9 @@ const FIELD = 'h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13
         BooTableAdminComponent,
         ColumnDefDirective,
         StatusBadgeComponent,
-        ErrorStateComponent
+        ErrorStateComponent,
+        BooButtonAdminComponent,
+        BooInputComponent
     ],
     host: { class: 'block h-full min-h-0' },
     template: `
@@ -47,7 +50,7 @@ const FIELD = 'h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13
             >
                 <div class="space-y-1">
                     <label for="audit-table" class="block text-[12px] font-medium text-secondary">Table</label>
-                    <input id="audit-table" name="tableName" type="text" [class]="field + ' w-48'" placeholder="e.g. Users" autocomplete="off" [(ngModel)]="tableName" />
+                    <boo-input [id]="'audit-table'" name="tableName" class="w-48" label="e.g. Users" size="small" [(ngModel)]="tableName"></boo-input>
                 </div>
                 <div class="space-y-1">
                     <span class="block text-[12px] font-medium text-secondary">Action</span>
@@ -95,14 +98,9 @@ const FIELD = 'h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13
                 >
                     Apply
                 </button>
-                <button
-                    *ngIf="hasFilters"
-                    type="button"
-                    class="h-9 px-3 rounded-1.5 text-[13px] font-medium text-secondary hover:text-primary hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
-                    (click)="clear()"
-                >
+                <boo-button-admin *ngIf="hasFilters" (click)="clear()" background="transparent" textColor="rgb(var(--twc-secondary))" padding="8px 12px" fontWeight="500">
                     Clear filters
-                </button>
+                </boo-button-admin>
             </form>
 
             <div *ngIf="loadFailed(); else logTable" class="bg-surface rounded-2 border border-borderGray/60" role="alert">
@@ -173,7 +171,6 @@ export class SuperadminAuditLogsComponent implements OnInit {
     // #endregion
 
     // #region Inputs, Outputs, Properties
-    readonly field = FIELD;
     readonly actionOptions = ACTIONS.map(a => ({ label: a, value: a }));
     readonly tone = auditActionTone;
 

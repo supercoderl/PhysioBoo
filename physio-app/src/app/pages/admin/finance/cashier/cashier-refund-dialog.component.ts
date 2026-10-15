@@ -1,11 +1,14 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { CashierInvoice, CashierPaymentMethod } from "../../../../shared/types/cashier.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
+import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
 
 @Component({
     selector: 'cashier-refund-dialog',
     standalone: true,
-    imports: [SharedModule],
+    imports: [SharedModule, BooButtonAdminComponent, BooSelectComponent, BooTextareaComponent],
     template: `
     <div *ngIf="isOpen && invoice" class="fixed inset-0 z-[10000] flex items-center justify-center">
       <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" (click)="close.emit()" aria-hidden="true"></div>
@@ -39,29 +42,20 @@ import { CashierInvoice, CashierPaymentMethod } from "../../../../shared/types/c
 
           <div>
             <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Refund Method</label>
-            <select [(ngModel)]="method" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-rose-400/30">
-              <option value="Cash">Cash</option>
-              <option value="CreditCard">Credit Card</option>
-              <option value="DebitCard">Debit Card</option>
-              <option value="BankTransfer">Bank Transfer</option>
-              <option value="Insurance">Insurance</option>
-            </select>
+            <boo-select [(ngModel)]="method" [options]="methodOptions"></boo-select>
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Reason</label>
-            <textarea [(ngModel)]="reason" rows="3" placeholder="Explain the reason for this refund"
-              class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-rose-400/30 resize-none"></textarea>
+            <boo-textarea [(ngModel)]="reason" [rows]="3" label="Explain the reason for this refund"></boo-textarea>
           </div>
         </div>
 
         <div class="px-5 py-4 border-t border-slate-100 flex justify-end gap-2">
-          <button type="button" (click)="close.emit()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
-          <button type="button" (click)="confirm()" [disabled]="!canConfirm()"
-            class="px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
-            [ngClass]="canConfirm() ? 'bg-rose-600 text-white hover:bg-rose-700' : 'bg-slate-200 text-slate-400 cursor-not-allowed'">
+          <boo-button-admin (click)="close.emit()" background="transparent" textColor="#71606A" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="600">Cancel</boo-button-admin>
+          <boo-button-admin (click)="confirm()" [disabled]="!canConfirm()" background="#E11D48" textColor="white" padding="8px 20px" [fontSize]="14" [radius]="8" fontWeight="600">
             Confirm Refund
-          </button>
+          </boo-button-admin>
         </div>
       </div>
     </div>
@@ -76,6 +70,13 @@ export class CashierRefundDialogComponent implements OnChanges {
     amount = 0;
     reason = '';
     method: CashierPaymentMethod = 'Cash';
+    readonly methodOptions: { label: string; value: CashierPaymentMethod }[] = [
+        { label: 'Cash', value: 'Cash' },
+        { label: 'Credit Card', value: 'CreditCard' },
+        { label: 'Debit Card', value: 'DebitCard' },
+        { label: 'Bank Transfer', value: 'BankTransfer' },
+        { label: 'Insurance', value: 'Insurance' },
+    ];
 
     ngOnChanges(): void {
         if (this.isOpen && this.invoice) {

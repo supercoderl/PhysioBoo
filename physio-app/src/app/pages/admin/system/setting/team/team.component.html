@@ -51,17 +51,18 @@
               name="inviteEmail"
             />
           </div>
-          <select
-            class="h-10 px-3 text-sm border border-gray-200 rounded-md bg-surface focus:outline-none focus:border-primary"
+          <boo-select
+            class="sm:w-48"
+            label="Select role"
+            required
+            [height]="40"
+            [options]="invitableRoles()"
+            bindLabel="name"
+            bindValue="id"
             [ngModel]="inviteRoleId()"
             (ngModelChange)="inviteRoleId.set($event)"
             name="inviteRole"
-          >
-            <option value="" disabled>Select role</option>
-            <option *ngFor="let r of invitableRoles()" [value]="r.id">
-              {{ r.name }}
-            </option>
-          </select>
+          ></boo-select>
           <button
             type="submit"
             [disabled]="inviting() || !inviteEmail() || !inviteRoleId()"

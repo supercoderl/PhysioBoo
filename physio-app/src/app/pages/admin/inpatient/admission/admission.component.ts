@@ -1,5 +1,11 @@
-import { Component, OnDestroy, OnInit, signal } from "@angular/core";
+import { Component, OnDestroy, OnInit, computed, signal } from "@angular/core";
 import { Subject, catchError, debounceTime, distinctUntilChanged, finalize, of, switchMap, takeUntil } from "rxjs";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooCheckboxComponent } from "../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
+import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
+import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
+import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
+import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { AdmissionService } from "../../../../services/admin/admission.service";
 import { BedMapService } from "../../../../services/admin/bed-map.service";
 import { DepartmentService } from "../../../../services/admin/department.service";
@@ -38,7 +44,13 @@ interface AdmissionDraft {
     selector: 'admin-admission',
     standalone: true,
     imports: [
-        SharedModule
+        SharedModule,
+        BooButtonAdminComponent,
+        BooCheckboxComponent,
+        BooDatepickerComponent,
+        BooInputComponent,
+        BooSelectComponent,
+        BooTextareaComponent
     ],
     template: `
     <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -69,9 +81,9 @@ interface AdmissionDraft {
             {{ done.admissionNumber }} · {{ done.departmentName }} · {{ done.doctorName }}
             <span *ngIf="done.bedNumber"> · Bed {{ done.bedNumber }} ({{ done.wardName }})</span>
           </p>
-          <button type="button" (click)="startNew()" class="mt-6 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primaryHover transition-colors">
+          <boo-button-admin (click)="startNew()" textColor="white" padding="8px 24px" [radius]="8" class="mt-6">
             Admit another patient
-          </button>
+          </boo-button-admin>
         </div>
 
         <form *ngIf="!createdAdmission()" (ngSubmit)="submitAdmission()" #admissionForm="ngForm">
@@ -113,10 +125,9 @@ interface AdmissionDraft {
                 <button type="button" (click)="clearPatient()" class="text-sm text-primary hover:text-primaryPressed">Change</button>
               </div>
               <ng-template #patientSearch>
-                <input id="patient-lookup" type="search" name="patientLookup"
-                       [(ngModel)]="patientQuery" (ngModelChange)="patientLookup$.next($event)"
-                       placeholder="Search by name, phone or patient number..."
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
+                <boo-input [id]="'patient-lookup'" type="search" name="patientLookup"
+                           [(ngModel)]="patientQuery" (ngModelChange)="patientLookup$.next($event)"
+                           label="Search by name, phone or patient number..."></boo-input>
                 <ul *ngIf="patientResults().length" role="listbox" aria-label="Matching patients"
                     class="absolute z-10 mt-1 w-full bg-surface border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-auto">
                   <li *ngFor="let p of patientResults()" role="option">
@@ -136,9 +147,8 @@ interface AdmissionDraft {
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label for="adm-date" class="block text-sm font-medium text-gray-700 mb-2">Admission Date <span class="text-red-500">*</span></label>
-                <input id="adm-date" type="date" name="admissionDate" [(ngModel)]="draft.admissionDate" required
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Admission Date <span class="text-red-500">*</span></label>
+                <boo-datepicker name="admissionDate" [(ngModel)]="draft.admissionDate" required></boo-datepicker>
               </div>
               <div>
                 <label for="adm-time" class="block text-sm font-medium text-gray-700 mb-2">Admission Time <span class="text-red-500">*</span></label>
@@ -149,60 +159,44 @@ interface AdmissionDraft {
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label for="adm-type" class="block text-sm font-medium text-gray-700 mb-2">Admission Type <span class="text-red-500">*</span></label>
-                <select id="adm-type" name="admissionType" [(ngModel)]="draft.admissionType" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                  <option value="">Select Type</option>
-                  <option *ngFor="let t of admissionTypes" [value]="t">{{ t }}</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Admission Type <span class="text-red-500">*</span></label>
+                <boo-select name="admissionType" [(ngModel)]="draft.admissionType" required
+                            label="Select Type" [options]="admissionTypeOptions"></boo-select>
               </div>
               <div>
                 <label for="adm-ref" class="block text-sm font-medium text-gray-700 mb-2">Referred By</label>
-                <input id="adm-ref" type="text" name="referredBy" [(ngModel)]="draft.referredBy" maxlength="120" placeholder="Referring physician or facility"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                <boo-input [id]="'adm-ref'" name="referredBy" [(ngModel)]="draft.referredBy" [maxlength]="120" label="Referring physician or facility"></boo-input>
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <label for="adm-dept" class="block text-sm font-medium text-gray-700 mb-2">Department <span class="text-red-500">*</span></label>
-                <select id="adm-dept" name="departmentId" [(ngModel)]="draft.departmentId" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                  <option value="">Select Department</option>
-                  <option *ngFor="let d of departments()" [value]="d.id">{{ d.name }}</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Department <span class="text-red-500">*</span></label>
+                <boo-select name="departmentId" [(ngModel)]="draft.departmentId" required
+                            label="Select Department" [options]="departments()" bindLabel="name" bindValue="id"></boo-select>
               </div>
               <div>
-                <label for="adm-doctor" class="block text-sm font-medium text-gray-700 mb-2">Assigned Doctor <span class="text-red-500">*</span></label>
-                <select id="adm-doctor" name="doctorId" [(ngModel)]="draft.doctorId" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                  <option value="">Select Doctor</option>
-                  <option *ngFor="let d of doctors()" [value]="d.id">{{ d.fullName }}</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Assigned Doctor <span class="text-red-500">*</span></label>
+                <boo-select name="doctorId" [(ngModel)]="draft.doctorId" required
+                            label="Select Doctor" [options]="doctors()" bindLabel="fullName" bindValue="id"></boo-select>
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label for="adm-ward" class="block text-sm font-medium text-gray-700 mb-2">Ward</label>
-                <select id="adm-ward" name="wardId" [(ngModel)]="draft.wardId" (ngModelChange)="onWardChanged()"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                  <option value="">No bed yet</option>
-                  <option *ngFor="let w of wards()" [value]="w.id">{{ w.name }} ({{ w.availableBeds }} free)</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Ward</label>
+                <boo-select name="wardId" [(ngModel)]="draft.wardId" (ngModelChange)="onWardChanged()"
+                            label="No bed yet" [options]="wardOptions()"></boo-select>
               </div>
               <div>
-                <label for="adm-bed" class="block text-sm font-medium text-gray-700 mb-2">Bed</label>
-                <select id="adm-bed" name="bedId" [(ngModel)]="draft.bedId" [disabled]="!draft.wardId || loadingBeds()"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent disabled:bg-gray-100">
-                  <option value="">{{ loadingBeds() ? 'Loading beds...' : (draft.wardId && beds().length === 0 ? 'No free beds' : 'Select Bed') }}</option>
-                  <option *ngFor="let b of beds()" [value]="b.id">{{ b.number }}{{ b.roomNumber ? ' · Room ' + b.roomNumber : '' }} · {{ b.bedType }}</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Bed</label>
+                <boo-select name="bedId" [(ngModel)]="draft.bedId" [disabled]="!draft.wardId || loadingBeds()"
+                            [label]="loadingBeds() ? 'Loading beds...' : (draft.wardId && beds().length === 0 ? 'No free beds' : 'Select Bed')"
+                            [options]="bedOptions()"></boo-select>
               </div>
               <div>
-                <label for="adm-exp" class="block text-sm font-medium text-gray-700 mb-2">Expected Discharge</label>
-                <input id="adm-exp" type="date" name="expectedDischargeDate" [(ngModel)]="draft.expectedDischargeDate" [disabled]="!draft.bedId"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent disabled:bg-gray-100">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Expected Discharge</label>
+                <boo-datepicker name="expectedDischargeDate" [(ngModel)]="draft.expectedDischargeDate" [disabled]="!draft.bedId"></boo-datepicker>
               </div>
             </div>
           </div>
@@ -213,29 +207,23 @@ interface AdmissionDraft {
 
             <div class="mb-4">
               <label for="adm-cc" class="block text-sm font-medium text-gray-700 mb-2">Chief Complaint <span class="text-red-500">*</span></label>
-              <textarea id="adm-cc" name="chiefComplaint" rows="3" maxlength="1000" [(ngModel)]="draft.chiefComplaint" required
-                        placeholder="Main reason for admission"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+              <boo-textarea [id]="'adm-cc'" name="chiefComplaint" [rows]="3" [maxlength]="1000" [(ngModel)]="draft.chiefComplaint" required label="Main reason for admission"></boo-textarea>
             </div>
             <div class="mb-4">
               <label for="adm-dx" class="block text-sm font-medium text-gray-700 mb-2">Provisional Diagnosis <span class="text-red-500">*</span></label>
-              <textarea id="adm-dx" name="provisionalDiagnosis" rows="3" maxlength="1000" [(ngModel)]="draft.provisionalDiagnosis" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+              <boo-textarea [id]="'adm-dx'" name="provisionalDiagnosis" [rows]="3" [maxlength]="1000" [(ngModel)]="draft.provisionalDiagnosis" required></boo-textarea>
             </div>
             <div class="mb-4">
               <label for="adm-allergies" class="block text-sm font-medium text-gray-700 mb-2">Known Allergies</label>
-              <textarea id="adm-allergies" name="allergies" rows="2" maxlength="1000" [(ngModel)]="draft.allergies"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+              <boo-textarea [id]="'adm-allergies'" name="allergies" [rows]="2" [maxlength]="1000" [(ngModel)]="draft.allergies"></boo-textarea>
             </div>
             <div class="mb-4">
               <label for="adm-meds" class="block text-sm font-medium text-gray-700 mb-2">Current Medications</label>
-              <textarea id="adm-meds" name="currentMedications" rows="2" maxlength="1000" [(ngModel)]="draft.currentMedications"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+              <boo-textarea [id]="'adm-meds'" name="currentMedications" [rows]="2" [maxlength]="1000" [(ngModel)]="draft.currentMedications"></boo-textarea>
             </div>
             <div>
               <label for="adm-history" class="block text-sm font-medium text-gray-700 mb-2">Medical History</label>
-              <textarea id="adm-history" name="medicalHistory" rows="3" maxlength="2000" [(ngModel)]="draft.medicalHistory"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+              <boo-textarea [id]="'adm-history'" name="medicalHistory" [rows]="3" [maxlength]="2000" [(ngModel)]="draft.medicalHistory"></boo-textarea>
             </div>
           </div>
 
@@ -244,23 +232,20 @@ interface AdmissionDraft {
             <h3 class="text-xl font-semibold text-gray-800 mb-6 pb-3 border-b border-gray-200">Insurance Information</h3>
 
             <div class="mb-6">
-              <label class="flex items-center cursor-pointer">
-                <input type="checkbox" [(ngModel)]="draft.hasInsurance" name="hasInsurance" class="mr-3 w-5 h-5 text-primary">
+              <boo-checkbox [(ngModel)]="draft.hasInsurance" name="hasInsurance" size="large">
                 <span class="text-gray-700 font-medium">Patient has health insurance</span>
-              </label>
+              </boo-checkbox>
             </div>
 
             <div *ngIf="draft.hasInsurance">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label for="adm-ins" class="block text-sm font-medium text-gray-700 mb-2">Insurance Provider <span class="text-red-500">*</span></label>
-                  <input id="adm-ins" type="text" name="insuranceProvider" maxlength="120" [(ngModel)]="draft.insuranceProvider" placeholder="Insurance company name"
-                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                  <boo-input [id]="'adm-ins'" name="insuranceProvider" [maxlength]="120" [(ngModel)]="draft.insuranceProvider" label="Insurance company name"></boo-input>
                 </div>
                 <div>
                   <label for="adm-policy" class="block text-sm font-medium text-gray-700 mb-2">Policy Number</label>
-                  <input id="adm-policy" type="text" name="policyNumber" maxlength="64" [(ngModel)]="draft.policyNumber" placeholder="Insurance policy number"
-                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                  <boo-input [id]="'adm-policy'" name="policyNumber" [maxlength]="64" [(ngModel)]="draft.policyNumber" label="Insurance policy number"></boo-input>
                 </div>
               </div>
               <div class="bg-primarySoft border border-primary/25 rounded-lg p-4">
@@ -277,18 +262,16 @@ interface AdmissionDraft {
 
           <!-- Navigation Buttons -->
           <div class="bg-surface rounded-lg shadow-md p-6 flex justify-between">
-            <button *ngIf="currentStep > 1" type="button" (click)="previousStep()"
-                    class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+            <boo-button-admin *ngIf="currentStep > 1" (click)="previousStep()" background="#85757D" textColor="white" padding="8px 24px" [radius]="8">
               Previous
-            </button>
+            </boo-button-admin>
             <div *ngIf="currentStep === 1"></div>
 
             <div class="flex items-center space-x-3">
               <span *ngIf="!canProceed" class="text-sm text-gray-500">Complete the required fields to continue.</span>
-              <button *ngIf="currentStep < 4" type="button" (click)="nextStep()" [disabled]="!canProceed"
-                      class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primaryHover transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+              <boo-button-admin *ngIf="currentStep < 4" (click)="nextStep()" [disabled]="!canProceed" textColor="white" padding="8px 24px" [radius]="8">
                 Next
-              </button>
+              </boo-button-admin>
               <button *ngIf="currentStep === 4" type="submit" [disabled]="!canProceed || isSubmitting"
                       class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
                 {{ isSubmitting ? 'Submitting...' : 'Submit Admission' }}
@@ -305,6 +288,7 @@ export class AdminAdmissionComponent implements OnInit, OnDestroy {
     // #region Inputs, Outputs, Properties
     readonly steps = ['Patient', 'Admission Details', 'Medical Info', 'Insurance'];
     readonly admissionTypes: AdmissionType[] = ['Emergency', 'Scheduled', 'Transfer', 'Outpatient'];
+    readonly admissionTypeOptions = this.admissionTypes.map(t => ({ label: t, value: t }));
 
     currentStep = 1;
     isSubmitting = false;
@@ -319,6 +303,8 @@ export class AdminAdmissionComponent implements OnInit, OnDestroy {
     wards = signal<Ward[]>([]);
     beds = signal<Bed[]>([]);
     loadingBeds = signal(false);
+    readonly wardOptions = computed(() => this.wards().map(w => ({ value: w.id, label: `${w.name} (${w.availableBeds} free)` })));
+    readonly bedOptions = computed(() => this.beds().map(b => ({ value: b.id, label: `${b.number}${b.roomNumber ? ' · Room ' + b.roomNumber : ''} · ${b.bedType}` })));
 
     createdAdmission = signal<Admission | null>(null);
     draft: AdmissionDraft = this.emptyDraft();

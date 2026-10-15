@@ -145,17 +145,14 @@ import { BooUploadComponent } from "../../../../../upload/boo-upload/boo-upload.
                 </div>
                 <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0 shadow-top-md">
                     <div>
-                        <button 
-                            *ngIf="currentId" class="group flex items-center gap-1.5 text-red-500 hover:text-red-700 px-2 py-1.5 rounded-md hover:bg-red-50 transition-all text-sm font-medium"
-                            (click)="onDelete()"
-                        >
+                        <boo-button-admin *ngIf="currentId" (click)="onDelete()" background="transparent" textColor="#EF4444" padding="6px 8px" [fontSize]="14" fontWeight="500" [gap]="6" buttonClass="group">
                             <physio-icon 
                                 name="trash" 
                                 [size]="16"
                                 [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
                             ></physio-icon> 
                             <span>Delete</span>
-                        </button>
+                        </boo-button-admin>
                     </div>
                     <div class="flex gap-3">
                         <boo-button-admin

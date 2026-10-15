@@ -20,6 +20,9 @@ import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING } from "../../../../shared/const
 import { DEFAULT_DATE_OF_BIRTH, DEFAULT_DOCTOR_ID } from "../../../../shared/constants/value.constant";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { CreatePatientRequest } from "../../../../shared/types/patient.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
+import { BooCheckboxComponent } from "../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
 
 type StepId = 'personal' | 'contact' | 'medical' | 'review';
 
@@ -41,6 +44,9 @@ interface Step {
     BooInputComponent,
     BooDatepickerComponent,
     BooSelectComponent,
+    BooButtonAdminComponent,
+    BooTextareaComponent,
+    BooCheckboxComponent
   ],
   host: { class: 'block h-full min-h-0' },
   templateUrl: './registration.component.html'

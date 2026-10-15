@@ -8,6 +8,9 @@ import { DialogService } from '../../../../../services/common/dialog.service';
 import { ToastService } from '../../../../../services/common/toast.service';
 import { SharedModule } from '../../../../../shared/shared-imports';
 import { ScrumBoard, ScrumCard, ScrumList } from '../../../../../shared/types/scrumboard.types';
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
+import { BooDatepickerComponent } from "../../../../../components/date-picker/boo-date-picker.component";
 
 /** Editable copy of a card: the card on the board changes only after Save succeeds. */
 interface CardDraft {
@@ -22,8 +25,12 @@ interface CardDraft {
   standalone: true,
   imports: [
     AdminBreadcrumbComponent,
-    SharedModule,
-    EmptyStateComponent
+    SharedModule,
+
+    EmptyStateComponent,
+    BooButtonAdminComponent,
+    BooTextareaComponent,
+    BooDatepickerComponent
   ],
   templateUrl: './board.component.html'
 })

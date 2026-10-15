@@ -2,11 +2,12 @@ import { Component, Input, computed, signal } from "@angular/core";
 import { Severity } from "../../../../../shared/enums/severity";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { CurrentStatus, DiagnosisRow } from "../../../../../shared/types/medical-record.types";
+import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 
 @Component({
   selector: 'mr-diagnoses-tab',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooSelectComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
       <div class="px-5 py-3 border-b border-gray-200 flex items-center gap-3 flex-wrap">
@@ -16,10 +17,8 @@ import { CurrentStatus, DiagnosisRow } from "../../../../../shared/types/medical
             placeholder="Search ICD-10, condition, category…"
             class="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
         </div>
-        <select [value]="status()" (change)="status.set($any($event.target).value)" class="border border-gray-200 rounded-md px-3 py-1.5 text-sm">
-          <option value="">All status</option>
-          <option *ngFor="let s of allStatuses" [value]="s">{{ s }}</option>
-        </select>
+        <boo-select label="All status" size="small" class="w-48" [options]="statusOptions"
+          [ngModel]="status()" (ngModelChange)="status.set($event ?? '')"></boo-select>
       </div>
 
       <div class="overflow-x-auto">
@@ -74,6 +73,7 @@ export class DiagnosesTabComponent {
   search = signal('');
   status = signal('');
   readonly allStatuses: CurrentStatus[] = ['Active', 'Managed', 'InRemission', 'Resolved', 'Cured'];
+  readonly statusOptions = this.allStatuses.map(s => ({ label: s, value: s }));
 
   filtered = computed(() => {
     const q = this.search().toLowerCase().trim();

@@ -20,6 +20,8 @@ import { RetailCheckoutPanelComponent } from "./retail-checkout-panel.component"
 import { RetailCustomerLookupDrawerComponent } from "./retail-customer-lookup-drawer.component";
 import { RetailPaymentDialogComponent } from "./retail-payment-dialog.component";
 import { RetailProductDetailDrawerComponent } from "./retail-product-detail-drawer.component";
+import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'admin-retail',
@@ -34,6 +36,8 @@ import { RetailProductDetailDrawerComponent } from "./retail-product-detail-draw
     RetailPaymentDialogComponent,
     RetailProductDetailDrawerComponent,
     RetailCustomerLookupDrawerComponent,
+    ButtonIconComponent,
+    BooButtonAdminComponent
   ],
   host: { class: 'block min-h-screen bg-gray-50' },
   template: `
@@ -45,13 +49,10 @@ import { RetailProductDetailDrawerComponent } from "./retail-product-detail-draw
           <p class="text-xs text-secondary">Cashier: Current Cashier · Shift started {{ shiftStart | date:'shortTime' }}</p>
         </div>
         <div class="flex items-center gap-2">
-          <button type="button" (click)="showInsight.set(!showInsight())"
-            class="px-3 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 flex items-center gap-1.5">
-            <physio-icon name="gauge" [size]="14"></physio-icon> {{ showInsight() ? 'Hide' : 'Show' }} Insight
-          </button>
-          <button type="button" (click)="newSale()" class="px-3 py-2 bg-primary text-white rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1.5">
+          <button-icon [icon]="{ name: 'gauge', size: 14 }" (onClick)="showInsight.set(!showInsight())" buttonClass="!rounded-lg text-xs font-semibold"> {{ showInsight() ? 'Hide' : 'Show' }} Insight </button-icon>
+          <boo-button-admin (click)="newSale()" textColor="white" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" [gap]="6">
             <physio-icon name="circle-plus" [size]="14"></physio-icon> New Sale
-          </button>
+          </boo-button-admin>
         </div>
       </div>
 

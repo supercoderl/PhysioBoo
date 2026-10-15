@@ -8,6 +8,8 @@ import { SharedModule } from "../../../../../shared/shared-imports";
 import { code128Svg } from "../../../../../shared/utils/barcode.utils";
 import { escapeHtml, printHtmlDocument } from "../../../../../shared/utils/print.utils";
 import { LabSample, LabSampleTimelineEvent, SampleCollectionStatus } from "../../../../../shared/types/laboratory.types";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
 
 const STAGE_LABELS: Record<LabSampleTimelineEvent['stage'], string> = {
   Ordered: 'Ordered', Collected: 'Collected', Received: 'Received', Processing: 'Processing',
@@ -17,7 +19,7 @@ const STAGE_LABELS: Record<LabSampleTimelineEvent['stage'], string> = {
 @Component({
   selector: 'laboratory-sample-tracking-tab',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent, BooButtonAdminComponent, ButtonIconComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -43,18 +45,16 @@ const STAGE_LABELS: Record<LabSampleTimelineEvent['stage'], string> = {
 
         <div *ngIf="expanded() === s.id" class="border-t border-gray-100 px-4 py-4 bg-gray-50">
           <div class="flex flex-wrap items-center gap-2 mb-4">
-            <button (click)="printBarcode(s)" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-              <physio-icon name="printer" [size]="14"></physio-icon> Print Barcode
-            </button>
-            <button [disabled]="s.collectionStatus !== 'NotCollected'" (click)="markCollected(s)" class="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-semibold hover:bg-primary/15 disabled:opacity-40 disabled:cursor-not-allowed">
+            <button-icon [icon]="{ name: 'printer', size: 14 }" (onClick)="printBarcode(s)" buttonClass="!rounded-lg text-xs font-semibold"> Print Barcode </button-icon>
+            <boo-button-admin [disabled]="s.collectionStatus !== 'NotCollected'" (click)="markCollected(s)" background="rgb(var(--twc-primary) / 0.1)" textColor="rgb(var(--twc-primary))" [fontSize]="12" [radius]="8" fontWeight="600">
               Mark Collected
-            </button>
-            <button [disabled]="s.collectionStatus === 'Rejected'" (click)="recollect(s)" class="px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-xs font-semibold hover:bg-amber-100 disabled:opacity-40 disabled:cursor-not-allowed">
+            </boo-button-admin>
+            <boo-button-admin [disabled]="s.collectionStatus === 'Rejected'" (click)="recollect(s)" background="#FFFBEB" textColor="#B45309" [fontSize]="12" [radius]="8" fontWeight="600">
               Recollect
-            </button>
-            <button [disabled]="s.collectionStatus === 'Rejected'" (click)="reject(s)" class="px-3 py-1.5 bg-rose-50 text-rose-700 rounded-lg text-xs font-semibold hover:bg-rose-100 disabled:opacity-40 disabled:cursor-not-allowed">
+            </boo-button-admin>
+            <boo-button-admin [disabled]="s.collectionStatus === 'Rejected'" (click)="reject(s)" background="#FFF1F2" textColor="#BE123C" [fontSize]="12" [radius]="8" fontWeight="600">
               Reject Sample
-            </button>
+            </boo-button-admin>
           </div>
 
           <div class="flex items-center overflow-x-auto pb-1">

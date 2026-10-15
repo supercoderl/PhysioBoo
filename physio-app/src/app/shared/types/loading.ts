@@ -71,6 +71,13 @@ export const LoadingKeys = {
         SAVE: 'note-save',
         DELETE: 'note-delete'
     },
+    CONVERSATION: {
+        CONTACTS: 'conversation-contacts',
+        MESSAGES: 'conversation-messages',
+        OLDER: 'conversation-older',
+        SEND: 'conversation-send',
+        READ: 'conversation-read'
+    },
     SCRUMBOARD: {
         BOARDS: 'scrumboard-boards',
         BOARD: 'scrumboard-board',

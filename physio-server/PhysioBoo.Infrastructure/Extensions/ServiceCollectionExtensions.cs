@@ -168,6 +168,9 @@ namespace PhysioBoo.Infrastructure.Extensions
             services.AddScoped<ILabAlertRepository, LabAlertRepository>();
             services.AddScoped<IRadiologyAlertRepository, RadiologyAlertRepository>();
             services.AddScoped<INoteRepository, NoteRepository>();
+            services.AddScoped<IConversationRepository, ConversationRepository>();
+            services.AddScoped<IConversationParticipantRepository, ConversationParticipantRepository>();
+            services.AddScoped<IConversationMessageRepository, ConversationMessageRepository>();
             services.AddScoped<IHomeBannerRepository, HomeBannerRepository>();
             services.AddScoped<IHomeFeatureRepository, HomeFeatureRepository>();
             services.AddScoped<IHomeTestimonialRepository, HomeTestimonialRepository>();

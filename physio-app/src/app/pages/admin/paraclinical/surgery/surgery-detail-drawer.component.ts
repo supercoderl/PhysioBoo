@@ -9,6 +9,7 @@ import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { EquipmentStatus, SurgeryCase, SurgeryTimelineStage } from "../../../../shared/types/surgery.types";
 import { escapeHtml, printHtmlDocument } from "../../../../shared/utils/print.utils";
+import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
 
 const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
   Scheduled: 'Scheduled', PatientArrived: 'Patient Arrived', PreOpCompleted: 'Pre-op Completed',
@@ -19,7 +20,7 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
 @Component({
   selector: 'surgery-detail-drawer',
   standalone: true,
-  imports: [SharedModule, DrawerComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule, DrawerComponent, StatusBadgeComponent, EmptyStateComponent, ButtonIconComponent],
   template: `
     <drawer [isOpen]="isOpen" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
@@ -58,18 +59,10 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
 
             <!-- Quick actions -->
             <div class="px-6 py-4 border-b border-gray-100 flex flex-wrap gap-2">
-              <button (click)="viewEmr()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <physio-icon name="file-text" [size]="14"></physio-icon> View EMR
-              </button>
-              <button (click)="printConsent()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <physio-icon name="printer" [size]="14"></physio-icon> Print Consent
-              </button>
-              <button (click)="viewImages()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <physio-icon name="image" [size]="14"></physio-icon> View Images
-              </button>
-              <button (click)="openTreatmentSheet()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <physio-icon name="clipboard" [size]="14"></physio-icon> Open Treatment Sheet
-              </button>
+              <button-icon [icon]="{ name: 'file-text', size: 14 }" (onClick)="viewEmr()" buttonClass="!rounded-lg text-xs font-semibold"> View EMR </button-icon>
+              <button-icon [icon]="{ name: 'printer', size: 14 }" (onClick)="printConsent()" buttonClass="!rounded-lg text-xs font-semibold"> Print Consent </button-icon>
+              <button-icon [icon]="{ name: 'image', size: 14 }" (onClick)="viewImages()" buttonClass="!rounded-lg text-xs font-semibold"> View Images </button-icon>
+              <button-icon [icon]="{ name: 'clipboard', size: 14 }" (onClick)="openTreatmentSheet()" buttonClass="!rounded-lg text-xs font-semibold"> Open Treatment Sheet </button-icon>
             </div>
 
             <!-- Surgical team -->

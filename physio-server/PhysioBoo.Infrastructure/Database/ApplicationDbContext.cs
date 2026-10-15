@@ -151,6 +151,9 @@ namespace PhysioBoo.Infrastructure.Database
         public DbSet<LabAlert> LabAlerts { get; set; } = null!;
         public DbSet<RadiologyAlert> RadiologyAlerts { get; set; } = null!;
         public DbSet<Note> Notes { get; set; } = null!;
+        public DbSet<Conversation> Conversations { get; set; } = null!;
+        public DbSet<ConversationParticipant> ConversationParticipants { get; set; } = null!;
+        public DbSet<ConversationMessage> ConversationMessages { get; set; } = null!;
         public DbSet<HomeBanner> HomeBanners { get; set; } = null!;
         public DbSet<HomeFeature> HomeFeatures { get; set; } = null!;
         public DbSet<HomeTestimonial> HomeTestimonials { get; set; } = null!;
@@ -364,6 +367,9 @@ namespace PhysioBoo.Infrastructure.Database
             builder.ApplyConfiguration(new LabAlertConfiguration());
             builder.ApplyConfiguration(new RadiologyAlertConfiguration());
             builder.ApplyConfiguration(new NoteConfiguration());
+            builder.ApplyConfiguration(new ConversationConfiguration());
+            builder.ApplyConfiguration(new ConversationParticipantConfiguration());
+            builder.ApplyConfiguration(new ConversationMessageConfiguration());
             builder.ApplyConfiguration(new HomeBannerConfiguration());
             builder.ApplyConfiguration(new HomeFeatureConfiguration());
             builder.ApplyConfiguration(new HomeTestimonialConfiguration());

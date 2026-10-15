@@ -12,6 +12,7 @@ import { ColumnDefDirective } from '../../../../shared/directives/column-def.dir
 import { SharedModule } from '../../../../shared/shared-imports';
 import { ActionItem, PaginationData } from '../../../../shared/types/common';
 import { PrintTemplate } from '../../../../shared/types/print-template.types';
+import { BooButtonAdminComponent } from '../../../../components/button/boo-button-admin/boo-button-admin.component';
 
 @Component({
   selector: 'admin-print-template-list',
@@ -22,6 +23,7 @@ import { PrintTemplate } from '../../../../shared/types/print-template.types';
     BooTableAdminComponent,
     ColumnDefDirective,
     BooActionAdminComponent,
+    BooButtonAdminComponent
   ],
   host: { class: 'block h-full min-h-0' },
   template: `
@@ -31,12 +33,10 @@ import { PrintTemplate } from '../../../../shared/types/print-template.types';
           <h4 class="text-[22px] text-primary font-semibold mb-0">Print Templates</h4>
         </div>
         <div class="text-right flex">
-          <button type="button"
-            (click)="onCreate()"
-            class="inline-flex items-center gap-1.5 px-3 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors">
+          <boo-button-admin (click)="onCreate()" textColor="white" padding="8px 12px" [fontSize]="14" fontWeight="500" [gap]="6">
             <physio-icon name="plus" class="w-4 h-4 text-white" />
             New Template
-          </button>
+          </boo-button-admin>
         </div>
       </div>
 

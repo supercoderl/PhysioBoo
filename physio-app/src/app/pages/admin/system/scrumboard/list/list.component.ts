@@ -5,6 +5,8 @@ import { ScrumboardService } from '../../../../../services/admin/scrumboard.serv
 import { ToastService } from '../../../../../services/common/toast.service';
 import { SharedModule } from '../../../../../shared/shared-imports';
 import { ScrumBoardSummary } from '../../../../../shared/types/scrumboard.types';
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
 
 @Component({
   selector: 'app-scrumboard-list',
@@ -12,7 +14,9 @@ import { ScrumBoardSummary } from '../../../../../shared/types/scrumboard.types'
   imports: [
     AdminBreadcrumbComponent,
     SharedModule,
-    EmptyStateComponent
+    EmptyStateComponent,
+    BooButtonAdminComponent,
+    BooTextareaComponent
   ],
   templateUrl: './list.component.html'
 })

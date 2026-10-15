@@ -5,11 +5,12 @@ import { InventoryManagementService } from "../../../../services/admin/inventory
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { InventoryAlert, InventoryAlertSeverity, alertSeverityRank } from "../../../../shared/types/inventory-management.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
     selector: 'inventory-alerts-panel',
     standalone: true,
-    imports: [SharedModule,EmptyStateComponent, StatusBadgeComponent],
+    imports: [SharedModule,EmptyStateComponent, StatusBadgeComponent, BooButtonAdminComponent],
     template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex items-center justify-between">
@@ -32,9 +33,9 @@ import { InventoryAlert, InventoryAlertSeverity, alertSeverityRank } from "../..
           <p class="text-xs font-semibold text-regular leading-tight">{{ a.medicineName }}</p>
           <p class="text-[11px] text-secondary mb-1">{{ a.message }}</p>
           <p class="text-[11px] text-secondary mb-1.5" *ngIf="a.recommendation">{{ a.recommendation }}</p>
-          <button type="button" *ngIf="!a.acknowledged" (click)="onAcknowledge(a)" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-white border border-gray-300 text-gray-600 hover:bg-gray-50">
+          <boo-button-admin *ngIf="!a.acknowledged" (click)="onAcknowledge(a)" background="white" textColor="#71606A" [border]="{ width: 1, color: '#E3D5DA' }" padding="4px 10px" [fontSize]="11" [radius]="8" fontWeight="600">
             Acknowledge
-          </button>
+          </boo-button-admin>
         </div>
       </div>
     </div>

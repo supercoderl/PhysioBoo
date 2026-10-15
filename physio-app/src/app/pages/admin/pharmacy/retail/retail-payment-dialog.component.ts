@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailPaymentMethod, RetailPaymentSplit } from "../../../../shared/types/retail-pos.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'retail-payment-dialog',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonAdminComponent],
   template: `
     <div *ngIf="isOpen" class="fixed inset-0 z-[10000] flex items-center justify-center">
       <div class="absolute inset-0 bg-black/50" (click)="close.emit()" aria-hidden="true"></div>
@@ -80,20 +81,18 @@ import { RetailPaymentMethod, RetailPaymentSplit } from "../../../../shared/type
             </div>
 
             <div class="mt-4 pt-3 border-t border-gray-200 flex gap-2">
-              <button type="button" class="flex-1 py-1.5 text-xs font-semibold border border-gray-300 rounded-lg hover:bg-gray-100">Print</button>
-              <button type="button" class="flex-1 py-1.5 text-xs font-semibold border border-gray-300 rounded-lg hover:bg-gray-100">Email</button>
-              <button type="button" class="flex-1 py-1.5 text-xs font-semibold border border-gray-300 rounded-lg hover:bg-gray-100">SMS</button>
+              <boo-button-admin background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" [fontSize]="12" [radius]="8" fontWeight="600" buttonClass="w-full" class="flex-1">Print</boo-button-admin>
+              <boo-button-admin background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" [fontSize]="12" [radius]="8" fontWeight="600" buttonClass="w-full" class="flex-1">Email</boo-button-admin>
+              <boo-button-admin background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" [fontSize]="12" [radius]="8" fontWeight="600" buttonClass="w-full" class="flex-1">SMS</boo-button-admin>
             </div>
           </div>
         </div>
 
         <div class="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
-          <button type="button" (click)="close.emit()" class="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
-          <button type="button" (click)="complete()" [disabled]="!canComplete()"
-            class="px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
-            [ngClass]="canComplete() ? 'bg-primary text-white hover:opacity-90' : 'bg-gray-200 text-gray-400 cursor-not-allowed'">
+          <boo-button-admin (click)="close.emit()" background="transparent" textColor="#71606A" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="600">Cancel</boo-button-admin>
+          <boo-button-admin (click)="complete()" [disabled]="!canComplete()" textColor="white" padding="8px 20px" [fontSize]="14" [radius]="8" fontWeight="600">
             Complete Sale
-          </button>
+          </boo-button-admin>
         </div>
       </div>
     </div>

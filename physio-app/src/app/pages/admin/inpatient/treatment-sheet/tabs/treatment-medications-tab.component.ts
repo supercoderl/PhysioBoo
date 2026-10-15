@@ -1,4 +1,7 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
 import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
@@ -22,12 +25,12 @@ type ViewMode = 'table' | 'timeline';
 @Component({
   selector: 'treatment-medications-tab',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule, BooButtonAdminComponent, BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-sm font-semibold text-primary m-0">Medication Administration Record</h3>
       <div class="flex items-center gap-2">
-      <button (click)="toggleSchedule()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-white hover:opacity-90">Schedule dose</button>
+      <boo-button-admin (click)="toggleSchedule()" textColor="white" [fontSize]="12" [radius]="8" fontWeight="600">Schedule dose</boo-button-admin>
       <div class="flex bg-gray-100 rounded-lg p-0.5">
         <button (click)="view = 'table'" class="px-3 py-1.5 text-xs font-semibold rounded-lg" [ngClass]="view === 'table' ? 'bg-surface shadow text-primary' : 'text-gray-500'">Table</button>
         <button (click)="view = 'timeline'" class="px-3 py-1.5 text-xs font-semibold rounded-lg" [ngClass]="view === 'timeline' ? 'bg-surface shadow text-primary' : 'text-gray-500'">Timeline</button>
@@ -37,28 +40,25 @@ type ViewMode = 'table' | 'timeline';
 
     <div *ngIf="scheduleOpen()" class="mb-4 rounded-lg border border-gray-200 bg-surface p-4">
       <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
-        <label class="flex flex-col gap-1 text-xs text-gray-600 md:col-span-2">Medication
-          <input [(ngModel)]="dose.medicationName" maxlength="200" placeholder="e.g. Paracetamol" class="rounded border border-gray-300 px-3 py-2 text-sm" />
-        </label>
-        <label class="flex flex-col gap-1 text-xs text-gray-600">Dose
-          <input [(ngModel)]="dose.dose" maxlength="50" placeholder="e.g. 500 mg" class="rounded border border-gray-300 px-3 py-2 text-sm" />
-        </label>
-        <label class="flex flex-col gap-1 text-xs text-gray-600">Route
-          <select [(ngModel)]="dose.route" class="rounded border border-gray-300 px-2 py-2 text-sm bg-surface">
-            <option *ngFor="let r of routes" [value]="r">{{ r }}</option>
-          </select>
-        </label>
-        <label class="flex flex-col gap-1 text-xs text-gray-600">Frequency
-          <input [(ngModel)]="dose.frequency" maxlength="50" placeholder="e.g. q6h" class="rounded border border-gray-300 px-3 py-2 text-sm" />
-        </label>
+        <div class="flex flex-col gap-1 text-xs text-gray-600 md:col-span-2">Medication
+          <boo-input [(ngModel)]="dose.medicationName" [maxlength]="200" label="e.g. Paracetamol" size="small"></boo-input>
+        </div>
+        <div class="flex flex-col gap-1 text-xs text-gray-600">Dose
+          <boo-input [(ngModel)]="dose.dose" [maxlength]="50" label="e.g. 500 mg" size="small"></boo-input>
+        </div>
+        <div class="flex flex-col gap-1 text-xs text-gray-600">Route
+          <boo-select [(ngModel)]="dose.route" [options]="routeOptions" size="small"></boo-select>
+        </div>
+        <div class="flex flex-col gap-1 text-xs text-gray-600">Frequency
+          <boo-input [(ngModel)]="dose.frequency" [maxlength]="50" label="e.g. q6h" size="small"></boo-input>
+        </div>
         <label class="flex flex-col gap-1 text-xs text-gray-600 md:col-span-2">Scheduled at
           <input type="datetime-local" [(ngModel)]="dose.scheduledAt" class="rounded border border-gray-300 px-2 py-2 text-sm" />
         </label>
       </div>
       <div class="flex justify-end gap-2 mt-3">
-        <button (click)="scheduleOpen.set(false)" class="px-3 py-2 rounded-lg text-xs border border-gray-300 text-gray-700">Cancel</button>
-        <button (click)="scheduleDose()" [disabled]="!dose.medicationName.trim() || !dose.dose.trim() || !dose.scheduledAt || savingDose()"
-          class="px-3 py-2 rounded-lg text-xs font-semibold bg-primary text-white disabled:opacity-50">{{ savingDose() ? 'Saving…' : 'Schedule' }}</button>
+        <boo-button-admin (click)="scheduleOpen.set(false)" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="12" [radius]="8">Cancel</boo-button-admin>
+        <boo-button-admin (click)="scheduleDose()" [disabled]="!dose.medicationName.trim() || !dose.dose.trim() || !dose.scheduledAt || savingDose()" textColor="white" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600">{{ savingDose() ? 'Saving…' : 'Schedule' }}</boo-button-admin>
       </div>
     </div>
 
@@ -95,8 +95,8 @@ type ViewMode = 'table' | 'timeline';
             <td class="px-4 py-3 text-gray-500">{{ m.notes ?? '—' }}</td>
             <td class="px-4 py-3">
               <div *ngIf="m.status === 'Scheduled'" class="flex gap-2">
-                <button (click)="markGiven(m)" [disabled]="loadingSrv.isLoading('med-' + m.id)" class="px-2.5 py-1 bg-emerald-600 text-white rounded text-xs hover:bg-emerald-700 disabled:opacity-50">Given</button>
-                <button (click)="markMissed(m)" [disabled]="loadingSrv.isLoading('med-' + m.id)" class="px-2.5 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 disabled:opacity-50">Missed</button>
+                <boo-button-admin (click)="markGiven(m)" [disabled]="loadingSrv.isLoading('med-' + m.id)" background="#059669" textColor="white" padding="4px 10px" [fontSize]="12" [radius]="4">Given</boo-button-admin>
+                <boo-button-admin (click)="markMissed(m)" [disabled]="loadingSrv.isLoading('med-' + m.id)" background="#EFE3E7" textColor="#55434B" padding="4px 10px" [fontSize]="12" [radius]="4">Missed</boo-button-admin>
               </div>
             </td>
           </tr>
@@ -124,6 +124,7 @@ export class TreatmentMedicationsTabComponent implements OnChanges {
   view: ViewMode = 'table';
 
   readonly routes = ['PO', 'IV', 'IM', 'SC', 'SL', 'PR', 'Topical', 'Inhaled'];
+  readonly routeOptions = this.routes.map(r => ({ label: r, value: r }));
   scheduleOpen = signal(false);
   savingDose = signal(false);
   dose = this.emptyDose();

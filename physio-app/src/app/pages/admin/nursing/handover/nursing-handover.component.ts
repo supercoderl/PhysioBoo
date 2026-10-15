@@ -6,13 +6,15 @@ import { LocalLoadingService } from "../../../../services/common/local-loading.s
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { ShiftCode, ShiftHandoverCard } from "../../../../shared/types/nursing.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
 
 type SbarKey = 'situation' | 'background' | 'assessment' | 'recommendation';
 
 @Component({
     selector: 'admin-nursing-handover',
     standalone: true,
-    imports: [SharedModule,BooSelectComponent, ErrorStateComponent],
+    imports: [SharedModule,BooSelectComponent, ErrorStateComponent, BooButtonAdminComponent, BooTextareaComponent],
     template: `
     <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div class="max-w-5xl mx-auto">
@@ -56,29 +58,25 @@ type SbarKey = 'situation' | 'background' | 'assessment' | 'recommendation';
               <div><dt class="text-xs text-gray-500 mb-0.5">Recommendation</dt><dd class="text-gray-800 m-0 whitespace-pre-line">{{ c.recommendation }}</dd></div>
             </dl>
             <div *ngIf="editingId() === c.id" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-              <label *ngFor="let f of sbarFields" class="flex flex-col gap-1">
-                <span class="text-xs text-gray-500">{{ f.label }}</span>
-                <textarea rows="3" maxlength="2000" [(ngModel)]="draft[f.key]" [name]="f.key + '-' + c.id"
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-primary"></textarea>
-              </label>
+              <div *ngFor="let f of sbarFields" class="flex flex-col gap-1">
+                <label [for]="f.key + '-' + c.id" class="text-xs text-gray-500">{{ f.label }}</label>
+                <boo-textarea [rows]="3" [maxlength]="2000" [(ngModel)]="draft[f.key]" [name]="f.key + '-' + c.id" [id]="f.key + '-' + c.id"></boo-textarea>
+              </div>
             </div>
             <div class="mt-4 flex justify-end gap-2" *ngIf="!c.acknowledged">
               <ng-container *ngIf="editingId() !== c.id; else editActions">
-                <button (click)="startEdit(c)"
-                  class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">
+                <boo-button-admin (click)="startEdit(c)" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 16px" [fontSize]="14" [radius]="8">
                   Edit SBAR
-                </button>
-                <button (click)="acknowledge(c)" [disabled]="loadingSrv.isLoading('ack-' + c.id)"
-                  class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:opacity-90 disabled:opacity-50">
+                </boo-button-admin>
+                <boo-button-admin (click)="acknowledge(c)" [disabled]="loadingSrv.isLoading('ack-' + c.id)" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8">
                   Acknowledge
-                </button>
+                </boo-button-admin>
               </ng-container>
               <ng-template #editActions>
-                <button (click)="editingId.set(null)" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
-                <button (click)="saveEdit(c)" [disabled]="savingEdit()"
-                  class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:opacity-90 disabled:opacity-50">
+                <boo-button-admin (click)="editingId.set(null)" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 16px" [fontSize]="14" [radius]="8">Cancel</boo-button-admin>
+                <boo-button-admin (click)="saveEdit(c)" [disabled]="savingEdit()" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8">
                   {{ savingEdit() ? 'Saving…' : 'Save' }}
-                </button>
+                </boo-button-admin>
               </ng-template>
             </div>
           </div>

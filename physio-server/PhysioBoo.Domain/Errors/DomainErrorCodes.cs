@@ -672,6 +672,20 @@
             public const string TooManyItems = "NOTE_TOO_MANY_ITEMS";
         }
 
+        public static class Conversation
+        {
+            // Conversation Validation
+            public const string EmptyId = "CONVERSATION_EMPTY_ID";
+            public const string EmptyMessageId = "CONVERSATION_EMPTY_MESSAGE_ID";
+            public const string EmptyContent = "CONVERSATION_EMPTY_CONTENT";
+            public const string ContentExceedsMaxLength = "CONVERSATION_CONTENT_EXCEEDS_MAX_LENGTH";
+            public const string EmptyContact = "CONVERSATION_EMPTY_CONTACT";
+            public const string CannotMessageSelf = "CONVERSATION_CANNOT_MESSAGE_SELF";
+            public const string InvalidContact = "CONVERSATION_INVALID_CONTACT";
+            public const string InvalidCursor = "CONVERSATION_INVALID_CURSOR";
+            public const string DuplicateMessageId = "CONVERSATION_DUPLICATE_MESSAGE_ID";
+        }
+
         public static class Surgery
         {
             // Surgery Validation

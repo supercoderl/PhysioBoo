@@ -1,4 +1,5 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
@@ -19,7 +20,7 @@ function nextQuarterHour(): string {
 @Component({
   selector: 'treatment-orders-tab',
   standalone: true,
-  imports: [SharedModule, BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule, BooButtonAdminComponent, BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
   template: `
     <div class="flex flex-wrap items-center gap-3 mb-4">
       <boo-input label="Search orders..." size="small" (search)="onSearch($event)"></boo-input>
@@ -31,37 +32,32 @@ function nextQuarterHour(): string {
         [ngClass]="groupByCategory ? 'bg-primary/10 border-primary text-primary' : 'bg-surface border-gray-200 text-gray-600'">
         Group by Category
       </button>
-      <button (click)="toggleNew()" class="ml-auto px-3 py-2 rounded-lg text-xs font-semibold bg-primary text-white hover:opacity-90">
+      <boo-button-admin (click)="toggleNew()" textColor="white" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" class="ml-auto">
         New order
-      </button>
+      </boo-button-admin>
     </div>
 
     <div *ngIf="newOpen()" class="mb-4 rounded-lg border border-gray-200 bg-surface p-4">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
-        <label class="md:col-span-2 flex flex-col gap-1 text-xs text-gray-600">Order
-          <input [(ngModel)]="draft.orderName" maxlength="200" placeholder="e.g. Chest physiotherapy BID" class="rounded border border-gray-300 px-3 py-2 text-sm" />
-        </label>
-        <label class="flex flex-col gap-1 text-xs text-gray-600">Type
-          <select [(ngModel)]="draft.orderType" class="rounded border border-gray-300 px-2 py-2 text-sm bg-surface">
-            <option *ngFor="let t of typeOptions.slice(1)" [value]="t.value">{{ t.label }}</option>
-          </select>
-        </label>
-        <label class="flex flex-col gap-1 text-xs text-gray-600">Priority
-          <select [(ngModel)]="draft.priority" class="rounded border border-gray-300 px-2 py-2 text-sm bg-surface">
-            <option *ngFor="let p of priorityOptions.slice(1)" [value]="p.value">{{ p.label }}</option>
-          </select>
-        </label>
-        <label class="flex flex-col gap-1 text-xs text-gray-600">Frequency
-          <input [(ngModel)]="draft.frequency" maxlength="50" placeholder="e.g. q8h" class="rounded border border-gray-300 px-3 py-2 text-sm" />
-        </label>
+        <div class="md:col-span-2 flex flex-col gap-1 text-xs text-gray-600">Order
+          <boo-input [(ngModel)]="draft.orderName" [maxlength]="200" label="e.g. Chest physiotherapy BID" size="small"></boo-input>
+        </div>
+        <div class="flex flex-col gap-1 text-xs text-gray-600">Type
+          <boo-select [(ngModel)]="draft.orderType" [options]="draftTypeOptions" size="small"></boo-select>
+        </div>
+        <div class="flex flex-col gap-1 text-xs text-gray-600">Priority
+          <boo-select [(ngModel)]="draft.priority" [options]="draftPriorityOptions" size="small"></boo-select>
+        </div>
+        <div class="flex flex-col gap-1 text-xs text-gray-600">Frequency
+          <boo-input [(ngModel)]="draft.frequency" [maxlength]="50" label="e.g. q8h" size="small"></boo-input>
+        </div>
         <label class="flex flex-col gap-1 text-xs text-gray-600">Start
           <input type="datetime-local" [(ngModel)]="draft.startTime" class="rounded border border-gray-300 px-2 py-2 text-sm" />
         </label>
       </div>
       <div class="flex justify-end gap-2 mt-3">
-        <button (click)="newOpen.set(false)" class="px-3 py-2 rounded-lg text-xs border border-gray-300 text-gray-700">Cancel</button>
-        <button (click)="createOrder()" [disabled]="!draft.orderName.trim() || !draft.startTime || saving()"
-          class="px-3 py-2 rounded-lg text-xs font-semibold bg-primary text-white disabled:opacity-50">{{ saving() ? 'Saving…' : 'Create order' }}</button>
+        <boo-button-admin (click)="newOpen.set(false)" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="12" [radius]="8">Cancel</boo-button-admin>
+        <boo-button-admin (click)="createOrder()" [disabled]="!draft.orderName.trim() || !draft.startTime || saving()" textColor="white" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600">{{ saving() ? 'Saving…' : 'Create order' }}</boo-button-admin>
       </div>
     </div>
 
@@ -131,6 +127,10 @@ export class TreatmentOrdersTabComponent implements OnChanges {
     { label: 'All Priorities', value: null },
     { label: 'Routine', value: 'Routine' }, { label: 'Urgent', value: 'Urgent' }, { label: 'Stat', value: 'Stat' },
   ];
+
+  /** The new-order form always needs a concrete type and priority, so it offers the filter options minus "All". */
+  readonly draftTypeOptions = this.typeOptions.slice(1);
+  readonly draftPriorityOptions = this.priorityOptions.slice(1);
 
   newOpen = signal(false);
   saving = signal(false);

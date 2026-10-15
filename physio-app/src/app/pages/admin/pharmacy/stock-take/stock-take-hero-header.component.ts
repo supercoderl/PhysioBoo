@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { StockTakeKpis } from "../../../../shared/types/stock-take.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
     selector: 'stock-take-hero-header',
     standalone: true,
-    imports: [SharedModule],
+    imports: [SharedModule, BooButtonAdminComponent],
     template: `
     <div class="relative rounded-2 overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-neutral-800 px-6 pt-6 pb-12 text-white">
       <div class="absolute inset-0 opacity-[0.06] pointer-events-none" style="background-image: radial-gradient(circle at 20% 20%, #fff 1px, transparent 1px); background-size: 22px 22px;"></div>
@@ -28,10 +29,9 @@ import { StockTakeKpis } from "../../../../shared/types/stock-take.types";
             class="w-10 h-10 rounded-1.5 bg-white/10 hover:bg-white/15 flex items-center justify-center transition-colors" aria-label="Export Excel">
             <physio-icon name="file-spreadsheet" [size]="16" class="text-white"></physio-icon>
           </button>
-          <button type="button" (click)="create.emit()"
-            class="h-10 px-4 rounded-1.5 bg-amber-400 hover:bg-amber-300 text-slate-900 text-sm font-semibold flex items-center gap-1.5 transition-colors">
+          <boo-button-admin (click)="create.emit()" background="#FBBF24" textColor="#26141A" padding="10px 16px" [fontSize]="14" fontWeight="600" [gap]="6">
             <physio-icon name="plus" [size]="16"></physio-icon> Create Stock Take
-          </button>
+          </boo-button-admin>
         </div>
       </div>
     </div>

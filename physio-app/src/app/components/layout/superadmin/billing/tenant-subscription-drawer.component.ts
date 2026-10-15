@@ -15,19 +15,16 @@ import { DrawerComponent } from "../../../drawer/drawer.component";
 import { BooSelectComponent } from "../../../select/boo-select/boo-select.component";
 import { ErrorStateComponent } from "../../../ui/error-state.component";
 import { StatusBadgeComponent } from "../../../ui/status-badge.component";
+import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
+import { BooInputComponent } from "../../../input/boo-input/boo-input.component";
+import { BooTextareaComponent } from "../../../textarea/boo-textarea/boo-textarea.component";
 
 const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
-const FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
-const BTN_PRIMARY = `h-9 px-3.5 rounded-1.5 bg-primary text-white text-[13px] font-semibold hover:opacity-90 ${FOCUS}`;
-const BTN_OUTLINE = `h-9 px-3.5 rounded-1.5 border border-borderGray bg-surface text-[13px] font-medium text-regular hover:bg-black/5 ${FOCUS}`;
-const BTN_SUCCESS = `h-9 px-3.5 rounded-1.5 border border-emerald-300 bg-surface text-[13px] font-medium text-emerald-700 hover:bg-emerald-50 ${FOCUS}`;
-const BTN_WARNING = `h-9 px-3.5 rounded-1.5 border border-amber-300 bg-surface text-[13px] font-medium text-amber-700 hover:bg-amber-50 ${FOCUS}`;
-const BTN_DANGER = `h-9 px-3.5 rounded-1.5 border border-danger/30 bg-surface text-[13px] font-medium text-danger hover:bg-danger/5 ${FOCUS}`;
 
 @Component({
     selector: 'superadmin-tenant-subscription-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooSelectComponent, StatusBadgeComponent, ErrorStateComponent],
+    imports: [SharedModule, DrawerComponent, BooSelectComponent, StatusBadgeComponent, ErrorStateComponent, BooButtonAdminComponent, BooInputComponent, BooTextareaComponent],
     template: `
         <drawer [isOpen]="isOpen" (close)="close.emit()">
             <div
@@ -125,41 +122,18 @@ const BTN_DANGER = `h-9 px-3.5 rounded-1.5 border border-danger/30 bg-surface te
                                 ></boo-select>
                             </div>
                             <div class="flex flex-wrap gap-2">
-                                <button
-                                    type="button"
-                                    [class]="btnPrimary"
-                                    [disabled]="busy() || !selectedPlanId || selectedPlanId === t.planId"
-                                    (click)="change('ChangePlan')"
-                                >
+                                <boo-button-admin [disabled]="busy() || !selectedPlanId || selectedPlanId === t.planId" (click)="change('ChangePlan')" textColor="white" padding="8px 14px" fontWeight="600">
                                     {{ t.status === 'None' ? 'Subscribe' : 'Change plan' }}
-                                </button>
-                                <button
-                                    *ngIf="t.status === 'Trial' || t.status === 'PastDue' || t.status === 'Cancelled'"
-                                    type="button"
-                                    [class]="btnSuccess"
-                                    [disabled]="busy()"
-                                    (click)="change('Activate')"
-                                >
+                                </boo-button-admin>
+                                <boo-button-admin *ngIf="t.status === 'Trial' || t.status === 'PastDue' || t.status === 'Cancelled'" [disabled]="busy()" (click)="change('Activate')" background="transparent" textColor="#047857" [border]="{ width: 1, color: '#6EE7B7' }" padding="8px 14px" fontWeight="500">
                                     Activate
-                                </button>
-                                <button
-                                    *ngIf="t.status === 'Active'"
-                                    type="button"
-                                    [class]="btnWarning"
-                                    [disabled]="busy()"
-                                    (click)="change('MarkPastDue')"
-                                >
+                                </boo-button-admin>
+                                <boo-button-admin *ngIf="t.status === 'Active'" [disabled]="busy()" (click)="change('MarkPastDue')" background="transparent" textColor="#B45309" [border]="{ width: 1, color: '#FCD34D' }" padding="8px 14px" fontWeight="500">
                                     Mark past due
-                                </button>
-                                <button
-                                    *ngIf="t.status !== 'Cancelled' && t.status !== 'None'"
-                                    type="button"
-                                    [class]="btnDanger"
-                                    [disabled]="busy()"
-                                    (click)="change('Cancel')"
-                                >
+                                </boo-button-admin>
+                                <boo-button-admin *ngIf="t.status !== 'Cancelled' && t.status !== 'None'" [disabled]="busy()" (click)="change('Cancel')" background="transparent" textColor="rgb(var(--twc-danger))" [border]="{ width: 1, color: 'rgb(var(--twc-danger) / 0.3)' }" padding="8px 14px" fontWeight="500">
                                     Cancel subscription
-                                </button>
+                                </boo-button-admin>
                             </div>
                         </section>
 
@@ -168,19 +142,13 @@ const BTN_DANGER = `h-9 px-3.5 rounded-1.5 border border-danger/30 bg-surface te
                             <h3 id="sub-details-title" class="text-xs font-bold text-secondary uppercase tracking-wider m-0">Billing details</h3>
                             <div class="space-y-1">
                                 <label for="sub-email" class="text-[13px] font-medium text-regular">Billing email</label>
-                                <input id="sub-email" type="email" [(ngModel)]="billingEmail" [class]="field" autocomplete="off" />
+                                <boo-input [id]="'sub-email'" type="email" [(ngModel)]="billingEmail" size="small"></boo-input>
                             </div>
                             <div class="space-y-1">
                                 <label for="sub-notes" class="text-[13px] font-medium text-regular">Notes</label>
-                                <textarea
-                                    id="sub-notes"
-                                    rows="3"
-                                    maxlength="1000"
-                                    [(ngModel)]="notes"
-                                    class="w-full px-3 py-2 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                                ></textarea>
+                                <boo-textarea [id]="'sub-notes'" [rows]="3" [maxlength]="1000" [(ngModel)]="notes" size="small"></boo-textarea>
                             </div>
-                            <button type="button" [class]="btnOutline" [disabled]="busy()" (click)="change('UpdateDetails')">Save details</button>
+                            <boo-button-admin [disabled]="busy()" (click)="change('UpdateDetails')" background="transparent" textColor="rgb(var(--twc-regular))" [border]="{ width: 1, color: 'rgb(var(--twc-border))' }" padding="8px 14px" fontWeight="500">Save details</boo-button-admin>
                         </section>
 
                         <!-- Invoices -->
@@ -228,8 +196,8 @@ const BTN_DANGER = `h-9 px-3.5 rounded-1.5 border border-danger/30 bg-surface te
                                         [(ngModel)]="paymentReference[inv.id]"
                                         [class]="field"
                                     />
-                                    <button type="button" [class]="btnSuccess + ' shrink-0'" [disabled]="busy()" (click)="payInvoice(inv)">Mark paid</button>
-                                    <button type="button" [class]="btnDanger + ' shrink-0'" [disabled]="busy()" (click)="voidInvoice(inv)">Void</button>
+                                    <boo-button-admin [disabled]="busy()" (click)="payInvoice(inv)" background="transparent" textColor="#047857" [border]="{ width: 1, color: '#6EE7B7' }" padding="8px 14px" fontWeight="500" class="shrink-0">Mark paid</boo-button-admin>
+                                    <boo-button-admin [disabled]="busy()" (click)="voidInvoice(inv)" background="transparent" textColor="rgb(var(--twc-danger))" [border]="{ width: 1, color: 'rgb(var(--twc-danger) / 0.3)' }" padding="8px 14px" fontWeight="500" class="shrink-0">Void</boo-button-admin>
                                 </div>
                             </article>
                         </section>
@@ -249,11 +217,6 @@ export class SuperadminTenantSubscriptionDrawerComponent implements OnChanges {
     @Output() changed = new EventEmitter<void>();
 
     readonly field = FIELD;
-    readonly btnPrimary = BTN_PRIMARY;
-    readonly btnOutline = BTN_OUTLINE;
-    readonly btnSuccess = BTN_SUCCESS;
-    readonly btnWarning = BTN_WARNING;
-    readonly btnDanger = BTN_DANGER;
     readonly money = formatMoney;
     readonly statusTone = billingStatusTone;
     readonly statusLabel = billingStatusLabel;

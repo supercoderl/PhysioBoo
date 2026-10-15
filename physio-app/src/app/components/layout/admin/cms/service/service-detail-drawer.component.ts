@@ -3,11 +3,12 @@ import { MedicalServiceService } from "../../../../../services/admin/medical-ser
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { MedicalService, ServiceAvailability, ServiceStatus } from "../../../../../shared/types/service.types";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
+import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 
 @Component({
     selector: 'cms-service-detail-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent],
+    imports: [SharedModule, DrawerComponent, BooButtonAdminComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="close.emit()">
             <div *ngIf="loading" class="flex items-center justify-center h-full">
@@ -18,9 +19,9 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
                 <physio-icon name="triangle-alert" [size]="28" [class]="'text-red-500 mb-3'"></physio-icon>
                 <p class="text-sm font-semibold text-regular mb-1">Couldn't load this service</p>
                 <p class="text-xs15 text-secondary max-w-[280px] mb-4">The request failed. Please try again.</p>
-                <button (click)="reload()" class="px-3 py-1.5 text-sm font-medium text-red-700 border border-red-300 rounded-md hover:bg-red-100">
+                <boo-button-admin (click)="reload()" background="transparent" textColor="#B91C1C" [border]="{ width: 1, color: '#FCA5A5' }" [fontSize]="14" fontWeight="500">
                     Retry
-                </button>
+                </boo-button-admin>
             </div>
 
             <div *ngIf="!loading && !loadError && item as s" class="flex flex-col h-full bg-surface">
@@ -41,10 +42,10 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
                         <p class="text-sm text-secondary mt-1" *ngIf="s.shortName">{{ s.shortName }}</p>
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
-                        <button (click)="editClick.emit(s)" class="px-3 py-1.5 text-sm border border-gray-200 rounded hover:bg-gray-50 flex items-center gap-1.5">
+                        <boo-button-admin (click)="editClick.emit(s)" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#EFE3E7' }" [fontSize]="14" [radius]="4" [gap]="6">
                             <physio-icon name="pencil" class="w-3.5 h-3.5"></physio-icon>
                             Edit
-                        </button>
+                        </boo-button-admin>
                         <button (click)="close.emit()" class="w-8 h-8 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 flex items-center justify-center">
                             <physio-icon name="x" [size]="20"></physio-icon>
                         </button>
@@ -130,24 +131,24 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
 
                 <div class="flex-none px-6 py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <button *ngIf="s.status === 'Draft'" (click)="publishClick.emit(s)" class="px-3 py-1.5 text-sm text-emerald-700 hover:bg-emerald-50 rounded flex items-center gap-1.5">
+                        <boo-button-admin *ngIf="s.status === 'Draft'" (click)="publishClick.emit(s)" background="transparent" textColor="#047857" [fontSize]="14" [radius]="4" [gap]="6">
                             <physio-icon name="check" class="w-3.5 h-3.5"></physio-icon>
                             Publish
-                        </button>
-                        <button (click)="duplicateClick.emit(s)" class="px-3 py-1.5 text-sm text-primary hover:bg-gray-100 rounded flex items-center gap-1.5">
+                        </boo-button-admin>
+                        <boo-button-admin (click)="duplicateClick.emit(s)" background="transparent" textColor="rgb(var(--twc-primary))" [fontSize]="14" [radius]="4" [gap]="6">
                             <physio-icon name="copy" class="w-3.5 h-3.5"></physio-icon>
                             Duplicate
-                        </button>
+                        </boo-button-admin>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button (click)="archiveClick.emit(s)" class="px-3 py-1.5 text-sm text-secondary hover:bg-gray-100 rounded flex items-center gap-1.5">
+                        <boo-button-admin (click)="archiveClick.emit(s)" background="transparent" textColor="rgb(var(--twc-secondary))" [fontSize]="14" [radius]="4" [gap]="6">
                             <physio-icon name="archive" class="w-3.5 h-3.5"></physio-icon>
                             Archive
-                        </button>
-                        <button (click)="deleteClick.emit(s)" class="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded flex items-center gap-1.5">
+                        </boo-button-admin>
+                        <boo-button-admin (click)="deleteClick.emit(s)" background="transparent" textColor="#DC2626" [fontSize]="14" [radius]="4" [gap]="6">
                             <physio-icon name="trash" class="w-3.5 h-3.5"></physio-icon>
                             Delete
-                        </button>
+                        </boo-button-admin>
                     </div>
                 </div>
             </div>

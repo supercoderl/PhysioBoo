@@ -4,13 +4,14 @@ import { RetailPosService } from "../../../../services/admin/retail-pos.service"
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailMedicineCard, RetailQuickCategory, RetailSuggestionMode } from "../../../../shared/types/retail-pos.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 type ResultMode = 'Search' | RetailSuggestionMode;
 
 @Component({
   selector: 'retail-catalog-panel',
   standalone: true,
-  imports: [SharedModule,EmptyStateComponent],
+  imports: [SharedModule,EmptyStateComponent, BooButtonAdminComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg flex flex-col h-full">
       <!-- Search + barcode -->
@@ -85,11 +86,9 @@ type ResultMode = 'Search' | RetailSuggestionMode;
 
             <div class="flex items-center justify-between mt-1">
               <span class="text-sm font-bold text-gray-900">\${{ med.price.toFixed(2) }}</span>
-              <button type="button" (click)="addToCart.emit(med)" [disabled]="med.stock === 0" [attr.aria-disabled]="med.stock === 0"
-                class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-                [ngClass]="med.stock > 0 ? 'bg-primary text-white hover:opacity-90' : 'bg-gray-200 text-gray-400 cursor-not-allowed'">
+              <boo-button-admin (click)="addToCart.emit(med)" [disabled]="med.stock === 0" textColor="white" [fontSize]="12" [radius]="8" fontWeight="600">
                 Add
-              </button>
+              </boo-button-admin>
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@ import { DialogService } from '../../../../../services/common/dialog.service';
 import { ToastService } from '../../../../../services/common/toast.service';
 import { Note, NoteLabel, SaveNotePayload } from '../../../../../shared/types/note.types';
 import { SharedModule } from '../../../../../shared/shared-imports';
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 /** Editable copy of a note: the editor never changes the list until Save succeeds. */
 interface NoteDraft {
@@ -28,7 +29,8 @@ const SEARCH_DEBOUNCE_MS = 300;
   imports: [
     AdminContentHeaderComponent,
     SharedModule,
-    EmptyStateComponent
+    EmptyStateComponent,
+    BooButtonAdminComponent
   ],
   templateUrl: './all.component.html',
   styleUrl: './all.component.scss'

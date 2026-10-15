@@ -20,6 +20,7 @@ import { CashierPaymentDialogComponent } from "./cashier-payment-dialog.componen
 import { CashierRefundDialogComponent } from "./cashier-refund-dialog.component";
 import { CashierSearchPanelComponent } from "./cashier-search-panel.component";
 import { CashierTransactionsTimelineComponent } from "./cashier-transactions-timeline.component";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 type LeftTab = 'invoices' | 'activity';
 
@@ -35,6 +36,7 @@ type LeftTab = 'invoices' | 'activity';
     CashierPaymentDialogComponent,
     CashierRefundDialogComponent,
     CashierTransactionsTimelineComponent,
+    BooButtonAdminComponent
   ],
   host: { class: 'block min-h-screen bg-slate-50' },
   template: `
@@ -47,14 +49,12 @@ type LeftTab = 'invoices' | 'activity';
           <p class="text-slate-400 text-xs mt-1">Cashier: Current Cashier · Shift started {{ shiftStart | date:'shortTime' }}</p>
         </div>
         <div class="flex items-center gap-2">
-          <button type="button" (click)="exportTransactions()"
-            class="px-3 py-2 border border-white/15 rounded-lg text-xs font-semibold text-slate-200 hover:bg-white/5 flex items-center gap-1.5">
+          <boo-button-admin (click)="exportTransactions()" background="transparent" textColor="#EFE3E7" [border]="{ width: 1, color: 'rgb(255 255 255 / 0.15)' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" [gap]="6">
             <physio-icon name="download" [size]="14"></physio-icon> Export
-          </button>
-          <button type="button" (click)="refreshAll()"
-            class="px-3 py-2 rounded-lg text-xs font-semibold text-slate-900 bg-amber-400 hover:bg-amber-300 flex items-center gap-1.5">
+          </boo-button-admin>
+          <boo-button-admin (click)="refreshAll()" background="#FBBF24" textColor="#26141A" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" [gap]="6">
             <physio-icon name="refresh" [size]="14" [class.animate-spin]="loadingSrv.isLoading('cashier-dashboard')"></physio-icon> Refresh
-          </button>
+          </boo-button-admin>
         </div>
       </div>
 

@@ -23,12 +23,14 @@ import { PrescriptionMedicationTableComponent } from "./components/prescription-
 import { PrescriptionPatientSummaryComponent } from "./components/prescription-patient-summary.component";
 import { PrescriptionSidebarComponent } from "./components/prescription-sidebar.component";
 import { hasUnacknowledgedAtOrAbove, severityRank } from "./prescription-rx.util";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
     selector: 'admin-prescription',
     standalone: true,
     imports: [
-        SharedModule,
+        SharedModule,
+
         ErrorStateComponent,
         PrescriptionActionBarComponent,
         PrescriptionPatientSummaryComponent,
@@ -37,6 +39,7 @@ import { hasUnacknowledgedAtOrAbove, severityRank } from "./prescription-rx.util
         PrescriptionSidebarComponent,
         PrescriptionMedicationDrawerComponent,
         PrescriptionFooterComponent,
+        BooButtonAdminComponent
     ],
     template: `
     <div class="min-h-screen bg-gray-50 flex flex-col">
@@ -128,7 +131,7 @@ import { hasUnacknowledgedAtOrAbove, severityRank } from "./prescription-rx.util
             </table>
           </ng-container>
           <div class="mt-6 flex justify-end gap-2">
-            <button (click)="printRx()" class="px-4 py-2 text-sm font-semibold bg-primary text-white rounded-lg hover:bg-primary/90">Print</button>
+            <boo-button-admin (click)="printRx()" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="600">Print</boo-button-admin>
           </div>
         </div>
       </div>

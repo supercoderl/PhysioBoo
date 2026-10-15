@@ -31,15 +31,10 @@
           <physio-icon name="settings-2" [size]="16"></physio-icon>
           Manage
         </button>
-        <button
-          *ngIf="canManage && manageMode"
-          type="button"
-          (click)="openDialog()"
-          class="flex items-center gap-1.5 rounded-lg bg-primary px-3 min-h-10 text-[13px] font-medium text-white"
-        >
+        <boo-button-admin *ngIf="canManage && manageMode" (click)="openDialog()" textColor="white" padding="10px 12px" [radius]="8" fontWeight="500" [gap]="6">
           <physio-icon name="plus" [size]="16"></physio-icon>
           New course
-        </button>
+        </boo-button-admin>
       </div>
     </div>
 
@@ -130,22 +125,19 @@
           <option *ngFor="let c of categories()" [value]="c"></option>
         </datalist>
       </label>
-      <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]">Description</span>
-        <textarea [(ngModel)]="d.description" maxlength="2000" rows="3"
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 py-2 text-[14px] outline-none focus:border-primary"></textarea>
-      </label>
-      <label class="flex items-center gap-2 text-[13px]">
-        <input type="checkbox" [(ngModel)]="d.isPublished" class="h-4 w-4" />
-        Publish now (otherwise it stays a draft)
-      </label>
+      <div class="block">
+        <label for="new-course-description" class="mb-1 block text-[12px] font-semibold text-[#71606A]">Description</label>
+        <boo-textarea [id]="'new-course-description'" [(ngModel)]="d.description" [maxlength]="2000" [rows]="3"></boo-textarea>
+      </div>
+      <boo-checkbox [(ngModel)]="d.isPublished">
+        <span class="text-[13px]">Publish now (otherwise it stays a draft)</span>
+      </boo-checkbox>
     </div>
     <div class="flex justify-end gap-2 border-t border-[#EFE3E7] px-4 py-3">
-      <button type="button" (click)="closeDialog()" class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#71606A] hover:bg-gray-100">Cancel</button>
-      <button type="button" (click)="createCourse()" [disabled]="!canCreate()"
-        class="rounded-lg bg-primary px-4 min-h-10 text-[13px] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50">
+      <boo-button-admin (click)="closeDialog()" background="transparent" textColor="#71606A" padding="10px 12px" [radius]="8" fontWeight="500">Cancel</boo-button-admin>
+      <boo-button-admin (click)="createCourse()" [disabled]="!canCreate()" textColor="white" padding="10px 16px" [radius]="8" fontWeight="500">
         {{ isSaving() ? 'Creating...' : 'Create' }}
-      </button>
+      </boo-button-admin>
     </div>
   </div>
 </div>

@@ -6,13 +6,14 @@ import { Lookup } from "../../../../../shared/types/common";
 import { RevenueGranularity, RevenueReportFilter } from "../../../../../shared/types/filter.types";
 import { BooDatepickerComponent } from "../../../../date-picker/boo-date-picker.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
+import { ButtonIconComponent } from "../../../../button/button-icon/button-icon.component";
 
 type RangePreset = 'today' | '7d' | '30d' | 'month' | 'quarter' | 'custom';
 
 @Component({
     selector: 'revenue-filter-bar',
     standalone: true,
-    imports: [SharedModule,BooSelectComponent, BooDatepickerComponent],
+    imports: [SharedModule,BooSelectComponent, BooDatepickerComponent, ButtonIconComponent],
     template: `
     <div class="bg-surface border border-borderGray/60 rounded-2 p-3.5">
       <div class="flex flex-wrap items-center gap-1.5 mb-3">
@@ -39,10 +40,7 @@ type RangePreset = 'today' | '7d' | '30d' | 'month' | 'quarter' | 'custom';
         <div class="flex items-center gap-2">
           <boo-select label="Granularity" [(ngModel)]="filter.granularity" (ngModelChange)="emitChange()"
             [options]="granularityOptions" bindLabel="label" bindValue="value" required></boo-select>
-          <button type="button" (click)="onReset()" title="Reset filters"
-            class="w-11 h-11 shrink-0 rounded-1.5 border border-gray-200 flex items-center justify-center hover:bg-gray-50" aria-label="Reset filters">
-            <physio-icon name="rotate-ccw" [size]="16" class="text-gray-500"></physio-icon>
-          </button>
+          <button-icon [icon]="{ name: 'rotate-ccw', size: 16, class: 'text-gray-500' }" (onClick)="onReset()" title="Reset filters" ariaLabel="Reset filters" buttonClass="!w-11 !h-11 !rounded-1.5"></button-icon>
         </div>
       </div>
     </div>

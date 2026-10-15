@@ -4,13 +4,14 @@ import { StatusBadgeComponent } from "../../../../../components/ui/status-badge.
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { RxMedicationItem, RxMedicationStatus } from "../../../../../shared/types/prescription-rx.types";
 import { formatCurrency, severityIcon, severityRank, totalDailyDosesOf } from "../prescription-rx.util";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 type EditableField = 'dose' | 'frequency' | 'durationDays' | 'quantity' | 'instructions';
 
 @Component({
   selector: 'rx-medication-table',
   standalone: true,
-  imports: [SharedModule, BooInputComponent, StatusBadgeComponent],
+  imports: [SharedModule, BooInputComponent, StatusBadgeComponent, BooButtonAdminComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg flex flex-col">
       <!-- Toolbar -->
@@ -34,10 +35,9 @@ type EditableField = 'dose' | 'frequency' | 'durationDays' | 'quantity' | 'instr
           Controlled
         </button>
 
-        <button *ngIf="editable" type="button" (click)="addMedication.emit()"
-          class="ml-auto inline-flex items-center gap-1.5 bg-primary text-white text-sm font-semibold px-3.5 py-2 rounded-lg hover:bg-primary/90">
+        <boo-button-admin *ngIf="editable" (click)="addMedication.emit()" textColor="white" padding="8px 14px" [fontSize]="14" [radius]="8" fontWeight="600" [gap]="6" class="ml-auto">
           <physio-icon name="plus" [size]="16"></physio-icon> Add Medication
-        </button>
+        </boo-button-admin>
       </div>
 
       <!-- Table -->
@@ -189,9 +189,9 @@ type EditableField = 'dose' | 'frequency' | 'durationDays' | 'quantity' | 'instr
       <div *ngIf="!filtered().length" class="py-14 text-center">
         <physio-icon name="clipboard" [size]="40" [class]="'text-gray-300 mx-auto mb-3'"></physio-icon>
         <p class="text-secondary text-sm mb-3">{{ itemsSignal().length ? 'No medications match the current filters.' : 'No medications added yet.' }}</p>
-        <button *ngIf="editable && !itemsSignal().length" type="button" (click)="addMedication.emit()" class="bg-primary text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-primary/90">
+        <boo-button-admin *ngIf="editable && !itemsSignal().length" (click)="addMedication.emit()" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="600">
           Add First Medication
-        </button>
+        </boo-button-admin>
       </div>
 
       <!-- Summary strip -->

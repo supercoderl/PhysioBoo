@@ -11,6 +11,7 @@ import {
   RxMedicationItem,
 } from "../../../../../shared/types/prescription-rx.types";
 import { severityIcon, severityRank } from "../prescription-rx.util";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 interface AlertEntry {
   itemId: string;
@@ -22,7 +23,7 @@ interface AlertEntry {
 @Component({
   selector: 'rx-sidebar',
   standalone: true,
-  imports: [SharedModule,BooTextareaComponent, StatusBadgeComponent],
+  imports: [SharedModule,BooTextareaComponent, StatusBadgeComponent, BooButtonAdminComponent],
   template: `
     <div class="space-y-4 sticky top-[72px]">
       <!-- Diagnosis recap -->
@@ -106,8 +107,8 @@ interface AlertEntry {
           <div *ngIf="savingTemplate" class="flex items-center gap-1.5">
             <input type="text" [(ngModel)]="templateName" placeholder="Template name" maxlength="120" (keydown.enter)="submitTemplate()"
               class="flex-1 min-w-0 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary" />
-            <button type="button" (click)="submitTemplate()" [disabled]="!templateName.trim()" class="text-xs font-semibold text-white bg-primary px-2 py-1 rounded disabled:opacity-50">Save</button>
-            <button type="button" (click)="savingTemplate = false; templateName = ''" class="text-xs text-secondary px-1">Cancel</button>
+            <boo-button-admin (click)="submitTemplate()" [disabled]="!templateName.trim()" textColor="white" padding="4px 8px" [fontSize]="12" [radius]="4" fontWeight="600">Save</boo-button-admin>
+            <boo-button-admin (click)="savingTemplate = false; templateName = ''" background="transparent" textColor="rgb(var(--twc-secondary))" padding="6px 4px" [fontSize]="12">Cancel</boo-button-admin>
           </div>
         </div>
       </div>

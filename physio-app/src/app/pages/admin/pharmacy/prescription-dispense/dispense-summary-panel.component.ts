@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DispenseWorkspace } from "../../../../shared/types/dispensing.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
     selector: 'dispense-summary-panel',
     standalone: true,
-    imports: [SharedModule,EmptyStateComponent],
+    imports: [SharedModule,EmptyStateComponent, BooButtonAdminComponent],
     template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60">
@@ -44,15 +45,13 @@ import { DispenseWorkspace } from "../../../../shared/types/dispensing.types";
         </div>
 
         <div class="p-3 border-t border-borderGray/60 space-y-2">
-          <button type="button" [disabled]="!!blockReason" (click)="complete.emit()"
-            class="w-full py-2.5 rounded-lg text-sm font-semibold text-white bg-primary hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
-            [title]="blockReason || ''">
+          <boo-button-admin [disabled]="!!blockReason" (click)="complete.emit()" [title]="blockReason || ''" textColor="white" padding="10px 12px" [fontSize]="14" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">
             Complete Dispensing
-          </button>
+          </boo-button-admin>
           <div class="grid grid-cols-3 gap-2">
-            <button type="button" (click)="hold.emit()" class="py-2 rounded-lg text-xs font-semibold border border-gray-300 text-gray-600 hover:bg-gray-50">Hold</button>
-            <button type="button" (click)="cancel.emit()" class="py-2 rounded-lg text-xs font-semibold border border-rose-200 text-rose-600 hover:bg-rose-50">Cancel</button>
-            <button type="button" (click)="printLabels.emit()" class="py-2 rounded-lg text-xs font-semibold border border-gray-300 text-gray-600 hover:bg-gray-50">Print</button>
+            <boo-button-admin (click)="hold.emit()" background="transparent" textColor="#71606A" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Hold</boo-button-admin>
+            <boo-button-admin (click)="cancel.emit()" background="transparent" textColor="#E11D48" [border]="{ width: 1, color: '#FECDD3' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Cancel</boo-button-admin>
+            <boo-button-admin (click)="printLabels.emit()" background="transparent" textColor="#71606A" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Print</boo-button-admin>
           </div>
         </div>
       </ng-container>

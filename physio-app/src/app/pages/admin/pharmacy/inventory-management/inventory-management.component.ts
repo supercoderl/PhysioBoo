@@ -22,6 +22,7 @@ import { InventoryIntelligencePanelComponent } from "./inventory-intelligence-pa
 import { InventoryKpiStripComponent } from "./inventory-kpi-strip.component";
 import { InventoryQuickActionsComponent, QuickOperation } from "./inventory-quick-actions.component";
 import { InventoryTimelinePanelComponent } from "./inventory-timeline-panel.component";
+import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
 
 @Component({
     selector: 'admin-inventory-management',
@@ -40,6 +41,7 @@ import { InventoryTimelinePanelComponent } from "./inventory-timeline-panel.comp
         InventoryTimelinePanelComponent,
         InventoryDetailDrawerComponent,
         InventoryQuickActionsComponent,
+        ButtonIconComponent
     ],
     host: { class: 'block min-h-screen bg-gray-50' },
     template: `
@@ -48,9 +50,7 @@ import { InventoryTimelinePanelComponent } from "./inventory-timeline-panel.comp
         <h1 class="text-lg font-semibold text-gray-800">Inventory Management</h1>
         <p class="text-xs text-secondary">Warehouse command center · Last sync {{ lastSync | date:'shortTime' }}</p>
       </div>
-      <button type="button" (click)="refresh()" class="px-3 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 flex items-center gap-1.5">
-        <physio-icon name="refresh" [size]="14"></physio-icon> Refresh
-      </button>
+      <button-icon [icon]="{ name: 'refresh', size: 14 }" (onClick)="refresh()" buttonClass="!rounded-lg text-xs font-semibold"> Refresh </button-icon>
     </div>
 
     <main class="px-4 sm:px-6 py-4 space-y-4">

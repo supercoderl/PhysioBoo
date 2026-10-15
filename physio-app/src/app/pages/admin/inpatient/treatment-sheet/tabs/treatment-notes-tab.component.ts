@@ -8,11 +8,12 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ProgressNoteType, TreatmentProgressNote } from "../../../../../shared/types/treatment-sheet.types";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'treatment-notes-tab',
   standalone: true,
-  imports: [SharedModule,BooSelectComponent, BooTextareaComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooSelectComponent, BooTextareaComponent, StatusBadgeComponent, EmptyStateComponent, BooButtonAdminComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg p-4 mb-4">
       <h3 class="text-sm font-semibold text-primary mb-3">Add Progress Note</h3>
@@ -21,9 +22,9 @@ import { ProgressNoteType, TreatmentProgressNote } from "../../../../../shared/t
         <boo-textarea label="Note Content" [(ngModel)]="form.content" [rows]="3" class="md:col-span-3"></boo-textarea>
       </div>
       <div class="flex justify-end mt-3">
-        <button (click)="submit()" [disabled]="loadingSrv.isLoading('note-add')" class="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm hover:bg-orange-700 disabled:opacity-50">
+        <boo-button-admin (click)="submit()" [disabled]="loadingSrv.isLoading('note-add')" background="#EA580C" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8">
           Add Note
-        </button>
+        </boo-button-admin>
       </div>
     </div>
 

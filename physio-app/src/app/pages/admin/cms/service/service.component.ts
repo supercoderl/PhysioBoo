@@ -15,6 +15,7 @@ import { FilterConfig, ServiceFilter } from "../../../../shared/types/filter.typ
 import { MedicalService, ServiceStats } from "../../../../shared/types/service.types";
 import { SortOption } from "../../../../shared/types/sort";
 import { BulkAction } from "../../../../shared/types/table.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
     selector: 'admin-service',
@@ -25,6 +26,7 @@ import { BulkAction } from "../../../../shared/types/table.types";
         CmsServiceTableCardComponent,
         CmsServiceDrawerComponent,
         CmsServiceDetailDrawerComponent,
+        BooButtonAdminComponent
     ],
     templateUrl: './service.component.html',
     host: { class: 'block h-full min-h-0' },

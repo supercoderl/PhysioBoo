@@ -4,6 +4,7 @@ import { MenuItem } from "../../../../shared/types/menu.types";
 import { isKnownMenuIcon, menuPermissionOf } from "../../../../shared/utils/menu.utils";
 import { EmptyStateComponent } from "../../../ui/empty-state.component";
 import { StatusBadgeComponent } from "../../../ui/status-badge.component";
+import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
 
 export interface MenuRowEvent {
     item: MenuItem;
@@ -19,7 +20,7 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
 @Component({
     selector: 'superadmin-menu-tree',
     standalone: true,
-    imports: [SharedModule, StatusBadgeComponent, EmptyStateComponent],
+    imports: [SharedModule, StatusBadgeComponent, EmptyStateComponent, BooButtonAdminComponent],
     template: `
         <div *ngIf="loading" class="space-y-3" aria-busy="true">
             <div *ngFor="let _ of [1, 2, 3]" class="h-[120px] rounded-2 border border-borderGray/60 bg-surface animate-pulse motion-reduce:animate-none"></div>
@@ -31,13 +32,9 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
                 title="No menu sections yet"
                 description="Sections group the pages in the sidebar. Add one, then add pages to it."
             >
-                <button
-                    type="button"
-                    class="h-9 px-4 rounded-1.5 bg-primary text-white text-[13px] font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
-                    (click)="addSection.emit()"
-                >
+                <boo-button-admin (click)="addSection.emit()" textColor="white" padding="8px 16px" fontWeight="600">
                     New section
-                </button>
+                </boo-button-admin>
             </boo-empty-state>
         </div>
 

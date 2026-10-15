@@ -9,6 +9,10 @@ import { ToastService } from '../../../../services/common/toast.service';
 import { Permissions } from '../../../../shared/constants/permission.constant';
 import { SharedModule } from '../../../../shared/shared-imports';
 import { Course, Lesson } from '../../../../shared/types/academy.types';
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
+import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
+import { BooCheckboxComponent } from "../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
 
 interface CourseDraft { title: string; category: string; description: string; isPublished: boolean; }
 interface LessonDraft { id: string | null; title: string; content: string; durationMinutes: number; }
@@ -19,7 +23,11 @@ interface LessonDraft { id: string | null; title: string; content: string; durat
   imports: [
     AdminBreadcrumbComponent,
     SharedModule,
-    EmptyStateComponent
+    EmptyStateComponent,
+    BooButtonAdminComponent,
+    BooInputComponent,
+    BooTextareaComponent,
+    BooCheckboxComponent
   ],
   templateUrl: './course.component.html'
 })

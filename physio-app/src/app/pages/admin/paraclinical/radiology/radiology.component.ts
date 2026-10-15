@@ -17,6 +17,7 @@ import { RadiologyQueueTabComponent } from "./tabs/radiology-queue-tab.component
 import { RadiologyReportingTabComponent } from "./tabs/radiology-reporting-tab.component";
 import { RadiologySchedulingTabComponent } from "./tabs/radiology-scheduling-tab.component";
 import { RadiologyStudyTrackingTabComponent } from "./tabs/radiology-study-tracking-tab.component";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 type TabKey = 'dashboard' | 'orders' | 'scheduling' | 'queue' | 'study-tracking' | 'reporting' | 'critical-findings';
 
@@ -39,6 +40,7 @@ const LOADING_KEY = 'radiology';
     RadiologyReportingTabComponent,
     RadiologyCriticalFindingsTabComponent,
     RadiologyPatientStudyDrawerComponent,
+    BooButtonAdminComponent
   ],
   host: { class: 'block min-h-screen bg-gray-50' },
   template: `
@@ -61,9 +63,9 @@ const LOADING_KEY = 'radiology';
             <h1 class="text-lg font-semibold text-gray-800">Radiology</h1>
             <p class="text-xs text-secondary">Radiology Information System — orders, scheduling, imaging, and reporting</p>
           </div>
-          <button class="px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2">
+          <boo-button-admin textColor="white" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="8">
             <physio-icon name="circle-plus" [size]="16"></physio-icon> New Order
-          </button>
+          </boo-button-admin>
         </div>
 
         <!-- Tab nav -->

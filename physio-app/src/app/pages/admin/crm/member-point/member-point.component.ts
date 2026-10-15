@@ -1,4 +1,5 @@
 import { A11yModule } from "@angular/cdk/a11y";
+import { TitleCasePipe } from "@angular/common";
 import { Component, HostListener, OnDestroy, OnInit, computed, signal } from "@angular/core";
 import { Subject, catchError, debounceTime, distinctUntilChanged, finalize, of, switchMap, takeUntil } from "rxjs";
 import { MemberService } from "../../../../services/admin/member.service";
@@ -13,6 +14,11 @@ import { Member, MemberStats, MemberStatus, MembershipTier } from "../../../../s
 import { Patient } from "../../../../shared/types/patient.types";
 import { Reward } from "../../../../shared/types/reward.types";
 import { PointTransaction } from "../../../../shared/types/transaction.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
+import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
+import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
+import { BooCheckboxComponent } from "../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
 
 type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
 
@@ -21,7 +27,12 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
     standalone: true,
     imports: [
         SharedModule,
-        A11yModule
+        A11yModule,
+        BooButtonAdminComponent,
+        BooInputComponent,
+        BooSelectComponent,
+        BooTextareaComponent,
+        BooCheckboxComponent
     ],
     template: `
     <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -148,7 +159,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
           <!-- Error state -->
           <div *ngIf="membersError()" class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6 flex items-center justify-between" role="alert">
             <span>Couldn't load members.</span>
-            <button type="button" (click)="loadMembers()" class="px-3 py-1 border border-red-300 rounded hover:bg-red-100">Retry</button>
+            <boo-button-admin (click)="loadMembers()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#FCA5A5' }" padding="4px 12px" [radius]="4">Retry</boo-button-admin>
           </div>
 
           <!-- Members Table -->
@@ -231,8 +242,8 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
             <div *ngIf="members() && members()!.totalPages > 1" class="flex items-center justify-between px-6 py-3 border-t border-gray-200">
               <span class="text-sm text-gray-600">Page {{ members()!.pageNumber }} of {{ members()!.totalPages }} · {{ members()!.totalCount | number }} members</span>
               <div class="space-x-2">
-                <button type="button" [disabled]="!members()!.hasPrevious" (click)="goToMemberPage(members()!.pageNumber - 1)" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
-                <button type="button" [disabled]="!members()!.hasNext" (click)="goToMemberPage(members()!.pageNumber + 1)" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
+                <boo-button-admin [disabled]="!members()!.hasPrevious" (click)="goToMemberPage(members()!.pageNumber - 1)" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="4px 12px" [radius]="4">Previous</boo-button-admin>
+                <boo-button-admin [disabled]="!members()!.hasNext" (click)="goToMemberPage(members()!.pageNumber + 1)" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="4px 12px" [radius]="4">Next</boo-button-admin>
               </div>
             </div>
           </div>
@@ -287,15 +298,15 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
             <div class="bg-surface rounded-lg shadow-md p-6">
               <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
               <div class="space-y-3">
-                <button type="button" [disabled]="!canChangePoints" (click)="openAddPoints()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
+                <boo-button-admin [disabled]="!canChangePoints" (click)="openAddPoints()" background="#22C55E" textColor="white" padding="12px 12px" [radius]="8" fontWeight="500" buttonClass="w-full" class="w-full">
                   + Add Points
-                </button>
-                <button type="button" [disabled]="!canChangePoints" (click)="openRedeem(null)" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
+                </boo-button-admin>
+                <boo-button-admin [disabled]="!canChangePoints" (click)="openRedeem(null)" background="#F97316" textColor="white" padding="12px 12px" [radius]="8" fontWeight="500" buttonClass="w-full" class="w-full">
                   - Redeem Points
-                </button>
-                <button type="button" [disabled]="!selectedMember()" (click)="loadTransactions()" class="w-full bg-primary hover:bg-primary text-white py-3 rounded-lg font-medium transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
+                </boo-button-admin>
+                <boo-button-admin [disabled]="!selectedMember()" (click)="loadTransactions()" textColor="white" padding="12px 12px" [radius]="8" fontWeight="500" buttonClass="w-full" class="w-full">
                   Refresh History
-                </button>
+                </boo-button-admin>
               </div>
             </div>
           </div>
@@ -306,7 +317,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
 
             <div *ngIf="transactionsError()" class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-4 flex items-center justify-between" role="alert">
               <span>Couldn't load transactions.</span>
-              <button type="button" (click)="loadTransactions()" class="px-3 py-1 border border-red-300 rounded hover:bg-red-100">Retry</button>
+              <boo-button-admin (click)="loadTransactions()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#FCA5A5' }" padding="4px 12px" [radius]="4">Retry</boo-button-admin>
             </div>
 
             <div class="space-y-3">
@@ -350,8 +361,8 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
             <div *ngIf="transactions() && transactions()!.totalPages > 1" class="flex items-center justify-between pt-4 mt-4 border-t border-gray-200">
               <span class="text-sm text-gray-600">Page {{ transactions()!.pageNumber }} of {{ transactions()!.totalPages }}</span>
               <div class="space-x-2">
-                <button type="button" [disabled]="!transactions()!.hasPrevious" (click)="goToTransactionPage(transactions()!.pageNumber - 1)" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
-                <button type="button" [disabled]="!transactions()!.hasNext" (click)="goToTransactionPage(transactions()!.pageNumber + 1)" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
+                <boo-button-admin [disabled]="!transactions()!.hasPrevious" (click)="goToTransactionPage(transactions()!.pageNumber - 1)" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="4px 12px" [radius]="4">Previous</boo-button-admin>
+                <boo-button-admin [disabled]="!transactions()!.hasNext" (click)="goToTransactionPage(transactions()!.pageNumber + 1)" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="4px 12px" [radius]="4">Next</boo-button-admin>
               </div>
             </div>
           </div>
@@ -361,7 +372,7 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
         <div *ngIf="activeTab === 'rewards'" role="tabpanel">
           <div *ngIf="rewardsError()" class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6 flex items-center justify-between" role="alert">
             <span>Couldn't load the rewards catalog.</span>
-            <button type="button" (click)="loadRewards()" class="px-3 py-1 border border-red-300 rounded hover:bg-red-100">Retry</button>
+            <boo-button-admin (click)="loadRewards()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#FCA5A5' }" padding="4px 12px" [radius]="4">Retry</boo-button-admin>
           </div>
 
           <p *ngIf="!selectedMember() && rewards().length" class="mb-4 text-sm text-gray-600">
@@ -397,14 +408,9 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                 <p class="text-sm text-gray-600 mb-4">{{ reward.description }}</p>
                 <div class="flex justify-between items-center">
                   <span class="text-2xl font-bold text-primary">{{ reward.pointsRequired | number }} pts</span>
-                  <button
-                    type="button"
-                    [disabled]="redeemBlockReason(reward) !== null"
-                    [attr.title]="redeemBlockReason(reward)"
-                    (click)="openRedeem(reward)"
-                    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+                  <boo-button-admin [disabled]="redeemBlockReason(reward) !== null" [attr.title]="redeemBlockReason(reward)" (click)="openRedeem(reward)" textColor="white" padding="8px 16px" [radius]="8">
                     Redeem
-                  </button>
+                  </boo-button-admin>
                 </div>
                 <p *ngIf="redeemBlockReason(reward) as reason" class="mt-2 text-xs text-gray-500">{{ reason }}</p>
               </div>
@@ -432,14 +438,13 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
                   <button type="button" (click)="clearPatient()" class="text-sm text-primary hover:text-primaryPressed">Change</button>
                 </div>
                 <ng-template #patientSearch>
-                  <input
-                    id="patient-lookup"
+                  <boo-input
+                    [id]="'patient-lookup'"
                     type="search"
                     name="patientLookup"
                     [(ngModel)]="patientQuery"
                     (ngModelChange)="patientLookup$.next($event)"
-                    placeholder="Search by name, phone or patient number..."
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
+                    label="Search by name, phone or patient number..."></boo-input>
                   <ul *ngIf="patientResults().length" role="listbox" aria-label="Matching patients"
                       class="absolute z-10 mt-1 w-full bg-surface border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-auto">
                     <li *ngFor="let p of patientResults()" role="option">
@@ -453,35 +458,28 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
               </div>
 
               <div>
-                <label for="enroll-tier" class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
                   Membership Type <span class="text-red-500">*</span>
                 </label>
-                <select
-                  id="enroll-tier"
+                <boo-select
                   [(ngModel)]="enrollTier"
                   name="membershipType"
                   required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
-                  <option value="">Select membership</option>
-                  <option *ngFor="let tier of tiers" [value]="tier">{{ tier }}</option>
-                </select>
+                  label="Select membership"
+                  [options]="tierOptions"></boo-select>
               </div>
             </div>
 
             <div class="mt-6">
-              <label class="flex items-center">
-                <input type="checkbox" [(ngModel)]="enrollAgreeTerms" name="agreeTerms" required class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
-                <span class="ml-2 text-sm text-gray-700">The patient agrees to the loyalty programme terms and conditions <span class="text-red-500">*</span></span>
-              </label>
+              <boo-checkbox [(ngModel)]="enrollAgreeTerms" name="agreeTerms">
+                <span class="text-sm text-gray-700">The patient agrees to the loyalty programme terms and conditions <span class="text-red-500">*</span></span>
+              </boo-checkbox>
             </div>
 
             <div class="mt-8 flex justify-end space-x-4">
-              <button
-                type="button"
-                (click)="resetEnrollForm()"
-                class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+              <boo-button-admin (click)="resetEnrollForm()" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 24px" [radius]="8">
                 Reset
-              </button>
+              </boo-button-admin>
               <button
                 type="submit"
                 [disabled]="!canEnroll || isSubmitting"
@@ -505,11 +503,11 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
               </div>
               <div>
                 <label for="add-points-reason" class="block text-sm font-medium text-gray-700 mb-2">Reason</label>
-                <textarea id="add-points-reason" name="description" rows="3" maxlength="255" [(ngModel)]="addPointsForm.description"
-                          class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="e.g., Consultation visit"></textarea>
+                <boo-textarea [id]="'add-points-reason'" name="description" [rows]="3" [maxlength]="255" [(ngModel)]="addPointsForm.description"
+                              label="e.g., Consultation visit"></boo-textarea>
               </div>
               <div class="pt-2 flex justify-end space-x-3">
-                <button type="button" (click)="closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                <boo-button-admin (click)="closeModals()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 16px" [radius]="8">Cancel</boo-button-admin>
                 <button type="submit" [disabled]="!canSubmitAddPoints || isSubmitting" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
                   {{ isSubmitting ? 'Adding...' : 'Add Points' }}
                 </button>
@@ -536,11 +534,10 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
               </div>
               <div>
                 <label for="redeem-note" class="block text-sm font-medium text-gray-700 mb-2">Note (optional)</label>
-                <textarea id="redeem-note" name="description" rows="2" maxlength="255" [(ngModel)]="redeemForm.description"
-                          class="w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea>
+                <boo-textarea [id]="'redeem-note'" name="description" [rows]="2" [maxlength]="255" [(ngModel)]="redeemForm.description"></boo-textarea>
               </div>
               <div class="pt-2 flex justify-end space-x-3">
-                <button type="button" (click)="closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                <boo-button-admin (click)="closeModals()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 16px" [radius]="8">Cancel</boo-button-admin>
                 <button type="submit" [disabled]="!redeemForm.rewardId || isSubmitting" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
                   {{ isSubmitting ? 'Redeeming...' : 'Redeem' }}
                 </button>
@@ -556,21 +553,17 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
             <form (ngSubmit)="saveMember()" class="space-y-4">
               <p class="text-sm text-gray-600">{{ member.name }} ({{ member.memberNumber }})</p>
               <div>
-                <label for="edit-tier" class="block text-sm font-medium text-gray-700 mb-2">Membership</label>
-                <select id="edit-tier" name="tier" [(ngModel)]="editForm.tier" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                  <option *ngFor="let tier of tiers" [value]="tier">{{ tier }}</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Membership</label>
+                <boo-select name="tier" [(ngModel)]="editForm.tier" [options]="tierOptions"></boo-select>
               </div>
               <div>
-                <label for="edit-status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                <select id="edit-status" name="status" [(ngModel)]="editForm.status" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                  <option *ngFor="let status of statuses" [value]="status">{{ status | titlecase }}</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                <boo-select name="status" [(ngModel)]="editForm.status" [options]="statusOptions"></boo-select>
               </div>
               <div class="pt-2 flex items-center justify-between">
                 <button type="button" (click)="removeMember(member)" [disabled]="isSubmitting" class="text-sm text-red-600 hover:text-red-800 disabled:opacity-50">Remove member</button>
                 <div class="space-x-3">
-                  <button type="button" (click)="closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                  <boo-button-admin (click)="closeModals()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 16px" [radius]="8">Cancel</boo-button-admin>
                   <button type="submit" [disabled]="isSubmitting" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryHover disabled:bg-gray-400 disabled:cursor-not-allowed">
                     {{ isSubmitting ? 'Saving...' : 'Save' }}
                   </button>
@@ -589,6 +582,8 @@ export class AdminMemberPointComponent implements OnInit, OnDestroy {
     readonly pageSize = 10;
     readonly tiers: MembershipTier[] = ['Basic', 'Silver', 'Gold', 'Platinum'];
     readonly statuses: MemberStatus[] = ['active', 'inactive', 'suspended'];
+    readonly tierOptions = this.tiers.map(t => ({ label: t, value: t }));
+    readonly statusOptions = this.statuses.map(s => ({ label: new TitleCasePipe().transform(s), value: s }));
     readonly tabs: { id: ActiveTab; label: string }[] = [
         { id: 'members', label: 'Members Directory' },
         { id: 'points', label: 'Points & Transactions' },

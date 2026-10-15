@@ -11,6 +11,7 @@ import { ToastService } from '../../../../../services/common/toast.service';
 import { SharedModule } from '../../../../../shared/shared-imports';
 import { User } from '../../../../../shared/types/core.types';
 import { Role } from '../../../../../shared/types/role.types';
+import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 
 interface PendingInvite {
   id: string;
@@ -32,7 +33,9 @@ const INVITABLE_ROLE_CODES = [
   imports: [
     SharedModule,
     FormsModule,
-    AdminBreadcrumbComponent,
+    AdminBreadcrumbComponent,
+    BooSelectComponent
+
   ],
   templateUrl: './team.component.html'
 })

@@ -16,6 +16,7 @@ import { SurgeryOperatingRoomsTabComponent } from "./tabs/surgery-operating-room
 import { SurgeryPostopTabComponent } from "./tabs/surgery-postop-tab.component";
 import { SurgeryQueueTabComponent } from "./tabs/surgery-queue-tab.component";
 import { SurgeryScheduleTabComponent } from "./tabs/surgery-schedule-tab.component";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 type TabKey = 'dashboard' | 'schedule' | 'rooms' | 'queue' | 'intraop' | 'postop' | 'alerts';
 type DateRange = 'today' | 'week' | 'month';
@@ -38,6 +39,7 @@ const LOADING_KEY = 'surgery';
     SurgeryPostopTabComponent,
     SurgeryAlertsTabComponent,
     SurgeryDetailDrawerComponent,
+    BooButtonAdminComponent
   ],
   host: { class: 'block min-h-screen bg-gray-50' },
   template: `
@@ -68,9 +70,9 @@ const LOADING_KEY = 'surgery';
                 {{ r.label }}
               </button>
             </div>
-            <button class="px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2">
+            <boo-button-admin textColor="white" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="8">
               <physio-icon name="circle-plus" [size]="16"></physio-icon> Schedule Surgery
-            </button>
+            </boo-button-admin>
           </div>
         </div>
 

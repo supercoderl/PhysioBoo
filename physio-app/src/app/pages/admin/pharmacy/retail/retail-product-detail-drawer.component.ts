@@ -3,11 +3,12 @@ import { DrawerComponent } from "../../../../components/drawer/drawer.component"
 import { RetailPosService } from "../../../../services/admin/retail-pos.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailMedicineDetail } from "../../../../shared/types/retail-pos.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'retail-product-detail-drawer',
   standalone: true,
-  imports: [SharedModule,DrawerComponent],
+  imports: [SharedModule,DrawerComponent, BooButtonAdminComponent],
   template: `
     <drawer [isOpen]="isOpen" (close)="close.emit()">
       <div class="p-5" *ngIf="detail">
@@ -57,11 +58,9 @@ import { RetailMedicineDetail } from "../../../../shared/types/retail-pos.types"
           </div>
         </div>
 
-        <button type="button" (click)="addToCart.emit(detail)" [disabled]="detail.stock === 0"
-          class="w-full py-3 rounded-lg font-semibold text-sm transition-colors"
-          [ngClass]="detail.stock > 0 ? 'bg-primary text-white hover:opacity-90' : 'bg-gray-200 text-gray-400 cursor-not-allowed'">
+        <boo-button-admin (click)="addToCart.emit(detail)" [disabled]="detail.stock === 0" textColor="white" padding="12px 12px" [fontSize]="14" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">
           {{ detail.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
-        </button>
+        </boo-button-admin>
       </div>
     </drawer>
   `,

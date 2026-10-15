@@ -7,13 +7,17 @@ import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING } from "../../../../shared/const
 import { SharedModule } from "../../../../shared/shared-imports";
 import { SaveSubscriptionPlanRequest, SubscriptionPlan } from "../../../../shared/types/billing.types";
 import { DrawerComponent } from "../../../drawer/drawer.component";
+import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
+import { BooInputComponent } from "../../../input/boo-input/boo-input.component";
+import { BooTextareaComponent } from "../../../textarea/boo-textarea/boo-textarea.component";
+import { BooCheckboxComponent } from "../../../checkbox/boo-checkbox/boo-checkbox.component";
 
 const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:bg-black/5 disabled:cursor-not-allowed';
 
 @Component({
     selector: 'superadmin-plan-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent],
+    imports: [SharedModule, DrawerComponent, BooButtonAdminComponent, BooInputComponent, BooTextareaComponent, BooCheckboxComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" (close)="close.emit()">
             <div
@@ -57,13 +61,7 @@ const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface t
 
                     <div class="space-y-1">
                         <label for="plan-description" class="text-[13px] font-medium text-regular">Description</label>
-                        <textarea
-                            id="plan-description"
-                            formControlName="description"
-                            rows="3"
-                            maxlength="500"
-                            class="w-full px-3 py-2 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                        ></textarea>
+                        <boo-textarea [id]="'plan-description'" formControlName="description" [rows]="3" [maxlength]="500" size="small"></boo-textarea>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
@@ -95,31 +93,21 @@ const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface t
                     <div class="grid grid-cols-2 gap-4 items-end">
                         <div class="space-y-1">
                             <label for="plan-sort" class="text-[13px] font-medium text-regular">Sort order</label>
-                            <input id="plan-sort" type="number" formControlName="sortOrder" [class]="field" inputmode="numeric" />
+                            <boo-input [id]="'plan-sort'" type="number" formControlName="sortOrder" size="small"></boo-input>
                         </div>
-                        <label class="flex items-center gap-2 h-9 text-[13px] text-regular cursor-pointer">
-                            <input type="checkbox" formControlName="isActive" class="w-4 h-4 accent-[rgb(var(--twc-primary))]" />
-                            Offered to tenants
-                        </label>
+                        <boo-checkbox formControlName="isActive" class="h-9 flex items-center">
+                            <span class="text-[13px] text-regular">Offered to tenants</span>
+                        </boo-checkbox>
                     </div>
                 </div>
 
                 <div class="flex-none px-6 py-4 border-t border-borderGray/60 bg-black/[0.02] flex items-center justify-end gap-3">
-                    <button
-                        type="button"
-                        class="h-9 px-4 rounded-1.5 text-[13px] font-medium text-regular hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
-                        (click)="close.emit()"
-                    >
+                    <boo-button-admin (click)="close.emit()" background="transparent" textColor="rgb(var(--twc-regular))" padding="8px 16px" fontWeight="500">
                         Cancel
-                    </button>
-                    <button
-                        type="button"
-                        class="h-9 px-4 rounded-1.5 bg-primary text-white text-[13px] font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                        [disabled]="saving()"
-                        (click)="save()"
-                    >
+                    </boo-button-admin>
+                    <boo-button-admin [disabled]="saving()" (click)="save()" textColor="white" padding="8px 16px" fontWeight="600">
                         {{ saving() ? 'Saving…' : 'Save plan' }}
-                    </button>
+                    </boo-button-admin>
                 </div>
             </div>
         </drawer>

@@ -2,13 +2,16 @@ import { Component, Input } from '@angular/core';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { ToastService } from '../../../../services/common/toast.service';
 import { SharedModule } from '../../../../shared/shared-imports';
+import { BooButtonAdminComponent } from '../../../button/boo-button-admin/boo-button-admin.component';
 
 @Component({
     selector: 'boo-json-editor',
     standalone: true,
     imports: [
         SharedModule,
-        FormsModule,
+        FormsModule,
+        BooButtonAdminComponent
+
     ],
     template: `
         <div class="m-6 mb-0 p-4 border border-dashed border-primary/70 bg-primarySoft/50 rounded-xl transition-all">
@@ -38,19 +41,19 @@ import { SharedModule } from '../../../../shared/shared-imports';
                 ></textarea>
                 
                 <div class="mt-3 flex justify-end gap-2">
-                    <button 
-                        (click)="clearText()" 
-                        class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors"
+                    <boo-button-admin
+                        (click)="clearText()"
+                        background="transparent" textColor="#85757D" [fontSize]="12" [radius]="4" fontWeight="500"
                     >
                         Clear
-                    </button>
-                    <button 
-                        (click)="applyJson()" 
-                        class="px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primaryHover transition-colors shadow-sm flex items-center gap-1.5"
+                    </boo-button-admin>
+                    <boo-button-admin
+                        (click)="applyJson()"
+                        textColor="white" padding="6px 16px" [fontSize]="12" [radius]="8" fontWeight="700" [gap]="6"
                     >
                         <physio-icon name="zap" [size]="14" class="text-white"></physio-icon>
                         Apply to Form
-                    </button>
+                    </boo-button-admin>
                 </div>
             </div>
         </div>

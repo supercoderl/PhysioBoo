@@ -7,13 +7,14 @@ import { InventoryManagementService } from "../../../../services/admin/inventory
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { InventoryHistoryEntry, InventoryMedicineDetail, WarehouseBatch } from "../../../../shared/types/inventory-management.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 type DrawerTab = 'Summary' | 'Batches' | 'Trends' | 'Purchase' | 'Dispensing' | 'Supplier' | 'Locations';
 
 @Component({
     selector: 'inventory-detail-drawer',
     standalone: true,
-    imports: [SharedModule,DrawerComponent, EmptyStateComponent],
+    imports: [SharedModule,DrawerComponent, EmptyStateComponent, BooButtonAdminComponent],
     template: `
     <drawer [isOpen]="isOpen" (close)="close.emit()">
       <div class="flex flex-col h-full" *ngIf="detail">
@@ -107,12 +108,12 @@ type DrawerTab = 'Summary' | 'Batches' | 'Trends' | 'Purchase' | 'Dispensing' | 
         </div>
 
         <div class="p-3 border-t border-borderGray/60 grid grid-cols-3 gap-2">
-          <button type="button" (click)="receiveStock.emit()" class="py-2 rounded-lg text-[11px] font-semibold border border-gray-300 hover:bg-gray-50">Receive Stock</button>
-          <button type="button" (click)="transferStock.emit()" class="py-2 rounded-lg text-[11px] font-semibold border border-gray-300 hover:bg-gray-50">Transfer</button>
-          <button type="button" (click)="adjustQuantity.emit()" class="py-2 rounded-lg text-[11px] font-semibold border border-gray-300 hover:bg-gray-50">Adjust Qty</button>
-          <button type="button" (click)="reserveStock.emit()" class="py-2 rounded-lg text-[11px] font-semibold border border-gray-300 hover:bg-gray-50">Reserve Stock</button>
-          <button type="button" (click)="disposeBatchAction.emit()" class="py-2 rounded-lg text-[11px] font-semibold border border-rose-200 text-rose-600 hover:bg-rose-50">Dispose Batch</button>
-          <button type="button" (click)="printBarcode.emit()" class="py-2 rounded-lg text-[11px] font-semibold border border-gray-300 hover:bg-gray-50">Print Barcode</button>
+          <boo-button-admin (click)="receiveStock.emit()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="11" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Receive Stock</boo-button-admin>
+          <boo-button-admin (click)="transferStock.emit()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="11" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Transfer</boo-button-admin>
+          <boo-button-admin (click)="adjustQuantity.emit()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="11" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Adjust Qty</boo-button-admin>
+          <boo-button-admin (click)="reserveStock.emit()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="11" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Reserve Stock</boo-button-admin>
+          <boo-button-admin (click)="disposeBatchAction.emit()" background="transparent" textColor="#E11D48" [border]="{ width: 1, color: '#FECDD3' }" padding="8px 12px" [fontSize]="11" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Dispose Batch</boo-button-admin>
+          <boo-button-admin (click)="printBarcode.emit()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="11" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Print Barcode</boo-button-admin>
         </div>
       </div>
     </drawer>

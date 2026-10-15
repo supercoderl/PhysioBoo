@@ -6,11 +6,12 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { MarEntry } from "../../../../../shared/types/nursing.types";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'nursing-mar-tab',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent],
+  imports: [SharedModule,StatusBadgeComponent, BooButtonAdminComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -39,8 +40,8 @@ import { MarEntry } from "../../../../../shared/types/nursing.types";
             <td class="px-4 py-3 text-gray-500">{{ m.givenBy ?? '—' }}</td>
             <td class="px-4 py-3">
               <div *ngIf="m.status === 'Due'" class="flex gap-2">
-                <button (click)="markGiven(m)" [disabled]="loadingSrv.isLoading('mar-' + m.id)" class="px-2.5 py-1 bg-emerald-600 text-white rounded text-xs hover:bg-emerald-700 disabled:opacity-50">Given</button>
-                <button (click)="markMissed(m)" [disabled]="loadingSrv.isLoading('mar-' + m.id)" class="px-2.5 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 disabled:opacity-50">Missed</button>
+                <boo-button-admin (click)="markGiven(m)" [disabled]="loadingSrv.isLoading('mar-' + m.id)" background="#059669" textColor="white" padding="4px 10px" [fontSize]="12" [radius]="4">Given</boo-button-admin>
+                <boo-button-admin (click)="markMissed(m)" [disabled]="loadingSrv.isLoading('mar-' + m.id)" background="#EFE3E7" textColor="#55434B" padding="4px 10px" [fontSize]="12" [radius]="4">Missed</boo-button-admin>
               </div>
             </td>
           </tr>

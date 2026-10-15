@@ -23,6 +23,7 @@ import { IconUtils } from "../../../../shared/utils/icon.utils";
 import { AdminUserPermissionPermissionTabComponent } from "./user-permission-permission-tab.component";
 import { AdminUserPermissionRoleTabComponent } from "./user-permission-role-tab.component";
 import { AdminUserPermissionUserTabComponent } from "./user-permission-user-tab.component";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 type TabKey = 'users' | 'roles' | 'permissions';
 
@@ -44,7 +45,9 @@ interface TabDef {
     AdminUserPermissionPermissionTabComponent,
     UserPermissionUserDrawerComponent,
     UserPermissionRoleDrawerComponent,
-    UserPermissionPermissionDrawerComponent,
+    UserPermissionPermissionDrawerComponent,
+    BooButtonAdminComponent
+
 ],
     templateUrl: './user-permission.component.html',
     host: { class: 'block h-full min-h-0' }

@@ -10,6 +10,8 @@ import {
 } from "../../../../shared/types/dispensing.types";
 import { ClinicalWarning } from "../../../../shared/types/prescription-rx.types";
 import { DispenseProgressStepperComponent } from "./dispense-progress-stepper.component";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
 
 interface FlatWarning extends ClinicalWarning {
   itemId: string;
@@ -19,7 +21,7 @@ interface FlatWarning extends ClinicalWarning {
 @Component({
   selector: 'dispense-picking-panel',
   standalone: true,
-  imports: [SharedModule, StatusBadgeComponent, EmptyStateComponent, DispenseProgressStepperComponent],
+  imports: [SharedModule, StatusBadgeComponent, EmptyStateComponent, DispenseProgressStepperComponent, BooButtonAdminComponent, BooTextareaComponent],
   template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <boo-empty-state *ngIf="!workspace" icon="clipboard" title="Select a prescription from the queue to begin verification"
@@ -71,10 +73,9 @@ interface FlatWarning extends ClinicalWarning {
                   <p class="text-xs text-regular">{{ w.message }}</p>
                   <p class="text-[11px] text-secondary mt-0.5" *ngIf="w.recommendation">{{ w.recommendation }}</p>
                 </div>
-                <button type="button" *ngIf="!w.acknowledged" (click)="acknowledgeAlert.emit({ itemId: w.itemId, alertId: w.id })"
-                  class="shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-white border border-rose-300 text-rose-700 hover:bg-rose-100">
+                <boo-button-admin *ngIf="!w.acknowledged" (click)="acknowledgeAlert.emit({ itemId: w.itemId, alertId: w.id })" background="white" textColor="#BE123C" [border]="{ width: 1, color: '#FDA4AF' }" padding="4px 10px" [fontSize]="11" [radius]="8" fontWeight="600" class="shrink-0">
                   Acknowledge
-                </button>
+                </boo-button-admin>
                 <boo-status-badge *ngIf="w.acknowledged" label="Acknowledged" tone="success"></boo-status-badge>
               </div>
             </div>
@@ -125,9 +126,8 @@ interface FlatWarning extends ClinicalWarning {
           <!-- Notes + barcode -->
           <div class="space-y-2">
             <label class="block text-[11px] font-medium text-secondary">Dispensing Notes</label>
-            <textarea rows="2" [ngModel]="workspace.pharmacistNotes" (ngModelChange)="notesChange.emit($event)"
-              placeholder="Pharmacist notes, counseling points, special instructions..."
-              class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary"></textarea>
+            <boo-textarea [rows]="2" [ngModel]="workspace.pharmacistNotes" (ngModelChange)="notesChange.emit($event)"
+              label="Pharmacist notes, counseling points, special instructions..." size="small"></boo-textarea>
 
             <div class="relative">
               <physio-icon name="scan-line" [size]="14" [class]="'absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>

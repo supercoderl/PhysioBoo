@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { BatchOption, DispenseMedicationItem, DispenseMedicineAlternative, DispenseMedicineDetail } from "../../../../shared/types/dispensing.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
     selector: 'dispense-medication-drawer',
     standalone: true,
-    imports: [SharedModule,DrawerComponent],
+    imports: [SharedModule,DrawerComponent, BooButtonAdminComponent],
     template: `
     <drawer [isOpen]="isOpen" (close)="close.emit()">
       <div class="flex flex-col h-full" *ngIf="item">
@@ -81,9 +82,9 @@ import { BatchOption, DispenseMedicationItem, DispenseMedicineAlternative, Dispe
                   <p class="text-xs font-semibold text-regular">{{ alt.name }}</p>
                   <p class="text-[11px] text-secondary">{{ alt.manufacturer }} · {{ alt.stock }} in stock</p>
                 </div>
-                <button type="button" (click)="selectAlternative.emit(alt)" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-primary/10 text-primary hover:bg-primary/20">
+                <boo-button-admin (click)="selectAlternative.emit(alt)" background="rgb(var(--twc-primary) / 0.1)" textColor="rgb(var(--twc-primary))" padding="4px 10px" [fontSize]="11" [radius]="8" fontWeight="600">
                   Use Instead
-                </button>
+                </boo-button-admin>
               </div>
             </div>
           </section>

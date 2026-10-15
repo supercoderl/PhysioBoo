@@ -8,6 +8,7 @@ import { HospitalGroupService } from "../../../../services/admin/hospital-group.
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DevDataModule, DevDataModuleList, DevDataModuleStatus } from "../../../../shared/types/dev-data.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 const DEFAULT_ROWS = 50;
 const TENANT_PAGE_SIZE = 100;
@@ -20,7 +21,7 @@ const CARD = 'bg-surface rounded-[14px] border border-borderGray';
 @Component({
     selector: 'superadmin-dev-data',
     standalone: true,
-    imports: [SharedModule, SuperadminPageHeaderComponent, SuperadminDevDataModuleCardComponent, BooSelectComponent],
+    imports: [SharedModule, SuperadminPageHeaderComponent, SuperadminDevDataModuleCardComponent, BooSelectComponent, BooButtonAdminComponent],
     template: `
         <!-- relative: contains the sr-only elements so they cannot extend the document past the shell's overflow-hidden -->
         <div class="relative space-y-5">
@@ -33,7 +34,7 @@ const CARD = 'bg-surface rounded-[14px] border border-borderGray';
                 <ng-container *ngIf="loadFailed()">
                     <div [class]="card + ' p-6 text-center space-y-3'">
                         <p class="text-[13px] text-regular m-0">The generator could not be loaded.</p>
-                        <button type="button" class="h-9 px-4 rounded-1.5 bg-primary text-white text-[13px] font-semibold hover:opacity-90 cursor-pointer" (click)="load()">Try again</button>
+                        <boo-button-admin (click)="load()" textColor="white" padding="8px 16px" fontWeight="600">Try again</boo-button-admin>
                     </div>
                 </ng-container>
 

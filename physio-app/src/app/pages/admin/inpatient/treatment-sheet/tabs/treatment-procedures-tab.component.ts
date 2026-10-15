@@ -7,17 +7,18 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { TreatmentProcedureRow } from "../../../../../shared/types/treatment-sheet.types";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'treatment-procedures-tab',
   standalone: true,
-  imports: [SharedModule,BooInputComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooInputComponent, StatusBadgeComponent, EmptyStateComponent, BooButtonAdminComponent],
   template: `
     <div class="flex items-center justify-between mb-3">
       <h3 class="text-sm font-semibold text-primary m-0">Procedures</h3>
-      <button (click)="showForm = !showForm" class="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-semibold hover:opacity-90">
+      <boo-button-admin (click)="showForm = !showForm" textColor="white" [fontSize]="12" [radius]="8" fontWeight="600">
         {{ showForm ? 'Cancel' : 'Add Procedure' }}
-      </button>
+      </boo-button-admin>
     </div>
 
     <form *ngIf="showForm" (ngSubmit)="submit()" class="bg-surface border border-gray-200 rounded-lg p-4 mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">

@@ -12,18 +12,14 @@
       </p>
     </div>
     <div class="flex items-center gap-2 shrink-0">
-      <button
-        (click)="bulkExport()"
-        class="px-3 py-2 text-sm font-medium border border-gray-200 text-primary hover:bg-gray-50 rounded-md flex items-center gap-2">
+      <boo-button-admin (click)="bulkExport()" background="transparent" textColor="rgb(var(--twc-primary))" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 12px" [fontSize]="14" fontWeight="500" [gap]="8">
         <physio-icon name="download" class="w-4 h-4"></physio-icon>
         Export
-      </button>
-      <button
-        (click)="openNewForm()"
-        class="px-4 py-2 text-sm font-medium bg-primary text-white hover:opacity-90 rounded-md flex items-center gap-2">
+      </boo-button-admin>
+      <boo-button-admin (click)="openNewForm()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
         <physio-icon name="plus" class="w-4 h-4"></physio-icon>
         New Service
-      </button>
+      </boo-button-admin>
     </div>
   </div>
 
@@ -64,11 +60,9 @@
       <physio-icon name="triangle-alert" [size]="16" [class]="'shrink-0'"></physio-icon>
       Couldn't load services. What you see below may be out of date.
     </div>
-    <button
-      (click)="load()"
-      class="px-3 py-1.5 text-sm font-medium text-red-700 border border-red-300 rounded-md hover:bg-red-100 shrink-0">
+    <boo-button-admin (click)="load()" background="transparent" textColor="#B91C1C" [border]="{ width: 1, color: '#FCA5A5' }" [fontSize]="14" fontWeight="500" class="shrink-0">
       Retry
-    </button>
+    </boo-button-admin>
   </div>
 
   <!-- ──────────────────────────────────────────────────────────── -->

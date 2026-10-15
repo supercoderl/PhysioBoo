@@ -77,34 +77,20 @@
               class="rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
             />
             <div class="flex gap-2">
-              <button
-                type="button"
-                (click)="saveBoard()"
-                [disabled]="!boardTitle.trim()"
-                class="rounded-lg bg-primary px-4 min-h-9 text-[13px] font-medium text-white disabled:opacity-50"
-              >
+              <boo-button-admin (click)="saveBoard()" [disabled]="!boardTitle.trim()" textColor="white" padding="8px 16px" [radius]="8" fontWeight="500">
                 Save
-              </button>
-              <button
-                type="button"
-                (click)="cancelInline()"
-                class="rounded-lg px-3 min-h-9 text-[13px] font-medium text-[#71606A] hover:bg-gray-100"
-              >
+              </boo-button-admin>
+              <boo-button-admin (click)="cancelInline()" background="transparent" textColor="#71606A" padding="8px 12px" [radius]="8" fontWeight="500">
                 Cancel
-              </button>
+              </boo-button-admin>
             </div>
           </div>
         </div>
 
-        <button
-          *ngIf="b.canDelete"
-          type="button"
-          (click)="deleteBoard()"
-          class="flex items-center gap-1.5 rounded-lg px-3 min-h-10 text-[13px] font-medium text-red-600 hover:bg-red-50"
-        >
+        <boo-button-admin *ngIf="b.canDelete" (click)="deleteBoard()" background="transparent" textColor="#DC2626" padding="10px 12px" [radius]="8" fontWeight="500" [gap]="6">
           <physio-icon name="trash" [size]="16"></physio-icon>
           Delete board
-        </button>
+        </boo-button-admin>
       </div>
 
       <!-- Columns -->
@@ -225,32 +211,19 @@
                 class="w-full rounded-lg border border-[#EFE3E7] px-3 py-2 text-[13px] outline-none focus:border-primary"
               ></textarea>
               <div class="flex gap-2">
-                <button
-                  type="button"
-                  (click)="addCard(list)"
-                  [disabled]="!newCardTitle.trim()"
-                  class="rounded-lg bg-primary px-3 min-h-8 text-[12px] font-medium text-white disabled:opacity-50"
-                >
+                <boo-button-admin (click)="addCard(list)" [disabled]="!newCardTitle.trim()" textColor="white" [fontSize]="12" [radius]="8" fontWeight="500">
                   Add card
-                </button>
-                <button
-                  type="button"
-                  (click)="cancelInline()"
-                  class="rounded-lg px-3 min-h-8 text-[12px] font-medium text-[#71606A] hover:bg-gray-200"
-                >
+                </boo-button-admin>
+                <boo-button-admin (click)="cancelInline()" background="transparent" textColor="#71606A" [fontSize]="12" [radius]="8" fontWeight="500">
                   Cancel
-                </button>
+                </boo-button-admin>
               </div>
             </div>
             <ng-template #addCardButton>
-              <button
-                type="button"
-                (click)="startAddCard(list)"
-                class="flex w-full items-center gap-1.5 rounded-lg px-2 min-h-9 text-[13px] text-[#71606A] hover:bg-gray-200"
-              >
+              <boo-button-admin (click)="startAddCard(list)" background="transparent" textColor="#71606A" padding="8px 8px" [radius]="8" [gap]="6" buttonClass="w-full" class="w-full">
                 <physio-icon name="plus" [size]="14"></physio-icon>
                 Add a card
-              </button>
+              </boo-button-admin>
             </ng-template>
           </footer>
         </section>
@@ -268,14 +241,9 @@
             aria-label="New list title"
             class="w-full rounded-lg border border-[#EFE3E7] bg-surface px-3 min-h-10 text-[13px] outline-none focus:border-primary"
           />
-          <button
-            *ngIf="newListTitle.trim()"
-            type="button"
-            (click)="addList()"
-            class="mt-2 rounded-lg bg-primary px-3 min-h-8 text-[12px] font-medium text-white"
-          >
+          <boo-button-admin *ngIf="newListTitle.trim()" (click)="addList()" textColor="white" [fontSize]="12" [radius]="8" fontWeight="500" class="mt-2">
             Add list
-          </button>
+          </boo-button-admin>
         </div>
       </div>
     </ng-container>
@@ -311,54 +279,32 @@
           class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
         />
       </label>
-      <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]"
-          >Description</span
+      <div class="block">
+        <label for="card-description" class="mb-1 block text-[12px] font-semibold text-[#71606A]"
+          >Description</label
         >
-        <textarea
-          [(ngModel)]="d.description"
-          maxlength="4000"
-          rows="5"
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 py-2 text-[14px] outline-none focus:border-primary"
-        ></textarea>
-      </label>
-      <label class="block">
+        <boo-textarea [id]="'card-description'" [(ngModel)]="d.description" [maxlength]="4000" [rows]="5"></boo-textarea>
+      </div>
+      <div class="block">
         <span class="mb-1 block text-[12px] font-semibold text-[#71606A]"
           >Due date</span
         >
-        <input
-          type="date"
-          [(ngModel)]="d.dueDate"
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
-        />
-      </label>
+        <boo-datepicker [(ngModel)]="d.dueDate"></boo-datepicker>
+      </div>
     </div>
     <div
       class="flex items-center justify-between gap-2 border-t border-[#EFE3E7] px-4 py-3"
     >
-      <button
-        type="button"
-        (click)="deleteCard()"
-        class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-red-600 hover:bg-red-50"
-      >
+      <boo-button-admin (click)="deleteCard()" background="transparent" textColor="#DC2626" padding="10px 12px" [radius]="8" fontWeight="500">
         Delete
-      </button>
+      </boo-button-admin>
       <div class="flex items-center gap-2">
-        <button
-          type="button"
-          (click)="closeCard()"
-          class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#71606A] hover:bg-gray-100"
-        >
+        <boo-button-admin (click)="closeCard()" background="transparent" textColor="#71606A" padding="10px 12px" [radius]="8" fontWeight="500">
           Cancel
-        </button>
-        <button
-          type="button"
-          (click)="saveCard()"
-          [disabled]="!canSaveCard()"
-          class="rounded-lg bg-primary px-4 min-h-10 text-[13px] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
-        >
+        </boo-button-admin>
+        <boo-button-admin (click)="saveCard()" [disabled]="!canSaveCard()" textColor="white" padding="10px 16px" [radius]="8" fontWeight="500">
           {{ isSaving() ? "Saving..." : "Save" }}
-        </button>
+        </boo-button-admin>
       </div>
     </div>
   </div>

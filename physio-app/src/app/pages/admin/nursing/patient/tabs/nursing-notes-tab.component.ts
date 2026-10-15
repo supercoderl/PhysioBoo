@@ -5,11 +5,12 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { NursingNote } from "../../../../../shared/types/nursing.types";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'nursing-notes-tab',
   standalone: true,
-  imports: [SharedModule,BooTextareaComponent],
+  imports: [SharedModule,BooTextareaComponent, BooButtonAdminComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -19,10 +20,9 @@ import { NursingNote } from "../../../../../shared/types/nursing.types";
       <div class="bg-surface border border-gray-200 rounded-lg p-4 mb-4">
         <boo-textarea label="Add Nursing Note" [rows]="3" [(ngModel)]="draft" name="note"></boo-textarea>
         <div class="flex justify-end mt-2">
-          <button (click)="submit()" [disabled]="!draft.trim() || loadingSrv.isLoading('note-add')"
-            class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:opacity-90 disabled:opacity-50">
+          <boo-button-admin (click)="submit()" [disabled]="!draft.trim() || loadingSrv.isLoading('note-add')" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8">
             Add Note
-          </button>
+          </boo-button-admin>
         </div>
       </div>
 

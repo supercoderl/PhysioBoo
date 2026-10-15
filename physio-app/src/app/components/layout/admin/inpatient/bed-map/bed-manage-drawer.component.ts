@@ -9,6 +9,9 @@ import { Bed, BedType, CreateBedRequest } from "../../../../../shared/types/bed.
 import { CreateWardRequest, Ward } from "../../../../../shared/types/ward.types";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
+import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
+import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
+import { BooCheckboxComponent } from "../../../../checkbox/boo-checkbox/boo-checkbox.component";
 
 /**
  * Ward and bed set-up for the bed map: add, rename and delete wards; add and delete beds.
@@ -17,7 +20,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
 @Component({
     selector: 'bed-map-manage-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent,BooSelectComponent],
+    imports: [SharedModule, DrawerComponent,BooSelectComponent, BooButtonAdminComponent, BooInputComponent, BooCheckboxComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="close.emit()">
             <div class="flex flex-col h-full bg-surface">
@@ -36,22 +39,21 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                     <section class="rounded-lg border border-gray-200 p-4">
                         <h3 class="text-sm font-semibold text-gray-800 mb-3">Add ward</h3>
                         <div class="grid grid-cols-2 gap-3">
-                            <label class="flex flex-col gap-1 text-xs text-gray-600 col-span-2">Name
-                                <input [(ngModel)]="wardForm.name" maxlength="120" class="rounded border border-gray-300 px-3 py-2 text-sm" placeholder="e.g. General Ward A" />
-                            </label>
-                            <label class="flex flex-col gap-1 text-xs text-gray-600">Code
-                                <input [(ngModel)]="wardForm.code" maxlength="20" class="rounded border border-gray-300 px-3 py-2 text-sm" placeholder="e.g. GWA" />
-                            </label>
-                            <label class="flex flex-col gap-1 text-xs text-gray-600">Floor
-                                <input type="number" [(ngModel)]="wardForm.floor" class="rounded border border-gray-300 px-3 py-2 text-sm" />
-                            </label>
+                            <div class="flex flex-col gap-1 text-xs text-gray-600 col-span-2">Name
+                                <boo-input [(ngModel)]="wardForm.name" [maxlength]="120" label="e.g. General Ward A" size="small"></boo-input>
+                            </div>
+                            <div class="flex flex-col gap-1 text-xs text-gray-600">Code
+                                <boo-input [(ngModel)]="wardForm.code" [maxlength]="20" label="e.g. GWA" size="small"></boo-input>
+                            </div>
+                            <div class="flex flex-col gap-1 text-xs text-gray-600">Floor
+                                <boo-input type="number" [(ngModel)]="wardForm.floor" size="small"></boo-input>
+                            </div>
                             <div class="col-span-2">
                                 <boo-select label="Department (optional)" [(ngModel)]="wardForm.departmentId" [options]="departmentOptions()" bindLabel="label" bindValue="value"></boo-select>
                             </div>
                         </div>
                         <div class="flex justify-end mt-3">
-                            <button (click)="addWard()" [disabled]="!wardForm.name.trim() || saving()"
-                                class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:opacity-90 disabled:opacity-50">Add ward</button>
+                            <boo-button-admin (click)="addWard()" [disabled]="!wardForm.name.trim() || saving()" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8">Add ward</boo-button-admin>
                         </div>
                     </section>
 
@@ -77,22 +79,17 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                             </div>
 
                             <div class="grid grid-cols-4 gap-2 items-end pt-2 border-t border-dashed border-gray-200">
-                                <label class="flex flex-col gap-1 text-xs text-gray-600">Bed no.
-                                    <input [(ngModel)]="bedForm.number" maxlength="20" class="rounded border border-gray-300 px-2 py-1.5 text-sm" />
-                                </label>
-                                <label class="flex flex-col gap-1 text-xs text-gray-600">Room
-                                    <input [(ngModel)]="bedForm.roomNumber" maxlength="20" class="rounded border border-gray-300 px-2 py-1.5 text-sm" />
-                                </label>
-                                <label class="flex flex-col gap-1 text-xs text-gray-600">Type
-                                    <select [(ngModel)]="bedForm.bedType" class="rounded border border-gray-300 px-2 py-1.5 text-sm bg-surface">
-                                        <option *ngFor="let t of bedTypes" [value]="t">{{ t }}</option>
-                                    </select>
-                                </label>
-                                <button (click)="addBed(w)" [disabled]="!bedForm.number.trim() || saving()"
-                                    class="px-3 py-1.5 bg-primary text-white rounded-lg text-sm hover:opacity-90 disabled:opacity-50">Add bed</button>
-                                <label class="col-span-4 flex items-center gap-2 text-xs text-gray-600">
-                                    <input type="checkbox" [(ngModel)]="bedForm.isolationRequired" class="rounded border-gray-300" /> Isolation required
-                                </label>
+                                <div class="flex flex-col gap-1 text-xs text-gray-600">Bed no.
+                                    <boo-input [(ngModel)]="bedForm.number" [maxlength]="20" size="small"></boo-input>
+                                </div>
+                                <div class="flex flex-col gap-1 text-xs text-gray-600">Room
+                                    <boo-input [(ngModel)]="bedForm.roomNumber" [maxlength]="20" size="small"></boo-input>
+                                </div>
+                                <div class="flex flex-col gap-1 text-xs text-gray-600">Type
+                                    <boo-select [(ngModel)]="bedForm.bedType" [options]="bedTypeOptions" size="small"></boo-select>
+                                </div>
+                                <boo-button-admin (click)="addBed(w)" [disabled]="!bedForm.number.trim() || saving()" textColor="white" [fontSize]="14" [radius]="8">Add bed</boo-button-admin>
+                                <boo-checkbox class="col-span-4" size="small" [(ngModel)]="bedForm.isolationRequired"><span class="text-gray-600">Isolation required</span></boo-checkbox>
                             </div>
                         </div>
                     </section>
@@ -108,6 +105,7 @@ export class BedMapManageDrawerComponent implements OnChanges {
     @Output() changed = new EventEmitter<void>();
 
     readonly bedTypes: BedType[] = ['Standard', 'ICU', 'Isolation', 'Pediatric', 'Surgical Recovery'];
+    readonly bedTypeOptions = this.bedTypes.map(t => ({ label: t, value: t }));
 
     wards = signal<Ward[]>([]);
     beds = signal<Bed[]>([]);

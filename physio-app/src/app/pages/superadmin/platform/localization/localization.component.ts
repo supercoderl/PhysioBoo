@@ -9,6 +9,8 @@ import { InitService } from "../../../../services/common/init.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { Language } from "../../../../shared/types/sys-language.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
 
 interface ResourceRow {
     key: string;
@@ -16,7 +18,6 @@ interface ResourceRow {
 }
 
 const PAGE_LIMIT = 200;
-const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 const CARD = 'bg-surface rounded-2 border border-borderGray/60';
 
 /** Flattens nested resource JSON into `a.b.c` keys so it reads as one table. */
@@ -32,7 +33,7 @@ function flatten(value: unknown, prefix = ''): ResourceRow[] {
 @Component({
     selector: 'superadmin-localization',
     standalone: true,
-    imports: [SharedModule, SuperadminPageHeaderComponent, BooSelectComponent, EmptyStateComponent, ErrorStateComponent],
+    imports: [SharedModule, SuperadminPageHeaderComponent, BooSelectComponent, EmptyStateComponent, ErrorStateComponent, BooButtonAdminComponent, BooInputComponent],
     template: `
         <div class="space-y-5">
             <superadmin-page-header
@@ -60,7 +61,7 @@ function flatten(value: unknown, prefix = ''): ResourceRow[] {
                         </div>
                         <div class="space-y-1">
                             <label for="loc-search" class="block text-[12px] font-medium text-secondary">Search</label>
-                            <input id="loc-search" type="search" [class]="field + ' w-56'" placeholder="Key or text" autocomplete="off" [ngModel]="search()" (ngModelChange)="search.set($event)" />
+                            <boo-input [id]="'loc-search'" type="search" class="w-56" label="Key or text" size="small" [ngModel]="search()" (ngModelChange)="search.set($event)"></boo-input>
                         </div>
                     </div>
 
@@ -124,27 +125,17 @@ function flatten(value: unknown, prefix = ''): ResourceRow[] {
                                 class="block w-full text-[13px] text-regular file:mr-3 file:h-9 file:px-3 file:rounded-1.5 file:border file:border-borderGray file:bg-surface file:text-[13px] file:font-medium file:cursor-pointer"
                                 (change)="onFileSelected($event)"
                             />
-                            <button
-                                type="button"
-                                class="h-9 px-4 rounded-1.5 bg-primary text-white text-[13px] font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                [disabled]="!file() || importing()"
-                                (click)="importFile()"
-                            >
+                            <boo-button-admin [disabled]="!file() || importing()" (click)="importFile()" textColor="white" padding="8px 16px" fontWeight="600">
                                 {{ importing() ? 'Importing…' : 'Import file' }}
-                            </button>
+                            </boo-button-admin>
                         </div>
 
                         <div class="space-y-2 pt-5 border-t border-borderGray/60">
                             <label for="import-url" class="text-[13px] font-medium text-regular">From a URL</label>
-                            <input id="import-url" type="url" [class]="field" placeholder="https://…/resources.json" autocomplete="off" [ngModel]="url()" (ngModelChange)="url.set($event)" />
-                            <button
-                                type="button"
-                                class="h-9 px-4 rounded-1.5 border border-borderGray bg-surface text-[13px] font-medium text-regular hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                [disabled]="!url().trim() || importing()"
-                                (click)="importUrl()"
-                            >
+                            <boo-input [id]="'import-url'" type="url" label="https://…/resources.json" size="small" [ngModel]="url()" (ngModelChange)="url.set($event)"></boo-input>
+                            <boo-button-admin [disabled]="!url().trim() || importing()" (click)="importUrl()" background="transparent" textColor="rgb(var(--twc-regular))" [border]="{ width: 1, color: 'rgb(var(--twc-border))' }" padding="8px 16px" fontWeight="500">
                                 Import from URL
-                            </button>
+                            </boo-button-admin>
                         </div>
 
                         <p *ngIf="lastResult() as result" class="m-0 text-[13px] text-regular rounded-1.5 bg-emerald-50 border border-emerald-200 px-3 py-2" role="status">
@@ -167,7 +158,6 @@ export class SuperadminLocalizationComponent implements OnInit {
 
     // #region Inputs, Outputs, Properties
     readonly card = CARD;
-    readonly field = FIELD;
     readonly languages: Language[] = this.initSrv.getConfig()?.languages ?? [];
     readonly languageOptions = this.languages.map(l => ({ label: `${l.name} (${l.code})`, value: l.code }));
 

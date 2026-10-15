@@ -1,11 +1,12 @@
 import { Component, Input, computed, signal } from "@angular/core";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { AppointmentStatus, EncounterRow } from "../../../../../shared/types/medical-record.types";
+import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 
 @Component({
   selector: 'mr-encounters-tab',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooSelectComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
       <!-- Filter strip -->
@@ -16,16 +17,10 @@ import { AppointmentStatus, EncounterRow } from "../../../../../shared/types/med
             placeholder="Search by doctor, department, complaint…"
             class="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
         </div>
-        <select [value]="dept()" (change)="dept.set(any($event.target).value)"
-          class="border border-gray-200 rounded-md px-3 py-1.5 text-sm">
-          <option value="">All departments</option>
-          <option *ngFor="let d of departments()" [value]="d">{{ d }}</option>
-        </select>
-        <select [value]="status()" (change)="status.set(any($event.target).value)"
-          class="border border-gray-200 rounded-md px-3 py-1.5 text-sm">
-          <option value="">All status</option>
-          <option *ngFor="let s of allStatuses" [value]="s">{{ s }}</option>
-        </select>
+        <boo-select label="All departments" size="small" class="w-48" [options]="departmentOptions()"
+          [ngModel]="dept()" (ngModelChange)="dept.set($event ?? '')"></boo-select>
+        <boo-select label="All status" size="small" class="w-48" [options]="statusOptions"
+          [ngModel]="status()" (ngModelChange)="status.set($event ?? '')"></boo-select>
       </div>
 
       <!-- Timeline -->
@@ -81,6 +76,8 @@ export class EncountersTabComponent {
 
   readonly allStatuses: AppointmentStatus[] = ['Scheduled', 'Confirmed', 'CheckedIn', 'InProgress', 'Completed', 'Cancelled', 'NoShow', 'Rescheduled'];
   departments = computed(() => Array.from(new Set(this._data().map(e => e.departmentName))).sort());
+  departmentOptions = computed(() => this.departments().map(d => ({ label: d, value: d })));
+  readonly statusOptions = this.allStatuses.map(s => ({ label: s, value: s }));
 
   filtered = computed(() => {
     const q = this.search().toLowerCase().trim();
@@ -121,5 +118,4 @@ export class EncountersTabComponent {
       default: return 'bg-gray-400';
     }
   }
-  any(t: EventTarget | null) { return t as HTMLSelectElement; }
 }

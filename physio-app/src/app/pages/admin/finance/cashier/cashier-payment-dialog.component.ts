@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { CashierInvoice, CashierPaymentMethod, CashierPaymentSplit } from "../../../../shared/types/cashier.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
     selector: 'cashier-payment-dialog',
     standalone: true,
-    imports: [SharedModule],
+    imports: [SharedModule, BooButtonAdminComponent],
     template: `
     <div *ngIf="isOpen && invoice" class="fixed inset-0 z-[10000] flex items-center justify-center">
       <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" (click)="close.emit()" aria-hidden="true"></div>
@@ -88,12 +89,10 @@ import { CashierInvoice, CashierPaymentMethod, CashierPaymentSplit } from "../..
         </div>
 
         <div class="px-5 py-4 border-t border-slate-100 flex justify-end gap-2">
-          <button type="button" (click)="close.emit()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
-          <button type="button" (click)="complete()" [disabled]="!canComplete()"
-            class="px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
-            [ngClass]="canComplete() ? 'bg-amber-500 text-slate-900 hover:bg-amber-400' : 'bg-slate-200 text-slate-400 cursor-not-allowed'">
+          <boo-button-admin (click)="close.emit()" background="transparent" textColor="#71606A" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="600">Cancel</boo-button-admin>
+          <boo-button-admin (click)="complete()" [disabled]="!canComplete()" background="#F59E0B" textColor="#26141A" padding="8px 20px" [fontSize]="14" [radius]="8" fontWeight="600">
             Confirm Payment
-          </button>
+          </boo-button-admin>
         </div>
       </div>
     </div>

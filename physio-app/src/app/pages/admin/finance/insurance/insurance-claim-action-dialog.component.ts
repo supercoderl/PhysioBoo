@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { ClaimActionMode, ClaimPriority, InsuranceProviderNode } from "../../../../shared/types/insurance-claims.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 export interface ClaimActionSubmitPayload {
   mode: ClaimActionMode;
@@ -34,7 +35,7 @@ const TITLES: Record<ClaimActionMode, string> = {
 @Component({
   selector: 'insurance-claim-action-dialog',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonAdminComponent],
   template: `
     <div class="fixed inset-0 z-[10000]" [style.pointer-events]="isOpen ? 'auto' : 'none'">
       <div
@@ -172,8 +173,8 @@ const TITLES: Record<ClaimActionMode, string> = {
         </div>
 
         <footer class="flex items-center justify-end gap-2 px-4 py-3 border-t border-[var(--ic-warm-gray-200)]">
-          <button type="button" class="px-3 py-1.5 rounded-1.5 text-xs font-semibold text-[var(--ic-warm-gray-600)] hover:bg-[var(--ic-warm-gray-200)]" (click)="close.emit()">Cancel</button>
-          <button type="button" class="px-3 py-1.5 rounded-1.5 text-xs font-semibold bg-[var(--ic-forest)] text-[var(--ic-ivory)] hover:bg-[var(--ic-forest-dark)]" (click)="submit()">Confirm</button>
+          <boo-button-admin (click)="close.emit()" background="transparent" textColor="var(--ic-warm-gray-600)" [fontSize]="12" fontWeight="600">Cancel</boo-button-admin>
+          <boo-button-admin (click)="submit()" background="var(--ic-forest)" textColor="var(--ic-ivory)" [fontSize]="12" fontWeight="600">Confirm</boo-button-admin>
         </footer>
       </div>
     </div>

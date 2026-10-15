@@ -6,11 +6,12 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { IntakeOutputCategory, IntakeOutputEntry } from "../../../../../shared/types/nursing.types";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'nursing-io-tab',
   standalone: true,
-  imports: [SharedModule,BooInputComponent, BooSelectComponent],
+  imports: [SharedModule,BooInputComponent, BooSelectComponent, BooButtonAdminComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -19,9 +20,9 @@ import { IntakeOutputCategory, IntakeOutputEntry } from "../../../../../shared/t
     <div *ngIf="!isLoading()">
       <div class="flex items-center justify-between mb-3">
         <div class="text-sm text-secondary">Balance (loaded entries): <span class="font-semibold" [ngClass]="balance() >= 0 ? 'text-emerald-600' : 'text-red-600'">{{ balance() }} mL</span></div>
-        <button (click)="showForm = !showForm" class="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-semibold hover:opacity-90">
+        <boo-button-admin (click)="showForm = !showForm" textColor="white" [fontSize]="12" [radius]="8" fontWeight="600">
           {{ showForm ? 'Cancel' : 'Add Entry' }}
-        </button>
+        </boo-button-admin>
       </div>
 
       <form *ngIf="showForm" (ngSubmit)="submit()" class="bg-surface border border-gray-200 rounded-lg p-4 mb-4 grid grid-cols-2 md:grid-cols-4 gap-3">

@@ -12,18 +12,21 @@ import { AuthService } from '../../../../../services/auth/auth.service';
 import { ToastService } from '../../../../../services/common/toast.service';
 import { SharedModule } from '../../../../../shared/shared-imports';
 import { MyAccount, UpdateMyAccountRequest } from '../../../../../shared/types/account.types';
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'setting-account',
   standalone: true,
   imports: [
     SharedModule,
-    AdminBreadcrumbComponent,
+    AdminBreadcrumbComponent,
+
     AdminAccountProfileComponent,
     AdminAccountContactComponent,
     AdminAccountEmergencyComponent,
     AdminAccountDoctorComponent,
-    AdminAccountPatientComponent
+    AdminAccountPatientComponent,
+    BooButtonAdminComponent
   ],
   templateUrl: './account.component.html'
 })

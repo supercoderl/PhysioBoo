@@ -9,11 +9,13 @@ import { DialogService } from "../../../../../services/common/dialog.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ImagingOrderRow, RadiologyReport, RadiologyReportTemplate, ReportStatus } from "../../../../../shared/types/radiology.types";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooCheckboxComponent } from "../../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
 
 @Component({
   selector: 'radiology-reporting-tab',
   standalone: true,
-  imports: [SharedModule,BooSelectComponent, BooTextareaComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooSelectComponent, BooTextareaComponent, StatusBadgeComponent, EmptyStateComponent, BooButtonAdminComponent, BooCheckboxComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -64,10 +66,9 @@ import { ImagingOrderRow, RadiologyReport, RadiologyReportTemplate, ReportStatus
             <boo-textarea label="Findings" [rows]="4" [(ngModel)]="report()!.findings" (ngModelChange)="onFieldChange()"></boo-textarea>
             <boo-textarea label="Impression" [rows]="3" [(ngModel)]="report()!.impression" (ngModelChange)="onFieldChange()"></boo-textarea>
             <boo-textarea label="Recommendations" [rows]="2" [(ngModel)]="report()!.recommendations" (ngModelChange)="onFieldChange()"></boo-textarea>
-            <label class="flex items-center gap-2 text-sm text-gray-700 select-none">
-              <input type="checkbox" class="rounded border-gray-300" [(ngModel)]="report()!.isCritical" (ngModelChange)="onFieldChange()" />
-              Critical finding (alerts the ordering clinician when the report is approved)
-            </label>
+            <boo-checkbox [(ngModel)]="report()!.isCritical" (ngModelChange)="onFieldChange()">
+              <span class="text-gray-700">Critical finding (alerts the ordering clinician when the report is approved)</span>
+            </boo-checkbox>
           </div>
 
           <div class="mt-3" *ngIf="report()!.attachments.length">
@@ -88,9 +89,9 @@ import { ImagingOrderRow, RadiologyReport, RadiologyReportTemplate, ReportStatus
             <div><span class="text-gray-500">Verified At</span><div class="font-medium text-gray-800">{{ report()!.verifiedAt ? (report()!.verifiedAt | date:'medium') : '—' }}</div></div>
           </div>
           <div class="flex gap-2">
-            <button (click)="approve()" class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700">Approve</button>
-            <button (click)="reject()" class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold hover:bg-red-700">Reject</button>
-            <button (click)="returnForRevision()" class="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-semibold hover:bg-amber-600">Return for Revision</button>
+            <boo-button-admin (click)="approve()" background="#059669" textColor="white" [fontSize]="12" [radius]="8" fontWeight="600">Approve</boo-button-admin>
+            <boo-button-admin (click)="reject()" background="#DC2626" textColor="white" [fontSize]="12" [radius]="8" fontWeight="600">Reject</boo-button-admin>
+            <boo-button-admin (click)="returnForRevision()" background="#F59E0B" textColor="white" [fontSize]="12" [radius]="8" fontWeight="600">Return for Revision</boo-button-admin>
           </div>
         </div>
       </div>

@@ -131,19 +131,13 @@
         </div>
 
         <div class="p-5 border-t border-gray-100 flex justify-end gap-2">
-          <button type="button"
-            (click)="onCancelPrefs()"
-            [disabled]="savingPrefs() || !isPrefsDirty()"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50">
+          <boo-button-admin (click)="onCancelPrefs()" [disabled]="savingPrefs() || !isPrefsDirty()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 16px" [fontSize]="14" fontWeight="500">
             Discard
-          </button>
-          <button type="button"
-            (click)="onSavePrefs()"
-            [disabled]="savingPrefs() || !isPrefsDirty()"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          </boo-button-admin>
+          <boo-button-admin (click)="onSavePrefs()" [disabled]="savingPrefs() || !isPrefsDirty()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
             <physio-icon *ngIf="savingPrefs()" name="loader-circle" [class]="'w-4 h-4 animate-spin'" />
             <span>{{ savingPrefs() ? 'Saving…' : 'Save preferences' }}</span>
-          </button>
+          </boo-button-admin>
         </div>
       </section>
 

@@ -74,13 +74,10 @@
     <div
       class="p-3 flex justify-between md:items-center"
     >
-      <button
-        (click)="openNewUser()"
-        class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 flex items-center gap-2 whitespace-nowrap"
-      >
+      <boo-button-admin (click)="openNewUser()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
         <physio-icon name="user-plus" class="w-4 h-4"></physio-icon>
         New User
-      </button>
+      </boo-button-admin>
     </div>
 
     <admin-user-permission-user-tab
@@ -97,13 +94,10 @@
     <div
       class="p-3 flex justify-between md:items-center"
     >
-      <button
-        (click)="openNewRole()"
-        class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 flex items-center gap-2 whitespace-nowrap"
-      >
+      <boo-button-admin (click)="openNewRole()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
         <physio-icon name="plus" class="w-4 h-4"></physio-icon>
         New Role
-      </button>
+      </boo-button-admin>
     </div>
 
     <admin-user-permission-role-tab
@@ -121,13 +115,10 @@
     <div
       class="p-3 flex justify-between md:items-center"
     >
-      <button
-        (click)="openNewPermission()"
-        class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 flex items-center gap-2 whitespace-nowrap"
-      >
+      <boo-button-admin (click)="openNewPermission()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
         <physio-icon name="plus" class="w-4 h-4"></physio-icon>
         New Permission
-      </button>
+      </boo-button-admin>
     </div>
 
     <admin-user-permission-permission-tab

@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PrescriptionDraft, PrescriptionRxStatus } from "../../../../../shared/types/prescription-rx.types";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
     selector: 'rx-action-bar',
     standalone: true,
-    imports: [SharedModule,StatusBadgeComponent],
+    imports: [SharedModule,StatusBadgeComponent, BooButtonAdminComponent],
     template: `
     <div class="sticky top-0 z-30 bg-surface border-b border-gray-200 shadow-sm">
       <div class="px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
@@ -33,34 +34,29 @@ import { PrescriptionDraft, PrescriptionRxStatus } from "../../../../../shared/t
         <!-- Right: actions -->
         <div class="flex items-center gap-2 shrink-0">
           <ng-container *ngIf="editable">
-            <button type="button" (click)="saveDraft.emit()" [disabled]="saving"
-              class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-secondary hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50">
+            <boo-button-admin (click)="saveDraft.emit()" [disabled]="saving" background="transparent" textColor="rgb(var(--twc-secondary))" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="6" class="!hidden sm:!inline-flex">
               <physio-icon name="save" [size]="16"></physio-icon> Save Draft
-            </button>
-            <button type="button" (click)="preview.emit()"
-              class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-secondary hover:bg-gray-100 rounded-lg transition-colors">
+            </boo-button-admin>
+            <boo-button-admin (click)="preview.emit()" background="transparent" textColor="rgb(var(--twc-secondary))" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="6" class="!hidden sm:!inline-flex">
               <physio-icon name="eye" [size]="16"></physio-icon> Preview
-            </button>
-            <button type="button" (click)="print.emit()"
-              class="hidden md:inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-secondary hover:bg-gray-100 rounded-lg transition-colors">
+            </boo-button-admin>
+            <boo-button-admin (click)="print.emit()" background="transparent" textColor="rgb(var(--twc-secondary))" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="6" class="!hidden md:!inline-flex">
               <physio-icon name="printer" [size]="16"></physio-icon> Print
-            </button>
-            <button type="button" (click)="issue.emit()" [disabled]="!canIssue"
-              [title]="!canIssue ? 'Add at least one medication before issuing' : ''"
-              class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            </boo-button-admin>
+            <boo-button-admin (click)="issue.emit()" [disabled]="!canIssue" [title]="!canIssue ? 'Add at least one medication before issuing' : ''" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="600" [gap]="6">
               <physio-icon name="circle-check" [size]="16"></physio-icon> Issue Prescription
-            </button>
-            <button type="button" (click)="cancel.emit()" class="text-rose-600 hover:text-rose-700 text-sm font-medium px-2">
+            </boo-button-admin>
+            <boo-button-admin (click)="cancel.emit()" background="transparent" textColor="#E11D48" padding="6px 8px" [fontSize]="14" fontWeight="500">
               Cancel
-            </button>
+            </boo-button-admin>
           </ng-container>
           <ng-container *ngIf="!editable">
-            <button type="button" (click)="preview.emit()" class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-secondary hover:bg-gray-100 rounded-lg transition-colors">
+            <boo-button-admin (click)="preview.emit()" background="transparent" textColor="rgb(var(--twc-secondary))" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="6">
               <physio-icon name="eye" [size]="16"></physio-icon> Preview
-            </button>
-            <button type="button" (click)="print.emit()" class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-secondary hover:bg-gray-100 rounded-lg transition-colors">
+            </boo-button-admin>
+            <boo-button-admin (click)="print.emit()" background="transparent" textColor="rgb(var(--twc-secondary))" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="6">
               <physio-icon name="printer" [size]="16"></physio-icon> Print
-            </button>
+            </boo-button-admin>
           </ng-container>
         </div>
       </div>

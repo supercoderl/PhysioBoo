@@ -11,11 +11,14 @@ import { LocalLoadingService } from "../../../../services/common/local-loading.s
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { AcuityLevel, AlertSeverity, NursingAlert, NursingAssignmentFilter, NursingPatient, NursingStats, ShiftCode } from "../../../../shared/types/nursing.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
+import { BooCheckboxComponent } from "../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
 
 @Component({
   selector: 'admin-nursing-dashboard',
   standalone: true,
-  imports: [SharedModule, BooInputComponent, BooSelectComponent, StatusBadgeComponent, ErrorStateComponent],
+  imports: [SharedModule, BooInputComponent, BooSelectComponent, StatusBadgeComponent, ErrorStateComponent, BooButtonAdminComponent, ButtonIconComponent, BooCheckboxComponent],
   template: `
     <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto">
@@ -29,16 +32,13 @@ import { AcuityLevel, AlertSeverity, NursingAlert, NursingAssignmentFilter, Nurs
             <boo-select label="Shift" [(ngModel)]="shift" (ngModelChange)="onShiftChange()" [options]="shiftOptions" bindLabel="label" bindValue="value"></boo-select>
             <boo-select label="Ward" [(ngModel)]="filter.wardId" (ngModelChange)="applyFilters()" [options]="wardOptions" bindLabel="label" bindValue="value"></boo-select>
             <boo-input label="Search patient or bed..." size="small" (search)="onSearch($event)"></boo-input>
-            <button (click)="toggleAssign()"
-              class="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+            <boo-button-admin (click)="toggleAssign()" textColor="white" padding="8px 16px" [radius]="8" [gap]="8">
               <physio-icon name="user-plus" [size]="16"></physio-icon>
               Assign patient
-            </button>
-            <button (click)="refresh()" [disabled]="loadingSrv.isLoading('nursing-dashboard')"
-              class="px-4 py-2 bg-surface border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2 disabled:opacity-50">
-              <physio-icon name="refresh" [size]="16" [class.animate-spin]="loadingSrv.isLoading('nursing-dashboard')"></physio-icon>
+            </boo-button-admin>
+            <button-icon [icon]="{ name: 'refresh', size: 16 }" [loading]="loadingSrv.isLoading('nursing-dashboard')" [disabled]="loadingSrv.isLoading('nursing-dashboard')" (onClick)="refresh()">
               Refresh
-            </button>
+            </button-icon>
           </div>
         </div>
 
@@ -48,15 +48,12 @@ import { AcuityLevel, AlertSeverity, NursingAlert, NursingAssignmentFilter, Nurs
           <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
             <boo-select label="Patient" [(ngModel)]="assignForm.admissionId" [options]="admissionOptions()" bindLabel="label" bindValue="value"></boo-select>
             <boo-select label="Acuity" [(ngModel)]="assignForm.acuity" [options]="acuityOptions" bindLabel="label" bindValue="value"></boo-select>
-            <label class="flex items-center gap-2 text-sm text-gray-700 select-none">
-              <input type="checkbox" [(ngModel)]="assignForm.fallRisk" class="rounded border-gray-300" /> Fall risk
-            </label>
+            <boo-checkbox [(ngModel)]="assignForm.fallRisk"><span class="text-gray-700">Fall risk</span></boo-checkbox>
             <div class="flex gap-2 justify-end">
-              <button (click)="assignOpen.set(false)" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
-              <button (click)="assign()" [disabled]="!assignForm.admissionId || assigning()"
-                class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:opacity-90 disabled:opacity-50">
+              <boo-button-admin (click)="assignOpen.set(false)" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 16px" [fontSize]="14" [radius]="8">Cancel</boo-button-admin>
+              <boo-button-admin (click)="assign()" [disabled]="!assignForm.admissionId || assigning()" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8">
                 {{ assigning() ? 'Assigning…' : 'Assign' }}
-              </button>
+              </boo-button-admin>
             </div>
           </div>
           <p *ngIf="!admissionOptions().length" class="text-xs text-gray-500 mt-2">No admitted patients found.</p>

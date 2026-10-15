@@ -430,6 +430,12 @@ export const BASE_API = {
     UPDATE: (noteId: string) => `/api/notes/${noteId}`,
     DELETE: (noteId: string) => `/api/notes/${noteId}`,
   },
+  CONVERSATION: {
+    CONTACTS: '/api/conversations/contacts',
+    DIRECT: '/api/conversations/direct',
+    MESSAGES: (conversationId: string) => `/api/conversations/${conversationId}/messages`,
+    READ: (conversationId: string) => `/api/conversations/${conversationId}/read`,
+  },
   SCRUMBOARD: {
     BOARDS: '/api/scrumboard/boards',
     BOARD: (boardId: string) => `/api/scrumboard/boards/${boardId}`,

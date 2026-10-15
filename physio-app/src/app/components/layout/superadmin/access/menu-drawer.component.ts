@@ -11,6 +11,8 @@ import { isKnownMenuIcon, MENU_ICON_NAMES, MenuArea, menuPermissionOf, SUPERADMI
 import { DrawerComponent } from "../../../drawer/drawer.component";
 import { BooIconSelectComponent } from "../../../select/boo-icon-select/boo-icon-select.component";
 import { BooSelectComponent } from "../../../select/boo-select/boo-select.component";
+import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
+import { BooCheckboxComponent } from "../../../checkbox/boo-checkbox/boo-checkbox.component";
 
 const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
@@ -21,7 +23,7 @@ const knownIconValidator = (control: AbstractControl): ValidationErrors | null =
 @Component({
     selector: 'superadmin-menu-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooSelectComponent, BooIconSelectComponent],
+    imports: [SharedModule, DrawerComponent, BooSelectComponent, BooIconSelectComponent, BooButtonAdminComponent, BooCheckboxComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" (close)="close.emit()">
             <div
@@ -129,28 +131,18 @@ const knownIconValidator = (control: AbstractControl): ValidationErrors | null =
                         <p *ngIf="!showError('permissionCode') && permissionsFailed" class="text-[12px] text-secondary m-0">The permission list could not be loaded, so type the code.</p>
                     </div>
 
-                    <label *ngIf="item" class="flex items-center gap-2 text-[13px] text-regular cursor-pointer">
-                        <input type="checkbox" formControlName="isActive" class="w-4 h-4 accent-[rgb(var(--twc-primary))]" />
-                        Active (visible to users who have the permission)
-                    </label>
+                    <boo-checkbox *ngIf="item" formControlName="isActive">
+                        <span class="text-[13px] text-regular">Active (visible to users who have the permission)</span>
+                    </boo-checkbox>
                 </div>
 
                 <div class="flex-none px-6 py-4 border-t border-borderGray/60 bg-black/[0.02] flex items-center justify-end gap-3">
-                    <button
-                        type="button"
-                        class="h-9 px-4 rounded-1.5 text-[13px] font-medium text-regular hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
-                        (click)="close.emit()"
-                    >
+                    <boo-button-admin (click)="close.emit()" background="transparent" textColor="rgb(var(--twc-regular))" padding="8px 16px" fontWeight="500">
                         Cancel
-                    </button>
-                    <button
-                        type="button"
-                        class="h-9 px-4 rounded-1.5 bg-primary text-white text-[13px] font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                        [disabled]="saving()"
-                        (click)="save()"
-                    >
+                    </boo-button-admin>
+                    <boo-button-admin [disabled]="saving()" (click)="save()" textColor="white" padding="8px 16px" fontWeight="600">
                         {{ saving() ? 'Saving…' : 'Save' }}
-                    </button>
+                    </boo-button-admin>
                 </div>
             </div>
         </drawer>

@@ -67,15 +67,13 @@
         </section>
 
         <footer class="flex justify-end gap-2">
-          <button type="button" (click)="onCancel()" [disabled]="saving()"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50">
+          <boo-button-admin (click)="onCancel()" [disabled]="saving()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 16px" [fontSize]="14" fontWeight="500">
             Discard changes
-          </button>
-          <button type="button" (click)="onSave()" [disabled]="saving()"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50">
+          </boo-button-admin>
+          <boo-button-admin (click)="onSave()" [disabled]="saving()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
             <physio-icon *ngIf="saving()" name="loader-circle" [class]="'w-4 h-4 animate-spin'" />
             <span>{{ saving() ? 'Saving…' : 'Save changes' }}</span>
-          </button>
+          </boo-button-admin>
         </footer>
 
       </form>

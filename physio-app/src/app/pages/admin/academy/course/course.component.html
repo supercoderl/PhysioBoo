@@ -76,20 +76,12 @@
         </div>
 
         <div *ngIf="canManage" class="flex items-center gap-2">
-          <button
-            type="button"
-            (click)="openCourseEditor()"
-            class="flex items-center gap-1.5 rounded-lg border border-[#EFE3E7] bg-surface px-3 min-h-10 text-[13px] font-medium hover:bg-gray-50"
-          >
+          <boo-button-admin (click)="openCourseEditor()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#EFE3E7' }" padding="10px 12px" [radius]="8" fontWeight="500" [gap]="6">
             <physio-icon name="pencil" [size]="16"></physio-icon> Edit course
-          </button>
-          <button
-            type="button"
-            (click)="deleteCourse()"
-            class="flex items-center gap-1.5 rounded-lg px-3 min-h-10 text-[13px] font-medium text-red-600 hover:bg-red-50"
-          >
+          </boo-button-admin>
+          <boo-button-admin (click)="deleteCourse()" background="transparent" textColor="#DC2626" padding="10px 12px" [radius]="8" fontWeight="500" [gap]="6">
             <physio-icon name="trash" [size]="16"></physio-icon> Delete
-          </button>
+          </boo-button-admin>
         </div>
       </div>
 
@@ -137,14 +129,9 @@
           >
             No lessons yet.
           </p>
-          <button
-            *ngIf="canManage"
-            type="button"
-            (click)="openLessonEditor()"
-            class="mt-1 flex w-full items-center gap-1.5 rounded-lg px-2 min-h-9 text-[13px] text-primary hover:bg-gray-50"
-          >
+          <boo-button-admin *ngIf="canManage" (click)="openLessonEditor()" background="transparent" textColor="rgb(var(--twc-primary))" padding="8px 8px" [radius]="8" [gap]="6" buttonClass="w-full" class="mt-1 w-full">
             <physio-icon name="plus" [size]="14"></physio-icon> Add lesson
-          </button>
+          </boo-button-admin>
         </nav>
 
         <!-- Reader -->
@@ -237,60 +224,29 @@
       <h2 class="m-0 text-[16px] font-semibold">Edit course</h2>
     </div>
     <div class="space-y-3 px-4 py-3">
-      <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]"
-          >Title</span
-        >
-        <input
-          type="text"
-          [(ngModel)]="d.title"
-          maxlength="200"
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
-        />
-      </label>
-      <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]"
-          >Category</span
-        >
-        <input
-          type="text"
-          [(ngModel)]="d.category"
-          maxlength="60"
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
-        />
-      </label>
-      <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]"
-          >Description</span
-        >
-        <textarea
-          [(ngModel)]="d.description"
-          maxlength="2000"
-          rows="3"
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 py-2 text-[14px] outline-none focus:border-primary"
-        ></textarea>
-      </label>
-      <label class="flex items-center gap-2 text-[13px]">
-        <input type="checkbox" [(ngModel)]="d.isPublished" class="h-4 w-4" />
-        Published (visible to everyone)
-      </label>
+      <div class="block">
+        <label for="course-title" class="mb-1 block text-[12px] font-semibold text-[#71606A]">Title</label>
+        <boo-input [id]="'course-title'" [(ngModel)]="d.title" [maxlength]="200"></boo-input>
+      </div>
+      <div class="block">
+        <label for="course-category" class="mb-1 block text-[12px] font-semibold text-[#71606A]">Category</label>
+        <boo-input [id]="'course-category'" [(ngModel)]="d.category" [maxlength]="60"></boo-input>
+      </div>
+      <div class="block">
+        <label for="course-description" class="mb-1 block text-[12px] font-semibold text-[#71606A]">Description</label>
+        <boo-textarea [id]="'course-description'" [(ngModel)]="d.description" [maxlength]="2000" [rows]="3"></boo-textarea>
+      </div>
+      <boo-checkbox [(ngModel)]="d.isPublished">
+        <span class="text-[13px]">Published (visible to everyone)</span>
+      </boo-checkbox>
     </div>
     <div class="flex justify-end gap-2 border-t border-[#EFE3E7] px-4 py-3">
-      <button
-        type="button"
-        (click)="courseDraft.set(null)"
-        class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#71606A] hover:bg-gray-100"
-      >
+      <boo-button-admin (click)="courseDraft.set(null)" background="transparent" textColor="#71606A" padding="10px 12px" [radius]="8" fontWeight="500">
         Cancel
-      </button>
-      <button
-        type="button"
-        (click)="saveCourse()"
-        [disabled]="!canSaveCourse()"
-        class="rounded-lg bg-primary px-4 min-h-10 text-[13px] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
-      >
+      </boo-button-admin>
+      <boo-button-admin (click)="saveCourse()" [disabled]="!canSaveCourse()" textColor="white" padding="10px 16px" [radius]="8" fontWeight="500">
         {{ isSaving() ? "Saving..." : "Save" }}
-      </button>
+      </boo-button-admin>
     </div>
   </div>
 </div>
@@ -326,17 +282,10 @@
           class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
         />
       </label>
-      <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]"
-          >Content</span
-        >
-        <textarea
-          [(ngModel)]="d.content"
-          maxlength="20000"
-          rows="10"
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 py-2 text-[14px] outline-none focus:border-primary"
-        ></textarea>
-      </label>
+      <div class="block">
+        <label for="course-content" class="mb-1 block text-[12px] font-semibold text-[#71606A]">Content</label>
+        <boo-textarea [id]="'course-content'" [(ngModel)]="d.content" [maxlength]="20000" [rows]="10"></boo-textarea>
+      </div>
       <label class="block">
         <span class="mb-1 block text-[12px] font-semibold text-[#71606A]"
           >Duration (minutes)</span
@@ -351,21 +300,12 @@
       </label>
     </div>
     <div class="flex justify-end gap-2 border-t border-[#EFE3E7] px-4 py-3">
-      <button
-        type="button"
-        (click)="lessonDraft.set(null)"
-        class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#71606A] hover:bg-gray-100"
-      >
+      <boo-button-admin (click)="lessonDraft.set(null)" background="transparent" textColor="#71606A" padding="10px 12px" [radius]="8" fontWeight="500">
         Cancel
-      </button>
-      <button
-        type="button"
-        (click)="saveLesson()"
-        [disabled]="!canSaveLesson()"
-        class="rounded-lg bg-primary px-4 min-h-10 text-[13px] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
-      >
+      </boo-button-admin>
+      <boo-button-admin (click)="saveLesson()" [disabled]="!canSaveLesson()" textColor="white" padding="10px 16px" [radius]="8" fontWeight="500">
         {{ isSaving() ? "Saving..." : "Save" }}
-      </button>
+      </boo-button-admin>
     </div>
   </div>
 </div>

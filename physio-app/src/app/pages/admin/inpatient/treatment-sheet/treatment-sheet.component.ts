@@ -18,6 +18,8 @@ import { TreatmentOrdersTabComponent } from "./tabs/treatment-orders-tab.compone
 import { TreatmentOverviewTabComponent } from "./tabs/treatment-overview-tab.component";
 import { TreatmentProceduresTabComponent } from "./tabs/treatment-procedures-tab.component";
 import { TreatmentTimelineTabComponent } from "./tabs/treatment-timeline-tab.component";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
 
 type TabKey = 'overview' | 'timeline' | 'orders' | 'medications' | 'procedures' | 'laboratory' | 'imaging' | 'notes';
 
@@ -40,6 +42,8 @@ const LOADING_KEY = 'treatment-sheet';
     TreatmentLaboratoryTabComponent,
     TreatmentImagingTabComponent,
     TreatmentNotesTabComponent,
+    BooButtonAdminComponent,
+    ButtonIconComponent
   ],
   host: { class: 'block min-h-screen bg-gray-50' },
   template: `
@@ -78,12 +82,8 @@ const LOADING_KEY = 'treatment-sheet';
             </div>
           </div>
           <div class="flex items-center gap-2 shrink-0">
-            <button (click)="printSheet()" class="px-3 py-2 bg-surface border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2 text-sm">
-              <physio-icon name="printer" [size]="16"></physio-icon> Print Sheet
-            </button>
-            <button (click)="exportPdf()" class="px-3 py-2 bg-surface border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2 text-sm">
-              <physio-icon name="file-down" [size]="16"></physio-icon> Export PDF
-            </button>
+            <button-icon [icon]="{ name: 'printer', size: 16 }" (onClick)="printSheet()"> Print Sheet </button-icon>
+            <button-icon [icon]="{ name: 'file-down', size: 16 }" (onClick)="exportPdf()"> Export PDF </button-icon>
           </div>
         </div>
 
@@ -129,18 +129,18 @@ const LOADING_KEY = 'treatment-sheet';
 
         <!-- Quick actions -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <button (click)="setTab('orders')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
+          <boo-button-admin (click)="setTab('orders')" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="12px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="8" buttonClass="w-full" class="w-full">
             <physio-icon name="circle-plus" [size]="18" class="text-primary"></physio-icon> Add Order
-          </button>
-          <button (click)="setTab('notes')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
+          </boo-button-admin>
+          <boo-button-admin (click)="setTab('notes')" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="12px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="8" buttonClass="w-full" class="w-full">
             <physio-icon name="file-plus" [size]="18" class="text-primary"></physio-icon> Add Progress Note
-          </button>
-          <button (click)="setTab('laboratory')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
+          </boo-button-admin>
+          <boo-button-admin (click)="setTab('laboratory')" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="12px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="8" buttonClass="w-full" class="w-full">
             <physio-icon name="flask-conical" [size]="18" class="text-primary"></physio-icon> View Laboratory
-          </button>
-          <button (click)="setTab('imaging')" class="bg-surface border border-gray-200 rounded-lg py-3 hover:border-primary/40 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
+          </boo-button-admin>
+          <boo-button-admin (click)="setTab('imaging')" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="12px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="8" buttonClass="w-full" class="w-full">
             <physio-icon name="scan" [size]="18" class="text-primary"></physio-icon> View Imaging
-          </button>
+          </boo-button-admin>
         </div>
 
         <!-- Tab content -->

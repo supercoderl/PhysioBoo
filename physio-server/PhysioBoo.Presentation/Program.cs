@@ -340,6 +340,7 @@ namespace PhysioBoo.Presentation
                 app.MapAdmissionEndpoints();
                 app.MapSurgeryEndpoints();
                 app.MapNoteEndpoints();
+                app.MapConversationEndpoints();
                 app.MapScrumboardEndpoints();
                 app.MapAcademyEndpoints();
                 app.MapNursingEndpoints();

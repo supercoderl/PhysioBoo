@@ -4,11 +4,12 @@ import { Orientation } from '../../../shared/enums/print-orientation';
 import { PaperSize } from '../../../shared/enums/print-paper-size';
 import { SharedModule } from '../../../shared/shared-imports';
 import { PrintRenderResult } from '../../../shared/types/print-template.types';
+import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-button-admin.component';
 
 @Component({
   selector: 'print-preview',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonAdminComponent],
   animations: [
     trigger('overlayAnim', [
       transition(':enter', [style({ opacity: 0 }), animate('120ms', style({ opacity: 1 }))]),
@@ -62,21 +63,21 @@ import { PrintRenderResult } from '../../../shared/types/print-template.types';
 
             <span class="w-px h-5 bg-gray-200 mx-1"></span>
 
-            <button type="button"
+            <boo-button-admin
               (click)="onClose()"
-              class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+              background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" [fontSize]="14" fontWeight="500">
               Cancel
-            </button>
-            <button type="button"
+            </boo-button-admin>
+            <boo-button-admin
               (click)="onPrint()"
               [disabled]="!result || printing()"
-              class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50">
+              textColor="white" padding="6px 16px" [fontSize]="14" fontWeight="500" [gap]="6">
               <physio-icon
                 [name]="printing() ? 'loader-circle' : 'printer'"
                 class="text-white"
                 [class]="printing() ? 'w-4 h-4 animate-spin' : 'w-4 h-4'" />
               <span>{{ printing() ? 'Sending…' : 'Print' }}</span>
-            </button>
+            </boo-button-admin>
             <button type="button"
               (click)="onClose()"
               class="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-900 ml-1"

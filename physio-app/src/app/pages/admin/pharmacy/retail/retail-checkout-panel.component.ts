@@ -1,13 +1,14 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailCart } from "../../../../shared/types/retail-pos.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 const VAT_RATE = 0.05;
 
 @Component({
   selector: 'retail-checkout-panel',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonAdminComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg flex flex-col h-full">
       <!-- Customer card -->
@@ -15,15 +16,13 @@ const VAT_RATE = 0.05;
         <h2 class="text-sm font-semibold text-gray-800 mb-2">Customer</h2>
 
         <div *ngIf="!cart?.customer" class="flex gap-2">
-          <button type="button" (click)="openCustomerLookup.emit()"
-            class="flex-1 px-3 py-2 border border-dashed border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-1.5">
+          <boo-button-admin (click)="openCustomerLookup.emit()" background="transparent" textColor="#71606A" [border]="{ width: 1, style: 'dashed', color: '#E3D5DA' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" [gap]="6" buttonClass="w-full" class="flex-1">
             <physio-icon name="search" [size]="14"></physio-icon> Search Patient
-          </button>
+          </boo-button-admin>
           <span class="text-xs text-gray-400 self-center">or</span>
-          <button type="button" (click)="useWalkIn.emit()"
-            class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+          <boo-button-admin (click)="useWalkIn.emit()" background="transparent" textColor="#71606A" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" buttonClass="w-full" class="flex-1">
             Walk-in Customer
-          </button>
+          </boo-button-admin>
         </div>
 
         <div *ngIf="cart?.customer" class="bg-gray-50 rounded-lg p-3">
@@ -73,20 +72,16 @@ const VAT_RATE = 0.05;
         </div>
 
         <div class="space-y-2">
-          <button type="button" (click)="checkout.emit()" [disabled]="!cart || !cart.items.length"
-            class="w-full py-3 rounded-lg font-semibold text-sm transition-colors"
-            [ngClass]="cart && cart.items.length ? 'bg-primary text-white hover:opacity-90' : 'bg-gray-200 text-gray-400 cursor-not-allowed'">
+          <boo-button-admin (click)="checkout.emit()" [disabled]="!cart || !cart.items.length" textColor="white" padding="12px 12px" [fontSize]="14" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">
             Checkout
-          </button>
+          </boo-button-admin>
           <div class="flex gap-2">
-            <button type="button" (click)="holdSale.emit()" [disabled]="!cart || !cart.items.length"
-              class="flex-1 py-2 border border-gray-300 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+            <boo-button-admin (click)="holdSale.emit()" [disabled]="!cart || !cart.items.length" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" buttonClass="w-full" class="flex-1">
               Hold Sale
-            </button>
-            <button type="button" (click)="printBill.emit()" [disabled]="!cart || !cart.items.length"
-              class="flex-1 py-2 border border-gray-300 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+            </boo-button-admin>
+            <boo-button-admin (click)="printBill.emit()" [disabled]="!cart || !cart.items.length" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" buttonClass="w-full" class="flex-1">
               Print Bill
-            </button>
+            </boo-button-admin>
           </div>
         </div>
       </div>

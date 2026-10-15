@@ -6,11 +6,12 @@ import { StockTakeService } from "../../../../services/admin/stock-take.service"
 import { SharedModule } from "../../../../shared/shared-imports";
 import { Lookup } from "../../../../shared/types/common";
 import { StockTakeFilter } from "../../../../shared/types/stock-take.types";
+import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
 
 @Component({
     selector: 'stock-take-filter-bar',
     standalone: true,
-    imports: [SharedModule,BooSelectComponent, BooDatepickerComponent],
+    imports: [SharedModule,BooSelectComponent, BooDatepickerComponent, ButtonIconComponent],
     template: `
     <div class="bg-surface border border-borderGray/60 rounded-2 p-3.5">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
@@ -34,10 +35,7 @@ import { StockTakeFilter } from "../../../../shared/types/stock-take.types";
               placeholder="Search stock take no..."
               class="w-full pl-8 pr-3 h-8 border border-gray-300 rounded-1.5 text-[13px] focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" />
           </div>
-          <button type="button" (click)="onReset()" title="Reset filters"
-            class="w-8 h-8 shrink-0 rounded-1.5 border border-gray-200 flex items-center justify-center hover:bg-gray-50" aria-label="Reset filters">
-            <physio-icon name="rotate-ccw" [size]="14" class="text-gray-500"></physio-icon>
-          </button>
+          <button-icon [icon]="{ name: 'rotate-ccw', size: 14, class: 'text-gray-500' }" (onClick)="onReset()" title="Reset filters" ariaLabel="Reset filters" buttonClass="!rounded-1.5"></button-icon>
         </div>
       </div>
     </div>

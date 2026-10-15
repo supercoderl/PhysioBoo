@@ -389,31 +389,17 @@
     <div
       class="flex items-center justify-between gap-2 border-t border-[#EFE3E7] px-4 py-3"
     >
-      <button
-        *ngIf="d.id"
-        type="button"
-        (click)="deleteFromEditor()"
-        class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-red-600 hover:bg-red-50"
-      >
+      <boo-button-admin *ngIf="d.id" (click)="deleteFromEditor()" background="transparent" textColor="#DC2626" padding="10px 12px" [radius]="8" fontWeight="500">
         Delete
-      </button>
+      </boo-button-admin>
       <span *ngIf="!d.id"></span>
       <div class="flex items-center gap-2">
-        <button
-          type="button"
-          (click)="closeEditor()"
-          class="rounded-lg px-3 min-h-10 text-[13px] font-medium text-[#71606A] hover:bg-gray-100"
-        >
+        <boo-button-admin (click)="closeEditor()" background="transparent" textColor="#71606A" padding="10px 12px" [radius]="8" fontWeight="500">
           Cancel
-        </button>
-        <button
-          type="button"
-          (click)="save()"
-          [disabled]="!canSave()"
-          class="rounded-lg bg-primary px-4 min-h-10 text-[13px] font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
-        >
+        </boo-button-admin>
+        <boo-button-admin (click)="save()" [disabled]="!canSave()" textColor="white" padding="10px 16px" [radius]="8" fontWeight="500">
           {{ isSaving() ? "Saving..." : "Save" }}
-        </button>
+        </boo-button-admin>
       </div>
     </div>
   </div>

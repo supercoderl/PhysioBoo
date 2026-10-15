@@ -23,6 +23,7 @@ import { InsuranceClaimCardComponent } from "./insurance-claim-card.component";
 import { InsuranceClaimDetailPanelComponent } from "./insurance-claim-detail-panel.component";
 import { InsuranceProvidersTreeComponent } from "./insurance-providers-tree.component";
 import { InsuranceWorkflowRailComponent } from "./insurance-workflow-rail.component";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 const LOADING_KEY = 'insurance-claims-workspace';
 
@@ -30,7 +31,8 @@ const LOADING_KEY = 'insurance-claims-workspace';
   selector: 'admin-insurance',
   standalone: true,
   imports: [
-    SharedModule,
+    SharedModule,
+
     EmptyStateComponent,
     ErrorStateComponent,
     InsuranceProvidersTreeComponent,
@@ -38,6 +40,7 @@ const LOADING_KEY = 'insurance-claims-workspace';
     InsuranceClaimCardComponent,
     InsuranceClaimDetailPanelComponent,
     InsuranceClaimActionDialogComponent,
+    BooButtonAdminComponent
   ],
   host: { class: 'block h-full overflow-hidden' },
   styles: [`
@@ -136,9 +139,9 @@ const LOADING_KEY = 'insurance-claims-workspace';
           </button>
         </div>
 
-        <button type="button" class="px-3 py-1.5 bg-[var(--ic-forest)] text-[var(--ic-ivory)] rounded-1.5 text-xs font-semibold hover:bg-[var(--ic-forest-dark)] transition-colors flex items-center gap-1.5" (click)="openDialog('create')">
+        <boo-button-admin (click)="openDialog('create')" background="var(--ic-forest)" textColor="var(--ic-ivory)" [fontSize]="12" fontWeight="600" [gap]="6">
           <physio-icon name="circle-plus" [size]="14"></physio-icon> New Claim
-        </button>
+        </boo-button-admin>
       </header>
 
       <!-- Workflow rail -->
@@ -164,7 +167,7 @@ const LOADING_KEY = 'insurance-claims-workspace';
         <main class="flex-1 min-w-0 overflow-y-auto p-3">
           <div *ngIf="filteredClaims().length === 0">
             <boo-empty-state icon="inbox" title="No claims match these filters" description="Try clearing filters or search to see the full queue.">
-              <button type="button" class="px-3 py-1.5 rounded-1.5 text-xs font-semibold bg-[var(--ic-warm-gray-200)] text-[var(--ic-warm-gray-700)] hover:bg-[var(--ic-warm-gray-300)]" (click)="clearFilters()">Clear Filters</button>
+              <boo-button-admin (click)="clearFilters()" background="var(--ic-warm-gray-200)" textColor="var(--ic-warm-gray-700)" [fontSize]="12" fontWeight="600">Clear Filters</boo-button-admin>
             </boo-empty-state>
           </div>
 

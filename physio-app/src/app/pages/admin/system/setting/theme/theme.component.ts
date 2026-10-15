@@ -4,6 +4,7 @@ import { PreferenceService } from "../../../../../services/common/preference.ser
 import { AccentColor, FontSize, ThemeConfig, ThemeConfigService, ThemeMode } from "../../../../../services/common/theme-config.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 interface ThemeOption { value: ThemeMode; label: string; icon: string; }
 interface FontSizeOption { value: FontSize; label: string; size: string; }
@@ -12,7 +13,7 @@ interface AccentOption { value: AccentColor; color: string; name: string; }
 @Component({
   selector: 'admin-system-setting-theme',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonAdminComponent],
   host: { class: 'block h-full min-h-0 overflow-y-auto' },
   template: `
     <main class="flex-1 py-4">
@@ -22,10 +23,9 @@ interface AccentOption { value: AccentColor; color: string; name: string; }
             <h1 class="text-2xl font-semibold text-gray-900">Appearance</h1>
             <p class="text-sm text-gray-500 mt-1">Personalize how PhysioBoo looks for your account.</p>
           </div>
-          <button type="button" (click)="onReset()" [disabled]="loading() || saving()"
-            class="text-sm text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors disabled:opacity-50">
+          <boo-button-admin (click)="onReset()" [disabled]="loading() || saving()" background="transparent" textColor="#85757D" [fontSize]="14">
             Reset to defaults
-          </button>
+          </boo-button-admin>
         </header>
 
         <section class="bg-surface rounded-lg border border-gray-200 mb-6">
@@ -106,15 +106,13 @@ interface AccentOption { value: AccentColor; color: string; name: string; }
         </section>
 
         <footer class="mt-6 flex justify-end gap-2">
-          <button type="button" (click)="onCancel()" [disabled]="saving() || !isDirty()"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50">
+          <boo-button-admin (click)="onCancel()" [disabled]="saving() || !isDirty()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 16px" [fontSize]="14" fontWeight="500">
             Discard changes
-          </button>
-          <button type="button" (click)="onSave()" [disabled]="saving() || !isDirty()"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50">
+          </boo-button-admin>
+          <boo-button-admin (click)="onSave()" [disabled]="saving() || !isDirty()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
             <physio-icon *ngIf="saving()" name="loader-circle" [class]="'w-4 h-4 animate-spin'" />
             <span>{{ saving() ? 'Saving…' : 'Save preferences' }}</span>
-          </button>
+          </boo-button-admin>
         </footer>
       </div>
     </main>

@@ -7,6 +7,7 @@ import { UserService } from '../../../../../services/admin/user.service';
 import { PreferenceService } from '../../../../../services/common/preference.service';
 import { ToastService } from '../../../../../services/common/toast.service';
 import { SharedModule } from '../../../../../shared/shared-imports';
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 interface ActiveSession {
   id: string;
@@ -36,8 +37,10 @@ const DEFAULTS: Record<string, boolean> = {
   imports: [
     SharedModule,
     FormsModule,
-    AdminBreadcrumbComponent,
-    SwitchComponent
+    AdminBreadcrumbComponent,
+
+    SwitchComponent,
+    BooButtonAdminComponent
   ],
   templateUrl: './security.component.html'
 })

@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { AlertItem, AlertsSnapshot, AlertSeverity } from "../../../../shared/types/dashboard-overview.types";
+import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
 
 @Component({
     selector: 'admin-alerts-card',
     standalone: true,
-    imports: [SharedModule],
+    imports: [SharedModule, BooButtonAdminComponent],
     template: `
     <div class="bg-surface border border-borderGray rounded-lg overflow-hidden h-full flex flex-col">
         <div class="px-3.5 pt-[13px] pb-2.5 border-b border-gray-100 flex items-center justify-between shrink-0">
@@ -41,8 +42,8 @@ import { AlertItem, AlertsSnapshot, AlertSeverity } from "../../../../shared/typ
                         </div>
                         <p class="text-[11px] text-gray-700 m-0 leading-[1.45]">{{ al.message }}</p>
                         <div class="flex gap-1.5 mt-2">
-                            <button type="button" class="text-[10px] font-semibold text-white bg-red-500 border-0 px-2.5 py-[3px] rounded cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" (click)="respond(al, 'critical')">Respond</button>
-                            <button type="button" class="text-[10px] font-semibold text-gray-500 bg-transparent border border-gray-200 px-2 py-[3px] rounded cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" (click)="dismiss(al, 'critical')">Dismiss</button>
+                            <boo-button-admin (click)="respond(al, 'critical')" background="#EF4444" textColor="white" padding="3px 10px" [fontSize]="10" [radius]="4" fontWeight="600">Respond</boo-button-admin>
+                            <boo-button-admin (click)="dismiss(al, 'critical')" background="transparent" textColor="#85757D" [border]="{ width: 1, color: '#EFE3E7' }" padding="3px 8px" [fontSize]="10" [radius]="4" fontWeight="600">Dismiss</boo-button-admin>
                         </div>
                     </div>
                     <div *ngIf="!critical.length" class="text-[11px] text-gray-400 py-1">No critical alerts</div>

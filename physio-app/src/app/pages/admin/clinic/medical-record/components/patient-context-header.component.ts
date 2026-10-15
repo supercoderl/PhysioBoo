@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { Severity } from "../../../../../shared/enums/severity";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PatientContext, RiskFlag } from "../../../../../shared/types/medical-record.types";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'mr-patient-context-header',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonAdminComponent],
   template: `
     <div *ngIf="patient" class="bg-surface border-b border-gray-200">
       <div class="px-6 py-4 flex items-start gap-5">
@@ -61,32 +62,32 @@ import { PatientContext, RiskFlag } from "../../../../../shared/types/medical-re
 
         <!-- Quick actions -->
         <div class="shrink-0 flex items-center gap-1.5 flex-wrap justify-end">
-          <button (click)="action.emit('encounter')" class="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded hover:opacity-90 flex items-center gap-1.5">
+          <boo-button-admin (click)="action.emit('encounter')" textColor="white" [fontSize]="12" [radius]="4" fontWeight="500" [gap]="6">
             <physio-icon name="plus" class="w-3.5 h-3.5"></physio-icon>
             New Encounter
-          </button>
-          <button (click)="action.emit('note')" class="px-3 py-1.5 text-xs font-medium border border-gray-200 text-primary rounded hover:bg-gray-50 flex items-center gap-1.5">
+          </boo-button-admin>
+          <boo-button-admin (click)="action.emit('note')" background="transparent" textColor="rgb(var(--twc-primary))" [border]="{ width: 1, color: '#EFE3E7' }" [fontSize]="12" [radius]="4" fontWeight="500" [gap]="6">
             <physio-icon name="file-text" class="w-3.5 h-3.5"></physio-icon>
             Add Note
-          </button>
-          <button (click)="action.emit('prescribe')" class="px-3 py-1.5 text-xs font-medium border border-gray-200 text-primary rounded hover:bg-gray-50 flex items-center gap-1.5">
+          </boo-button-admin>
+          <boo-button-admin (click)="action.emit('prescribe')" background="transparent" textColor="rgb(var(--twc-primary))" [border]="{ width: 1, color: '#EFE3E7' }" [fontSize]="12" [radius]="4" fontWeight="500" [gap]="6">
             <physio-icon name="pill" class="w-3.5 h-3.5"></physio-icon>
             Prescribe
-          </button>
-          <button (click)="action.emit('lab')" class="px-3 py-1.5 text-xs font-medium border border-gray-200 text-primary rounded hover:bg-gray-50 flex items-center gap-1.5">
+          </boo-button-admin>
+          <boo-button-admin (click)="action.emit('lab')" background="transparent" textColor="rgb(var(--twc-primary))" [border]="{ width: 1, color: '#EFE3E7' }" [fontSize]="12" [radius]="4" fontWeight="500" [gap]="6">
             <physio-icon name="flask-conical" class="w-3.5 h-3.5"></physio-icon>
             Order Lab
-          </button>
-          <button (click)="action.emit('imaging')" class="px-3 py-1.5 text-xs font-medium border border-gray-200 text-primary rounded hover:bg-gray-50 flex items-center gap-1.5">
+          </boo-button-admin>
+          <boo-button-admin (click)="action.emit('imaging')" background="transparent" textColor="rgb(var(--twc-primary))" [border]="{ width: 1, color: '#EFE3E7' }" [fontSize]="12" [radius]="4" fontWeight="500" [gap]="6">
             <physio-icon name="scan" class="w-3.5 h-3.5"></physio-icon>
             Order Imaging
-          </button>
-          <button (click)="action.emit('print')" class="px-2 py-1.5 text-xs text-secondary border border-gray-200 rounded hover:bg-gray-50" title="Print medical record">
+          </boo-button-admin>
+          <boo-button-admin (click)="action.emit('print')" title="Print medical record" background="transparent" textColor="rgb(var(--twc-secondary))" [border]="{ width: 1, color: '#EFE3E7' }" padding="6px 8px" [fontSize]="12" [radius]="4">
             <physio-icon name="printer" class="w-3.5 h-3.5"></physio-icon>
-          </button>
-          <button (click)="action.emit('discharge')" class="px-2 py-1.5 text-xs text-red-600 border border-red-200 rounded hover:bg-red-50" title="Discharge patient">
+          </boo-button-admin>
+          <boo-button-admin (click)="action.emit('discharge')" title="Discharge patient" background="transparent" textColor="#DC2626" [border]="{ width: 1, color: '#FECACA' }" padding="6px 8px" [fontSize]="12" [radius]="4">
             <physio-icon name="logout" class="w-3.5 h-3.5"></physio-icon>
-          </button>
+          </boo-button-admin>
         </div>
       </div>
     </div>

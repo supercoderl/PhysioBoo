@@ -8,6 +8,11 @@ import { TreatmentSheetService } from "../../../../services/admin/treatment-shee
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DrawerComponent } from "../../../drawer/drawer.component";
+import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
+import { BooInputComponent } from "../../../input/boo-input/boo-input.component";
+import { BooSelectComponent } from "../../../select/boo-select/boo-select.component";
+import { BooTextareaComponent } from "../../../textarea/boo-textarea/boo-textarea.component";
+import { BooCheckboxComponent } from "../../../checkbox/boo-checkbox/boo-checkbox.component";
 
 export type ClinicalAction = 'lab' | 'imaging' | 'note';
 type Priority = 'Routine' | 'Urgent' | 'Stat';
@@ -19,7 +24,7 @@ type Priority = 'Routine' | 'Urgent' | 'Stat';
 @Component({
     selector: 'clinical-action-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent],
+    imports: [SharedModule, DrawerComponent, BooButtonAdminComponent, BooInputComponent, BooSelectComponent, BooTextareaComponent, BooCheckboxComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="close.emit()">
             <div class="flex flex-col h-full bg-surface">
@@ -36,14 +41,14 @@ type Priority = 'Routine' | 'Urgent' | 'Stat';
                 <div class="flex-1 overflow-y-auto p-6 space-y-4" custom-scrollbar>
                     <!-- Lab -->
                     <ng-container *ngIf="action === 'lab'">
-                        <label class="flex flex-col gap-1 text-xs text-gray-600">Find tests
-                            <input [(ngModel)]="testSearch" placeholder="Type to filter tests" class="rounded border border-gray-300 px-3 py-2 text-sm" />
-                        </label>
+                        <div class="flex flex-col gap-1 text-xs text-gray-600">Find tests
+                            <boo-input [(ngModel)]="testSearch" label="Type to filter tests" size="small"></boo-input>
+                        </div>
                         <div class="max-h-72 overflow-y-auto rounded border border-gray-200 divide-y divide-gray-100">
-                            <label *ngFor="let t of filteredTests()" class="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50">
-                                <input type="checkbox" [checked]="selectedTests.has(t.id)" (change)="toggleTest(t.id)" class="rounded border-gray-300" />
+                            <boo-checkbox *ngFor="let t of filteredTests()" class="px-3 py-2 hover:bg-gray-50"
+                                [ngModel]="selectedTests.has(t.id)" (ngModelChange)="toggleTest(t.id)">
                                 <span>{{ t.testName }}</span>
-                            </label>
+                            </boo-checkbox>
                             <div *ngIf="!filteredTests().length" class="px-3 py-4 text-xs text-gray-500">No matching tests.</div>
                         </div>
                         <div class="text-xs text-gray-500">{{ selectedTests.size }} selected</div>
@@ -51,41 +56,31 @@ type Priority = 'Routine' | 'Urgent' | 'Stat';
 
                     <!-- Imaging -->
                     <ng-container *ngIf="action === 'imaging'">
-                        <label class="flex flex-col gap-1 text-xs text-gray-600">Modality
-                            <select [(ngModel)]="modalityId" class="rounded border border-gray-300 px-2 py-2 text-sm bg-surface">
-                                <option [ngValue]="null" disabled>Select a modality</option>
-                                <option *ngFor="let m of modalities()" [ngValue]="m.id">{{ m.name }}</option>
-                            </select>
-                        </label>
-                        <label class="flex flex-col gap-1 text-xs text-gray-600">Body part
-                            <input [(ngModel)]="bodyPart" maxlength="100" placeholder="e.g. Chest, Left knee" class="rounded border border-gray-300 px-3 py-2 text-sm" />
-                        </label>
-                        <label class="flex items-center gap-2 text-sm text-gray-700">
-                            <input type="checkbox" [(ngModel)]="contrastRequired" class="rounded border-gray-300" /> Contrast required
-                        </label>
+                        <div class="flex flex-col gap-1 text-xs text-gray-600">Modality
+                            <boo-select [(ngModel)]="modalityId" required label="Select a modality" [options]="modalities()" bindLabel="name" bindValue="id" size="small"></boo-select>
+                        </div>
+                        <div class="flex flex-col gap-1 text-xs text-gray-600">Body part
+                            <boo-input [(ngModel)]="bodyPart" [maxlength]="100" label="e.g. Chest, Left knee" size="small"></boo-input>
+                        </div>
+                        <boo-checkbox [(ngModel)]="contrastRequired"><span class="text-gray-700">Contrast required</span></boo-checkbox>
                     </ng-container>
 
                     <ng-container *ngIf="action !== 'note'">
-                        <label class="flex flex-col gap-1 text-xs text-gray-600">Priority
-                            <select [(ngModel)]="priority" class="rounded border border-gray-300 px-2 py-2 text-sm bg-surface">
-                                <option value="Routine">Routine</option>
-                                <option value="Urgent">Urgent</option>
-                                <option value="Stat">Stat</option>
-                            </select>
-                        </label>
+                        <div class="flex flex-col gap-1 text-xs text-gray-600">Priority
+                            <boo-select [(ngModel)]="priority" [options]="priorityOptions" size="small"></boo-select>
+                        </div>
                     </ng-container>
 
-                    <label class="flex flex-col gap-1 text-xs text-gray-600">{{ action === 'note' ? 'Note' : 'Clinical indication / notes' }}
-                        <textarea [(ngModel)]="text" rows="5" maxlength="2000" class="rounded border border-gray-300 px-3 py-2 text-sm"></textarea>
-                    </label>
+                    <div class="flex flex-col gap-1 text-xs text-gray-600">{{ action === 'note' ? 'Note' : 'Clinical indication / notes' }}
+                        <boo-textarea [(ngModel)]="text" [rows]="5" [maxlength]="2000" size="small"></boo-textarea>
+                    </div>
                 </div>
 
                 <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
-                    <button (click)="close.emit()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-white">Cancel</button>
-                    <button (click)="submit()" [disabled]="!canSubmit() || saving()"
-                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:opacity-90 disabled:opacity-50">
+                    <boo-button-admin (click)="close.emit()" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 16px" [fontSize]="14" [radius]="8">Cancel</boo-button-admin>
+                    <boo-button-admin (click)="submit()" [disabled]="!canSubmit() || saving()" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8">
                         {{ saving() ? 'Saving…' : action === 'note' ? 'Add note' : 'Place order' }}
-                    </button>
+                    </boo-button-admin>
                 </div>
             </div>
         </drawer>
@@ -109,6 +104,11 @@ export class ClinicalActionDrawerComponent implements OnChanges {
     bodyPart = '';
     contrastRequired = false;
     priority: Priority = 'Routine';
+    readonly priorityOptions: { label: string; value: Priority }[] = [
+        { label: 'Routine', value: 'Routine' },
+        { label: 'Urgent', value: 'Urgent' },
+        { label: 'Stat', value: 'Stat' },
+    ];
     text = '';
 
     constructor(

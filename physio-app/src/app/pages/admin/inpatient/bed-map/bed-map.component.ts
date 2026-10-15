@@ -10,6 +10,8 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { Bed, BedHistoryEntry, BedStatus } from "../../../../shared/types/bed.types";
 import { BedFilter } from "../../../../shared/types/filter.types";
 import { BedMapStats, Ward } from "../../../../shared/types/ward.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
 
 @Component({
   selector: 'admin-bed-map',
@@ -19,7 +21,9 @@ import { BedMapStats, Ward } from "../../../../shared/types/ward.types";
 
     BooSelectComponent,
     BedMapAssignDrawerComponent,
-    BedMapManageDrawerComponent
+    BedMapManageDrawerComponent,
+    BooButtonAdminComponent,
+    ButtonIconComponent
   ],
   template: `
         <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -31,16 +35,10 @@ import { BedMapStats, Ward } from "../../../../shared/types/ward.types";
             <p class="text-gray-600">Real-time bed occupancy and availability</p>
           </div>
           <div class="flex items-center gap-2">
-            <button (click)="manageOpen = true"
-              class="px-4 py-2 bg-surface border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
-              <physio-icon name="settings-2" [size]="16"></physio-icon>
-              Wards & beds
-            </button>
-            <button (click)="refresh()" [disabled]="loadingSrv.isLoading('bed-map-snapshot')"
-              class="px-4 py-2 bg-surface border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2 disabled:opacity-50">
-              <physio-icon name="refresh" [size]="16" [class.animate-spin]="loadingSrv.isLoading('bed-map-snapshot')"></physio-icon>
+            <button-icon [icon]="{ name: 'settings-2', size: 16 }" (onClick)="manageOpen = true"> Wards & beds </button-icon>
+            <button-icon [icon]="{ name: 'refresh', size: 16 }" [loading]="loadingSrv.isLoading('bed-map-snapshot')" [disabled]="loadingSrv.isLoading('bed-map-snapshot')" (onClick)="refresh()">
               Refresh
-            </button>
+            </button-icon>
           </div>
         </div>
         <bed-map-manage-drawer [isOpen]="manageOpen" (close)="manageOpen = false" (changed)="refresh()" />
@@ -51,7 +49,7 @@ import { BedMapStats, Ward } from "../../../../shared/types/ward.types";
             <physio-icon name="warning-circle" [size]="20" class="text-red-500"></physio-icon>
             <span class="text-red-700 text-sm">Unable to load the bed map. Please try again.</span>
           </div>
-          <button (click)="refresh()" class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors">Retry</button>
+          <boo-button-admin (click)="refresh()" background="#DC2626" textColor="white" [fontSize]="14" [radius]="8">Retry</boo-button-admin>
         </div>
 
         <!-- Loading State (initial) -->
@@ -119,9 +117,9 @@ import { BedMapStats, Ward } from "../../../../shared/types/ward.types";
               <boo-select label="Status" [(ngModel)]="filter.status" [options]="statusOptions" bindLabel="label" bindValue="value"></boo-select>
               <boo-select label="Floor" [(ngModel)]="filter.floor" [options]="floorOptions" bindLabel="label" bindValue="value"></boo-select>
               <div class="flex items-end">
-                <button (click)="applyFilters()" class="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryHover transition-colors">
+                <boo-button-admin (click)="applyFilters()" textColor="white" padding="8px 16px" [radius]="8" buttonClass="w-full" class="w-full">
                   Apply Filters
-                </button>
+                </boo-button-admin>
               </div>
             </div>
           </div>
@@ -256,15 +254,15 @@ import { BedMapStats, Ward } from "../../../../shared/types/ward.types";
             </div>
 
             <div class="mt-6 flex space-x-3">
-              <button *ngIf="selectedBed.status === 'Available'" (click)="openAssignDrawer()" class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryHover transition-colors">
+              <boo-button-admin *ngIf="selectedBed.status === 'Available'" (click)="openAssignDrawer()" textColor="white" padding="8px 16px" [radius]="8" buttonClass="w-full" class="flex-1">
                 Assign Patient
-              </button>
-              <button *ngIf="selectedBed.status === 'Occupied'" (click)="confirmDischarge()" [disabled]="loadingSrv.isLoading('bed-discharge')" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50">
+              </boo-button-admin>
+              <boo-button-admin *ngIf="selectedBed.status === 'Occupied'" (click)="confirmDischarge()" [disabled]="loadingSrv.isLoading('bed-discharge')" background="#16A34A" textColor="white" padding="8px 16px" [radius]="8" buttonClass="w-full" class="flex-1">
                 Discharge Patient
-              </button>
-              <button (click)="toggleHistory()" class="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+              </boo-button-admin>
+              <boo-button-admin (click)="toggleHistory()" background="#85757D" textColor="white" padding="8px 16px" [radius]="8" buttonClass="w-full" class="flex-1">
                 View History
-              </button>
+              </boo-button-admin>
             </div>
           </div>
         </div>

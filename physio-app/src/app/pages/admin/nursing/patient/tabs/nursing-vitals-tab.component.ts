@@ -5,11 +5,12 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { VitalsReading } from "../../../../../shared/types/nursing.types";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'nursing-vitals-tab',
   standalone: true,
-  imports: [SharedModule,BooInputComponent],
+  imports: [SharedModule,BooInputComponent, BooButtonAdminComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -18,9 +19,9 @@ import { VitalsReading } from "../../../../../shared/types/nursing.types";
     <div *ngIf="!isLoading()">
       <div class="flex items-center justify-between mb-3">
         <h3 class="text-sm font-semibold text-primary m-0">Vitals History</h3>
-        <button (click)="showForm = !showForm" class="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-semibold hover:opacity-90">
+        <boo-button-admin (click)="showForm = !showForm" textColor="white" [fontSize]="12" [radius]="8" fontWeight="600">
           {{ showForm ? 'Cancel' : 'Add Reading' }}
-        </button>
+        </boo-button-admin>
       </div>
 
       <form *ngIf="showForm" (ngSubmit)="submit()" class="bg-surface border border-gray-200 rounded-lg p-4 mb-4 grid grid-cols-2 md:grid-cols-4 gap-3">

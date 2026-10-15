@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { CashierChargeCategory, CashierInvoice } from "../../../../shared/types/cashier.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 const CATEGORY_ICON: Record<CashierChargeCategory, string> = {
     Medication: 'pill',
@@ -23,7 +24,7 @@ const STATUS_CLASS: Record<CashierInvoice['status'], string> = {
 @Component({
     selector: 'cashier-invoice-detail-panel',
     standalone: true,
-    imports: [SharedModule],
+    imports: [SharedModule, BooButtonAdminComponent],
     template: `
     <div class="bg-surface rounded-2xl border border-slate-200 shadow-sm h-full flex flex-col overflow-hidden">
       <ng-container *ngIf="invoice; else emptyState">
@@ -138,23 +139,19 @@ const STATUS_CLASS: Record<CashierInvoice['status'], string> = {
 
         <!-- Sticky payment action bar -->
         <div class="shrink-0 border-t border-slate-100 px-5 py-3 bg-slate-50/60">
-          <button type="button" (click)="receivePayment.emit(invoice)" [disabled]="invoice.remainingBalance <= 0"
-            class="w-full py-2.5 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2"
-            [ngClass]="invoice.remainingBalance > 0 ? 'bg-amber-500 text-slate-900 hover:bg-amber-400' : 'bg-slate-200 text-slate-400 cursor-not-allowed'">
+          <boo-button-admin (click)="receivePayment.emit(invoice)" [disabled]="invoice.remainingBalance <= 0" background="#F59E0B" textColor="#26141A" padding="10px 12px" [fontSize]="14" [radius]="12" fontWeight="600" [gap]="8" buttonClass="w-full" class="w-full">
             <physio-icon name="wallet" [size]="15"></physio-icon> Receive Payment
-          </button>
+          </boo-button-admin>
           <div class="grid grid-cols-3 gap-2 mt-2">
-            <button type="button" (click)="printInvoice.emit(invoice)" class="py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1">
+            <boo-button-admin (click)="printInvoice.emit(invoice)" background="transparent" textColor="#71606A" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" [gap]="4" buttonClass="w-full" class="w-full">
               <physio-icon name="printer" [size]="13"></physio-icon> Print
-            </button>
-            <button type="button" (click)="refund.emit(invoice)" [disabled]="invoice.paidAmount <= 0"
-              class="py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed">
+            </boo-button-admin>
+            <boo-button-admin (click)="refund.emit(invoice)" [disabled]="invoice.paidAmount <= 0" background="transparent" textColor="#71606A" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" [gap]="4" buttonClass="w-full" class="w-full">
               <physio-icon name="undo-2" [size]="13"></physio-icon> Refund
-            </button>
-            <button type="button" (click)="voidInvoice.emit(invoice)"
-              class="py-2 rounded-lg border border-rose-200 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center justify-center gap-1">
+            </boo-button-admin>
+            <boo-button-admin (click)="voidInvoice.emit(invoice)" background="transparent" textColor="#E11D48" [border]="{ width: 1, color: '#FECDD3' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" [gap]="4" buttonClass="w-full" class="w-full">
               <physio-icon name="ban" [size]="13"></physio-icon> Void
-            </button>
+            </boo-button-admin>
           </div>
         </div>
       </ng-container>

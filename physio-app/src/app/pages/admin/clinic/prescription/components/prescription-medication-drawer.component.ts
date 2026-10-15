@@ -9,11 +9,12 @@ import { PrescriptionService } from "../../../../../services/admin/prescription.
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ClinicalWarning, MedicineCatalogItem, RxMedicationItem } from "../../../../../shared/types/prescription-rx.types";
 import { severityIcon } from "../prescription-rx.util";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
     selector: 'rx-medication-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooInputComponent, BooTextareaComponent, BooCheckboxComponent],
+    imports: [SharedModule, DrawerComponent, BooInputComponent, BooTextareaComponent, BooCheckboxComponent, BooButtonAdminComponent],
     template: `
     <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
@@ -147,13 +148,13 @@ import { severityIcon } from "../prescription-rx.util";
         </div>
 
         <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3 sticky bottom-0">
-          <button type="button" (click)="onClose()" class="px-4 py-2 text-sm font-medium text-secondary hover:bg-gray-100 rounded-lg">Cancel</button>
-          <button type="button" (click)="onSave(true)" [disabled]="!canSave()" class="px-4 py-2 text-sm font-medium border border-primary text-primary rounded-lg hover:bg-primary/5 disabled:opacity-50">
+          <boo-button-admin (click)="onClose()" background="transparent" textColor="rgb(var(--twc-secondary))" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="500">Cancel</boo-button-admin>
+          <boo-button-admin (click)="onSave(true)" [disabled]="!canSave()" background="transparent" textColor="rgb(var(--twc-primary))" [border]="{ width: 1, color: 'rgb(var(--twc-primary))' }" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="500">
             Save & Add Another
-          </button>
-          <button type="button" (click)="onSave(false)" [disabled]="!canSave()" class="px-4 py-2 text-sm font-semibold bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50">
+          </boo-button-admin>
+          <boo-button-admin (click)="onSave(false)" [disabled]="!canSave()" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="600">
             Save
-          </button>
+          </boo-button-admin>
         </div>
       </div>
     </drawer>

@@ -16,13 +16,16 @@ import {
     PrintTemplateVersion
 } from '../../../../shared/types/print-template.types';
 import { convertEnumToSelection } from '../../../../shared/utils/common';
+import { BooButtonAdminComponent } from '../../../../components/button/boo-button-admin/boo-button-admin.component';
+import { BooInputComponent } from '../../../../components/input/boo-input/boo-input.component';
+import { BooCheckboxComponent } from '../../../../components/checkbox/boo-checkbox/boo-checkbox.component';
 
 type EditField = 'header' | 'body' | 'footer' | 'css';
 
 @Component({
   selector: 'admin-print-template-designer',
   standalone: true,
-  imports: [SharedModule, ReactiveFormsModule,BooSelectComponent],
+  imports: [SharedModule, ReactiveFormsModule,BooSelectComponent, BooButtonAdminComponent, BooInputComponent, BooCheckboxComponent],
   host: { class: 'block h-full min-h-0' },
   template: `
     <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col h-full bg-slate-50">
@@ -58,11 +61,10 @@ type EditField = 'header' | 'body' | 'footer' | 'css';
 
           <span class="w-px h-5 bg-gray-200 mx-1"></span>
 
-          <button type="button" (click)="onTestPrint()"
-            class="inline-flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded hover:bg-gray-50 whitespace-nowrap shrink-0">
+          <boo-button-admin (click)="onTestPrint()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" [fontSize]="12" [radius]="4" fontWeight="500" [gap]="6" class="shrink-0">
             <physio-icon name="printer" class="w-3.5 h-3.5" />
             Test print
-          </button>
+          </boo-button-admin>
           <button type="submit" [disabled]="!form.dirty || form.invalid"
             class="inline-flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-white bg-primary hover:bg-primary/90 rounded disabled:opacity-50 whitespace-nowrap shrink-0">
             <span>Save</span>
@@ -78,10 +80,9 @@ type EditField = 'header' | 'body' | 'footer' | 'css';
           <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Available fields</h3>
           <p class="text-xs text-gray-500 mb-3">Click a field to insert at cursor.</p>
 
-          <input type="text" placeholder="Filter fields…"
-            class="w-full h-8 px-2 text-xs border border-gray-200 rounded mb-3 outline-none focus:border-primary"
+          <boo-input label="Filter fields…" size="small" class="mb-3"
             [ngModelOptions]="{ standalone: true }"
-            [ngModel]="paletteFilter()" (ngModelChange)="paletteFilter.set($event)" />
+            [ngModel]="paletteFilter()" (ngModelChange)="paletteFilter.set($event)"></boo-input>
 
           <div *ngFor="let g of filteredPalette()" class="mb-4">
             <div class="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-1">{{ g.group }}</div>
@@ -123,14 +124,12 @@ type EditField = 'header' | 'body' | 'footer' | 'css';
         <section class="bg-surface flex flex-col overflow-hidden">
           <div class="flex items-center justify-between px-4 py-2 border-b border-gray-200 bg-gray-50">
             <span class="text-xs font-medium text-gray-600">Live preview</span>
-            <label class="inline-flex items-center gap-1 text-xs text-gray-500 cursor-pointer">
-              <input type="checkbox"
+            <boo-checkbox size="small"
                 [ngModelOptions]="{ standalone: true }"
                 [ngModel]="useSampleData()"
-                (ngModelChange)="useSampleData.set($event)"
-                class="w-3 h-3 accent-primary" />
+                (ngModelChange)="useSampleData.set($event)">
               Sample data
-            </label>
+            </boo-checkbox>
           </div>
           <iframe #previewRef class="flex-1 bg-white border-0" [srcdoc]="previewHtml()"></iframe>
         </section>

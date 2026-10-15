@@ -4,11 +4,12 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { NursingTask } from "../../../../../shared/types/nursing.types";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'nursing-tasks-tab',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonAdminComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -27,10 +28,9 @@ import { NursingTask } from "../../../../../shared/types/nursing.types";
               <div class="text-sm" [ngClass]="t.status === 'Completed' ? 'text-secondary line-through' : 'text-primary'">{{ t.label }}</div>
               <div class="text-xs text-secondary">{{ t.dueAt | date:'short' }} · {{ t.assignedNurseName }}</div>
             </div>
-            <button *ngIf="t.status === 'Pending' || t.status === 'Overdue'" (click)="complete(t)" [disabled]="loadingSrv.isLoading('task-' + t.id)"
-              class="shrink-0 px-2.5 py-1 bg-emerald-600 text-white rounded text-xs hover:bg-emerald-700 disabled:opacity-50">
+            <boo-button-admin *ngIf="t.status === 'Pending' || t.status === 'Overdue'" (click)="complete(t)" [disabled]="loadingSrv.isLoading('task-' + t.id)" background="#059669" textColor="white" padding="4px 10px" [fontSize]="12" [radius]="4" class="shrink-0">
               Complete
-            </button>
+            </boo-button-admin>
           </li>
         </ul>
         <div *ngIf="!group.items.length" class="px-5 py-4 text-center text-xs text-secondary">None.</div>

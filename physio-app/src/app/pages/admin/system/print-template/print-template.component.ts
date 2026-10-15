@@ -5,22 +5,22 @@ import { LabTest } from "../../../../shared/types/laboratory-imaging.types";
 import { Doctor } from "../../../../shared/types/medical-staff.types";
 import { Medication } from "../../../../shared/types/medication.types";
 import { PatientInfo } from "../../../../shared/types/patient.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'admin-print-template',
   standalone: true,
   imports: [
-    SharedModule
+    SharedModule,
+    BooButtonAdminComponent
   ],
   template: `
     <div class="print-container bg-surface p-8 max-w-4xl mx-auto">
   <!-- Print Button - Hidden during print -->
   <div class="no-print mb-6 flex justify-end">
-    <button 
-      (click)="print()" 
-      class="bg-primary hover:bg-primaryHover text-white px-6 py-2 rounded-lg shadow-md transition-colors">
+    <boo-button-admin (click)="print()" textColor="white" padding="8px 24px" [radius]="8">
       Print Document
-    </button>
+    </boo-button-admin>
   </div>
 
   <!-- Document Body -->

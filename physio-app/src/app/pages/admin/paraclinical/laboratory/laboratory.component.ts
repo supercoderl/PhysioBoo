@@ -15,6 +15,7 @@ import { LaboratoryDashboardTabComponent } from "./tabs/laboratory-dashboard-tab
 import { LaboratoryOrdersTabComponent } from "./tabs/laboratory-orders-tab.component";
 import { LaboratoryResultVerificationTabComponent } from "./tabs/laboratory-result-verification-tab.component";
 import { LaboratorySampleTrackingTabComponent } from "./tabs/laboratory-sample-tracking-tab.component";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 type TabKey = 'dashboard' | 'orders' | 'sample-tracking' | 'result-verification' | 'critical-alerts';
 
@@ -35,6 +36,7 @@ const LOADING_KEY = 'laboratory';
     LaboratoryResultVerificationTabComponent,
     LaboratoryCriticalAlertsTabComponent,
     LaboratoryPatientResultDrawerComponent,
+    BooButtonAdminComponent
   ],
   host: { class: 'block min-h-screen bg-gray-50' },
   template: `
@@ -57,9 +59,9 @@ const LOADING_KEY = 'laboratory';
             <h1 class="text-lg font-semibold text-gray-800">Laboratory</h1>
             <p class="text-xs text-secondary">Laboratory Information System — orders, samples, results, and verification</p>
           </div>
-          <button class="px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2">
+          <boo-button-admin textColor="white" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="8">
             <physio-icon name="circle-plus" [size]="16"></physio-icon> New Order
-          </button>
+          </boo-button-admin>
         </div>
 
         <!-- Tab nav -->

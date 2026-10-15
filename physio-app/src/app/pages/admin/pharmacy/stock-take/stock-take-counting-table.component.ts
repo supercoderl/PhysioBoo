@@ -3,11 +3,12 @@ import { Subject, debounceTime } from "rxjs";
 import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { STOCK_TAKE_REASONS, StockTakeItem } from "../../../../shared/types/stock-take.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
     selector: 'stock-take-counting-table',
     standalone: true,
-    imports: [SharedModule,EmptyStateComponent],
+    imports: [SharedModule,EmptyStateComponent, BooButtonAdminComponent],
     template: `
     <div class="h-full flex flex-col bg-surface border border-borderGray/60 rounded-2 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex items-center gap-3">
@@ -79,10 +80,9 @@ import { STOCK_TAKE_REASONS, StockTakeItem } from "../../../../shared/types/stoc
       </div>
 
       <div class="flex-none p-3 border-t border-gray-100 bg-gray-50 flex justify-end sticky bottom-0">
-        <button type="button" (click)="saveNow.emit()"
-          class="px-4 py-2 rounded-1.5 bg-primary text-white text-sm font-semibold hover:opacity-90 flex items-center gap-1.5">
+        <boo-button-admin (click)="saveNow.emit()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="600" [gap]="6">
           <physio-icon name="save" [size]="15"></physio-icon> Save Progress
-        </button>
+        </boo-button-admin>
       </div>
     </div>
   `,

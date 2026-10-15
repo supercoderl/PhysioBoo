@@ -3,6 +3,7 @@ import { EmptyStateComponent } from "../../../../components/ui/empty-state.compo
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { StockMovementEvent, StockMovementType } from "../../../../shared/types/inventory-management.types";
+import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 
 const MOVEMENT_ICON: Record<StockMovementType, string> = {
   Purchase: 'shopping-cart',
@@ -24,16 +25,13 @@ interface DayGroup {
 @Component({
   selector: 'inventory-timeline-panel',
   standalone: true,
-  imports: [SharedModule, EmptyStateComponent],
+  imports: [SharedModule, EmptyStateComponent, BooSelectComponent],
   template: `
     <div class="bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex flex-wrap items-center justify-between gap-2">
         <h2 class="text-sm font-semibold text-regular">Warehouse Timeline</h2>
         <div class="flex items-center gap-2">
-          <select [(ngModel)]="typeFilter" (ngModelChange)="apply()" class="px-2.5 py-1.5 text-xs border border-gray-300 rounded-lg">
-            <option value="">All Movement Types</option>
-            <option *ngFor="let t of movementTypes" [value]="t">{{ t }}</option>
-          </select>
+          <boo-select [(ngModel)]="typeFilter" (ngModelChange)="apply()" label="All Movement Types" [options]="movementTypeOptions" size="small" class="w-48"></boo-select>
           <div class="relative">
             <physio-icon name="search" [size]="13" [class]="'absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
             <input type="text" [(ngModel)]="query" (ngModelChange)="apply()" placeholder="Filter by medicine, zone, or user..."
@@ -80,6 +78,7 @@ export class InventoryTimelinePanelComponent implements OnInit {
   typeFilter: StockMovementType | '' = '';
 
   readonly movementTypes: StockMovementType[] = ['Purchase', 'Receiving', 'Transfer', 'Dispense', 'RetailSale', 'Return', 'Adjustment', 'Disposal', 'Expiry'];
+  readonly movementTypeOptions = this.movementTypes.map(t => ({ label: t, value: t }));
 
   constructor(private srv: InventoryManagementService) { }
 

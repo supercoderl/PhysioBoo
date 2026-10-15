@@ -31,30 +31,18 @@
       </div>
 
       <div class="flex flex-col sm:flex-row gap-2 justify-center">
-        <button
-          type="button"
-          (click)="printIntakeForm()"
-          class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
-        >
+        <boo-button-admin (click)="printIntakeForm()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="10px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
           <physio-icon name="printer" />
           Print intake form
-        </button>
-        <button
-          type="button"
-          (click)="goToPatient()"
-          class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
-        >
+        </boo-button-admin>
+        <boo-button-admin (click)="goToPatient()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="10px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
           <physio-icon name="external-link" />
           Open patient record
-        </button>
-        <button
-          type="button"
-          (click)="registerAnother()"
-          class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors"
-        >
+        </boo-button-admin>
+        <boo-button-admin (click)="registerAnother()" textColor="white" padding="10px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
           <physio-icon name="user-plus" />
           Register another patient
-        </button>
+        </boo-button-admin>
       </div>
     </div>
   </div>
@@ -98,30 +86,18 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-2 justify-center">
-          <button
-            type="button"
-            (click)="printIntakeForm()"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
-          >
+          <boo-button-admin (click)="printIntakeForm()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="10px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
             <physio-icon name="printer" />
             Print intake form
-          </button>
-          <button
-            type="button"
-            (click)="goToPatient()"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
-          >
+          </boo-button-admin>
+          <boo-button-admin (click)="goToPatient()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="10px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
             <physio-icon name="external-link" />
             Open patient record
-          </button>
-          <button
-            type="button"
-            (click)="registerAnother()"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors"
-          >
+          </boo-button-admin>
+          <boo-button-admin (click)="registerAnother()" textColor="white" padding="10px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
             <physio-icon name="user-plus" />
             Register another patient
-          </button>
+          </boo-button-admin>
         </div>
       </div>
     </div>
@@ -358,12 +334,7 @@
               <span class="text-xs font-medium text-gray-700"
                 >Street address <span class="text-red-500">*</span></span
               >
-              <textarea
-                rows="2"
-                formControlName="address"
-                placeholder="Street, ward, district"
-                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
-              ></textarea>
+              <boo-textarea [rows]="2" formControlName="address" label="Street, ward, district" />
             </label>
             <label class="flex flex-col gap-1">
               <span class="text-xs font-medium text-gray-700"
@@ -439,69 +410,39 @@
                 <span class="text-xs font-medium text-gray-700"
                   >Known allergies</span
                 >
-                <textarea
-                  rows="2"
-                  formControlName="allergyInformation"
-                  placeholder="Medications, food, latex, etc."
-                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
-                ></textarea>
+                <boo-textarea [rows]="2" formControlName="allergyInformation" label="Medications, food, latex, etc." />
               </label>
               <label class="flex flex-col gap-1">
                 <span class="text-xs font-medium text-gray-700"
                   >Medical history</span
                 >
-                <textarea
-                  rows="3"
-                  formControlName="medicalHistory"
-                  placeholder="Chronic conditions, prior diagnoses…"
-                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
-                ></textarea>
+                <boo-textarea [rows]="3" formControlName="medicalHistory" label="Chronic conditions, prior diagnoses…" />
               </label>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <label class="flex flex-col gap-1">
                   <span class="text-xs font-medium text-gray-700"
                     >Family history</span
                   >
-                  <textarea
-                    rows="2"
-                    formControlName="familyHistory"
-                    placeholder="Hereditary conditions…"
-                    class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
-                  ></textarea>
+                  <boo-textarea [rows]="2" formControlName="familyHistory" label="Hereditary conditions…" />
                 </label>
                 <label class="flex flex-col gap-1">
                   <span class="text-xs font-medium text-gray-700"
                     >Surgical history</span
                   >
-                  <textarea
-                    rows="2"
-                    formControlName="surgicalHistory"
-                    placeholder="Past surgeries, year…"
-                    class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
-                  ></textarea>
+                  <boo-textarea [rows]="2" formControlName="surgicalHistory" label="Past surgeries, year…" />
                 </label>
               </div>
               <label class="flex flex-col gap-1">
                 <span class="text-xs font-medium text-gray-700"
                   >Current medications</span
                 >
-                <textarea
-                  rows="2"
-                  formControlName="currentMedications"
-                  placeholder="Drug · dosage · frequency"
-                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
-                ></textarea>
+                <boo-textarea [rows]="2" formControlName="currentMedications" label="Drug · dosage · frequency" />
               </label>
               <label class="flex flex-col gap-1">
                 <span class="text-xs font-medium text-gray-700"
                   >Lifestyle notes</span
                 >
-                <textarea
-                  rows="2"
-                  formControlName="lifestyleNotes"
-                  placeholder="Smoker, alcohol use, exercise…"
-                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary resize-none"
-                ></textarea>
+                <boo-textarea [rows]="2" formControlName="lifestyleNotes" label="Smoker, alcohol use, exercise…" />
               </label>
             </div>
             <div
@@ -538,12 +479,7 @@
                 <span class="text-xs font-medium text-gray-700"
                   >Coverage amount</span
                 >
-                <input
-                  type="number"
-                  formControlName="insuranceCoverageAmount"
-                  placeholder="0"
-                  class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-surface outline-none focus:border-primary"
-                />
+                <boo-input type="number" formControlName="insuranceCoverageAmount" label="0" />
               </label>
             </div>
             <div
@@ -735,14 +671,7 @@
               </div>
             </div>
 
-            <label
-              class="flex items-start gap-2 pt-3 border-t border-gray-100 cursor-pointer"
-            >
-              <input
-                type="checkbox"
-                formControlName="agreeToTerms"
-                class="mt-0.5 w-4 h-4 accent-primary cursor-pointer"
-              />
+            <boo-checkbox formControlName="agreeToTerms" class="pt-3 border-t border-gray-100">
               <span class="text-sm text-gray-700">
                 I confirm the information above is accurate and the patient has
                 agreed to our
@@ -752,7 +681,7 @@
                 >.
                 <span class="text-red-500">*</span>
               </span>
-            </label>
+            </boo-checkbox>
             <span
               *ngIf="isFieldInvalid('agreeToTerms')"
               class="block text-[11px] text-red-500 -mt-2"
@@ -765,29 +694,19 @@
         <div
           class="px-5 py-4 border-t border-gray-100 flex items-center justify-between gap-2 bg-gray-50/50 rounded-b-lg"
         >
-          <button
-            type="button"
-            (click)="prev()"
-            [disabled]="currentStepIdx() === 0"
-            class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
+          <boo-button-admin (click)="prev()" [disabled]="currentStepIdx() === 0" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="6">
             <physio-icon name="arrow-left" />
             Previous
-          </button>
+          </boo-button-admin>
 
           <span class="text-xs text-gray-500">
             Step {{ currentStepIdx() + 1 }} of {{ steps.length }}
           </span>
 
-          <button
-            *ngIf="currentStep().id !== 'review'"
-            type="button"
-            (click)="next()"
-            class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors"
-          >
+          <boo-button-admin *ngIf="currentStep().id !== 'review'" (click)="next()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="6">
             Next
             <physio-icon name="arrow-right" class="text-white" />
-          </button>
+          </boo-button-admin>
           <button
             *ngIf="currentStep().id === 'review'"
             type="submit"

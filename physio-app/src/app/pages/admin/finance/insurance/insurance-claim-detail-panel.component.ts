@@ -8,6 +8,7 @@ import {
   DocumentStatus,
   InsuranceClaimDetail,
 } from "../../../../shared/types/insurance-claims.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 type InspectorTab = 'overview' | 'documents' | 'medical' | 'billing' | 'timeline' | 'communication' | 'notes' | 'audit';
 
@@ -20,7 +21,7 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BadgeTone> = {
 @Component({
   selector: 'insurance-claim-detail-panel',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent, BooButtonAdminComponent],
   template: `
     <section class="h-full flex flex-col bg-[var(--ic-ivory)] border-l border-[var(--ic-warm-gray-200)] min-w-0">
       <!-- Idle -->
@@ -42,12 +43,12 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BadgeTone> = {
           </div>
 
           <div class="flex flex-wrap items-center gap-1.5 mt-2">
-            <button type="button" class="px-2.5 py-1 rounded-1.5 text-[11px] font-semibold bg-[var(--ic-forest)] text-[var(--ic-ivory)] hover:bg-[var(--ic-forest-dark)] disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="!canSubmit" (click)="actionRequested.emit('submit')">Submit</button>
+            <boo-button-admin [disabled]="!canSubmit" (click)="actionRequested.emit('submit')" background="var(--ic-forest)" textColor="var(--ic-ivory)" padding="4px 10px" [fontSize]="11" fontWeight="600">Submit</boo-button-admin>
             <button type="button" class="px-2.5 py-1 rounded-1.5 text-[11px] font-semibold bg-[var(--ic-emerald)]/10 text-[var(--ic-emerald)] hover:bg-[var(--ic-emerald)]/20 disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="!canApprove" (click)="actionRequested.emit('approve')">Approve</button>
             <button type="button" class="px-2.5 py-1 rounded-1.5 text-[11px] font-semibold bg-[var(--ic-rose)]/10 text-[var(--ic-rose)] hover:bg-[var(--ic-rose)]/20 disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="!canReject" (click)="actionRequested.emit('reject')">Reject</button>
             <button type="button" class="px-2.5 py-1 rounded-1.5 text-[11px] font-semibold bg-[var(--ic-amber)]/10 text-[var(--ic-amber)] hover:bg-[var(--ic-amber)]/20 disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="!canAppeal" (click)="actionRequested.emit('appeal')">Appeal</button>
-            <button type="button" class="px-2.5 py-1 rounded-1.5 text-[11px] font-semibold bg-[var(--ic-warm-gray-200)] text-[var(--ic-warm-gray-700)] hover:bg-[var(--ic-warm-gray-300)] disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="!canSettle" (click)="actionRequested.emit('settle')">Settlement</button>
-            <button type="button" class="px-2.5 py-1 rounded-1.5 text-[11px] font-semibold text-[var(--ic-warm-gray-600)] hover:bg-[var(--ic-warm-gray-200)]" (click)="print()">Print</button>
+            <boo-button-admin [disabled]="!canSettle" (click)="actionRequested.emit('settle')" background="var(--ic-warm-gray-200)" textColor="var(--ic-warm-gray-700)" padding="4px 10px" [fontSize]="11" fontWeight="600">Settlement</boo-button-admin>
+            <boo-button-admin (click)="print()" background="transparent" textColor="var(--ic-warm-gray-600)" padding="4px 10px" [fontSize]="11" fontWeight="600">Print</boo-button-admin>
           </div>
         </header>
 
@@ -173,7 +174,7 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BadgeTone> = {
             </div>
             <div class="flex gap-2 pt-1">
               <input type="text" [(ngModel)]="draftMessage" placeholder="Message the provider…" class="flex-1 px-2 py-1.5 text-[11px] border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]" />
-              <button type="button" class="px-2.5 py-1 rounded-1.5 text-[11px] font-semibold bg-[var(--ic-forest)] text-[var(--ic-ivory)] disabled:opacity-40" [disabled]="!draftMessage.trim()" (click)="sendMessage()">Send</button>
+              <boo-button-admin [disabled]="!draftMessage.trim()" (click)="sendMessage()" background="var(--ic-forest)" textColor="var(--ic-ivory)" padding="4px 10px" [fontSize]="11" fontWeight="600">Send</boo-button-admin>
             </div>
           </div>
 
@@ -185,7 +186,7 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BadgeTone> = {
             </div>
             <div class="flex gap-2 pt-1">
               <input type="text" [(ngModel)]="draftNote" placeholder="Add an internal note…" class="flex-1 px-2 py-1.5 text-[11px] border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]" />
-              <button type="button" class="px-2.5 py-1 rounded-1.5 text-[11px] font-semibold bg-[var(--ic-forest)] text-[var(--ic-ivory)] disabled:opacity-40" [disabled]="!draftNote.trim()" (click)="addNote()">Add</button>
+              <boo-button-admin [disabled]="!draftNote.trim()" (click)="addNote()" background="var(--ic-forest)" textColor="var(--ic-ivory)" padding="4px 10px" [fontSize]="11" fontWeight="600">Add</boo-button-admin>
             </div>
           </div>
 

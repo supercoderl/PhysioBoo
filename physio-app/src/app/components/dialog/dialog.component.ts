@@ -3,11 +3,12 @@ import { Component, HostListener, inject } from '@angular/core';
 import { DialogService } from '../../services/common/dialog.service';
 import { SharedModule } from '../../shared/shared-imports'; // Nơi chứa CommonModule, Icons...
 import { DialogType } from '../../shared/types/dialog.types';
+import { BooButtonAdminComponent } from '../button/boo-button-admin/boo-button-admin.component';
 
 @Component({
   selector: 'global-dialog',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonAdminComponent],
   animations: [
     trigger('backdrop', [
       transition(':enter', [
@@ -56,20 +57,21 @@ import { DialogType } from '../../shared/types/dialog.types';
           </div>
 
           <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3">
-            <button 
+            <boo-button-admin
               (click)="data.onCancel ? data.onCancel() : dialogService.close()"
-              class="px-4 py-2 text-sm font-medium text-gray-700 bg-surface border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:ring-2 focus:ring-gray-200"
+              background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }"
+              padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="500"
             >
               {{ data.cancelText }}
-            </button>
-            
-            <button 
+            </boo-button-admin>
+
+            <boo-button-admin
               (click)="data.onConfirm()"
-              [class]="getConfirmButtonClass(data.type)"
-              class="px-4 py-2 text-sm font-medium text-white rounded-lg shadow-sm focus:ring-2 focus:ring-offset-1 transition-all"
+              [background]="getConfirmBackground(data.type)" textColor="white"
+              padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="500"
             >
               {{ data.confirmText }}
-            </button>
+            </boo-button-admin>
           </div>
         </div>
       </div>
@@ -114,12 +116,12 @@ export class DialogComponent {
     }
   }
 
-  getConfirmButtonClass(type: DialogType): string {
+  getConfirmBackground(type: DialogType): string {
     switch (type) {
-      case 'danger': return 'bg-red-600 hover:bg-red-700 focus:ring-red-500';
-      case 'warning': return 'bg-amber-600 hover:bg-amber-700 focus:ring-amber-500';
-      case 'success': return 'bg-green-600 hover:bg-green-700 focus:ring-green-500';
-      default: return 'bg-primary hover:bg-primaryHover focus:ring-primary';
+      case 'danger': return '#DC2626';
+      case 'warning': return '#D97706';
+      case 'success': return '#16A34A';
+      default: return 'rgb(var(--twc-primary))';
     }
   }
   // #endregion

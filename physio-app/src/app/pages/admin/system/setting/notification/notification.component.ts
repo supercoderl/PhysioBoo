@@ -5,6 +5,7 @@ import { SwitchComponent } from "../../../../../components/switch/switch.compone
 import { PreferenceService } from '../../../../../services/common/preference.service';
 import { ToastService } from '../../../../../services/common/toast.service';
 import { SharedModule } from '../../../../../shared/shared-imports';
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 interface NotificationGroup {
   title: string;
@@ -44,6 +45,7 @@ const DEFAULTS: Record<string, boolean> = {
     SharedModule,
     AdminBreadcrumbComponent,
     SwitchComponent,
+    BooButtonAdminComponent
   ],
   templateUrl: './notification.component.html'
 })

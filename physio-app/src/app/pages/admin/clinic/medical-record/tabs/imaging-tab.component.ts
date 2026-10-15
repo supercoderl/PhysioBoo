@@ -1,11 +1,12 @@
 import { Component, Input } from "@angular/core";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ImagingOrderStatus, ImagingStudyRow } from "../../../../../shared/types/medical-record.types";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'mr-imaging-tab',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonAdminComponent],
   template: `
     <div *ngIf="data?.length" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
       <article *ngFor="let s of data" class="bg-surface border border-gray-200 rounded-lg overflow-hidden flex flex-col">
@@ -49,12 +50,12 @@ import { ImagingOrderStatus, ImagingStudyRow } from "../../../../../shared/types
           <div class="mt-auto flex items-center gap-2 pt-2 border-t border-gray-100 text-xs">
             <span class="font-mono text-secondary">{{ s.orderNumber }}</span>
             <div class="ml-auto flex items-center gap-1">
-              <button *ngIf="s.reportPdfUrl" class="px-2 py-1 text-primary hover:bg-gray-100 rounded inline-flex items-center gap-1">
+              <boo-button-admin *ngIf="s.reportPdfUrl" background="transparent" textColor="rgb(var(--twc-primary))" padding="4px 8px" [radius]="4" [gap]="4">
                 <physio-icon name="file-text" class="w-3 h-3"></physio-icon> Report
-              </button>
-              <button *ngIf="s.imagesUrl || s.dicomStudyUid" class="px-2 py-1 text-primary hover:bg-gray-100 rounded inline-flex items-center gap-1">
+              </boo-button-admin>
+              <boo-button-admin *ngIf="s.imagesUrl || s.dicomStudyUid" background="transparent" textColor="rgb(var(--twc-primary))" padding="4px 8px" [radius]="4" [gap]="4">
                 <physio-icon name="image" class="w-3 h-3"></physio-icon> Images
-              </button>
+              </boo-button-admin>
             </div>
           </div>
         </div>

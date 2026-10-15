@@ -1,6 +1,9 @@
 import { Component, EventEmitter, Input, Output, signal } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { CashierInvoiceStatus } from "../../../../shared/types/cashier.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
+import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
 
 interface StatusChip {
     label: string;
@@ -10,7 +13,7 @@ interface StatusChip {
 @Component({
     selector: 'cashier-search-panel',
     standalone: true,
-    imports: [SharedModule],
+    imports: [SharedModule, BooButtonAdminComponent, BooInputComponent, BooDatepickerComponent],
     template: `
     <div class="bg-surface rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
       <div class="flex items-center justify-between mb-4">
@@ -38,24 +41,23 @@ interface StatusChip {
             placeholder="Scan barcode…"
             class="w-full pl-9 pr-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 outline-none transition-colors" />
         </div>
-        <button type="button" (click)="onQueryChange(query)"
-          class="px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors flex items-center justify-center gap-1.5">
+        <boo-button-admin (click)="onQueryChange(query)" background="#26141A" textColor="white" padding="10px 16px" [fontSize]="14" [radius]="12" fontWeight="600" [gap]="6">
           <physio-icon name="search" [size]="14"></physio-icon> Search
-        </button>
+        </boo-button-admin>
       </div>
 
       <div *ngIf="advancedOpen()" class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Invoice Date From</label>
-          <input type="date" [(ngModel)]="dateFrom" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-amber-400/40" />
+          <boo-datepicker [(ngModel)]="dateFrom"></boo-datepicker>
         </div>
         <div>
           <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Invoice Date To</label>
-          <input type="date" [(ngModel)]="dateTo" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-amber-400/40" />
+          <boo-datepicker [(ngModel)]="dateTo"></boo-datepicker>
         </div>
         <div>
           <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Department</label>
-          <input type="text" [(ngModel)]="department" placeholder="Any department" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-amber-400/40" />
+          <boo-input [(ngModel)]="department" label="Any department"></boo-input>
         </div>
       </div>
 

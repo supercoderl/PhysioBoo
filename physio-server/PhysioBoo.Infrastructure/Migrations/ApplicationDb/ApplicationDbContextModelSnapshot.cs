@@ -10608,6 +10608,145 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.ToTable("SurgeryTimelineEvents", (string)null);
                 });
 
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Workspace.Conversation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DirectKey")
+                        .HasMaxLength(65)
+                        .HasColumnType("character varying(65)");
+
+                    b.Property<DateTime?>("LastMessageAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("LastMessagePreview")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid?>("LastMessageSenderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LastMessageSenderId");
+
+                    b.HasIndex("TenantId", "DirectKey")
+                        .IsUnique()
+                        .HasFilter("\"DirectKey\" IS NOT NULL");
+
+                    b.ToTable("Conversations", (string)null);
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Workspace.ConversationMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("ConversationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SenderUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SenderUserId");
+
+                    b.HasIndex("ConversationId", "CreatedAt", "Id");
+
+                    b.ToTable("ConversationMessages", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_ConversationMessages_Content_NotBlank", "length(btrim(\"Content\")) > 0");
+                        });
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Workspace.ConversationParticipant", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ConversationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LastReadAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ConversationId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("ConversationParticipants", (string)null);
+                });
+
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Workspace.Note", b =>
                 {
                     b.Property<Guid>("Id")
@@ -13997,6 +14136,48 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("SurgeryCase");
                 });
 
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Workspace.Conversation", b =>
+                {
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", null)
+                        .WithMany()
+                        .HasForeignKey("LastMessageSenderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Workspace.ConversationMessage", b =>
+                {
+                    b.HasOne("PhysioBoo.Domain.Entities.Workspace.Conversation", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", null)
+                        .WithMany()
+                        .HasForeignKey("SenderUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Workspace.ConversationParticipant", b =>
+                {
+                    b.HasOne("PhysioBoo.Domain.Entities.Workspace.Conversation", "Conversation")
+                        .WithMany("Participants")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PhysioBoo.Domain.Entities.Core.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+                });
+
             modelBuilder.Entity("PhysioBoo.Domain.Entities.Workspace.ScrumCard", b =>
                 {
                     b.HasOne("PhysioBoo.Domain.Entities.Workspace.ScrumBoard", null)
@@ -14825,6 +15006,13 @@ namespace PhysioBoo.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("Team");
 
                     b.Navigation("Timeline");
+                });
+
+            modelBuilder.Entity("PhysioBoo.Domain.Entities.Workspace.Conversation", b =>
+                {
+                    b.Navigation("Messages");
+
+                    b.Navigation("Participants");
                 });
 #pragma warning restore 612, 618
         }

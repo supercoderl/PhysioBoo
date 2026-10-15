@@ -4,11 +4,13 @@ import { EmptyStateComponent } from "../../../../components/ui/empty-state.compo
 import { RetailPosService } from "../../../../services/admin/retail-pos.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailCustomer } from "../../../../shared/types/retail-pos.types";
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
 
 @Component({
   selector: 'retail-customer-lookup-drawer',
   standalone: true,
-  imports: [SharedModule,DrawerComponent, EmptyStateComponent],
+  imports: [SharedModule,DrawerComponent, EmptyStateComponent, BooButtonAdminComponent, BooInputComponent],
   template: `
     <drawer [isOpen]="isOpen" (close)="close.emit()">
       <div class="p-5">
@@ -38,15 +40,11 @@ import { RetailCustomer } from "../../../../shared/types/retail-pos.types";
         <div class="mt-6 pt-4 border-t border-gray-200">
           <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Walk-in Customer</p>
           <div class="flex flex-col gap-2">
-            <input type="text" [(ngModel)]="walkInName" placeholder="Name"
-              class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/30 outline-none" />
-            <input type="tel" [(ngModel)]="walkInPhone" placeholder="Phone"
-              class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/30 outline-none" />
-            <button type="button" (click)="useWalkIn()" [disabled]="!walkInName"
-              class="py-2 rounded-lg text-sm font-semibold transition-colors"
-              [ngClass]="walkInName ? 'bg-primary text-white hover:opacity-90' : 'bg-gray-200 text-gray-400 cursor-not-allowed'">
+            <boo-input [(ngModel)]="walkInName" label="Name" size="small"></boo-input>
+            <boo-input type="tel" [(ngModel)]="walkInPhone" label="Phone" size="small"></boo-input>
+            <boo-button-admin (click)="useWalkIn()" [disabled]="!walkInName" textColor="white" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">
               Use Walk-in Customer
-            </button>
+            </boo-button-admin>
           </div>
         </div>
       </div>

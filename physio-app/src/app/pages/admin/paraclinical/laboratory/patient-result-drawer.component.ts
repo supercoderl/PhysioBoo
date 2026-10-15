@@ -9,11 +9,12 @@ import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { escapeHtml, htmlTable, printHtmlDocument } from "../../../../shared/utils/print.utils";
 import { LabOrderRow, LabPatientResultSummary, LabVerificationStatus } from "../../../../shared/types/laboratory.types";
+import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
 
 @Component({
   selector: 'laboratory-patient-result-drawer',
   standalone: true,
-  imports: [SharedModule, DrawerComponent,StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule, DrawerComponent,StatusBadgeComponent, EmptyStateComponent, ButtonIconComponent],
   template: `
     <drawer [isOpen]="isOpen" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
@@ -44,15 +45,9 @@ import { LabOrderRow, LabPatientResultSummary, LabVerificationStatus } from "../
 
             <!-- Quick actions -->
             <div class="px-6 py-4 border-b border-gray-100 flex flex-wrap gap-2">
-              <button (click)="viewEmr()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <physio-icon name="file-text" [size]="14"></physio-icon> View EMR
-              </button>
-              <button (click)="printReport()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <physio-icon name="printer" [size]="14"></physio-icon> Print Report
-              </button>
-              <button (click)="exportPdf()" class="px-3 py-1.5 bg-surface border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                <physio-icon name="file-down" [size]="14"></physio-icon> Export PDF
-              </button>
+              <button-icon [icon]="{ name: 'file-text', size: 14 }" (onClick)="viewEmr()" buttonClass="!rounded-lg text-xs font-semibold"> View EMR </button-icon>
+              <button-icon [icon]="{ name: 'printer', size: 14 }" (onClick)="printReport()" buttonClass="!rounded-lg text-xs font-semibold"> Print Report </button-icon>
+              <button-icon [icon]="{ name: 'file-down', size: 14 }" (onClick)="exportPdf()" buttonClass="!rounded-lg text-xs font-semibold"> Export PDF </button-icon>
             </div>
 
             <!-- Laboratory history -->

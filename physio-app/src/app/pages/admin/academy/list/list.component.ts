@@ -8,6 +8,9 @@ import { ToastService } from '../../../../services/common/toast.service';
 import { Permissions } from '../../../../shared/constants/permission.constant';
 import { SharedModule } from '../../../../shared/shared-imports';
 import { CourseSummary } from '../../../../shared/types/academy.types';
+import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
+import { BooCheckboxComponent } from "../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
 
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -17,7 +20,10 @@ const SEARCH_DEBOUNCE_MS = 300;
   imports: [
     AdminBreadcrumbComponent,
     SharedModule,
-    EmptyStateComponent
+    EmptyStateComponent,
+    BooButtonAdminComponent,
+    BooTextareaComponent,
+    BooCheckboxComponent
   ],
   templateUrl: './list.component.html'
 })

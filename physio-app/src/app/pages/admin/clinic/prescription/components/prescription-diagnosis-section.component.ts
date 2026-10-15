@@ -3,11 +3,12 @@ import { BooInputComponent } from "../../../../../components/input/boo-input/boo
 import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { RxDiagnosisEntry } from "../../../../../shared/types/prescription-rx.types";
+import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
     selector: 'rx-diagnosis-section',
     standalone: true,
-    imports: [SharedModule,BooInputComponent, BooTextareaComponent],
+    imports: [SharedModule,BooInputComponent, BooTextareaComponent, BooButtonAdminComponent],
     template: `
     <div class="bg-surface border border-gray-200 rounded-lg">
       <button type="button" class="w-full px-5 py-3 flex items-center justify-between" (click)="expanded = !expanded">
@@ -30,9 +31,9 @@ import { RxDiagnosisEntry } from "../../../../../shared/types/prescription-rx.ty
           <div *ngIf="!primaryDiagnosis && editable" class="grid grid-cols-3 gap-2 mt-1.5">
             <boo-input [(ngModel)]="newCode" placeholder="ICD-10 (e.g. I10)" class="col-span-1"></boo-input>
             <boo-input [(ngModel)]="newDescription" placeholder="Diagnosis description" class="col-span-2"></boo-input>
-            <button type="button" (click)="addPrimary()" class="col-span-3 bg-primary text-white text-sm font-medium py-2 rounded-lg hover:bg-primary/90">
+            <boo-button-admin (click)="addPrimary()" textColor="white" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="500" buttonClass="w-full" class="w-full col-span-3">
               Set Primary Diagnosis
-            </button>
+            </boo-button-admin>
           </div>
         </div>
 
@@ -50,9 +51,9 @@ import { RxDiagnosisEntry } from "../../../../../shared/types/prescription-rx.ty
           <div *ngIf="editable" class="grid grid-cols-3 gap-2 mt-2">
             <boo-input [(ngModel)]="newSecCode" placeholder="ICD-10" class="col-span-1"></boo-input>
             <boo-input [(ngModel)]="newSecDescription" placeholder="Diagnosis description" class="col-span-2"></boo-input>
-            <button type="button" (click)="addSecondary()" class="col-span-3 border border-gray-300 text-secondary text-sm font-medium py-2 rounded-lg hover:bg-gray-50">
+            <boo-button-admin (click)="addSecondary()" background="transparent" textColor="rgb(var(--twc-secondary))" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="500" buttonClass="w-full" class="w-full col-span-3">
               + Add Secondary Diagnosis
-            </button>
+            </boo-button-admin>
           </div>
         </div>
 

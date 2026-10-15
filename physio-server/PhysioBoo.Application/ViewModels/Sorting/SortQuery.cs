@@ -54,6 +54,12 @@ namespace PhysioBoo.Application.ViewModels.Sorting
         {
             value = value.Trim();
 
+            // field:asc, field:desc (the documented QueryParameters.Sort format)
+            if (value.Contains(':'))
+            {
+                return GetSortParamFromColonStyle(value);
+            }
+
             var queryInfo = FindTokens(value);
 
             if (queryInfo.OpeningBracketIndex > 0)
@@ -70,6 +76,30 @@ namespace PhysioBoo.Application.ViewModels.Sorting
 
             // name, +name, -name, name+, name-
             return GetSortParamFromSingleWord(value, queryInfo);
+        }
+
+        private static SortParameter GetSortParamFromColonStyle(string value)
+        {
+            string[] parts = value.Split(':', 2, StringSplitOptions.TrimEntries);
+            string order = parts[1];
+
+            if (parts[0].Length == 0)
+            {
+                throw new ArgumentException("Expected query string in form of \"{param}:asc/desc\"");
+            }
+
+            if (order == "asc" || order == "ascending")
+            {
+                return new SortParameter(parts[0], SortOrder.Ascending);
+            }
+
+            if (order == "desc" || order == "descending")
+            {
+                return new SortParameter(parts[0], SortOrder.Descending);
+            }
+
+            throw new ArgumentException(
+                $"Unsupported sort order {order}. Valid are 'asc', 'ascending', 'desc' or 'descending'");
         }
 
         private static SortParameter GetSortParamFromSentence(string value, QueryInfo info)

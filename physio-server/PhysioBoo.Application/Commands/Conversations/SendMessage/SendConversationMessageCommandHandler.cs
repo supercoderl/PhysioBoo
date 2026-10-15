@@ -33,7 +33,10 @@ namespace PhysioBoo.Application.Commands.Conversations.SendMessage
             _user = user;
         }
 
-        public async Task Handle(SendConversationMessageCommand request, CancellationToken cancellationToken)
+        public Task Handle(SendConversationMessageCommand request, CancellationToken cancellationToken)
+            => _unitOfWork.ExecuteInStrategyAsync(() => HandleCore(request, cancellationToken));
+
+        private async Task HandleCore(SendConversationMessageCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 

@@ -215,7 +215,7 @@ export const BASE_API = {
   PERMISSION: {
     BASE: '/api/permissions',
     SEARCH: '/api/permissions/search',
-    CREATE: '/api/permissions/create',
+    CREATE: '/api/permissions',
   },
   PREFERENCE: {
     BASE: '/api/user-preferences',

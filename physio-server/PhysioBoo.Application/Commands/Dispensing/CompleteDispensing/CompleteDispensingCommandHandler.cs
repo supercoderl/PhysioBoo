@@ -38,7 +38,10 @@ namespace PhysioBoo.Application.Commands.Dispensing.CompleteDispensing
             _user = user;
         }
 
-        public async Task Handle(CompleteDispensingCommand request, CancellationToken ct)
+        public Task Handle(CompleteDispensingCommand request, CancellationToken ct)
+            => _unitOfWork.ExecuteInStrategyAsync(() => HandleCore(request, ct));
+
+        private async Task HandleCore(CompleteDispensingCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

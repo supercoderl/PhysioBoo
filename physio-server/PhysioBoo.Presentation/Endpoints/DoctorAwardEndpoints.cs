@@ -28,13 +28,13 @@ namespace PhysioBoo.Presentation.Endpoints
 
                 await bus.SendCommandAsync(new CreateDoctorAwardCommand(newDoctorAward, newId));
 
-                return Results.CreatedAtRoute(
-                    "GetDoctorAwardById",
-                    new { id = newId },
+                // There is no named single-read route to link to, so the Location is a plain URL.
+                return Results.Created(
+                    $"/api/doctor-awards/{newId}",
                     new ResponseMessage<Guid>
                     {
                         Success = true,
-                        Data = newDoctorAward.Id
+                        Data = newId
                     }
                 );
             }).WithName("CreateDoctorAward")

@@ -142,20 +142,6 @@ export class AuthService {
         this.menuSrv.publish(items);
     }
 
-    private fetchPermissions() {
-        return this.http.get<any>(`/api/users/user-permission`).pipe(
-            tap((permissions) => this.permissionsSubject.next(permissions.value.permission_code)),
-            catchError(() => {
-                this.permissionsSubject.next([]);
-                return of(null);
-            })
-        );
-    }
-
-    loadPermissions() {
-        this.fetchPermissions().subscribe();
-    }
-
     getPermissions() {
         return this.permissionsSubject.getValue();
     }

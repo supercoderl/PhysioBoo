@@ -1,6 +1,6 @@
 # Database seeding
 
-Reference data is plain SQL, run with `psql` after the migrations. C# seeds nothing; `--seed` only applies migrations.
+Reference data is plain SQL, run with `psql` after the migrations. C# seeds nothing; `--seed` only applies migrations (application, event-store and notification-store contexts).
 
 | What | Where | How it runs |
 |---|---|---|

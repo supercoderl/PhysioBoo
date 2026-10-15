@@ -43,7 +43,10 @@ namespace PhysioBoo.Application.Commands.RetailCarts.CheckoutCart
             _user = user;
         }
 
-        public async Task Handle(CheckoutCartCommand request, CancellationToken ct)
+        public Task Handle(CheckoutCartCommand request, CancellationToken ct)
+            => _unitOfWork.ExecuteInStrategyAsync(() => HandleCore(request, ct));
+
+        private async Task HandleCore(CheckoutCartCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

@@ -92,7 +92,9 @@ export class CmsArticleNewsListComponent implements OnInit {
             filter: {
                 ...this.params.filter,
                 start: this.dateSrv.format(this.params.filter.start, "YYYY-MM-DD"),
-                end: this.dateSrv.format(this.params.filter.end, "YYYY-MM-DD")
+                end: this.dateSrv.format(this.params.filter.end, "YYYY-MM-DD"),
+                // Staff list: Draft and Archived articles must be manageable too.
+                includeUnpublished: true
             } as any
         })
             .subscribe(_res => {

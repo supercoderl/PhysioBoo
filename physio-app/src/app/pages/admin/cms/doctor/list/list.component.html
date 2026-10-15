@@ -111,6 +111,7 @@
 
   <cms-doctor-drawer
     [isOpen]="isDrawerOpen"
+    [doctorId]="selectedId"
     (close)="onCloseDrawer()"
     (saveSuccess)="onSaveSuccess($event)"
   />

@@ -4,7 +4,7 @@ import { forkJoin, map, Observable } from "rxjs";
 import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
 import { RoleFilter } from "../../shared/types/filter.types";
-import { AssignPermissionRequest, CreateRoleRequest } from "../../shared/types/permission.types";
+import { AssignPermissionsRequest, CreateRoleRequest, RevokePermissionRequest } from "../../shared/types/permission.types";
 import { RoleStats } from "../../shared/types/platform.types";
 import { Role } from "../../shared/types/role.types";
 
@@ -57,11 +57,11 @@ export class RoleService {
         return this.http.delete<PagedResponse<string>>(`${BASE_API.ROLE.BASE}/${id}`);
     }
 
-    assignPermission(params: AssignPermissionRequest) {
+    assignPermissions(params: AssignPermissionsRequest) {
         return this.http.post<PagedResponse<string>>(BASE_API.ROLE.ASSIGN_PERMISSION, params);
     }
 
-    removePermission(params: AssignPermissionRequest) {
+    removePermission(params: RevokePermissionRequest) {
         return this.http.delete<PagedResponse<string>>(`${BASE_API.ROLE.BASE}/${params.roleId}/permissions/${params.permissionId}`);
     }
 }

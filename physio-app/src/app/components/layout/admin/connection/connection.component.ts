@@ -3,10 +3,10 @@ import { Component, computed, DestroyRef, ElementRef, inject, OnInit, PLATFORM_I
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, EMPTY, exhaustMap, filter, map, Observable, of, Subject, switchMap, tap, timer } from 'rxjs';
 import { ConversationService } from '../../../../services/admin/conversation.service';
-import { DATE_FORMATS } from '../../../../shared/types/date.types';
-import { ChatContact, ChatThreadMessage, ConversationMessage } from '../../../../shared/types/conversation.types';
 import { FormatDatePipe } from '../../../../shared/pipes/date.pipe';
 import { SharedModule } from '../../../../shared/shared-imports';
+import { ChatContact, ChatThreadMessage } from '../../../../shared/types/conversation.types';
+import { DATE_FORMATS } from '../../../../shared/types/date.types';
 import { EmptyStateComponent } from '../../../ui/empty-state.component';
 import { ErrorStateComponent } from '../../../ui/error-state.component';
 
@@ -424,9 +424,15 @@ export class AdminConnectionComponent implements OnInit {
   }
 
   private newId(): string {
-    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
-    // randomUUID needs a secure context; fall back to a v4 uuid from getRandomValues.
-    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    const webCrypto: Crypto | undefined = typeof crypto !== 'undefined' ? crypto : undefined;
+    if (typeof webCrypto?.randomUUID === 'function') return webCrypto.randomUUID();
+
+    const bytes = new Uint8Array(16);
+    if (typeof webCrypto?.getRandomValues === 'function') {
+      webCrypto.getRandomValues(bytes);
+    } else {
+      for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+    }
     bytes[6] = (bytes[6] & 0x0f) | 0x40;
     bytes[8] = (bytes[8] & 0x3f) | 0x80;
     const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');

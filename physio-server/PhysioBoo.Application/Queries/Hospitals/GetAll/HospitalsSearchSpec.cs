@@ -4,6 +4,7 @@ using PhysioBoo.Application.Extensions;
 using PhysioBoo.Application.ViewModels.Hospitals;
 using PhysioBoo.Application.ViewModels.Sorting;
 using PhysioBoo.Domain.Entities.Operation;
+using PhysioBoo.Domain.Enums;
 
 namespace PhysioBoo.Application.Queries.Hospitals.GetAll
 {
@@ -40,6 +41,37 @@ namespace PhysioBoo.Application.Queries.Hospitals.GetAll
                         DateTime fromDate = startDate.ToDateTime(TimeOnly.MinValue);
                         DateTime toDate = endDate.AddDays(1).ToDateTime(TimeOnly.MinValue);
                         Query.Where(x => x.CreatedAt >= fromDate && x.CreatedAt < toDate);
+                    }
+                }
+
+                // A hospital group is the tenant that owns its hospitals.
+                if (q.Request.Filter.HospitalGroupId.HasValue)
+                {
+                    Guid groupId = q.Request.Filter.HospitalGroupId.Value;
+                    Query.Where(x => x.TenantId == groupId);
+                }
+
+                if (q.Request.Filter.Type.HasValue)
+                {
+                    HospitalType type = (HospitalType)q.Request.Filter.Type.Value;
+                    Query.Where(x => x.HospitalType == type);
+                }
+
+                if (q.Request.Filter.IsActive.HasValue)
+                {
+                    bool isActive = q.Request.Filter.IsActive.Value;
+                    Query.Where(x => x.IsActive == isActive);
+                }
+
+                if (q.Request.Filter.HasEmergencyServices.HasValue)
+                {
+                    if (q.Request.Filter.HasEmergencyServices.Value)
+                    {
+                        Query.Where(x => x.EmergencyCapacity > 0);
+                    }
+                    else
+                    {
+                        Query.Where(x => x.EmergencyCapacity == 0);
                     }
                 }
             }

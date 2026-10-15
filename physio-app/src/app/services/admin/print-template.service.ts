@@ -25,7 +25,7 @@ export class PrintTemplateService {
   }
 
   getByCode(code: string) {
-    return this.http.get<PagedResponse<PrintTemplateDetail>>(`${BASE_API.PRINT_TEMPLATE.BASE}/by-code/${encodeURIComponent(code)}`);
+    return this.http.get<PagedResponse<PrintTemplateDetail>>(`${BASE_API.PRINT_TEMPLATE.BASE}/${encodeURIComponent(code)}`);
   }
 
   create(payload: Partial<PrintTemplate> & { version: Partial<PrintTemplateVersion> }) {

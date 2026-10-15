@@ -25,6 +25,17 @@ export class HospitalService {
         }).pipe(map(res => res.success ? res.data?.items ?? [] : []));
     }
 
+    /** Hospitals visible to the current user, sorted by name, for pickers. */
+    lookup(limit = 200): Observable<Hospital[]> {
+        return this.search({
+            pageNumber: 1,
+            pageSize: limit,
+            search: '',
+            sort: '+name',
+            filter: { start: '', end: '', hospitalGroupId: null, type: null, isActive: true, hasEmergencyServices: null }
+        }).pipe(map(res => res.success ? res.data?.items ?? [] : []));
+    }
+
     search_by_id(id: string) {
         return this.http.get<PagedResponse<Hospital | null>>(`${BASE_API.HOSPITAL.BASE}/${id}`);
     }

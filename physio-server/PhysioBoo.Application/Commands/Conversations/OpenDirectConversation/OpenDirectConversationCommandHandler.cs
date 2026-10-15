@@ -30,7 +30,10 @@ namespace PhysioBoo.Application.Commands.Conversations.OpenDirectConversation
             _user = user;
         }
 
-        public async Task Handle(OpenDirectConversationCommand request, CancellationToken cancellationToken)
+        public Task Handle(OpenDirectConversationCommand request, CancellationToken cancellationToken)
+            => _unitOfWork.ExecuteInStrategyAsync(() => HandleCore(request, cancellationToken));
+
+        private async Task HandleCore(OpenDirectConversationCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 

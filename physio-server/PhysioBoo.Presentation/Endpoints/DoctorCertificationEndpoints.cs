@@ -28,9 +28,9 @@ namespace PhysioBoo.Presentation.Endpoints
 
                 await bus.SendCommandAsync(new CreateDoctorCertificationCommand(newDoctorCertification, newId));
 
-                return Results.CreatedAtRoute(
-                    "GetDoctorCertificationById",
-                    new { id = newId },
+                // There is no named single-read route to link to, so the Location is a plain URL.
+                return Results.Created(
+                    $"/api/doctor-certifications/{newId}",
                     new ResponseMessage<Guid>
                     {
                         Success = true,

@@ -29,7 +29,9 @@ namespace PhysioBoo.Infrastructure.Repositories
                 try
                 {
                     patient.SetProfile(profile);
+                    // Profile has no navigation back to Patient, so the patient must be added explicitly.
                     _context.Profiles.Add(profile);
+                    _context.Patients.Add(patient);
 
                     await _context.SaveChangesAsync(ct);
                     await transaction.CommitAsync(ct);

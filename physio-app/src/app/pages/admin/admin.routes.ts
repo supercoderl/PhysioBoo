@@ -288,11 +288,6 @@ export const routes: Routes = [
                         path: 'member-point',
                         data: { breadcrumb: ['member-point'] },
                         loadComponent: () => import('./crm/member-point/member-point.component').then(m => m.AdminMemberPointComponent),
-                    },
-                    {
-                        path: 'patient',
-                        data: { breadcrumb: ['patient'] },
-                        loadComponent: () => import('./crm/patient/list.component').then(m => m.CrmPatientListComponent),
                     }
                 ]
             },

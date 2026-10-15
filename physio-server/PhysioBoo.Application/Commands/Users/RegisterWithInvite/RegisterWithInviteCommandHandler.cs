@@ -87,7 +87,7 @@ namespace PhysioBoo.Application.Commands.Users.RegisterWithInvite
 
             newUser.SetTenantId(invite.TenantId);
 
-            SharedKernel.Results.DbResult<Guid> result = await _userRepository.InsertAsync<User, Guid>(newUser);
+            SharedKernel.Results.DbResult<Guid> result = await _userRepository.InsertWithRolesAsync(newUser);
 
             if (!result.Success)
             {

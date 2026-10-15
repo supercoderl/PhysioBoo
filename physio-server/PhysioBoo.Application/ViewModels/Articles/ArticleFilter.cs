@@ -10,6 +10,8 @@ namespace PhysioBoo.Application.ViewModels.Articles
         string Start,
         string End,
         ArticleCategory? Category,
-        ArticleStatus? Status
+        ArticleStatus? Status,
+        // Staff only: without a Status, also return Draft and Archived articles (ignored for anonymous callers).
+        bool IncludeUnpublished = false
     );
 }

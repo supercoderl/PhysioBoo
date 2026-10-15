@@ -42,7 +42,7 @@ export class HospitalGroupService {
     }
 
     update(id: string, params: any) {
-        return this.http.patch<PagedResponse<string>>(`${BASE_API.HOSPITALGROUP.BASE}/${id}`, params);
+        return this.http.patch<void>(`${BASE_API.HOSPITALGROUP.BASE}/${id}`, params);
     }
 
     delete(id: string) {

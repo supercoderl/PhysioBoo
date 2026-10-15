@@ -8,6 +8,15 @@ namespace PhysioBoo.Application.Commands.Roles.AssignPermissionToRole
         public AssignPermissionToRoleCommandValidation()
         {
             RuleForRoleId();
+            RuleForPermissions();
+        }
+
+        public void RuleForPermissions()
+        {
+            RuleFor(cmd => cmd.PermissionForAssigning.Permissions)
+                .NotNull()
+                .WithErrorCode(DomainErrorCodes.Validation.Required)
+                .WithMessage("Permissions may not be null.");
         }
 
         public void RuleForRoleId()

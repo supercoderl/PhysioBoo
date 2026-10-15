@@ -325,16 +325,24 @@ export class SuperadminRoleListComponent implements OnInit {
             if (roleId) {
                 await firstValueFrom(this.roleSrv.update(roleId, v));
             } else {
-                roleId = this.genId();
-                await firstValueFrom(this.roleSrv.create({ id: roleId, ...v }));
+                // The server generates the role id; later calls must use the id it returns.
+                const created = await firstValueFrom(this.roleSrv.create(v));
+                roleId = created.data;
             }
 
             const currentIds = await this.fetchRolePermissionIds(roleId);
             const draft = this.rolePermissionsDraft();
             const toAdd = [...draft].filter(id => !currentIds.has(id));
             const toRemove = [...currentIds].filter(id => !draft.has(id));
+            // Grants go in one call keyed by permission code; revocations are per permission id.
+            const codeById = new Map((this.permissionsData()?.items ?? []).map(p => [p.id, p.code]));
+            const grants: Record<string, boolean> = {};
+            for (const id of toAdd) {
+                const code = codeById.get(id);
+                if (code) grants[code] = true;
+            }
             await Promise.all([
-                ...toAdd.map(permissionId => firstValueFrom(this.roleSrv.assignPermission({ roleId: roleId!, permissionId }))),
+                ...(Object.keys(grants).length ? [firstValueFrom(this.roleSrv.assignPermissions({ roleId: roleId!, permissions: grants }))] : []),
                 ...toRemove.map(permissionId => firstValueFrom(this.roleSrv.removePermission({ roleId: roleId!, permissionId }))),
             ]);
 
@@ -371,12 +379,6 @@ export class SuperadminRoleListComponent implements OnInit {
                 error: () => this.toastSrv.error('Failed to delete role')
             });
         });
-    }
-
-    private genId(): string {
-        return typeof crypto !== 'undefined' && crypto.randomUUID
-            ? crypto.randomUUID()
-            : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
     }
     // #endregion
 }

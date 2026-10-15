@@ -41,6 +41,8 @@ namespace PhysioBoo.Application.Commands.Roles.UpdateRole
             role.SetName(request.Role.Name);
             role.SetCode(request.Role.Code);
             role.SetDescription(request.Role.Description);
+            role.SetColor(request.Role.Color);
+            role.SetIcon(request.Role.Icon);
 
             int executedNum = await _roleRepository.UpdateTrackedAsync(role, ct);
 

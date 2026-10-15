@@ -15,7 +15,6 @@
   </span>
 </ng-template>
 
-<!-- Contact strip - always visible, sticky width 70px -->
 <div class="sticky flex top-0 right-0 h-screen z-[1000] w-[70px]">
   <div
     class="flex flex-col w-full h-full bg-surface border-l border-solid border-[#EFE3E7]"
@@ -23,7 +22,7 @@
     <header class="shadow-md flex flex-col bg-primary">
       <div class="px-1 min-h-12 relative flex items-center justify-center">
         <button
-          class="h-14 w-14 inline-flex items-center justify-center relative cursor-pointer text-[26px] rounded-2 p-3 transition-colors shrink-0"
+          class="h-14 w-14 inline-flex items-center justify-center relative cursor-pointer text-white text-[26px] rounded-2 p-3 transition-colors shrink-0"
           tabindex="0"
           type="button"
           aria-label="Open team chat"
@@ -36,7 +35,8 @@
           <span
             *ngIf="totalUnread() > 0"
             class="absolute top-2 right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-danger text-white text-[10px] font-semibold leading-[18px] text-center"
-          >{{ totalUnread() > 99 ? '99+' : totalUnread() }}</span>
+            >{{ totalUnread() > 99 ? "99+" : totalUnread() }}</span
+          >
         </button>
       </div>
     </header>
@@ -47,27 +47,50 @@
         class="group flex flex-col overflow-y-auto overscroll-contain py-2 w-full bg-surface"
       >
         <div class="flex shrink-0 flex-col">
-          <ng-container *ngIf="contactsState() === 'loading' && !contacts().length">
-            <div *ngFor="let _ of [1, 2, 3, 4, 5]" class="flex justify-center p-1.5">
-              <span class="w-9 h-9 rounded-full bg-gray-100 animate-pulse"></span>
+          <ng-container
+            *ngIf="contactsState() === 'loading' && !contacts().length"
+          >
+            <div
+              *ngFor="let _ of [1, 2, 3, 4, 5]"
+              class="flex justify-center p-1.5"
+            >
+              <span
+                class="w-9 h-9 rounded-full bg-gray-100 animate-pulse"
+              ></span>
             </div>
           </ng-container>
           <div *ngFor="let contact of contacts(); trackBy: trackByUser">
             <button
               class="h-auto max-h-none min-h-auto rounded-none py-1 inline-flex items-start justify-center relative w-full p-1.5 hover:bg-gray-50 transition-colors"
-              [ngClass]="{ 'bg-primary/5': isOpen() && thread()?.userId === contact.userId }"
+              [ngClass]="{
+                'bg-primary/5': isOpen() && thread()?.userId === contact.userId,
+              }"
               tabindex="0"
               type="button"
               [title]="contact.name"
-              [attr.aria-label]="'Chat with ' + contact.name + (contact.unreadCount ? ', ' + contact.unreadCount + ' unread' : '')"
+              [attr.aria-label]="
+                'Chat with ' +
+                contact.name +
+                (contact.unreadCount
+                  ? ', ' + contact.unreadCount + ' unread'
+                  : '')
+              "
               (click)="openContact(contact)"
             >
               <span class="relative">
-                <ng-container *ngTemplateOutlet="avatar; context: { $implicit: contact, size: 36 }"></ng-container>
+                <ng-container
+                  *ngTemplateOutlet="
+                    avatar;
+                    context: { $implicit: contact, size: 36 }
+                  "
+                ></ng-container>
                 <span
                   *ngIf="contact.unreadCount > 0"
                   class="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-danger text-white text-[10px] font-semibold leading-4 text-center border border-white"
-                >{{ contact.unreadCount > 9 ? '9+' : contact.unreadCount }}</span>
+                  >{{
+                    contact.unreadCount > 9 ? "9+" : contact.unreadCount
+                  }}</span
+                >
               </span>
             </button>
           </div>
@@ -90,7 +113,9 @@
   >
     <header class="shadow-md flex flex-col bg-primary">
       <div class="px-1 py-2.5 min-h-12 relative flex items-center">
-        <ng-container *ngIf="view() === 'thread' && thread() as t; else listHeader">
+        <ng-container
+          *ngIf="view() === 'thread' && thread() as t; else listHeader"
+        >
           <button
             class="inline-flex items-center justify-center cursor-pointer w-9 h-9 rounded-2 hover:bg-surface/10 transition-colors"
             type="button"
@@ -99,11 +124,23 @@
           >
             <physio-icon name="arrow-left" class="w-4 h-4 stroke-white" />
           </button>
-          <div *ngIf="selectedContact() as c" class="flex flex-1 items-center gap-2 min-w-0 px-1">
-            <ng-container *ngTemplateOutlet="avatar; context: { $implicit: c, size: 28 }"></ng-container>
+          <div
+            *ngIf="selectedContact() as c"
+            class="flex flex-1 items-center gap-2 min-w-0 px-1"
+          >
+            <ng-container
+              *ngTemplateOutlet="avatar; context: { $implicit: c, size: 28 }"
+            ></ng-container>
             <div class="min-w-0">
-              <p class="m-0 text-[14px] text-white font-medium truncate">{{ c.name }}</p>
-              <p *ngIf="c.roleName" class="m-0 text-[11px] text-white/70 truncate">{{ c.roleName }}</p>
+              <p class="m-0 text-[14px] text-white font-medium truncate">
+                {{ c.name }}
+              </p>
+              <p
+                *ngIf="c.roleName"
+                class="m-0 text-[11px] text-white/70 truncate"
+              >
+                {{ c.roleName }}
+              </p>
             </div>
           </div>
         </ng-container>
@@ -131,8 +168,14 @@
     <!-- Conversation list -->
     <div *ngIf="view() === 'list'" class="flex flex-1 flex-col overflow-hidden">
       <div class="p-3 border-b border-solid border-[#EFE3E7]">
-        <label class="flex items-center gap-2 h-9 px-3 rounded-2 bg-gray-50 border border-solid border-[#EFE3E7] focus-within:border-primary">
-          <physio-icon name="search" [size]="14" class="text-secondary"></physio-icon>
+        <label
+          class="flex items-center gap-2 h-9 px-3 rounded-2 bg-gray-50 border border-solid border-[#EFE3E7] focus-within:border-primary"
+        >
+          <physio-icon
+            name="search"
+            [size]="14"
+            class="text-secondary"
+          ></physio-icon>
           <input
             type="text"
             class="flex-1 min-w-0 bg-transparent outline-none text-[13px]"
@@ -145,8 +188,15 @@
       </div>
 
       <div class="flex-1 overflow-y-auto" custom-scrollbar>
-        <div *ngIf="contactsState() === 'loading' && !contacts().length" class="flex justify-center py-10">
-          <physio-icon name="loader-circle" [size]="22" class="text-primary animate-spin"></physio-icon>
+        <div
+          *ngIf="contactsState() === 'loading' && !contacts().length"
+          class="flex justify-center py-10"
+        >
+          <physio-icon
+            name="loader-circle"
+            [size]="22"
+            class="text-primary animate-spin"
+          ></physio-icon>
         </div>
 
         <boo-error-state
@@ -176,32 +226,60 @@
           class="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-gray-50 transition-colors border-b border-solid border-[#F6EEF1]"
           (click)="openContact(contact)"
         >
-          <ng-container *ngTemplateOutlet="avatar; context: { $implicit: contact, size: 38 }"></ng-container>
+          <ng-container
+            *ngTemplateOutlet="
+              avatar;
+              context: { $implicit: contact, size: 38 }
+            "
+          ></ng-container>
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
               <p
                 class="m-0 flex-1 truncate text-[13px] text-regular"
-                [ngClass]="contact.unreadCount ? 'font-semibold' : 'font-medium'"
-              >{{ contact.name }}</p>
-              <span *ngIf="contact.lastMessageAt" class="shrink-0 text-[11px] text-secondary">
-                {{ contact.lastMessageAt | formatDate: (isToday(contact.lastMessageAt) ? DATE_FORMATS.DISPLAY_TIME : DATE_FORMATS.DISPLAY_DATE) }}
+                [ngClass]="
+                  contact.unreadCount ? 'font-semibold' : 'font-medium'
+                "
+              >
+                {{ contact.name }}
+              </p>
+              <span
+                *ngIf="contact.lastMessageAt"
+                class="shrink-0 text-[11px] text-secondary"
+              >
+                {{
+                  contact.lastMessageAt
+                    | formatDate
+                      : (isToday(contact.lastMessageAt)
+                          ? DATE_FORMATS.DISPLAY_TIME
+                          : DATE_FORMATS.DISPLAY_DATE)
+                }}
               </span>
             </div>
             <div class="flex items-center gap-2 mt-0.5">
               <p
                 class="m-0 flex-1 truncate text-[12px]"
-                [ngClass]="contact.unreadCount ? 'text-regular' : 'text-secondary'"
+                [ngClass]="
+                  contact.unreadCount ? 'text-regular' : 'text-secondary'
+                "
               >
-                <ng-container *ngIf="contact.lastMessagePreview; else noPreview">
-                  <span *ngIf="contact.lastMessageIsMine">You: </span>{{ contact.lastMessagePreview }}
+                <ng-container
+                  *ngIf="contact.lastMessagePreview; else noPreview"
+                >
+                  <span *ngIf="contact.lastMessageIsMine">You: </span
+                  >{{ contact.lastMessagePreview }}
                 </ng-container>
-                <ng-template #noPreview>{{ contact.roleName || contact.email }}</ng-template>
+                <ng-template #noPreview>{{
+                  contact.roleName || contact.email
+                }}</ng-template>
               </p>
               <span
                 *ngIf="contact.unreadCount > 0"
                 class="shrink-0 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[10px] font-semibold leading-[18px] text-center"
                 [attr.aria-label]="contact.unreadCount + ' unread'"
-              >{{ contact.unreadCount > 99 ? '99+' : contact.unreadCount }}</span>
+                >{{
+                  contact.unreadCount > 99 ? "99+" : contact.unreadCount
+                }}</span
+              >
             </div>
           </div>
         </button>
@@ -209,10 +287,24 @@
     </div>
 
     <!-- Conversation view -->
-    <div *ngIf="view() === 'thread' && thread() as t" class="flex flex-1 flex-col overflow-hidden bg-gray-50">
-      <div #scroller class="flex-1 overflow-y-auto px-3 py-3" custom-scrollbar role="log" aria-live="polite" aria-label="Messages">
+    <div
+      *ngIf="view() === 'thread' && thread() as t"
+      class="flex flex-1 flex-col overflow-hidden bg-gray-50"
+    >
+      <div
+        #scroller
+        class="flex-1 overflow-y-auto px-3 py-3"
+        custom-scrollbar
+        role="log"
+        aria-live="polite"
+        aria-label="Messages"
+      >
         <div *ngIf="t.state === 'loading'" class="flex justify-center py-10">
-          <physio-icon name="loader-circle" [size]="22" class="text-primary animate-spin"></physio-icon>
+          <physio-icon
+            name="loader-circle"
+            [size]="22"
+            class="text-primary animate-spin"
+          ></physio-icon>
         </div>
 
         <boo-error-state
@@ -230,8 +322,12 @@
               [disabled]="t.loadingOlder"
               (click)="loadOlder()"
             >
-              <physio-icon [name]="t.loadingOlder ? 'loader-circle' : 'refresh'" [size]="12" [ngClass]="{ 'animate-spin': t.loadingOlder }"></physio-icon>
-              {{ t.loadingOlder ? 'Loading…' : 'Load earlier messages' }}
+              <physio-icon
+                [name]="t.loadingOlder ? 'loader-circle' : 'refresh'"
+                [size]="12"
+                [ngClass]="{ 'animate-spin': t.loadingOlder }"
+              ></physio-icon>
+              {{ t.loadingOlder ? "Loading…" : "Load earlier messages" }}
             </button>
           </div>
 
@@ -239,7 +335,11 @@
             *ngIf="!t.messages.length"
             icon="message-square-text"
             title="No messages yet"
-            [description]="'Send the first message to ' + (selectedContact()?.name || 'your colleague') + '.'"
+            [description]="
+              'Send the first message to ' +
+              (selectedContact()?.name || 'your colleague') +
+              '.'
+            "
           ></boo-empty-state>
 
           <div
@@ -247,18 +347,38 @@
             class="flex mb-2"
             [ngClass]="message.isMine ? 'justify-end' : 'justify-start'"
           >
-            <div class="max-w-[80%] flex flex-col" [ngClass]="message.isMine ? 'items-end' : 'items-start'">
+            <div
+              class="max-w-[80%] flex flex-col"
+              [ngClass]="message.isMine ? 'items-end' : 'items-start'"
+            >
               <div
                 class="px-3 py-2 rounded-2 text-[13px] leading-[1.45] whitespace-pre-wrap break-words"
-                [ngClass]="message.isMine
-                  ? 'bg-primary text-white rounded-br-sm'
-                  : 'bg-surface text-regular border border-solid border-[#EFE3E7] rounded-bl-sm'"
+                [ngClass]="
+                  message.isMine
+                    ? 'bg-primary text-white rounded-br-sm'
+                    : 'bg-surface text-regular border border-solid border-[#EFE3E7] rounded-bl-sm'
+                "
                 [class.opacity-60]="message.status === 'sending'"
-              >{{ message.content }}</div>
-              <span *ngIf="message.status === 'sent'" class="mt-0.5 text-[10px] text-secondary">
-                {{ message.createdAt | formatDate: (isToday(message.createdAt) ? DATE_FORMATS.DISPLAY_TIME : DATE_FORMATS.DISPLAY_DATETIME) }}
+              >
+                {{ message.content }}
+              </div>
+              <span
+                *ngIf="message.status === 'sent'"
+                class="mt-0.5 text-[10px] text-secondary"
+              >
+                {{
+                  message.createdAt
+                    | formatDate
+                      : (isToday(message.createdAt)
+                          ? DATE_FORMATS.DISPLAY_TIME
+                          : DATE_FORMATS.DISPLAY_DATETIME)
+                }}
               </span>
-              <span *ngIf="message.status === 'sending'" class="mt-0.5 text-[10px] text-secondary">Sending…</span>
+              <span
+                *ngIf="message.status === 'sending'"
+                class="mt-0.5 text-[10px] text-secondary"
+                >Sending…</span
+              >
               <button
                 *ngIf="message.status === 'failed'"
                 type="button"
@@ -273,7 +393,10 @@
         </ng-container>
       </div>
 
-      <form class="p-3 bg-surface border-t border-solid border-[#EFE3E7]" (ngSubmit)="send()">
+      <form
+        class="p-3 bg-surface border-t border-solid border-[#EFE3E7]"
+        (ngSubmit)="send()"
+      >
         <div class="flex items-end gap-2">
           <textarea
             rows="2"
@@ -292,14 +415,24 @@
             aria-label="Send message"
             [disabled]="!canSend()"
           >
-            <physio-icon name="send-square" [size]="18" class="stroke-white"></physio-icon>
+            <physio-icon
+              name="send-square"
+              [size]="18"
+              class="stroke-white"
+            ></physio-icon>
           </button>
         </div>
         <p
           *ngIf="draft().length > MAX_LENGTH - 200"
           class="m-0 mt-1 text-right text-[10px]"
-          [ngClass]="draft().trim().length > MAX_LENGTH ? 'text-danger' : 'text-secondary'"
-        >{{ draft().trim().length }}/{{ MAX_LENGTH }}</p>
+          [ngClass]="
+            draft().trim().length > MAX_LENGTH
+              ? 'text-danger'
+              : 'text-secondary'
+          "
+        >
+          {{ draft().trim().length }}/{{ MAX_LENGTH }}
+        </p>
       </form>
     </div>
   </div>

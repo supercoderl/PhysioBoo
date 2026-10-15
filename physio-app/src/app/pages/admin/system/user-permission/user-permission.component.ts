@@ -127,7 +127,7 @@ export class AdminUserPermissionComponent implements OnInit {
             ? items.filter(p =>
                 p.name.toLowerCase().includes(q) ||
                 p.code.toLowerCase().includes(q) ||
-                p.category.toLowerCase().includes(q) ||
+                (p.category ?? '').toLowerCase().includes(q) ||
                 (p.description ?? '').toLowerCase().includes(q))
             : items;
         const map = new Map<string, Permission[]>();
@@ -177,9 +177,7 @@ export class AdminUserPermissionComponent implements OnInit {
         this.permForm = this.fb.group({
             name: ['', [Validators.required]],
             code: ['', [Validators.required]],
-            category: ['', [Validators.required]],
             description: [''],
-            isActive: [true],
         });
     }
 
@@ -401,16 +399,24 @@ export class AdminUserPermissionComponent implements OnInit {
             if (roleId) {
                 await firstValueFrom(this.roleSrv.update(roleId, v));
             } else {
-                roleId = this.genId();
-                await firstValueFrom(this.roleSrv.create({ id: roleId, ...v }));
+                // The server generates the role id; later calls must use the id it returns.
+                const created = await firstValueFrom(this.roleSrv.create(v));
+                roleId = created.data;
             }
 
             const currentIds = await this.fetchRolePermissionIds(roleId);
             const draft = this.rolePermissionsDraft();
             const toAdd = [...draft].filter(id => !currentIds.has(id));
             const toRemove = [...currentIds].filter(id => !draft.has(id));
+            // Grants go in one call keyed by permission code; revocations are per permission id.
+            const codeById = new Map((this.permissionsData()?.items ?? []).map(p => [p.id, p.code]));
+            const grants: Record<string, boolean> = {};
+            for (const id of toAdd) {
+                const code = codeById.get(id);
+                if (code) grants[code] = true;
+            }
             await Promise.all([
-                ...toAdd.map(permissionId => firstValueFrom(this.roleSrv.assignPermission({ roleId: roleId!, permissionId }))),
+                ...(Object.keys(grants).length ? [firstValueFrom(this.roleSrv.assignPermissions({ roleId: roleId!, permissions: grants }))] : []),
                 ...toRemove.map(permissionId => firstValueFrom(this.roleSrv.removePermission({ roleId: roleId!, permissionId }))),
             ]);
 
@@ -477,7 +483,7 @@ export class AdminUserPermissionComponent implements OnInit {
 
     openNewPermission(): void {
         this.selectedPermissionId.set(null);
-        this.permForm.reset({ name: '', code: '', category: '', description: '', isActive: true });
+        this.permForm.reset({ name: '', code: '', description: '' });
         this.isPermDrawerOpen.set(true);
     }
 
@@ -486,9 +492,7 @@ export class AdminUserPermissionComponent implements OnInit {
         this.permForm.reset({
             name: p.name,
             code: p.code,
-            category: p.category,
             description: p.description ?? '',
-            isActive: p.isActive,
         });
         this.isPermDrawerOpen.set(true);
     }
@@ -504,7 +508,7 @@ export class AdminUserPermissionComponent implements OnInit {
             if (this.selectedPermissionId()) {
                 await firstValueFrom(this.permSrv.update(this.selectedPermissionId()!, v));
             } else {
-                await firstValueFrom(this.permSrv.create({ id: this.genId(), ...v }));
+                await firstValueFrom(this.permSrv.create(v));
             }
             this.toastSrv.success(this.selectedPermissionId() ? 'Permission updated' : 'Permission created');
             this.closePermDrawer();
@@ -526,14 +530,5 @@ export class AdminUserPermissionComponent implements OnInit {
                 error: () => this.toastSrv.error('Failed to delete permission'),
             });
         });
-    }
-
-    // ────────────────────────────────────────────────────────────
-    // Utils
-    // ────────────────────────────────────────────────────────────
-    private genId(): string {
-        return typeof crypto !== 'undefined' && crypto.randomUUID
-            ? crypto.randomUUID()
-            : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
     }
 }

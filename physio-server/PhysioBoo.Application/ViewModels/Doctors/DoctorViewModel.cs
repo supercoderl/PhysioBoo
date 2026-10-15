@@ -6,6 +6,8 @@ namespace PhysioBoo.Application.ViewModels.Doctors
     public sealed class DoctorViewModel
     {
         public Guid UserId { get; set; }
+        /// <summary>The doctor's primary key (same value as <see cref="UserId"/>); the admin UI keys rows on <c>id</c>.</summary>
+        public Guid Id => UserId;
         public string FullName { get; set; } = string.Empty;
         public string? Avatar { get; set; }
         public string? Bio { get; set; }

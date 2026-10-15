@@ -185,11 +185,8 @@ export class CommonCategoryLabTestCategoryDrawerComponent implements OnChanges {
         try {
             let id: string;
             if (this.currentId) {
-                const updateRes = await firstValueFrom(this.labTestCategorySrv.update(this.currentId, formData));
-                if (!updateRes.success) {
-                    this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
+                // The endpoint answers 204 No Content: a failure surfaces as an HTTP error, not as `success: false`.
+                await firstValueFrom(this.labTestCategorySrv.update(this.currentId, formData));
                 id = this.currentId;
             } else {
                 const createRes = await firstValueFrom(this.labTestCategorySrv.create(formData));

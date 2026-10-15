@@ -9,16 +9,12 @@ export interface Permission {
 }
 
 export interface CreatePermissionRequest {
-  id: string;
   name: string;
   code: string;
-  category: string;
   description?: string | null;
-  isActive?: boolean;
 }
 
 export interface CreateRoleRequest {
-  id: string;
   name: string;
   code: string;
   description?: string | null;
@@ -32,7 +28,13 @@ export interface AssignRoleRequest {
   roleId: string;
 }
 
-export interface AssignPermissionRequest {
+/** Grants permissions to a role. `permissions` maps a permission code to whether it is granted. */
+export interface AssignPermissionsRequest {
+  roleId: string;
+  permissions: Record<string, boolean>;
+}
+
+export interface RevokePermissionRequest {
   roleId: string;
   permissionId: string;
 }

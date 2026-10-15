@@ -33,7 +33,10 @@ namespace PhysioBoo.Application.Commands.MedicineInventories.ChangeBatch
             _user = user;
         }
 
-        public async Task Handle(ChangeBatchCommand request, CancellationToken ct)
+        public Task Handle(ChangeBatchCommand request, CancellationToken ct)
+            => _unitOfWork.ExecuteInStrategyAsync(() => HandleCore(request, ct));
+
+        private async Task HandleCore(ChangeBatchCommand request, CancellationToken ct)
         {
             if (!await TestValidityAsync(request)) return;
 

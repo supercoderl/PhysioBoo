@@ -53,10 +53,10 @@ namespace PhysioBoo.Application.Queries.Articles.GetAll
                 {
                     Query.Where(x => x.Status == q.Request.Filter.Status.Value);
                 }
-                else
+                else if (!q.Request.Filter.IncludeUnpublished)
                 {
                     // Public/anonymous callers (no explicit status filter) only see Published articles.
-                    // Draft/Archived content is staff-only and must be requested explicitly.
+                    // Draft/Archived content is staff-only; the endpoint strips IncludeUnpublished for non-staff.
                     Query.Where(x => x.Status == ArticleStatus.Published);
                 }
             }

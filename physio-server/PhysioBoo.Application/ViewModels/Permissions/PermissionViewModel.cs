@@ -9,6 +9,9 @@ namespace PhysioBoo.Application.ViewModels.Permissions
         public string Code { get; set; } = string.Empty;
         public string? Description { get; set; }
 
+        /// <summary>Grouping label for the role matrix: the module segment of the code ("iam" for "iam:user:read").</summary>
+        public string Category => Code.Split(':', 2)[0];
+
         public static PermissionViewModel FromPermission(Permission permission)
         {
             return new PermissionViewModel

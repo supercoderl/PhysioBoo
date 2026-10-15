@@ -46,7 +46,10 @@ namespace PhysioBoo.Application.Commands.Tenants.RegisterTenant
             _tenantSubscriptionRepository = tenantSubscriptionRepository;
         }
 
-        public async Task Handle(RegisterTenantCommand request, CancellationToken cancellationToken)
+        public Task Handle(RegisterTenantCommand request, CancellationToken cancellationToken)
+            => _unitOfWork.ExecuteInStrategyAsync(() => HandleCore(request, cancellationToken));
+
+        private async Task HandleCore(RegisterTenantCommand request, CancellationToken cancellationToken)
         {
             if (!await TestValidityAsync(request)) return;
 
@@ -228,7 +231,7 @@ namespace PhysioBoo.Application.Commands.Tenants.RegisterTenant
 
             newUser.SetTenantId(request.NewId);
 
-            SharedKernel.Results.DbResult<Guid> result = await _userRepository.InsertAsync<User, Guid>(newUser);
+            SharedKernel.Results.DbResult<Guid> result = await _userRepository.InsertWithRolesAsync(newUser);
 
             if (!result.Success)
             {

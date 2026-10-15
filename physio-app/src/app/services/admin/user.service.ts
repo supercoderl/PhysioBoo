@@ -36,10 +36,6 @@ export class UserService {
         );
     }
 
-    search_by_id(id: string) {
-        return this.http.get<PagedResponse<User | null>>(`${BASE_API.USER.BASE}/${id}`);
-    }
-
     register(params: any) {
         return this.http.post<PagedResponse<string>>(BASE_API.USER.REGISTER, params);
     }

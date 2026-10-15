@@ -22,6 +22,31 @@ namespace PhysioBoo.Infrastructure
             _transaction = await _context.Database.BeginTransactionAsync(ct);
         }
 
+        public async Task ExecuteInStrategyAsync(Func<Task> work)
+        {
+            IExecutionStrategy strategy = _context.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
+            {
+                try
+                {
+                    await work();
+                }
+                catch
+                {
+                    // Leave a clean slate for the retry (or the caller): no open transaction, no stale tracked entities.
+                    if (_transaction != null)
+                    {
+                        await _transaction.RollbackAsync();
+                        await _transaction.DisposeAsync();
+                        _transaction = null;
+                    }
+
+                    _context.ChangeTracker.Clear();
+                    throw;
+                }
+            });
+        }
+
         public async Task<bool> CommitAsync()
         {
             try

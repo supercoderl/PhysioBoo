@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, Output, WritableSignal } from "@angular
 import { FormGroup } from "@angular/forms";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent } from "../../../../checkbox/boo-checkbox/boo-checkbox.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
@@ -15,7 +14,6 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
 
         BooInputComponent, 
         BooTextareaComponent, 
-        BooCheckboxComponent, 
         BooButtonAdminComponent,
         SharedModule
     ],
@@ -55,13 +53,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                     <boo-input
                         label="Code"
                         formControlName="code"
-                        placeholder="Ex: PATIENTS_VIEW"
-                        required
-                    ></boo-input>
-                    <boo-input
-                        label="Category"
-                        formControlName="category"
-                        placeholder="Ex: Patient Management"
+                        placeholder="Ex: patients:patient:read"
                         required
                     ></boo-input>
                     <boo-textarea
@@ -70,18 +62,6 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                         [rows]="3"
                         placeholder="What does this permission allow?"
                     ></boo-textarea>
-
-                    <div
-                        class="flex items-center justify-between p-3 border rounded-lg border-gray-200"
-                    >
-                        <div>
-                            <div class="text-sm font-medium text-primary">Active</div>
-                            <div class="text-xs text-secondary">
-                                Inactive permissions are hidden from role assignment
-                            </div>
-                        </div>
-                        <boo-checkbox formControlName="isActive"></boo-checkbox>
-                    </div>
                 </div>
 
                 <div

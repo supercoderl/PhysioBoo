@@ -27,13 +27,13 @@ namespace PhysioBoo.Application.Commands.Departments.UpdateDepartment
         {
             if (!await TestValidityAsync(request)) return;
 
-            Domain.Entities.Operation.Department? department = await _departmentRepository.GetByIdAsync(request.Department.Id);
+            Domain.Entities.Operation.Department? department = await _departmentRepository.GetByIdAsync(request.NewId);
 
             if (department == null)
             {
                 await NotifyAsync(new DomainNotification(
                     request.MessageType,
-                    $"Department with Id {request.Department.Id} not found.",
+                    $"Department with Id {request.NewId} not found.",
                     ErrorCodes.ObjectNotFound
                 ));
 

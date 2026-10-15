@@ -32,9 +32,9 @@ namespace PhysioBoo.Presentation.Endpoints
 
                 await bus.SendCommandAsync(new CreatePermissionCommand(newId, newPermission));
 
-                return Results.CreatedAtRoute(
-                "GetPermissionById",
-                    new { id = newId },
+                // There is no named single-read route to link to, so the Location is a plain URL.
+                return Results.Created(
+                    $"/api/permissions/{newId}",
                     new ResponseMessage<Guid>
                     {
                         Success = true,

@@ -35,7 +35,7 @@ namespace PhysioBoo.Presentation.Endpoints
                 return Results.Created($"/api/bills/{newId}", new ResponseMessage<Guid>
                 {
                     Success = true,
-                    Data = newBill.Id
+                    Data = newId
                 });
             }).WithName("CreateBill")
             .WithSummary("Create new bill")

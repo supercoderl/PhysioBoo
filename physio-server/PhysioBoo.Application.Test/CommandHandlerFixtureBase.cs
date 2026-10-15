@@ -25,6 +25,8 @@ namespace PhysioBoo.Application.Test
             User.GetUserRole().Returns(Role.ADMIN.ToString());
 
             UnitOfWork.CommitAsync().Returns(true);
+            // Run the wrapped work directly, as the real unit of work does when nothing fails.
+            UnitOfWork.ExecuteInStrategyAsync(Arg.Any<Func<Task>>()).Returns(call => call.Arg<Func<Task>>()());
         }
 
         public CommandHandlerFixtureBase VerifyExistingNotification(string errorCode, string message)

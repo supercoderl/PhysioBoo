@@ -1,7 +1,9 @@
-﻿using Npgsql;
+﻿using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using PhysioBoo.Domain.Entities.Core;
 
 using PhysioBoo.Infrastructure.Database;
+using PhysioBoo.SharedKernel.Results;
 using PhysioBoo.SharedKernel.Utils;
 using System.Data;
 
@@ -14,6 +16,22 @@ namespace PhysioBoo.Infrastructure.Repositories
         public UserRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
+        }
+
+        public async Task<DbResult<Guid>> InsertWithRolesAsync(User user, CancellationToken ct = default)
+        {
+            try
+            {
+                // One SaveChanges: the user and its role links are written together, inside the ambient transaction if any.
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync(ct);
+                return DbResult<Guid>.Ok(user.Id);
+            }
+            catch (Exception ex)
+            {
+                _context.ChangeTracker.Clear();
+                return DbResult<Guid>.Fail(DbErrorMapper.Map(ex is DbUpdateException { InnerException: not null } ? ex.InnerException! : ex));
+            }
         }
 
         public async Task<User?> GetByEmailAsync(string email)

@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Commands.Departments.CreateDepartment
             if (!await TestValidityAsync(request)) return;
 
             Department newDepartment = new Department(
-                request.NewDepartment.Id,
+                request.NewId,
                 request.NewDepartment.HospitalId,
                 request.NewDepartment.Name,
                 request.NewDepartment.DepartmentCode,

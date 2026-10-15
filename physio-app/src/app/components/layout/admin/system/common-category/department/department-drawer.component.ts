@@ -1,6 +1,8 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { finalize, firstValueFrom } from "rxjs";
+import { DoctorService } from "../../../../../../services/admin/doctor.service";
+import { HospitalService } from "../../../../../../services/admin/hospital.service";
 import { DepartmentService } from "../../../../../../services/admin/department.service";
 import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../../services/common/toast.service";
@@ -53,8 +55,8 @@ import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-t
                             <boo-input label="Department Code" formControlName="departmentCode" placeholder="Ex: DEPT-CARD"></boo-input>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <boo-select label="Head of Department" formControlName="headOfDepartment" [options]="[]"></boo-select>
-                            <boo-input label="Hospital ID" formControlName="hospitalId"></boo-input>
+                            <boo-select label="Head of Department" formControlName="headOfDepartment" [options]="doctorOptions"></boo-select>
+                            <boo-select label="Hospital" formControlName="hospitalId" [options]="hospitalOptions" required></boo-select>
                         </div>
                     </div>
 
@@ -152,10 +154,21 @@ export class CommonCategoryDepartmentDrawerComponent implements OnChanges {
         private fb: FormBuilder,
         private toastSrv: ToastService,
         private departmentSrv: DepartmentService,
+        private hospitalSrv: HospitalService,
+        private doctorSrv: DoctorService,
         protected loadingSrv: LocalLoadingService
     ) {
         this.form = this.initForm();
+        this.hospitalSrv.lookup().subscribe(items => {
+            this.hospitalOptions = items.map(h => ({ label: h.name, value: h.id }));
+        });
+        this.doctorSrv.search({ pageNumber: 1, pageSize: 200, search: '', sort: '+fullName', filter: { start: '', end: '' } }).subscribe(res => {
+            if (res.success) this.doctorOptions = (res.data?.items ?? []).map(d => ({ label: d.fullName, value: d.id }));
+        });
     }
+
+    doctorOptions: { label: string; value: string }[] = [];
+    hospitalOptions: { label: string; value: string }[] = [];
 
     ngOnChanges(changes: SimpleChanges): void {
         if (!this.isOpen) return;
@@ -187,7 +200,9 @@ export class CommonCategoryDepartmentDrawerComponent implements OnChanges {
             isOutPatient: [false],
             isInPatient: [false],
             operationHours: [''],
-            equipmentList: ['']
+            equipmentList: [''],
+            // Not shown, but the update contract carries it: dropping it would deactivate the department on every edit.
+            isActive: [true]
         });
     }
 
@@ -211,6 +226,7 @@ export class CommonCategoryDepartmentDrawerComponent implements OnChanges {
                         phone: _res.data?.phone,
                         email: _res.data?.email,
                         budgetAllocated: _res.data?.budgetAllocated,
+                        isActive: _res.data?.isActive ?? true,
                         bedCount: _res.data?.bedCount ?? 0,
                         isEmergency: _res.data?.isEmergency ?? false,
                         isCriticalCare: _res.data?.isCriticalCare ?? false,
@@ -283,7 +299,8 @@ export class CommonCategoryDepartmentDrawerComponent implements OnChanges {
             isOutPatient: false,
             isInPatient: false,
             operationHours: '',
-            equipmentList: ''
+            equipmentList: '',
+            isActive: true
         });
     }
 

@@ -130,6 +130,7 @@ export interface ArticleFilter {
     end: string,
     category: number | null,
     status: number | null,
+    includeUnpublished?: boolean,
 }
 
 export interface UserFilter {

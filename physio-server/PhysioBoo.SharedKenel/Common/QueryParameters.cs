@@ -5,7 +5,7 @@
     /// </summary>
     public class QueryParameters
     {
-        private const int MaxPageSize = 100;
+        private const int MaxPageSize = 500;
 
         private int _pageSize = 20;
         public int PageSize

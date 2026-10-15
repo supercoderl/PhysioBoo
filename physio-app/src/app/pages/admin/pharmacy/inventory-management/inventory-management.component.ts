@@ -1,4 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
+import { Router } from "@angular/router";
 import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { DialogService } from "../../../../services/common/dialog.service";
@@ -120,6 +121,7 @@ export class AdminInventoryManagementComponent implements OnInit {
         private srv: InventoryManagementService,
         private toastSrv: ToastService,
         private dialogSrv: DialogService,
+        private router: Router,
     ) { }
 
     ngOnInit(): void {
@@ -231,14 +233,18 @@ export class AdminInventoryManagementComponent implements OnInit {
     }
 
     onQuickAction(op: QuickOperation): void {
+        // Stock Count and Inventory Audit are served by the Stock Take module (see docs/inventory-management-redesign.md §15).
+        if (op === 'StockCount' || op === 'Audit') {
+            void this.router.navigate(['/admin/pharmacy/stock-take']);
+            return;
+        }
+
+        // The guided receiving / transfer / adjustment / merge / split wizards are not built yet (docs §18).
+        // Say so instead of reporting a success that did not happen.
         const labels: Record<QuickOperation, string> = {
             Receiving: 'Stock Receiving', Transfer: 'Stock Transfer', Adjustment: 'Stock Adjustment',
             StockCount: 'Stock Count', BatchMerge: 'Batch Merge', BatchSplit: 'Batch Split', Audit: 'Inventory Audit',
         };
-        this.dialogSrv.confirm(
-            `Start ${labels[op]}? This will open the guided workflow (placeholder until the dedicated wizard ships).`,
-            () => this.toastSrv.success(`${labels[op]} started`),
-            labels[op], 'info', 'Start', 'Cancel',
-        );
+        this.toastSrv.info(`${labels[op]} is not available yet. Nothing was changed.`, labels[op]);
     }
 }

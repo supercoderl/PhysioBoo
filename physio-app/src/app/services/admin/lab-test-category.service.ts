@@ -43,7 +43,7 @@ export class LabTestCategoryService {
     }
 
     update(id: string, params: any) {
-        return this.http.patch<PagedResponse<string>>(`${BASE_API.LABTESTCATEGORY.BASE}/${id}`, params);
+        return this.http.patch<void>(`${BASE_API.LABTESTCATEGORY.BASE}/${id}`, params);
     }
 
     delete(id: string) {

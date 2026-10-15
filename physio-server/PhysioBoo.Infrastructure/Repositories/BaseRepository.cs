@@ -539,6 +539,17 @@ namespace PhysioBoo.Infrastructure.Repositories
             return sql;
         }
 
+        private bool UsesNumericColumn(Type entityType, ColumnMetadata column, Type enumType)
+        {
+            Microsoft.EntityFrameworkCore.Metadata.IProperty? property = _dbContext.Model
+                .FindEntityType(entityType)?
+                .FindProperty(column.PropertyName);
+
+            // On the runtime model the converter is part of the type mapping, not a property annotation.
+            Type storedAs = property?.FindTypeMapping()?.Converter?.ProviderClrType ?? enumType;
+            return storedAs != typeof(string);
+        }
+
         private DynamicParameters BuildParameters<T>(T entity, TableMetadata metadata)
         {
             DynamicParameters parameters = new DynamicParameters();
@@ -609,7 +620,16 @@ namespace PhysioBoo.Infrastructure.Repositories
 
                 if (valueType.IsEnum)
                 {
-                    parameters.Add($"@{columnName}", value.ToString(), DbType.String);
+                    // Bind as the column is mapped: HasConversion<string>() stores the name, HasConversion<int>()
+                    // (and an unconverted enum) stores the number. Sending the name to an integer column fails.
+                    if (UsesNumericColumn(typeof(T), column, valueType))
+                    {
+                        parameters.Add($"@{columnName}", Convert.ToInt32(value), DbType.Int32);
+                    }
+                    else
+                    {
+                        parameters.Add($"@{columnName}", value.ToString(), DbType.String);
+                    }
                     continue;
                 }
 

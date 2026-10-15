@@ -1,6 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { firstValueFrom } from "rxjs";
+import { MedicalSpecialtyService } from "../../../../../services/admin/medical-specialty.service";
 import { DoctorService } from "../../../../../services/admin/doctor.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -12,7 +13,7 @@ import { MaritalStatus } from "../../../../../shared/enums/marital-status";
 import { PreferredCommunication } from "../../../../../shared/enums/preferred-communication";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { Doctor } from "../../../../../shared/types/medical-staff.types";
-import { convertEnumToSelection, generateUUID } from "../../../../../shared/utils/common";
+import { convertEnumToSelection } from "../../../../../shared/utils/common";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
 import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
@@ -52,8 +53,8 @@ interface StepConfig {
             <div class="flex flex-col h-full bg-surface relative">
                 <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
                     <div>
-                        <h2 class="text-xl font-bold text-primary leading-none mb-1">New Doctor Account</h2>
-                        <p class="text-sm text-secondary m-0">Complete all 3 steps to register a new medical professional</p>
+                        <h2 class="text-xl font-bold text-primary leading-none mb-1">{{ isEdit ? 'Edit Doctor' : 'New Doctor Account' }}</h2>
+                        <p class="text-sm text-secondary m-0">{{ isEdit ? 'Update the professional details. Account and profile are managed separately.' : 'Complete all 3 steps to register a new medical professional' }}</p>
                     </div>
                     <button (click)="onClose()"
                         class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
@@ -206,7 +207,7 @@ interface StepConfig {
                             <boo-select
                                 label="Primary Specialty"
                                 formControlName="primarySpecialtyId"
-                                [options]="[]"
+                                [options]="specialtyOptions"
                                 class="md:col-span-2">
                             </boo-select>
                             <boo-input label="Languages Spoken" formControlName="languagesSpoken" placeholder="English, Spanish..."></boo-input>
@@ -262,11 +263,11 @@ interface StepConfig {
                 </div>
                 <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0 shadow-top-md">
                     <div class="text-sm text-secondary">
-                        <span class="font-semibold text-primary">Step {{ currentStep }}</span> of {{ steps.length }}
+                        <span class="font-semibold text-primary">Step {{ steps.indexOf(currentStepConfig) + 1 }}</span> of {{ steps.length }}
                     </div>
                     <div class="flex gap-3">
                         <boo-button-admin
-                            *ngIf="currentStep > 1"
+                            *ngIf="currentStep > firstStepId"
                             buttonClass="hover:!bg-gray-200"
                             background="transparent"
                             (click)="prevStep()">
@@ -282,7 +283,7 @@ interface StepConfig {
                         </boo-button-admin>
  
                         <boo-button-admin
-                            *ngIf="currentStep < steps.length"
+                            *ngIf="currentStep < lastStepId"
                             textColor="white"
                             (click)="nextStep()">
                             Continue
@@ -290,12 +291,13 @@ interface StepConfig {
                         </boo-button-admin>
  
                         <boo-button-admin
-                            *ngIf="currentStep === steps.length"
+                            *ngIf="currentStep === lastStepId"
                             textColor="white"
+                            [disabled]="isSaving || isLoadingDoctor"
                             (click)="onSave()"
-                            [loading]="loadingSrv.isLoading('create')">
+                            [loading]="isSaving">
                             <physio-icon name="check" [size]="14" [class]="'mr-1 text-white'"></physio-icon>
-                            Create Doctor
+                            {{ isEdit ? 'Save Changes' : 'Create Doctor' }}
                         </boo-button-admin>
                     </div>
                 </div>
@@ -314,6 +316,8 @@ interface StepConfig {
 export class CmsDoctorDrawerComponent implements OnChanges {
     // #region Inputs, Outputs, Properties
     @Input() isOpen = false;
+    /** When set, the drawer edits that doctor instead of registering a new one. */
+    @Input() doctorId: string | null = null;
     @Output() close = new EventEmitter<void>();
     @Output() saveSuccess = new EventEmitter<Doctor>();
     @ViewChild('scrollContainer') scrollContainer!: ElementRef;
@@ -325,11 +329,27 @@ export class CmsDoctorDrawerComponent implements OnChanges {
     profileForm!: FormGroup;
     doctorForm!: FormGroup;
 
-    steps: StepConfig[] = [
+    private readonly allSteps: StepConfig[] = [
         { id: 1, label: 'Account', description: 'Login credentials', icon: 'user', formGroupName: 'userForm' },
         { id: 2, label: 'Profile', description: 'Personal details', icon: 'id-card', formGroupName: 'profileForm' },
         { id: 3, label: 'Doctor', description: 'Medical profile', icon: 'stethoscope', formGroupName: 'doctorForm' },
     ];
+
+    /** Account and profile are not updatable through the update endpoint, so editing only shows the doctor step. */
+    get steps(): StepConfig[] {
+        return this.isEdit ? this.allSteps.filter(x => x.id === 3) : this.allSteps;
+    }
+    get isEdit(): boolean { return !!this.doctorId; }
+    get firstStepId(): number { return this.steps[0].id; }
+    get lastStepId(): number { return this.steps[this.steps.length - 1].id; }
+    get currentStepConfig(): StepConfig { return this.allSteps.find(x => x.id === this.currentStep)!; }
+
+    private readonly readOnlyWhenEditing = ['primarySpecialtyId', 'medicalLicenseNumber', 'medicalLicenseExpiry', 'medicalLicenseIssuingAuthority'];
+
+    specialtyOptions: { label: string; value: string }[] = [];
+    isSaving = false;
+    isLoadingDoctor = false;
+    private loadedDoctor: Doctor | null = null;
 
     employmentStatusOptions = convertEnumToSelection(EmploymentStatus);
     genderOptions = convertEnumToSelection(Gender);
@@ -348,15 +368,65 @@ export class CmsDoctorDrawerComponent implements OnChanges {
         private fb: FormBuilder,
         private toastSrv: ToastService,
         private doctorSrv: DoctorService,
+        private specialtySrv: MedicalSpecialtyService,
         protected loadingSrv: LocalLoadingService
     ) {
         this.initForms();
+        this.specialtySrv.search({ pageNumber: 1, pageSize: 200, search: '', sort: '+name', filter: { start: '', end: '' } }).subscribe(res => {
+            if (res.success) this.specialtyOptions = (res.data?.items ?? []).map(x => ({ label: x.name, value: x.id }));
+        });
     }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['isOpen'] && this.isOpen) {
             this.resetAll();
+            if (this.doctorId) void this.loadDoctor(this.doctorId);
         }
+    }
+
+    private async loadDoctor(id: string) {
+        this.isLoadingDoctor = true;
+        try {
+            const res = await firstValueFrom(this.doctorSrv.search_by_id(id));
+            if (!res.success || !res.data) {
+                this.toastSrv.error('Doctor not found.');
+                this.onClose();
+                return;
+            }
+            const d = res.data;
+            this.loadedDoctor = d;
+            // Not changeable through the update endpoint.
+            for (const name of this.readOnlyWhenEditing) this.doctorForm.get(name)?.disable();
+            this.doctorForm.patchValue({
+                primarySpecialtyId: d.primarySpecialtyId,
+                languagesSpoken: (d.languagesSpoken ?? []).join(', '),
+                yearsOfExperience: d.yearsOfExperience,
+                yearsOfPractice: d.yearsOfPractice,
+                bio: d.bio ?? '',
+                about: d.about ?? '',
+                archivements: d.archivements ?? '',
+                researchInterests: d.researchInterests ?? '',
+                publicationsCount: d.publicationsCount,
+                conferencePresentations: d.conferencePresentations,
+                medicalLicenseNumber: d.medicalLicenseNumber,
+                medicalLicenseExpiry: d.medicalLicenseExpiry,
+                medicalLicenseIssuingAuthority: d.medicalLicenseIssuingAuthority ?? '',
+                employmentStatus: d.employmentStatus,
+                bankAccountDetails: d.bankAccountDetails ?? '',
+                panNumber: d.panNumber ?? '',
+                gstin: d.gstin ?? '',
+            });
+        } catch {
+            this.toastSrv.error('Could not load the doctor.');
+            this.onClose();
+        } finally {
+            this.isLoadingDoctor = false;
+        }
+    }
+
+    private parseLanguages(value: unknown): string[] {
+        if (Array.isArray(value)) return value;
+        return String(value ?? '').split(',').map(x => x.trim()).filter(Boolean);
     }
     // #endregion
 
@@ -417,7 +487,9 @@ export class CmsDoctorDrawerComponent implements OnChanges {
     }
 
     private resetAll() {
-        this.currentStep = 1;
+        this.loadedDoctor = null;
+        this.doctorForm.enable();
+        this.currentStep = this.isEdit ? 3 : 1;
         this.completedSteps.clear();
         this.userForm.reset({ email: '', phone: '', password: '' });
         this.profileForm.reset({ gender: null, bloodGroup: null, maritalStatus: null, preferredCommunication: null });
@@ -465,23 +537,43 @@ export class CmsDoctorDrawerComponent implements OnChanges {
         }, 0);
     }
 
+    private serializeBankDetails(value: unknown): string | null {
+        if (value === null || value === undefined || value === '') return null;
+        return typeof value === 'string' ? value : JSON.stringify(value);
+    }
+
     async onSave() {
-        // Validate final step
+        if (this.isSaving || this.isLoadingDoctor) return;
+
         if (this.doctorForm.invalid) {
             this.doctorForm.markAllAsTouched();
             this.toastSrv.error('Please complete all required fields.');
             return;
         }
 
+        this.isSaving = true;
+        try {
+            const targetId = this.isEdit ? await this.update() : await this.create();
+            const response = await firstValueFrom(this.doctorSrv.search_by_id(targetId));
+            if (response.success && response.data) {
+                this.toastSrv.success(this.isEdit ? 'Doctor updated' : 'Doctor created');
+                this.saveSuccess.emit(response.data);
+            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
+        } catch (error) {
+            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+            console.error(error);
+        } finally {
+            this.isSaving = false;
+        }
+    }
+
+    private async create(): Promise<string> {
         const user = this.userForm.getRawValue();
         const profile = this.profileForm.getRawValue();
         const doctor = this.doctorForm.getRawValue();
 
-        const targetId = generateUUID();
-
-        const payload = {
+        const created = await firstValueFrom(this.doctorSrv.create({
             // User
-            id: targetId,
             email: user.email,
             phone: user.phone,
             password: user.password,
@@ -504,37 +596,62 @@ export class CmsDoctorDrawerComponent implements OnChanges {
             // Doctor
             bio: doctor.bio,
             about: doctor.about,
-            languagesSpoken: doctor.languagesSpoken,
+            languagesSpoken: this.parseLanguages(doctor.languagesSpoken),
             primarySpecialtyId: doctor.primarySpecialtyId,
             medicalLicenseNumber: doctor.medicalLicenseNumber,
             medicalLicenseExpiry: doctor.medicalLicenseExpiry,
             medicalLicenseIssuingAuthority: doctor.medicalLicenseIssuingAuthority,
             yearsOfExperience: doctor.yearsOfExperience,
             yearsOfPractice: doctor.yearsOfPractice,
-            archivements: doctor.archivements?.join(',') ?? '',
-            researchInterests: doctor.researchInterests?.join(',') ?? '',
+            archivements: doctor.archivements,
+            researchInterests: doctor.researchInterests,
             publicationsCount: doctor.publicationsCount,
             conferencePresentations: doctor.conferencePresentations,
             employmentStatus: doctor.employmentStatus,
-            bankAccountDetails: JSON.stringify(doctor.bankAccountDetails ?? ''),
+            bankAccountDetails: this.serializeBankDetails(doctor.bankAccountDetails),
             panNumber: doctor.panNumber,
             gstin: doctor.gstin,
-        };
+        }));
+        if (!created.success || !created.data) throw new Error('Doctor was not created');
+        return created.data;
+    }
 
+    /** The update contract also carries fees and availability; those are re-sent unchanged from the loaded record. */
+    private async update(): Promise<string> {
+        const id = this.doctorId!;
+        const current = this.loadedDoctor;
+        if (!current) throw new Error('Doctor is not loaded');
+        const doctor = this.doctorForm.getRawValue();
 
-        const request$ = this.doctorSrv.create(payload);
-
-        try {
-            await firstValueFrom(request$);
-
-            const response = await firstValueFrom(this.doctorSrv.search_by_id(targetId));
-            if (response.success && response.data) {
-                this.saveSuccess.emit(response.data);
-            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (error) {
-            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            console.error(error);
-        }
+        await firstValueFrom(this.doctorSrv.update(id, {
+            bio: doctor.bio,
+            about: doctor.about,
+            archivements: doctor.archivements,
+            researchInterests: doctor.researchInterests,
+            languagesSpoken: this.parseLanguages(doctor.languagesSpoken),
+            publicationsCount: doctor.publicationsCount,
+            conferencePresentations: doctor.conferencePresentations,
+            yearsOfExperience: doctor.yearsOfExperience,
+            yearsOfPractice: doctor.yearsOfPractice,
+            consultationFeeMin: current.consultationFeeMin,
+            consultationFeeMax: current.consultationFeeMax,
+            followUpFee: current.followUpFee,
+            emergencyConsultationFee: current.emergencyConsultationFee,
+            homeVisitFee: current.homeVisitFee,
+            videoConsultationFee: current.videoConsultationFee,
+            consultationDuration: current.consultationDuration,
+            bufferTime: current.bufferTime,
+            advanceBookingDays: current.advanceBookingDays,
+            cancellationPolicy: current.cancellationPolicy,
+            isAvailableOnline: current.isAvailableOnline,
+            isAvailableHomeVisit: current.isAvailableHomeVisit,
+            isAvailableEmergency: current.isAvailableEmergency,
+            bankAccountDetails: this.serializeBankDetails(doctor.bankAccountDetails),
+            panNumber: doctor.panNumber,
+            gstin: doctor.gstin,
+            employmentStatus: doctor.employmentStatus,
+        }));
+        return id;
     }
 
     onClose() {

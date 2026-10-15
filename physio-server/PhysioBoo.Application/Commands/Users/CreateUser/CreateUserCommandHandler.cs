@@ -41,7 +41,7 @@ namespace PhysioBoo.Application.Commands.Users.CreateUser
                 request.AssignedBy
             );
 
-            SharedKernel.Results.DbResult<Guid> result = await _userRepository.InsertAsync<User, Guid>(newUser);
+            SharedKernel.Results.DbResult<Guid> result = await _userRepository.InsertWithRolesAsync(newUser);
 
             if (!result.Success)
             {

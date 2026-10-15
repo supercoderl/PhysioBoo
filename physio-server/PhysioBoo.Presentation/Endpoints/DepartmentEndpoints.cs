@@ -39,7 +39,7 @@ namespace PhysioBoo.Presentation.Endpoints
                     new ResponseMessage<Guid>
                     {
                         Success = true,
-                        Data = newDepartment.Id
+                        Data = newId
                     }
                 );
             }).WithName("CreateDepartment")

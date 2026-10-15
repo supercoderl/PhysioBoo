@@ -1,10 +1,13 @@
 
+using Microsoft.AspNetCore.Authorization;
 using PhysioBoo.Application.Commands.Articles.CreateArticle;
 using PhysioBoo.Application.Commands.Articles.DeleteArticle;
 using PhysioBoo.Application.Commands.Articles.UpdateArticle;
 using PhysioBoo.Application.Queries.Articles.GetAll;
 using PhysioBoo.Application.Queries.Articles.GetById;
 using PhysioBoo.Application.ViewModels.Articles;
+using PhysioBoo.Domain.Enums;
+using System.Security.Claims;
 
 
 
@@ -51,10 +54,22 @@ namespace PhysioBoo.Presentation.Endpoints
             #region Search Articles
             group.MapPost("search", async (
                 [FromBody] PagedRequest<ArticleFilter> request,
+                ClaimsPrincipal user,
+                IAuthorizationService authorization,
                 IMediatorHandler bus,
                 CancellationToken ct
             ) =>
             {
+                // The route is public, so only staff may ask for non-Published articles.
+                if (request.Filter is not null && !await CanReadUnpublishedAsync(user, authorization))
+                {
+                    request.Filter = request.Filter with
+                    {
+                        Status = request.Filter.Status is null ? null : ArticleStatus.Published,
+                        IncludeUnpublished = false
+                    };
+                }
+
                 PagedResult<ArticleViewModel> result = await bus.QueryAsync(new GetAllArticlesQuery(request));
 
                 return Results.Ok(new ResponseMessage<PagedResult<ArticleViewModel>>
@@ -107,11 +122,19 @@ namespace PhysioBoo.Presentation.Endpoints
             #region Get Article By Id
             group.MapGet("{id:guid}", async (
                 Guid id,
+                ClaimsPrincipal user,
+                IAuthorizationService authorization,
                 IMediatorHandler bus,
                 CancellationToken ct
             ) =>
             {
                 ArticleViewModel? result = await bus.QueryAsync(new GetArticleByIdQuery(id));
+
+                // Draft and archived articles must not leak through the public route.
+                if (result is not null && result.Status != ArticleStatus.Published && !await CanReadUnpublishedAsync(user, authorization))
+                {
+                    result = null;
+                }
 
                 return Results.Ok(new ResponseMessage<ArticleViewModel?>
                 {
@@ -123,6 +146,12 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces<ResponseMessage<ArticleViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<ArticleViewModel?>>(StatusCodes.Status400BadRequest);
             #endregion
+        }
+
+        private static async Task<bool> CanReadUnpublishedAsync(ClaimsPrincipal user, IAuthorizationService authorization)
+        {
+            AuthorizationResult result = await authorization.AuthorizeAsync(user, Permissions.Cms.ArticleRead);
+            return result.Succeeded;
         }
     }
 }

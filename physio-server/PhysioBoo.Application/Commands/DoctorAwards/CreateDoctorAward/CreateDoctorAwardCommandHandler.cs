@@ -29,7 +29,7 @@ namespace PhysioBoo.Application.Commands.DoctorAwards.CreateDoctorAward
             if (!await TestValidityAsync(request)) return;
 
             DoctorAward newDoctorAward = new DoctorAward(
-                request.NewDoctorAward.Id,
+                request.NewId,
                 request.NewDoctorAward.DoctorId,
                 request.NewDoctorAward.AwardName,
                 request.NewDoctorAward.AwardCategory,

@@ -1,4 +1,5 @@
 
+using PhysioBoo.Application.Commands.Doctors.CreateDoctor;
 using PhysioBoo.Application.Commands.Doctors.DeleteDoctor;
 using PhysioBoo.Application.Commands.Doctors.UpdateDoctor;
 using PhysioBoo.Application.Queries.Doctors.GetAll;
@@ -20,6 +21,33 @@ namespace PhysioBoo.Presentation.Endpoints
                 .WithTags("Doctors")
                 .WithOpenApi()
                 .AddEndpointFilter<NotificationResultFilter>();
+
+            #region Create New Doctor
+            group.MapPost("", async (
+                [FromBody] CreateDoctorViewModel newDoctor,
+                IMediatorHandler bus,
+                CancellationToken ct
+            ) =>
+            {
+                Guid newId = Guid.NewGuid();
+
+                await bus.SendCommandAsync(new CreateDoctorCommand(newDoctor, newId));
+
+                return Results.CreatedAtRoute(
+                    "GetDoctorById",
+                    new { id = newId },
+                    new ResponseMessage<Guid>
+                    {
+                        Success = true,
+                        Data = newId
+                    }
+                );
+            }).WithName("CreateDoctor")
+            .WithSummary("Create a doctor together with the user account and profile.")
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status201Created)
+            .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization(Permissions.Hr.DoctorRegister);
+            #endregion
 
             #region Get All Doctors
             group.MapPost("search", async (

@@ -1,36 +1,56 @@
-import { Component, HostListener, Input } from '@angular/core';
-import { RouterLink } from "@angular/router";
-import { HEADERS } from '../../../../shared/data/dummy';
+import { Component, ElementRef, HostListener, Input, inject } from '@angular/core';
+import { CLIENT_NAV, CLIENT_TENANT, ClientNavItem } from '../../../../shared/data/client-site';
+import { AuthService } from '../../../../services/auth/auth.service';
 import { SharedModule } from '../../../../shared/shared-imports';
 
 @Component({
   selector: 'layout-header',
   standalone: true,
   imports: [
-    SharedModule,
-    RouterLink
-],
+    SharedModule
+  ],
   templateUrl: './header.component.html'
 })
 export class HeaderComponent {
-  isSticky = false;
-  isOpen = false;
-
-  readonly headers = HEADERS;
-
-  @HostListener('window:scroll', [])
-  onWindowScroll() {
-    this.isSticky = window.scrollY > 50;
-  }
   @Input() currentPath: string = "";
 
-  getHeaderByCurrentPath() {
-    return this.headers.find(
-      (x: { title: string }) => x.title.toLowerCase() === this.currentPath.toLowerCase()
-    )?.id ?? 0;
+  isOpen = false;
+  langOpen = false;
+
+  readonly nav = CLIENT_NAV;
+  readonly tenant = CLIENT_TENANT;
+  readonly isAuthenticated = inject(AuthService).isAuthenticated;
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  isActive(item: ClientNavItem): boolean {
+    return !!item.key && item.key === (this.currentPath || 'home').toLowerCase();
   }
 
   onToggle() {
     this.isOpen = !this.isOpen;
+    this.langOpen = false;
+  }
+
+  closeMenu() {
+    this.isOpen = false;
+  }
+
+  toggleLang() {
+    this.langOpen = !this.langOpen;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const menu = this.host.nativeElement.querySelector('[data-lang-menu]');
+    if (this.langOpen && menu && !menu.contains(event.target as Node)) {
+      this.langOpen = false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.langOpen = false;
+    this.isOpen = false;
   }
 }

@@ -15,7 +15,8 @@ using PhysioBoo.Application.ViewModels.Scrumboard;
 
 namespace PhysioBoo.Presentation.Endpoints
 {
-    // Boards are shared by the whole tenant: every route needs a login but no permission code.
+    // Boards are shared by the tenant's staff: every route needs a login and a team-member role
+    // (TeamMemberFilter keeps PATIENT accounts of the tenant out), but no permission code.
     public static class ScrumboardEndpoints
     {
         public static void MapScrumboardEndpoints(this IEndpointRouteBuilder app)
@@ -23,7 +24,8 @@ namespace PhysioBoo.Presentation.Endpoints
             RouteGroupBuilder group = app.MapGroup("api/scrumboard")
                 .WithTags("Scrumboard")
                 .WithOpenApi()
-                .AddEndpointFilter<NotificationResultFilter>();
+                .AddEndpointFilter<NotificationResultFilter>()
+                .AddEndpointFilter<TeamMemberFilter>();
 
             #region Boards
             group.MapGet("/boards", async (IMediatorHandler bus, CancellationToken ct) =>

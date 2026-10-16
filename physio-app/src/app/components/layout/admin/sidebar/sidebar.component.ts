@@ -1,6 +1,4 @@
-import { SocialAuthService } from "@abacritt/angularx-social-login";
 import { Component, Input } from "@angular/core";
-import { Router } from "@angular/router";
 import { MenuService } from "../../../../services/admin/menu.service";
 import { AuthService } from "../../../../services/auth/auth.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
@@ -40,19 +38,14 @@ export class AdminLayoutSideBarComponent {
     constructor(
         private authSrv: AuthService,
         private menuSrv: MenuService,
-        private router: Router,
         private toastSrv: ToastService,
-        protected loadingSrv: LocalLoadingService,
-        private oauthSrv: SocialAuthService
+        protected loadingSrv: LocalLoadingService
     ) { }
     // #endregion
 
     // #region Events
     logout() {
-        this.oauthSrv.signOut().catch(() => { });
-        this.router.navigate(['/auth/login']).then(() => {
-            this.authSrv.logout().subscribe({ error: () => { } });
-        });
+        this.authSrv.signOut();
     }
     // #endregion
 }

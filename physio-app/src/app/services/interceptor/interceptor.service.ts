@@ -50,8 +50,9 @@ export class InterceptorService implements HttpInterceptor {
       delay(environment.DELAY_TIMES),
       catchError((err: HttpErrorResponse) => {
         if (err.status === 401) {
-          // If user was never logged in, don't even attempt to refresh — short-circuit
-          if (!this.authSrv.isAuthenticated()) {
+          // A guest never had a session: don't attempt a refresh. The profile request is the exception —
+          // after a reload the access token may have expired while the refresh cookie is still valid.
+          if (!this.authSrv.isAuthenticated() && !this.isProfileRequest(apiReq)) {
             return throwError(() => err);
           }
           return this.handle401Error(apiReq, next);
@@ -63,15 +64,8 @@ export class InterceptorService implements HttpInterceptor {
 
         this.handleUnactiveUser(err);
 
-        switch (err.status) {
-          case 403:
-            this.router.navigate(['exception/403']);
-            break;
-          case 404:
-            this.router.navigate(['exception/404']);
-            break;
-        }
-
+        // API 403/404 stay on the current page (a single denied or missing lookup must not replace the
+        // whole screen); page-level 403/404 are handled by the route guards and the `**` route.
         const shouldSkipToast = request.context.get(SKIP_ERROR_TOAST);
         if (!shouldSkipToast) {
           this.handleGlobalErrorToast(err);
@@ -102,7 +96,7 @@ export class InterceptorService implements HttpInterceptor {
           this.refreshTokenSubject.next(false);
           // Clear local session state synchronously (don't make another HTTP call)
           this.authSrv.clearSession();
-          this.router.navigate(['/auth/login']);
+          this.redirectToLogin(request);
           return throwError(() => error);
         })
       );
@@ -134,9 +128,46 @@ export class InterceptorService implements HttpInterceptor {
     }
   }
 
+  /**
+   * Session expired mid-use: back to login, returning to the current page afterwards.
+   * The profile request is left to its caller (route guards build the login redirect themselves),
+   * and nothing happens when the user is already on an auth page, so this can't loop.
+   */
+  private redirectToLogin(request: HttpRequest<any>) {
+    if (this.isProfileRequest(request)) return;
+
+    const current = this.router.url;
+    if (current.startsWith('/auth')) return;
+
+    this.router.navigate(['/auth/login'], {
+      queryParams: current && current !== '/' ? { returnUrl: current } : {}
+    });
+  }
+
+  private isProfileRequest(request: HttpRequest<any>): boolean {
+    return request.url.endsWith(BASE_API.PROFILE);
+  }
+
+  private lastToast = { message: '', at: 0 };
+
   private handleGlobalErrorToast(err: HttpErrorResponse) {
-    if (err.status === 401 || err.status === 403) return;
-    const message = err.error?.message || err.message || 'An error occurred, please try again.';
+    if (err.status === 401) return;
+
+    let message: string;
+    if (err.status === 403) {
+      message = 'You do not have permission to perform this action.';
+    } else if (err.status === 0 || err.status >= 500) {
+      // Never surface server internals (stack traces, URLs) to the user.
+      message = 'An error occurred, please try again.';
+    } else {
+      // 4xx bodies are ResponseMessage: `errors` holds the domain/validation messages meant for the user.
+      message = err.error?.message || err.error?.errors?.[0] || 'An error occurred, please try again.';
+    }
+
+    // Parallel requests failing the same way show one toast, not one per request.
+    const now = Date.now();
+    if (message === this.lastToast.message && now - this.lastToast.at < 3000) return;
+    this.lastToast = { message, at: now };
 
     this.toastSrv.error(message);
   }

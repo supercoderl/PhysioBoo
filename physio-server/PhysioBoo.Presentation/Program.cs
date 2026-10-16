@@ -1,4 +1,6 @@
-﻿
+﻿using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
+
 using Aikido.Zen.DotNetCore;
 using HealthChecks.ApplicationStatus.DependencyInjection;
 using HealthChecks.UI.Client;
@@ -81,6 +83,24 @@ namespace PhysioBoo.Presentation
             LogStep("Handlers added", ref stepTimer);
 
             builder.Services.AddAuth(builder.Configuration);
+
+            // Anonymous public-site forms: a few posts per visitor IP per window, then 429.
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                options.AddPolicy(PublicDoctorEndpoints.PublicFormsPolicy, context =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(10), QueueLimit = 0 }));
+                options.OnRejected = async (context, ct) =>
+                {
+                    await context.HttpContext.Response.WriteAsJsonAsync(new ResponseMessage<object>
+                    {
+                        Success = false,
+                        Errors = new[] { "Too many requests from this device. Please wait a few minutes before trying again." }
+                    }, ct);
+                };
+            });
             LogStep("Auth configured", ref stepTimer);
 
             if (builder.Environment.IsDevelopment())
@@ -250,6 +270,8 @@ namespace PhysioBoo.Presentation
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
+            // After forwarded headers, so limits apply to the visitor's IP rather than the proxy's.
+            app.UseRateLimiter();
             app.UseMiddleware<SecurityGuardMiddleware>();
 
             #region Map endpoints
@@ -328,6 +350,7 @@ namespace PhysioBoo.Presentation
                 app.MapReviewEndpoints();
                 app.MapMedicalSpecialtyEndpoints();
                 app.MapArticleEndpoints();
+                app.MapPublicDoctorEndpoints();
                 app.MapHomeSettingsEndpoints();
                 app.MapHomeBannerEndpoints();
                 app.MapHomeFeatureEndpoints();

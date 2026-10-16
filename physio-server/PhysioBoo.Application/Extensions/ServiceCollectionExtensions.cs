@@ -130,6 +130,8 @@ using PhysioBoo.Application.Queries.Addresses.GetById;
 using PhysioBoo.Application.Queries.AdminMenus.GetAll;
 using PhysioBoo.Application.Queries.AdminMenus.GetById;
 using PhysioBoo.Application.Queries.AdminMenus.GetMine;
+using PhysioBoo.Application.Queries.Public.Doctors;
+using PhysioBoo.Application.ViewModels.Public;
 using PhysioBoo.Application.Queries.Appointments.GetAll;
 using PhysioBoo.Application.Queries.Appointments.GetById;
 using PhysioBoo.Application.Queries.Appointments.GetDaily;
@@ -334,6 +336,10 @@ namespace PhysioBoo.Application.Extensions
             services.AddScoped<IRequestHandler<GetAllAdminMenusQuery, PagedResult<AdminMenuViewModel>>, GetAllAdminMenusQueryHandler>();
             services.AddScoped<IRequestHandler<GetAdminMenuByIdQuery, AdminMenuViewModel?>, GetAdminMenuByIdQueryHandler>();
             services.AddScoped<IRequestHandler<GetMyMenusQuery, List<UserMenuViewModel>>, GetMyMenusQueryHandler>();
+            services.AddScoped<IRequestHandler<SearchPublicDoctorsQuery, PagedResult<PublicDoctorViewModel>>, SearchPublicDoctorsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetPublicDoctorFilterOptionsQuery, PublicDoctorFilterOptionsViewModel>, GetPublicDoctorFilterOptionsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetPublicDoctorQuery, PublicDoctorDetailViewModel?>, GetPublicDoctorQueryHandler>();
+            services.AddScoped<IRequestHandler<GetRelatedPublicDoctorsQuery, List<PublicDoctorViewModel>>, GetRelatedPublicDoctorsQueryHandler>();
 
             // MedicalSpecialty
             services.AddScoped<IRequestHandler<GetAllMedicalSpecialtiesQuery, PagedResult<MedicalSpecialtyViewModel>>, GetAllMedicalSpecialtiesQueryHandler>();

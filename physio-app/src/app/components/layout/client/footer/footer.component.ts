@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
+import { CLIENT_FOOTER_COLS, CLIENT_TENANT } from '../../../../shared/data/client-site';
 import { SharedModule } from '../../../../shared/shared-imports';
-import { FOOTER_MENUS } from '../../../../shared/data/dummy';
 
 @Component({
   selector: 'layout-footer',
@@ -8,14 +8,10 @@ import { FOOTER_MENUS } from '../../../../shared/data/dummy';
   imports: [
     SharedModule
   ],
-  templateUrl: './footer.component.html',
-  styles: `
-    button {
-      background: linear-gradient(90.08deg,#E11D48 .09%,#06aed4 70.28%);
-    }
-  `
+  templateUrl: './footer.component.html'
 })
 export class FooterComponent {
-
-  readonly menus = FOOTER_MENUS;
+  readonly cols = CLIENT_FOOTER_COLS;
+  readonly tenant = CLIENT_TENANT;
+  readonly year = new Date().getFullYear();
 }

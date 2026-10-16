@@ -1,289 +1,136 @@
-<div>
-  <div class="bg-headerBg py-2 hidden md:block">
-    <div class="container w-full mx-auto">
-      <div class="flex-center-between">
-        <div class="flex items-center gap-4">
-          <p class="text-primary text-xs14 m-0 inline-flex items-center">
-            <physio-icon name="email" class="text-secondary me-1" />
-            info&#64;example.com
-          </p>
-          <p class="text-primary text-xs14 m-0 inline-flex items-center">
-            <physio-icon name="phone" class="text-secondary me-1" />
-            +1 66589 14556
-          </p>
-        </div>
-        <ul class="m-0 p-0 flex items-center">
-          <li
-            class="mr-2 pr-2 border-r border-solid border-borderGray flex-center-center"
-          >
-            <physio-icon name="sun" />
-          </li>
-          <li
-            class="inline-flex items-center mr-2 pr-2 border-r border-solid border-borderGray"
-          >
-            <div class="mr-4 relative flex items-center">
-              <a
-                class="inline-flex items-center text-neutral transition-smooth"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-                href="/react/template/index"
-                data-discover="true"
-              >
-                <physio-icon name="us-flag" [size]="24" />
-              </a>
-              <ul
-                class="bg-surface border border-solid border-[rgba(0,_0,_0,_0.1)] text-xs14 rounded-xs p-2 mt-2 hidden flex items-center"
-              >
-                <li>
-                  <a
-                    class="dropdown-item rounded d-flex align-items-center"
-                    href="/react/template/index"
-                    data-discover="true"
-                  >
-                    <img
-                      class="me-2"
-                      alt="flag"
-                      src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/flags/us-flag.svg"
-                    />
-                    ENG
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item rounded d-flex align-items-center"
-                    href="/react/template/index"
-                    data-discover="true"
-                  >
-                    <img
-                      class="me-2"
-                      alt="flag"
-                      src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/flags/arab-flag.svg"
-                    />
-                    ARA
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item rounded d-flex align-items-center"
-                    href="/react/template/index"
-                    data-discover="true"
-                  >
-                    <img
-                      class="me-2"
-                      alt="flag"
-                      src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/flags/france-flag.svg"
-                    />
-                    FRA
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div class="relative">
-              <a
-                class="relative text-xs14 font-medium whitespace-nowrap text-neutral transition-smooth"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-                href="/react/template/index"
-                data-discover="true"
-              >
-                USD
-              </a>
-              <ul
-                class="bg-surface border border-solid border-[rgba(0,_0,_0,_0.1)] text-xs14 rounded-xs p-2 mt-2 hidden"
-              >
-                <li>
-                  <a
-                    class="dropdown-item rounded"
-                    href="/react/template/index"
-                    data-discover="true"
-                  >
-                    USD
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item rounded"
-                    href="/react/template/index"
-                    data-discover="true"
-                  >
-                    YEN
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item rounded"
-                    href="/react/template/index"
-                    data-discover="true"
-                  >
-                    EURO
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="m-0 p-0 border-0 inline-block text-xs15">
-            <div class="border-0 flex items-center">
-              <!-- <a
-                href="/react/template/index"
-                class="w-5.5 h-5.5 bg-transparent rounded-full text-brandDark text-xs14 mr-2 inlineFlex-center-center cursor-pointer transition-smooth hover:bg-gray-200"
-              >
-                <physio-icon name="facebook-outline" />
-              </a>
-              <a
-                href="/react/template/index"
-                class="w-5.5 h-5.5 bg-transparent rounded-full text-brandDark text-xs14 mr-2 inlineFlex-center-center cursor-pointer transition-smooth hover:bg-gray-200"
-              >
-                <physio-icon name="twitter-outline" />
-              </a>
-              <a
-                href="/react/template/index"
-                class="w-5.5 h-5.5 bg-transparent rounded-full text-brandDark text-xs14 mr-2 inlineFlex-center-center cursor-pointer transition-smooth hover:bg-gray-200"
-              >
-                <physio-icon name="instagram-outline" />
-              </a>
-              <a
-                href="/react/template/index"
-                class="w-5.5 h-5.5 bg-transparent rounded-full text-brandDark text-xs14 mr-2 inlineFlex-center-center cursor-pointer transition-smooth hover:bg-gray-200"
-              >
-                <physio-icon name="linkedin-outline" />
-              </a> -->
-            </div>
-          </li>
-        </ul>
-      </div>
+<div class="sticky top-0 z-[999]">
+  <div *ngIf="tenant.showEmergency" class="bg-gray-900 text-white text-[13px] leading-[18px] xl:text-sm">
+    <div class="max-w-[1200px] mx-auto px-5 xl:px-0 py-2.5 flex gap-2.5 items-start xl:items-center">
+      <physio-icon name="siren" [size]="16" class="text-[#FDA4AF] mt-0.5 xl:mt-0" />
+      <span>In a medical emergency, call your local emergency number. Clinic line: <b class="font-semibold">{{ tenant.phone }}</b></span>
     </div>
   </div>
-  <header
-    [ngClass]="{
-      'fixed w-full z-[999] bg-surface border-b border-[#f0f0f0] transition-all duration-300 top-0': true,
-      'shadow-md': isSticky,
-      'md:top-10': !isSticky,
-    }"
-  >
-    <div class="container mx-auto">
-      <nav
-        class="bg-surface h-17 relative flex-wrap m-0 mx-3.75 md:p-0 flex-center-between"
-      >
-        <div class="w-full md:w-auto inline-flex items-center">
-          <a
-            id="mobile_btn"
-            href="javascript:void(0)"
-            class="md:hidden inline-block m-0 md:mr-7.5 text-neutral cursor-pointer transition-smooth z-[99] absolute md:relative left-0"
-            (click)="onToggle()"
-          >
-            <span class="inline-block w-[31px]">
-              <span
-                class="bg-[#E11D48] block h-0.75 mb-1.75 w-[31px] rounded-0.5"
-              ></span>
-              <span
-                class="bg-[#E11D48] block h-0.75 mb-1.75 w-4 rounded-0.5"
-              ></span>
-              <span
-                class="bg-[#E11D48] block h-0.75 w-[31px] rounded-0.5"
-              ></span
-            ></span>
-          </a>
-          <a
-            class="w-full md:w-auto max-w-full md:max-w-[35%] text-center md:text-left inline-block m-0 md:mr-6 py-1.25"
-            href=""
-          >
-            <img
-              class="h-10 md:h-auto mx-auto md:mx-0"
-              alt="Logo"
-              src="../../../../../assets/logo/logo.webp"
-            />
-          </a>
-        </div>
-        <div class="inline-flex items-center">
-          <div
-            [ngClass]="{
-              'order-3 md:order-none w-[260px] md:w-auto overflow-x-hidden md:overflow-auto z-[1060] md:z-[0] md:translate-x-[none] transition-all duration-500 bg-[#E11D48] md:bg-[unset] fixed md:relative inset-0': true,
-              '-translate-x-[260px]': !isOpen,
-              'translate-x-0': isOpen,
-            }"
-          >
-            <div
-              class="bg-surface h-15 border-b border-solid border-[#f0f0f0] flex items-center justify-between md:hidden px-5"
-            >
-              <a class="text-[#2e3842]" href="" data-discover="true">
-                <img
-                  class="h-8 max-w-full"
-                  alt="Logo"
-                  src="../../../../../assets/logo/logo.webp"
-                />
-              </a>
-              <a
-                id="menu_close"
-                class="text-[18px] text-[#2e3842]"
-                href="javascript:void(0)"
-                (click)="onToggle()"
-              >
-                <i nz-icon nzType="close"></i>
-              </a>
-            </div>
-            <ul class="flex flex-col md:flex-row m-0">
-              <li
-                class="block m-0 md:mr-6.25 text-xs15 border-b md:border-0 border-solid border-[#E11D48]"
-                *ngFor="let item of headers"
-              >
-                <a
-                  [ngClass]="{
-                    'leading-17 block text-xs14 font-medium md:p-0 py-3.75 px-5  transition-smooth hover:text-secondary': true,
-                    'text-white md:text-primary':
-                      getHeaderByCurrentPath() !== item.id,
-                    'text-secondary': getHeaderByCurrentPath() === item.id,
-                  }"
-                  [routerLink]="item.href"
-                >
-                  {{ item.title }}
-                </a>
-              </li>
-            </ul>
-          </div>
-          <ul class="ml-6 m-0 hidden md:flex flex-wrap">
-            <li class="pr-6 inlineFlex-center-center text-xs15">
-              <a
-                href="/react/template/index"
-                class="text-neutral transition-smooth"
-              >
-                <physio-icon name="search" [size]="15" />
-              </a>
-              <div
-                class="top-14 right-[18%] absolute w-70 z-[999] bg-surface p-2.5 rounded-1.25 shadow-[0_2px_8px_#b7b7b740] hidden"
-              >
-                <form action="/patient/search-doctor1">
-                  <div class="input-group">
-                    <input class="form-control" type="text" /><button
-                      type="submit"
-                      class="btn"
-                    >
-                      Search
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </li>
-            <li class="pr-2 inlineFlex-center-center text-xs15">
-              <a
-                class="bg-[linear-gradient(90.08deg,_#E11D48_.09%,_#06aed4_70.28%)] text-white relative overflow-hidden z-[1] py-1 px-3.4 text-[0.813rem] transition-smooth font-medium rounded-full items-center inline-flex hover:text-gray-300"
-                routerLink="/auth/login"
-              >
-                <physio-icon name="lock" [size]="13" [class]="'mr-1'" />
-                Login
-              </a>
-            </li>
-            <li>
-              <a
-                class="bg-primary text-white relative overflow-hidden z-[1] py-1 px-3.4 text-[0.813rem] transition-smooth font-medium rounded-full items-center inline-flex hover:text-gray-300"
-                href="/auth/register"
-              >
-                <physio-icon name="user-round-x" [size]="13" [class]="'mr-1'" />
-                Register
-              </a>
-            </li>
-          </ul>
-        </div>
+
+  <header class="bg-surface border-b border-gray-200">
+    <div class="max-w-[1200px] mx-auto h-16 xl:h-[76px] pl-5 pr-3 xl:px-0 flex items-center gap-10">
+      <a routerLink="/" aria-label="Home" class="flex items-center">
+        <img src="assets/logo/logo.webp" [alt]="tenant.name" class="h-6 xl:h-[30px]" />
+      </a>
+
+      <nav aria-label="Main" class="hidden xl:flex gap-1 text-[15px] font-medium">
+        <a
+          *ngFor="let item of nav"
+          [routerLink]="item.href"
+          [fragment]="item.fragment"
+          [attr.aria-current]="isActive(item) ? 'page' : null"
+          class="px-3 py-2 rounded-lg transition-colors"
+          [ngClass]="isActive(item)
+            ? 'bg-primarySoft text-primaryDeep'
+            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'"
+        >{{ item.title }}</a>
       </nav>
+
+      <div class="ml-auto hidden xl:flex items-center gap-2">
+        <div class="relative" data-lang-menu>
+          <button
+            type="button"
+            (click)="toggleLang()"
+            [attr.aria-expanded]="langOpen"
+            aria-haspopup="menu"
+            class="h-10 px-2.5 border-0 bg-transparent rounded-lg flex gap-1.5 items-center text-sm font-medium text-gray-700 hover:bg-gray-100 cursor-pointer"
+          >
+            <physio-icon name="globe" [size]="16" />EN<physio-icon name="chevron-down" [size]="14" />
+          </button>
+          <div
+            *ngIf="langOpen"
+            role="menu"
+            class="absolute top-[46px] right-0 w-[200px] bg-surface border border-gray-200 rounded-xl shadow-[0_12px_32px_rgba(38,20,26,.12)] p-1.5 z-10"
+          >
+            <div role="menuitemradio" aria-checked="true" class="px-3 py-2.5 rounded-lg bg-gray-100 text-sm font-medium flex justify-between items-center">
+              English <physio-icon name="check" [size]="16" class="text-primary" />
+            </div>
+            <p class="px-3 py-2.5 text-xs text-gray-600">More languages appear here when a tenant enables them.</p>
+          </div>
+        </div>
+
+        <!-- Signed in: /auth/login's guest guard forwards to the user's own area (patient, admin or super admin). -->
+        <a
+          *ngIf="isAuthenticated()"
+          routerLink="/auth/login"
+          class="h-10 px-3.5 rounded-[10px] flex gap-2 items-center text-sm font-medium text-gray-900 border border-gray-300 hover:border-gray-400"
+        >
+          <physio-icon name="circle-user" [size]="15" />My account
+        </a>
+        <ng-container *ngIf="!isAuthenticated()">
+          <a routerLink="/auth/login" class="h-10 px-3.5 rounded-[10px] flex items-center text-sm font-medium text-gray-900 hover:bg-gray-100">Log in</a>
+          <a routerLink="/auth/register" class="h-10 px-3.5 rounded-[10px] flex items-center text-sm font-medium text-gray-900 border border-gray-300 hover:border-gray-400">Sign up</a>
+        </ng-container>
+        <a
+          routerLink="/doctor"
+          class="h-10 px-4 rounded-[10px] flex gap-2 items-center text-sm font-semibold text-white bg-primary hover:bg-primaryHover hover:text-white"
+        >
+          <physio-icon name="search" [size]="15" />Find a doctor
+        </a>
+      </div>
+
+      <div class="ml-auto flex xl:hidden gap-1">
+        <a routerLink="/doctor" aria-label="Find a doctor" class="w-11 h-11 rounded-[10px] flex items-center justify-center text-gray-900">
+          <physio-icon name="search" [size]="20" />
+        </a>
+        <button
+          type="button"
+          (click)="onToggle()"
+          aria-label="Open menu"
+          [attr.aria-expanded]="isOpen"
+          class="w-11 h-11 border-0 rounded-[10px] bg-gray-100 flex items-center justify-center text-gray-900 cursor-pointer"
+        >
+          <physio-icon name="menu" [size]="20" />
+        </button>
+      </div>
     </div>
   </header>
+</div>
+
+<!-- Mobile menu -->
+<div *ngIf="isOpen" class="xl:hidden fixed inset-0 bg-surface z-[1000] flex flex-col overflow-y-auto" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="h-16 pl-5 pr-3 flex items-center justify-between border-b border-gray-200 flex-none">
+    <img src="assets/logo/logo.webp" [alt]="tenant.name" class="h-6" />
+    <button
+      type="button"
+      (click)="closeMenu()"
+      aria-label="Close menu"
+      class="w-11 h-11 border-0 rounded-[10px] bg-gray-100 flex items-center justify-center text-gray-900 cursor-pointer"
+    >
+      <physio-icon name="x" [size]="20" />
+    </button>
+  </div>
+  <nav class="p-3 flex flex-col gap-0.5">
+    <a
+      *ngFor="let item of nav"
+      [routerLink]="item.href"
+      [fragment]="item.fragment"
+      (click)="closeMenu()"
+      [attr.aria-current]="isActive(item) ? 'page' : null"
+      class="h-[52px] px-3.5 rounded-[10px] flex items-center justify-between text-[17px]"
+      [ngClass]="isActive(item) ? 'font-semibold bg-primarySoft text-primaryDeep' : 'font-medium text-gray-900'"
+    >
+      {{ item.title }}
+      <physio-icon *ngIf="!isActive(item)" name="chevron-right" [size]="18" class="text-gray-400" />
+    </a>
+  </nav>
+  <div class="mt-auto px-6 pt-4 pb-7 flex flex-col gap-2.5 border-t border-gray-200">
+    <a routerLink="/doctor" (click)="closeMenu()" class="h-[52px] rounded-xl bg-primary text-white text-base font-semibold flex gap-2 items-center justify-center hover:text-white">
+      <physio-icon name="search" [size]="18" />Find a doctor
+    </a>
+    <a
+      *ngIf="isAuthenticated()"
+      routerLink="/auth/login"
+      (click)="closeMenu()"
+      class="h-12 rounded-xl border border-gray-300 text-[15px] font-semibold flex gap-2 items-center justify-center"
+    >
+      <physio-icon name="circle-user" [size]="16" />My account
+    </a>
+    <div *ngIf="!isAuthenticated()" class="grid grid-cols-2 gap-2.5">
+      <a routerLink="/auth/login" (click)="closeMenu()" class="h-12 rounded-xl border border-gray-300 text-[15px] font-semibold flex items-center justify-center">Log in</a>
+      <a routerLink="/auth/register" (click)="closeMenu()" class="h-12 rounded-xl border border-gray-300 text-[15px] font-semibold flex items-center justify-center">Sign up</a>
+    </div>
+    <span class="text-sm text-gray-600 flex gap-2 items-center justify-center pt-1.5">
+      <physio-icon name="globe" [size]="16" />English
+    </span>
+  </div>
 </div>

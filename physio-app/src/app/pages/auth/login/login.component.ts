@@ -1,7 +1,7 @@
 import { GoogleSigninButtonModule, SocialAuthService } from '@abacritt/angularx-social-login';
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom, take } from 'rxjs';
 import { BooCheckboxComponent } from 'src/app/components/checkbox/boo-checkbox/boo-checkbox.component';
 import { BooButtonComponent } from "../../../components/button/boo-button/boo-button.component";
@@ -10,9 +10,9 @@ import { BooInputComponent } from "../../../components/input/boo-input/boo-input
 import { AuthService } from '../../../services/auth/auth.service';
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
 import { ToastService } from '../../../services/common/toast.service';
-import { Role } from '../../../shared/enums/role';
 import { SharedModule } from '../../../shared/shared-imports';
 import { LoadingKeys } from '../../../shared/types/loading';
+import { canReturnTo, homeRouteFor } from '../../../shared/utils/role.utils';
 import { AppValidators } from '../../../shared/validator/validator-config.validator';
 
 @Component({
@@ -46,6 +46,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     protected loadingSrv: LocalLoadingService,
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private authSrv: AuthService,
     private oauthSrc: SocialAuthService,
     private toastSrv: ToastService
@@ -93,20 +94,19 @@ export class LoginComponent implements OnInit, OnDestroy {
         } finally {
           this.isLoggingIn.set(false);
         }
-      }
+      },
+      error: () => this.isLoggingIn.set(false)
     })
   }
 
+  /**
+   * Roles come from `/api/users/me` (loaded by login), not from anything the client sent.
+   * The requested page is honoured only when this role may open it; otherwise the role's own area.
+   */
   private async redirectByRole(): Promise<boolean> {
-    const raw = await firstValueFrom(this.authSrv.role$.pipe(take(1)));
-    const roles = raw ?? [];
-    if (roles.includes(Role.SUPER_ADMIN.toString())) {
-      return this.router.navigate(['/superadmin']);
-    }
-    if (roles.some(r => r !== Role.PATIENT.toString())) {
-      return this.router.navigate(['/admin']);
-    }
-    return this.router.navigate(['/']);
+    const roles = await firstValueFrom(this.authSrv.role$.pipe(take(1)));
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    return this.router.navigateByUrl(canReturnTo(returnUrl, roles) ? returnUrl : homeRouteFor(roles));
   }
 
   onChangeState = (newState: string) => {

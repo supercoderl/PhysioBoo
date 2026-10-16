@@ -1,0 +1,295 @@
+<!-- Intro: breadcrumb, title, search, live result count -->
+<section class="bg-gray-50 border-b border-gray-200">
+  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-7 md:pt-8 md:pb-10 lg:pt-10 lg:pb-12">
+    <nav aria-label="Breadcrumb">
+      <ol class="list-none m-0 mb-5 p-0 flex gap-2 items-center text-sm text-gray-600">
+        <li><a routerLink="/" class="text-gray-700 hover:text-primaryDeep">Home</a></li>
+        <li aria-hidden="true" class="flex"><physio-icon name="chevron-right" [size]="13" /></li>
+        <li aria-current="page" class="text-gray-900 font-medium">Doctors</li>
+      </ol>
+    </nav>
+
+    <h1 class="text-[30px] leading-9 md:text-[38px] md:leading-[46px] lg:text-[44px] lg:leading-[52px] font-semibold tracking-[-0.02em] text-gray-900 mb-3 max-w-[760px] text-balance">
+      Find the Right Specialist for Your Recovery
+    </h1>
+    <p class="text-base leading-[26px] text-gray-700 mb-7 max-w-[640px]">
+      Browse physiotherapists and rehabilitation specialists in the network. Filter by specialty, facility or
+      consultation type, then view a profile or request an appointment.
+    </p>
+
+    <div class="flex gap-4 items-center flex-wrap">
+      <label class="flex-[1_1_320px] max-w-[640px] h-14 flex gap-3 items-center px-4 bg-surface border border-gray-300 rounded-xl focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+        <physio-icon
+          [name]="searching ? 'loader-circle' : 'search'"
+          [size]="19"
+          class="text-gray-600 flex-none"
+          [class.animate-spin]="searching"
+        />
+        <span class="sr-only">Search doctors</span>
+        <input
+          type="search"
+          [ngModel]="qInput"
+          (ngModelChange)="onSearchInput($event)"
+          placeholder="Search by doctor name or specialty"
+          maxlength="100"
+          autocomplete="off"
+          class="border-0 outline-none text-base w-full bg-transparent text-gray-900 placeholder:text-gray-500 [&::-webkit-search-cancel-button]:hidden"
+        />
+        <button
+          *ngIf="qInput"
+          type="button"
+          (click)="clearSearch()"
+          aria-label="Clear search"
+          class="w-8 h-8 flex-none rounded-lg bg-gray-100 flex items-center justify-center text-gray-700 cursor-pointer hover:bg-gray-200"
+        >
+          <physio-icon name="x" [size]="16" />
+        </button>
+      </label>
+      <p role="status" aria-live="polite" class="text-sm text-gray-700 m-0">
+        <b class="font-semibold text-gray-900">{{ countLabel }}</b>
+      </p>
+    </div>
+  </div>
+</section>
+
+<div #results class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 pb-10 md:pt-7 md:pb-16 lg:pt-8 lg:pb-20 scroll-mt-24">
+  <!-- Filter bar (tablet and desktop) -->
+  <div role="group" aria-label="Filters" class="hidden md:flex gap-3 items-end flex-wrap mb-4">
+    <label class="flex flex-col gap-1.5 text-[13px] font-semibold text-gray-700 flex-[1_1_220px] max-w-[280px]">
+      Specialty
+      <select
+        [ngModel]="query.specialty"
+        (ngModelChange)="setSpecialty($event)"
+        class="h-11 border border-gray-300 rounded-[10px] px-3 text-[15px] font-normal text-gray-900 bg-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+      >
+        <option value="">All specialties</option>
+        <option *ngFor="let o of specialties" [value]="o.id">{{ o.name }}</option>
+      </select>
+    </label>
+    <label class="flex flex-col gap-1.5 text-[13px] font-semibold text-gray-700 flex-[1_1_220px] max-w-[280px]">
+      Clinic or facility
+      <select
+        [ngModel]="query.facility"
+        (ngModelChange)="setFacility($event)"
+        class="h-11 border border-gray-300 rounded-[10px] px-3 text-[15px] font-normal text-gray-900 bg-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+      >
+        <option value="">All facilities</option>
+        <option *ngFor="let o of facilities" [value]="o.id">{{ o.name }}</option>
+      </select>
+    </label>
+    <fieldset class="border-0 m-0 p-0 flex flex-col gap-1.5">
+      <legend class="text-[13px] font-semibold text-gray-700 p-0 mb-1.5">Consultation type</legend>
+      <div class="flex gap-1.5">
+        <button
+          type="button"
+          (click)="toggleOnline()"
+          [attr.aria-pressed]="query.online"
+          class="h-11 px-3.5 rounded-[10px] border text-sm font-medium flex gap-1.5 items-center cursor-pointer"
+          [ngClass]="query.online ? 'border-primary bg-primarySoft text-primaryDeep' : 'border-gray-300 bg-surface text-gray-900 hover:bg-gray-50'"
+        >
+          <physio-icon name="video" [size]="16" />Online
+        </button>
+        <button
+          type="button"
+          (click)="toggleHomeVisit()"
+          [attr.aria-pressed]="query.homeVisit"
+          class="h-11 px-3.5 rounded-[10px] border text-sm font-medium flex gap-1.5 items-center cursor-pointer"
+          [ngClass]="query.homeVisit ? 'border-primary bg-primarySoft text-primaryDeep' : 'border-gray-300 bg-surface text-gray-900 hover:bg-gray-50'"
+        >
+          <physio-icon name="house" [size]="16" />Home visit
+        </button>
+      </div>
+    </fieldset>
+    <button
+      *ngIf="chips.length"
+      type="button"
+      (click)="clearAll()"
+      class="h-11 px-1.5 border-0 bg-transparent text-primaryDeep text-sm font-semibold underline cursor-pointer ml-auto"
+    >Clear all filters</button>
+  </div>
+
+  <!-- Filter button (mobile) -->
+  <div class="md:hidden flex gap-2.5 items-center mb-3.5">
+    <button
+      #filterButton
+      type="button"
+      (click)="openDrawer()"
+      [attr.aria-expanded]="drawerOpen"
+      aria-controls="filter-drawer"
+      class="flex-1 h-12 border border-gray-300 rounded-xl bg-surface text-[15px] font-semibold text-gray-900 flex gap-2 items-center justify-center cursor-pointer"
+    >
+      <physio-icon name="sliders-horizontal" [size]="18" />{{ filterButtonLabel }}
+    </button>
+    <button
+      *ngIf="chips.length"
+      type="button"
+      (click)="clearAll()"
+      class="h-12 px-2.5 border-0 bg-transparent text-primaryDeep text-sm font-semibold underline cursor-pointer"
+    >Clear all</button>
+  </div>
+
+  <!-- Active filter chips -->
+  <ul *ngIf="chips.length" aria-label="Active filters" class="list-none m-0 mb-5 p-0 flex gap-2 flex-wrap">
+    <li *ngFor="let c of chips">
+      <button
+        type="button"
+        (click)="removeChip(c)"
+        [attr.aria-label]="'Remove filter ' + c.label"
+        class="h-[34px] pl-3 pr-2 rounded-full border border-primary bg-primarySoft text-primaryDeep text-[13px] font-medium flex gap-1.5 items-center cursor-pointer"
+      >
+        {{ c.label }}<physio-icon name="x" [size]="14" />
+      </button>
+    </li>
+  </ul>
+
+  <!-- Loading -->
+  <div *ngIf="state === 'loading'" aria-busy="true" aria-label="Loading doctors" class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
+    <doctor-card *ngFor="let s of skeletons; let i = index" [skeleton]="true" [class.hidden]="i >= 2" class="md:!block" />
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="state === 'error'" role="alert" class="border border-dangerBorder bg-dangerSoft rounded-2xl px-6 py-10 text-center">
+    <physio-icon name="cloud-off" [size]="32" class="text-danger inline-flex" />
+    <h2 class="text-xl font-semibold mt-3.5 mb-1.5">We couldn't load doctors</h2>
+    <p class="text-[15px] text-gray-700 m-0 mb-5">Check your connection and try again. Your search and filters are kept.</p>
+    <button
+      type="button"
+      (click)="retry()"
+      class="h-11 px-5 border-0 rounded-[10px] bg-primary text-white text-sm font-semibold inline-flex gap-2 items-center cursor-pointer hover:bg-primaryHover"
+    >
+      <physio-icon name="rotate-cw" [size]="16" />Try again
+    </button>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="state === 'empty'" class="border border-dashed border-gray-300 rounded-2xl px-6 py-12 text-center">
+    <physio-icon name="search-x" [size]="32" class="text-gray-600 inline-flex" />
+    <h2 class="text-xl font-semibold mt-3.5 mb-1.5">No doctors match these filters</h2>
+    <p class="text-[15px] text-gray-700 mx-auto mb-5 max-w-[420px]">
+      Try a different specialty or facility, or remove a filter. You can also contact the clinic to ask about availability.
+    </p>
+    <div class="flex gap-2.5 justify-center flex-wrap">
+      <button
+        *ngIf="chips.length"
+        type="button"
+        (click)="clearAll()"
+        class="h-11 px-[18px] border-0 rounded-[10px] bg-primary text-white text-sm font-semibold cursor-pointer hover:bg-primaryHover"
+      >Clear all filters</button>
+      <a routerLink="/contact" class="h-11 px-[18px] border border-gray-300 rounded-[10px] text-sm font-semibold flex items-center text-gray-900 hover:border-primary hover:text-primaryDeep">Contact us</a>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <ng-container *ngIf="state === 'results'">
+    <ul class="list-none m-0 p-0 grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
+      <li *ngFor="let d of doctors; trackBy: trackById"><doctor-card [doctor]="d" /></li>
+    </ul>
+
+    <nav *ngIf="totalPages > 1" aria-label="Pagination" class="flex justify-center md:justify-end items-center gap-1.5 mt-8 flex-wrap">
+      <button
+        type="button"
+        (click)="goToPage(query.page - 1)"
+        [disabled]="query.page <= 1"
+        aria-label="Previous page"
+        class="h-11 w-11 border border-gray-300 rounded-[10px] bg-surface text-gray-900 flex items-center justify-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        <physio-icon name="chevron-left" [size]="18" />
+      </button>
+      <ng-container *ngFor="let p of pages">
+        <span *ngIf="p === null" class="h-11 min-w-8 flex items-center justify-center text-gray-600" aria-hidden="true">…</span>
+        <button
+          *ngIf="p !== null"
+          type="button"
+          (click)="goToPage(p)"
+          [attr.aria-current]="p === query.page ? 'page' : null"
+          [attr.aria-label]="'Page ' + p"
+          class="h-11 min-w-11 px-2 border rounded-[10px] text-sm font-semibold cursor-pointer"
+          [ngClass]="p === query.page ? 'border-primary bg-primary text-white' : 'border-gray-300 bg-surface text-gray-900 hover:border-primary'"
+        >{{ p }}</button>
+      </ng-container>
+      <button
+        type="button"
+        (click)="goToPage(query.page + 1)"
+        [disabled]="query.page >= totalPages"
+        aria-label="Next page"
+        class="h-11 w-11 border border-gray-300 rounded-[10px] bg-surface text-gray-900 flex items-center justify-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        <physio-icon name="chevron-right" [size]="18" />
+      </button>
+    </nav>
+  </ng-container>
+</div>
+
+<!-- Filter drawer (mobile) -->
+<div *ngIf="drawerOpen" class="md:hidden fixed inset-0 z-[1100] bg-gray-900/45" (click)="closeDrawer()">
+  <div
+    id="filter-drawer"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="filter-drawer-title"
+    class="absolute inset-x-0 bottom-0 max-h-[85vh] bg-surface rounded-t-[20px] flex flex-col"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex justify-between items-center pl-5 pr-4 pt-4 pb-3 border-b border-gray-200">
+      <h2 id="filter-drawer-title" class="text-lg font-semibold m-0">Filters</h2>
+      <button
+        #drawerClose
+        type="button"
+        (click)="closeDrawer()"
+        aria-label="Close filters"
+        class="w-11 h-11 border-0 rounded-[10px] bg-gray-100 flex items-center justify-center cursor-pointer text-gray-900"
+      >
+        <physio-icon name="x" [size]="20" />
+      </button>
+    </div>
+    <div class="p-5 flex flex-col gap-[22px] overflow-auto">
+      <label class="flex flex-col gap-2 text-sm font-semibold text-gray-900">
+        Specialty
+        <select
+          [ngModel]="query.specialty"
+          (ngModelChange)="setSpecialty($event)"
+          class="h-12 border border-gray-300 rounded-xl px-3 text-base font-normal text-gray-900 bg-surface"
+        >
+          <option value="">All specialties</option>
+          <option *ngFor="let o of specialties" [value]="o.id">{{ o.name }}</option>
+        </select>
+      </label>
+      <label class="flex flex-col gap-2 text-sm font-semibold text-gray-900">
+        Clinic or facility
+        <select
+          [ngModel]="query.facility"
+          (ngModelChange)="setFacility($event)"
+          class="h-12 border border-gray-300 rounded-xl px-3 text-base font-normal text-gray-900 bg-surface"
+        >
+          <option value="">All facilities</option>
+          <option *ngFor="let o of facilities" [value]="o.id">{{ o.name }}</option>
+        </select>
+      </label>
+      <fieldset class="border-0 m-0 p-0">
+        <legend class="text-sm font-semibold p-0 mb-2">Consultation type</legend>
+        <div class="flex flex-col gap-2">
+          <label class="min-h-12 flex gap-3 items-center text-[15px]">
+            <input type="checkbox" [checked]="query.online" (change)="toggleOnline()" class="w-5 h-5 accent-primary" />
+            Online consultation
+          </label>
+          <label class="min-h-12 flex gap-3 items-center text-[15px]">
+            <input type="checkbox" [checked]="query.homeVisit" (change)="toggleHomeVisit()" class="w-5 h-5 accent-primary" />
+            Home visit
+          </label>
+        </div>
+      </fieldset>
+    </div>
+    <div class="grid grid-cols-[1fr_1.6fr] gap-2.5 px-5 pt-3.5 pb-5 border-t border-gray-200">
+      <button
+        type="button"
+        (click)="clearAll()"
+        class="h-[50px] border border-gray-300 rounded-xl bg-surface text-[15px] font-semibold text-gray-900 cursor-pointer"
+      >Clear all</button>
+      <button
+        type="button"
+        (click)="closeDrawer()"
+        class="h-[50px] border-0 rounded-xl bg-primary text-white text-[15px] font-semibold cursor-pointer"
+      >{{ state === 'loading' ? 'Updating…' : showLabel }}</button>
+    </div>
+  </div>
+</div>

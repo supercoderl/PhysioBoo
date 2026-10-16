@@ -1,6 +1,7 @@
 import { SocialAuthService } from '@abacritt/angularx-social-login';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, finalize, firstValueFrom, forkJoin, map, Observable, of, shareReplay, switchMap, tap, throwError } from 'rxjs';
 import { BASE_API } from '../../shared/api/base';
 import { createHttpContext } from '../../shared/contexts/option.context';
@@ -25,6 +26,7 @@ export class AuthService {
     private prefSrv = inject(PreferenceService);
     private themeSrv = inject(ThemeConfigService);
     private menuSrv = inject(MenuService);
+    private router = inject(Router);
 
     isAuthenticated = signal(false);
     public permissions$ = this.permissionsSubject.asObservable();
@@ -79,6 +81,18 @@ export class AuthService {
         return this.http.post<PagedResponse<string>>(BASE_API.LOGOUT, null).pipe(
             finalize(() => this.clearSession())
         );
+    }
+
+    /**
+     * User-initiated sign-out from any area. The local session is cleared before leaving, so the login
+     * page's guest guard doesn't send the user straight back; the server-side logout runs afterwards.
+     */
+    signOut(): void {
+        this.oauthService.signOut().catch(() => { });
+        this.clearSession();
+        this.router.navigate(['/auth/login']).then(() => {
+            this.logout().subscribe({ error: () => { } });
+        });
     }
 
     clearSession(): void {
@@ -152,6 +166,16 @@ export class AuthService {
 
     forgotPassword(body: any): Observable<any> {
         return this.http.post(BASE_API.FORGOTPASSWORD, body);
+    }
+
+    /** 204 on success; an invalid/expired token or a weak password comes back as an HTTP error. */
+    resetPassword(token: string, newPassword: string): Observable<void> {
+        return this.http.post<void>(BASE_API.RESETPASSWORD, { token, newPassword }, {
+            context: createHttpContext({
+                loadingKey: LoadingKeys.USER.RESET_PASSWORD,
+                skipErrorToast: true
+            })
+        });
     }
 
     hasPermission(code: string): boolean {

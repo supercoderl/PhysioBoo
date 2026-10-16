@@ -9,6 +9,7 @@ export const BASE_API = {
   REGISTER: '/api/users/register',
   REFRESHTOKEN: 'api/users/refresh/refresh-token',
   FORGOTPASSWORD: '/api/users/forgot-password',
+  RESETPASSWORD: '/api/users/reset-password',
   MEDICALSPECIALTY: {
     BASE: '/api/medical-specialties',
     SEARCH: '/api/medical-specialties/search'
@@ -524,5 +525,15 @@ export const BASE_API = {
     BASE: '/api/appointments',
     SEARCH: '/api/appointments/search',
     STATUS: (id: string) => `/api/appointments/${id}/status`,
+  },
+  /** Anonymous endpoints for the public website (tenant-scoped server-side, public fields only). */
+  PUBLIC: {
+    DOCTORS: {
+      SEARCH: '/api/public/doctors/search',
+      FILTERS: '/api/public/doctors/filters',
+      DETAIL: (id: string) => `/api/public/doctors/${id}`,
+      RELATED: (id: string) => `/api/public/doctors/${id}/related`,
+      APPOINTMENT_REQUEST: (id: string) => `/api/public/doctors/${id}/appointment-requests`,
+    }
   }
 };

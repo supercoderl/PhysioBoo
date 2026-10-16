@@ -112,11 +112,13 @@ export const routes: Routes = [
                         path: 'bed-map',
                         data: { breadcrumb: ['bed-map'] },
                         loadComponent: () => import('./inpatient/bed-map/bed-map.component').then(m => m.AdminBedMapComponent),
+                        canActivate: [permissionGuard(Permissions.Inpatient.BedRead)],
                     },
                     {
                         path: 'admission',
                         data: { breadcrumb: ['admission'] },
                         loadComponent: () => import('./inpatient/admission/admission.component').then(m => m.AdminAdmissionComponent),
+                        canActivate: [permissionGuard(Permissions.Inpatient.AdmissionRead)],
                     },
                     {
                         path: 'nursing',
@@ -131,16 +133,19 @@ export const routes: Routes = [
                                 path: 'dashboard',
                                 data: { breadcrumb: ['dashboard'] },
                                 loadComponent: () => import('./nursing/dashboard/nursing-dashboard.component').then(m => m.AdminNursingDashboardComponent),
+                                canActivate: [permissionGuard(Permissions.Inpatient.NursingRead)],
                             },
                             {
                                 path: 'patient/:patientId',
                                 data: { breadcrumb: ['patient'] },
                                 loadComponent: () => import('./nursing/patient/nursing-patient.component').then(m => m.AdminNursingPatientComponent),
+                                canActivate: [permissionGuard(Permissions.Inpatient.NursingRead)],
                             },
                             {
                                 path: 'handover',
                                 data: { breadcrumb: ['handover'] },
                                 loadComponent: () => import('./nursing/handover/nursing-handover.component').then(m => m.AdminNursingHandoverComponent),
+                                canActivate: [permissionGuard(Permissions.Inpatient.NursingRead)],
                             }
                         ]
                     },
@@ -148,6 +153,7 @@ export const routes: Routes = [
                         path: 'treatment-sheet',
                         data: { breadcrumb: ['treatment-sheet'] },
                         loadComponent: () => import('./inpatient/treatment-sheet/treatment-sheet.component').then(m => m.AdminTreatmentSheetComponent),
+                        canActivate: [permissionGuard(Permissions.Inpatient.TreatmentSheetRead)],
                     }
                 ]
             },
@@ -176,6 +182,7 @@ export const routes: Routes = [
                         path: 'surgery',
                         data: { breadcrumb: ['surgery'] },
                         loadComponent: () => import('./paraclinical/surgery/surgery.component').then(m => m.AdminSurgeryComponent),
+                        canActivate: [permissionGuard(Permissions.Surgery.SurgeryRead)],
                     }
                 ]
             },
@@ -268,21 +275,25 @@ export const routes: Routes = [
                         path: 'patient',
                         loadComponent: () => import('./crm/patient/list.component').then(m => m.CrmPatientListComponent),
                         data: { breadcrumb: ['patient'] },
+                        canActivate: [permissionGuard(Permissions.Reception.PatientRead)]
                     },
                     {
                         path: 'marketing-campaign',
                         data: { breadcrumb: ['marketing-campaign'] },
                         loadComponent: () => import('./crm/marketing-campaign/list.component').then(m => m.CrmMarketingCampaignListComponent),
+                        canActivate: [permissionGuard(Permissions.Crm.CampaignRead)],
                     },
                     {
                         path: 'lead-management',
                         data: { breadcrumb: ['lead-management'] },
                         loadComponent: () => import('./crm/lead-management/lead-management.component').then(m => m.AdminLeadManagementComponent),
+                        canActivate: [permissionGuard(Permissions.Crm.LeadRead)],
                     },
                     {
                         path: 'support-complaint',
                         data: { breadcrumb: ['support-complaint'] },
                         loadComponent: () => import('./crm/support-complaint/support-complaint.component').then(m => m.AdminSupportComplaintComponent),
+                        canActivate: [permissionGuard(Permissions.Crm.ComplaintRead)],
                     },
                     {
                         path: 'member-point',
@@ -304,16 +315,19 @@ export const routes: Routes = [
                         path: 'article-news',
                         data: { breadcrumb: ['article-news'] },
                         loadComponent: () => import('./cms/article-news/list/list.component').then(m => m.CmsArticleNewsListComponent),
+                        canActivate: [permissionGuard(Permissions.Cms.ArticleRead)],
                     },
                     {
                         path: 'service',
                         data: { breadcrumb: ['service'] },
                         loadComponent: () => import('./cms/service/service.component').then(m => m.AdminServiceComponent),
+                        canActivate: [permissionGuard(Permissions.Cms.ServiceRead)],
                     },
                     {
                         path: 'home-configuration',
                         data: { breadcrumb: ['home-configuration'] },
                         loadComponent: () => import('./cms/home-configuration/home-configuration.component').then(m => m.AdminHomeConfigurationComponent),
+                        canActivate: [permissionGuard(Permissions.Cms.HomeSettingsRead)],
                     },
                     {
                         path: 'doctor',
@@ -328,6 +342,7 @@ export const routes: Routes = [
                                 path: 'list',
                                 loadComponent: () => import('./cms/doctor/list/list.component').then(m => m.CmsDoctorListComponent),
                                 data: { breadcrumb: ['list'] },
+                                canActivate: [permissionGuard(Permissions.Hr.DoctorRead)]
                             }
                         ]
                     },

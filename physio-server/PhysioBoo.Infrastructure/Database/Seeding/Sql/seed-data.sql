@@ -348,7 +348,7 @@ FROM "Roles" r CROSS JOIN "Permissions" p
 WHERE r."Code" = 'SUPER_ADMIN'
   AND NOT EXISTS (SELECT 1 FROM "RolePermissions" rp WHERE rp."RoleId" = r."Id" AND rp."PermissionId" = p."Id");
 
--- 6. Admin menus (10 sections, 36 pages) ------------------------------------------------
+-- 6. Admin menus (10 sections, 36 pages; permission codes for Inpatient/CRM/CMS/Surgery pages are set in 6c) ------------------------------------------------
 -- Only seeded while the table is empty, so menus you edit later are never overwritten.
 DO $$
 DECLARE admin_id uuid := (SELECT "Id" FROM "Users" WHERE "Id" = '15859ffa-3eb1-4bb8-88f0-e00dee314636');
@@ -412,6 +412,77 @@ BEGIN
         ('/admin/system', 'Settings', 'settings-2', '/admin/system/settings', '', 5)
     ) AS v(parent_route, label, icon, route, perm, ord);
 END $$;
+
+-- 6b. Super Admin menus (7 sections, 13 pages) -------------------------------------------
+-- The Super Admin sidebar shows only root rows whose route starts with '/superadmin' (MenuService.superadminMenus),
+-- and section 6 seeds none, so the sidebar was empty. Seeded only while no '/superadmin' root row exists, so it
+-- also fills databases seeded before this section without overwriting a Super Admin menu edited in the UI.
+-- Section rows are group headings (their route is a valid page in that group); permission codes match the
+-- route guards in physio-app/src/app/pages/superadmin/superadmin.routes.ts.
+DO $$
+DECLARE admin_id uuid := (SELECT "Id" FROM "Users" WHERE "Id" = '15859ffa-3eb1-4bb8-88f0-e00dee314636');
+BEGIN
+    IF EXISTS (SELECT 1 FROM "AdminMenus" WHERE "ParentId" IS NULL AND "Route" LIKE '/superadmin%') THEN RETURN; END IF;
+
+    INSERT INTO "AdminMenus" ("Id", "Label", "Icon", "Route", "ParentId", "IsActive", "Order", "PermissionCode", "CreatedAt", "CreatedBy")
+    SELECT md5('admin-menu:' || v.route)::uuid, v.label, v.icon, v.route, NULL, TRUE, v.ord, v.perm, LOCALTIMESTAMP, admin_id
+    FROM (VALUES
+        ('Overview', 'layout-dashboard', '/superadmin/overview', '', 100),
+        ('Tenants', 'building-2', '/superadmin/tenants', '', 101),
+        ('Billing', 'credit-card', '/superadmin/billing', '', 102),
+        ('Access Control', 'shield', '/superadmin/users', '', 103),
+        ('Master Data', 'database', '/superadmin/master-data', '', 104),
+        ('Platform', 'settings', '/superadmin/platform/sequence-rules', '', 105),
+        ('Security', 'lock', '/superadmin/security', '', 106)
+    ) AS v(label, icon, route, perm, ord)
+    WHERE NOT EXISTS (SELECT 1 FROM "AdminMenus" m WHERE m."Id" = md5('admin-menu:' || v.route)::uuid);
+
+    INSERT INTO "AdminMenus" ("Id", "Label", "Icon", "Route", "ParentId", "IsActive", "Order", "PermissionCode", "CreatedAt", "CreatedBy")
+    SELECT md5('admin-menu:' || v.parent_route || '|' || v.route)::uuid, v.label, v.icon, v.route,
+           md5('admin-menu:' || v.parent_route)::uuid, TRUE, v.ord, v.perm, LOCALTIMESTAMP, admin_id
+    FROM (VALUES
+        ('/superadmin/overview', 'Dashboard', 'layout-dashboard', '/superadmin/overview/dashboard', '', 0),
+        ('/superadmin/tenants', 'Hospital Groups', 'building-2', '/superadmin/tenants/hospital-group', 'admin:hospital-group:read', 0),
+        ('/superadmin/billing', 'Plans & Subscriptions', 'credit-card', '/superadmin/billing', 'subscription:plan:read', 0),
+        ('/superadmin/users', 'Users', 'users', '/superadmin/users', 'iam:user:read', 0),
+        ('/superadmin/users', 'Roles & Permissions', 'key', '/superadmin/roles', 'iam:role:read', 1),
+        ('/superadmin/users', 'Menu Management', 'list', '/superadmin/menus', 'admin:admin-menu:read', 2),
+        ('/superadmin/master-data', 'Catalogs', 'database', '/superadmin/master-data', '', 0),
+        ('/superadmin/platform/sequence-rules', 'Sequence Rules', 'hash', '/superadmin/platform/sequence-rules', 'admin:sequence-tracker:read', 0),
+        ('/superadmin/platform/sequence-rules', 'Localization', 'globe', '/superadmin/platform/localization', 'system:resource:read', 1),
+        ('/superadmin/platform/sequence-rules', 'Icons', 'image', '/superadmin/platform/icons', '', 2),
+        ('/superadmin/platform/sequence-rules', 'Dev Data', 'code', '/superadmin/platform/dev-data', 'system:dev:access', 3),
+        ('/superadmin/security', 'Audit Logs', 'history', '/superadmin/security/audit-logs', 'system:audit-log:read', 0),
+        ('/superadmin/security', 'IP Access', 'ban', '/superadmin/security/ip-access', 'system:security:block-ip', 1)
+    ) AS v(parent_route, label, icon, route, perm, ord)
+    WHERE NOT EXISTS (SELECT 1 FROM "AdminMenus" m WHERE m."Id" = md5('admin-menu:' || v.parent_route || '|' || v.route)::uuid);
+END $$;
+
+-- 6c. Permission codes for the admin pages section 6 seeded without one ---------------------------
+-- These pages are guarded by these permissions (route guards + API), so an empty code showed the item to staff
+-- who then got 403. Only rows still carrying the seeded id AND an empty code are touched: the menu API rejects
+-- an empty code, so such a row was never edited in the UI.
+UPDATE "AdminMenus" m
+SET "PermissionCode" = v.perm
+FROM (VALUES
+    ('/admin/inpatient', '/admin/inpatient/bed-map', 'inpatient:bed:read'),
+    ('/admin/inpatient', '/admin/inpatient/admission', 'inpatient:admission:read'),
+    ('/admin/inpatient', '/admin/inpatient/nursing/dashboard', 'inpatient:nursing:read'),
+    ('/admin/inpatient', '/admin/inpatient/nursing/handover', 'inpatient:nursing:read'),
+    ('/admin/inpatient', '/admin/inpatient/treatment-sheet', 'inpatient:treatment-sheet:read'),
+    ('/admin/paraclinical', '/admin/paraclinical/surgery', 'surgery:case:read'),
+    ('/admin/crm', '/admin/crm/patient', 'reception:patient:read'),
+    ('/admin/crm', '/admin/crm/marketing-campaign', 'crm:campaign:read'),
+    ('/admin/crm', '/admin/crm/lead-management', 'crm:lead:read'),
+    ('/admin/crm', '/admin/crm/support-complaint', 'crm:complaint:read'),
+    ('/admin/crm', '/admin/crm/member-point', 'crm:member:read'),
+    ('/admin/cms', '/admin/cms/article-news', 'cms:article:read'),
+    ('/admin/cms', '/admin/cms/service', 'cms:service:read'),
+    ('/admin/cms', '/admin/cms/home-configuration', 'cms:home-settings:read'),
+    ('/admin/cms', '/admin/cms/doctor/list', 'hr:doctor:read')
+) AS v(parent_route, route, perm)
+WHERE m."Id" = md5('admin-menu:' || v.parent_route || '|' || v.route)::uuid
+  AND coalesce(m."PermissionCode", '') = '';
 
 -- 7. Default subscription plans (editable from Super Admin -> Billing). Only while none exist. ---
 INSERT INTO "SubscriptionPlans" ("Id", "Code", "Name", "Description", "MonthlyPrice", "Currency", "MaxUsers", "MaxBranches", "SortOrder", "IsActive", "CreatedAt", "CreatedBy")

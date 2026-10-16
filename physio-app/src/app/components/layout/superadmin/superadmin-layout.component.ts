@@ -1,10 +1,10 @@
-import { SocialAuthService } from '@abacritt/angularx-social-login';
 import { Component, HostListener, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
-import { filter, Subject, takeUntil } from 'rxjs';
+import { filter, map, Subject, takeUntil } from 'rxjs';
 import { MenuService } from '../../../services/admin/menu.service';
 import { AuthService } from '../../../services/auth/auth.service';
 import { SharedModule } from '../../../shared/shared-imports';
+import { isStaff } from '../../../shared/utils/role.utils';
 import { BooAvatarComponent } from '../../image/avatar/boo-avatar.component';
 import { SidebarItemComponent } from '../admin/sidebar/sidebar-item/sidebar-item.component';
 
@@ -99,6 +99,7 @@ import { SidebarItemComponent } from '../admin/sidebar/sidebar-item/sidebar-item
                         <h1 class="text-sm font-semibold text-regular m-0 truncate">{{ pageTitle }}</h1>
                     </div>
                     <a
+                        *ngIf="hasStaffRole$ | async"
                         routerLink="/admin"
                         class="flex items-center gap-1.5 px-2 py-2 -mr-2 rounded-1.5 text-xs text-secondary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors"
                     >
@@ -129,12 +130,13 @@ export class SuperadminLayoutComponent implements OnInit, OnDestroy {
     // #region Inject Services
     private authSrv = inject(AuthService);
     private router = inject(Router);
-    private oauthSrv = inject(SocialAuthService);
     private menuSrv = inject(MenuService);
     // #endregion
 
     // #region Inputs, Outputs, Properties
     userInfo$ = this.authSrv.userInfo$;
+    /** `/admin` is the tenant workspace; a SUPER_ADMIN only reaches it when also holding a staff role. */
+    hasStaffRole$ = this.authSrv.role$.pipe(map(isStaff));
     pageTitle = 'Super Admin';
     menus = this.menuSrv.superadminMenus;
     loaded = this.menuSrv.loaded;
@@ -171,10 +173,7 @@ export class SuperadminLayoutComponent implements OnInit, OnDestroy {
     }
 
     logout() {
-        this.oauthSrv.signOut().catch(() => { });
-        this.router.navigate(['/auth/login']).then(() => {
-            this.authSrv.logout().subscribe({ error: () => { } });
-        });
+        this.authSrv.signOut();
     }
 
     private updateTitle() {

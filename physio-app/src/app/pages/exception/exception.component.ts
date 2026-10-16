@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzResultModule } from 'ng-zorro-antd/result';
+import { AuthService } from '../../services/auth/auth.service';
+import { homeRouteFor } from '../../shared/utils/role.utils';
 
 @Component({
   selector: 'app-exception',
@@ -19,12 +21,13 @@ import { NzResultModule } from 'ng-zorro-antd/result';
           <p class="text-md md:text-xl text-opacity-80 mb-6">
               {{ getErrorSubtitle() }}
           </p>
-          <a 
-            class="inline-block bg-primary hover:bg-primary text-white font-bold py-2 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+          <button
+            type="button"
+            class="inline-block bg-primary hover:bg-primary text-white font-bold py-2 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer"
             (click)="goHome()"
           >
               Go to Home
-          </a>
+          </button>
       </div>
     </section>                                     
   `,
@@ -126,7 +129,8 @@ export class ExceptionComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private authSrv: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -165,7 +169,10 @@ export class ExceptionComponent implements OnInit {
     return classes[this.errorCode] || 'w-12 h-12 flex-center-center bg-gray-100 text-gray-600 rounded-full';
   }
 
+  /** Signed-in users go back to their own area; guests to the public site. */
   goHome(): void {
-    this.router.navigate(['/']);
+    let roles: string[] | null = null;
+    this.authSrv.role$.subscribe(r => roles = r).unsubscribe();
+    this.router.navigateByUrl(homeRouteFor(roles));
   }
 }

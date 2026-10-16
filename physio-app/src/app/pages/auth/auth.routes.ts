@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { guestGuardFn } from '../../services/auth/guest-guard.guard';
 
 export const routes: Routes = [
     {
@@ -8,7 +9,8 @@ export const routes: Routes = [
             { 
                 path: 'login', 
                 loadComponent: () => import('./login/login.component').then(m => m.LoginComponent),
-                data: { breadcrumbs: ['login'] } 
+                canActivate: [guestGuardFn],
+                data: { breadcrumbs: ['login'] }
             },
             {
                 path: 'register',

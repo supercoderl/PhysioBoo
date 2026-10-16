@@ -1,29 +1,5 @@
-import { isPlatformBrowser } from '@angular/common';
-import { inject, PLATFORM_ID } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
-import { catchError, map, of, switchMap, take } from 'rxjs';
-import { Role } from '../../shared/enums/role';
-import { AuthService } from './auth.service';
+import { isSuperAdmin } from '../../shared/utils/role.utils';
+import { createRoleGuard } from './role-guard';
 
-export const superadminGuardFn: CanActivateFn = () => {
-    const authService = inject(AuthService);
-    const router = inject(Router);
-    const platformId = inject(PLATFORM_ID);
-
-    if (!isPlatformBrowser(platformId)) {
-        return true;
-    }
-
-    return authService.role$.pipe(
-        take(1),
-        switchMap(role => role !== null ? of(role) : authService.getProfile().pipe(
-            switchMap(() => authService.role$),
-            take(1)
-        )),
-        map(roles => {
-            if (!roles) return router.createUrlTree(['/auth/login']);
-            return roles.some(code => code === Role[Role.SUPER_ADMIN]) ? true : router.createUrlTree(['/exception/403']);
-        }),
-        catchError(() => of(router.createUrlTree(['/auth/login'])))
-    );
-};
+/** Platform console (`/superadmin`): SUPER_ADMIN only. */
+export const superadminGuardFn = createRoleGuard(isSuperAdmin);

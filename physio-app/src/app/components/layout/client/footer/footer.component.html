@@ -1,246 +1,33 @@
-<footer class="relative z-[1] bg-25 block">
-  <div class="pt-20 md:pt-25 bg-surface pb-10 relative overflow-hidden z-[1]">
-    <div class="container mx-auto">
-      <div class="grid md:grid-cols-3">
-        <div class="md:col-span-2">
-          <div class="grid md:grid-cols-4">
-            <div class="px-3" *ngFor="let menu of menus">
-              <div class="mb-7.5 md:mb-5">
-                <h6
-                  class="text-primary text-base md:text-lg font-semibold mb-3.75 md:mb-6 capitalize"
-                >
-                  {{ menu.title }}
-                </h6>
-                <ul>
-                  <li
-                    class="mb-2.5 md:mb-4 relative text-xs15"
-                    *ngFor="let menu_child of menu.children"
-                  >
-                    <a
-                      [href]="menu_child.href"
-                      class="text-brandDark transition-transform ease-in-out duration-500 text-xs15 relative inline-block hover:scale-x-110 origin-left transform-gpu"
-                    >
-                      {{ menu_child.title }}
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+<footer class="border-t border-gray-200 bg-gray-50">
+  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-10 pb-8 md:pt-16">
+    <div class="grid grid-cols-2 gap-x-4 gap-y-7 md:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,1fr))] md:gap-12 pb-7 md:pb-12 border-b border-gray-200">
+      <div class="col-span-2 md:col-span-1">
+        <img src="assets/logo/logo.webp" [alt]="tenant.name" class="h-6 md:h-7 mb-3.5 md:mb-4" />
+        <p class="text-sm md:text-[15px] md:leading-6 text-gray-700 max-w-[320px] mb-4 md:mb-5">{{ tenant.tagline }}</p>
+        <div class="flex flex-col gap-2.5 text-sm text-gray-800">
+          <span class="flex gap-2 items-center"><physio-icon name="map-pin" [size]="16" class="text-gray-600" />{{ tenant.address }}</span>
+          <span class="flex gap-2 items-center"><physio-icon name="phone" [size]="16" class="text-gray-600" />{{ tenant.phone }}</span>
+          <span class="flex gap-2 items-center"><physio-icon name="email" [size]="16" class="text-gray-600" />{{ tenant.email }}</span>
         </div>
-        <div class="px-3">
-          <div class="mb-5">
-            <h6
-              class="text-primary text-base md:text-lg font-semibold mb-3.75 md:mb-6 capitalize"
-            >
-              Newsletter
-            </h6>
-            <p class="mb-2 text-xs15">
-              Subscribe &amp; Stay Updated from the Doccure
-            </p>
-            <div class="relative mb-6">
-              <form action="#" class="relative bg-transparent">
-                <input
-                  class="w-full h-13.5 rounded-1.25 pr-25 border border-solid border-borderGray text-xs14 text-primary min-h-9.5 bg-surface py-1.75 pl-3.75 transition-smooth block outline-none focus:bg-transparent"
-                  placeholder="Enter Email Address"
-                  type="email"
-                  autocomplete="off"
-                /><button
-                  type="submit"
-                  class="absolute right-4 top-1/2 -translate-y-1/2 rounded-11 text-white border-0 overflow-hidden z-[1] py-[0.315rem] px-3.4 text-[0.813rem] cursor-pointer transition-smooth inline-flex items-center"
-                >
-                  <i
-                    nz-icon
-                    nzType="send"
-                    nzTheme="outline"
-                    class="mr-1 w-3.25"
-                  ></i
-                  >Send
-                </button>
-              </form>
-            </div>
-            <div>
-              <h6 class="mb-3 text-lg font-semibold">Connect With Us</h6>
-              <ul class="flex items-center">
-                <li class="group mr-2 text-xs15">
-                  <a
-                    href="/react/template/index"
-                    class="flex-center-center bg-info w-8 h-8 rounded-full text-brandDark text-base transition-smooth group-hover:bg-black"
-                  >
-                    <physio-icon
-                      name="facebook-outline"
-                      [size]="14"
-                      [class]="'group-hover:animate-flip360 group-hover:text-white'"
-                    />
-                  </a>
-                </li>
-                <li class="group mr-2 text-xs15">
-                  <a
-                    href="/react/template/index"
-                    class="flex-center-center bg-info w-8 h-8 rounded-full text-brandDark text-base transition-smooth group-hover:bg-black"
-                  >
-                    <physio-icon
-                      name="twitter-outline"
-                      [size]="14"
-                      [class]="'group-hover:animate-flip360 group-hover:text-white'"
-                    />
-                  </a>
-                </li>
-                <li class="group mr-2 text-xs15">
-                  <a
-                    href="/react/template/index"
-                    class="flex-center-center bg-info w-8 h-8 rounded-full text-brandDark text-base transition-smooth group-hover:bg-black"
-                  >
-                    <physio-icon
-                      name="instagram-outline"
-                      [size]="14"
-                      [class]="'group-hover:animate-flip360 group-hover:text-white'"
-                    />
-                  </a>
-                </li>
-                <li class="group mr-2 text-xs15">
-                  <a
-                    href="/react/template/index"
-                    class="flex-center-center bg-info w-8 h-8 rounded-full text-brandDark text-base transition-smooth group-hover:bg-black"
-                  >
-                    <physio-icon
-                      name="linkedin-outline"
-                      [size]="14"
-                      [class]="'group-hover:animate-flip360 group-hover:text-white'"
-                    />
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
+      </div>
+      <div *ngFor="let col of cols">
+        <h4 class="text-[13px] md:text-sm font-semibold mb-3 md:mb-4">{{ col.title }}</h4>
+        <div class="flex flex-col md:gap-3">
+          <a
+            *ngFor="let item of col.items"
+            [routerLink]="item.href"
+            [fragment]="item.fragment"
+            class="text-[15px] text-gray-700 hover:text-primaryDeep min-h-9 md:min-h-0 flex items-center"
+          >{{ item.title }}</a>
         </div>
       </div>
     </div>
-    <div>
-      <img
-        class="absolute top-[20%] left-0 z-[-1]"
-        alt="img"
-        src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/bg/footer-bg-01.png"
-      /><img
-        class="absolute top-0 right-0 h-full z-[-1]"
-        alt="img"
-        src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/bg/footer-bg-02.png"
-      /><img
-        class="absolute bottom-0 left-0 h-full z-[-1]"
-        alt="img"
-        src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/bg/footer-bg-03.png"
-      /><img
-        class="absolute bottom-0 left-[10%] h-full z-[-1]"
-        alt="img"
-        src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/bg/footer-bg-04.png"
-      /><img
-        class="absolute top-0 right-0 z-[-1]"
-        alt="img"
-        src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/bg/footer-bg-05.png"
-      />
-    </div>
-  </div>
-  <div class="bg-info border border-solid border-white">
-    <div class="container mx-auto px-3 md:px-0">
-      <div class="py-2.5 flex-center-between flex-wrap">
-        <div>
-          <p class="text-base text-brandDark mb-0">
-            Copyright © 2025 Doccure. All Rights Reserved
-          </p>
-        </div>
-        <div>
-          <ul class="text-base mb-0">
-            <li
-              class="inline-flex mr-2 pr-3.5 relative text-xs15 items-center"
-            >
-              <a
-                href="/react/template/index"
-                class="text-brandDark transition-smooth text-xs15 relative"
-                >Legal Notice</a
-              >
-              <div
-                class="bg-secondary w-1.5 h-1.5 absolute right-0 left-auto rounded-full top-1/2 -translate-y-1/2 content-[''] text-white"
-              ></div>
-            </li>
-            <li
-              class="inline-flex mr-2 pr-3.5 relative text-xs15 items-center"
-            >
-              <a
-                href="/privacy"
-                class="text-brandDark transition-smooth text-xs15 relative"
-                >Privacy Policy</a
-              >
-              <div
-                class="bg-secondary w-1.5 h-1.5 absolute right-0 left-auto rounded-full top-1/2 -translate-y-1/2 content-[''] text-white"
-              ></div>
-            </li>
-            <li
-              class="inline-flex mr-2 pr-3.5 relative text-xs15"
-            >
-              <a
-                href="/term"
-                class="text-brandDark transition-smooth text-xs15 relative"
-                >Term & Condition</a
-              >
-            </li>
-          </ul>
-        </div>
-        <ul class="flex-center-end m-0">
-          <li class="mr-2.5 text-xs15 inline-block">
-            <a
-              href="/react/template/index"
-              class="text-brandDark transition-smooth text-xs15 relative"
-              ><img
-                alt="Img"
-                src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/card-01.svg"
-            /></a>
-          </li>
-          <li class="mr-2.5 text-xs15">
-            <a
-              href="/react/template/index"
-              class="text-brandDark transition-smooth text-xs15 relative"
-              ><img
-                alt="Img"
-                src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/card-02.svg"
-            /></a>
-          </li>
-          <li class="mr-2.5 text-xs15">
-            <a
-              href="/react/template/index"
-              class="text-brandDark transition-smooth text-xs15 relative"
-              ><img
-                alt="Img"
-                src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/card-03.svg"
-            /></a>
-          </li>
-          <li class="mr-2.5 text-xs15">
-            <a
-              href="/react/template/index"
-              class="text-brandDark transition-smooth text-xs15 relative"
-              ><img
-                alt="Img"
-                src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/card-04.svg"
-            /></a>
-          </li>
-          <li class="mr-2.5 text-xs15">
-            <a
-              href="/react/template/index"
-              class="text-brandDark transition-smooth text-xs15 relative"
-              ><img
-                alt="Img"
-                src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/card-05.svg"
-            /></a>
-          </li>
-          <li class="mr-2.5 text-xs15">
-            <a
-              href="/react/template/index"
-              class="text-brandDark transition-smooth text-xs15 relative"
-              ><img
-                alt="Img"
-                src="https://doccure.dreamstechnologies.com/react/template/src/assets/img/icons/card-06.svg"
-            /></a>
-          </li>
-        </ul>
+    <div class="pt-5 md:pt-6 flex flex-col-reverse gap-2.5 md:flex-row md:justify-between md:items-center text-[13px] md:text-sm text-gray-600">
+      <span>© {{ year }} {{ tenant.name }}. All rights reserved.</span>
+      <div class="flex gap-5 md:gap-6 items-center">
+        <a routerLink="/privacy" class="hover:text-gray-900">Privacy Policy</a>
+        <a routerLink="/term" class="hover:text-gray-900">Terms of Service</a>
+        <span class="hidden md:flex gap-1.5 items-center"><physio-icon name="globe" [size]="14" />English</span>
       </div>
     </div>
   </div>

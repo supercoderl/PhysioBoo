@@ -223,7 +223,8 @@ namespace PhysioBoo.Infrastructure.Database
         {
             // Enable triggers
             optionsBuilder.EnableServiceProviderCaching(true);
-            optionsBuilder.EnableSensitiveDataLogging(true);
+            // Sensitive data logging (SQL parameter values: phone numbers, emails, hashes) is enabled only in
+            // Development, in Program.cs. Enabling it here would also log patients' details in production.
             base.OnConfiguring(optionsBuilder);
         }
 

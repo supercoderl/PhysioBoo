@@ -20,6 +20,11 @@ export const routes: Routes = [
                 loadComponent: () => import('./doctor/doctor.component').then(m => m.DoctorComponent),
                 data: { breadcrumbs: ['doctor'] }  
             },
+            {
+                path: 'doctor/:id',
+                loadComponent: () => import('./doctor/detail/doctor-detail.component').then(m => m.DoctorDetailComponent),
+                data: { breadcrumbs: ['doctor'] }
+            },
             { 
                 path: 'about-us', 
                 loadComponent: () => import('./about-us/about-us.component').then(m => m.AboutUsComponent),

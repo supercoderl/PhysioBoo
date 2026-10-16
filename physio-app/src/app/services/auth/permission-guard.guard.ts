@@ -1,10 +1,11 @@
 import { inject } from "@angular/core";
 import { CanActivateFn, Router } from "@angular/router";
-import { map, of, switchMap, take } from "rxjs";
+import { catchError, map, of, switchMap, take } from "rxjs";
 import { AuthService } from "./auth.service";
+import { loginUrlTree } from "./role-guard";
 
 export const permissionGuard = (code: string): CanActivateFn => {
-    return () => {
+    return (_route, state) => {
         const auth = inject(AuthService);
         const router = inject(Router);
 
@@ -15,9 +16,11 @@ export const permissionGuard = (code: string): CanActivateFn => {
                 take(1)
             )),
             map(perms => {
-                if ((perms ?? []).includes(code)) return true;
+                if (perms === null) return loginUrlTree(router, state.url);
+                if (perms.includes(code)) return true;
                 return router.createUrlTree(['/exception/403']);
-            })
+            }),
+            catchError(() => of(loginUrlTree(router, state.url)))
         )
     }
 }

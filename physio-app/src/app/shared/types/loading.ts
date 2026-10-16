@@ -13,7 +13,8 @@ export const LoadingKeys = {
                 GOOGLE: 'user-login-oauth-google',
                 FACEBOOK: 'user-login-oauth-facebook'
             }
-        }
+        },
+        RESET_PASSWORD: 'user-reset-password'
     },
     PRESCRIPTION: {
         GET_DRAFT: 'prescription-get-draft',
@@ -290,6 +291,13 @@ export const LoadingKeys = {
     },
     PATIENT: {
         CREATE: 'patient-create'
+    },
+    PUBLIC_DOCTOR: {
+        SEARCH: 'public-doctor-search',
+        FILTERS: 'public-doctor-filters',
+        DETAIL: 'public-doctor-detail',
+        RELATED: 'public-doctor-related',
+        APPOINTMENT_REQUEST: 'public-doctor-appointment-request'
     }
 } as const;
 

@@ -35,7 +35,8 @@ namespace PhysioBoo.Presentation.Endpoints
             }).WithName("GetAcademyCourses")
             .WithSummary("Published courses with the signed-in user's progress.")
             .Produces<ResponseMessage<List<CourseSummaryViewModel>>>(StatusCodes.Status200OK)
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .AddEndpointFilter<TeamMemberFilter>();
 
             group.MapGet("/courses/{id:guid}", async (Guid id, IMediatorHandler bus, CancellationToken ct) =>
             {
@@ -46,7 +47,8 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("A published course with its lessons and which of them the user has finished.")
             .Produces<ResponseMessage<CourseViewModel?>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<CourseViewModel?>>(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .AddEndpointFilter<TeamMemberFilter>();
 
             group.MapPost("/lessons/{id:guid}/complete", async (Guid id, IMediatorHandler bus, CancellationToken ct) =>
             {
@@ -58,7 +60,8 @@ namespace PhysioBoo.Presentation.Endpoints
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status400BadRequest)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .AddEndpointFilter<TeamMemberFilter>();
 
             group.MapDelete("/lessons/{id:guid}/complete", async (Guid id, IMediatorHandler bus, CancellationToken ct) =>
             {
@@ -69,7 +72,8 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Mark a lesson as not finished.")
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status200OK)
             .Produces<ResponseMessage<Guid>>(StatusCodes.Status404NotFound)
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .AddEndpointFilter<TeamMemberFilter>();
             #endregion
 
             #region Manage

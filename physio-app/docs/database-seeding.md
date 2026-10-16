@@ -40,6 +40,8 @@ Steps 2 to 4 can be repeated safely: each skips what already exists.
 | 4 | 274 permissions (from `Permissions.cs`) | skipped per code |
 | 5 | `SUPER_ADMIN` gets every permission | adds only missing grants, so it also grants permissions added later |
 | 6 | Admin menus (10 sections, 36 pages) | only while `AdminMenus` is empty, so menus edited in the UI are never overwritten |
+| 6b | Super Admin menus (7 sections, 13 pages, routes under `/superadmin`) | only while no root menu with a `/superadmin` route exists, so it also fills databases seeded before it (empty Super Admin sidebar) |
+| 6c | Permission codes for the Inpatient / CRM / CMS / Surgery pages seeded by 6 without one | only rows with the seeded id **and** an empty code (the menu API never saves an empty code) |
 | 7 | 3 subscription plans | only while `SubscriptionPlans` is empty |
 | 8 | 22 code-numbering rules | skipped per entity type |
 

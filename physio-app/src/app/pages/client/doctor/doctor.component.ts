@@ -1,97 +1,317 @@
-import { Component } from "@angular/core";
-import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.component";
-import { TitleDoctorComponent } from "./title.component";
-import { FilterDoctorComponent } from "./filter.component";
-import { SharedModule } from "../../../shared/shared-imports";
-import { ListDoctorComponent } from "./list.component";
-import { MapDoctorComponent } from "./map.component";
+import { isPlatformBrowser } from '@angular/common';
+import { Component, DestroyRef, ElementRef, HostListener, OnDestroy, OnInit, PLATFORM_ID, ViewChild, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
+import { Subject, catchError, debounceTime, distinctUntilChanged, map, merge, of, switchMap, tap } from 'rxjs';
+import { DoctorCardComponent } from '../../../components/layout/client/doctor/doctor-card.component';
+import { PublicDoctorService } from '../../../services/public/public-doctor.service';
+import { SharedModule } from '../../../shared/shared-imports';
+import { PublicDoctor, PublicOption } from '../../../shared/types/public-doctor.types';
 
+type ListState = 'loading' | 'results' | 'empty' | 'error';
+
+interface Query {
+  q: string;
+  specialty: string;
+  facility: string;
+  online: boolean;
+  homeVisit: boolean;
+  page: number;
+}
+
+interface Chip {
+  label: string;
+  remove: Partial<Query>;
+}
+
+// 12 fills the 3-, 2- and 1-column grids evenly.
+const PAGE_SIZE = 12;
+const SEARCH_DEBOUNCE_MS = 300;
+const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const EMPTY_QUERY: Query = { q: '', specialty: '', facility: '', online: false, homeVisit: false, page: 1 };
+
+/**
+ * Public doctor listing (design: Doctors Page / Doctor Listing, Direction A).
+ * The URL is the single source of truth for search, filters and page, so refresh, back/forward and
+ * shared links all restore the same results.
+ */
 @Component({
-    selector: 'app-doctor',
-    standalone: true,
-    imports: [
-    BreadcrumbComponent,
-    TitleDoctorComponent,
-    FilterDoctorComponent,
-    SharedModule,
-    ListDoctorComponent,
-    MapDoctorComponent
-],
-    template: `
-        <breadcrumb title="Doctors" [isHidden]="false">
-            <div id="doctor-form" class="max-w-[816px] w-full mx-auto mt-5 -mb-20 p-0.5 text-white rounded-full">
-                <div class="p-2 min-w-[800px] w-full bg-surface border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] m-0 table relative z-[1] rounded-full">
-                    <form class="flex-center-between float-left w-full">
-                        <div class="w-[35%] float-left table-cell align-middle relative before:absolute before:top-1/2 before:-translate-y-1/2 before:right-0 before:w-[1px] before:h-11 before:bg-[#e3e4e8] before:content-[''] before:z-[1]">
-                            <physio-icon name="hospital" [size]="18" [class]="'text-[#8894ae] absolute top-1/2 -translate-y-1/2'" />
-                            <div class="mb-0">
-                                <input 
-                                    class="h-10 pr-2.5 pl-6.25 outline-none border-0 text-primary min-h-9.5 bg-surface text-xs14 rounded-1.25 transition-smooth block w-full" 
-                                    placeholder="Search for Doctors, Hospitals, Clinics" 
-                                    type="text"
-                                >
-                            </div>
-                        </div>
-                        <div class="w-[26%] float-left table-cell align-middle relative">
-                            <physio-icon name="map-pin" [size]="18" [class]="'text-[#8894ae] absolute top-1/2 -translate-y-1/2'" />
-                            <div class="mb-0">
-                                <input 
-                                    class="h-10 px-9 outline-none border-0 text-primary min-h-9.5 bg-surface text-xs14 rounded-1.25 transition-smooth block w-full" 
-                                    placeholder="Location" 
-                                    type="text"
-                                >
-                            </div>
-                        </div>
-                        <div class="w-1/4 float-left table-cell align-middle relative">
-                            <physio-icon name="calendar-heart" [size]="18" [class]="'text-[#8894ae] absolute top-1/2 -translate-y-1/2'" />
-                            <div class="mb-0">
-                                <div class="px-9">
-                                    <div class="ant-picker-input">
-                                        <input aria-invalid="false" autocomplete="off" size="12" placeholder="dd/mm/yyyy" value="">
-                                        <span class="ant-picker-suffix">
-                                            <span role="img" aria-label="calendar" class="anticon anticon-calendar">
-                                                <svg viewBox="64 64 896 896" focusable="false" data-icon="calendar" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M880 184H712v-64c0-4.4-3.6-8-8-8h-56c-4.4 0-8 3.6-8 8v64H384v-64c0-4.4-3.6-8-8-8h-56c-4.4 0-8 3.6-8 8v64H144c-17.7 0-32 14.3-32 32v664c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V216c0-17.7-14.3-32-32-32zm-40 656H184V460h656v380zM184 392V256h128v48c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8v-48h256v48c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8v-48h128v136H184z"></path></svg>
-                                            </span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="float-right">
-                            <button 
-                                class="text-base font-medium min-w-21.5 py-2.25 px-3.75 transition-smooth text-white relative overflow-hidden z-[1] bg-secondary border border-solid border-secondary cursor-pointer rounded-full inline-flex items-center" 
-                                type="submit"
-                            >
-                                <physio-icon name="search" [class]="'mr-2 [&_svg]:fill-white'" />Search
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </breadcrumb>
-        <div class="pt-28.75 min-h-50 pb-9 mt-0.75">
-            <div class="container mx-auto">
-                <div class="grid grid-cols-2">
-                    <title-doctor></title-doctor>
-                    <filter-doctor></filter-doctor>
-                </div>
-                <div class="grid grid-cols-4">
-                    <list-doctor class="col-span-3"></list-doctor>
-                    <map-doctor class="col-span-1"></map-doctor>
-                </div>
-            </div>
-        </div>
-    `,
-    styles: `
-        #doctor-form {
-            background: linear-gradient(90.08deg,#E11D48 .09%,#06aed4 70.28%);
-        }
-
-        button {
-            background-image: linear-gradient(90.08deg,#E11D48 .09%,#06aed4 70.28%);
-        }
-    `
+  selector: 'app-doctor',
+  standalone: true,
+  imports: [SharedModule, DoctorCardComponent],
+  templateUrl: './doctor.component.html'
 })
+export class DoctorComponent implements OnInit, OnDestroy {
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly doctorSrv = inject(PublicDoctorService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-export class DoctorComponent {
+  @ViewChild('drawerClose') private drawerClose?: ElementRef<HTMLButtonElement>;
+  @ViewChild('filterButton') private filterButton?: ElementRef<HTMLButtonElement>;
+  @ViewChild('results') private results?: ElementRef<HTMLElement>;
+
+  query: Query = { ...EMPTY_QUERY };
+  qInput = '';
+  state: ListState = 'loading';
+  doctors: PublicDoctor[] = [];
+  total = 0;
+  totalPages = 1;
+  specialties: PublicOption[] = [];
+  facilities: PublicOption[] = [];
+  drawerOpen = false;
+
+  readonly skeletons = Array.from({ length: 6 });
+
+  /** True between a keystroke and its debounced search, so URL updates don't overwrite the input. */
+  private typing = false;
+  private readonly search$ = new Subject<string>();
+  private readonly reload$ = new Subject<void>();
+
+  ngOnInit(): void {
+    // Server render shows the loading skeleton; data is fetched in the browser only.
+    if (!this.isBrowser) return;
+
+    this.doctorSrv.getFilterOptions().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: res => {
+        if (!res.success || !res.data) return;
+        this.specialties = res.data.specialties;
+        this.facilities = res.data.facilities;
+      },
+      // Without options the selects only offer "All"; the listing itself still works.
+      error: () => { }
+    });
+
+    this.search$.pipe(
+      map(v => v.trim()),
+      debounceTime(SEARCH_DEBOUNCE_MS),
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(q => {
+      this.typing = false;
+      if (q !== this.query.q) this.navigate({ q, page: 1 }, true);
+    });
+
+    // Every URL change (filters, paging, back/forward) and every retry runs one request; a newer one cancels the older.
+    merge(
+      this.route.queryParamMap.pipe(
+        map(params => this.parse(params)),
+        tap(q => {
+          this.query = q;
+          // Keep what the visitor is still typing; otherwise mirror the URL (e.g. after back/forward).
+          if (!this.typing && this.qInput.trim() !== q.q) this.qInput = q.q;
+        })
+      ),
+      this.reload$.pipe(map(() => this.query))
+    ).pipe(
+      switchMap(q => this.fetch(q)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.lockScroll(false);
+  }
+
+  // #region Search and filters
+  get searching(): boolean {
+    return this.qInput.trim() !== this.query.q;
+  }
+
+  onSearchInput(value: string): void {
+    this.qInput = value;
+    this.typing = true;
+    this.search$.next(value);
+  }
+
+  clearSearch(): void {
+    this.qInput = '';
+    this.typing = false;
+    this.search$.next('');
+    this.navigate({ q: '', page: 1 }, true);
+  }
+
+  setSpecialty(id: string): void {
+    this.navigate({ specialty: id, page: 1 });
+  }
+
+  setFacility(id: string): void {
+    this.navigate({ facility: id, page: 1 });
+  }
+
+  toggleOnline(): void {
+    this.navigate({ online: !this.query.online, page: 1 });
+  }
+
+  toggleHomeVisit(): void {
+    this.navigate({ homeVisit: !this.query.homeVisit, page: 1 });
+  }
+
+  clearAll(): void {
+    this.qInput = '';
+    this.typing = false;
+    this.search$.next('');
+    this.navigate({ ...EMPTY_QUERY });
+  }
+
+  get chips(): Chip[] {
+    const q = this.query;
+    const chips: Chip[] = [];
+    if (q.q) chips.push({ label: `“${q.q}”`, remove: { q: '' } });
+    if (q.specialty) chips.push({ label: this.nameOf(this.specialties, q.specialty, 'Selected specialty'), remove: { specialty: '' } });
+    if (q.facility) chips.push({ label: this.nameOf(this.facilities, q.facility, 'Selected facility'), remove: { facility: '' } });
+    if (q.online) chips.push({ label: 'Online consultation', remove: { online: false } });
+    if (q.homeVisit) chips.push({ label: 'Home visit', remove: { homeVisit: false } });
+    return chips;
+  }
+
+  removeChip(chip: Chip): void {
+    if (chip.remove.q !== undefined) {
+      this.qInput = '';
+      this.typing = false;
+      this.search$.next('');
+    }
+    this.navigate({ ...chip.remove, page: 1 });
+  }
+
+  retry(): void {
+    this.reload$.next();
+  }
+  // #endregion
+
+  // #region Labels
+  get countLabel(): string {
+    if (this.state === 'loading') return 'Loading doctors…';
+    if (this.state === 'error') return 'Results unavailable';
+    return this.plural(this.state === 'results' ? this.total : 0);
+  }
+
+  get showLabel(): string {
+    return `Show ${this.plural(this.state === 'results' ? this.total : 0)}`;
+  }
+
+  get filterButtonLabel(): string {
+    const n = this.chips.length;
+    return n ? `Filters (${n})` : 'Filters';
+  }
+
+  private plural(n: number): string {
+    return `${n} ${n === 1 ? 'doctor' : 'doctors'}`;
+  }
+  // #endregion
+
+  // #region Pagination
+  /** Page numbers to render; `null` is an ellipsis. Short lists show every page. */
+  get pages(): (number | null)[] {
+    const total = this.totalPages, current = this.query.page;
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    const set = new Set([1, total, current - 1, current, current + 1].filter(p => p >= 1 && p <= total));
+    const sorted = [...set].sort((a, b) => a - b);
+    const out: (number | null)[] = [];
+    sorted.forEach((p, i) => {
+      if (i > 0 && p - sorted[i - 1] > 1) out.push(null);
+      out.push(p);
+    });
+    return out;
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages || page === this.query.page) return;
+    this.navigate({ page });
+    this.results?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  // #endregion
+
+  // #region Mobile filter drawer
+  openDrawer(): void {
+    this.drawerOpen = true;
+    this.lockScroll(true);
+    setTimeout(() => this.drawerClose?.nativeElement.focus());
+  }
+
+  @HostListener('document:keydown.escape')
+  closeDrawer(): void {
+    if (!this.drawerOpen) return;
+    this.drawerOpen = false;
+    this.lockScroll(false);
+    setTimeout(() => this.filterButton?.nativeElement.focus());
+  }
+
+  private lockScroll(lock: boolean): void {
+    if (this.isBrowser) document.body.style.overflow = lock ? 'hidden' : '';
+  }
+  // #endregion
+
+  // #region Data
+  private fetch(q: Query) {
+    this.state = 'loading';
+    return this.doctorSrv.search({
+      pageNumber: q.page,
+      pageSize: PAGE_SIZE,
+      search: q.q || undefined,
+      filter: {
+        specialtyId: q.specialty || undefined,
+        hospitalId: q.facility || undefined,
+        online: q.online || undefined,
+        homeVisit: q.homeVisit || undefined,
+      }
+    }).pipe(
+      tap(res => {
+        if (!res.success || !res.data) {
+          this.state = 'error';
+          return;
+        }
+        this.doctors = res.data.items;
+        this.total = res.data.totalCount;
+        this.totalPages = Math.max(1, Math.ceil(res.data.totalCount / PAGE_SIZE));
+        this.state = this.doctors.length ? 'results' : 'empty';
+        // A page past the end (e.g. an old link) falls back to the last page that has results.
+        if (!this.doctors.length && q.page > 1 && this.total > 0) this.navigate({ page: this.totalPages }, true);
+      }),
+      catchError(() => {
+        this.state = 'error';
+        return of(null);
+      })
+    );
+  }
+
+  private parse(params: ParamMap): Query {
+    const id = (key: string) => {
+      const v = params.get(key) ?? '';
+      return GUID.test(v) ? v : '';
+    };
+    const page = Number.parseInt(params.get('page') ?? '1', 10);
+    return {
+      q: (params.get('q') ?? '').trim().slice(0, 100),
+      specialty: id('specialty'),
+      facility: id('facility'),
+      online: params.get('online') === '1',
+      homeVisit: params.get('homeVisit') === '1',
+      page: Number.isFinite(page) && page > 0 ? page : 1,
+    };
+  }
+
+  /** Writes the query to the URL; the queryParamMap subscription then loads the results. */
+  private navigate(patch: Partial<Query>, replaceUrl = false): void {
+    const q = { ...this.query, ...patch };
+    const queryParams: Params = {
+      q: q.q || null,
+      specialty: q.specialty || null,
+      facility: q.facility || null,
+      online: q.online ? '1' : null,
+      homeVisit: q.homeVisit ? '1' : null,
+      page: q.page > 1 ? q.page : null,
+    };
+    this.router.navigate([], { relativeTo: this.route, queryParams, replaceUrl });
+  }
+
+  trackById(_: number, d: PublicDoctor): string {
+    return d.id;
+  }
+
+  private nameOf(options: PublicOption[], id: string, fallback: string): string {
+    return options.find(o => o.id === id)?.name ?? fallback;
+  }
+  // #endregion
 }

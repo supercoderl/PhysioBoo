@@ -56,11 +56,22 @@ export interface PublicDoctorDetail {
     isAvailableHomeVisit: boolean;
     services: string[];
     facilities: PublicFacility[];
+    /** The same services with ids, for the request form. */
+    serviceOptions: PublicDoctorService[];
+}
+
+export interface PublicDoctorService {
+    id: string;
+    name: string;
+    /** Set when the service belongs to one clinic; it can only be requested there. */
+    hospitalId: string | null;
 }
 
 /** Call-back request from an anonymous visitor; stored as a CRM lead, not a booking. */
 export interface PublicAppointmentRequest {
     facilityId: string | null;
+    /** Preferred over the name: names aren't unique across clinics. */
+    serviceId: string | null;
     service: string | null;
     fullName: string;
     phone: string;

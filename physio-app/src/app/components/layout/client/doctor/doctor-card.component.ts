@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { SharedModule } from '../../../../shared/shared-imports';
 import { PublicDoctor } from '../../../../shared/types/public-doctor.types';
 
@@ -69,6 +69,7 @@ import { PublicDoctor } from '../../../../shared/types/public-doctor.types';
             >View profile</a>
             <a
               [routerLink]="['/doctor', d.id]"
+              [queryParams]="requestParams"
               fragment="request"
               [attr.aria-label]="'Request appointment with ' + d.fullName"
               class="h-11 rounded-[10px] border border-gray-300 bg-surface text-gray-900 text-sm font-semibold flex items-center justify-center text-center leading-tight px-2 hover:border-primary hover:text-primaryDeep"
@@ -82,9 +83,23 @@ import { PublicDoctor } from '../../../../shared/types/public-doctor.types';
     .ph-stripes { background: repeating-linear-gradient(135deg, #F3EAED 0 10px, #F9F4F6 10px 20px); }
   `
 })
-export class DoctorCardComponent {
+export class DoctorCardComponent implements OnChanges {
   @Input() doctor: PublicDoctor | null = null;
   @Input() skeleton = false;
+  /** Set on a clinic page: the request link preselects this clinic in the doctor's request form. */
+  @Input() facilityId: string | null = null;
+  /** Set on a service page: the request link preselects this service (by id) in the doctor's request form. */
+  @Input() serviceId: string | null = null;
+
+  /** Query params of the request link; rebuilt only when the inputs change, so the binding stays stable. */
+  requestParams: Record<string, string> | null = null;
+
+  ngOnChanges(): void {
+    const params: Record<string, string> = {};
+    if (this.facilityId) params['facility'] = this.facilityId;
+    if (this.serviceId) params['service'] = this.serviceId;
+    this.requestParams = Object.keys(params).length ? params : null;
+  }
 
   imageFailed = false;
 

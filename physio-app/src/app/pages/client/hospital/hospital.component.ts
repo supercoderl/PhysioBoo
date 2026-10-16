@@ -1,231 +1,274 @@
-import { Component } from "@angular/core";
-import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.component";
-import { HOSPITALS } from "../../../shared/data/dummy";
-import { SharedModule } from "../../../shared/shared-imports";
+import { isPlatformBrowser } from '@angular/common';
+import { Component, DestroyRef, ElementRef, HostListener, OnDestroy, OnInit, PLATFORM_ID, ViewChild, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
+import { Subject, catchError, debounceTime, distinctUntilChanged, map, merge, of, switchMap, tap } from 'rxjs';
+import { ClinicCardComponent } from '../../../components/layout/client/hospital/clinic-card.component';
+import { PublicHospitalService } from '../../../services/public/public-hospital.service';
+import { HOSPITAL_TYPE_LABELS, HospitalType } from '../../../shared/enums/hospital-type';
+import { SharedModule } from '../../../shared/shared-imports';
+import { PublicHospital } from '../../../shared/types/public-hospital.types';
 
+type ListState = 'loading' | 'results' | 'empty' | 'error';
+
+interface Query {
+  q: string;
+  /** HospitalType as a string ('' = all), so it binds to the select directly. */
+  type: string;
+  page: number;
+}
+
+interface Chip {
+  label: string;
+  remove: Partial<Query>;
+}
+
+// 12 fills the 3-, 2- and 1-column grids evenly.
+const PAGE_SIZE = 12;
+const SEARCH_DEBOUNCE_MS = 300;
+const EMPTY_QUERY: Query = { q: '', type: '', page: 1 };
+
+// The facility types a physiotherapy network lists most, in the design's order.
+const TYPE_OPTIONS = [HospitalType.Rehabilitation, HospitalType.Clinic, HospitalType.Specialty, HospitalType.General]
+  .map(v => ({ value: String(v), label: HOSPITAL_TYPE_LABELS[v] }));
+
+/**
+ * Public clinic listing (design: Clinics Page / Clinic Listing).
+ * Same model as the doctor listing: the URL is the single source of truth for search, type and page.
+ */
 @Component({
-    selector: 'app-hospital',
-    standalone: true,
-    imports: [
-    SharedModule,
-    BreadcrumbComponent
-],
-    template: `
-        <breadcrumb title="Hospital"></breadcrumb>
-        <div class="py-12.5 md:py-15 bg-surface min-h-50">
-            <div class="container mx-auto px-3">
-                <div class="border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 rounded-[10px] flex">
-                    <div class="p-5 flex-1">
-                        <div
-                            class="flex-center-between flex-wrap gap-4"
-                        >
-                            <h5 class="text-[20px] font-semibold text-primary leading-[1.2] m-0">
-                                Showing <span class="text-[#822bd4]">450</span> Hospitals For You
-                            </h5>
-                            <div class="flex items-center flex-wrap gap-4">
-                                <!-- <div class="relative min-w-62.75">
-                                    <span
-                                        id="react-select-3-live-region"
-                                        class="css-7pg0cj-a11yText"
-                                    ></span
-                                    ><span
-                                        aria-live="polite"
-                                        aria-atomic="false"
-                                        aria-relevant="additions text"
-                                        role="log"
-                                        class="css-7pg0cj-a11yText"
-                                    ></span>
-                                    <div class="css-13cymwt-control">
-                                        <div class="css-hlgwow">
-                                        <div class="css-1dimb5e-singleValue">
-                                            United States Of America (USA)
-                                        </div>
-                                        <div class="css-19bb58m" data-value="">
-                                            <input
-                                            class=""
-                                            autocapitalize="none"
-                                            autocomplete="off"
-                                            autocorrect="off"
-                                            id="react-select-3-input"
-                                            spellcheck="false"
-                                            tabindex="0"
-                                            aria-autocomplete="list"
-                                            aria-expanded="false"
-                                            aria-haspopup="true"
-                                            role="combobox"
-                                            aria-activedescendant=""
-                                            type="text"
-                                            value=""
-                                            style="
-                                                color: inherit;
-                                                background: 0px center;
-                                                opacity: 0;
-                                                width: 100%;
-                                                grid-area: 1 / 2;
-                                                font: inherit;
-                                                min-width: 2px;
-                                                border: 0px;
-                                                margin: 0px;
-                                                outline: 0px;
-                                                padding: 0px;
-                                            "
-                                            />
-                                        </div>
-                                        </div>
-                                        <div class="css-1wy0on6">
-                                        <div
-                                            class="css-1xc3v61-indicatorContainer"
-                                            aria-hidden="true"
-                                        >
-                                            <svg
-                                            height="20"
-                                            width="20"
-                                            viewBox="0 0 20 20"
-                                            aria-hidden="true"
-                                            focusable="false"
-                                            class="css-8mmkcg"
-                                            >
-                                            <path
-                                                d="M14.348 14.849c-0.469 0.469-1.229 0.469-1.697 0l-2.651-3.030-2.651 3.029c-0.469 0.469-1.229 0.469-1.697 0-0.469-0.469-0.469-1.229 0-1.697l2.758-3.15-2.759-3.152c-0.469-0.469-0.469-1.228 0-1.697s1.228-0.469 1.697 0l2.652 3.031 2.651-3.031c0.469-0.469 1.228-0.469 1.697 0s0.469 1.229 0 1.697l-2.758 3.152 2.758 3.15c0.469 0.469 0.469 1.229 0 1.698z"
-                                            ></path>
-                                            </svg>
-                                        </div>
-                                        <span class="css-1u9des2-indicatorSeparator"></span>
-                                        <div
-                                            class="css-1xc3v61-indicatorContainer"
-                                            aria-hidden="true"
-                                        >
-                                            <svg
-                                            height="20"
-                                            width="20"
-                                            viewBox="0 0 20 20"
-                                            aria-hidden="true"
-                                            focusable="false"
-                                            class="css-8mmkcg"
-                                            >
-                                            <path
-                                                d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
-                                            ></path>
-                                            </svg>
-                                        </div>
-                                        </div>
-                                    </div>
-                                </div> -->
-                                <div class="max-w-100 relative">
-                                    <input
-                                        class="h-9.5 min-h-9.5 border border-solid border-borderGray rounded-[5px] pl-8.5 text-primary bg-surface text-xs14 leading-[1.6] py-1.75 px-3.75 transition-smooth block w-full"
-                                        placeholder="Search Hospitals"
-                                        type="text"
-                                    />
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-primary text-xs14">
-                                        <physio-icon name="search" [size]="14" />
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center flex-wrap">
-                    <div class="mr-6 mb-6 flex items-center pl-6">
-                        <input
-                            class="bg-secondary border-secondary rounded-full float-left -ml-6 w-14.4 h-14.4 border border-solid bg-center transition-smooth"
-                            id="all-hospital"
-                            type="radio"
-                            value="all-hospital"
-                            checked=""
-                            name="Radio"
-                        />
-                        <label
-                            class="text-[0.875rem] font-medium ml-2"
-                            for="all-hospital"
-                        >
-                            All Hospitals
-                        </label>
-                    </div>
-                    <div class="mr-6 mb-6 flex items-center pl-6">
-                        <input
-                            class="bg-secondary border-secondary rounded-full float-left -ml-6 w-14.4 h-14.4 border border-solid bg-center transition-smooth"
-                            id="virtual"
-                            type="radio"
-                            value="virtual"
-                            name="Radio"
-                        />
-                        <label class="text-[0.875rem] font-medium ml-2" for="virtual">
-                            Virtual
-                        </label>
-                    </div>
-                    <div class="mr-6 mb-6 flex items-center pl-6">
-                        <input
-                            class="bg-secondary border-secondary rounded-full float-left -ml-6 w-14.4 h-14.4 border border-solid bg-center transition-smooth"
-                            id="appointment"
-                            type="radio"
-                            value="appointment"
-                            name="Radio"
-                        />
-                        <label class="text-[0.875rem] font-medium ml-2" for="appointment">
-                            Appointments
-                        </label>
-                    </div>
-                    <div class="mb-6 flex items-center pl-6">
-                        <input
-                            class="bg-secondary border-secondary rounded-full float-left -ml-6 w-14.4 h-14.4 border border-solid bg-center transition-smooth"
-                            id="clinic"
-                            type="radio"
-                            value="clinic"
-                            name="Radio"
-                        />
-                        <label class="text-[0.875rem] font-medium ml-2" for="clinic">
-                            Hospitals / Clinics
-                        </label>
-                    </div>
-                </div>
-                <div class="block">
-                    <div class="grid md:grid-cols-4 -mx-3">
-                        <div *ngFor="let item of hospitals" class="px-3">
-                            <div class="border border-solid border-borderGray shadow-[0_4px_14px_#FFE9EE40] mb-6 rounded-[10px] relative flex flex-col">
-                                <div class="p-5 text-center flex-1">
-                                    <a
-                                        class="block mb-5 text-neutral transition-smooth"
-                                            href="javascript:throw new Error('React has blocked a javascript: URL as a security precaution.')"
-                                    >
-                                        <img
-                                            alt="img"
-                                            class="mx-auto"
-                                            [src]="item.img"
-                                        />
-                                    </a>
-                                    <h6 class="mb-1 block font-semibold leading-[1.2] text-primary">
-                                        <a
-                                            href="javascript:throw new Error('React has blocked a javascript: URL as a security precaution.')"
-                                            class="text-neutral cursor-pointer transition-smooth"
-                                        >
-                                            {{item.name}}
-                                        </a>
-                                    </h6>
-                                    <p class="inline-flex items-center text-[0.875rem] mb-0 text-brandDark">
-                                        <physio-icon name="map-pin" [size]="14" [class]="'text-primary mr-1'" />
-                                        {{item.address}}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-4 text-center flex justify-center">
-                        <a
-                            class="py-2.25 px-4 bg-[linear-gradient(90.08deg,_#E11D48_0.09%,_#06aed4_70.28%)] text-white text-xs14 rounded-[44px] relative overflow-hidden z-[1] bg-secondary border border-solid border-secondary transition-smooth font-medium flex items-center w-fit"
-                            href="/react/template/pages/hospitals"
-                        >
-                            <physio-icon name="scan-qr-code" [size]="14" [class]="'mr-2'" />
-                            Load More 425 Hospitals
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `
+  selector: 'app-hospital',
+  standalone: true,
+  imports: [SharedModule, ClinicCardComponent],
+  templateUrl: './hospital.component.html'
 })
+export class HospitalComponent implements OnInit, OnDestroy {
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly hospitalSrv = inject(PublicHospitalService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-export class HospitalComponent {
+  @ViewChild('drawerClose') private drawerClose?: ElementRef<HTMLButtonElement>;
+  @ViewChild('filterButton') private filterButton?: ElementRef<HTMLButtonElement>;
+  @ViewChild('results') private results?: ElementRef<HTMLElement>;
 
-    readonly hospitals = HOSPITALS;
+  query: Query = { ...EMPTY_QUERY };
+  qInput = '';
+  state: ListState = 'loading';
+  hospitals: PublicHospital[] = [];
+  total = 0;
+  totalPages = 1;
+  drawerOpen = false;
+
+  readonly typeOptions = TYPE_OPTIONS;
+  readonly skeletons = Array.from({ length: 6 });
+
+  /** True between a keystroke and its debounced search, so URL updates don't overwrite the input. */
+  private typing = false;
+  private readonly search$ = new Subject<string>();
+  private readonly reload$ = new Subject<void>();
+
+  ngOnInit(): void {
+    // Server render shows the loading skeleton; data is fetched in the browser only.
+    if (!this.isBrowser) return;
+
+    this.search$.pipe(
+      map(v => v.trim()),
+      debounceTime(SEARCH_DEBOUNCE_MS),
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(q => {
+      this.typing = false;
+      if (q !== this.query.q) this.navigate({ q, page: 1 }, true);
+    });
+
+    // Every URL change (filters, paging, back/forward) and every retry runs one request; a newer one cancels the older.
+    merge(
+      this.route.queryParamMap.pipe(
+        map(params => this.parse(params)),
+        tap(q => {
+          this.query = q;
+          // Keep what the visitor is still typing; otherwise mirror the URL (e.g. after back/forward).
+          if (!this.typing && this.qInput.trim() !== q.q) this.qInput = q.q;
+        })
+      ),
+      this.reload$.pipe(map(() => this.query))
+    ).pipe(
+      switchMap(q => this.fetch(q)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.lockScroll(false);
+  }
+
+  // #region Search and filters
+  get searching(): boolean {
+    return this.qInput.trim() !== this.query.q;
+  }
+
+  onSearchInput(value: string): void {
+    this.qInput = value;
+    this.typing = true;
+    this.search$.next(value);
+  }
+
+  clearSearch(): void {
+    this.qInput = '';
+    this.typing = false;
+    this.search$.next('');
+    this.navigate({ q: '', page: 1 }, true);
+  }
+
+  setType(type: string): void {
+    this.navigate({ type, page: 1 });
+  }
+
+  clearAll(): void {
+    this.qInput = '';
+    this.typing = false;
+    this.search$.next('');
+    this.navigate({ ...EMPTY_QUERY });
+  }
+
+  get chips(): Chip[] {
+    const q = this.query;
+    const chips: Chip[] = [];
+    if (q.q) chips.push({ label: `“${q.q}”`, remove: { q: '' } });
+    if (q.type) chips.push({ label: HOSPITAL_TYPE_LABELS[Number(q.type) as HospitalType], remove: { type: '' } });
+    return chips;
+  }
+
+  removeChip(chip: Chip): void {
+    if (chip.remove.q !== undefined) {
+      this.qInput = '';
+      this.typing = false;
+      this.search$.next('');
+    }
+    this.navigate({ ...chip.remove, page: 1 });
+  }
+
+  retry(): void {
+    this.reload$.next();
+  }
+  // #endregion
+
+  // #region Labels
+  get countLabel(): string {
+    if (this.state === 'loading') return 'Loading clinics…';
+    if (this.state === 'error') return 'Results unavailable';
+    return this.plural(this.state === 'results' ? this.total : 0);
+  }
+
+  get showLabel(): string {
+    return `Show ${this.plural(this.state === 'results' ? this.total : 0)}`;
+  }
+
+  get filterButtonLabel(): string {
+    const n = this.chips.length;
+    return n ? `Filters (${n})` : 'Filters';
+  }
+
+  private plural(n: number): string {
+    return `${n} ${n === 1 ? 'clinic' : 'clinics'}`;
+  }
+  // #endregion
+
+  // #region Pagination
+  /** Page numbers to render; `null` is an ellipsis. Short lists show every page. */
+  get pages(): (number | null)[] {
+    const total = this.totalPages, current = this.query.page;
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    const set = new Set([1, total, current - 1, current, current + 1].filter(p => p >= 1 && p <= total));
+    const sorted = [...set].sort((a, b) => a - b);
+    const out: (number | null)[] = [];
+    sorted.forEach((p, i) => {
+      if (i > 0 && p - sorted[i - 1] > 1) out.push(null);
+      out.push(p);
+    });
+    return out;
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages || page === this.query.page) return;
+    this.navigate({ page });
+    this.results?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  // #endregion
+
+  // #region Mobile filter drawer
+  openDrawer(): void {
+    this.drawerOpen = true;
+    this.lockScroll(true);
+    setTimeout(() => this.drawerClose?.nativeElement.focus());
+  }
+
+  @HostListener('document:keydown.escape')
+  closeDrawer(): void {
+    if (!this.drawerOpen) return;
+    this.drawerOpen = false;
+    this.lockScroll(false);
+    setTimeout(() => this.filterButton?.nativeElement.focus());
+  }
+
+  private lockScroll(lock: boolean): void {
+    if (this.isBrowser) document.body.style.overflow = lock ? 'hidden' : '';
+  }
+  // #endregion
+
+  // #region Data
+  private fetch(q: Query) {
+    this.state = 'loading';
+    return this.hospitalSrv.search({
+      pageNumber: q.page,
+      pageSize: PAGE_SIZE,
+      search: q.q || undefined,
+      filter: { type: q.type ? Number(q.type) as HospitalType : undefined }
+    }).pipe(
+      tap(res => {
+        if (!res.success || !res.data) {
+          this.state = 'error';
+          return;
+        }
+        this.hospitals = res.data.items;
+        this.total = res.data.totalCount;
+        this.totalPages = Math.max(1, Math.ceil(res.data.totalCount / PAGE_SIZE));
+        this.state = this.hospitals.length ? 'results' : 'empty';
+        // A page past the end (e.g. an old link) falls back to the last page that has results.
+        if (!this.hospitals.length && q.page > 1 && this.total > 0) this.navigate({ page: this.totalPages }, true);
+      }),
+      catchError(() => {
+        this.state = 'error';
+        return of(null);
+      })
+    );
+  }
+
+  private parse(params: ParamMap): Query {
+    const type = params.get('type') ?? '';
+    const page = Number.parseInt(params.get('page') ?? '1', 10);
+    return {
+      q: (params.get('q') ?? '').trim().slice(0, 100),
+      type: Object.prototype.hasOwnProperty.call(HOSPITAL_TYPE_LABELS, type) ? type : '',
+      page: Number.isFinite(page) && page > 0 ? page : 1,
+    };
+  }
+
+  /** Writes the query to the URL; the queryParamMap subscription then loads the results. */
+  private navigate(patch: Partial<Query>, replaceUrl = false): void {
+    const q = { ...this.query, ...patch };
+    const queryParams: Params = {
+      q: q.q || null,
+      type: q.type || null,
+      page: q.page > 1 ? q.page : null,
+    };
+    this.router.navigate([], { relativeTo: this.route, queryParams, replaceUrl });
+  }
+
+  trackById(_: number, h: PublicHospital): string {
+    return h.id;
+  }
+  // #endregion
 }

@@ -351,6 +351,8 @@ namespace PhysioBoo.Presentation
                 app.MapMedicalSpecialtyEndpoints();
                 app.MapArticleEndpoints();
                 app.MapPublicDoctorEndpoints();
+                app.MapPublicHospitalEndpoints();
+                app.MapPublicServiceEndpoints();
                 app.MapHomeSettingsEndpoints();
                 app.MapHomeBannerEndpoints();
                 app.MapHomeFeatureEndpoints();

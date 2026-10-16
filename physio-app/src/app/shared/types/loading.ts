@@ -298,6 +298,15 @@ export const LoadingKeys = {
         DETAIL: 'public-doctor-detail',
         RELATED: 'public-doctor-related',
         APPOINTMENT_REQUEST: 'public-doctor-appointment-request'
+    },
+    PUBLIC_HOSPITAL: {
+        SEARCH: 'public-hospital-search',
+        DETAIL: 'public-hospital-detail'
+    },
+    PUBLIC_SERVICE: {
+        SEARCH: 'public-service-search',
+        FILTERS: 'public-service-filters',
+        DETAIL: 'public-service-detail'
     }
 } as const;
 

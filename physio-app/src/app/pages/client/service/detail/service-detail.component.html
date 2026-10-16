@@ -1,0 +1,159 @@
+<!-- Loading -->
+<div *ngIf="state === 'loading'" aria-busy="true" aria-label="Loading service"
+  class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 flex flex-col gap-5 animate-pulse motion-reduce:animate-none">
+  <span class="h-3 w-[220px] rounded-md bg-[#F4ECEF]"></span>
+  <span class="aspect-[4/3] lg:aspect-[21/8] rounded-[20px] bg-[#F4ECEF]"></span>
+  <div class="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-10">
+    <div class="flex flex-col gap-3">
+      <span class="h-3.5 w-1/4 rounded-md bg-[#F4ECEF]"></span>
+      <span class="h-[34px] w-[65%] rounded-lg bg-gray-200"></span>
+      <span class="h-3 w-[90%] rounded-md bg-[#F7F0F2] mt-2"></span>
+      <span class="h-3 w-3/4 rounded-md bg-[#F7F0F2]"></span>
+      <span class="h-[52px] w-[240px] rounded-xl bg-gray-200 mt-3"></span>
+    </div>
+    <span class="h-[280px] rounded-[20px] bg-[#FAF5F7]"></span>
+  </div>
+</div>
+
+<!-- Not found: unknown, unpublished, archived, deleted and other-tenant services look the same -->
+<div *ngIf="state === 'notfound'" class="max-w-[640px] mx-auto px-6 py-24 text-center">
+  <physio-icon name="search-x" [size]="36" class="text-gray-600 inline-flex" />
+  <h1 class="text-[28px] leading-9 font-semibold mt-4 mb-2">We couldn't find this service</h1>
+  <p class="text-base leading-[26px] text-gray-700 m-0 mb-6">
+    It may have moved or is no longer listed. You can browse all services in the network instead.
+  </p>
+  <div class="flex gap-2.5 justify-center flex-wrap">
+    <a routerLink="/services" class="h-12 px-5 rounded-xl bg-primary text-white font-semibold text-[15px] flex items-center hover:bg-primaryHover hover:text-white">Browse All Services</a>
+    <a routerLink="/" class="h-12 px-5 rounded-xl border border-gray-300 font-semibold text-[15px] flex items-center text-gray-900 hover:border-primary hover:text-primaryDeep">Go to homepage</a>
+  </div>
+</div>
+
+<!-- Error -->
+<div *ngIf="state === 'error'" class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 lg:pt-10 lg:pb-20">
+  <div role="alert" class="border border-dangerBorder bg-dangerSoft rounded-2xl px-6 py-12 text-center">
+    <physio-icon name="cloud-off" [size]="32" class="text-danger inline-flex" />
+    <h1 class="text-[22px] font-semibold mt-3.5 mb-1.5">We couldn't load this service</h1>
+    <p class="text-[15px] text-gray-700 m-0 mb-5">Check your connection and try again.</p>
+    <div class="flex gap-2.5 justify-center flex-wrap">
+      <button type="button" (click)="retry()" class="h-11 px-5 border-0 rounded-[10px] bg-primary text-white text-sm font-semibold inline-flex gap-2 items-center cursor-pointer hover:bg-primaryHover">
+        <physio-icon name="rotate-cw" [size]="16" />Try again
+      </button>
+      <a routerLink="/services" [queryParams]="backQuery" class="h-11 px-[18px] border border-gray-300 rounded-[10px] text-sm font-semibold flex items-center bg-surface text-gray-900 hover:border-primary hover:text-primaryDeep">Browse All Services</a>
+    </div>
+  </div>
+</div>
+
+<ng-container *ngIf="state === 'live' && service as s">
+  <!-- Breadcrumb -->
+  <div class="bg-gray-50 border-b border-gray-200">
+    <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4">
+      <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600 flex-wrap">
+        <li><a routerLink="/" class="text-gray-700 hover:text-primaryDeep">Home</a></li>
+        <li aria-hidden="true" class="flex"><physio-icon name="chevron-right" [size]="13" /></li>
+        <li><a routerLink="/services" [queryParams]="backQuery" class="text-gray-700 hover:text-primaryDeep">Services</a></li>
+        <li aria-hidden="true" class="flex"><physio-icon name="chevron-right" [size]="13" /></li>
+        <li aria-current="page" class="text-gray-900 font-medium">{{ s.name }}</li>
+      </ol>
+    </nav>
+  </div>
+
+  <!-- Hero: image first on tablet and mobile, beside the text on desktop -->
+  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 md:pt-8 lg:pt-12 lg:pb-2 grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] gap-6 lg:gap-14 items-center">
+    <div class="flex flex-col gap-3.5 min-w-0 order-1 lg:order-none">
+      <span *ngIf="s.clinic" class="text-sm font-semibold text-primaryDeep flex gap-1.5 items-center">
+        <physio-icon name="building-2" [size]="15" />{{ s.clinic.name }}
+      </span>
+      <h1 class="text-[30px] leading-[38px] md:text-[44px] md:leading-[52px] font-semibold tracking-[-0.02em] m-0 text-balance">{{ s.name }}</h1>
+      <p *ngIf="summary" class="text-[17px] leading-7 text-gray-800 m-0 max-w-[560px] text-pretty">{{ summary }}</p>
+      <div class="flex gap-2.5 flex-wrap mt-2">
+        <a
+          *ngIf="onlyDoctor as d"
+          [routerLink]="['/doctor', d.id]"
+          [queryParams]="requestParams"
+          fragment="request"
+          class="h-[52px] px-[22px] rounded-xl bg-primary text-white text-base font-semibold flex gap-2 items-center justify-center hover:bg-primaryHover hover:text-white basis-full md:basis-auto"
+        >
+          <physio-icon name="calendar-plus" [size]="18" />Request Appointment
+        </a>
+        <button
+          *ngIf="s.doctors.length > 1"
+          type="button"
+          (click)="chooseDoctor()"
+          aria-controls="svc-doctors"
+          class="h-[52px] px-[22px] border-0 rounded-xl bg-primary text-white text-base font-semibold flex gap-2 items-center justify-center cursor-pointer hover:bg-primaryHover basis-full md:basis-auto"
+        >
+          <physio-icon name="calendar-plus" [size]="18" />Request Appointment
+        </button>
+        <a
+          routerLink="/services" [queryParams]="backQuery"
+          class="h-[52px] px-5 border border-gray-300 rounded-xl text-base font-semibold flex gap-2 items-center justify-center text-gray-900 hover:border-primary hover:text-primaryDeep basis-full md:basis-auto"
+        >
+          <physio-icon name="arrow-left" [size]="18" />Browse All Services
+        </a>
+      </div>
+      <p class="text-[13px] leading-5 text-gray-700 m-0 max-w-[560px]">{{ requestNote }}</p>
+    </div>
+
+    <div class="relative aspect-[4/3] rounded-[20px] overflow-hidden" [ngClass]="s.coverImageUrl && !imageFailed ? 'ph-stripes' : 'bg-[#FAF5F7]'">
+      <img
+        *ngIf="s.coverImageUrl && !imageFailed"
+        [src]="s.coverImageUrl"
+        alt=""
+        class="absolute inset-0 w-full h-full object-cover"
+        (error)="imageFailed = true"
+      />
+      <span *ngIf="!s.coverImageUrl || imageFailed" class="absolute inset-0 flex items-center justify-center text-[#C9B9C0]" aria-hidden="true">
+        <physio-icon name="activity" [size]="56" />
+      </span>
+    </div>
+  </div>
+
+  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-8 pb-12 md:pt-9 md:pb-16 lg:pt-10 lg:pb-20 flex flex-col gap-8 md:gap-10">
+    <!-- About: the description after its first paragraph -->
+    <section *ngIf="paragraphs.length" aria-labelledby="ov-h" class="flex flex-col gap-4 pt-8 md:pt-10 border-t border-gray-200">
+      <h2 id="ov-h" class="text-2xl leading-8 font-semibold m-0">About this service</h2>
+      <div class="flex flex-col gap-3.5 max-w-[720px]">
+        <p *ngFor="let p of paragraphs" class="text-base leading-[27px] text-gray-800 m-0 text-pretty whitespace-pre-line">{{ p }}</p>
+      </div>
+    </section>
+
+    <!-- Clinic -->
+    <section *ngIf="s.clinic" aria-labelledby="cl-h" class="flex flex-col gap-5 pt-8 md:pt-10 border-t border-gray-200">
+      <div>
+        <h2 id="cl-h" class="text-2xl leading-8 font-semibold m-0 mb-1">Where it's offered</h2>
+        <p class="text-[15px] text-gray-700 m-0">This service is listed at one clinic.</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <clinic-card [hospital]="s.clinic" />
+      </div>
+    </section>
+
+    <!-- Doctors -->
+    <section *ngIf="s.doctors.length" id="svc-doctors" aria-labelledby="dr-h" class="flex flex-col gap-5 pt-8 md:pt-10 border-t border-gray-200 scroll-mt-24">
+      <div>
+        <h2 #doctorsHeading id="dr-h" tabindex="-1" class="text-2xl leading-8 font-semibold m-0 mb-1 outline-none">{{ doctorsTitle }}</h2>
+        <p class="text-[15px] text-gray-700 m-0">{{ doctorsNote }}</p>
+      </div>
+      <ul
+        class="list-none m-0 p-0 grid md:grid-cols-2 lg:grid-cols-3 gap-5 rounded-[18px] outline outline-2 outline-offset-8 transition-[outline-color] duration-300"
+        [ngClass]="flashDoctors ? 'outline-primary' : 'outline-transparent'"
+      >
+        <li *ngFor="let d of s.doctors; trackBy: trackById">
+          <doctor-card [doctor]="d" [facilityId]="s.clinic?.id ?? null" [serviceId]="s.id" />
+        </li>
+      </ul>
+    </section>
+
+    <!-- No doctor to send a request to -->
+    <section *ngIf="!s.doctors.length" role="note" class="border border-dashed border-gray-300 rounded-2xl p-6 flex gap-3.5 items-start">
+      <physio-icon name="info" [size]="20" class="text-gray-600 flex-none mt-0.5" />
+      <div>
+        <h2 class="text-[17px] font-semibold m-0 mb-1">Online requests aren't available for this service yet</h2>
+        <p class="text-[15px] leading-6 text-gray-700 m-0">
+          {{ s.clinic ? 'No doctor is listed for it at this clinic yet.' : 'No doctor or clinic is listed for it.' }}
+          <a routerLink="/contact" class="text-primaryDeep underline hover:text-primaryHover">Contact us</a> and we'll tell you where it's offered.
+        </p>
+      </div>
+    </section>
+  </div>
+</ng-container>

@@ -43,8 +43,12 @@ namespace PhysioBoo.Application.ViewModels.Public
         bool IsAvailableOnline,
         bool IsAvailableHomeVisit,
         IReadOnlyList<string> Services,
-        IReadOnlyList<PublicFacilityViewModel> Facilities
+        IReadOnlyList<PublicFacilityViewModel> Facilities,
+        // The same services with ids, for the request form. HospitalId is set when a service belongs to one clinic.
+        IReadOnlyList<PublicDoctorServiceViewModel> ServiceOptions
     );
+
+    public sealed record PublicDoctorServiceViewModel(Guid Id, string Name, Guid? HospitalId);
 
     /// <summary>Appointment request from an anonymous visitor. Stored as a CRM lead for the clinic to call back.</summary>
     public sealed record PublicAppointmentRequestViewModel(
@@ -55,7 +59,9 @@ namespace PhysioBoo.Application.ViewModels.Public
         string Phone,
         string? Email,
         // Honeypot: a hidden field people never fill in. Anything here means a bot.
-        string? Website
+        string? Website,
+        // Preferred over Service: names aren't unique across clinics. Optional so older clients keep working.
+        Guid? ServiceId = null
     );
 
     public sealed record PublicAppointmentRequestResultViewModel(string Reference);

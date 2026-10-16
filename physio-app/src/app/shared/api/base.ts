@@ -534,6 +534,15 @@ export const BASE_API = {
       DETAIL: (id: string) => `/api/public/doctors/${id}`,
       RELATED: (id: string) => `/api/public/doctors/${id}/related`,
       APPOINTMENT_REQUEST: (id: string) => `/api/public/doctors/${id}/appointment-requests`,
+    },
+    HOSPITALS: {
+      SEARCH: '/api/public/hospitals/search',
+      DETAIL: (id: string) => `/api/public/hospitals/${id}`,
+    },
+    SERVICES: {
+      SEARCH: '/api/public/services/search',
+      FILTERS: '/api/public/services/filters',
+      DETAIL: (id: string) => `/api/public/services/${id}`,
     }
   }
 };

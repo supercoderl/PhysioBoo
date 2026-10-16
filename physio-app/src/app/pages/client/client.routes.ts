@@ -45,6 +45,21 @@ export const routes: Routes = [
                 loadComponent: () => import('./hospital/hospital.component').then(m => m.HospitalComponent),
                 data: { breadcrumbs: ['hospitals'] }  
             },
+            {
+                path: 'hospitals/:id',
+                loadComponent: () => import('./hospital/detail/hospital-detail.component').then(m => m.HospitalDetailComponent),
+                data: { breadcrumbs: ['hospitals'] }
+            },
+            {
+                path: 'services',
+                loadComponent: () => import('./service/service.component').then(m => m.ServiceComponent),
+                data: { breadcrumbs: ['services'] }
+            },
+            {
+                path: 'services/:id',
+                loadComponent: () => import('./service/detail/service-detail.component').then(m => m.ServiceDetailComponent),
+                data: { breadcrumbs: ['services'] }
+            },
             { 
                 path: 'blog', 
                 loadComponent: () => import('./blog/blog.component').then(m => m.BlogComponent),

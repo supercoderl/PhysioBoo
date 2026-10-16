@@ -64,16 +64,23 @@ namespace PhysioBoo.Application.Commands.Public.RequestAppointment
             }
             facility ??= facilities.Count == 1 ? facilities[0] : null;
 
-            List<string> services = await PublicDoctorScope
+            // ServicesOf is tenant-scoped, so a service id from another tenant is never found.
+            List<PublicRequestServiceOption> offered = await PublicDoctorScope
                 .ServicesOf(_medicalServiceRepository.GetAllNoTracking(), command.TenantId, r.DoctorId)
-                .Select(s => s.Name)
+                .Select(s => new PublicRequestServiceOption(s.Id, s.Name, s.HospitalId))
                 .ToListAsync(ct);
-            string? service = PublicText.OrNull(r.Service);
-            if (service is not null && !services.Contains(service) || service is null && services.Count > 0)
+            var (chosenService, serviceError) = PublicRequestService.Resolve(offered, r.ServiceId, PublicText.OrNull(r.Service), facility?.Id);
+            if (serviceError == PublicRequestServiceError.NotOffered)
             {
                 await NotifyAsync(new DomainNotification(command.MessageType, "Choose a service.", ErrorCodes.InvalidValue));
                 return;
             }
+            if (serviceError == PublicRequestServiceError.WrongFacility)
+            {
+                await NotifyAsync(new DomainNotification(command.MessageType, "This service isn't offered at the chosen facility. Choose another service or facility.", ErrorCodes.InvalidValue));
+                return;
+            }
+            string? service = chosenService?.Name;
 
             string phone = r.Phone.Trim();
             string doctorTag = $"Doctor ID: {r.DoctorId}";

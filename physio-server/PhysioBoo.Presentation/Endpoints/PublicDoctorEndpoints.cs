@@ -104,10 +104,10 @@ namespace PhysioBoo.Presentation.Endpoints
             .RequireRateLimiting(PublicFormsPolicy);
         }
 
-        private static bool TryGetSiteTenant(IConfiguration configuration, out Guid tenantId) =>
+        internal static bool TryGetSiteTenant(IConfiguration configuration, out Guid tenantId) =>
             Guid.TryParse(configuration["PublicSite:TenantId"], out tenantId) && tenantId != Guid.Empty;
 
-        private static IResult SiteNotConfigured() =>
+        internal static IResult SiteNotConfigured() =>
             Results.Json(new ResponseMessage<object>
             {
                 Success = false,

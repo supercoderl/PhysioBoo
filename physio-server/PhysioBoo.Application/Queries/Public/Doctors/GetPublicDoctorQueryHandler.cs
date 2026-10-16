@@ -46,10 +46,10 @@ namespace PhysioBoo.Application.Queries.Public.Doctors
 
             List<PublicFacilityViewModel> facilities = await PublicDoctorFacilities.ForDoctorAsync(_doctorRepository, q.TenantId, q.DoctorId, ct);
 
-            List<string> services = await PublicDoctorScope
+            List<PublicDoctorServiceViewModel> services = await PublicDoctorScope
                 .ServicesOf(_medicalServiceRepository.GetAllNoTracking(), q.TenantId, q.DoctorId)
                 .OrderBy(s => s.Name)
-                .Select(s => s.Name)
+                .Select(s => new PublicDoctorServiceViewModel(s.Id, s.Name, s.HospitalId))
                 .ToListAsync(ct);
 
             return new PublicDoctorDetailViewModel(
@@ -66,8 +66,9 @@ namespace PhysioBoo.Application.Queries.Public.Doctors
                 (row.LanguagesSpoken ?? Array.Empty<string>()).Where(l => !string.IsNullOrWhiteSpace(l)).Select(l => l.Trim()).Distinct().ToList(),
                 row.IsAvailableOnline,
                 row.IsAvailableHomeVisit,
-                services.Distinct().ToList(),
-                facilities
+                services.Select(s => s.Name).Distinct().ToList(),
+                facilities,
+                services
             );
         }
     }

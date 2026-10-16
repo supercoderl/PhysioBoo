@@ -22,7 +22,7 @@ export const CLIENT_NAV: ClientNavItem[] = [
     { title: 'Home', href: '/', key: 'home' },
     { title: 'Doctors', href: '/doctor', key: 'doctor' },
     { title: 'Hospitals', href: '/hospitals', key: 'hospitals' },
-    { title: 'Services', href: '/', fragment: 'specialties' },
+    { title: 'Services', href: '/services', key: 'services' },
     { title: 'Blog', href: '/blog', key: 'blog' },
     { title: 'About us', href: '/about-us', key: 'about-us' },
     { title: 'Contact', href: '/contact', key: 'contact' },
@@ -34,7 +34,7 @@ export const CLIENT_FOOTER_COLS: { title: string; items: ClientNavItem[] }[] = [
         items: [
             { title: 'Doctors', href: '/doctor' },
             { title: 'Hospitals & clinics', href: '/hospitals' },
-            { title: 'Services', href: '/', fragment: 'specialties' },
+            { title: 'Services', href: '/services' },
             { title: 'Specialties', href: '/', fragment: 'specialties' },
         ],
     },

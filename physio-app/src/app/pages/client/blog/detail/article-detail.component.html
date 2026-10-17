@@ -1,0 +1,296 @@
+<!-- Loading: same sizes as the loaded page -->
+<div *ngIf="state === 'loading'" aria-busy="true" aria-label="Loading article" class="animate-pulse motion-reduce:animate-none">
+  <div class="bg-gray-50 border-b border-gray-200">
+    <div class="max-w-[1200px] mx-auto px-5 md:px-8 lg:px-6 py-3.5 md:py-4"><span class="block h-3.5 w-[220px] rounded-lg bg-[#F4ECEF]"></span></div>
+  </div>
+  <div class="md:max-w-[808px] mx-auto px-5 md:px-8 lg:px-6 pt-6 pb-5 md:pt-9 md:pb-7 lg:pt-12 lg:pb-8 flex flex-col gap-3.5">
+    <span class="block h-6 w-[90px] rounded-full bg-[#F4ECEF]"></span>
+    <span class="block h-9 md:h-11 lg:h-[52px] w-full rounded-lg bg-[#F4ECEF]"></span>
+    <span class="block h-9 md:h-11 lg:h-[52px] w-[70%] rounded-lg bg-[#F4ECEF]"></span>
+    <span class="block h-[18px] w-[95%] rounded-lg bg-[#F4ECEF] mt-1.5"></span>
+    <span class="block h-[18px] w-4/5 rounded-lg bg-[#F4ECEF]"></span>
+    <div class="flex gap-3 items-center pt-4 border-t border-gray-200">
+      <span class="block size-9 rounded-full bg-[#F4ECEF]"></span>
+      <span class="block h-3.5 w-[240px] rounded-lg bg-[#F4ECEF]"></span>
+    </div>
+  </div>
+  <div class="md:max-w-[808px] mx-auto px-5 md:px-8 lg:px-6">
+    <span class="block aspect-[4/3] md:aspect-video rounded-[20px] bg-[#F4ECEF]"></span>
+  </div>
+  <div class="md:max-w-[808px] mx-auto px-5 md:px-8 lg:px-6 pt-7 pb-12 md:pt-10 md:pb-14 lg:pt-12 lg:pb-[72px] flex flex-col gap-3">
+    <span class="block h-4 w-full rounded-lg bg-[#F4ECEF]"></span>
+    <span class="block h-4 w-[96%] rounded-lg bg-[#F4ECEF]"></span>
+    <span class="block h-4 w-[88%] rounded-lg bg-[#F4ECEF]"></span>
+    <span class="block h-[26px] w-2/5 rounded-lg bg-[#F4ECEF] mt-5"></span>
+    <span class="block h-4 w-full rounded-lg bg-[#F4ECEF]"></span>
+    <span class="block h-4 w-[92%] rounded-lg bg-[#F4ECEF]"></span>
+  </div>
+</div>
+
+<!-- Unavailable: unknown, draft, archived and deleted articles look the same -->
+<ng-container *ngIf="state === 'notfound'">
+  <div class="bg-gray-50 border-b border-gray-200">
+    <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 md:px-8 lg:px-6 py-3.5 md:py-4">
+      <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600">
+        <li><a routerLink="/" class="text-primaryDeep font-medium underline decoration-[#F3C1CD] underline-offset-[3px] hover:text-primaryHover">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a routerLink="/blog" class="text-primaryDeep font-medium underline decoration-[#F3C1CD] underline-offset-[3px] hover:text-primaryHover">Blog</a></li>
+      </ol>
+    </nav>
+  </div>
+  <div class="max-w-[640px] mx-auto px-6 pt-[88px] pb-24 text-center">
+    <physio-icon name="file-x" [size]="36" class="text-gray-600 inline-flex" />
+    <h1 class="text-[28px] leading-9 font-semibold mt-4 mb-2">This article isn't available</h1>
+    <p class="text-base leading-[26px] text-gray-700 m-0 mb-6">It may have been moved, unpublished or removed. You can find our latest articles on the blog.</p>
+    <div class="flex gap-2.5 justify-center flex-wrap">
+      <a routerLink="/blog" class="h-12 px-5 rounded-xl bg-primary text-white font-semibold text-[15px] flex items-center hover:bg-primaryHover hover:text-white">Back to the blog</a>
+      <a routerLink="/" class="h-12 px-5 rounded-xl border border-gray-300 font-semibold text-[15px] flex items-center text-gray-900 hover:border-primary hover:text-primaryDeep">Go to homepage</a>
+    </div>
+  </div>
+</ng-container>
+
+<!-- Error -->
+<div *ngIf="state === 'error'" class="max-w-[808px] mx-auto px-5 md:px-8 lg:px-6 pt-6 pb-12 md:pt-9 lg:pt-12 lg:pb-20">
+  <div role="alert" class="border border-dangerBorder bg-dangerSoft rounded-2xl px-6 py-12 text-center">
+    <physio-icon name="cloud-off" [size]="32" class="text-danger inline-flex" />
+    <h1 class="text-[22px] font-semibold mt-3.5 mb-1.5">We couldn't load this article</h1>
+    <p class="text-[15px] text-gray-700 m-0 mb-5">Check your connection and try again.</p>
+    <div class="flex gap-2.5 justify-center flex-wrap">
+      <button type="button" (click)="retry()" class="h-11 px-5 border-0 rounded-[10px] bg-primary text-white text-sm font-semibold inline-flex gap-2 items-center cursor-pointer hover:bg-primaryHover">
+        <physio-icon name="rotate-cw" [size]="16" />Try again
+      </button>
+      <a routerLink="/blog" class="h-11 px-[18px] border border-gray-300 rounded-[10px] text-sm font-semibold flex items-center bg-surface text-gray-900 hover:border-primary hover:text-primaryDeep">Back to the blog</a>
+    </div>
+  </div>
+</div>
+
+<ng-container *ngIf="state === 'live' && article as a">
+  <!-- Breadcrumb -->
+  <div class="bg-gray-50 border-b border-gray-200">
+    <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 md:px-8 lg:px-6 py-3.5 md:py-4">
+      <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600 min-w-0">
+        <li class="flex-none"><a routerLink="/" class="text-primaryDeep font-medium underline decoration-[#F3C1CD] underline-offset-[3px] hover:text-primaryHover">Home</a></li>
+        <li aria-hidden="true" class="flex-none">/</li>
+        <li class="flex-none"><a routerLink="/blog" class="text-primaryDeep font-medium underline decoration-[#F3C1CD] underline-offset-[3px] hover:text-primaryHover">Blog</a></li>
+        <li aria-hidden="true" class="flex-none">/</li>
+        <li aria-current="page" [title]="a.title" class="min-w-0 flex-1 text-gray-900 font-medium truncate">{{ a.title }}</li>
+      </ol>
+    </nav>
+  </div>
+
+  <article aria-labelledby="art-h">
+    <!-- Header -->
+    <div
+      class="mx-auto px-5 md:px-8 lg:px-6 pt-6 pb-5 md:pt-9 md:pb-7 lg:pt-12 lg:pb-8 grid"
+      [ngClass]="hasToc ? 'md:max-w-[834px] lg:max-w-[1012px] md:grid-cols-[170px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,680px)] md:gap-9 lg:gap-16' : 'md:max-w-[808px]'"
+    >
+      <header class="min-w-0 flex flex-col gap-4" [ngClass]="{ 'md:col-start-2': hasToc }">
+        <span class="self-start text-[13px] font-semibold px-3 py-1 rounded-full bg-primarySoft text-primaryDeep">{{ categoryLabel }}</span>
+        <h1 id="art-h" class="text-[28px] leading-9 md:text-4xl md:leading-[44px] lg:text-[44px] lg:leading-[52px] font-semibold tracking-[-0.02em] m-0 text-balance break-words">{{ a.title }}</h1>
+        <p *ngIf="a.excerpt" class="text-[17px] leading-[27px] md:text-[19px] md:leading-[30px] text-gray-800 m-0 text-pretty">{{ a.excerpt }}</p>
+
+        <div class="flex gap-x-4 gap-y-3 items-center justify-between flex-wrap pt-4 border-t border-gray-200">
+          <div class="flex gap-x-3 gap-y-2 items-center flex-wrap min-w-0 text-sm text-gray-700">
+            <ng-container *ngIf="a.author.trim()">
+              <span class="flex gap-2.5 items-center">
+                <span aria-hidden="true" class="size-9 rounded-full bg-primarySoft text-primaryDeep text-[13px] font-semibold flex items-center justify-center flex-none">{{ initials }}</span>
+                <span class="text-[15px] font-semibold text-gray-900">{{ a.author }}</span>
+              </span>
+              <span *ngIf="a.publishDate || a.readTime" aria-hidden="true" class="size-1 rounded-full bg-[#C9B9C0]"></span>
+            </ng-container>
+            <span *ngIf="a.publishDate">Published <time [attr.datetime]="a.publishDate">{{ a.publishDate | date: 'd MMMM y' }}</time></span>
+            <span *ngIf="updatedDate as u">· Updated <time [attr.datetime]="u">{{ u | date: 'd MMMM y' }}</time></span>
+            <span *ngIf="a.readTime" class="flex gap-1.5 items-center"><ng-container *ngIf="a.publishDate">· </ng-container><physio-icon name="clock" [size]="14" />{{ a.readTime }}</span>
+          </div>
+
+          <!-- Share -->
+          <div #shareBox class="relative" (keydown.escape)="closeShare(true)">
+            <button
+              #shareButton
+              type="button"
+              (click)="toggleShare()"
+              [attr.aria-expanded]="shareOpen"
+              aria-haspopup="menu"
+              aria-controls="share-menu"
+              class="h-11 px-4 border border-gray-300 rounded-[10px] text-sm font-semibold text-gray-900 flex gap-2 items-center cursor-pointer hover:border-[#D9C3CB] hover:bg-gray-50"
+              [ngClass]="shareOpen ? 'bg-gray-50' : 'bg-surface'"
+            >
+              <physio-icon name="share-2" [size]="16" />Share
+            </button>
+            <div
+              *ngIf="shareOpen"
+              id="share-menu"
+              role="menu"
+              aria-label="Share this article"
+              class="absolute left-0 md:left-auto md:right-0 top-[calc(100%+8px)] z-20 w-60 bg-surface border border-gray-200 rounded-xl shadow-[0_12px_32px_rgba(38,20,26,.12)] p-1.5"
+            >
+              <button type="button" role="menuitem" (click)="copyLink()" class="w-full min-h-11 border-0 rounded-lg bg-transparent flex gap-2.5 items-center px-2.5 text-sm font-medium text-gray-900 cursor-pointer text-left hover:bg-gray-100">
+                <physio-icon [name]="copied ? 'check' : 'link'" [size]="16" [ngClass]="copied ? 'text-[#14532D]' : 'text-gray-600'" />
+                <span aria-live="polite">{{ copied ? 'Link copied' : 'Copy link' }}</span>
+              </button>
+              <button type="button" role="menuitem" (click)="shareByEmail()" class="w-full min-h-11 border-0 rounded-lg bg-transparent flex gap-2.5 items-center px-2.5 text-sm font-medium text-gray-900 cursor-pointer text-left hover:bg-gray-100">
+                <physio-icon name="mail" [size]="16" class="text-gray-600" />Share by email
+              </button>
+              <button *ngIf="canNativeShare" type="button" role="menuitem" (click)="shareNative()" class="w-full min-h-11 border-0 rounded-lg bg-transparent flex gap-2.5 items-center px-2.5 text-sm font-medium text-gray-900 cursor-pointer text-left hover:bg-gray-100">
+                <physio-icon name="share" [size]="16" class="text-gray-600" />More options…
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+    </div>
+
+    <!-- Cover -->
+    <figure class="mx-auto px-5 md:px-8 lg:px-6 m-0" [ngClass]="hasToc ? 'md:max-w-[834px] lg:max-w-[1012px]' : 'md:max-w-[808px]'">
+      <div *ngIf="a.coverImageUrl && !imageFailed" class="relative aspect-[4/3] md:aspect-video rounded-[20px] overflow-hidden bg-[#FAF5F7]">
+        <img [src]="a.coverImageUrl" [alt]="a.title" class="absolute inset-0 w-full h-full object-cover" (error)="imageFailed = true" />
+      </div>
+      <div *ngIf="!a.coverImageUrl || imageFailed" aria-hidden="true" class="aspect-video md:aspect-[3/1] rounded-[20px] bg-[#FAF5F7] border border-[#F4ECEF] flex items-center justify-center text-[#C9B9C0]">
+        <physio-icon name="newspaper" [size]="40" />
+      </div>
+    </figure>
+
+    <!-- Body -->
+    <div
+      class="mx-auto px-5 md:px-8 lg:px-6 pt-7 pb-12 md:pt-10 md:pb-14 lg:pt-12 lg:pb-[72px] grid items-start"
+      [ngClass]="hasToc ? 'md:max-w-[834px] lg:max-w-[1012px] md:grid-cols-[170px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,680px)] md:gap-9 lg:gap-16' : 'md:max-w-[808px]'"
+    >
+      <!-- Contents: sidebar on tablet and desktop -->
+      <nav *ngIf="hasToc" aria-labelledby="toc-h" class="hidden md:block sticky top-24 min-w-0">
+        <h2 id="toc-h" class="text-xs font-semibold tracking-[.08em] text-gray-700 m-0 mb-2.5">ON THIS PAGE</h2>
+        <ol class="list-none m-0 p-0 border-l-2 border-gray-200">
+          <li *ngFor="let t of toc">
+            <a
+              [attr.href]="'#' + t.id"
+              (click)="goToSection($event, t.id)"
+              [attr.aria-current]="activeId === t.id ? 'location' : null"
+              class="block py-[7px] pl-3.5 -ml-0.5 border-l-2 text-sm leading-5 hover:text-primaryDeep"
+              [ngClass]="activeId === t.id ? 'border-primary text-gray-900 font-semibold' : 'border-transparent text-gray-700'"
+            >{{ t.text }}</a>
+          </li>
+        </ol>
+      </nav>
+
+      <div class="min-w-0" [ngClass]="{ 'md:col-start-2': hasToc }">
+        <!-- Contents: collapsible panel on mobile -->
+        <div *ngIf="hasToc" class="md:hidden border border-gray-200 rounded-xl mb-7 bg-gray-50">
+          <button
+            type="button"
+            (click)="tocOpen = !tocOpen"
+            [attr.aria-expanded]="tocOpen"
+            aria-controls="toc-m"
+            class="w-full min-h-12 px-4 border-0 bg-transparent flex justify-between items-center text-[15px] font-semibold text-gray-900 cursor-pointer"
+          >
+            <span class="flex gap-2 items-center"><physio-icon name="list" [size]="16" class="text-gray-600" />On this page</span>
+            <physio-icon [name]="tocOpen ? 'chevron-up' : 'chevron-down'" [size]="16" />
+          </button>
+          <ol *ngIf="tocOpen" id="toc-m" class="list-none m-0 px-4 pb-2">
+            <li *ngFor="let t of toc; let i = index">
+              <a [attr.href]="'#' + t.id" (click)="goToSection($event, t.id)" class="min-h-11 flex items-center gap-3 text-[15px] leading-[21px] text-gray-800 border-t border-gray-200 py-2 hover:text-primaryDeep">
+                <span class="font-mono text-xs text-gray-600 flex-none">{{ (i + 1).toString().padStart(2, '0') }}</span>{{ t.text }}
+              </a>
+            </li>
+          </ol>
+        </div>
+
+        <div class="flex flex-col gap-5 text-[17px] leading-7 md:text-lg md:leading-[30px] text-[#2E1A20]">
+          <ng-container *ngFor="let b of blocks; trackBy: trackByIndex" [ngSwitch]="b.kind">
+            <p *ngSwitchCase="'p'" class="m-0 text-pretty break-words whitespace-pre-line">{{ $any(b).text }}</p>
+            <h2
+              *ngSwitchCase="'h2'"
+              [id]="$any(b).id"
+              tabindex="-1"
+              class="text-[22px] leading-[30px] md:text-[26px] md:leading-[34px] font-semibold mt-5 -mb-1 text-gray-900 tracking-[-0.01em] text-balance scroll-mt-24 outline-none"
+            >{{ $any(b).text }}</h2>
+            <h3 *ngSwitchCase="'h3'" class="text-[19px] md:text-xl leading-7 font-semibold mt-2 -mb-2 text-gray-900">{{ $any(b).text }}</h3>
+            <ul *ngSwitchCase="'ul'" class="m-0 pl-6 list-disc flex flex-col gap-2">
+              <li *ngFor="let item of $any(b).items" class="pl-1 break-words">{{ item }}</li>
+            </ul>
+            <ol *ngSwitchCase="'ol'" class="m-0 p-0 list-none flex flex-col gap-3">
+              <li *ngFor="let item of $any(b).items; let i = index" class="grid grid-cols-[28px_minmax(0,1fr)] gap-3.5 items-start">
+                <span aria-hidden="true" class="size-7 rounded-full bg-gray-100 text-primaryDeep font-mono text-[13px] font-semibold flex items-center justify-center mt-px">{{ i + 1 }}</span>
+                <span class="break-words">{{ item }}</span>
+              </li>
+            </ol>
+            <aside *ngSwitchCase="'takeaway'" aria-label="Key takeaway" class="my-2 px-6 py-[22px] rounded-2xl bg-primarySoft text-gray-800">
+              <p class="m-0 mb-1.5 text-sm font-semibold tracking-[.04em] text-primaryDeep flex gap-2 items-center"><physio-icon name="lightbulb" [size]="16" />KEY TAKEAWAY</p>
+              <p class="m-0 text-[17px] leading-[27px] md:text-[19px] md:leading-[30px] font-medium text-gray-900">{{ $any(b).text }}</p>
+            </aside>
+            <aside *ngSwitchCase="'callout'" role="note" class="px-[18px] py-4 rounded-xl border border-gray-300 bg-gray-50 flex gap-3 items-start">
+              <physio-icon name="info" [size]="18" class="text-gray-600 mt-[3px] flex-none" />
+              <div>
+                <p *ngIf="$any(b).title" class="m-0 mb-0.5 text-[15px] leading-[23px] font-semibold text-gray-900">{{ $any(b).title }}</p>
+                <p class="m-0 text-[15px] leading-6 text-gray-800">{{ $any(b).text }}</p>
+              </div>
+            </aside>
+          </ng-container>
+        </div>
+
+        <p class="mt-10 mb-0 pt-5 border-t border-gray-200 text-sm leading-[22px] text-gray-700">
+          This article is general information. It isn't a diagnosis or a treatment plan. Speak to a qualified health professional about your own situation.
+        </p>
+        <!-- Plain labels: there is no tag page -->
+        <ul *ngIf="tags.length" aria-label="Tags" class="list-none mt-4 mb-0 p-0 flex gap-2 flex-wrap">
+          <li *ngFor="let t of tags" class="text-[13px] px-3 py-1 rounded-full border border-gray-300 text-gray-800">{{ t }}</li>
+        </ul>
+
+        <section *ngIf="a.author.trim()" aria-label="About the author" class="mt-8 p-5 border border-gray-200 rounded-2xl flex gap-3.5 items-center">
+          <span aria-hidden="true" class="size-12 rounded-full bg-primarySoft text-primaryDeep text-base font-semibold flex items-center justify-center flex-none">{{ initials }}</span>
+          <div class="min-w-0">
+            <span class="text-[13px] text-gray-700">Written by</span>
+            <p class="m-0 text-[17px] leading-6 font-semibold">{{ a.author }}</p>
+          </div>
+        </section>
+
+        <section aria-labelledby="ns-h" class="mt-8 p-6 rounded-2xl bg-gray-50 border border-gray-200">
+          <h2 id="ns-h" class="text-lg leading-[26px] font-semibold m-0 mb-1">Next steps</h2>
+          <p class="text-[15px] leading-6 text-gray-800 m-0 mb-4">If you'd like advice about your own situation, a physiotherapist can assess you in person.</p>
+          <div class="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2">
+            <a
+              *ngFor="let l of nextLinks"
+              [routerLink]="l.href"
+              class="min-h-12 px-3.5 py-2.5 border border-gray-300 rounded-xl bg-surface flex gap-2.5 items-center text-[15px] font-semibold text-gray-900 hover:border-primary hover:text-primaryDeep"
+            >
+              <physio-icon [name]="l.icon" [size]="16" class="text-gray-600" />
+              <span class="flex-1">{{ l.label }}</span>
+              <physio-icon name="arrow-right" [size]="16" class="text-gray-600" />
+            </a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </article>
+
+  <!-- Related: hidden if the search fails -->
+  <section *ngIf="relatedState !== 'error'" aria-labelledby="rel-h" class="bg-gray-50 border-t border-gray-200">
+    <div class="max-w-[1200px] mx-auto px-5 md:px-8 lg:px-6 pt-10 pb-12 md:pt-12 md:pb-14 lg:pt-14 lg:pb-[72px]">
+      <div class="flex justify-between items-end gap-4 mb-6 flex-wrap">
+        <h2 id="rel-h" class="text-2xl leading-8 md:text-[28px] md:leading-9 font-semibold m-0">Related articles</h2>
+        <a routerLink="/blog" class="text-[15px] font-semibold text-primaryDeep flex gap-1.5 items-center min-h-11 hover:text-primaryHover">All articles<physio-icon name="arrow-right" [size]="16" /></a>
+      </div>
+
+      <div *ngIf="relatedState === 'loading'" class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <article-card *ngFor="let _ of [0, 1, 2]" [skeleton]="true" />
+      </div>
+
+      <div *ngIf="relatedState === 'live' && related.length" class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <article-card *ngFor="let r of related" [article]="r" />
+      </div>
+
+      <div *ngIf="relatedState === 'live' && !related.length" class="bg-surface border border-dashed border-gray-300 rounded-2xl px-6 py-9 text-center">
+        <physio-icon name="newspaper" [size]="28" class="text-gray-600 inline-flex" />
+        <h3 class="text-[17px] font-semibold mt-2.5 mb-1.5">No related articles yet</h3>
+        <p class="text-[15px] leading-[23px] text-gray-700 mx-auto mt-0 mb-3.5 max-w-[440px]">When we publish more articles in {{ categoryLabel }}, they'll appear here.</p>
+        <a routerLink="/blog" class="text-[15px] font-semibold text-primaryDeep inline-flex gap-1.5 items-center min-h-11 hover:text-primaryHover">Browse the blog<physio-icon name="arrow-right" [size]="16" /></a>
+      </div>
+    </div>
+  </section>
+</ng-container>
+
+<p
+  *ngIf="toast"
+  role="status"
+  class="fixed left-1/2 -translate-x-1/2 bottom-6 z-30 m-0 px-4 py-3 rounded-[10px] bg-gray-900 text-white text-sm flex gap-2.5 items-center max-w-[calc(100%-32px)] shadow-[0_8px_24px_rgba(0,0,0,.2)]"
+>
+  <physio-icon name="info" [size]="16" class="flex-none" />{{ toast }}
+</p>

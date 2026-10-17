@@ -307,6 +307,13 @@ export const LoadingKeys = {
         SEARCH: 'public-service-search',
         FILTERS: 'public-service-filters',
         DETAIL: 'public-service-detail'
+    },
+    PUBLIC_CONTACT: {
+        SEND: 'public-contact-send'
+    },
+    PUBLIC_ARTICLE: {
+        DETAIL: 'public-article-detail',
+        RELATED: 'public-article-related'
     }
 } as const;
 

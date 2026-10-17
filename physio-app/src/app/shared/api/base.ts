@@ -543,6 +543,14 @@ export const BASE_API = {
       SEARCH: '/api/public/services/search',
       FILTERS: '/api/public/services/filters',
       DETAIL: (id: string) => `/api/public/services/${id}`,
+    },
+    CONTACT: {
+      SEND: '/api/public/contact-messages',
+    },
+    /** The article routes are already public: they return Data: null for drafts and archived articles. */
+    ARTICLES: {
+      SEARCH: '/api/articles/search',
+      DETAIL: (id: string) => `/api/articles/${id}`,
     }
   }
 };

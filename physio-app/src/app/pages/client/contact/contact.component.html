@@ -1,0 +1,299 @@
+<!-- Intro: breadcrumb, title, lead -->
+<section class="bg-gray-50 border-b border-gray-200">
+  <div class="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 pt-5 pb-7 md:pt-6 md:pb-9 lg:pt-7 lg:pb-10 flex flex-col gap-3.5">
+    <nav aria-label="Breadcrumb">
+      <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600">
+        <li><a routerLink="/" class="text-gray-700 hover:text-primaryDeep">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page" class="text-gray-900 font-medium">Contact</li>
+      </ol>
+    </nav>
+
+    <div class="flex gap-6 items-center justify-between flex-wrap">
+      <div class="max-w-[640px] flex flex-col gap-2.5">
+        <span class="text-[13px] font-semibold tracking-[.08em] text-primaryDeep">CONTACT US</span>
+        <h1 class="text-[32px] leading-10 md:text-[44px] md:leading-[52px] font-semibold tracking-[-0.02em] text-gray-900 m-0">We're here to help</h1>
+        <p class="text-base leading-[25px] md:text-lg md:leading-7 text-gray-800 m-0 text-pretty">
+          Have a question about our services or need help finding the right clinic? Our team is here to help you take the next step.
+        </p>
+      </div>
+      <div aria-hidden="true" class="hidden lg:flex gap-2.5">
+        <span class="w-14 h-14 rounded-2xl bg-surface border border-gray-200 flex items-center justify-center text-primaryDeep"><physio-icon name="message-square" [size]="24" /></span>
+        <span class="w-14 h-14 rounded-2xl bg-primarySoft flex items-center justify-center text-primaryDeep"><physio-icon name="phone" [size]="24" /></span>
+        <span class="w-14 h-14 rounded-2xl bg-surface border border-gray-200 flex items-center justify-center text-primaryDeep"><physio-icon name="map-pin" [size]="24" /></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Optional notice from tenant settings -->
+<div *ngIf="tenant.notice as n" class="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 pt-5 md:pt-6 lg:pt-7">
+  <div role="region" aria-label="Important notice" class="border border-[#F0D49B] bg-[#FFFBF2] rounded-[14px] px-[18px] py-4 flex gap-3.5 items-start flex-wrap">
+    <physio-icon name="info" [size]="20" class="text-[#8A5300] mt-px flex-none" />
+    <div class="flex-[1_1_260px]">
+      <p class="m-0 text-[15px] font-semibold">{{ n.title }}</p>
+      <p class="mt-0.5 mb-0 text-sm leading-[21px] text-gray-800">{{ n.body }}</p>
+    </div>
+    <a
+      *ngIf="noticePhoneHref as href"
+      [href]="href"
+      class="h-11 px-4 border border-[#E8C78E] rounded-[10px] bg-surface font-semibold text-sm flex gap-2 items-center text-gray-900"
+    ><physio-icon name="phone" [size]="16" />Call {{ n.phone }}</a>
+  </div>
+</div>
+
+<!-- Contact details (each card hides when its setting is missing) -->
+<section *ngIf="infoCards.length" aria-label="Contact details" class="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 pt-5 md:pt-6 lg:pt-7">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4" [ngClass]="infoCols">
+    <div *ngFor="let c of infoCards" class="bg-surface border border-gray-200 rounded-2xl p-5 flex flex-col gap-2 min-w-0">
+      <span class="w-10 h-10 rounded-xl bg-primarySoft text-primaryDeep flex items-center justify-center mb-1" aria-hidden="true"><physio-icon [name]="c.icon" [size]="18" /></span>
+      <h2 class="text-base leading-6 font-semibold m-0">{{ c.title }}</h2>
+      <p *ngFor="let l of c.lines" class="m-0 text-[15px] leading-[22px] text-gray-800 [overflow-wrap:anywhere]">{{ l }}</p>
+      <dl *ngIf="c.rows" class="m-0 grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 text-sm leading-[21px]">
+        <ng-container *ngFor="let r of c.rows">
+          <dt class="text-gray-700">{{ r.days }}</dt>
+          <dd class="m-0 text-gray-900 tabular-nums">{{ r.time }}</dd>
+        </ng-container>
+      </dl>
+      <a
+        *ngIf="c.action as a"
+        [href]="a.href"
+        [attr.target]="a.external ? '_blank' : null"
+        [attr.rel]="a.external ? 'noopener noreferrer' : null"
+        class="mt-auto min-h-11 flex items-center gap-1.5 text-[15px] font-semibold text-primaryDeep self-start hover:text-primaryHover"
+      >{{ a.label }}<physio-icon name="arrow-right" [size]="16" /></a>
+    </div>
+  </div>
+</section>
+
+<!-- Form and booking help -->
+<div class="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 pt-7 pb-12 md:pt-8 md:pb-14 lg:pt-10 lg:pb-[72px] grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-6 lg:gap-8 items-start">
+  <div class="border border-gray-200 rounded-[20px] bg-surface shadow-[0_12px_40px_rgba(38,20,26,.06)] p-5 md:p-8 min-w-0">
+    <!-- Success -->
+    <div *ngIf="submitState === 'success'" role="status" aria-live="polite" class="flex flex-col gap-3.5 items-start">
+      <span class="w-[52px] h-[52px] rounded-full bg-[#E8F5EC] text-[#14532D] flex items-center justify-center" aria-hidden="true"><physio-icon name="check" [size]="26" /></span>
+      <h2 class="text-2xl leading-8 font-semibold m-0">Message received</h2>
+      <p class="text-base leading-[26px] text-gray-800 m-0">
+        Thank you. Your message has reached the {{ tenant.name }} team, and we'll reply using the contact details you gave.
+      </p>
+      <div *ngIf="reference" class="w-full px-4 py-3.5 bg-[#FAF5F7] rounded-xl flex flex-col gap-0.5">
+        <span class="text-[13px] text-gray-700">Reference number</span>
+        <span class="font-mono font-semibold text-[17px] tracking-[.02em]">{{ reference }}</span>
+        <span class="text-[13px] leading-5 text-gray-700 mt-1">Keep this if you contact us again about the same enquiry.</span>
+      </div>
+      <div class="flex gap-2.5 flex-wrap w-full">
+        <a routerLink="/" class="h-12 px-5 rounded-xl bg-primary text-white font-semibold text-[15px] flex items-center justify-center flex-[1_1_100%] md:flex-none hover:bg-primaryHover hover:text-white">Back to homepage</a>
+        <a routerLink="/hospitals" class="h-12 px-5 rounded-xl border border-gray-300 font-semibold text-[15px] flex items-center justify-center text-gray-900 flex-[1_1_100%] md:flex-none">Browse clinics</a>
+      </div>
+      <button type="button" (click)="sendAnother()" class="border-0 bg-transparent p-0 min-h-11 text-primaryDeep font-semibold text-sm underline cursor-pointer">Send another message</button>
+    </div>
+
+    <!-- Form -->
+    <form *ngIf="submitState !== 'success'" novalidate (submit)="submit($event)" aria-labelledby="ct-h" class="relative flex flex-col gap-[18px]">
+      <div>
+        <h2 id="ct-h" class="text-2xl leading-8 font-semibold m-0 mb-1">Send us a message</h2>
+        <p class="text-[15px] leading-[23px] text-gray-700 m-0">Tell us how we can help, and our team will get back to you.</p>
+        <p class="text-[13px] text-gray-600 mt-2 mb-0">All fields are required unless marked optional.</p>
+      </div>
+
+      <div *ngIf="summary.length" #summaryBox tabindex="-1" role="alert" class="border border-dangerBorder bg-dangerSoft rounded-xl px-4 py-3.5 outline-offset-2">
+        <p class="m-0 mb-1.5 text-[15px] font-semibold text-[#7A271A] flex gap-2 items-center"><physio-icon name="circle-alert" [size]="16" class="text-danger" />{{ summaryTitle }}</p>
+        <ul class="m-0 pl-7 flex flex-col gap-0.5">
+          <li *ngFor="let s of summary" class="text-[#7A271A]">
+            <a href="#" (click)="focusField(s.field, $event)" class="text-sm leading-[22px] text-[#7A271A] underline">{{ s.message }}</a>
+          </li>
+        </ul>
+      </div>
+
+      <div
+        *ngIf="banner as b"
+        role="alert"
+        class="border rounded-xl px-4 py-3.5 flex gap-2.5 items-start"
+        [ngClass]="b.tone === 'danger' ? 'border-dangerBorder bg-dangerSoft' : 'border-[#F0D49B] bg-[#FFFBF2]'"
+      >
+        <physio-icon [name]="b.icon" [size]="16" class="mt-[3px] flex-none" [ngClass]="b.tone === 'danger' ? 'text-danger' : 'text-[#8A5300]'" />
+        <div>
+          <p class="m-0 text-[15px] font-semibold text-gray-900">{{ b.title }}</p>
+          <p class="mt-0.5 mb-0 text-sm leading-[21px] text-gray-800">{{ b.text }}</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1.5 min-w-0">
+          <label for="ct-name" class="text-sm font-semibold">Full name</label>
+          <input
+            id="ct-name" name="name" autocomplete="name" maxlength="120"
+            [(ngModel)]="form.name" (ngModelChange)="onEdit('name')" (blur)="touch('name')"
+            [attr.aria-invalid]="!!errorFor('name')" [attr.aria-describedby]="errorFor('name') ? 'ct-name-err' : null" aria-required="true"
+            class="h-12 w-full border rounded-xl px-3.5 text-base text-gray-900 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
+            [ngClass]="errorFor('name') ? 'border-danger ring-1 ring-danger' : 'border-gray-300 focus:border-primary'"
+          />
+          <span *ngIf="errorFor('name')" id="ct-name-err" class="text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('name') }}</span>
+        </div>
+
+        <div class="flex flex-col gap-1.5 min-w-0">
+          <label for="ct-phone" class="text-sm font-semibold">Phone number</label>
+          <input
+            id="ct-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="32" placeholder="e.g. 0901 234 567"
+            [(ngModel)]="form.phone" (ngModelChange)="onEdit('phone')" (blur)="touch('phone')"
+            [attr.aria-invalid]="!!errorFor('phone')" [attr.aria-describedby]="errorFor('phone') ? 'ct-phone-err' : null" aria-required="true"
+            class="h-12 w-full border rounded-xl px-3.5 text-base text-gray-900 bg-surface placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/20"
+            [ngClass]="errorFor('phone') ? 'border-danger ring-1 ring-danger' : 'border-gray-300 focus:border-primary'"
+          />
+          <span *ngIf="errorFor('phone')" id="ct-phone-err" class="text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('phone') }}</span>
+        </div>
+
+        <div class="flex flex-col gap-1.5 min-w-0">
+          <label for="ct-email" class="text-sm font-semibold">Email address <span class="font-normal text-gray-600">(optional)</span></label>
+          <input
+            id="ct-email" name="email" type="email" autocomplete="email" maxlength="254"
+            [(ngModel)]="form.email" (ngModelChange)="onEdit('email')" (blur)="touch('email')"
+            [attr.aria-invalid]="!!errorFor('email')" [attr.aria-describedby]="errorFor('email') ? 'ct-email-err' : null"
+            class="h-12 w-full border rounded-xl px-3.5 text-base text-gray-900 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
+            [ngClass]="errorFor('email') ? 'border-danger ring-1 ring-danger' : 'border-gray-300 focus:border-primary'"
+          />
+          <span *ngIf="errorFor('email')" id="ct-email-err" class="text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('email') }}</span>
+        </div>
+
+        <div class="flex flex-col gap-1.5 min-w-0">
+          <label for="ct-topic" class="text-sm font-semibold">Topic <span class="font-normal text-gray-600">(optional)</span></label>
+          <select
+            id="ct-topic" name="topic" [(ngModel)]="form.topic"
+            class="h-12 w-full border border-gray-300 rounded-xl px-3 text-base text-gray-900 bg-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="">Choose a topic</option>
+            <option *ngFor="let o of topics" [value]="o.value">{{ o.label }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Hidden when there are no public clinics (or they couldn't be loaded). -->
+      <div *ngIf="clinics.length" class="flex flex-col gap-1.5 min-w-0">
+        <label for="ct-clinic" class="text-sm font-semibold">Clinic <span class="font-normal text-gray-600">(optional)</span></label>
+        <select
+          id="ct-clinic" name="clinic" [(ngModel)]="form.clinic" (ngModelChange)="onEdit('clinic')"
+          [attr.aria-invalid]="!!errorFor('clinic')" [attr.aria-describedby]="errorFor('clinic') ? 'ct-clinic-err' : null"
+          class="h-12 w-full border rounded-xl px-3 text-base text-gray-900 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
+          [ngClass]="errorFor('clinic') ? 'border-danger ring-1 ring-danger' : 'border-gray-300 focus:border-primary'"
+        >
+          <option value="">No preference</option>
+          <option *ngFor="let c of clinics" [value]="c.id">{{ c.name }}</option>
+        </select>
+        <span *ngIf="errorFor('clinic')" id="ct-clinic-err" class="text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('clinic') }}</span>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <div class="flex justify-between gap-3 items-baseline">
+          <label for="ct-message" class="text-sm font-semibold">Message</label>
+          <span aria-live="polite" class="font-mono text-xs" [ngClass]="form.message.length > messageMax ? 'text-danger' : 'text-gray-600'">{{ form.message.length }} / {{ messageMax }}</span>
+        </div>
+        <textarea
+          id="ct-message" name="message" rows="5"
+          [(ngModel)]="form.message" (ngModelChange)="onEdit('message')" (blur)="touch('message')"
+          [attr.aria-invalid]="!!errorFor('message')" [attr.aria-describedby]="errorFor('message') ? 'ct-message-err ct-message-hint' : 'ct-message-hint'" aria-required="true"
+          class="min-h-[140px] w-full resize-y border rounded-xl px-3.5 py-3 text-base leading-6 text-gray-900 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
+          [ngClass]="errorFor('message') ? 'border-danger ring-1 ring-danger' : 'border-gray-300 focus:border-primary'"
+        ></textarea>
+        <span id="ct-message-hint" class="text-[13px] leading-[19px] text-gray-700">Please don't include medical records or detailed health information.</span>
+        <span *ngIf="errorFor('message')" id="ct-message-err" class="text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('message') }}</span>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label
+          class="flex gap-3 items-start text-sm leading-[21px] cursor-pointer min-h-11 px-3 py-2.5 rounded-xl border"
+          [ngClass]="errorFor('consent') ? 'border-danger bg-dangerSoft' : 'border-gray-200 bg-gray-50'"
+        >
+          <input
+            id="ct-consent" name="consent" type="checkbox"
+            [(ngModel)]="form.consent" (ngModelChange)="onEdit('consent')"
+            [attr.aria-invalid]="!!errorFor('consent')" [attr.aria-describedby]="errorFor('consent') ? 'ct-consent-err' : null" aria-required="true"
+            class="w-5 h-5 m-0 accent-primary flex-none"
+          />
+          <span>I agree that {{ tenant.name }} can use these details to respond to my enquiry, as described in the
+            <a routerLink="/privacy" target="_blank" class="text-primaryDeep underline font-medium">Privacy Policy</a>.</span>
+        </label>
+        <span *ngIf="errorFor('consent')" id="ct-consent-err" class="text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('consent') }}</span>
+      </div>
+
+      <!-- Honeypot: hidden from people and assistive tech; bots that fill it are ignored server-side. -->
+      <div class="absolute w-px h-px overflow-hidden [clip:rect(0_0_0_0)]" aria-hidden="true">
+        <label for="ct-website">Website</label>
+        <input id="ct-website" name="website" type="text" tabindex="-1" autocomplete="off" [(ngModel)]="form.website" />
+      </div>
+
+      <p class="text-[13px] leading-5 text-gray-700 m-0">Submitting this form lets the {{ tenant.name }} team contact you about your enquiry.</p>
+
+      <button
+        type="submit"
+        [disabled]="submitDisabled"
+        [attr.aria-busy]="submitState === 'submitting'"
+        class="h-[52px] w-full md:w-auto md:self-start px-7 border-0 rounded-xl text-white font-semibold text-base flex gap-2.5 items-center justify-center"
+        [ngClass]="failKind === 'unavailable' ? 'bg-gray-400 cursor-not-allowed' : submitState === 'submitting' ? 'bg-primaryHover cursor-not-allowed' : 'bg-primary hover:bg-primaryHover cursor-pointer'"
+      >
+        <physio-icon [name]="submitIcon" [size]="18" [class.animate-spin]="submitState === 'submitting'" />{{ submitLabel }}
+      </button>
+    </form>
+  </div>
+
+  <aside aria-labelledby="help-h" class="bg-gray-50 border border-gray-200 rounded-[20px] p-6 flex flex-col gap-3.5">
+    <span aria-hidden="true" class="w-11 h-11 rounded-xl bg-surface border border-gray-200 text-primaryDeep flex items-center justify-center"><physio-icon name="calendar-heart" [size]="20" /></span>
+    <h2 id="help-h" class="text-xl leading-7 font-semibold m-0">Need help booking?</h2>
+    <p class="text-[15px] leading-[23px] text-gray-800 m-0">You can request an appointment online. The clinic will contact you to confirm a time.</p>
+    <!-- Requests are made per doctor (there is no /booking route), so this opens the doctor listing. -->
+    <a routerLink="/doctor" class="h-12 px-[18px] border border-primary rounded-xl bg-surface text-primaryDeep font-semibold text-[15px] flex gap-2 items-center justify-center hover:bg-primarySoft">
+      <physio-icon name="calendar-plus" [size]="16" />Request an appointment
+    </a>
+    <ul class="list-none mt-1.5 mb-0 pt-1.5 px-0 border-t border-gray-200 flex flex-col">
+      <li>
+        <a routerLink="/doctor" class="min-h-12 flex gap-2.5 items-center text-[15px] font-medium text-gray-900 border-b border-gray-200 hover:text-primaryDeep">
+          <physio-icon name="stethoscope" [size]="16" class="text-gray-600" /><span class="flex-1">Find a doctor</span><physio-icon name="chevron-right" [size]="16" class="text-gray-600" />
+        </a>
+      </li>
+      <li>
+        <a routerLink="/hospitals" class="min-h-12 flex gap-2.5 items-center text-[15px] font-medium text-gray-900 hover:text-primaryDeep">
+          <physio-icon name="building-2" [size]="16" class="text-gray-600" /><span class="flex-1">Browse clinics</span><physio-icon name="chevron-right" [size]="16" class="text-gray-600" />
+        </a>
+      </li>
+    </ul>
+  </aside>
+</div>
+
+<!-- Clinics -->
+<section aria-labelledby="fc-h" class="bg-gray-50 border-t border-gray-200">
+  <div class="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 pt-10 pb-12 md:pt-12 md:pb-14 lg:pt-14 lg:pb-[72px]">
+    <div class="flex justify-between items-end gap-4 mb-6 flex-wrap">
+      <div class="max-w-[620px]">
+        <h2 id="fc-h" class="text-2xl leading-8 md:text-[28px] md:leading-9 font-semibold m-0 mb-1.5">Find a clinic near you</h2>
+        <p class="text-[15px] leading-[23px] text-gray-700 m-0">Explore our clinics to find contact details and information about available services.</p>
+      </div>
+      <a *ngIf="clinicState === 'live' && clinicTotal > clinicCards.length" routerLink="/hospitals" class="text-[15px] font-semibold text-primaryDeep flex gap-1.5 items-center min-h-11 hover:text-primaryHover">
+        View all {{ clinicTotal }} clinics<physio-icon name="arrow-right" [size]="16" />
+      </a>
+    </div>
+
+    <div *ngIf="clinicState === 'loading'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" aria-busy="true">
+      <clinic-card *ngFor="let s of skeletons" [skeleton]="true" />
+    </div>
+
+    <div *ngIf="clinicState === 'live' && clinicCards.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <clinic-card *ngFor="let c of clinicCards" [hospital]="c" />
+    </div>
+
+    <div *ngIf="clinicState === 'live' && !clinicCards.length" class="bg-surface border border-dashed border-gray-300 rounded-2xl px-6 py-10 text-center">
+      <physio-icon name="building-2" [size]="30" class="text-gray-600 inline-flex" />
+      <h3 class="text-lg font-semibold mt-3 mb-1.5">No clinics are listed yet</h3>
+      <p class="text-[15px] leading-[23px] text-gray-700 m-0 mx-auto max-w-[480px]">
+        When clinics are published, their addresses and phone numbers will appear here. You can still reach the {{ tenant.name }} team using the details above.
+      </p>
+    </div>
+
+    <div *ngIf="clinicState === 'error'" role="alert" class="bg-surface border border-gray-200 rounded-2xl px-6 py-10 text-center">
+      <physio-icon name="cloud-off" [size]="30" class="text-danger inline-flex" />
+      <h3 class="text-lg font-semibold mt-3 mb-1.5">Clinics couldn't be loaded</h3>
+      <p class="text-[15px] leading-[23px] text-gray-700 m-0 mb-4">You can still send us a message above.</p>
+      <button type="button" (click)="loadClinics()" class="h-11 px-4 rounded-[10px] border border-gray-300 bg-surface font-semibold text-sm inline-flex gap-2 items-center cursor-pointer hover:border-primary hover:text-primaryDeep">
+        <physio-icon name="rotate-cw" [size]="16" />Try again
+      </button>
+    </div>
+  </div>
+</section>

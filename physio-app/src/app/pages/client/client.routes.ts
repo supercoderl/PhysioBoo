@@ -65,6 +65,11 @@ export const routes: Routes = [
                 loadComponent: () => import('./blog/blog.component').then(m => m.BlogComponent),
                 data: { breadcrumbs: ['blog'] }  
             },
+            {
+                path: 'blog/:id',
+                loadComponent: () => import('./blog/detail/article-detail.component').then(m => m.ArticleDetailComponent),
+                data: { breadcrumbs: ['blog'] }
+            },
         ],
     },
 ];

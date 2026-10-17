@@ -9,13 +9,34 @@ export interface ClientNavItem {
     key?: string;
 }
 
-export const CLIENT_TENANT = {
+export interface ClientTenant {
+    name: string;
+    tagline: string;
+    address: string | null;
+    phone: string | null;
+    email: string | null;
+    showEmergency: boolean;
+    /** Verified map link for the address; "Get directions" is hidden without it. */
+    mapUrl: string | null;
+    /** One-line hours under the phone number, e.g. "Mon–Fri, 08:00–18:00". */
+    hoursShort: string | null;
+    /** Structured opening hours; the contact page's hours card is hidden without them. */
+    hours: { days: string; time: string }[] | null;
+    /** Notice on the contact page (approved wording only); hidden when null. */
+    notice: { title: string; body: string; phone: string | null } | null;
+}
+
+export const CLIENT_TENANT: ClientTenant = {
     name: 'PhysioBoo',
     tagline: '[Tenant tagline from Home settings]',
     address: '[Address]',
     phone: '[Contact phone]',
     email: '[Contact email]',
     showEmergency: false,
+    mapUrl: null,
+    hoursShort: null,
+    hours: null,
+    notice: null,
 };
 
 export const CLIENT_NAV: ClientNavItem[] = [

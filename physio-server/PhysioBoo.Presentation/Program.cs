@@ -353,6 +353,7 @@ namespace PhysioBoo.Presentation
                 app.MapPublicDoctorEndpoints();
                 app.MapPublicHospitalEndpoints();
                 app.MapPublicServiceEndpoints();
+                app.MapPublicContactEndpoints();
                 app.MapHomeSettingsEndpoints();
                 app.MapHomeBannerEndpoints();
                 app.MapHomeFeatureEndpoints();

@@ -210,7 +210,7 @@
             class="w-5 h-5 m-0 accent-primary flex-none"
           />
           <span>I agree that {{ tenant.name }} can use these details to respond to my enquiry, as described in the
-            <a routerLink="/privacy" target="_blank" class="text-primaryDeep underline font-medium">Privacy Policy</a>.</span>
+            <a routerLink="/privacy" fragment="s4" target="_blank" class="text-primaryDeep underline font-medium">Privacy Policy</a>.</span>
         </label>
         <span *ngIf="errorFor('consent')" id="ct-consent-err" class="text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('consent') }}</span>
       </div>

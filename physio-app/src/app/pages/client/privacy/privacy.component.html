@@ -1,0 +1,170 @@
+<!-- Copy with [placeholders] highlighted until final wording replaces them -->
+<ng-template #copy let-segs>
+  <ng-container *ngFor="let g of segs">
+    <mark *ngIf="g.placeholder; else plain" class="bg-[#FEF3C7] text-[#78350F] px-1.5 py-px rounded text-[.92em] print:bg-transparent print:text-inherit print:p-0">{{ g.text }}</mark>
+    <ng-template #plain>{{ g.text }}</ng-template>
+  </ng-container>
+</ng-template>
+
+<!-- Draft notice: remove by setting PRIVACY_IS_DRAFT to false once the copy is approved -->
+<div *ngIf="isDraft" role="note" class="bg-[#FEF3C7] text-[#78350F] font-mono text-xs font-medium px-4 py-1.5 text-center print:hidden">
+  DRAFT — placeholder copy for layout only. Requires legal review and approval before publication.
+</div>
+
+<!-- Print-only header -->
+<div class="hidden print:flex justify-between items-center px-12 pt-7 pb-5 border-b border-gray-900 text-xs text-gray-800">
+  <img src="assets/logo/logo.webp" alt="PhysioBoo" class="h-6" />
+  <span>{{ pageAddress }}</span>
+</div>
+
+<!-- Intro: breadcrumb -->
+<div class="bg-gray-50 border-b border-gray-200 print:hidden">
+  <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 py-3.5 md:py-4">
+    <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600">
+      <li><a routerLink="/" class="text-primaryDeep font-medium underline decoration-primarySoft underline-offset-[3px]">Home</a></li>
+      <li aria-hidden="true">/</li>
+      <li aria-current="page" class="text-gray-900 font-medium">Privacy Policy</li>
+    </ol>
+  </nav>
+</div>
+
+<div id="top" class="max-w-[1012px] mx-auto px-5 md:px-8 xl:px-6 print:px-12">
+  <!-- Title -->
+  <div class="pt-6 md:pt-8 lg:pt-10 pb-2 lg:grid lg:grid-cols-[240px_minmax(0,700px)] lg:gap-[72px] print:pt-7">
+    <header class="lg:col-start-2 min-w-0 flex flex-col gap-3.5">
+      <h1 class="text-[30px] leading-[38px] md:text-4xl md:leading-[44px] lg:text-[40px] lg:leading-[48px] print:text-[28px] print:leading-9 font-semibold tracking-[-0.02em] text-gray-900 m-0">Privacy Policy</h1>
+      <p class="m-0 text-base leading-[25px] md:text-[17px] md:leading-[27px] lg:text-lg lg:leading-7 print:text-sm print:leading-[22px] text-gray-800 text-pretty">
+        This policy describes how PhysioBoo collects, uses and protects personal information when you use our website, including when you request an appointment or contact us.
+      </p>
+      <div class="flex flex-wrap gap-x-4 gap-y-2.5 items-center justify-between pt-3.5 border-t border-gray-200">
+        <p class="m-0 text-sm text-gray-700 flex gap-2 items-center flex-wrap">
+          <physio-icon name="calendar" [size]="16" aria-hidden="true" />Last updated
+          <time class="font-mono text-[13px] font-medium bg-[#FEF3C7] text-[#78350F] px-2 py-0.5 rounded-md print:bg-transparent print:text-inherit print:p-0">{{ lastUpdated }}</time>
+        </p>
+        <button
+          type="button"
+          (click)="print()"
+          class="h-11 px-4 border border-gray-300 rounded-[10px] bg-surface font-semibold text-sm text-gray-900 flex gap-2 items-center hover:bg-gray-50 hover:border-gray-400 print:hidden"
+        ><physio-icon name="printer" [size]="16" />Print</button>
+      </div>
+    </header>
+  </div>
+
+  <div class="pt-6 pb-12 md:pt-7 md:pb-16 lg:pt-8 lg:pb-20 print:pt-6 print:pb-10 lg:grid lg:grid-cols-[240px_minmax(0,700px)] lg:gap-[72px] lg:items-start">
+    <!-- Contents: sticky list on desktop -->
+    <nav aria-labelledby="toc-h" class="hidden lg:block sticky top-6 min-w-0 print:!hidden">
+      <h2 id="toc-h" class="text-xs font-semibold tracking-[.08em] text-gray-700 m-0 mb-2.5">CONTENTS</h2>
+      <ol class="list-none m-0 p-0 border-l-2 border-gray-200">
+        <li *ngFor="let s of sections">
+          <a
+            [href]="'#' + s.id"
+            (click)="goTo(s.id, $event)"
+            [attr.aria-current]="activeId === s.id ? 'location' : null"
+            class="grid grid-cols-[22px_minmax(0,1fr)] py-1.5 pl-3 -ml-0.5 border-l-2 text-sm leading-5 hover:text-primaryDeep"
+            [ngClass]="activeId === s.id ? 'border-primary text-gray-900 font-semibold' : 'border-transparent text-gray-700'"
+          >
+            <span class="font-mono text-xs leading-5 text-gray-600">{{ s.n }}</span>{{ s.title }}
+          </a>
+        </li>
+      </ol>
+    </nav>
+
+    <div class="min-w-0 lg:col-start-2 lg:row-start-1">
+      <!-- Contents: collapsible on tablet and mobile -->
+      <div class="lg:hidden print:hidden border border-gray-200 rounded-xl mb-8 bg-gray-50">
+        <button
+          type="button"
+          (click)="toggleToc()"
+          [attr.aria-expanded]="tocOpen"
+          aria-controls="toc-m"
+          class="w-full min-h-[52px] px-4 flex justify-between items-center font-semibold text-[15px] text-gray-900"
+        >
+          <span class="flex gap-2 items-center"><physio-icon name="list" [size]="18" class="text-gray-600" />Contents · {{ sections.length }} sections</span>
+          <physio-icon [name]="tocOpen ? 'chevron-up' : 'chevron-down'" [size]="18" />
+        </button>
+        <ol *ngIf="tocOpen" id="toc-m" class="list-none m-0 px-4 pb-2 grid grid-cols-1 md:grid-cols-2 md:gap-x-6">
+          <li *ngFor="let s of sections">
+            <a
+              [href]="'#' + s.id"
+              (click)="goTo(s.id, $event)"
+              class="min-h-11 py-2 flex items-center gap-3 border-t border-gray-200 text-[15px] leading-[21px] text-gray-800 hover:text-primaryDeep"
+            >
+              <span class="font-mono text-xs text-gray-600 flex-none w-[18px]">{{ s.n }}</span>{{ s.title }}
+            </a>
+          </li>
+        </ol>
+      </div>
+
+      <!-- Sections -->
+      <div class="flex flex-col gap-8 md:gap-10 lg:gap-11 print:gap-[22px]">
+        <section
+          *ngFor="let s of sections"
+          [id]="s.id"
+          [attr.aria-labelledby]="s.id + '-h'"
+          class="scroll-mt-6 flex flex-col gap-4 text-base leading-[26px] md:text-[17px] md:leading-7 print:text-[13px] print:leading-5 text-gray-900 print:break-inside-avoid-page"
+        >
+          <div class="flex flex-wrap items-baseline gap-x-3 gap-y-2">
+            <h2 [id]="s.id + '-h'" tabindex="-1" class="m-0 flex gap-3 items-baseline text-xl leading-7 md:text-[22px] md:leading-[30px] print:text-base print:leading-[22px] font-semibold tracking-[-0.01em] text-gray-900">
+              <span class="font-mono text-sm md:text-[15px] print:text-xs font-medium text-primaryDeep flex-none">{{ s.number }}</span>
+              <span>{{ s.title }}</span>
+            </h2>
+            <span *ngIf="s.review && isDraft" class="self-center font-mono text-[11px] font-medium tracking-[.04em] px-2 py-[3px] rounded-md bg-[#FEF3C7] text-[#78350F] flex gap-1.5 items-center print:hidden">
+              <physio-icon name="scale" [size]="12" aria-hidden="true" />NEEDS LEGAL REVIEW
+            </span>
+          </div>
+
+          <ng-container *ngFor="let b of s.blocks">
+            <p *ngIf="b.type === 'p'" class="m-0 text-pretty break-words">
+              <ng-container *ngTemplateOutlet="copy; context: { $implicit: b.segs }"></ng-container>
+            </p>
+
+            <ul *ngIf="b.type === 'ul'" class="m-0 pl-6 flex flex-col gap-2.5 list-disc">
+              <li *ngFor="let i of b.items" class="pl-1 break-words">
+                <ng-container *ngTemplateOutlet="copy; context: { $implicit: i.segs }"></ng-container>
+                <ul *ngIf="i.sub.length" class="mt-2 mb-0.5 pl-[22px] list-[circle] flex flex-col gap-1.5 text-gray-800">
+                  <li *ngFor="let x of i.sub" class="pl-0.5">{{ x }}</li>
+                </ul>
+              </li>
+            </ul>
+
+            <dl *ngIf="b.type === 'contact'" class="m-0 border border-gray-200 rounded-2xl px-[22px] py-5 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3.5 bg-gray-50 print:break-inside-avoid">
+              <div *ngFor="let c of contactRows" class="min-w-0">
+                <dt class="text-[13px] leading-[18px] text-gray-700">{{ c.label }}</dt>
+                <dd class="m-0 mt-0.5 text-[15px] leading-[22px] break-words">
+                  <ng-container *ngTemplateOutlet="copy; context: { $implicit: c.segs }"></ng-container>
+                </dd>
+              </div>
+            </dl>
+          </ng-container>
+
+          <a
+            *ngIf="s.id === 's13'"
+            routerLink="/contact"
+            class="self-start min-h-11 flex gap-1.5 items-center text-[15px] font-semibold text-primaryDeep underline decoration-primarySoft underline-offset-[3px] print:hidden"
+          >Or use the contact form<physio-icon name="arrow-right" [size]="16" /></a>
+
+          <a
+            href="#top"
+            (click)="goToTop($event)"
+            class="lg:hidden self-end min-h-11 flex gap-1.5 items-center text-sm font-medium text-gray-700 hover:text-primaryDeep print:hidden"
+          ><physio-icon name="arrow-up" [size]="14" />Back to top</a>
+        </section>
+      </div>
+
+      <div class="mt-12 pt-5 border-t border-gray-200 flex flex-wrap justify-between items-center gap-3 text-sm text-gray-700">
+        <span>Last updated
+          <time class="font-mono text-[13px] font-medium bg-[#FEF3C7] text-[#78350F] px-2 py-0.5 rounded-md print:bg-transparent print:text-inherit print:p-0">{{ lastUpdated }}</time>
+        </span>
+        <a href="#top" (click)="goToTop($event)" class="min-h-11 flex gap-1.5 items-center font-medium text-gray-700 hover:text-primaryDeep print:hidden">
+          <physio-icon name="arrow-up" [size]="14" />Back to top
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Print-only footer -->
+<div class="hidden print:flex justify-between mx-12 pt-4 pb-8 border-t border-gray-900 text-xs text-gray-800">
+  <span>© {{ year }} PhysioBoo · Privacy Policy</span>
+  <span>Last updated {{ lastUpdated }}</span>
+</div>

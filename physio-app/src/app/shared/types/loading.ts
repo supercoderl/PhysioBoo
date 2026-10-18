@@ -312,6 +312,7 @@ export const LoadingKeys = {
         SEND: 'public-contact-send'
     },
     PUBLIC_ARTICLE: {
+        SEARCH: 'public-article-search',
         DETAIL: 'public-article-detail',
         RELATED: 'public-article-related'
     }

@@ -1,113 +1,154 @@
-import { Component } from "@angular/core";
-import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.component";
-import { SharedModule } from "../../../shared/shared-imports";
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { AfterViewInit, Component, ElementRef, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { SharedModule } from '../../../shared/shared-imports';
+import {
+  PRIVACY_CONTACT_ROWS,
+  PRIVACY_IS_DRAFT,
+  PRIVACY_LAST_UPDATED,
+  PRIVACY_SECTIONS,
+  PrivacyTextSegment,
+  splitPlaceholders,
+} from './privacy-content';
 
+interface PrivacyListView {
+  segs: PrivacyTextSegment[];
+  sub: string[];
+}
+
+interface PrivacyBlockView {
+  type: 'p' | 'ul' | 'contact';
+  segs: PrivacyTextSegment[];
+  items: PrivacyListView[];
+}
+
+interface PrivacySectionView {
+  id: string;
+  number: string;
+  /** Unpadded number shown in the contents list. */
+  n: number;
+  title: string;
+  review: boolean;
+  blocks: PrivacyBlockView[];
+}
+
+/** Distance kept above a section when it is scrolled into view. */
+const SCROLL_OFFSET = 24;
+
+/**
+ * Public privacy policy (design: Privacy Page / Privacy Policy).
+ * The copy is static and lives in privacy-content.ts; sections have stable ids (#s1 to #s13) so forms and emails can
+ * link to them. The contents list marks the section being read and the page has its own print layout.
+ */
 @Component({
-    selector: 'app-privacy',
-    standalone: true,
-    template: `
-        <breadcrumb title="Privacy Policy"></breadcrumb>
-        <section class="py-10 md:py-15 block">
-            <div class="container mx-auto">
-                <div class="flex">
-                    <div class="px-3">
-                        <div>
-                            <div class="pb-6 mb-4">
-                                <p class="text-base text-[#85757D] mb-6">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                                    eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                                    enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                                    nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-                                    reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                                    nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                                    sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                </p>
-                                <p class="text-base text-[#85757D] mb-6">
-                                    Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                                    accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
-                                    quae ab illo inventore veritatis et quasi architecto beatae vitae
-                                    dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
-                                    aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
-                                    eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam
-                                    est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci
-                                    velit, sed quia non numquam eius modi tempora incidunt ut labore
-                                    et dolore magnam aliquam quaerat voluptatem.
-                                </p>
-                                <p class="text-base text-[#85757D]">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                                    eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                                    enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                                    nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-                                    reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                                    nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                                    sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                </p>
-                            </div>
-                            <div class="pb-6 mb-4">
-                                <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
-                                    <physio-icon name="circle-check" [size]="20" [class]="'mr-2 text-white [&_svg]:fill-secondary'" /> At vero eos et accusamus et
-                                    iusto odio dignissimos ducimus qui blanditiis praesentium
-                                    voluptatum deleniti atque corrupti quos dolores et
-                                </p>
-                                <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
-                                    <physio-icon name="circle-check" [size]="20" [class]="'mr-2 text-white [&_svg]:fill-secondary'" /> Sed ut perspiciatis unde omnis
-                                    iste natus error sit voluptatem accusantium doloremque laudantium,
-                                </p>
-                                <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
-                                    <physio-icon name="circle-check" [size]="20" [class]="'mr-2 text-white [&_svg]:fill-secondary'" /> Nemo enim ipsam voluptatem
-                                    quia voluptas sit aspernatur aut odit aut fugit, sed quia
-                                    consequuntur magni dolores eos qui ratione voluptatem sequi
-                                    nesciunt.
-                                </p>
-                                <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
-                                    <physio-icon name="circle-check" [size]="20" [class]="'mr-2 text-white [&_svg]:fill-secondary'" /> At vero eos et accusamus et
-                                    iusto odio dignissimos ducimus qui blanditiis praesentium
-                                    voluptatum deleniti atque corrupti quos dolores et
-                                </p>
-                                <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
-                                    <physio-icon name="circle-check" [size]="20" [class]="'mr-2 text-white [&_svg]:fill-secondary'" /> Sed ut perspiciatis unde omnis
-                                    iste natus error sit voluptatem accusantium doloremque laudantium,
-                                </p>
-                                <p class="mb-2.5 inline-flex items-start text-base text-[#85757D] flex items-center">
-                                    <physio-icon name="circle-check" [size]="20" [class]="'mr-2 text-white [&_svg]:fill-secondary'" /> Nemo enim ipsam voluptatem
-                                    quia voluptas sit aspernatur aut odit aut fugit, sed quia
-                                    consequuntur magni dolores eos qui ratione voluptatem sequi
-                                    nesciunt.
-                                </p>
-                            </div>
-                            <div class="md:pb-6 md:mb-4">
-                                <p class="text-base text-[#85757D] mb-6">
-                                    Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                                    accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
-                                    quae ab illo inventore veritatis et quasi architecto beatae vitae
-                                    dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
-                                    aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
-                                    eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam
-                                    est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci
-                                    velit, sed quia non numquam eius modi tempora incidunt ut labore
-                                    et dolore magnam aliquam quaerat voluptatem.
-                                </p>
-                                <p class="text-base text-[#85757D] mb-6">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                                    eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                                    enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                                    nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-                                    reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                                    nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                                    sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    `,
-    imports: [
-        BreadcrumbComponent,
-        SharedModule
-    ]
+  selector: 'app-privacy',
+  standalone: true,
+  imports: [SharedModule],
+  templateUrl: './privacy.component.html',
 })
+export class PrivacyComponent implements AfterViewInit, OnDestroy {
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly document = inject(DOCUMENT);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-export class PrivacyComponent {
+  readonly year = new Date().getFullYear();
+  readonly pageAddress = this.isBrowser ? `${window.location.origin}/privacy` : '/privacy';
+  readonly isDraft = PRIVACY_IS_DRAFT;
+  readonly lastUpdated = PRIVACY_LAST_UPDATED;
+  readonly contactRows = PRIVACY_CONTACT_ROWS.map(r => ({ label: r.label, segs: splitPlaceholders(r.value) }));
+  readonly sections: PrivacySectionView[] = PRIVACY_SECTIONS.map((s, i) => ({
+    id: s.id,
+    number: String(i + 1).padStart(2, '0'),
+    n: i + 1,
+    title: s.title,
+    review: !!s.review,
+    blocks: s.blocks.map(b => ({
+      type: b.type,
+      segs: b.type === 'p' ? splitPlaceholders(b.text) : [],
+      items: b.type === 'ul'
+        ? b.items.map(it => {
+          const item = typeof it === 'string' ? { text: it } : it;
+          return { segs: splitPlaceholders(item.text), sub: item.sub ?? [] };
+        })
+        : [],
+    })),
+  }));
+
+  activeId = this.sections[0].id;
+  tocOpen = false;
+
+  private observer?: IntersectionObserver;
+  private visible = new Set<string>();
+
+  ngAfterViewInit(): void {
+    if (!this.isBrowser) return;
+    this.observeSections();
+    const fragment = this.route.snapshot.fragment;
+    if (fragment && this.sections.some(s => s.id === fragment)) {
+      // Wait a frame so the layout (and web fonts) settle before measuring the target.
+      requestAnimationFrame(() => this.scrollToSection(fragment, false));
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.observer?.disconnect();
+  }
+
+  toggleToc(): void {
+    this.tocOpen = !this.tocOpen;
+  }
+
+  goTo(id: string, event: Event): void {
+    event.preventDefault();
+    this.tocOpen = false;
+    this.activeId = id;
+    this.router.navigate([], { fragment: id, replaceUrl: true });
+    this.scrollToSection(id, true);
+  }
+
+  goToTop(event: Event): void {
+    event.preventDefault();
+    this.activeId = this.sections[0].id;
+    this.router.navigate([], { fragment: undefined, replaceUrl: true });
+    this.scrollTo(this.host.nativeElement.querySelector('#top'), true);
+  }
+
+  print(): void {
+    if (this.isBrowser) window.print();
+  }
+
+  private scrollToSection(id: string, focus: boolean): void {
+    const section = this.document.getElementById(id);
+    this.scrollTo(section, true);
+    if (focus) {
+      // Move keyboard and screen reader focus to the heading so the jump is announced.
+      this.document.getElementById(id + '-h')?.focus({ preventScroll: true });
+    }
+  }
+
+  private scrollTo(target: Element | null, smooth: boolean): void {
+    if (!this.isBrowser || !target) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const top = target.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET;
+    window.scrollTo({ top, behavior: smooth && !reduce ? 'smooth' : 'auto' });
+  }
+
+  /** Marks the topmost section inside the reading band as the current one in the contents list. */
+  private observeSections(): void {
+    if (typeof IntersectionObserver === 'undefined') return;
+    this.observer = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        if (e.isIntersecting) this.visible.add(e.target.id);
+        else this.visible.delete(e.target.id);
+      }
+      const current = this.sections.find(s => this.visible.has(s.id));
+      if (current) this.activeId = current.id;
+    }, { rootMargin: '0px 0px -65% 0px' });
+    for (const s of this.sections) {
+      const el = this.document.getElementById(s.id);
+      if (el) this.observer.observe(el);
+    }
+  }
 }

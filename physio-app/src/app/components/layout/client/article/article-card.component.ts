@@ -45,8 +45,17 @@ import { PublicArticle } from '../../../../shared/types/public-article.types';
           </div>
           <h3 class="text-[17px] leading-[25px] font-semibold m-0 line-clamp-2">{{ a.title }}</h3>
           <p *ngIf="a.excerpt" class="text-sm leading-[21px] text-gray-700 m-0 line-clamp-2">{{ a.excerpt }}</p>
-          <span class="mt-auto pt-1.5 text-sm font-semibold text-primaryDeep flex gap-1.5 items-center">
-            Read article<physio-icon name="arrow-right" [size]="15" />
+          <div *ngIf="showMeta && (a.author || a.readTime)" class="mt-auto pt-2.5 flex gap-x-3 gap-y-1.5 items-center flex-wrap text-[13px] text-gray-700">
+            <span *ngIf="a.author" class="flex gap-2 items-center font-medium text-gray-800 min-w-0">
+              <span aria-hidden="true" class="w-6 h-6 rounded-full bg-primarySoft text-primaryDeep text-[10px] font-semibold flex items-center justify-center flex-none">{{ initials }}</span>
+              <span class="truncate">{{ a.author }}</span>
+            </span>
+            <span *ngIf="a.readTime" class="flex gap-1.5 items-center">
+              <physio-icon name="clock" [size]="13" />{{ a.readTime }}
+            </span>
+          </div>
+          <span class="pt-1.5 text-sm font-semibold text-primaryDeep flex gap-1.5 items-center" [class.mt-auto]="!showMeta || !(a.author || a.readTime)">
+            {{ ctaLabel }}<physio-icon name="arrow-right" [size]="15" />
           </span>
         </div>
       </a>
@@ -56,8 +65,15 @@ import { PublicArticle } from '../../../../shared/types/public-article.types';
 export class ArticleCardComponent {
   @Input() article: PublicArticle | null = null;
   @Input() skeleton = false;
+  /** Shows author and read time; off by default so the related-article cards stay as they were. */
+  @Input() showMeta = false;
+  @Input() ctaLabel = 'Read article';
 
   imageFailed = false;
+
+  get initials(): string {
+    return (this.article?.author ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  }
 
   get category(): string {
     return this.article ? ArticleCategory[this.article.category] ?? '' : '';

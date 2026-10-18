@@ -12,6 +12,12 @@ import { PublicArticle, PublicArticleFilter } from "../../shared/types/public-ar
 export class PublicArticleService {
     constructor(private http: HttpClient) { }
 
+    search(request: PagedRequest<PublicArticleFilter>) {
+        return this.http.post<PagedResponse<PaginationData<PublicArticle>>>(BASE_API.PUBLIC.ARTICLES.SEARCH, request, {
+            context: createHttpContext({ loadingKey: LoadingKeys.PUBLIC_ARTICLE.SEARCH, skipErrorToast: true })
+        });
+    }
+
     /** Data is null for missing, draft and archived articles. */
     getById(id: string) {
         return this.http.get<PagedResponse<PublicArticle | null>>(BASE_API.PUBLIC.ARTICLES.DETAIL(id), {

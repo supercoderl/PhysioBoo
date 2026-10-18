@@ -127,3 +127,11 @@ body {
   color: rgb(var(--twc-regular));
   -webkit-font-smoothing: antialiased;
 }
+
+/* Printed pages carry their own header and footer (see the privacy page); hide the site chrome. */
+@media print {
+  layout-header,
+  layout-footer {
+    display: none !important;
+  }
+}

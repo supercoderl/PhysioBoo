@@ -7,6 +7,9 @@ import { Subject, catchError, map, merge, of, switchMap, tap } from 'rxjs';
 import { ArticleCardComponent } from '../../../components/layout/client/article/article-card.component';
 import { PublicArticleService } from '../../../services/public/public-article.service';
 import { ArticleCategory } from '../../../shared/enums/article';
+import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
+import { EmptyStateComponent } from '../../../components/ui/empty-state.component';
+import { ErrorStateComponent } from '../../../components/ui/error-state.component';
 import { SharedModule } from '../../../shared/shared-imports';
 import { PublicArticle } from '../../../shared/types/public-article.types';
 
@@ -47,7 +50,7 @@ const CATEGORIES: CategoryChip[] = [
 @Component({
   selector: 'app-blog',
   standalone: true,
-  imports: [SharedModule, ArticleCardComponent],
+  imports: [SharedModule, BooButtonComponent, ArticleCardComponent, EmptyStateComponent, ErrorStateComponent],
   templateUrl: './blog.component.html'
 })
 export class BlogComponent implements OnInit, OnDestroy {

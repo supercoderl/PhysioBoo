@@ -1,35 +1,36 @@
-import { Component } from "@angular/core";
-import { SharedModule } from "../../../shared/shared-imports";
-import { BreadcrumbComponent } from "../../../components/breadcrumb/breadcrumb.component";
-import { AboutAboutUsComponent } from "./about.component";
-import { WhyChooseAboutUsComponent } from "./why-choose.component";
-import { WayAboutUsComponent } from "./way.component";
-import { DoctorAboutUsComponent } from "./doctor.component";
-import { TestimonialAboutUsComponent } from "./testimonial.component";
-import { FaqAboutUsComponent } from "./faq.component";
+import { Component } from '@angular/core';
+import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
+import { SharedModule } from '../../../shared/shared-imports';
+import {
+  ABOUT_CAPABILITIES,
+  ABOUT_COPY_IS_DRAFT,
+  ABOUT_EXPLORE,
+  ABOUT_HERO_IMAGE,
+  ABOUT_MISSION_VISION,
+  ABOUT_STEPS,
+  ABOUT_TRUST,
+  ABOUT_VALUES,
+} from './about-content';
+import { ExploreCardComponent } from './explore-card.component';
+import { ValueCardComponent } from './value-card.component';
 
+/**
+ * Public About Us page (design: About Us Page / About Us).
+ * All copy is static (see about-content.ts); the page makes no API calls.
+ */
 @Component({
-    selector: 'app-about-us',
-    standalone: true,
-    imports: [
-    SharedModule,
-    BreadcrumbComponent,
-    AboutAboutUsComponent,
-    WhyChooseAboutUsComponent,
-    WayAboutUsComponent,
-    DoctorAboutUsComponent,
-    TestimonialAboutUsComponent,
-    FaqAboutUsComponent
-],
-    template: `
-        <breadcrumb title="About Us"></breadcrumb>
-        <about-about-us></about-about-us>
-        <why-choose-about-us></why-choose-about-us>
-        <way-about-us></way-about-us>
-        <doctor-about-us></doctor-about-us>
-        <testimonial-about-us></testimonial-about-us>
-        <faq-about-us></faq-about-us>
-    `
+  selector: 'app-about-us',
+  standalone: true,
+  imports: [BooButtonComponent, SharedModule, ValueCardComponent, ExploreCardComponent],
+  templateUrl: './about-us.component.html',
 })
-
-export class AboutUsComponent {}
+export class AboutUsComponent {
+  readonly isDraft = ABOUT_COPY_IS_DRAFT;
+  readonly heroImage = ABOUT_HERO_IMAGE;
+  readonly capabilities = ABOUT_CAPABILITIES;
+  readonly missionVision = ABOUT_MISSION_VISION;
+  readonly values = ABOUT_VALUES;
+  readonly steps = ABOUT_STEPS;
+  readonly explore = ABOUT_EXPLORE;
+  readonly trust = ABOUT_TRUST;
+}

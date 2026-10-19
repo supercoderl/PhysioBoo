@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 /**
  * Patient area, guarded by `patientGuardFn` in app.routes.ts. Unknown `/patient/...` URLs fall through
- * to the app-level `**` → `/exception/404`.
+ * to the app-level `**` (404 page).
  *
  * Profile and Security reuse the account/security settings pages: both only call the signed-in user's
  * own endpoints (`/api/users/me/account`, `/me/sessions`, `/change-password`, `/me/preferences`).

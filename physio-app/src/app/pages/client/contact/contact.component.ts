@@ -2,6 +2,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, ElementRef, OnInit, PLATFORM_ID, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
 import { ClinicCardComponent } from '../../../components/layout/client/hospital/clinic-card.component';
 import { PublicContactService } from '../../../services/public/public-contact.service';
 import { PublicHospitalService } from '../../../services/public/public-hospital.service';
@@ -47,7 +48,7 @@ const CLINIC_CARDS = 3;
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [SharedModule, ClinicCardComponent],
+  imports: [BooButtonComponent, SharedModule, ClinicCardComponent],
   templateUrl: './contact.component.html',
 })
 export class ContactComponent implements OnInit {
@@ -273,6 +274,10 @@ export class ContactComponent implements OnInit {
       });
   }
   // #endregion
+
+  trackByField(_: number, item: { field: string }): string {
+    return item.field;
+  }
 }
 
 /** `tel:` link for a number, or null when the value has no digits (e.g. an unfilled placeholder). */

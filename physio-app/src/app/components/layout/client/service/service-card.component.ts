@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { SharedModule } from '../../../../shared/shared-imports';
+import { BooButtonComponent } from '../../../button/boo-button/boo-button.component';
 import { PublicService } from '../../../../shared/types/public-service.types';
 
 /**
@@ -10,7 +11,7 @@ import { PublicService } from '../../../../shared/types/public-service.types';
 @Component({
   selector: 'service-card',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonComponent],
   template: `
     <div *ngIf="skeleton; else card" aria-hidden="true" class="h-full border border-gray-200 rounded-2xl overflow-hidden bg-surface">
       <div class="aspect-[16/10] bg-[#F4ECEF] animate-pulse motion-reduce:animate-none"></div>
@@ -50,27 +51,35 @@ import { PublicService } from '../../../../shared/types/public-service.types';
           </p>
           <p *ngIf="s.description" class="text-sm leading-[21px] text-gray-700 mb-[18px] line-clamp-3">{{ s.description }}</p>
 
-          <div class="mt-auto pt-1 grid gap-2" [ngClass]="s.doctorId || s.hospitalId ? 'grid-cols-2' : 'grid-cols-1'">
+          <!-- Actions share a row when they fit and stack when the card is narrow; labels never wrap. -->
+          <div class="mt-auto pt-1 flex flex-wrap gap-2">
             <a
+              boo-button
+              variant="primary"
+              class="flex-[1_1_auto]"
               [routerLink]="['/services', s.id]"
               [attr.aria-label]="'View service ' + s.name"
-              class="h-11 rounded-[10px] bg-primary text-white text-sm font-semibold flex items-center justify-center hover:bg-primaryHover hover:text-white"
-            >View Service</a>
+            >View service</a>
             <a
               *ngIf="s.doctorId"
+              boo-button
+              variant="secondary"
+              class="flex-[1_1_auto]"
               [routerLink]="['/doctor', s.doctorId]"
               [queryParams]="{ service: s.id, facility: s.hospitalId }"
               fragment="request"
               [attr.aria-label]="'Request appointment for ' + s.name"
-              class="h-11 rounded-[10px] border border-gray-300 bg-surface text-gray-900 text-sm font-semibold flex items-center justify-center text-center leading-tight px-2 hover:border-primary hover:text-primaryDeep"
-            >Request Appointment</a>
+            >Request appointment</a>
+            <!-- No listed doctor delivers it: the clinic's doctors are where a request can be sent. -->
             <a
               *ngIf="!s.doctorId && s.hospitalId"
+              boo-button
+              variant="secondary"
+              class="flex-[1_1_auto]"
               routerLink="/doctor"
               [queryParams]="{ facility: s.hospitalId }"
-              [attr.aria-label]="'Find a doctor for ' + s.name + ' at ' + s.hospitalName"
-              class="h-11 rounded-[10px] border border-gray-300 bg-surface text-gray-900 text-sm font-semibold flex items-center justify-center text-center leading-tight px-2 hover:border-primary hover:text-primaryDeep"
-            >Request Appointment</a>
+              [attr.aria-label]="'Find a doctor at ' + s.hospitalName"
+            >Find a doctor</a>
           </div>
         </div>
       </article>

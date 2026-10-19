@@ -35,5 +35,8 @@ export const routes: Routes = [
         path: 'exception',
         loadChildren: () => import('./pages/exception/exception.routes').then(m => m.routes)
     },
-    { path: '**', redirectTo: 'exception/404' }
+    {
+        path: '**',
+        loadChildren: () => import('./pages/exception/exception.routes').then(m => m.notFoundRoutes)
+    }
 ];

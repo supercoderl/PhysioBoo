@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Params, Router, UrlTree } from '@angular/router';
 import { Subject, catchError, map, merge, of, switchMap, tap } from 'rxjs';
+import { BooButtonComponent } from '../../../../components/button/boo-button/boo-button.component';
 import { DoctorCardComponent } from '../../../../components/layout/client/doctor/doctor-card.component';
 import { PublicDoctorService } from '../../../../services/public/public-doctor.service';
 import { PublicHospitalService } from '../../../../services/public/public-hospital.service';
@@ -35,7 +36,7 @@ const DOCTOR_PREVIEW = 4;
 @Component({
   selector: 'app-hospital-detail',
   standalone: true,
-  imports: [SharedModule, DoctorCardComponent],
+  imports: [BooButtonComponent, SharedModule, DoctorCardComponent],
   templateUrl: './hospital-detail.component.html',
   styles: `
     .ph-stripes { background: repeating-linear-gradient(135deg, #F3EAED 0 10px, #F9F4F6 10px 20px); }
@@ -197,4 +198,9 @@ export class HospitalDetailComponent implements OnInit, OnDestroy {
     this.meta.updateTag({ name: 'description', content: description });
   }
   // #endregion
+
+  /** Rows are rebuilt by a getter on every check; tracking by label keeps the same DOM nodes. */
+  trackByLabel(_: number, item: { label: string }): string {
+    return item.label;
+  }
 }

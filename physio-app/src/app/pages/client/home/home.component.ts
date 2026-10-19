@@ -1,32 +1,71 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, DestroyRef, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { Component, DestroyRef, ElementRef, OnInit, PLATFORM_ID, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, Subject, catchError, map, of, startWith, switchMap } from 'rxjs';
+import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
+import { InlineErrorComponent, InlineErrorState } from '../../../components/ui/inline-error.component';
+import { EmptyStateComponent } from '../../../components/ui/empty-state.component';
+import { ArticleCardComponent } from '../../../components/layout/client/article/article-card.component';
+import { DoctorCardComponent } from '../../../components/layout/client/doctor/doctor-card.component';
+import { ClinicCardComponent } from '../../../components/layout/client/hospital/clinic-card.component';
+import { PublicArticleService } from '../../../services/public/public-article.service';
+import { PublicDoctorService } from '../../../services/public/public-doctor.service';
+import { PublicHospitalService } from '../../../services/public/public-hospital.service';
 import { CLIENT_TENANT } from '../../../shared/data/client-site';
 import { SharedModule } from '../../../shared/shared-imports';
+import { PagedResponse, PaginationData } from '../../../shared/types/common';
+import { PublicArticle } from '../../../shared/types/public-article.types';
+import { PublicDoctor, PublicOption } from '../../../shared/types/public-doctor.types';
+import { PublicHospital } from '../../../shared/types/public-hospital.types';
 import {
-  HOME_ARTICLES,
-  HOME_DOCTORS,
+  HOME_ARTICLE_COUNT,
+  HOME_CLINIC_COUNT,
+  HOME_DOCTOR_COUNT,
   HOME_FAQS,
-  HOME_GUIDANCE,
-  HOME_HOSPITALS,
-  HOME_POPULAR,
+  HOME_POPULAR_COUNT,
   HOME_REASONS,
-  HOME_SPECIALTIES,
+  HOME_SPECIALTY_COUNT,
   HOME_STEPS,
   HOME_TESTIMONIALS,
+  specialtyIcon,
 } from './home.data';
+
+const MAX_SEARCH_LENGTH = 100;
+
+/** One API-backed section. `error` keeps the section with a retry; it never turns into an empty state. */
+export interface HomeSection<T> {
+  state: 'loading' | 'results' | 'empty' | 'error';
+  items: T[];
+  /** State of the section's InlineError while it is in `error`. */
+  retry: InlineErrorState;
+}
+
+export interface HomeSpecialty extends PublicOption {
+  icon: string;
+}
+
+export type HomeSectionKey = 'specialties' | 'doctors' | 'clinics' | 'articles';
+
+function loadingSection<T>(): HomeSection<T> {
+  return { state: 'loading', items: [], retry: 'default' };
+}
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
-    SharedModule
+    SharedModule,
+    BooButtonComponent,
+    InlineErrorComponent,
+    EmptyStateComponent,
+    DoctorCardComponent,
+    ClinicCardComponent,
+    ArticleCardComponent,
   ],
   templateUrl: './home.component.html',
   styles: `
     .ph-stripes { background: repeating-linear-gradient(135deg, #F3EAED 0 10px, #F9F4F6 10px 20px); }
-    .ph-stripes-sm { background: repeating-linear-gradient(135deg, #F3EAED 0 6px, #F9F4F6 6px 12px); }
     .no-scrollbar { scrollbar-width: none; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
   `
@@ -36,21 +75,39 @@ export class HomeComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly doctorSrv = inject(PublicDoctorService);
+  private readonly hospitalSrv = inject(PublicHospitalService);
+  private readonly articleSrv = inject(PublicArticleService);
+
+  @ViewChild('searchInput') private searchInput?: ElementRef<HTMLInputElement>;
 
   readonly tenant = CLIENT_TENANT;
-  readonly popular = HOME_POPULAR;
-  readonly specialties = HOME_SPECIALTIES;
-  readonly doctors = HOME_DOCTORS;
-  readonly hospitals = HOME_HOSPITALS;
   readonly steps = HOME_STEPS;
-  readonly guidance = HOME_GUIDANCE;
   readonly reasons = HOME_REASONS;
   readonly faqs = HOME_FAQS;
-  readonly articles = HOME_ARTICLES;
   readonly testimonials = HOME_TESTIMONIALS;
+  readonly maxSearchLength = MAX_SEARCH_LENGTH;
+  readonly doctorSkeletons = Array.from({ length: HOME_DOCTOR_COUNT });
+  readonly clinicSkeletons = Array.from({ length: HOME_CLINIC_COUNT });
+  readonly articleSkeletons = Array.from({ length: HOME_ARTICLE_COUNT });
+  readonly specialtySkeletons = Array.from({ length: HOME_SPECIALTY_COUNT });
 
-  search = { q: '', location: '', date: '' };
+  specialties: HomeSection<HomeSpecialty> = loadingSection();
+  doctors: HomeSection<PublicDoctor> = loadingSection();
+  clinics: HomeSection<PublicHospital> = loadingSection();
+  articles: HomeSection<PublicArticle> = loadingSection();
+
+  q = '';
+  /** Set when Search is pressed with nothing typed; cleared once the visitor types. */
+  emptySubmit = false;
   openFaq = 0;
+
+  private readonly reload: Record<HomeSectionKey, Subject<void>> = {
+    specialties: new Subject<void>(),
+    doctors: new Subject<void>(),
+    clinics: new Subject<void>(),
+    articles: new Subject<void>(),
+  };
 
   ngOnInit(): void {
     // The router has no anchor scrolling, so links like /#specialties are handled here.
@@ -60,21 +117,102 @@ export class HomeComponent implements OnInit {
         if (!this.isBrowser || !fragment) return;
         setTimeout(() => document.getElementById(fragment)?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
       });
+
+    // Server render shows the skeletons; data is fetched in the browser only, like the listing pages.
+    if (!this.isBrowser) return;
+
+    this.track('specialties', () => this.doctorSrv.getFilterOptions().pipe(
+      map(res => this.unwrap(res).specialties.slice(0, HOME_SPECIALTY_COUNT).map(s => ({ ...s, icon: specialtyIcon(s.name) })))
+    ));
+    this.track('doctors', () => this.doctorSrv.search({ pageNumber: 1, pageSize: HOME_DOCTOR_COUNT }).pipe(
+      map(res => this.page(res))
+    ));
+    this.track('clinics', () => this.hospitalSrv.search({ pageNumber: 1, pageSize: HOME_CLINIC_COUNT }).pipe(
+      map(res => this.page(res))
+    ));
+    this.track('articles', () => this.articleSrv.search({
+      pageNumber: 1,
+      pageSize: HOME_ARTICLE_COUNT,
+      sort: '-publishDate',
+      filter: { start: '', end: '', category: null, status: null },
+    }).pipe(
+      map(res => this.page(res))
+    ));
   }
 
-  pickPopular(name: string) {
-    this.search.q = name;
+  // #region Search
+  /** First specialties from the API; hidden while they load or if the request failed. */
+  get popular(): string[] {
+    return this.specialties.state === 'results' ? this.specialties.items.slice(0, HOME_POPULAR_COUNT).map(s => s.name) : [];
   }
 
-  submitSearch(event: Event) {
+  onQueryChange(value: string): void {
+    this.q = value;
+    if (value.trim()) this.emptySubmit = false;
+  }
+
+  /** Hands the keyword to the Search page, which looks across doctors, services, clinics and articles. */
+  submitSearch(event: Event): void {
     event.preventDefault();
-    const { q, location, date } = this.search;
-    this.router.navigate(['/doctor'], {
-      queryParams: { q: q.trim() || null, location: location.trim() || null, date: date.trim() || null },
-    });
+    const q = this.q.trim().slice(0, MAX_SEARCH_LENGTH);
+    if (!q) {
+      this.emptySubmit = true;
+      this.searchInput?.nativeElement.focus();
+      return;
+    }
+    this.router.navigate(['/search'], { queryParams: { q } });
+  }
+
+  searchFor(term: string): void {
+    this.router.navigate(['/search'], { queryParams: { q: term } });
+  }
+  // #endregion
+
+  retry(section: HomeSectionKey): void {
+    this[section].retry = 'retrying';
+    this.reload[section].next();
   }
 
   toggleFaq(index: number) {
     this.openFaq = this.openFaq === index ? -1 : index;
   }
+
+  trackById(_: number, item: { id: string }): string {
+    return item.id;
+  }
+
+  // #region Data
+  /** Runs a section's request now and again on each retry; a newer request cancels an older one. */
+  private track<K extends HomeSectionKey>(key: K, request: () => Observable<HomeComponent[K]['items']>): void {
+    this.reload[key].pipe(
+      startWith(undefined),
+      switchMap(() => request().pipe(
+        map(items => ({ ok: true as const, items })),
+        catchError(() => of({ ok: false as const, items: [] }))
+      )),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(result => {
+      const section = this[key] as HomeSection<unknown>;
+      if (result.ok) {
+        section.items = result.items;
+        section.state = result.items.length ? 'results' : 'empty';
+        section.retry = 'default';
+      } else {
+        // A second failure after Try again says so, instead of looking unchanged.
+        section.retry = section.state === 'error' ? 'failed' : 'default';
+        section.state = 'error';
+      }
+    });
+  }
+
+  /** A response the API marks unsuccessful is a failure, never an empty result. */
+  private unwrap<T>(res: PagedResponse<T>): T {
+    if (!res?.success || !res.data) throw new Error('Request was not successful');
+    return res.data;
+  }
+
+  private page<T>(res: PagedResponse<PaginationData<T>>): T[] {
+    return this.unwrap(res).items ?? [];
+  }
+  // #endregion
 }

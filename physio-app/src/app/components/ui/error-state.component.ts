@@ -1,18 +1,25 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { SharedModule } from "../../shared/shared-imports";
+import { BooButtonComponent } from "../button/boo-button/boo-button.component";
 
+/**
+ * A request failed. `default` is the compact admin block; `panel` is the full-width block the public listing and
+ * detail pages show in place of their results. Extra actions go in the content slot (next to Try again in a panel).
+ */
 @Component({
     selector: 'boo-error-state',
     standalone: true,
-    imports: [SharedModule],
+    imports: [SharedModule, BooButtonComponent],
     template: `
-        <div class="flex flex-col items-center justify-center text-center py-10 px-6">
+        <ng-template #projected><ng-content></ng-content></ng-template>
+
+        <div *ngIf="appearance === 'default'" class="flex flex-col items-center justify-center text-center py-10 px-6">
             <div class="flex items-center justify-center w-14 h-14 rounded-2 bg-danger/5 mb-4">
                 <physio-icon [name]="icon" [size]="26" class="text-danger"></physio-icon>
             </div>
             <p class="text-sm font-semibold text-regular mb-1">{{ title }}</p>
             <p class="text-xs15 text-secondary max-w-[280px] mb-5" *ngIf="description">{{ description }}</p>
-            <ng-content></ng-content>
+            <ng-container *ngTemplateOutlet="projected"></ng-container>
             <button
                 *ngIf="showRetry"
                 type="button"
@@ -23,6 +30,22 @@ import { SharedModule } from "../../shared/shared-imports";
                 {{ retryLabel }}
             </button>
         </div>
+
+        <div
+            *ngIf="appearance === 'panel'"
+            role="alert"
+            class="border border-dangerBorder bg-dangerSoft rounded-2xl px-5 py-9 md:px-8 md:py-12 text-center"
+        >
+            <physio-icon [name]="icon" [size]="32" class="text-danger inline-flex" />
+            <p role="heading" [attr.aria-level]="headingLevel" class="text-xl leading-7 font-semibold text-gray-900 mt-3.5 mb-1.5 break-words">{{ title }}</p>
+            <p *ngIf="description" class="text-[15px] leading-6 text-gray-700 mx-auto mb-0 max-w-[460px]">{{ description }}</p>
+            <div class="flex gap-2.5 justify-center flex-wrap mt-5 empty:hidden">
+                <button *ngIf="showRetry" boo-button variant="primary" (click)="retry.emit()">
+                    <physio-icon name="rotate-cw" [size]="16" />{{ retryLabel }}
+                </button>
+                <ng-container *ngTemplateOutlet="projected"></ng-container>
+            </div>
+        </div>
     `,
 })
 export class ErrorStateComponent {
@@ -31,5 +54,8 @@ export class ErrorStateComponent {
     @Input() description?: string | null;
     @Input() showRetry: boolean = true;
     @Input() retryLabel: string = 'Retry';
+    @Input() appearance: 'default' | 'panel' = 'default';
+    /** Heading level of the title in a panel (2 when the panel replaces a page's results, 3 inside a section). */
+    @Input() headingLevel: 2 | 3 = 2;
     @Output() retry = new EventEmitter<void>();
 }

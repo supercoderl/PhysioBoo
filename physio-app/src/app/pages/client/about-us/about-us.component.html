@@ -1,0 +1,184 @@
+<!-- Draft notice (until mission, vision and values are approved) -->
+<div *ngIf="isDraft" class="bg-[#FEF3C7] text-[#78350F] font-mono text-xs font-medium px-4 py-1.5 text-center">
+  PROPOSED COPY — mission, vision and values are drafts for review, not approved statements
+</div>
+
+<!-- Hero: breadcrumb, title, lead, actions, photo -->
+<section aria-labelledby="ab-h1" class="bg-gray-50 border-b border-gray-200">
+  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 pb-8 md:pt-6 md:pb-10 lg:pt-7 lg:pb-14 flex flex-col gap-5">
+    <nav aria-label="Breadcrumb">
+      <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600">
+        <li><a routerLink="/" class="text-gray-700 hover:text-primaryDeep">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page" class="text-gray-900 font-medium">About Us</li>
+      </ol>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] gap-6 md:gap-8 lg:gap-14 items-center">
+      <div class="flex flex-col gap-3.5 min-w-0">
+        <span class="text-[13px] font-semibold tracking-[.08em] text-primaryDeep">ABOUT PHYSIOBOO</span>
+        <h1 id="ab-h1" class="text-[34px] leading-[42px] md:text-[44px] md:leading-[52px] lg:text-[52px] lg:leading-[60px] font-semibold tracking-[-0.02em] text-gray-900 m-0 text-balance">
+          Helping you find the right care
+        </h1>
+        <p class="text-base leading-[25px] md:text-lg md:leading-7 text-gray-800 m-0 max-w-[540px] text-pretty">
+          PhysioBoo helps people discover doctors, clinics, and healthcare services so they can take the next step with greater clarity and confidence.
+        </p>
+        <div class="flex gap-2.5 flex-wrap mt-2">
+          <a boo-button variant="primary" size="lg" routerLink="/doctor" class="flex-[1_1_100%] md:flex-none">
+            <physio-icon name="stethoscope" [size]="18" />Find a doctor
+          </a>
+          <a boo-button variant="secondary" size="lg" routerLink="/services" class="flex-[1_1_100%] md:flex-none">
+            Explore our services
+          </a>
+        </div>
+      </div>
+
+      <img
+        *ngIf="heroImage as img"
+        [src]="img.src"
+        [alt]="img.alt"
+        class="w-full aspect-[4/3] md:aspect-video lg:aspect-[5/4] object-cover rounded-[20px] min-w-0"
+      />
+      <!-- No real photo yet: a quiet decorative panel instead of a stock image. Hidden on phones to keep the actions near the top. -->
+      <div
+        *ngIf="!heroImage"
+        aria-hidden="true"
+        class="hidden md:flex w-full aspect-video lg:aspect-[5/4] rounded-[20px] bg-gradient-to-br from-primarySoft to-surface border border-gray-200 items-center justify-center gap-4 min-w-0"
+      >
+        <span class="w-16 h-16 rounded-2xl bg-surface border border-gray-200 text-primaryDeep flex items-center justify-center"><physio-icon name="stethoscope" [size]="28" /></span>
+        <span class="w-20 h-20 rounded-3xl bg-primary text-white flex items-center justify-center"><physio-icon name="heart-pulse" [size]="34" /></span>
+        <span class="w-16 h-16 rounded-2xl bg-surface border border-gray-200 text-primaryDeep flex items-center justify-center"><physio-icon name="building-2" [size]="28" /></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Who we are -->
+<section aria-labelledby="ab-who" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-11 md:py-14 lg:py-[72px]">
+  <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-5 md:gap-6 lg:gap-16 items-start">
+    <div class="flex flex-col gap-2.5 min-w-0">
+      <span class="text-[13px] font-semibold tracking-[.08em] text-primaryDeep">WHO WE ARE</span>
+      <h2 id="ab-who" class="text-2xl leading-8 md:text-[28px] md:leading-9 lg:text-[32px] lg:leading-10 font-semibold tracking-[-0.01em] m-0 text-balance">
+        Healthcare information, made easier to navigate
+      </h2>
+    </div>
+    <div class="flex flex-col gap-4 min-w-0">
+      <p class="text-[17px] leading-7 text-gray-800 m-0 text-pretty">
+        PhysioBoo is an online platform for exploring healthcare options. It brings information about doctors, healthcare services and clinics into one place, so you can compare what is available before deciding where to go.
+      </p>
+      <p class="text-[17px] leading-7 text-gray-800 m-0 text-pretty">
+        PhysioBoo does not provide medical treatment itself. Care is given by the doctors and clinics listed on the platform, and they confirm any appointment you request.
+      </p>
+      <ul class="list-none mt-2 mb-0 p-0 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <li *ngFor="let c of capabilities" class="flex gap-3 items-center px-4 py-3.5 border border-gray-200 rounded-[14px] bg-surface text-[15px] font-medium">
+          <span aria-hidden="true" class="w-9 h-9 flex-none rounded-[10px] bg-primarySoft text-primaryDeep flex items-center justify-center"><physio-icon [name]="c.icon" [size]="17" /></span>
+          {{ c.label }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Mission and vision -->
+<section aria-labelledby="ab-mv" class="bg-gray-50 border-y border-gray-200">
+  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 py-11 md:py-14 lg:py-[72px] flex flex-col gap-6">
+    <h2 id="ab-mv" class="text-2xl leading-8 md:text-[28px] md:leading-9 lg:text-[32px] lg:leading-10 font-semibold tracking-[-0.01em] m-0">Our mission and vision</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div *ngFor="let m of missionVision" class="bg-surface border border-gray-200 rounded-[20px] p-6 md:p-8 flex flex-col gap-3.5 min-w-0">
+        <div class="flex items-center gap-3 justify-between flex-wrap">
+          <div class="flex items-center gap-3">
+            <span aria-hidden="true" class="w-11 h-11 rounded-xl bg-primarySoft text-primaryDeep flex items-center justify-center"><physio-icon [name]="m.icon" [size]="20" /></span>
+            <h3 class="text-xl leading-7 font-semibold m-0">{{ m.title }}</h3>
+          </div>
+          <span *ngIf="isDraft" class="font-mono text-[11px] font-medium text-[#78350F] bg-[#FEF3C7] px-2 py-[3px] rounded">PROPOSED COPY</span>
+        </div>
+        <p class="text-lg leading-7 md:text-xl md:leading-[31px] text-gray-900 m-0 text-pretty">{{ m.body }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Core values -->
+<section aria-labelledby="ab-val" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-11 md:py-14 lg:py-[72px] flex flex-col gap-6">
+  <div class="flex flex-col gap-2 max-w-[640px]">
+    <h2 id="ab-val" class="text-2xl leading-8 md:text-[28px] md:leading-9 lg:text-[32px] lg:leading-10 font-semibold tracking-[-0.01em] m-0">Our core values</h2>
+    <p class="text-base leading-[25px] text-gray-700 m-0">The principles we use when deciding what to build and how to present information.</p>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <value-card *ngFor="let v of values" [icon]="v.icon" [title]="v.title" [body]="v.body" />
+  </div>
+</section>
+
+<!-- How PhysioBoo helps -->
+<section aria-labelledby="ab-how" class="bg-gray-50 border-y border-gray-200">
+  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 py-11 md:py-14 lg:py-[72px] flex flex-col gap-7">
+    <div class="flex flex-col gap-2 max-w-[640px]">
+      <h2 id="ab-how" class="text-2xl leading-8 md:text-[28px] md:leading-9 lg:text-[32px] lg:leading-10 font-semibold tracking-[-0.01em] m-0">How PhysioBoo helps</h2>
+      <p class="text-base leading-[25px] text-gray-700 m-0">Three steps from looking around to getting in touch with a provider.</p>
+    </div>
+    <!-- Phones: a vertical rail; tablet and up: a horizontal line between the numbers. -->
+    <ol class="list-none m-0 p-0 grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6">
+      <li *ngFor="let s of steps; let i = index; let last = last" class="flex flex-row md:flex-col gap-4 min-w-0">
+        <div class="flex flex-col md:flex-row items-center gap-3 flex-none">
+          <span class="w-11 h-11 flex-none rounded-full bg-primary text-white text-[17px] font-semibold flex items-center justify-center">{{ i + 1 }}</span>
+          <span *ngIf="!last" aria-hidden="true" class="flex-1 bg-gray-300 w-0.5 min-h-6 md:w-auto md:h-0.5 md:min-h-0 md:-mr-6"></span>
+        </div>
+        <div class="flex flex-col gap-1.5 pb-7 md:pb-0">
+          <span class="font-mono text-xs font-medium tracking-[.04em] text-gray-600">STEP {{ i + 1 }}</span>
+          <h3 class="text-[19px] leading-[27px] font-semibold m-0">{{ s.title }}</h3>
+          <p class="text-[15px] leading-[23px] text-gray-800 m-0 text-pretty">{{ s.body }}</p>
+        </div>
+      </li>
+    </ol>
+    <p class="m-0 text-sm leading-[21px] text-gray-700 flex gap-2 items-start">
+      <physio-icon name="info" [size]="16" class="mt-0.5 flex-none" />An appointment request is not a confirmed booking. The doctor or clinic contacts you to confirm a time.
+    </p>
+  </div>
+</section>
+
+<!-- Explore -->
+<section aria-labelledby="ab-exp" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-11 md:py-14 lg:py-[72px] flex flex-col gap-6">
+  <div class="flex flex-col gap-2 max-w-[640px]">
+    <h2 id="ab-exp" class="text-2xl leading-8 md:text-[28px] md:leading-9 lg:text-[32px] lg:leading-10 font-semibold tracking-[-0.01em] m-0">Explore PhysioBoo</h2>
+    <p class="text-base leading-[25px] text-gray-700 m-0">Start with whatever you already know: a doctor, a type of care, or a place.</p>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <explore-card *ngFor="let x of explore" [icon]="x.icon" [title]="x.title" [body]="x.body" [cta]="x.cta" [href]="x.href" />
+  </div>
+</section>
+
+<!-- Trust and transparency -->
+<section aria-labelledby="ab-trust" class="max-w-[1200px] mx-auto px-5 xl:px-0 pb-11 md:pb-14 lg:pb-[72px]">
+  <div class="border border-gray-200 rounded-[20px] px-5 pt-6 pb-3 md:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-5 md:gap-6 lg:gap-16 items-start">
+    <div class="flex flex-col gap-2.5 min-w-0">
+      <span aria-hidden="true" class="w-11 h-11 rounded-xl bg-primarySoft text-primaryDeep flex items-center justify-center mb-1"><physio-icon name="shield-check" [size]="20" /></span>
+      <h2 id="ab-trust" class="text-[22px] leading-[30px] md:text-2xl md:leading-8 font-semibold m-0">Trust and transparency</h2>
+      <p class="text-base leading-[25px] text-gray-800 m-0 text-pretty">
+        We aim to communicate clearly and responsibly about what PhysioBoo does and what happens after you get in touch.
+      </p>
+    </div>
+    <ul class="list-none m-0 p-0 flex flex-col">
+      <li *ngFor="let t of trust; let last = last" class="flex gap-3 items-start py-3.5 text-[15px] leading-[23px] text-gray-900" [class.border-b]="!last" [class.border-gray-200]="!last">
+        <physio-icon name="check" [size]="18" class="text-primaryDeep mt-0.5 flex-none" /><span>{{ t }}</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- Contact CTA -->
+<section aria-labelledby="ab-cta" class="max-w-[1200px] mx-auto px-5 xl:px-0 pb-12 md:pb-16 lg:pb-20">
+  <div class="bg-primarySoft rounded-3xl px-5 py-7 md:p-10 lg:px-14 lg:py-12 flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+    <div class="flex flex-col gap-2 max-w-[560px]">
+      <h2 id="ab-cta" class="text-2xl leading-8 md:text-[28px] md:leading-9 lg:text-[32px] lg:leading-10 font-semibold tracking-[-0.01em] m-0 text-gray-900">We're here to help</h2>
+      <p class="text-[17px] leading-[27px] text-gray-800 m-0">Have questions about PhysioBoo? Get in touch with our team.</p>
+    </div>
+    <div class="flex gap-2.5 flex-wrap w-full md:w-auto">
+      <a boo-button variant="primary" size="lg" routerLink="/contact" class="flex-[1_1_100%] md:flex-none">
+        <physio-icon name="message-circle" [size]="18" />Contact us
+      </a>
+      <a boo-button variant="secondary" size="lg" routerLink="/doctor" class="flex-[1_1_100%] md:flex-none !border-[#E3C4CE] hover:!border-[#C9A3AF]">
+        Find a doctor
+      </a>
+    </div>
+  </div>
+</section>

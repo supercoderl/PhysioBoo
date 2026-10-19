@@ -1,6 +1,6 @@
 <!-- Loading -->
 <div *ngIf="state === 'loading'" aria-busy="true" aria-label="Loading doctor profile"
-  class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 grid lg:grid-cols-[minmax(0,1fr)_400px] gap-10">
+  class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_400px] gap-10">
   <div class="flex flex-col gap-4 animate-pulse motion-reduce:animate-none">
     <span class="h-3 w-[220px] rounded-md bg-[#F4ECEF]"></span>
     <div class="flex flex-col md:flex-row gap-6">
@@ -26,8 +26,8 @@
     The profile may have moved or is no longer listed. You can browse all doctors in the network instead.
   </p>
   <div class="flex gap-2.5 justify-center flex-wrap">
-    <a routerLink="/doctor" class="h-12 px-5 rounded-xl bg-primary text-white font-semibold text-[15px] flex items-center hover:bg-primaryHover hover:text-white">Browse doctors</a>
-    <a routerLink="/" class="h-12 px-5 rounded-xl border border-gray-300 font-semibold text-[15px] flex items-center text-gray-900 hover:border-primary hover:text-primaryDeep">Go to homepage</a>
+    <a boo-button variant="primary" size="lg" routerLink="/doctor">Browse doctors</a>
+    <a boo-button variant="secondary" size="lg" routerLink="/">Go to homepage</a>
   </div>
 </div>
 
@@ -38,10 +38,10 @@
     <h1 class="text-[22px] font-semibold mt-3.5 mb-1.5">We couldn't load this profile</h1>
     <p class="text-[15px] text-gray-700 m-0 mb-5">Check your connection and try again.</p>
     <div class="flex gap-2.5 justify-center flex-wrap">
-      <button type="button" (click)="retry()" class="h-11 px-5 border-0 rounded-[10px] bg-primary text-white text-sm font-semibold inline-flex gap-2 items-center cursor-pointer hover:bg-primaryHover">
+      <button boo-button variant="primary" (click)="retry()">
         <physio-icon name="rotate-cw" [size]="16" />Try again
       </button>
-      <a routerLink="/doctor" class="h-11 px-[18px] border border-gray-300 rounded-[10px] text-sm font-semibold flex items-center bg-surface text-gray-900 hover:border-primary hover:text-primaryDeep">Back to doctors</a>
+      <a boo-button variant="secondary" routerLink="/doctor">Back to doctors</a>
     </div>
   </div>
 </div>
@@ -60,7 +60,7 @@
     </nav>
   </div>
 
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 grid lg:grid-cols-[minmax(0,1fr)_400px] gap-10 lg:gap-14 items-start">
+  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_400px] gap-10 lg:gap-14 items-start">
     <div class="flex flex-col gap-8 md:gap-10 min-w-0">
 
       <!-- Hero -->
@@ -86,22 +86,19 @@
           <h1 id="doc-name" class="text-[30px] leading-[38px] md:text-[40px] md:leading-[48px] font-semibold tracking-[-0.02em] m-0 text-balance">{{ d.fullName }}</h1>
           <p *ngIf="d.bio" class="text-[17px] leading-7 text-gray-800 m-0 max-w-[620px] text-pretty">{{ d.bio }}</p>
           <ul *ngIf="facts.length" class="list-none mt-1 mb-0 p-0 flex gap-2 flex-wrap">
-            <li *ngFor="let f of facts" class="h-[34px] px-3 rounded-full bg-gray-100 text-gray-800 text-sm font-medium flex gap-1.5 items-center">
+            <li *ngFor="let f of facts; trackBy: trackByLabel" class="h-[34px] px-3 rounded-full bg-gray-100 text-gray-800 text-sm font-medium flex gap-1.5 items-center">
               <physio-icon [name]="f.icon" [size]="15" class="text-gray-600" />{{ f.label }}
             </li>
           </ul>
           <div class="flex gap-2.5 flex-wrap mt-2">
-            <button
-              type="button"
-              (click)="goToForm()"
-              class="h-[52px] px-[22px] border-0 rounded-xl bg-primary text-white text-base font-semibold flex gap-2 items-center justify-center cursor-pointer hover:bg-primaryHover basis-full md:basis-auto"
+            <button boo-button variant="primary" size="lg"
+              (click)="goToForm()" class="basis-full md:basis-auto"
             >
               <physio-icon name="calendar-plus" [size]="18" />Request an Appointment
             </button>
-            <a
+            <a boo-button variant="secondary" size="lg"
               *ngIf="contactFacility as cf"
-              [href]="tel(cf.phone!)"
-              class="h-[52px] px-5 border border-gray-300 rounded-xl text-base font-semibold flex gap-2 items-center justify-center text-gray-900 hover:border-primary hover:text-primaryDeep basis-full md:basis-auto"
+              [href]="tel(cf.phone!)" class="basis-full md:basis-auto"
             >
               <physio-icon name="phone" [size]="18" />Contact Clinic
             </a>
@@ -176,7 +173,7 @@
             This is a request, not a confirmed appointment. Staff will contact you to confirm a time.
             <span class="block mt-1">Reference: <span class="font-mono font-medium">{{ reference }}</span></span>
           </p>
-          <button type="button" (click)="sendAnother()" class="h-11 px-4 border border-gray-300 rounded-[10px] bg-surface text-sm font-semibold text-gray-900 cursor-pointer hover:border-primary">Send another request</button>
+          <button boo-button variant="secondary" (click)="sendAnother()">Send another request</button>
         </div>
 
         <!-- Form -->
@@ -312,13 +309,9 @@
             <a routerLink="/privacy" class="text-primaryDeep underline">Privacy Policy</a>.
           </p>
 
-          <button
-            type="submit"
-            [disabled]="submitState === 'submitting'"
-            [attr.aria-busy]="submitState === 'submitting'"
-            class="h-[52px] border-0 rounded-xl bg-primary text-white text-base font-semibold flex gap-2 items-center justify-center cursor-pointer hover:bg-primaryHover disabled:opacity-70 disabled:cursor-wait"
-          >
-            <physio-icon [name]="submitIcon" [size]="18" [class.animate-spin]="submitState === 'submitting'" />
+          <!-- Disabled while sending, so a double click can't send the request twice. -->
+          <button boo-button variant="primary" size="lg" type="submit" [loading]="submitState === 'submitting'">
+            <physio-icon *ngIf="submitState !== 'submitting'" [name]="submitIcon" [size]="18" />
             {{ submitLabel }}
           </button>
         </form>

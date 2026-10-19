@@ -3,7 +3,7 @@
   class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 flex flex-col gap-5 animate-pulse motion-reduce:animate-none">
   <span class="h-3 w-[220px] rounded-md bg-[#F4ECEF]"></span>
   <span class="aspect-[4/3] md:aspect-[21/8] rounded-[20px] bg-[#F4ECEF]"></span>
-  <div class="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-10">
+  <div class="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_360px] gap-10">
     <div class="flex flex-col gap-3">
       <span class="h-3.5 w-1/4 rounded-md bg-[#F4ECEF]"></span>
       <span class="h-[34px] w-[65%] rounded-lg bg-gray-200"></span>
@@ -23,8 +23,8 @@
     It may have moved or is no longer listed. You can browse all clinics in the network instead.
   </p>
   <div class="flex gap-2.5 justify-center flex-wrap">
-    <a routerLink="/hospitals" class="h-12 px-5 rounded-xl bg-primary text-white font-semibold text-[15px] flex items-center hover:bg-primaryHover hover:text-white">Browse clinics</a>
-    <a routerLink="/" class="h-12 px-5 rounded-xl border border-gray-300 font-semibold text-[15px] flex items-center text-gray-900 hover:border-primary hover:text-primaryDeep">Go to homepage</a>
+    <a boo-button variant="primary" size="lg" routerLink="/hospitals">Browse clinics</a>
+    <a boo-button variant="secondary" size="lg" routerLink="/">Go to homepage</a>
   </div>
 </div>
 
@@ -35,10 +35,10 @@
     <h1 class="text-[22px] font-semibold mt-3.5 mb-1.5">We couldn't load this clinic</h1>
     <p class="text-[15px] text-gray-700 m-0 mb-5">Check your connection and try again.</p>
     <div class="flex gap-2.5 justify-center flex-wrap">
-      <button type="button" (click)="retry()" class="h-11 px-5 border-0 rounded-[10px] bg-primary text-white text-sm font-semibold inline-flex gap-2 items-center cursor-pointer hover:bg-primaryHover">
+      <button boo-button variant="primary" (click)="retry()">
         <physio-icon name="rotate-cw" [size]="16" />Try again
       </button>
-      <a routerLink="/hospitals" [queryParams]="backQuery" class="h-11 px-[18px] border border-gray-300 rounded-[10px] text-sm font-semibold flex items-center bg-surface text-gray-900 hover:border-primary hover:text-primaryDeep">Back to clinics</a>
+      <a boo-button variant="secondary" routerLink="/hospitals" [queryParams]="backQuery">Back to clinics</a>
     </div>
   </div>
 </div>
@@ -73,7 +73,7 @@
     </div>
   </div>
 
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-9 lg:pb-20 grid lg:grid-cols-[minmax(0,1fr)_360px] gap-9 lg:gap-14 items-start">
+  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-9 lg:pb-20 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_360px] gap-9 lg:gap-14 items-start">
     <div class="flex flex-col gap-8 md:gap-10 min-w-0">
 
       <!-- Overview -->
@@ -92,17 +92,15 @@
         </p>
         <p *ngIf="c.description" class="text-[17px] leading-7 text-gray-800 m-0 max-w-[640px] text-pretty whitespace-pre-line">{{ c.description }}</p>
         <div class="flex gap-2.5 flex-wrap mt-2">
-          <a
+          <a boo-button variant="primary" size="lg"
             routerLink="/doctor"
-            [queryParams]="{ facility: c.id }"
-            class="h-[52px] px-[22px] rounded-xl bg-primary text-white text-base font-semibold flex gap-2 items-center justify-center hover:bg-primaryHover hover:text-white basis-full md:basis-auto"
+            [queryParams]="{ facility: c.id }" class="basis-full md:basis-auto"
           >
             <physio-icon name="calendar-plus" [size]="18" />Request Appointment
           </a>
-          <a
+          <a boo-button variant="secondary" size="lg"
             *ngIf="c.phone"
-            [href]="tel(c.phone)"
-            class="h-[52px] px-5 border border-gray-300 rounded-xl text-base font-semibold flex gap-2 items-center justify-center text-gray-900 hover:border-primary hover:text-primaryDeep basis-full md:basis-auto"
+            [href]="tel(c.phone)" class="basis-full md:basis-auto"
           >
             <physio-icon name="phone" [size]="18" />Call Clinic
           </a>
@@ -123,7 +121,7 @@
             View All Doctors<physio-icon name="arrow-right" [size]="16" />
           </a>
         </div>
-        <ul class="list-none m-0 p-0 grid md:grid-cols-2 gap-5">
+        <ul class="list-none m-0 p-0 grid grid-cols-[minmax(0,1fr)] md:grid-cols-2 gap-5">
           <li *ngFor="let d of doctors; trackBy: trackById"><doctor-card [doctor]="d" [facilityId]="c.id" /></li>
         </ul>
       </section>
@@ -142,7 +140,7 @@
       <div class="border border-gray-200 rounded-[20px] bg-surface shadow-[0_12px_40px_rgba(38,20,26,.07)] p-5 md:p-6 flex flex-col gap-[18px]">
         <h2 id="info-h" class="text-lg leading-[26px] font-semibold m-0">Clinic information</h2>
         <dl class="m-0 flex flex-col gap-4">
-          <div *ngFor="let r of infoRows" class="flex gap-3">
+          <div *ngFor="let r of infoRows; trackBy: trackByLabel" class="flex gap-3">
             <span class="w-9 h-9 rounded-[10px] bg-gray-100 text-primaryDeep flex items-center justify-center flex-none" aria-hidden="true">
               <physio-icon [name]="r.icon" [size]="16" />
             </span>
@@ -161,12 +159,8 @@
             </div>
           </div>
         </dl>
-        <a
-          routerLink="/doctor"
-          [queryParams]="{ facility: c.id }"
-          class="h-12 rounded-xl bg-primary text-white text-[15px] font-semibold flex gap-2 items-center justify-center hover:bg-primaryHover hover:text-white"
-        >
-          <physio-icon name="calendar-plus" [size]="17" />Request Appointment
+        <a boo-button variant="primary" size="lg" [block]="true" routerLink="/doctor" [queryParams]="{ facility: c.id }">
+          <physio-icon name="calendar-plus" [size]="17" />Request appointment
         </a>
       </div>
     </aside>

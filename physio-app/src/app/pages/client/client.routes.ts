@@ -66,6 +66,11 @@ export const routes: Routes = [
                 data: { breadcrumbs: ['blog'] }  
             },
             {
+                path: 'search',
+                loadComponent: () => import('./search/search.component').then(m => m.SearchComponent),
+                data: { breadcrumbs: ['search'] }
+            },
+            {
                 path: 'blog/:id',
                 loadComponent: () => import('./blog/detail/article-detail.component').then(m => m.ArticleDetailComponent),
                 data: { breadcrumbs: ['blog'] }

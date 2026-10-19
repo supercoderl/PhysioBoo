@@ -3,7 +3,7 @@
   class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 flex flex-col gap-5 animate-pulse motion-reduce:animate-none">
   <span class="h-3 w-[220px] rounded-md bg-[#F4ECEF]"></span>
   <span class="aspect-[4/3] lg:aspect-[21/8] rounded-[20px] bg-[#F4ECEF]"></span>
-  <div class="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-10">
+  <div class="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_360px] gap-10">
     <div class="flex flex-col gap-3">
       <span class="h-3.5 w-1/4 rounded-md bg-[#F4ECEF]"></span>
       <span class="h-[34px] w-[65%] rounded-lg bg-gray-200"></span>
@@ -23,8 +23,8 @@
     It may have moved or is no longer listed. You can browse all services in the network instead.
   </p>
   <div class="flex gap-2.5 justify-center flex-wrap">
-    <a routerLink="/services" class="h-12 px-5 rounded-xl bg-primary text-white font-semibold text-[15px] flex items-center hover:bg-primaryHover hover:text-white">Browse All Services</a>
-    <a routerLink="/" class="h-12 px-5 rounded-xl border border-gray-300 font-semibold text-[15px] flex items-center text-gray-900 hover:border-primary hover:text-primaryDeep">Go to homepage</a>
+    <a boo-button variant="primary" size="lg" routerLink="/services">Browse All Services</a>
+    <a boo-button variant="secondary" size="lg" routerLink="/">Go to homepage</a>
   </div>
 </div>
 
@@ -35,10 +35,10 @@
     <h1 class="text-[22px] font-semibold mt-3.5 mb-1.5">We couldn't load this service</h1>
     <p class="text-[15px] text-gray-700 m-0 mb-5">Check your connection and try again.</p>
     <div class="flex gap-2.5 justify-center flex-wrap">
-      <button type="button" (click)="retry()" class="h-11 px-5 border-0 rounded-[10px] bg-primary text-white text-sm font-semibold inline-flex gap-2 items-center cursor-pointer hover:bg-primaryHover">
+      <button boo-button variant="primary" (click)="retry()">
         <physio-icon name="rotate-cw" [size]="16" />Try again
       </button>
-      <a routerLink="/services" [queryParams]="backQuery" class="h-11 px-[18px] border border-gray-300 rounded-[10px] text-sm font-semibold flex items-center bg-surface text-gray-900 hover:border-primary hover:text-primaryDeep">Browse All Services</a>
+      <a boo-button variant="secondary" routerLink="/services" [queryParams]="backQuery">Browse All Services</a>
     </div>
   </div>
 </div>
@@ -58,7 +58,7 @@
   </div>
 
   <!-- Hero: image first on tablet and mobile, beside the text on desktop -->
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 md:pt-8 lg:pt-12 lg:pb-2 grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] gap-6 lg:gap-14 items-center">
+  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 md:pt-8 lg:pt-12 lg:pb-2 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] gap-6 lg:gap-14 items-center">
     <div class="flex flex-col gap-3.5 min-w-0 order-1 lg:order-none">
       <span *ngIf="s.clinic" class="text-sm font-semibold text-primaryDeep flex gap-1.5 items-center">
         <physio-icon name="building-2" [size]="15" />{{ s.clinic.name }}
@@ -66,27 +66,23 @@
       <h1 class="text-[30px] leading-[38px] md:text-[44px] md:leading-[52px] font-semibold tracking-[-0.02em] m-0 text-balance">{{ s.name }}</h1>
       <p *ngIf="summary" class="text-[17px] leading-7 text-gray-800 m-0 max-w-[560px] text-pretty">{{ summary }}</p>
       <div class="flex gap-2.5 flex-wrap mt-2">
-        <a
+        <a boo-button variant="primary" size="lg"
           *ngIf="onlyDoctor as d"
           [routerLink]="['/doctor', d.id]"
           [queryParams]="requestParams"
-          fragment="request"
-          class="h-[52px] px-[22px] rounded-xl bg-primary text-white text-base font-semibold flex gap-2 items-center justify-center hover:bg-primaryHover hover:text-white basis-full md:basis-auto"
+          fragment="request" class="basis-full md:basis-auto"
         >
           <physio-icon name="calendar-plus" [size]="18" />Request Appointment
         </a>
-        <button
+        <button boo-button variant="primary" size="lg"
           *ngIf="s.doctors.length > 1"
-          type="button"
           (click)="chooseDoctor()"
-          aria-controls="svc-doctors"
-          class="h-[52px] px-[22px] border-0 rounded-xl bg-primary text-white text-base font-semibold flex gap-2 items-center justify-center cursor-pointer hover:bg-primaryHover basis-full md:basis-auto"
+          aria-controls="svc-doctors" class="basis-full md:basis-auto"
         >
           <physio-icon name="calendar-plus" [size]="18" />Request Appointment
         </button>
-        <a
-          routerLink="/services" [queryParams]="backQuery"
-          class="h-[52px] px-5 border border-gray-300 rounded-xl text-base font-semibold flex gap-2 items-center justify-center text-gray-900 hover:border-primary hover:text-primaryDeep basis-full md:basis-auto"
+        <a boo-button variant="secondary" size="lg"
+          routerLink="/services" [queryParams]="backQuery" class="basis-full md:basis-auto"
         >
           <physio-icon name="arrow-left" [size]="18" />Browse All Services
         </a>
@@ -123,7 +119,7 @@
         <h2 id="cl-h" class="text-2xl leading-8 font-semibold m-0 mb-1">Where it's offered</h2>
         <p class="text-[15px] text-gray-700 m-0">This service is listed at one clinic.</p>
       </div>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="grid grid-cols-[minmax(0,1fr)] md:grid-cols-2 lg:grid-cols-3 gap-5">
         <clinic-card [hospital]="s.clinic" />
       </div>
     </section>
@@ -135,7 +131,7 @@
         <p class="text-[15px] text-gray-700 m-0">{{ doctorsNote }}</p>
       </div>
       <ul
-        class="list-none m-0 p-0 grid md:grid-cols-2 lg:grid-cols-3 gap-5 rounded-[18px] outline outline-2 outline-offset-8 transition-[outline-color] duration-300"
+        class="list-none m-0 p-0 grid grid-cols-[minmax(0,1fr)] md:grid-cols-2 lg:grid-cols-3 gap-5 rounded-[18px] outline outline-2 outline-offset-8 transition-[outline-color] duration-300"
         [ngClass]="flashDoctors ? 'outline-primary' : 'outline-transparent'"
       >
         <li *ngFor="let d of s.doctors; trackBy: trackById">

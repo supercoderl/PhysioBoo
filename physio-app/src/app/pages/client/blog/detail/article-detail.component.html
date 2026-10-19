@@ -1,7 +1,7 @@
 <!-- Loading: same sizes as the loaded page -->
 <div *ngIf="state === 'loading'" aria-busy="true" aria-label="Loading article" class="animate-pulse motion-reduce:animate-none">
   <div class="bg-gray-50 border-b border-gray-200">
-    <div class="max-w-[1200px] mx-auto px-5 md:px-8 lg:px-6 py-3.5 md:py-4"><span class="block h-3.5 w-[220px] rounded-lg bg-[#F4ECEF]"></span></div>
+    <div class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4"><span class="block h-3.5 w-[220px] rounded-lg bg-[#F4ECEF]"></span></div>
   </div>
   <div class="md:max-w-[808px] mx-auto px-5 md:px-8 lg:px-6 pt-6 pb-5 md:pt-9 md:pb-7 lg:pt-12 lg:pb-8 flex flex-col gap-3.5">
     <span class="block h-6 w-[90px] rounded-full bg-[#F4ECEF]"></span>
@@ -30,7 +30,7 @@
 <!-- Unavailable: unknown, draft, archived and deleted articles look the same -->
 <ng-container *ngIf="state === 'notfound'">
   <div class="bg-gray-50 border-b border-gray-200">
-    <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 md:px-8 lg:px-6 py-3.5 md:py-4">
+    <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4">
       <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600">
         <li><a routerLink="/" class="text-primaryDeep font-medium underline decoration-[#F3C1CD] underline-offset-[3px] hover:text-primaryHover">Home</a></li>
         <li aria-hidden="true">/</li>
@@ -43,8 +43,8 @@
     <h1 class="text-[28px] leading-9 font-semibold mt-4 mb-2">This article isn't available</h1>
     <p class="text-base leading-[26px] text-gray-700 m-0 mb-6">It may have been moved, unpublished or removed. You can find our latest articles on the blog.</p>
     <div class="flex gap-2.5 justify-center flex-wrap">
-      <a routerLink="/blog" class="h-12 px-5 rounded-xl bg-primary text-white font-semibold text-[15px] flex items-center hover:bg-primaryHover hover:text-white">Back to the blog</a>
-      <a routerLink="/" class="h-12 px-5 rounded-xl border border-gray-300 font-semibold text-[15px] flex items-center text-gray-900 hover:border-primary hover:text-primaryDeep">Go to homepage</a>
+      <a boo-button variant="primary" size="lg" routerLink="/blog">Back to the blog</a>
+      <a boo-button variant="secondary" size="lg" routerLink="/">Go to homepage</a>
     </div>
   </div>
 </ng-container>
@@ -56,10 +56,10 @@
     <h1 class="text-[22px] font-semibold mt-3.5 mb-1.5">We couldn't load this article</h1>
     <p class="text-[15px] text-gray-700 m-0 mb-5">Check your connection and try again.</p>
     <div class="flex gap-2.5 justify-center flex-wrap">
-      <button type="button" (click)="retry()" class="h-11 px-5 border-0 rounded-[10px] bg-primary text-white text-sm font-semibold inline-flex gap-2 items-center cursor-pointer hover:bg-primaryHover">
+      <button boo-button variant="primary" (click)="retry()">
         <physio-icon name="rotate-cw" [size]="16" />Try again
       </button>
-      <a routerLink="/blog" class="h-11 px-[18px] border border-gray-300 rounded-[10px] text-sm font-semibold flex items-center bg-surface text-gray-900 hover:border-primary hover:text-primaryDeep">Back to the blog</a>
+      <a boo-button variant="secondary" routerLink="/blog">Back to the blog</a>
     </div>
   </div>
 </div>
@@ -67,7 +67,7 @@
 <ng-container *ngIf="state === 'live' && article as a">
   <!-- Breadcrumb -->
   <div class="bg-gray-50 border-b border-gray-200">
-    <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 md:px-8 lg:px-6 py-3.5 md:py-4">
+    <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4">
       <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600 min-w-0">
         <li class="flex-none"><a routerLink="/" class="text-primaryDeep font-medium underline decoration-[#F3C1CD] underline-offset-[3px] hover:text-primaryHover">Home</a></li>
         <li aria-hidden="true" class="flex-none">/</li>
@@ -107,13 +107,13 @@
           <div #shareBox class="relative" (keydown.escape)="closeShare(true)">
             <button
               #shareButton
-              type="button"
+              boo-button
+              variant="secondary"
               (click)="toggleShare()"
               [attr.aria-expanded]="shareOpen"
               aria-haspopup="menu"
               aria-controls="share-menu"
-              class="h-11 px-4 border border-gray-300 rounded-[10px] text-sm font-semibold text-gray-900 flex gap-2 items-center cursor-pointer hover:border-[#D9C3CB] hover:bg-gray-50"
-              [ngClass]="shareOpen ? 'bg-gray-50' : 'bg-surface'"
+              [class.!bg-gray-50]="shareOpen"
             >
               <physio-icon name="share-2" [size]="16" />Share
             </button>
@@ -263,17 +263,17 @@
 
   <!-- Related: hidden if the search fails -->
   <section *ngIf="relatedState !== 'error'" aria-labelledby="rel-h" class="bg-gray-50 border-t border-gray-200">
-    <div class="max-w-[1200px] mx-auto px-5 md:px-8 lg:px-6 pt-10 pb-12 md:pt-12 md:pb-14 lg:pt-14 lg:pb-[72px]">
+    <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-10 pb-12 md:pt-12 md:pb-14 lg:pt-14 lg:pb-[72px]">
       <div class="flex justify-between items-end gap-4 mb-6 flex-wrap">
         <h2 id="rel-h" class="text-2xl leading-8 md:text-[28px] md:leading-9 font-semibold m-0">Related articles</h2>
         <a routerLink="/blog" class="text-[15px] font-semibold text-primaryDeep flex gap-1.5 items-center min-h-11 hover:text-primaryHover">All articles<physio-icon name="arrow-right" [size]="16" /></a>
       </div>
 
-      <div *ngIf="relatedState === 'loading'" class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div *ngIf="relatedState === 'loading'" class="grid grid-cols-[minmax(0,1fr)] md:grid-cols-2 lg:grid-cols-3 gap-5">
         <article-card *ngFor="let _ of [0, 1, 2]" [skeleton]="true" />
       </div>
 
-      <div *ngIf="relatedState === 'live' && related.length" class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div *ngIf="relatedState === 'live' && related.length" class="grid grid-cols-[minmax(0,1fr)] md:grid-cols-2 lg:grid-cols-3 gap-5">
         <article-card *ngFor="let r of related" [article]="r" />
       </div>
 

@@ -3,12 +3,15 @@
     <div class="grid grid-cols-2 gap-x-4 gap-y-7 md:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,1fr))] md:gap-12 pb-7 md:pb-12 border-b border-gray-200">
       <div class="col-span-2 md:col-span-1">
         <img src="assets/logo/logo.webp" [alt]="tenant.name" class="h-6 md:h-7 mb-3.5 md:mb-4" />
-        <p class="text-sm md:text-[15px] md:leading-6 text-gray-700 max-w-[320px] mb-4 md:mb-5">{{ tenant.tagline }}</p>
-        <div class="flex flex-col gap-2.5 text-sm text-gray-800">
-          <span class="flex gap-2 items-center"><physio-icon name="map-pin" [size]="16" class="text-gray-600" />{{ tenant.address }}</span>
-          <span class="flex gap-2 items-center"><physio-icon name="phone" [size]="16" class="text-gray-600" />{{ tenant.phone }}</span>
-          <span class="flex gap-2 items-center"><physio-icon name="email" [size]="16" class="text-gray-600" />{{ tenant.email }}</span>
+        <p *ngIf="tenant.tagline" class="text-sm md:text-[15px] md:leading-6 text-gray-700 max-w-[320px] mb-4 md:mb-5">{{ tenant.tagline }}</p>
+        <div *ngIf="tenant.address || tenant.phone || tenant.email" class="flex flex-col gap-2.5 text-sm text-gray-800">
+          <span *ngIf="tenant.address" class="flex gap-2 items-start"><physio-icon name="map-pin" [size]="16" class="text-gray-600 flex-none mt-0.5" />{{ tenant.address }}</span>
+          <span *ngIf="tenant.phone" class="flex gap-2 items-center"><physio-icon name="phone" [size]="16" class="text-gray-600 flex-none" />{{ tenant.phone }}</span>
+          <span *ngIf="tenant.email" class="flex gap-2 items-center break-all"><physio-icon name="email" [size]="16" class="text-gray-600 flex-none" />{{ tenant.email }}</span>
         </div>
+        <a *ngIf="!tenant.address && !tenant.phone && !tenant.email" routerLink="/contact" class="text-sm font-semibold text-primary hover:text-primaryHover inline-flex gap-1.5 items-center">
+          Contact us<physio-icon name="arrow-right" [size]="14" />
+        </a>
       </div>
       <div *ngFor="let col of cols">
         <h4 class="text-[13px] md:text-sm font-semibold mb-3 md:mb-4">{{ col.title }}</h4>

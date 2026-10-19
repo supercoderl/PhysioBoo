@@ -1,7 +1,8 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { catchError, firstValueFrom, of, throwError } from 'rxjs';
 import { BASE_API } from '../../shared/api/base';
+import { SKIP_ERROR_TOAST } from '../../shared/contexts/option.context';
 import { SERVER_HAS_NOT_RESPONSED } from '../../shared/constants/error.constant';
 import { CONFIG_CACHE_KEY } from '../../shared/data/cache';
 import { AppConfig, PagedResponse } from '../../shared/types/common';
@@ -23,16 +24,22 @@ export class InitService {
     **/
     async load(): Promise<void> {
         try {
+            const session = this.authSrv.checkSession();
             await Promise.all([
-                this.authSrv.checkSession(),
-                this.loadConfig(),
+                session,
+                this.loadConfig(session),
             ]);
         } catch (err) {
             console.log(this.loggerSrv.error(SERVER_HAS_NOT_RESPONSED, err));
         }
     }
 
-    private async loadConfig(): Promise<void> {
+    /**
+     * `api/config` needs the system:config:read permission, so it is only requested once the session check says
+     * someone is signed in: anonymous visitors of the public site would always get a 401 for it. The anonymous
+     * version check still runs in parallel with the session check.
+     */
+    private async loadConfig(session: Promise<void>): Promise<void> {
         try {
             const cache = LocalStorage.load<AppConfig>(CONFIG_CACHE_KEY);
             const cachedVersion = cache?.version;
@@ -61,9 +68,17 @@ export class InitService {
                 return;
             }
 
+            await session;
+            if (!this.authSrv.isAuthenticated()) {
+                this.config = cache ?? this.getDefaultConfig();
+                return;
+            }
+
+            // A signed-in user without the permission (e.g. a patient) gets a 403: fall back quietly, no toast.
             const res = await firstValueFrom(
                 this.http.get<PagedResponse<AppConfig>>(BASE_API.CONFIG, {
-                    headers: { 'X-Global-Loading': 'true' }
+                    headers: { 'X-Global-Loading': 'true' },
+                    context: new HttpContext().set(SKIP_ERROR_TOAST, true)
                 })
             );
 

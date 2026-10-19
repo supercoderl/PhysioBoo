@@ -1,11 +1,12 @@
-import { GoogleLoginProvider, SOCIAL_AUTH_CONFIG, SocialAuthServiceConfig } from "@abacritt/angularx-social-login";
+import { GoogleLoginProvider, SocialAuthServiceConfig } from "@abacritt/angularx-social-login";
 import { EnvironmentProviders, makeEnvironmentProviders } from "@angular/core";
 import { environment } from "../environments/environment.development";
 
 export function provideOAuth(): EnvironmentProviders {
   return makeEnvironmentProviders([
-    { 
-        provide: SOCIAL_AUTH_CONFIG,
+    {
+        // 2.2.0 (the pinned version) injects this string token; SOCIAL_AUTH_CONFIG only exists in later releases.
+        provide: 'SocialAuthServiceConfig',
         useValue: {
             autoLogin: false,
             providers: [

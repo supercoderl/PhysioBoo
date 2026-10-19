@@ -1,0 +1,388 @@
+<!-- Intro: breadcrumb, title, search form -->
+<section aria-labelledby="sr-h1" class="bg-gray-50 border-b border-gray-200">
+  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-4 pb-6 md:pt-5 md:pb-7 lg:pt-6 lg:pb-8 flex flex-col gap-4">
+    <nav aria-label="Breadcrumb">
+      <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600">
+        <li><a routerLink="/" class="text-gray-700 hover:text-primaryDeep">Home</a></li>
+        <li aria-hidden="true" class="flex"><physio-icon name="chevron-right" [size]="13" /></li>
+        <li aria-current="page" class="text-gray-900 font-medium">Search</li>
+      </ol>
+    </nav>
+
+    <h1 id="sr-h1" class="text-[28px] leading-9 md:text-[32px] md:leading-10 lg:text-4xl lg:leading-[44px] font-semibold tracking-[-0.02em] text-gray-900 m-0">
+      Find the right care for you
+    </h1>
+
+    <form role="search" (submit)="submit($event)" class="flex flex-col md:flex-row gap-2.5 max-w-[820px]">
+      <div class="relative flex-1 min-w-0">
+        <label for="sr-q" class="sr-only">Search doctors, specialties, services, clinics and articles</label>
+        <physio-icon name="search" [size]="20" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" />
+        <input
+          #searchInput
+          id="sr-q"
+          name="q"
+          type="search"
+          maxlength="100"
+          enterkeyhint="search"
+          autocomplete="off"
+          [ngModel]="qInput"
+          (ngModelChange)="onInput($event)"
+          placeholder="Search doctors, specialties, services..."
+          [attr.aria-describedby]="hint ? 'sr-hint' : null"
+          class="w-full h-14 pl-12 pr-12 border rounded-[14px] bg-surface text-base text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 [&::-webkit-search-cancel-button]:hidden"
+          [ngClass]="hint ? 'border-primary ring-[3px] ring-primarySoft' : 'border-gray-300'"
+        />
+        <button
+          *ngIf="qInput"
+          type="button"
+          (click)="clear()"
+          aria-label="Clear search"
+          class="absolute right-1.5 top-1/2 -translate-y-1/2 w-11 h-11 border-0 bg-transparent rounded-[10px] text-gray-700 flex items-center justify-center cursor-pointer hover:bg-gray-100"
+        >
+          <physio-icon name="x" [size]="18" />
+        </button>
+      </div>
+      <button boo-button variant="primary" size="lg"
+        type="submit" class="flex-none"
+      >
+        <physio-icon name="search" [size]="18" />Search
+      </button>
+    </form>
+
+    <p *ngIf="hint" id="sr-hint" class="m-0 text-sm leading-[21px] text-gray-800 flex gap-2 items-start">
+      <physio-icon name="info" [size]="16" class="mt-0.5 flex-none text-primaryDeep" />
+      Type a doctor’s name, a specialty or a service, then press Search.
+    </p>
+
+    <div *ngIf="!submitted && popular.length" class="flex gap-2 flex-wrap items-center">
+      <span class="text-sm text-gray-700 mr-1">Popular searches:</span>
+      <button
+        *ngFor="let p of popular"
+        type="button"
+        (click)="searchFor(p)"
+        class="min-h-11 px-4 border border-gray-300 rounded-full bg-surface text-sm font-medium text-gray-900 cursor-pointer hover:border-primary hover:text-primaryDeep"
+      >{{ p }}</button>
+    </div>
+  </div>
+</section>
+
+<!-- Initial: browse by category -->
+<section *ngIf="!submitted" aria-labelledby="sr-browse" class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-10 md:pt-7 md:pb-12 lg:pt-8 lg:pb-14 flex flex-col gap-5">
+  <h2 id="sr-browse" class="text-[22px] leading-[30px] font-semibold m-0">Or browse by category</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <a
+      *ngFor="let b of browse"
+      [routerLink]="b.link"
+      class="min-h-[72px] px-[18px] py-4 border border-gray-200 rounded-2xl bg-surface flex gap-3.5 items-center text-gray-900 hover:border-[#E3C4CE] hover:text-primaryDeep"
+    >
+      <span aria-hidden="true" class="w-10 h-10 flex-none rounded-xl bg-primarySoft text-primaryDeep flex items-center justify-center">
+        <physio-icon [name]="b.icon" [size]="18" />
+      </span>
+      <span class="flex-1 text-base font-semibold">{{ b.label }}</span>
+      <physio-icon name="chevron-right" [size]="16" class="text-gray-600" />
+    </a>
+  </div>
+</section>
+
+<!-- Results -->
+<section
+  *ngIf="submitted"
+  #results
+  aria-labelledby="sr-sum"
+  class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-10 md:pt-7 md:pb-12 lg:pt-8 lg:pb-14 flex flex-col gap-5 scroll-mt-24"
+>
+  <div class="flex gap-3 items-center justify-between flex-wrap">
+    <div class="flex flex-col gap-0.5 min-w-0">
+      <h2 id="sr-sum" class="text-xl leading-7 md:text-2xl md:leading-8 font-semibold m-0 [overflow-wrap:anywhere]">Results for “{{ query.q }}”</h2>
+      <p aria-live="polite" class="m-0 text-[15px] text-gray-700">{{ summary }}</p>
+    </div>
+    <button boo-button variant="secondary" (click)="clear()" class="!gap-1.5">
+      <physio-icon name="x" [size]="16" />Clear search
+    </button>
+  </div>
+
+  <div
+    role="tablist"
+    aria-label="Result type"
+    (keydown)="onTabKey($event)"
+    class="flex gap-1 shadow-[inset_0_-1px_0_theme(colors.gray.200)] overflow-x-auto overflow-y-hidden -mx-5 px-4 md:mx-0 md:px-0"
+  >
+    <button
+      *ngFor="let t of tabs"
+      [id]="'sr-tab-' + t.key"
+      type="button"
+      role="tab"
+      [attr.aria-selected]="t.key === query.tab"
+      aria-controls="sr-panel"
+      [tabindex]="t.key === query.tab ? 0 : -1"
+      (click)="selectTab(t.key)"
+      class="min-h-12 px-3.5 border-0 bg-transparent text-[15px] flex gap-2 items-center whitespace-nowrap cursor-pointer flex-none hover:text-primaryDeep"
+      [ngClass]="t.key === query.tab ? 'font-semibold text-primaryDeep shadow-[inset_0_-2px_0_rgb(var(--twc-primary))]' : 'font-medium text-gray-700'"
+    >
+      {{ t.label }}
+      <span
+        *ngIf="tabCount(t.key) !== null"
+        class="font-mono text-xs font-medium px-[7px] py-px rounded-full"
+        [ngClass]="t.key === query.tab ? 'bg-primarySoft text-primaryDeep' : 'bg-[#F4ECEF] text-gray-700'"
+      >{{ tabCount(t.key) }}</span>
+    </button>
+  </div>
+
+  <div
+    id="sr-panel"
+    role="tabpanel"
+    [attr.aria-labelledby]="'sr-tab-' + query.tab"
+    class="grid gap-8 items-start"
+    [ngClass]="hasFilters ? 'lg:grid-cols-[260px_minmax(0,1fr)]' : 'grid-cols-1'"
+  >
+    <!-- Filters (desktop): apply immediately -->
+    <aside *ngIf="hasFilters" aria-labelledby="sr-fh" class="hidden lg:flex border border-gray-200 rounded-2xl p-5 flex-col gap-[18px] sticky top-4">
+      <div class="flex justify-between items-center">
+        <h2 id="sr-fh" class="text-base font-semibold m-0">Filters</h2>
+        <button *ngIf="chips.length" boo-button variant="link" (click)="clearFilters()" class="!px-0 !no-underline">Clear all</button>
+      </div>
+      <ng-container *ngTemplateOutlet="filterFields; context: { f: query, idp: 'sr-fd-', live: true }" />
+    </aside>
+
+    <div class="flex flex-col gap-4 min-w-0">
+      <!-- Filter button (mobile and tablet) -->
+      <div *ngIf="hasFilters && view !== 'error'" class="lg:hidden flex justify-between items-center gap-3">
+        <span class="text-sm text-gray-700">{{ tabCountLabel }}</span>
+        <button
+          #filterButton
+          boo-button
+          variant="secondary"
+          (click)="openSheet()"
+          aria-haspopup="dialog"
+          [attr.aria-expanded]="sheetOpen"
+          aria-controls="sr-sheet"
+        >
+          <physio-icon name="sliders-horizontal" [size]="16" />{{ filterButtonLabel }}
+        </button>
+      </div>
+
+      <!-- Active filter chips -->
+      <ul *ngIf="chips.length" aria-label="Active filters" class="list-none m-0 p-0 flex gap-2 flex-wrap">
+        <li *ngFor="let c of chips; trackBy: trackByLabel">
+          <button
+            type="button"
+            (click)="removeChip(c)"
+            [attr.aria-label]="'Remove filter: ' + c.label"
+            class="min-h-9 pl-3 pr-2 border border-primary rounded-full bg-primarySoft text-sm font-medium text-primaryDeep flex gap-1.5 items-center cursor-pointer"
+          >{{ c.label }}<physio-icon name="x" [size]="14" /></button>
+        </li>
+      </ul>
+
+      <!-- Loading -->
+      <div *ngIf="view === 'loading'" role="status" aria-label="Loading results" class="flex flex-col gap-3">
+        <span class="h-5 w-[140px] rounded-md bg-gray-200"></span>
+        <search-result *ngFor="let s of skeletons" [skeleton]="true" />
+      </div>
+
+      <!-- Request error -->
+      <div *ngIf="view === 'error'" role="alert" class="border border-gray-200 bg-gray-50 rounded-2xl p-6 flex flex-col gap-3 items-start">
+        <span aria-hidden="true" class="w-11 h-11 rounded-xl bg-surface border border-gray-200 text-[#B42318] flex items-center justify-center">
+          <physio-icon name="circle-alert" [size]="20" />
+        </span>
+        <h3 class="m-0 text-lg leading-[26px] font-semibold">We couldn’t load search results</h3>
+        <p class="m-0 text-[15px] leading-[23px] text-gray-800">Something went wrong on our side. Your search is still here.</p>
+        <button boo-button variant="primary" size="lg"
+          (click)="retry()" class="mt-1"
+        >
+          <physio-icon name="rotate-cw" [size]="16" />Try again
+        </button>
+      </div>
+
+      <!-- No results: not an error -->
+      <div *ngIf="view === 'empty'" class="border border-dashed border-gray-300 rounded-2xl px-5 py-6 md:p-8 flex flex-col gap-3 items-start">
+        <span aria-hidden="true" class="w-12 h-12 rounded-[14px] bg-gray-50 border border-gray-200 text-gray-700 flex items-center justify-center">
+          <physio-icon name="search-x" [size]="22" />
+        </span>
+        <h3 class="m-0 text-xl leading-7 font-semibold">We couldn't find a match for this search.</h3>
+        <p class="m-0 text-[15px] leading-[23px] text-gray-800">{{ emptyBody }}</p>
+        <div *ngIf="otherTabs.length" class="flex gap-2 flex-wrap">
+          <button
+            *ngFor="let o of otherTabs; trackBy: trackByLabel"
+            type="button"
+            (click)="selectTab(o.kind)"
+            class="min-h-11 px-3.5 border border-gray-300 rounded-full bg-surface text-sm font-medium text-gray-900 cursor-pointer hover:border-primary hover:text-primaryDeep"
+          >{{ o.label }}</button>
+        </div>
+        <div class="flex gap-2.5 flex-wrap mt-1 w-full md:w-auto">
+          <a boo-button variant="primary" size="lg" routerLink="/doctor" class="basis-full md:basis-auto">Browse doctors</a>
+          <a boo-button variant="secondary" size="lg" routerLink="/hospitals" class="basis-full md:basis-auto">Explore clinics</a>
+          <button boo-button variant="link" size="lg"
+            *ngIf="chips.length"
+            (click)="clearFilters()"
+          >Clear filters</button>
+        </div>
+      </div>
+
+      <!-- All tab: up to three of each type -->
+      <div *ngIf="view === 'results' && query.tab === 'all'" class="flex flex-col gap-8">
+        <section *ngFor="let k of sections" [attr.aria-labelledby]="'sr-s-' + k" class="flex flex-col gap-3">
+          <div class="flex justify-between items-baseline gap-3">
+            <h3 [id]="'sr-s-' + k" class="m-0 text-lg leading-[26px] font-semibold">
+              {{ titles[k] }}
+              <span class="font-normal text-gray-700">({{ overview[k].status === 'ok' ? overview[k].total : '—' }})</span>
+            </h3>
+            <a
+              *ngIf="overview[k].status === 'ok' && overview[k].total > overview[k].rows.length"
+              routerLink="/search"
+              [queryParams]="seeAllParams(k)"
+              class="min-h-11 flex gap-1.5 items-center text-[15px] font-semibold text-primaryDeep whitespace-nowrap"
+            >See all {{ plural(k, overview[k].total) }}<physio-icon name="arrow-right" [size]="16" /></a>
+          </div>
+          <boo-inline-error
+            *ngIf="overview[k].status === 'error'"
+            [what]="k"
+            [state]="overview[k].retry"
+            (retry)="retrySection(k)"
+            class="block md:hidden"
+            [compact]="true"
+          />
+          <boo-inline-error
+            *ngIf="overview[k].status === 'error'"
+            [what]="k"
+            [state]="overview[k].retry"
+            (retry)="retrySection(k)"
+            class="hidden md:block"
+          />
+          <search-result *ngFor="let r of overview[k].rows" [row]="r" />
+        </section>
+      </div>
+
+      <!-- Category tab -->
+      <ng-container *ngIf="view === 'results' && query.tab !== 'all'">
+        <div class="flex flex-col gap-3">
+          <search-result *ngFor="let r of tabRows" [row]="r" />
+        </div>
+        <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between mt-2">
+          <p class="m-0 text-sm text-gray-700">{{ pagerLabel }}</p>
+          <nav *ngIf="totalPages > 1" aria-label="Pagination" class="flex justify-center md:justify-end items-center gap-1.5 flex-wrap">
+            <button boo-button variant="secondary" [iconOnly]="true"
+              (click)="goToPage(query.page - 1)"
+              [disabled]="query.page <= 1"
+              aria-label="Previous page"
+            >
+              <physio-icon name="chevron-left" [size]="18" />
+            </button>
+            <ng-container *ngFor="let p of pages">
+              <span *ngIf="p === null" class="h-11 min-w-8 flex items-center justify-center text-gray-600" aria-hidden="true">…</span>
+              <button
+                *ngIf="p !== null"
+                boo-button
+                [variant]="p === query.page ? 'primary' : 'secondary'"
+                (click)="goToPage(p)"
+                [attr.aria-current]="p === query.page ? 'page' : null"
+                [attr.aria-label]="'Page ' + p"
+                class="min-w-11 !px-2"
+              >{{ p }}</button>
+            </ng-container>
+            <button boo-button variant="secondary" [iconOnly]="true"
+              (click)="goToPage(query.page + 1)"
+              [disabled]="query.page >= totalPages"
+              aria-label="Next page"
+            >
+              <physio-icon name="chevron-right" [size]="18" />
+            </button>
+          </nav>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</section>
+
+<!-- Filter sheet (mobile and tablet): applies on "Show" -->
+<div *ngIf="sheetOpen && hasFilters" class="lg:hidden fixed inset-0 z-[1100] bg-gray-900/40 flex flex-col justify-end" (click)="closeSheet()">
+  <div
+    id="sr-sheet"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="sr-sh"
+    class="bg-surface rounded-t-[20px] max-h-[88vh] flex flex-col"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex justify-between items-center pl-5 pr-3 py-3 border-b border-gray-200">
+      <h2 id="sr-sh" class="text-lg font-semibold m-0">Filter {{ noun(query.tab) }}</h2>
+      <button boo-button variant="subtle" [iconOnly]="true"
+        #sheetClose
+        (click)="closeSheet()"
+        aria-label="Close filters"
+      >
+        <physio-icon name="x" [size]="18" />
+      </button>
+    </div>
+    <div class="p-5 flex flex-col gap-[18px] overflow-auto">
+      <ng-container *ngTemplateOutlet="filterFields; context: { f: draft, idp: 'sr-fm-', live: false }" />
+    </div>
+    <div class="flex gap-2.5 px-5 pt-4 pb-5 border-t border-gray-200">
+      <button boo-button variant="secondary" size="lg"
+        (click)="clearDraft()"
+      >Clear all</button>
+      <button boo-button variant="primary" size="lg"
+        (click)="applySheet()" class="flex-1"
+      >Show {{ noun(query.tab) }}</button>
+    </div>
+  </div>
+</div>
+
+<!--
+  Filter fields for the current tab. `live` writes straight to the URL (desktop aside);
+  otherwise it edits the sheet's draft.
+-->
+<ng-template #filterFields let-f="f" let-idp="idp" let-live="live">
+  <ng-container [ngSwitch]="query.tab">
+    <ng-container *ngSwitchCase="'doctors'">
+      <div class="flex flex-col gap-1.5">
+        <label [for]="idp + 'specialty'" class="text-sm font-semibold">Specialty</label>
+        <select [id]="idp + 'specialty'" [ngModel]="f.specialty" (ngModelChange)="live ? setFilter({ specialty: $event }) : (draft.specialty = $event)" [ngClass]="live ? 'h-11 rounded-[10px] px-2.5 text-[15px]' : 'h-12 rounded-xl px-3 text-base'" class="w-full border border-gray-300 text-gray-900 bg-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+          <option value="">All specialties</option>
+          <option *ngFor="let o of specialties" [value]="o.id">{{ o.name }}</option>
+        </select>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label [for]="idp + 'clinic'" class="text-sm font-semibold">Clinic or hospital</label>
+        <select [id]="idp + 'clinic'" [ngModel]="f.clinic" (ngModelChange)="live ? setFilter({ clinic: $event }) : (draft.clinic = $event)" [ngClass]="live ? 'h-11 rounded-[10px] px-2.5 text-[15px]' : 'h-12 rounded-xl px-3 text-base'" class="w-full border border-gray-300 text-gray-900 bg-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+          <option value="">All clinics</option>
+          <option *ngFor="let o of facilities" [value]="o.id">{{ o.name }}</option>
+        </select>
+      </div>
+      <fieldset class="border-0 m-0 p-0 flex flex-col gap-0.5">
+        <legend class="text-sm font-semibold mb-1 p-0">Availability</legend>
+        <label class="flex gap-2.5 items-center cursor-pointer" [ngClass]="live ? 'min-h-11 text-[15px]' : 'min-h-12 text-base'">
+          <input type="checkbox" [checked]="f.online" (change)="live ? setFilter({ online: $any($event.target).checked }) : (draft.online = $any($event.target).checked)" class="w-5 h-5 m-0 accent-primary" />
+          Online consultation
+        </label>
+        <label class="flex gap-2.5 items-center cursor-pointer" [ngClass]="live ? 'min-h-11 text-[15px]' : 'min-h-12 text-base'">
+          <input type="checkbox" [checked]="f.home" (change)="live ? setFilter({ home: $any($event.target).checked }) : (draft.home = $any($event.target).checked)" class="w-5 h-5 m-0 accent-primary" />
+          Home visits
+        </label>
+      </fieldset>
+    </ng-container>
+
+    <div *ngSwitchCase="'services'" class="flex flex-col gap-1.5">
+      <label [for]="idp + 'clinic'" class="text-sm font-semibold">Clinic or hospital</label>
+      <select [id]="idp + 'clinic'" [ngModel]="f.clinic" (ngModelChange)="live ? setFilter({ clinic: $event }) : (draft.clinic = $event)" [ngClass]="live ? 'h-11 rounded-[10px] px-2.5 text-[15px]' : 'h-12 rounded-xl px-3 text-base'" class="w-full border border-gray-300 text-gray-900 bg-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+        <option value="">All clinics</option>
+        <option *ngFor="let o of serviceClinics" [value]="o.id">{{ o.name }}</option>
+      </select>
+    </div>
+
+    <div *ngSwitchCase="'clinics'" class="flex flex-col gap-1.5">
+      <label [for]="idp + 'type'" class="text-sm font-semibold">Type</label>
+      <select [id]="idp + 'type'" [ngModel]="f.type" (ngModelChange)="live ? setFilter({ type: $event }) : (draft.type = $event)" [ngClass]="live ? 'h-11 rounded-[10px] px-2.5 text-[15px]' : 'h-12 rounded-xl px-3 text-base'" class="w-full border border-gray-300 text-gray-900 bg-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+        <option value="">All types</option>
+        <option *ngFor="let o of typeOptions" [value]="o.id">{{ o.name }}</option>
+      </select>
+    </div>
+
+    <div *ngSwitchCase="'articles'" class="flex flex-col gap-1.5">
+      <label [for]="idp + 'category'" class="text-sm font-semibold">Category</label>
+      <select [id]="idp + 'category'" [ngModel]="f.category" (ngModelChange)="live ? setFilter({ category: $event }) : (draft.category = $event)" [ngClass]="live ? 'h-11 rounded-[10px] px-2.5 text-[15px]' : 'h-12 rounded-xl px-3 text-base'" class="w-full border border-gray-300 text-gray-900 bg-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+        <option value="">All categories</option>
+        <option *ngFor="let o of categoryOptions" [value]="o.id">{{ o.name }}</option>
+      </select>
+    </div>
+  </ng-container>
+</ng-template>

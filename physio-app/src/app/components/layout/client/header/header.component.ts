@@ -2,12 +2,14 @@ import { Component, ElementRef, HostListener, Input, inject } from '@angular/cor
 import { CLIENT_NAV, CLIENT_TENANT, ClientNavItem } from '../../../../shared/data/client-site';
 import { AuthService } from '../../../../services/auth/auth.service';
 import { SharedModule } from '../../../../shared/shared-imports';
+import { BooButtonComponent } from '../../../button/boo-button/boo-button.component';
 
 @Component({
   selector: 'layout-header',
   standalone: true,
   imports: [
-    SharedModule
+    SharedModule,
+    BooButtonComponent
   ],
   templateUrl: './header.component.html'
 })

@@ -19,7 +19,7 @@
 
 <!-- Intro: breadcrumb -->
 <div class="bg-gray-50 border-b border-gray-200 print:hidden">
-  <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 py-3.5 md:py-4">
+  <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4">
     <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600">
       <li><a routerLink="/" class="text-primaryDeep font-medium underline decoration-primarySoft underline-offset-[3px]">Home</a></li>
       <li aria-hidden="true">/</li>
@@ -41,10 +41,8 @@
           <physio-icon name="calendar" [size]="16" aria-hidden="true" />Last updated
           <time class="font-mono text-[13px] font-medium bg-[#FEF3C7] text-[#78350F] px-2 py-0.5 rounded-md print:bg-transparent print:text-inherit print:p-0">{{ lastUpdated }}</time>
         </p>
-        <button
-          type="button"
-          (click)="print()"
-          class="h-11 px-4 border border-gray-300 rounded-[10px] bg-surface font-semibold text-sm text-gray-900 flex gap-2 items-center hover:bg-gray-50 hover:border-gray-400 print:hidden"
+        <button boo-button variant="secondary"
+          (click)="print()" class="print:hidden"
         ><physio-icon name="printer" [size]="16" />Print</button>
       </div>
     </header>

@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, catchError, map, merge, of, switchMap, tap } from 'rxjs';
+import { BooButtonComponent } from '../../../../components/button/boo-button/boo-button.component';
 import { ArticleCardComponent } from '../../../../components/layout/client/article/article-card.component';
 import { PublicArticleService } from '../../../../services/public/public-article.service';
 import { ArticleCategory } from '../../../../shared/enums/article';
@@ -32,7 +33,7 @@ const OG_TAGS = ['og:title', 'og:description', 'og:image', 'og:type'];
 @Component({
   selector: 'app-article-detail',
   standalone: true,
-  imports: [SharedModule, ArticleCardComponent],
+  imports: [BooButtonComponent, SharedModule, ArticleCardComponent],
   templateUrl: './article-detail.component.html',
 })
 export class ArticleDetailComponent implements OnInit, OnDestroy {
@@ -44,7 +45,7 @@ export class ArticleDetailComponent implements OnInit, OnDestroy {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   @ViewChild('shareBox') private shareBox?: ElementRef<HTMLElement>;
-  @ViewChild('shareButton') private shareButton?: ElementRef<HTMLButtonElement>;
+  @ViewChild('shareButton', { read: ElementRef }) private shareButton?: ElementRef<HTMLButtonElement>;
 
   readonly nextLinks = [
     { icon: 'activity', label: 'Explore our services', href: '/services' },

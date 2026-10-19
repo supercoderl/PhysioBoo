@@ -5,6 +5,9 @@ import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { Subject, catchError, debounceTime, distinctUntilChanged, map, merge, of, switchMap, tap } from 'rxjs';
 import { ServiceCardComponent } from '../../../components/layout/client/service/service-card.component';
 import { PublicServiceService } from '../../../services/public/public-service.service';
+import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
+import { EmptyStateComponent } from '../../../components/ui/empty-state.component';
+import { ErrorStateComponent } from '../../../components/ui/error-state.component';
 import { SharedModule } from '../../../shared/shared-imports';
 import { PublicOption } from '../../../shared/types/public-doctor.types';
 import { PublicService } from '../../../shared/types/public-service.types';
@@ -36,7 +39,7 @@ const EMPTY_QUERY: Query = { q: '', clinic: '', page: 1 };
 @Component({
   selector: 'app-service',
   standalone: true,
-  imports: [SharedModule, ServiceCardComponent],
+  imports: [SharedModule, BooButtonComponent, ServiceCardComponent, EmptyStateComponent, ErrorStateComponent],
   templateUrl: './service.component.html'
 })
 export class ServiceComponent implements OnInit, OnDestroy {
@@ -46,8 +49,8 @@ export class ServiceComponent implements OnInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  @ViewChild('drawerClose') private drawerClose?: ElementRef<HTMLButtonElement>;
-  @ViewChild('filterButton') private filterButton?: ElementRef<HTMLButtonElement>;
+  @ViewChild('drawerClose', { read: ElementRef }) private drawerClose?: ElementRef<HTMLButtonElement>;
+  @ViewChild('filterButton', { read: ElementRef }) private filterButton?: ElementRef<HTMLButtonElement>;
   @ViewChild('results') private results?: ElementRef<HTMLElement>;
 
   query: Query = { ...EMPTY_QUERY };
@@ -274,4 +277,9 @@ export class ServiceComponent implements OnInit, OnDestroy {
     return s.id;
   }
   // #endregion
+
+  /** Rows are rebuilt by a getter on every check; tracking by label keeps the same DOM nodes. */
+  trackByLabel(_: number, item: { label: string }): string {
+    return item.label;
+  }
 }

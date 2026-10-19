@@ -1,178 +1,102 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, DestroyRef, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzResultModule } from 'ng-zorro-antd/result';
+import { combineLatest } from 'rxjs';
+import { BooButtonComponent } from '../../components/button/boo-button/boo-button.component';
 import { AuthService } from '../../services/auth/auth.service';
-import { homeRouteFor } from '../../shared/utils/role.utils';
+import { SharedModule } from '../../shared/shared-imports';
+import { canReturnTo, homeRouteFor } from '../../shared/utils/role.utils';
+import { EXCEPTION_CONTENT, ExceptionCode, ExceptionContent, isExceptionCode } from './exception-content';
 
+type RetryState = 'default' | 'retrying' | 'failed';
+
+/**
+ * Full-page error inside the client layout (design: Error Pages / ErrorPage).
+ *
+ * - `/exception/:code` for 404, 403, 500, 503 and `network`; any other code shows 404.
+ * - `/exception/401` never shows a page: it redirects to login.
+ * - The `**` route renders this component directly (`data.code = '404'`) so the typed URL is kept.
+ * - `?from=/path` is the page that failed. "Try again" re-navigates there; without it, it goes home.
+ */
 @Component({
   selector: 'app-exception',
   standalone: true,
-  imports: [CommonModule, NzResultModule, NzButtonModule, NzIconModule],
-  template: `
-    <section class="h-dvh flex-center-center">
-      <div class="text-center animate-fade-in bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-2xl p-10 max-w-xl mx-auto shadow-2xl border border-white border-opacity-20">
-          <div class="relative mb-6">
-              <span class="text-9xl font-extrabold text-primary/70 block animate-bounce-in leading-none">{{ errorCode }}</span>
-          </div>
-          <h1 class="text-3xl md:text-4xl font-bold mb-4">{{ getErrorTitle() }}</h1>
-          <p class="text-md md:text-xl text-opacity-80 mb-6">
-              {{ getErrorSubtitle() }}
-          </p>
-          <button
-            type="button"
-            class="inline-block bg-primary hover:bg-primary text-white font-bold py-2 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer"
-            (click)="goHome()"
-          >
-              Go to Home
-          </button>
-      </div>
-    </section>                                     
-  `,
-  styles: `
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    .animate-fade-in {
-      animation: fadeIn 0.8s ease-out forwards;
-    }
-
-    @keyframes bounceIn {
-      0%, 20%, 40%, 60%, 80%, 100% {
-        transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-      }
-      0% {
-        opacity: 0;
-        transform: scale3d(.3, .3, .3);
-      }
-      20% {
-        transform: scale3d(1.1, 1.1, 1.1);
-      }
-      40% {
-        transform: scale3d(.9, .9, .9);
-      }
-      60% {
-        opacity: 1;
-        transform: scale3d(1.03, 1.03, 1.03);
-      }
-      80% {
-        transform: scale3d(.97, .97, .97);
-      }
-      100% {
-        opacity: 1;
-        transform: scale3d(1, 1, 1);
-      }
-    }
-        
-    .animate-bounce-in {
-      animation: bounceIn 1.2s ease-out forwards;
-    }
-
-    @keyframes wiggle {
-      0%, 7% {
-        transform: rotateZ(0);
-      }
-      15% {
-        transform: rotateZ(-15deg);
-      }
-      20% {
-        transform: rotateZ(10deg);
-      }
-      25% {
-        transform: rotateZ(-10deg);
-      }
-      30% {
-        transform: rotateZ(6deg);
-      }
-      35% {
-        transform: rotateZ(-4deg);
-      }
-      40%, 100% {
-        transform: rotateZ(0);
-      }
-    }
-    .animate-wiggle {
-      animation: wiggle 2s infinite ease-in-out; /* Infinite loop */
-    }
-  `
+  imports: [BooButtonComponent, SharedModule],
+  templateUrl: './exception.component.html',
 })
 export class ExceptionComponent implements OnInit {
-  errorCode: '404' | '403' | '500' | '401' = '404';
+  code: ExceptionCode = '404';
+  content: ExceptionContent = EXCEPTION_CONTENT['404'];
+  state: RetryState = 'default';
+  homeLink = '/';
 
-  errorMessages: { [key: string]: { title: string; subtitle: string } } = {
-    '401': {
-      title: 'Authentication Required',
-      subtitle: 'Please sign in to access this resource.'
-    },
-    '403': {
-      title: 'Access Forbidden',
-      subtitle: 'You don\'t have permission to view this page.'
-    },
-    '404': {
-      title: 'Page Not Found',
-      subtitle: 'The requested page could not be found.'
-    },
-    '500': {
-      title: 'Internal Server Error',
-      subtitle: 'A server error occurred. Please try again later.'
-    }
-  };
+  private roles: string[] | null = null;
+  private from: string | null = null;
+  private destroyed = false;
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private authSrv: AuthService
-  ) { }
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private authSrv = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
+  private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
+  get busy(): boolean {
+    return this.state === 'retrying';
+  }
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      if (params['code'] && this.errorMessages[params['code']]) {
-        this.errorCode = params['code'];
-      }
-    });
+    this.destroyRef.onDestroy(() => this.destroyed = true);
+
+    this.authSrv.role$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(roles => {
+        this.roles = roles;
+        this.homeLink = homeRouteFor(roles);
+      });
+
+    combineLatest([this.route.paramMap, this.route.queryParamMap, this.route.data])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([params, query, data]) => {
+        const code = params.get('code') ?? data['code'];
+        this.from = query.get('from');
+
+        // A visitor who isn't signed in gets the login page, not an error page.
+        if (code === '401') {
+          this.router.navigate(['/auth/login'], {
+            queryParams: this.from ? { returnUrl: this.from } : {},
+            replaceUrl: true,
+          });
+          return;
+        }
+
+        this.code = isExceptionCode(code) ? code : '404';
+        this.content = EXCEPTION_CONTENT[this.code];
+        this.state = 'default';
+      });
   }
 
-  getErrorTitle(): string {
-    return this.errorMessages[this.errorCode]?.title || 'Error';
+  /**
+   * Re-runs the failed route (not a hard reload). When it loads, this component is destroyed and the
+   * original page appears in place; when we're still here afterwards, the retry failed.
+   */
+  retry(): void {
+    if (this.busy) return;
+    this.state = 'retrying';
+
+    // Offline: navigating would only fail again, so report it straight away (after the spinner shows).
+    if (this.code === 'network' && this.isBrowser && !navigator.onLine) {
+      const timer = setTimeout(() => this.onRetryDone(), 800);
+      this.destroyRef.onDestroy(() => clearTimeout(timer));
+      return;
+    }
+
+    const target = canReturnTo(this.from, this.roles) ? this.from : this.homeLink;
+    this.router.navigateByUrl(target).then(() => this.onRetryDone(), () => this.onRetryDone());
   }
 
-  getErrorSubtitle(): string {
-    return this.errorMessages[this.errorCode]?.subtitle || 'An error occurred.';
-  }
-
-  getIconName(): string {
-    const icons: { [key: string]: string } = {
-      '401': 'lock',
-      '403': 'stop',
-      '404': 'file-search',
-      '500': 'exclamation-circle'
-    };
-    return icons[this.errorCode] || 'question-circle';
-  }
-
-  getIconContainerClass(): string {
-    const classes = {
-      '401': 'w-12 h-12 flex-center-center bg-purple-100 text-purple-600 rounded-full',
-      '403': 'w-12 h-12 flex-center-center bg-red-100 text-red-600 rounded-full',
-      '404': 'w-12 h-12 flex-center-center bg-yellow-100 text-yellow-600 rounded-full',
-      '500': 'w-12 h-12 flex-center-center bg-red-100 text-red-600 rounded-full'
-    };
-    return classes[this.errorCode] || 'w-12 h-12 flex-center-center bg-gray-100 text-gray-600 rounded-full';
-  }
-
-  /** Signed-in users go back to their own area; guests to the public site. */
-  goHome(): void {
-    let roles: string[] | null = null;
-    this.authSrv.role$.subscribe(r => roles = r).unsubscribe();
-    this.router.navigateByUrl(homeRouteFor(roles));
+  private onRetryDone(): void {
+    if (this.destroyed) return;
+    this.state = 'failed';
   }
 }

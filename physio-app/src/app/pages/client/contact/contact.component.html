@@ -1,6 +1,6 @@
 <!-- Intro: breadcrumb, title, lead -->
 <section class="bg-gray-50 border-b border-gray-200">
-  <div class="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 pt-5 pb-7 md:pt-6 md:pb-9 lg:pt-7 lg:pb-10 flex flex-col gap-3.5">
+  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 pb-7 md:pt-6 md:pb-9 lg:pt-7 lg:pb-10 flex flex-col gap-3.5">
     <nav aria-label="Breadcrumb">
       <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600">
         <li><a routerLink="/" class="text-gray-700 hover:text-primaryDeep">Home</a></li>
@@ -27,23 +27,22 @@
 </section>
 
 <!-- Optional notice from tenant settings -->
-<div *ngIf="tenant.notice as n" class="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 pt-5 md:pt-6 lg:pt-7">
+<div *ngIf="tenant.notice as n" class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 md:pt-6 lg:pt-7">
   <div role="region" aria-label="Important notice" class="border border-[#F0D49B] bg-[#FFFBF2] rounded-[14px] px-[18px] py-4 flex gap-3.5 items-start flex-wrap">
     <physio-icon name="info" [size]="20" class="text-[#8A5300] mt-px flex-none" />
     <div class="flex-[1_1_260px]">
       <p class="m-0 text-[15px] font-semibold">{{ n.title }}</p>
       <p class="mt-0.5 mb-0 text-sm leading-[21px] text-gray-800">{{ n.body }}</p>
     </div>
-    <a
+    <a boo-button variant="secondary" class="!border-[#E8C78E]"
       *ngIf="noticePhoneHref as href"
       [href]="href"
-      class="h-11 px-4 border border-[#E8C78E] rounded-[10px] bg-surface font-semibold text-sm flex gap-2 items-center text-gray-900"
     ><physio-icon name="phone" [size]="16" />Call {{ n.phone }}</a>
   </div>
 </div>
 
 <!-- Contact details (each card hides when its setting is missing) -->
-<section *ngIf="infoCards.length" aria-label="Contact details" class="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 pt-5 md:pt-6 lg:pt-7">
+<section *ngIf="infoCards.length" aria-label="Contact details" class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 md:pt-6 lg:pt-7">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4" [ngClass]="infoCols">
     <div *ngFor="let c of infoCards" class="bg-surface border border-gray-200 rounded-2xl p-5 flex flex-col gap-2 min-w-0">
       <span class="w-10 h-10 rounded-xl bg-primarySoft text-primaryDeep flex items-center justify-center mb-1" aria-hidden="true"><physio-icon [name]="c.icon" [size]="18" /></span>
@@ -67,7 +66,7 @@
 </section>
 
 <!-- Form and booking help -->
-<div class="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 pt-7 pb-12 md:pt-8 md:pb-14 lg:pt-10 lg:pb-[72px] grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-6 lg:gap-8 items-start">
+<div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-7 pb-12 md:pt-8 md:pb-14 lg:pt-10 lg:pb-[72px] grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-6 lg:gap-8 items-start">
   <div class="border border-gray-200 rounded-[20px] bg-surface shadow-[0_12px_40px_rgba(38,20,26,.06)] p-5 md:p-8 min-w-0">
     <!-- Success -->
     <div *ngIf="submitState === 'success'" role="status" aria-live="polite" class="flex flex-col gap-3.5 items-start">
@@ -82,10 +81,10 @@
         <span class="text-[13px] leading-5 text-gray-700 mt-1">Keep this if you contact us again about the same enquiry.</span>
       </div>
       <div class="flex gap-2.5 flex-wrap w-full">
-        <a routerLink="/" class="h-12 px-5 rounded-xl bg-primary text-white font-semibold text-[15px] flex items-center justify-center flex-[1_1_100%] md:flex-none hover:bg-primaryHover hover:text-white">Back to homepage</a>
-        <a routerLink="/hospitals" class="h-12 px-5 rounded-xl border border-gray-300 font-semibold text-[15px] flex items-center justify-center text-gray-900 flex-[1_1_100%] md:flex-none">Browse clinics</a>
+        <a boo-button variant="primary" size="lg" routerLink="/" class="flex-[1_1_100%] md:flex-none">Back to homepage</a>
+        <a boo-button variant="secondary" size="lg" routerLink="/hospitals" class="flex-[1_1_100%] md:flex-none">Browse clinics</a>
       </div>
-      <button type="button" (click)="sendAnother()" class="border-0 bg-transparent p-0 min-h-11 text-primaryDeep font-semibold text-sm underline cursor-pointer">Send another message</button>
+      <button boo-button variant="link" (click)="sendAnother()" class="!px-0">Send another message</button>
     </div>
 
     <!-- Form -->
@@ -99,7 +98,7 @@
       <div *ngIf="summary.length" #summaryBox tabindex="-1" role="alert" class="border border-dangerBorder bg-dangerSoft rounded-xl px-4 py-3.5 outline-offset-2">
         <p class="m-0 mb-1.5 text-[15px] font-semibold text-[#7A271A] flex gap-2 items-center"><physio-icon name="circle-alert" [size]="16" class="text-danger" />{{ summaryTitle }}</p>
         <ul class="m-0 pl-7 flex flex-col gap-0.5">
-          <li *ngFor="let s of summary" class="text-[#7A271A]">
+          <li *ngFor="let s of summary; trackBy: trackByField" class="text-[#7A271A]">
             <a href="#" (click)="focusField(s.field, $event)" class="text-sm leading-[22px] text-[#7A271A] underline">{{ s.message }}</a>
           </li>
         </ul>
@@ -223,14 +222,17 @@
 
       <p class="text-[13px] leading-5 text-gray-700 m-0">Submitting this form lets the {{ tenant.name }} team contact you about your enquiry.</p>
 
+      <!-- Disabled while sending (no double submit) and while the form is unavailable. -->
       <button
+        boo-button
         type="submit"
+        variant="primary"
+        size="lg"
+        [loading]="submitState === 'submitting'"
         [disabled]="submitDisabled"
-        [attr.aria-busy]="submitState === 'submitting'"
-        class="h-[52px] w-full md:w-auto md:self-start px-7 border-0 rounded-xl text-white font-semibold text-base flex gap-2.5 items-center justify-center"
-        [ngClass]="failKind === 'unavailable' ? 'bg-gray-400 cursor-not-allowed' : submitState === 'submitting' ? 'bg-primaryHover cursor-not-allowed' : 'bg-primary hover:bg-primaryHover cursor-pointer'"
+        class="w-full md:w-auto md:self-start !gap-2.5"
       >
-        <physio-icon [name]="submitIcon" [size]="18" [class.animate-spin]="submitState === 'submitting'" />{{ submitLabel }}
+        <physio-icon *ngIf="submitState !== 'submitting'" [name]="submitIcon" [size]="18" />{{ submitLabel }}
       </button>
     </form>
   </div>
@@ -240,7 +242,7 @@
     <h2 id="help-h" class="text-xl leading-7 font-semibold m-0">Need help booking?</h2>
     <p class="text-[15px] leading-[23px] text-gray-800 m-0">You can request an appointment online. The clinic will contact you to confirm a time.</p>
     <!-- Requests are made per doctor (there is no /booking route), so this opens the doctor listing. -->
-    <a routerLink="/doctor" class="h-12 px-[18px] border border-primary rounded-xl bg-surface text-primaryDeep font-semibold text-[15px] flex gap-2 items-center justify-center hover:bg-primarySoft">
+    <a boo-button variant="outline" size="lg" routerLink="/doctor">
       <physio-icon name="calendar-plus" [size]="16" />Request an appointment
     </a>
     <ul class="list-none mt-1.5 mb-0 pt-1.5 px-0 border-t border-gray-200 flex flex-col">
@@ -260,7 +262,7 @@
 
 <!-- Clinics -->
 <section aria-labelledby="fc-h" class="bg-gray-50 border-t border-gray-200">
-  <div class="max-w-[1200px] mx-auto px-5 md:px-8 xl:px-0 pt-10 pb-12 md:pt-12 md:pb-14 lg:pt-14 lg:pb-[72px]">
+  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-10 pb-12 md:pt-12 md:pb-14 lg:pt-14 lg:pb-[72px]">
     <div class="flex justify-between items-end gap-4 mb-6 flex-wrap">
       <div class="max-w-[620px]">
         <h2 id="fc-h" class="text-2xl leading-8 md:text-[28px] md:leading-9 font-semibold m-0 mb-1.5">Find a clinic near you</h2>
@@ -291,7 +293,7 @@
       <physio-icon name="cloud-off" [size]="30" class="text-danger inline-flex" />
       <h3 class="text-lg font-semibold mt-3 mb-1.5">Clinics couldn't be loaded</h3>
       <p class="text-[15px] leading-[23px] text-gray-700 m-0 mb-4">You can still send us a message above.</p>
-      <button type="button" (click)="loadClinics()" class="h-11 px-4 rounded-[10px] border border-gray-300 bg-surface font-semibold text-sm inline-flex gap-2 items-center cursor-pointer hover:border-primary hover:text-primaryDeep">
+      <button boo-button variant="secondary" (click)="loadClinics()">
         <physio-icon name="rotate-cw" [size]="16" />Try again
       </button>
     </div>

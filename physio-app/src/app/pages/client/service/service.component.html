@@ -66,44 +66,36 @@
         <option *ngFor="let o of clinics" [value]="o.id">{{ o.name }}</option>
       </select>
     </label>
-    <button
-      *ngIf="chips.length"
-      type="button"
-      (click)="clearAll()"
-      class="h-11 px-1.5 border-0 bg-transparent text-primaryDeep text-sm font-semibold underline cursor-pointer ml-auto"
-    >Clear all filters</button>
+    <button *ngIf="chips.length" boo-button variant="link" (click)="clearAll()" class="ml-auto">Clear all filters</button>
   </div>
 
   <!-- Filter button (mobile) -->
   <div class="md:hidden flex gap-2.5 items-center mb-3.5">
     <button
       #filterButton
-      type="button"
+      boo-button
+      variant="secondary"
+      size="lg"
       (click)="openDrawer()"
       [attr.aria-expanded]="drawerOpen"
       aria-controls="filter-drawer"
-      class="flex-1 h-12 border border-gray-300 rounded-xl bg-surface text-[15px] font-semibold text-gray-900 flex gap-2 items-center justify-center cursor-pointer"
+      class="flex-1"
     >
       <physio-icon name="sliders-horizontal" [size]="18" />{{ filterButtonLabel }}
     </button>
-    <button
-      *ngIf="chips.length"
-      type="button"
-      (click)="clearAll()"
-      class="h-12 px-2.5 border-0 bg-transparent text-primaryDeep text-sm font-semibold underline cursor-pointer"
-    >Clear all</button>
+    <button *ngIf="chips.length" boo-button variant="link" size="lg" (click)="clearAll()">Clear all</button>
   </div>
 
   <!-- Active filter chips -->
   <ul *ngIf="chips.length" aria-label="Active filters" class="list-none m-0 mb-5 p-0 flex gap-2 flex-wrap">
-    <li *ngFor="let c of chips">
+    <li *ngFor="let c of chips; trackBy: trackByLabel" class="max-w-full">
       <button
         type="button"
         (click)="removeChip(c)"
         [attr.aria-label]="'Remove filter ' + c.label"
-        class="h-[34px] pl-3 pr-2 rounded-full border border-primary bg-primarySoft text-primaryDeep text-[13px] font-medium flex gap-1.5 items-center cursor-pointer"
+        class="max-w-full h-[34px] pl-3 pr-2 rounded-full border border-primary bg-primarySoft text-primaryDeep text-[13px] font-medium flex gap-1.5 items-center cursor-pointer whitespace-nowrap"
       >
-        {{ c.label }}<physio-icon name="x" [size]="14" />
+        <span class="truncate">{{ c.label }}</span><physio-icon name="x" [size]="14" class="flex-none" />
       </button>
     </li>
   </ul>
@@ -114,36 +106,29 @@
   </div>
 
   <!-- Error -->
-  <div *ngIf="state === 'error'" role="alert" class="border border-dangerBorder bg-dangerSoft rounded-2xl px-6 py-10 text-center">
-    <physio-icon name="cloud-off" [size]="32" class="text-danger inline-flex" />
-    <h2 class="text-xl font-semibold mt-3.5 mb-1.5">We couldn't load services</h2>
-    <p class="text-[15px] text-gray-700 m-0 mb-5">Check your connection and try again. Your search and filters are kept.</p>
-    <button
-      type="button"
-      (click)="retry()"
-      class="h-11 px-5 border-0 rounded-[10px] bg-primary text-white text-sm font-semibold inline-flex gap-2 items-center cursor-pointer hover:bg-primaryHover"
-    >
-      <physio-icon name="rotate-cw" [size]="16" />Try again
-    </button>
-  </div>
+  <boo-error-state
+    *ngIf="state === 'error'"
+    appearance="panel"
+    icon="cloud-off"
+    title="We couldn't load services"
+    description="Check your connection and try again. Your search and filters are kept."
+    retryLabel="Try again"
+    (retry)="retry()"
+  />
 
   <!-- Empty -->
-  <div *ngIf="state === 'empty'" class="border border-dashed border-gray-300 rounded-2xl px-6 py-12 text-center">
-    <physio-icon name="search-x" [size]="32" class="text-gray-600 inline-flex" />
-    <h2 class="text-xl font-semibold mt-3.5 mb-1.5">No services match your search</h2>
-    <p class="text-[15px] text-gray-700 mx-auto mb-5 max-w-[420px]">
-      Try a shorter or different term, choose another clinic, or clear your filters. You can also contact us to ask about a treatment.
-    </p>
-    <div class="flex gap-2.5 justify-center flex-wrap">
-      <button
-        *ngIf="chips.length"
-        type="button"
-        (click)="clearAll()"
-        class="h-11 px-[18px] border-0 rounded-[10px] bg-primary text-white text-sm font-semibold cursor-pointer hover:bg-primaryHover"
-      >Clear all filters</button>
-      <a routerLink="/contact" class="h-11 px-[18px] border border-gray-300 rounded-[10px] text-sm font-semibold flex items-center text-gray-900 hover:border-primary hover:text-primaryDeep">Contact us</a>
-    </div>
-  </div>
+  <boo-empty-state
+    *ngIf="state === 'empty'"
+    appearance="panel"
+    icon="search-x"
+    [title]="chips.length ? 'No services match your search' : 'No services are listed yet'"
+    [description]="chips.length
+      ? 'Try a shorter or different term, choose another clinic, or clear your filters. You can also contact us to ask about a treatment.'
+      : 'Services appear here once the clinic publishes them. You can still contact us to ask about a treatment.'"
+  >
+    <button *ngIf="chips.length" boo-button variant="primary" (click)="clearAll()">Clear all filters</button>
+    <a boo-button variant="secondary" routerLink="/contact">Contact us</a>
+  </boo-empty-state>
 
   <!-- Results -->
   <ng-container *ngIf="state === 'results'">
@@ -152,34 +137,22 @@
     </ul>
 
     <nav *ngIf="totalPages > 1" aria-label="Pagination" class="flex justify-center md:justify-end items-center gap-1.5 mt-8 flex-wrap">
-      <button
-        type="button"
-        (click)="goToPage(query.page - 1)"
-        [disabled]="query.page <= 1"
-        aria-label="Previous page"
-        class="h-11 w-11 border border-gray-300 rounded-[10px] bg-surface text-gray-900 flex items-center justify-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-      >
+      <button boo-button variant="secondary" [iconOnly]="true" (click)="goToPage(query.page - 1)" [disabled]="query.page <= 1" aria-label="Previous page">
         <physio-icon name="chevron-left" [size]="18" />
       </button>
       <ng-container *ngFor="let p of pages">
         <span *ngIf="p === null" class="h-11 min-w-8 flex items-center justify-center text-gray-600" aria-hidden="true">…</span>
         <button
           *ngIf="p !== null"
-          type="button"
+          boo-button
+          [variant]="p === query.page ? 'primary' : 'secondary'"
           (click)="goToPage(p)"
           [attr.aria-current]="p === query.page ? 'page' : null"
           [attr.aria-label]="'Page ' + p"
-          class="h-11 min-w-11 px-2 border rounded-[10px] text-sm font-semibold cursor-pointer"
-          [ngClass]="p === query.page ? 'border-primary bg-primary text-white' : 'border-gray-300 bg-surface text-gray-900 hover:border-primary'"
+          class="min-w-11 !px-2"
         >{{ p }}</button>
       </ng-container>
-      <button
-        type="button"
-        (click)="goToPage(query.page + 1)"
-        [disabled]="query.page >= totalPages"
-        aria-label="Next page"
-        class="h-11 w-11 border border-gray-300 rounded-[10px] bg-surface text-gray-900 flex items-center justify-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-      >
+      <button boo-button variant="secondary" [iconOnly]="true" (click)="goToPage(query.page + 1)" [disabled]="query.page >= totalPages" aria-label="Next page">
         <physio-icon name="chevron-right" [size]="18" />
       </button>
     </nav>
@@ -198,13 +171,7 @@
   >
     <div class="flex justify-between items-center pl-5 pr-4 pt-4 pb-3 border-b border-gray-200">
       <h2 id="filter-drawer-title" class="text-lg font-semibold m-0">Filters</h2>
-      <button
-        #drawerClose
-        type="button"
-        (click)="closeDrawer()"
-        aria-label="Close filters"
-        class="w-11 h-11 border-0 rounded-[10px] bg-gray-100 flex items-center justify-center cursor-pointer text-gray-900"
-      >
+      <button #drawerClose boo-button variant="subtle" [iconOnly]="true" (click)="closeDrawer()" aria-label="Close filters">
         <physio-icon name="x" [size]="20" />
       </button>
     </div>
@@ -225,16 +192,8 @@
       </p>
     </div>
     <div class="grid grid-cols-[1fr_1.6fr] gap-2.5 px-5 pt-3.5 pb-5 border-t border-gray-200">
-      <button
-        type="button"
-        (click)="clearAll()"
-        class="h-[50px] border border-gray-300 rounded-xl bg-surface text-[15px] font-semibold text-gray-900 cursor-pointer"
-      >Clear all</button>
-      <button
-        type="button"
-        (click)="closeDrawer()"
-        class="h-[50px] border-0 rounded-xl bg-primary text-white text-[15px] font-semibold cursor-pointer"
-      >{{ state === 'loading' ? 'Updating…' : showLabel }}</button>
+      <button boo-button variant="secondary" size="lg" [block]="true" (click)="clearAll()">Clear all</button>
+      <button boo-button variant="primary" size="lg" [block]="true" (click)="closeDrawer()">{{ state === 'loading' ? 'Updating…' : showLabel }}</button>
     </div>
   </div>
 </div>

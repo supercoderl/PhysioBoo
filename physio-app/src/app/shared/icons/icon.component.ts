@@ -4,6 +4,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 const ICON_BASE_PATH = 'assets/icons';
 const svgCache = new Map<string, Promise<string>>();
+// Markup of icons that have finished loading, so new instances can render it without waiting a microtask.
+const svgLoaded = new Map<string, string>();
 
 @Component({
   selector: 'physio-icon',
@@ -44,21 +46,40 @@ export class IconComponent implements OnChanges {
       return;
     }
 
+    // Already loaded: apply it now. Resolving through a promise here schedules a task per new instance, and a
+    // list that re-creates its rows on every change detection (e.g. *ngFor over a getter) then never settles.
+    const loaded = svgLoaded.get(this.name);
+    if (loaded !== undefined) {
+      this.apply(loaded);
+      return;
+    }
+
     let pending = svgCache.get(this.name);
     if (!pending) {
-      pending = fetch(`${ICON_BASE_PATH}/${this.name}.svg`)
+      const name = this.name;
+      pending = fetch(`${ICON_BASE_PATH}/${name}.svg`)
         .then((res) => (res.ok ? res.text() : Promise.reject(res.status)))
         .catch(() => {
-          console.warn(`[physioboo-icons] Icon not found: ${ICON_BASE_PATH}/${this.name}.svg`);
+          console.warn(`[physioboo-icons] Icon not found: ${ICON_BASE_PATH}/${name}.svg`);
           return '';
+        })
+        .then((markup) => {
+          svgLoaded.set(name, markup);
+          return markup;
         });
       svgCache.set(this.name, pending);
     }
 
+    const requested = this.name;
     pending.then((markup) => {
-      this.safeMarkup = this.sanitizer.bypassSecurityTrustHtml(markup);
-      this.height = this.deriveHeight(markup);
+      // The name may have changed while this one was loading.
+      if (requested === this.name) this.apply(markup);
     });
+  }
+
+  private apply(markup: string): void {
+    this.safeMarkup = this.sanitizer.bypassSecurityTrustHtml(markup);
+    this.height = this.deriveHeight(markup);
   }
 
   private deriveHeight(markup: string): number {

@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { hospitalTypeLabel } from '../../../../shared/enums/hospital-type';
 import { SharedModule } from '../../../../shared/shared-imports';
+import { BooButtonComponent } from '../../../button/boo-button/boo-button.component';
 import { PublicHospital } from '../../../../shared/types/public-hospital.types';
 
 /**
@@ -10,7 +11,7 @@ import { PublicHospital } from '../../../../shared/types/public-hospital.types';
 @Component({
   selector: 'clinic-card',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonComponent],
   template: `
     <div *ngIf="skeleton; else card" aria-hidden="true" class="h-full border border-gray-200 rounded-2xl overflow-hidden bg-surface">
       <div class="aspect-[16/10] bg-[#F4ECEF] animate-pulse motion-reduce:animate-none"></div>
@@ -63,18 +64,23 @@ import { PublicHospital } from '../../../../shared/types/public-hospital.types';
             <li *ngFor="let l of h.languages" class="text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-800">{{ l }}</li>
           </ul>
 
-          <div class="mt-auto pt-1 grid grid-cols-2 gap-2">
+          <!-- Actions share a row when they fit and stack when the card is narrow; labels never wrap. -->
+          <div class="mt-auto pt-1 flex flex-wrap gap-2">
             <a
+              boo-button
+              variant="primary"
+              class="flex-[1_1_auto]"
               [routerLink]="['/hospitals', h.id]"
               [attr.aria-label]="'View clinic ' + h.name"
-              class="h-11 rounded-[10px] bg-primary text-white text-sm font-semibold flex items-center justify-center hover:bg-primaryHover hover:text-white"
-            >View Clinic</a>
+            >View clinic</a>
             <a
+              boo-button
+              variant="secondary"
+              class="flex-[1_1_auto]"
               routerLink="/doctor"
               [queryParams]="{ facility: h.id }"
               [attr.aria-label]="'Request appointment at ' + h.name"
-              class="h-11 rounded-[10px] border border-gray-300 bg-surface text-gray-900 text-sm font-semibold flex items-center justify-center text-center leading-tight px-2 hover:border-primary hover:text-primaryDeep"
-            >Request Appointment</a>
+            >Request appointment</a>
           </div>
         </div>
       </article>

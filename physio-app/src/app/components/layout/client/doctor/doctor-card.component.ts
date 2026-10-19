@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { SharedModule } from '../../../../shared/shared-imports';
+import { BooButtonComponent } from '../../../button/boo-button/boo-button.component';
 import { PublicDoctor } from '../../../../shared/types/public-doctor.types';
 
 /**
@@ -10,7 +11,7 @@ import { PublicDoctor } from '../../../../shared/types/public-doctor.types';
 @Component({
   selector: 'doctor-card',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonComponent],
   template: `
     <div *ngIf="skeleton; else card" aria-hidden="true" class="h-full border border-gray-200 rounded-2xl overflow-hidden bg-surface">
       <div class="aspect-[4/3] bg-[#F4ECEF] animate-pulse motion-reduce:animate-none"></div>
@@ -22,7 +23,7 @@ import { PublicDoctor } from '../../../../shared/types/public-doctor.types';
         <span class="h-3 w-[85%] rounded-md bg-[#F7F0F2]"></span>
         <span class="flex gap-2 mt-2.5">
           <span class="flex-1 h-11 rounded-[10px] bg-gray-200"></span>
-          <span class="flex-1 h-11 rounded-[10px] bg-[#F4ECEF]"></span>
+          <span class="flex-[1.4] h-11 rounded-[10px] bg-[#F4ECEF]"></span>
         </span>
       </div>
     </div>
@@ -61,18 +62,23 @@ import { PublicDoctor } from '../../../../shared/types/public-doctor.types';
             <li *ngIf="d.isAvailableHomeVisit" class="text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-800">Home visit</li>
           </ul>
 
-          <div class="mt-auto grid grid-cols-2 gap-2">
+          <!-- Actions share a row when they fit and stack when the card is narrow; labels never wrap. -->
+          <div class="mt-auto flex flex-wrap gap-2">
             <a
+              boo-button
+              variant="primary"
+              class="flex-[1_1_auto]"
               [routerLink]="['/doctor', d.id]"
               [attr.aria-label]="'View profile of ' + d.fullName"
-              class="h-11 rounded-[10px] bg-primary text-white text-sm font-semibold flex items-center justify-center hover:bg-primaryHover hover:text-white"
             >View profile</a>
             <a
+              boo-button
+              variant="secondary"
+              class="flex-[1_1_auto]"
               [routerLink]="['/doctor', d.id]"
               [queryParams]="requestParams"
               fragment="request"
               [attr.aria-label]="'Request appointment with ' + d.fullName"
-              class="h-11 rounded-[10px] border border-gray-300 bg-surface text-gray-900 text-sm font-semibold flex items-center justify-center text-center leading-tight px-2 hover:border-primary hover:text-primaryDeep"
             >Request appointment</a>
           </div>
         </div>

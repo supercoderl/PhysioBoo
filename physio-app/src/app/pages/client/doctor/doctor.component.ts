@@ -3,7 +3,10 @@ import { Component, DestroyRef, ElementRef, HostListener, OnDestroy, OnInit, PLA
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { Subject, catchError, debounceTime, distinctUntilChanged, map, merge, of, switchMap, tap } from 'rxjs';
+import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
 import { DoctorCardComponent } from '../../../components/layout/client/doctor/doctor-card.component';
+import { EmptyStateComponent } from '../../../components/ui/empty-state.component';
+import { ErrorStateComponent } from '../../../components/ui/error-state.component';
 import { PublicDoctorService } from '../../../services/public/public-doctor.service';
 import { SharedModule } from '../../../shared/shared-imports';
 import { PublicDoctor, PublicOption } from '../../../shared/types/public-doctor.types';
@@ -38,7 +41,7 @@ const EMPTY_QUERY: Query = { q: '', specialty: '', facility: '', online: false, 
 @Component({
   selector: 'app-doctor',
   standalone: true,
-  imports: [SharedModule, DoctorCardComponent],
+  imports: [SharedModule, BooButtonComponent, DoctorCardComponent, EmptyStateComponent, ErrorStateComponent],
   templateUrl: './doctor.component.html'
 })
 export class DoctorComponent implements OnInit, OnDestroy {
@@ -48,8 +51,8 @@ export class DoctorComponent implements OnInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  @ViewChild('drawerClose') private drawerClose?: ElementRef<HTMLButtonElement>;
-  @ViewChild('filterButton') private filterButton?: ElementRef<HTMLButtonElement>;
+  @ViewChild('drawerClose', { read: ElementRef }) private drawerClose?: ElementRef<HTMLButtonElement>;
+  @ViewChild('filterButton', { read: ElementRef }) private filterButton?: ElementRef<HTMLButtonElement>;
   @ViewChild('results') private results?: ElementRef<HTMLElement>;
 
   query: Query = { ...EMPTY_QUERY };
@@ -314,4 +317,9 @@ export class DoctorComponent implements OnInit, OnDestroy {
     return options.find(o => o.id === id)?.name ?? fallback;
   }
   // #endregion
+
+  /** Rows are rebuilt by a getter on every check; tracking by label keeps the same DOM nodes. */
+  trackByLabel(_: number, item: { label: string }): string {
+    return item.label;
+  }
 }

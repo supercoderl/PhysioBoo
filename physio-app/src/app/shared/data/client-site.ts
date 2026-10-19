@@ -1,5 +1,6 @@
 // Public site chrome shared by the client header, footer and homepage.
-// Contact details are placeholders until tenant Home settings are wired in.
+// Tenant details are null until a public source exists: Home settings (api/home-settings) is staff-only, so the
+// public site has no endpoint for them yet. Every consumer hides a field that is null; never put placeholder text here.
 
 export interface ClientNavItem {
     title: string;
@@ -11,7 +12,7 @@ export interface ClientNavItem {
 
 export interface ClientTenant {
     name: string;
-    tagline: string;
+    tagline: string | null;
     address: string | null;
     phone: string | null;
     email: string | null;
@@ -28,10 +29,10 @@ export interface ClientTenant {
 
 export const CLIENT_TENANT: ClientTenant = {
     name: 'PhysioBoo',
-    tagline: '[Tenant tagline from Home settings]',
-    address: '[Address]',
-    phone: '[Contact phone]',
-    email: '[Contact email]',
+    tagline: null,
+    address: null,
+    phone: null,
+    email: null,
     showEmergency: false,
     mapUrl: null,
     hoursShort: null,

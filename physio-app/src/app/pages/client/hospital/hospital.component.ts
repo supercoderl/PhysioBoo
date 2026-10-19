@@ -6,6 +6,9 @@ import { Subject, catchError, debounceTime, distinctUntilChanged, map, merge, of
 import { ClinicCardComponent } from '../../../components/layout/client/hospital/clinic-card.component';
 import { PublicHospitalService } from '../../../services/public/public-hospital.service';
 import { HOSPITAL_TYPE_LABELS, HospitalType } from '../../../shared/enums/hospital-type';
+import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
+import { EmptyStateComponent } from '../../../components/ui/empty-state.component';
+import { ErrorStateComponent } from '../../../components/ui/error-state.component';
 import { SharedModule } from '../../../shared/shared-imports';
 import { PublicHospital } from '../../../shared/types/public-hospital.types';
 
@@ -39,7 +42,7 @@ const TYPE_OPTIONS = [HospitalType.Rehabilitation, HospitalType.Clinic, Hospital
 @Component({
   selector: 'app-hospital',
   standalone: true,
-  imports: [SharedModule, ClinicCardComponent],
+  imports: [SharedModule, BooButtonComponent, ClinicCardComponent, EmptyStateComponent, ErrorStateComponent],
   templateUrl: './hospital.component.html'
 })
 export class HospitalComponent implements OnInit, OnDestroy {
@@ -49,8 +52,8 @@ export class HospitalComponent implements OnInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  @ViewChild('drawerClose') private drawerClose?: ElementRef<HTMLButtonElement>;
-  @ViewChild('filterButton') private filterButton?: ElementRef<HTMLButtonElement>;
+  @ViewChild('drawerClose', { read: ElementRef }) private drawerClose?: ElementRef<HTMLButtonElement>;
+  @ViewChild('filterButton', { read: ElementRef }) private filterButton?: ElementRef<HTMLButtonElement>;
   @ViewChild('results') private results?: ElementRef<HTMLElement>;
 
   query: Query = { ...EMPTY_QUERY };
@@ -271,4 +274,9 @@ export class HospitalComponent implements OnInit, OnDestroy {
     return h.id;
   }
   // #endregion
+
+  /** Rows are rebuilt by a getter on every check; tracking by label keeps the same DOM nodes. */
+  trackByLabel(_: number, item: { label: string }): string {
+    return item.label;
+  }
 }

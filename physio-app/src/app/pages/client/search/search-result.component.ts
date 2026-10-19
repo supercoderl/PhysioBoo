@@ -48,13 +48,13 @@ const KIND: Record<SearchResultKind, { icon: string; action: string }> = {
     </div>
 
     <ng-template #item>
-      <article *ngIf="row as r" class="bg-surface border border-gray-200 rounded-2xl p-4 md:px-5 md:py-[18px] flex gap-4 items-start md:items-center min-w-0 text-gray-900 hover:border-[#E3C4CE]">
+      <article *ngIf="row as r" class="bg-surface border border-gray-200 rounded-2xl p-4 md:px-5 md:py-[18px] flex gap-4 items-start md:items-center min-w-0 text-gray-900 motion-card">
         <span
           *ngIf="r.kind === 'doctor'"
           aria-hidden="true"
           class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-primarySoft text-primaryDeep font-semibold text-lg flex items-center justify-center flex-none overflow-hidden"
         >
-          <img *ngIf="showImage; else initialsTpl" [src]="r.imageUrl" alt="" class="w-full h-full object-cover" (error)="imageFailed = true" />
+          <img *ngIf="showImage; else initialsTpl" [src]="r.imageUrl" alt="" appImgFade class="w-full h-full object-cover" (error)="imageFailed = true" />
           <ng-template #initialsTpl>{{ initials }}</ng-template>
         </span>
         <span
@@ -62,7 +62,7 @@ const KIND: Record<SearchResultKind, { icon: string; action: string }> = {
           aria-hidden="true"
           class="w-14 h-14 md:w-[88px] md:h-[72px] rounded-xl bg-[#FAF1F3] text-[#B8A3AC] flex items-center justify-center flex-none overflow-hidden"
         >
-          <img *ngIf="showImage; else iconTpl" [src]="r.imageUrl" alt="" class="w-full h-full object-cover" (error)="imageFailed = true" />
+          <img *ngIf="showImage; else iconTpl" [src]="r.imageUrl" alt="" appImgFade class="w-full h-full object-cover" (error)="imageFailed = true" />
           <ng-template #iconTpl><physio-icon [name]="icon" [size]="24" /></ng-template>
         </span>
 
@@ -80,7 +80,7 @@ const KIND: Record<SearchResultKind, { icon: string; action: string }> = {
           <a
             [routerLink]="r.link"
             [attr.aria-label]="ariaAction"
-            class="md:hidden min-h-11 flex gap-1.5 items-center text-[15px] font-semibold text-primaryDeep self-start"
+            class="md:hidden min-h-11 flex gap-1.5 items-center text-[15px] font-semibold text-primaryDeep self-start motion-arrow"
           >{{ action }}<physio-icon name="arrow-right" [size]="16" /></a>
         </div>
 

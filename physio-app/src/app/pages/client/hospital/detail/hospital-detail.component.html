@@ -60,7 +60,7 @@
   <!-- Photo -->
   <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-4 md:pt-6 lg:pt-8">
     <div class="relative aspect-[4/3] md:aspect-[21/8] rounded-[20px] overflow-hidden" [ngClass]="c.imageUrl && !imageFailed ? 'ph-stripes' : 'bg-[#FAF5F7]'">
-      <img
+      <img appImgFade
         *ngIf="c.imageUrl && !imageFailed"
         [src]="c.imageUrl"
         [alt]="'Photo of ' + c.name"
@@ -80,7 +80,7 @@
       <section aria-labelledby="cl-name" class="flex flex-col gap-3.5">
         <div class="flex gap-4 items-center">
           <span *ngIf="c.logoUrl && !logoFailed" class="w-16 h-16 flex-none rounded-[14px] border border-gray-200 bg-surface overflow-hidden flex items-center justify-center">
-            <img [src]="c.logoUrl" [alt]="c.name + ' logo'" class="max-w-full max-h-full object-contain" (error)="logoFailed = true" />
+            <img appImgFade [src]="c.logoUrl" [alt]="c.name + ' logo'" class="max-w-full max-h-full object-contain" (error)="logoFailed = true" />
           </span>
           <div class="flex flex-col gap-1.5 min-w-0">
             <span class="text-sm font-semibold text-primaryDeep">{{ typeLabel }}</span>
@@ -111,7 +111,7 @@
       </section>
 
       <!-- Doctors -->
-      <section *ngIf="doctors.length" aria-labelledby="dr-h" class="flex flex-col gap-5 pt-8 md:pt-10 border-t border-gray-200">
+      <section appReveal *ngIf="doctors.length" aria-labelledby="dr-h" class="flex flex-col gap-5 pt-8 md:pt-10 border-t border-gray-200">
         <div class="flex justify-between items-end gap-4 flex-wrap">
           <div>
             <h2 id="dr-h" class="text-2xl leading-8 font-semibold m-0 mb-1">Doctors at this clinic</h2>
@@ -127,7 +127,7 @@
       </section>
 
       <!-- Services -->
-      <section *ngIf="c.services.length" aria-labelledby="sv-h" class="flex flex-col gap-4 pt-8 md:pt-10 border-t border-gray-200">
+      <section appReveal *ngIf="c.services.length" aria-labelledby="sv-h" class="flex flex-col gap-4 pt-8 md:pt-10 border-t border-gray-200">
         <h2 id="sv-h" class="text-2xl leading-8 font-semibold m-0">Services</h2>
         <ul class="list-none m-0 p-0 flex gap-2 flex-wrap">
           <li *ngFor="let s of c.services" class="min-h-9 px-3.5 py-1.5 rounded-[10px] border border-gray-300 text-[15px] text-gray-800 flex items-center">{{ s }}</li>

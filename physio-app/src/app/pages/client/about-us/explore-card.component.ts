@@ -9,7 +9,7 @@ import { SharedModule } from '../../../shared/shared-imports';
   imports: [SharedModule, BooButtonComponent],
   host: { class: 'block h-full' },
   template: `
-    <article class="h-full bg-surface border border-gray-200 rounded-[20px] p-7 flex flex-col gap-3 text-gray-900 min-w-0 transition-shadow hover:border-[#E3C4CE] hover:shadow-[0_12px_32px_rgba(38,20,26,.06)]">
+    <article class="h-full bg-surface border border-gray-200 rounded-[20px] p-7 flex flex-col gap-3 text-gray-900 min-w-0 motion-card">
       <span aria-hidden="true" class="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-200 text-primaryDeep flex items-center justify-center mb-1"><physio-icon [name]="icon" [size]="24" /></span>
       <h3 class="text-xl leading-7 font-semibold m-0">{{ title }}</h3>
       <p class="text-[15px] leading-[23px] text-gray-800 m-0 flex-1 text-pretty">{{ body }}</p>

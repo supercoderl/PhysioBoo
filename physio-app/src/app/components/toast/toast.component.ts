@@ -1,7 +1,9 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { ToastService } from '../../services/common/toast.service';
 import { SharedModule } from '../../shared/shared-imports';
+import { isPublicUrl, motionState } from '../../shared/utils/motion.utils';
 import { Toast, ToastType } from '../../shared/types/toast.types';
 
 @Component({
@@ -11,13 +13,28 @@ import { Toast, ToastType } from '../../shared/types/toast.types';
         SharedModule
     ],
     animations: [
+        // 'admin' is the original behaviour of this shared component; 'full' / 'reduced' are the public-site motion.
         trigger('toastAnimation', [
-            transition(':enter', [
+            transition('void => admin', [
                 style({ transform: 'translateX(100%)', opacity: 0 }),
                 animate('300ms cubic-bezier(0.25, 0.8, 0.25, 1)', style({ transform: 'translateX(0)', opacity: 1 }))
             ]),
-            transition(':leave', [
+            transition('admin => void', [
                 animate('200ms ease-in', style({ transform: 'translateX(100%)', opacity: 0 }))
+            ]),
+            transition('void => full', [
+                style({ transform: 'translateX(16px)', opacity: 0 }),
+                animate('240ms cubic-bezier(0.22, 1, 0.36, 1)', style({ transform: 'none', opacity: 1 }))
+            ]),
+            transition('full => void', [
+                animate('160ms cubic-bezier(0.4, 0, 1, 1)', style({ transform: 'translateX(8px)', opacity: 0 }))
+            ]),
+            transition('void => reduced', [
+                style({ opacity: 0 }),
+                animate('100ms linear', style({ opacity: 1 }))
+            ]),
+            transition('reduced => void', [
+                animate('80ms linear', style({ opacity: 0 }))
             ])
         ]),
         trigger('shakeAnimation', [
@@ -39,13 +56,13 @@ import { Toast, ToastType } from '../../shared/types/toast.types';
         <div class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none">
             <div 
                 *ngFor="let toast of toastService.toasts(); trackBy: trackById" 
-                [@toastAnimation]
-                [@shakeAnimation]="toast.shakeTrigger"
+                [@toastAnimation]="mode"
+                [@shakeAnimation]="mode === 'admin' ? toast.shakeTrigger : 0"
                 class="
                     relative pointer-events-auto w-80 shadow-lg rounded-lg border-l-4 p-4 bg-surface 
-                    flex items-start gap-3 transition-all hover:scale-[1.02]
+                    flex items-start gap-3
                 "
-                [ngClass]="getClasses(toast.type)"
+                [ngClass]="[getClasses(toast.type), mode === 'admin' ? 'transition-all hover:scale-[1.02]' : '']"
             >
                 <div class="w-6 h-6 flex-shrink-0 flex items-center justify-center">
                     <physio-icon 
@@ -83,6 +100,13 @@ import { Toast, ToastType } from '../../shared/types/toast.types';
 export class ToastComponent {
     // #region Inputs, Outputs, Properties
     toastService = inject(ToastService);
+    private readonly router = inject(Router);
+    private readonly motion = motionState();
+
+    /** Public pages get the public motion; every other area keeps the original behaviour. */
+    get mode(): 'admin' | 'full' | 'reduced' {
+        return isPublicUrl(this.router.url) ? this.motion : 'admin';
+    }
     // #endregion
 
     // #region Methods

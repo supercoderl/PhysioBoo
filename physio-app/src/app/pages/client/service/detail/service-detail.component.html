@@ -91,7 +91,7 @@
     </div>
 
     <div class="relative aspect-[4/3] rounded-[20px] overflow-hidden" [ngClass]="s.coverImageUrl && !imageFailed ? 'ph-stripes' : 'bg-[#FAF5F7]'">
-      <img
+      <img appImgFade
         *ngIf="s.coverImageUrl && !imageFailed"
         [src]="s.coverImageUrl"
         alt=""
@@ -106,7 +106,7 @@
 
   <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-8 pb-12 md:pt-9 md:pb-16 lg:pt-10 lg:pb-20 flex flex-col gap-8 md:gap-10">
     <!-- About: the description after its first paragraph -->
-    <section *ngIf="paragraphs.length" aria-labelledby="ov-h" class="flex flex-col gap-4 pt-8 md:pt-10 border-t border-gray-200">
+    <section appReveal *ngIf="paragraphs.length" aria-labelledby="ov-h" class="flex flex-col gap-4 pt-8 md:pt-10 border-t border-gray-200">
       <h2 id="ov-h" class="text-2xl leading-8 font-semibold m-0">About this service</h2>
       <div class="flex flex-col gap-3.5 max-w-[720px]">
         <p *ngFor="let p of paragraphs" class="text-base leading-[27px] text-gray-800 m-0 text-pretty whitespace-pre-line">{{ p }}</p>
@@ -114,7 +114,7 @@
     </section>
 
     <!-- Clinic -->
-    <section *ngIf="s.clinic" aria-labelledby="cl-h" class="flex flex-col gap-5 pt-8 md:pt-10 border-t border-gray-200">
+    <section appReveal *ngIf="s.clinic" aria-labelledby="cl-h" class="flex flex-col gap-5 pt-8 md:pt-10 border-t border-gray-200">
       <div>
         <h2 id="cl-h" class="text-2xl leading-8 font-semibold m-0 mb-1">Where it's offered</h2>
         <p class="text-[15px] text-gray-700 m-0">This service is listed at one clinic.</p>
@@ -125,7 +125,7 @@
     </section>
 
     <!-- Doctors -->
-    <section *ngIf="s.doctors.length" id="svc-doctors" aria-labelledby="dr-h" class="flex flex-col gap-5 pt-8 md:pt-10 border-t border-gray-200 scroll-mt-24">
+    <section appReveal *ngIf="s.doctors.length" id="svc-doctors" aria-labelledby="dr-h" class="flex flex-col gap-5 pt-8 md:pt-10 border-t border-gray-200 scroll-mt-24">
       <div>
         <h2 #doctorsHeading id="dr-h" tabindex="-1" class="text-2xl leading-8 font-semibold m-0 mb-1 outline-none">{{ doctorsTitle }}</h2>
         <p class="text-[15px] text-gray-700 m-0">{{ doctorsNote }}</p>

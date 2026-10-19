@@ -23,7 +23,7 @@ import { PublicArticle } from '../../../../shared/types/public-article.types';
       <a
         *ngIf="article as a"
         [routerLink]="['/blog', a.id]"
-        class="h-full flex flex-col border border-gray-200 rounded-2xl overflow-hidden bg-surface text-gray-900 hover:text-gray-900 hover:shadow-[0_12px_32px_rgba(38,20,26,.08)] transition-shadow"
+        class="h-full flex flex-col border border-gray-200 rounded-2xl overflow-hidden bg-surface text-gray-900 hover:text-gray-900 motion-card motion-card-lift"
       >
         <div class="relative aspect-[16/10] bg-[#FAF5F7]">
           <img
@@ -31,7 +31,8 @@ import { PublicArticle } from '../../../../shared/types/public-article.types';
             [src]="a.coverImageUrl"
             alt=""
             loading="lazy"
-            class="absolute inset-0 w-full h-full object-cover"
+            appImgFade
+            class="absolute inset-0 w-full h-full object-cover motion-zoom"
             (error)="imageFailed = true"
           />
           <span *ngIf="!a.coverImageUrl || imageFailed" class="absolute inset-0 flex items-center justify-center text-[#C9B9C0]" aria-hidden="true">
@@ -54,7 +55,7 @@ import { PublicArticle } from '../../../../shared/types/public-article.types';
               <physio-icon name="clock" [size]="13" />{{ a.readTime }}
             </span>
           </div>
-          <span class="pt-1.5 text-sm font-semibold text-primaryDeep flex gap-1.5 items-center" [class.mt-auto]="!showMeta || !(a.author || a.readTime)">
+          <span class="motion-arrow pt-1.5 text-sm font-semibold text-primaryDeep flex gap-1.5 items-center" [class.mt-auto]="!showMeta || !(a.author || a.readTime)">
             {{ ctaLabel }}<physio-icon name="arrow-right" [size]="15" />
           </span>
         </div>

@@ -163,12 +163,12 @@
 
       <!-- Active filter chips -->
       <ul *ngIf="chips.length" aria-label="Active filters" class="list-none m-0 p-0 flex gap-2 flex-wrap">
-        <li *ngFor="let c of chips; trackBy: trackByLabel">
+        <li *ngFor="let c of chips; trackBy: trackByLabel" [@chipPop]="motion">
           <button
             type="button"
             (click)="removeChip(c)"
             [attr.aria-label]="'Remove filter: ' + c.label"
-            class="min-h-9 pl-3 pr-2 border border-primary rounded-full bg-primarySoft text-sm font-medium text-primaryDeep flex gap-1.5 items-center cursor-pointer"
+            class="min-h-9 pl-3 pr-2 border border-primary rounded-full bg-primarySoft text-sm font-medium text-primaryDeep flex gap-1.5 items-center cursor-pointer motion-chip"
           >{{ c.label }}<physio-icon name="x" [size]="14" /></button>
         </li>
       </ul>
@@ -248,14 +248,14 @@
             (retry)="retrySection(k)"
             class="hidden md:block"
           />
-          <search-result *ngFor="let r of overview[k].rows" [row]="r" />
+          <search-result *ngFor="let r of overview[k].rows" [row]="r" class="motion-fade" />
         </section>
       </div>
 
       <!-- Category tab -->
       <ng-container *ngIf="view === 'results' && query.tab !== 'all'">
         <div class="flex flex-col gap-3">
-          <search-result *ngFor="let r of tabRows" [row]="r" />
+          <search-result *ngFor="let r of tabRows" [row]="r" class="motion-fade" />
         </div>
         <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between mt-2">
           <p class="m-0 text-sm text-gray-700">{{ pagerLabel }}</p>

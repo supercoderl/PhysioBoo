@@ -29,13 +29,14 @@ import { PublicHospital } from '../../../../shared/types/public-hospital.types';
     </div>
 
     <ng-template #card>
-      <article *ngIf="hospital as h" class="h-full flex flex-col border border-gray-200 rounded-2xl overflow-hidden bg-surface hover:shadow-[0_12px_32px_rgba(38,20,26,.08)] transition-shadow">
+      <article *ngIf="hospital as h" class="h-full flex flex-col border border-gray-200 rounded-2xl overflow-hidden bg-surface motion-card">
         <div class="relative aspect-[16/10] bg-[#FAF5F7]">
           <img
             *ngIf="h.imageUrl && !imageFailed"
             [src]="h.imageUrl"
             [alt]="'Photo of ' + h.name"
             loading="lazy"
+            appImgFade
             class="absolute inset-0 w-full h-full object-cover"
             (error)="imageFailed = true"
           />

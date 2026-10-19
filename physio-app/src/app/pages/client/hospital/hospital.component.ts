@@ -9,7 +9,9 @@ import { HOSPITAL_TYPE_LABELS, HospitalType } from '../../../shared/enums/hospit
 import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
 import { EmptyStateComponent } from '../../../components/ui/empty-state.component';
 import { ErrorStateComponent } from '../../../components/ui/error-state.component';
+import { chipPop, drawerSheet } from '../../../shared/animations/motion.animation';
 import { SharedModule } from '../../../shared/shared-imports';
+import { motionState } from '../../../shared/utils/motion.utils';
 import { PublicHospital } from '../../../shared/types/public-hospital.types';
 
 type ListState = 'loading' | 'results' | 'empty' | 'error';
@@ -43,9 +45,13 @@ const TYPE_OPTIONS = [HospitalType.Rehabilitation, HospitalType.Clinic, Hospital
   selector: 'app-hospital',
   standalone: true,
   imports: [SharedModule, BooButtonComponent, ClinicCardComponent, EmptyStateComponent, ErrorStateComponent],
-  templateUrl: './hospital.component.html'
+  templateUrl: './hospital.component.html',
+  animations: [chipPop, drawerSheet]
 })
 export class HospitalComponent implements OnInit, OnDestroy {
+  /** 'reduced' limits chips and drawers to a short opacity fade. */
+  readonly motion = motionState();
+
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly hospitalSrv = inject(PublicHospitalService);

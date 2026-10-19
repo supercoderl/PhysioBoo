@@ -44,8 +44,9 @@
           </button>
           <div
             *ngIf="langOpen"
+            [@menuPop]="motion"
             role="menu"
-            class="absolute top-[46px] right-0 w-[200px] bg-surface border border-gray-200 rounded-xl shadow-[0_12px_32px_rgba(38,20,26,.12)] p-1.5 z-10"
+            class="absolute top-[46px] right-0 w-[200px] bg-surface border border-gray-200 rounded-xl shadow-[0_12px_32px_rgba(38,20,26,.12)] p-1.5 z-10 origin-top-right"
           >
             <div role="menuitemradio" aria-checked="true" class="px-3 py-2.5 rounded-lg bg-gray-100 text-sm font-medium flex justify-between items-center">
               English <physio-icon name="check" [size]="16" class="text-primary" />
@@ -87,7 +88,7 @@
 </div>
 
 <!-- Mobile menu -->
-<div *ngIf="isOpen" class="xl:hidden fixed inset-0 bg-surface z-[1000] flex flex-col overflow-y-auto" role="dialog" aria-modal="true" aria-label="Menu">
+<div *ngIf="isOpen" [@menuPanel]="motion" class="xl:hidden fixed inset-0 bg-surface z-[1000] flex flex-col overflow-y-auto" role="dialog" aria-modal="true" aria-label="Menu">
   <div class="h-16 pl-5 pr-3 flex items-center justify-between border-b border-gray-200 flex-none">
     <img src="assets/logo/logo.webp" [alt]="tenant.name" class="h-6" />
     <button boo-button variant="subtle" [iconOnly]="true" (click)="closeMenu()" aria-label="Close menu">
@@ -101,7 +102,7 @@
       [fragment]="item.fragment"
       (click)="closeMenu()"
       [attr.aria-current]="isActive(item) ? 'page' : null"
-      class="h-13 px-3.5 rounded-[10px] flex items-center justify-between text-[17px]"
+      class="h-13 px-3.5 rounded-[10px] flex items-center justify-between text-[17px] transition-colors duration-150"
       [ngClass]="isActive(item) ? 'font-semibold bg-primarySoft text-primaryDeep' : 'font-medium text-gray-900'"
     >
       {{ item.title }}

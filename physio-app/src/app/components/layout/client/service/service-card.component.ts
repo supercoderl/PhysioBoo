@@ -29,13 +29,14 @@ import { PublicService } from '../../../../shared/types/public-service.types';
     </div>
 
     <ng-template #card>
-      <article *ngIf="service as s" class="h-full flex flex-col border border-gray-200 rounded-2xl overflow-hidden bg-surface hover:shadow-[0_12px_32px_rgba(38,20,26,.08)] transition-shadow">
+      <article *ngIf="service as s" class="h-full flex flex-col border border-gray-200 rounded-2xl overflow-hidden bg-surface motion-card">
         <div class="relative aspect-[16/10] bg-[#FAF5F7]">
           <img
             *ngIf="s.coverImageUrl && !imageFailed"
             [src]="s.coverImageUrl"
             alt=""
             loading="lazy"
+            appImgFade
             class="absolute inset-0 w-full h-full object-cover"
             (error)="imageFailed = true"
           />

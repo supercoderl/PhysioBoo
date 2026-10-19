@@ -29,13 +29,14 @@ import { PublicDoctor } from '../../../../shared/types/public-doctor.types';
     </div>
 
     <ng-template #card>
-      <article *ngIf="doctor as d" class="h-full flex flex-col border border-gray-200 rounded-2xl overflow-hidden bg-surface hover:shadow-[0_12px_32px_rgba(38,20,26,.08)] transition-shadow">
+      <article *ngIf="doctor as d" class="h-full flex flex-col border border-gray-200 rounded-2xl overflow-hidden bg-surface motion-card">
         <div class="relative aspect-[4/3] ph-stripes">
           <img
             *ngIf="d.avatarUrl && !imageFailed"
             [src]="d.avatarUrl"
             [alt]="'Photo of ' + d.fullName"
             loading="lazy"
+            appImgFade
             class="absolute inset-0 w-full h-full object-cover"
             (error)="imageFailed = true"
           />

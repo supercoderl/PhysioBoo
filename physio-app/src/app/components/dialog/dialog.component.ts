@@ -1,8 +1,10 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, HostListener, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { DialogService } from '../../services/common/dialog.service';
 import { SharedModule } from '../../shared/shared-imports'; // Nơi chứa CommonModule, Icons...
 import { DialogType } from '../../shared/types/dialog.types';
+import { isPublicUrl, motionState } from '../../shared/utils/motion.utils';
 import { BooButtonAdminComponent } from '../button/boo-button-admin/boo-button-admin.component';
 
 @Component({
@@ -10,22 +12,51 @@ import { BooButtonAdminComponent } from '../button/boo-button-admin/boo-button-a
   standalone: true,
   imports: [SharedModule, BooButtonAdminComponent],
   animations: [
+    // 'admin' is the original behaviour of this shared component; 'full' / 'reduced' are the public-site motion.
     trigger('backdrop', [
-      transition(':enter', [
+      transition('void => admin', [
         style({ opacity: 0 }),
         animate('200ms ease-out', style({ opacity: 1 }))
       ]),
-      transition(':leave', [
+      transition('admin => void', [
         animate('150ms ease-in', style({ opacity: 0 }))
+      ]),
+      transition('void => full', [
+        style({ opacity: 0 }),
+        animate('200ms cubic-bezier(0.22, 1, 0.36, 1)', style({ opacity: 1 }))
+      ]),
+      transition('full => void', [
+        animate('150ms cubic-bezier(0.4, 0, 1, 1)', style({ opacity: 0 }))
+      ]),
+      transition('void => reduced', [
+        style({ opacity: 0 }),
+        animate('100ms linear', style({ opacity: 1 }))
+      ]),
+      transition('reduced => void', [
+        animate('80ms linear', style({ opacity: 0 }))
       ])
     ]),
     trigger('modal', [
-      transition(':enter', [
+      transition('void => admin', [
         style({ opacity: 0, transform: 'scale(0.95) translateY(10px)' }),
         animate('200ms cubic-bezier(0.16, 1, 0.3, 1)', style({ opacity: 1, transform: 'scale(1) translateY(0)' }))
       ]),
-      transition(':leave', [
+      transition('admin => void', [
         animate('150ms ease-in', style({ opacity: 0, transform: 'scale(0.95)' }))
+      ]),
+      transition('void => full', [
+        style({ opacity: 0, transform: 'scale(0.96) translateY(8px)' }),
+        animate('200ms cubic-bezier(0.22, 1, 0.36, 1)', style({ opacity: 1, transform: 'none' }))
+      ]),
+      transition('full => void', [
+        animate('150ms cubic-bezier(0.4, 0, 1, 1)', style({ opacity: 0, transform: 'scale(0.98)' }))
+      ]),
+      transition('void => reduced', [
+        style({ opacity: 0 }),
+        animate('100ms linear', style({ opacity: 1 }))
+      ]),
+      transition('reduced => void', [
+        animate('80ms linear', style({ opacity: 0 }))
       ])
     ])
   ],
@@ -34,13 +65,14 @@ import { BooButtonAdminComponent } from '../button/boo-button-admin/boo-button-a
       <div class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
         
         <div 
-          @backdrop
-          class="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          [@backdrop]="mode"
+          class="absolute inset-0 bg-black/40"
+          [class.backdrop-blur-sm]="mode === 'admin'"
           (click)="dialogService.close()"
         ></div>
 
         <div 
-          @modal
+          [@modal]="mode"
           class="relative bg-surface rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100"
         >
           <div class="px-6 py-5 border-b border-gray-100 flex items-start gap-4">
@@ -81,6 +113,13 @@ import { BooButtonAdminComponent } from '../button/boo-button-admin/boo-button-a
 export class DialogComponent {
   // #region Inputs, Outputs, Properties
   dialogService = inject(DialogService);
+  private readonly router = inject(Router);
+  private readonly motion = motionState();
+
+  /** Public pages get the public motion (and no backdrop blur); every other area keeps the original behaviour. */
+  get mode(): 'admin' | 'full' | 'reduced' {
+    return isPublicUrl(this.router.url) ? this.motion : 'admin';
+  }
   // #endregion
 
   // #region Methods

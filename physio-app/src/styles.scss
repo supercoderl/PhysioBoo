@@ -135,3 +135,214 @@ body {
     display: none !important;
   }
 }
+
+/* ------------------------------------------------------------------------------------------------
+   Public-site motion system (docs/public-motion-redesign.md)
+   Everything below is progressive enhancement: with no JavaScript every element is visible and static.
+   Scoped to `.public-motion` (the client layout) so admin, patient and auth pages are unaffected.
+   ------------------------------------------------------------------------------------------------ */
+:root {
+  --motion-fast: 150ms;
+  --motion-base: 220ms;
+  --motion-slow: 280ms;
+  --motion-reveal: 400ms;
+  --motion-stagger: 60ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* Colour/border changes on controls and links; :where() keeps specificity at zero so utility classes still win. */
+:where(.public-motion) a {
+  transition: color var(--motion-fast) var(--ease-in-out), text-decoration-color var(--motion-fast) var(--ease-in-out);
+}
+:where(.public-motion) :is(input, select, textarea) {
+  transition: border-color var(--motion-fast) var(--ease-in-out), box-shadow var(--motion-fast) var(--ease-in-out),
+    background-color var(--motion-fast) var(--ease-in-out);
+}
+
+/* Pressed feedback for the design-system button (only buttons with a variant get the `border` class). */
+.public-motion [boo-button]:not(:disabled):not([aria-disabled='true']):active {
+  transform: scale(0.98);
+}
+
+/* Scroll reveal. The hidden state is added by the appReveal directive after hydration, only to content below the fold. */
+.motion-pre {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.motion-reveal {
+  transition: opacity var(--motion-reveal) var(--ease-out), transform var(--motion-reveal) var(--ease-out);
+}
+
+/* Cards: shadow + border (non-clickable cards) and a restrained lift (whole-card links). */
+.motion-card {
+  transition: box-shadow var(--motion-base) var(--ease-in-out), border-color var(--motion-base) var(--ease-in-out),
+    transform var(--motion-base) var(--ease-in-out);
+}
+.motion-card:hover,
+.motion-card:focus-within {
+  box-shadow: 0 12px 32px rgb(38 20 26 / 0.08);
+  border-color: #e3d5da;
+}
+:root.dark .motion-card:hover,
+:root.dark .motion-card:focus-within {
+  border-color: rgb(var(--twc-placeholder) / 0.5);
+}
+@media (hover: hover) {
+  .motion-card-lift:hover {
+    transform: translateY(-3px);
+  }
+}
+.motion-card-lift:focus-visible {
+  transform: translateY(-3px);
+}
+.motion-card-lift:active {
+  transform: translateY(0);
+  transition-duration: 100ms;
+}
+.motion-zoom {
+  transition: transform 300ms var(--ease-out);
+}
+.motion-card-lift:hover .motion-zoom,
+.motion-card-lift:focus-visible .motion-zoom {
+  transform: scale(1.03);
+}
+
+/* Arrow icon at the end of a link nudges right. */
+.motion-arrow > physio-icon:last-child {
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+.motion-arrow:hover > physio-icon:last-child,
+.motion-arrow:focus-visible > physio-icon:last-child,
+.motion-card-lift:hover .motion-arrow > physio-icon:last-child,
+.motion-card-lift:focus-visible .motion-arrow > physio-icon:last-child {
+  transform: translateX(3px);
+}
+
+/* Chips and pill buttons that are plain <button>s. */
+.motion-chip {
+  transition: color var(--motion-fast) var(--ease-in-out), background-color var(--motion-fast) var(--ease-in-out),
+    border-color var(--motion-fast) var(--ease-in-out), transform 100ms var(--ease-in-out);
+}
+.motion-chip:active {
+  transform: scale(0.98);
+}
+
+/* Specialty tiles and similar: accent border on hover/focus. */
+@media (hover: hover) {
+  .motion-card-accent:hover {
+    border-color: rgb(var(--twc-primary));
+  }
+}
+.motion-card-accent:focus-visible {
+  border-color: rgb(var(--twc-primary));
+}
+
+/* Image fade-in; the directive adds .motion-img-pending only while the image is still loading. */
+.motion-img {
+  transition: opacity 200ms var(--ease-out);
+}
+.motion-img-pending {
+  opacity: 0;
+}
+
+/* Results updating and route changes: opacity only. */
+@keyframes motion-fade {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+.motion-fade {
+  animation: motion-fade 180ms var(--ease-out) backwards;
+}
+@keyframes motion-route {
+  from { opacity: 0.25; }
+  to { opacity: 1; }
+}
+.motion-route {
+  animation: motion-route 180ms var(--ease-out) backwards;
+}
+
+/* Inline feedback (validation text, banners, success panel). The text is in the DOM and announced from the first frame. */
+@keyframes motion-feedback {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.motion-feedback {
+  animation: motion-feedback 180ms var(--ease-out) backwards;
+}
+.motion-feedback-lg {
+  animation-duration: var(--motion-slow);
+}
+
+/* Height collapse without measuring: the inner element must be the only child. */
+.motion-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--motion-base) var(--ease-in-out);
+}
+.motion-collapse > * {
+  min-height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  transition: visibility 0s linear var(--motion-base);
+}
+.motion-collapse.is-open {
+  grid-template-rows: 1fr;
+}
+.motion-collapse.is-open > * {
+  visibility: visible;
+  transition-delay: 0s;
+}
+.motion-icon-swap {
+  transition: transform var(--motion-base) var(--ease-in-out);
+}
+.motion-icon-swap.is-open {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-motion [boo-button]:active,
+  .motion-chip:active,
+  .motion-card-lift:hover,
+  .motion-card-lift:focus-visible,
+  .motion-card-lift:active,
+  .motion-card-lift:hover .motion-zoom,
+  .motion-card-lift:focus-visible .motion-zoom,
+  .motion-arrow:hover > physio-icon:last-child,
+  .motion-arrow:focus-visible > physio-icon:last-child,
+  .motion-card-lift:hover .motion-arrow > physio-icon:last-child,
+  .motion-card-lift:focus-visible .motion-arrow > physio-icon:last-child {
+    transform: none;
+  }
+  .motion-pre {
+    opacity: 1;
+    transform: none;
+  }
+  .motion-reveal,
+  .motion-zoom,
+  .motion-chip,
+  .motion-img,
+  .motion-collapse,
+  .motion-collapse > *,
+  .motion-icon-swap,
+  .motion-arrow > physio-icon:last-child {
+    transition: none;
+  }
+  .motion-fade,
+  .motion-route {
+    animation: none;
+  }
+  .motion-feedback {
+    animation-name: motion-fade;
+    animation-duration: 100ms;
+  }
+}
+
+@media print {
+  .motion-pre,
+  .motion-img-pending {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

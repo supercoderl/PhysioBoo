@@ -33,7 +33,7 @@
 
 <!-- Error -->
 <div *ngIf="state === 'error'" class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 lg:pt-10 lg:pb-20">
-  <div role="alert" class="border border-dangerBorder bg-dangerSoft rounded-2xl px-6 py-12 text-center">
+  <div role="alert" class="motion-feedback border border-dangerBorder bg-dangerSoft rounded-2xl px-6 py-12 text-center">
     <physio-icon name="cloud-off" [size]="32" class="text-danger inline-flex" />
     <h1 class="text-[22px] font-semibold mt-3.5 mb-1.5">We couldn't load this profile</h1>
     <p class="text-[15px] text-gray-700 m-0 mb-5">Check your connection and try again.</p>
@@ -66,7 +66,7 @@
       <!-- Hero -->
       <section aria-labelledby="doc-name" class="flex flex-col md:flex-row gap-5 md:gap-8 items-start">
         <div class="relative w-full md:w-[200px] lg:w-[240px] flex-none aspect-[5/6] rounded-[20px] overflow-hidden ph-stripes">
-          <img
+          <img appImgFade
             *ngIf="d.avatarUrl && !imageFailed"
             [src]="d.avatarUrl"
             [alt]="'Photo of ' + d.fullName"
@@ -107,7 +107,7 @@
       </section>
 
       <!-- Professional overview -->
-      <section *ngIf="hasOverview" aria-labelledby="ov-h" class="flex flex-col gap-5 pt-8 md:pt-10 border-t border-gray-200">
+      <section appReveal *ngIf="hasOverview" aria-labelledby="ov-h" class="flex flex-col gap-5 pt-8 md:pt-10 border-t border-gray-200">
         <h2 id="ov-h" class="text-2xl leading-8 font-semibold m-0">Professional overview</h2>
         <div *ngIf="aboutParagraphs.length" class="flex flex-col gap-3.5 max-w-[680px]">
           <p *ngFor="let p of aboutParagraphs" class="text-base leading-[27px] text-gray-800 m-0 text-pretty whitespace-pre-line">{{ p }}</p>
@@ -123,7 +123,7 @@
       </section>
 
       <!-- Specialties and services -->
-      <section *ngIf="hasServices" aria-labelledby="sv-h" class="flex flex-col gap-4 pt-8 md:pt-10 border-t border-gray-200">
+      <section appReveal *ngIf="hasServices" aria-labelledby="sv-h" class="flex flex-col gap-4 pt-8 md:pt-10 border-t border-gray-200">
         <h2 id="sv-h" class="text-2xl leading-8 font-semibold m-0">Specialties and services</h2>
         <div *ngIf="d.specialty" class="flex flex-col gap-2">
           <span class="text-[13px] font-semibold text-gray-600">Primary specialty</span>
@@ -138,7 +138,7 @@
       </section>
 
       <!-- Facilities -->
-      <section *ngIf="d.facilities.length" aria-labelledby="fc-h" class="flex flex-col gap-4 pt-8 md:pt-10 border-t border-gray-200">
+      <section appReveal *ngIf="d.facilities.length" aria-labelledby="fc-h" class="flex flex-col gap-4 pt-8 md:pt-10 border-t border-gray-200">
         <h2 id="fc-h" class="text-2xl leading-8 font-semibold m-0">Where {{ d.fullName }} practises</h2>
         <ul class="list-none m-0 p-0 grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3">
           <li *ngFor="let f of d.facilities" class="border border-gray-200 rounded-2xl p-5 flex flex-col gap-2.5">
@@ -165,7 +165,7 @@
         [ngClass]="flash ? 'border-primary' : 'border-gray-200'"
       >
         <!-- Success -->
-        <div *ngIf="submitState === 'success'" role="status" aria-live="polite" class="flex flex-col gap-3.5 items-start">
+        <div *ngIf="submitState === 'success'" role="status" aria-live="polite" class="motion-feedback motion-feedback-lg flex flex-col gap-3.5 items-start">
           <span class="w-12 h-12 rounded-full bg-[#E8F5EC] text-[#14532D] flex items-center justify-center"><physio-icon name="check" [size]="24" /></span>
           <h2 id="req-h" class="text-[22px] leading-[30px] font-semibold m-0">Request received</h2>
           <p class="text-[15px] leading-6 text-gray-800 m-0">{{ successMessage }}</p>
@@ -191,7 +191,7 @@
             </div>
           </div>
 
-          <div *ngIf="paramNotice" role="alert" class="px-3.5 py-3 rounded-[10px] bg-[#FFF7E6] border border-[#F5D9A8] text-sm leading-[21px] text-[#6B3E00] flex gap-2.5">
+          <div *ngIf="paramNotice" role="alert" class="motion-feedback px-3.5 py-3 rounded-[10px] bg-[#FFF7E6] border border-[#F5D9A8] text-sm leading-[21px] text-[#6B3E00] flex gap-2.5">
             <physio-icon name="triangle-alert" [size]="16" class="mt-0.5 flex-none" /><span>{{ paramNotice }}</span>
           </div>
 
@@ -211,7 +211,7 @@
               <option value="">Choose a facility</option>
               <option *ngFor="let o of d.facilities" [value]="o.id">{{ o.name }}</option>
             </select>
-            <span *ngIf="errorFor('facility')" id="rq-facility-err" class="text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('facility') }}</span>
+            <span *ngIf="errorFor('facility')" id="rq-facility-err" class="motion-feedback text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('facility') }}</span>
           </div>
           <p *ngIf="singleFacility as only" class="m-0 text-sm text-gray-700 flex gap-2 items-center">
             <physio-icon name="building-2" [size]="15" class="text-gray-600" />At {{ only.name }}
@@ -233,7 +233,7 @@
               <option value="">Choose a service</option>
               <option *ngFor="let s of d.serviceOptions" [value]="s.id">{{ s.name }}</option>
             </select>
-            <span *ngIf="errorFor('service')" id="rq-service-err" class="text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('service') }}</span>
+            <span *ngIf="errorFor('service')" id="rq-service-err" class="motion-feedback text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('service') }}</span>
           </div>
 
           <div class="flex flex-col gap-1.5">
@@ -251,7 +251,7 @@
               class="h-12 border rounded-xl px-3.5 text-base text-gray-900 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
               [ngClass]="errorFor('name') ? 'border-danger' : 'border-gray-300 focus:border-primary'"
             />
-            <span *ngIf="errorFor('name')" id="rq-name-err" class="text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('name') }}</span>
+            <span *ngIf="errorFor('name')" id="rq-name-err" class="motion-feedback text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('name') }}</span>
           </div>
 
           <div class="flex flex-col gap-1.5">
@@ -272,7 +272,7 @@
               class="h-12 border rounded-xl px-3.5 text-base text-gray-900 bg-surface placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/20"
               [ngClass]="errorFor('phone') ? 'border-danger' : 'border-gray-300 focus:border-primary'"
             />
-            <span *ngIf="errorFor('phone')" id="rq-phone-err" class="text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('phone') }}</span>
+            <span *ngIf="errorFor('phone')" id="rq-phone-err" class="motion-feedback text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('phone') }}</span>
           </div>
 
           <div class="flex flex-col gap-1.5">
@@ -291,7 +291,7 @@
               class="h-12 border rounded-xl px-3.5 text-base text-gray-900 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
               [ngClass]="errorFor('email') ? 'border-danger' : 'border-gray-300 focus:border-primary'"
             />
-            <span *ngIf="errorFor('email')" id="rq-email-err" class="text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('email') }}</span>
+            <span *ngIf="errorFor('email')" id="rq-email-err" class="motion-feedback text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('email') }}</span>
           </div>
 
           <!-- Honeypot: hidden from people and assistive tech; bots that fill it are ignored server-side. -->
@@ -300,7 +300,7 @@
             <input id="rq-website" name="website" type="text" tabindex="-1" autocomplete="off" [(ngModel)]="form.website" />
           </div>
 
-          <div *ngIf="submitError" role="alert" class="px-3.5 py-3 rounded-[10px] bg-dangerSoft border border-dangerBorder text-sm leading-[21px] text-[#7A271A] flex gap-2.5">
+          <div *ngIf="submitError" role="alert" class="motion-feedback px-3.5 py-3 rounded-[10px] bg-dangerSoft border border-dangerBorder text-sm leading-[21px] text-[#7A271A] flex gap-2.5">
             <physio-icon name="circle-alert" [size]="16" class="text-danger mt-0.5 flex-none" /><span>{{ submitError }}</span>
           </div>
 
@@ -321,13 +321,13 @@
 
   <!-- Related doctors -->
   <section *ngIf="related.length" aria-labelledby="rel-h" class="bg-gray-50 border-t border-gray-200">
-    <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-10 pb-12 md:pt-12 md:pb-14 lg:pt-14 lg:pb-[72px]">
+    <div appReveal class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-10 pb-12 md:pt-12 md:pb-14 lg:pt-14 lg:pb-[72px]">
       <div class="flex justify-between items-end gap-4 mb-6 flex-wrap">
         <div>
           <h2 id="rel-h" class="text-2xl leading-8 font-semibold m-0 mb-1">Related doctors</h2>
           <p class="text-[15px] text-gray-700 m-0">{{ relatedNote }}</p>
         </div>
-        <a routerLink="/doctor" class="text-[15px] font-semibold text-primaryDeep flex gap-1.5 items-center min-h-11">All doctors<physio-icon name="arrow-right" [size]="16" /></a>
+        <a routerLink="/doctor" class="text-[15px] font-semibold text-primaryDeep flex gap-1.5 items-center min-h-11 motion-arrow">All doctors<physio-icon name="arrow-right" [size]="16" /></a>
       </div>
       <ul class="list-none m-0 p-0 grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5">
         <li *ngFor="let r of related; trackBy: trackById"><doctor-card [doctor]="r" /></li>

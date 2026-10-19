@@ -88,12 +88,12 @@
 
   <!-- Active filter chips -->
   <ul *ngIf="chips.length" aria-label="Active filters" class="list-none m-0 mb-5 p-0 flex gap-2 flex-wrap">
-    <li *ngFor="let c of chips; trackBy: trackByLabel" class="max-w-full">
+    <li *ngFor="let c of chips; trackBy: trackByLabel" [@chipPop]="motion" class="max-w-full">
       <button
         type="button"
         (click)="removeChip(c)"
         [attr.aria-label]="'Remove filter ' + c.label"
-        class="max-w-full h-[34px] pl-3 pr-2 rounded-full border border-primary bg-primarySoft text-primaryDeep text-[13px] font-medium flex gap-1.5 items-center cursor-pointer whitespace-nowrap"
+        class="max-w-full h-[34px] pl-3 pr-2 rounded-full border border-primary bg-primarySoft text-primaryDeep text-[13px] font-medium flex gap-1.5 items-center cursor-pointer motion-chip whitespace-nowrap"
       >
         <span class="truncate">{{ c.label }}</span><physio-icon name="x" [size]="14" class="flex-none" />
       </button>
@@ -133,7 +133,7 @@
   <!-- Results -->
   <ng-container *ngIf="state === 'results'">
     <ul class="list-none m-0 p-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      <li *ngFor="let h of hospitals; trackBy: trackById"><clinic-card [hospital]="h" /></li>
+      <li *ngFor="let h of hospitals; trackBy: trackById" class="motion-fade"><clinic-card [hospital]="h" /></li>
     </ul>
 
     <nav *ngIf="totalPages > 1" aria-label="Pagination" class="flex justify-center md:justify-end items-center gap-1.5 mt-8 flex-wrap">
@@ -160,13 +160,13 @@
 </div>
 
 <!-- Filter drawer (mobile) -->
-<div *ngIf="drawerOpen" class="md:hidden fixed inset-0 z-[1100] bg-gray-900/45" (click)="closeDrawer()">
+<div *ngIf="drawerOpen" [@drawerSheet]="motion" class="md:hidden fixed inset-0 z-[1100] bg-gray-900/45" (click)="closeDrawer()">
   <div
     id="filter-drawer"
     role="dialog"
     aria-modal="true"
     aria-labelledby="filter-drawer-title"
-    class="absolute inset-x-0 bottom-0 max-h-[85vh] bg-surface rounded-t-[20px] flex flex-col"
+    class="drawer-sheet absolute inset-x-0 bottom-0 max-h-[85vh] bg-surface rounded-t-[20px] flex flex-col"
     (click)="$event.stopPropagation()"
   >
     <div class="flex justify-between items-center pl-5 pr-4 pt-4 pb-3 border-b border-gray-200">

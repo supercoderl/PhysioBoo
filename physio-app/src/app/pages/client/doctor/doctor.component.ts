@@ -8,7 +8,9 @@ import { DoctorCardComponent } from '../../../components/layout/client/doctor/do
 import { EmptyStateComponent } from '../../../components/ui/empty-state.component';
 import { ErrorStateComponent } from '../../../components/ui/error-state.component';
 import { PublicDoctorService } from '../../../services/public/public-doctor.service';
+import { chipPop, drawerSheet } from '../../../shared/animations/motion.animation';
 import { SharedModule } from '../../../shared/shared-imports';
+import { motionState } from '../../../shared/utils/motion.utils';
 import { PublicDoctor, PublicOption } from '../../../shared/types/public-doctor.types';
 
 type ListState = 'loading' | 'results' | 'empty' | 'error';
@@ -42,9 +44,13 @@ const EMPTY_QUERY: Query = { q: '', specialty: '', facility: '', online: false, 
   selector: 'app-doctor',
   standalone: true,
   imports: [SharedModule, BooButtonComponent, DoctorCardComponent, EmptyStateComponent, ErrorStateComponent],
-  templateUrl: './doctor.component.html'
+  templateUrl: './doctor.component.html',
+  animations: [chipPop, drawerSheet]
 })
 export class DoctorComponent implements OnInit, OnDestroy {
+  /** 'reduced' limits chips and drawers to a short opacity fade. */
+  readonly motion = motionState();
+
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly doctorSrv = inject(PublicDoctorService);

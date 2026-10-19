@@ -161,7 +161,7 @@
     <!-- Results -->
     <ng-container *ngIf="state === 'results'">
       <ul *ngIf="articles.length" class="list-none m-0 p-0 grid grid-cols-[minmax(0,1fr)] md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6">
-        <li *ngFor="let a of articles; trackBy: trackById"><article-card [article]="a" [showMeta]="true" ctaLabel="Read more" /></li>
+        <li *ngFor="let a of articles; trackBy: trackById" class="motion-fade"><article-card [article]="a" [showMeta]="true" ctaLabel="Read more" /></li>
       </ul>
 
       <nav *ngIf="totalPages > 1" aria-label="Pagination" class="mt-8 md:mt-10 lg:mt-12 pt-6 border-t border-gray-200 flex justify-between items-center gap-3">

@@ -43,7 +43,7 @@
 
 <!-- Contact details (each card hides when its setting is missing) -->
 <section *ngIf="infoCards.length" aria-label="Contact details" class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 md:pt-6 lg:pt-7">
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4" [ngClass]="infoCols">
+  <div appReveal appRevealStagger class="grid grid-cols-1 md:grid-cols-2 gap-4" [ngClass]="infoCols">
     <div *ngFor="let c of infoCards" class="bg-surface border border-gray-200 rounded-2xl p-5 flex flex-col gap-2 min-w-0">
       <span class="w-10 h-10 rounded-xl bg-primarySoft text-primaryDeep flex items-center justify-center mb-1" aria-hidden="true"><physio-icon [name]="c.icon" [size]="18" /></span>
       <h2 class="text-base leading-6 font-semibold m-0">{{ c.title }}</h2>
@@ -69,7 +69,7 @@
 <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-7 pb-12 md:pt-8 md:pb-14 lg:pt-10 lg:pb-[72px] grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-6 lg:gap-8 items-start">
   <div class="border border-gray-200 rounded-[20px] bg-surface shadow-[0_12px_40px_rgba(38,20,26,.06)] p-5 md:p-8 min-w-0">
     <!-- Success -->
-    <div *ngIf="submitState === 'success'" role="status" aria-live="polite" class="flex flex-col gap-3.5 items-start">
+    <div *ngIf="submitState === 'success'" role="status" aria-live="polite" class="motion-feedback motion-feedback-lg flex flex-col gap-3.5 items-start">
       <span class="w-[52px] h-[52px] rounded-full bg-[#E8F5EC] text-[#14532D] flex items-center justify-center" aria-hidden="true"><physio-icon name="check" [size]="26" /></span>
       <h2 class="text-2xl leading-8 font-semibold m-0">Message received</h2>
       <p class="text-base leading-[26px] text-gray-800 m-0">
@@ -95,7 +95,7 @@
         <p class="text-[13px] text-gray-600 mt-2 mb-0">All fields are required unless marked optional.</p>
       </div>
 
-      <div *ngIf="summary.length" #summaryBox tabindex="-1" role="alert" class="border border-dangerBorder bg-dangerSoft rounded-xl px-4 py-3.5 outline-offset-2">
+      <div *ngIf="summary.length" #summaryBox tabindex="-1" role="alert" class="motion-feedback border border-dangerBorder bg-dangerSoft rounded-xl px-4 py-3.5 outline-offset-2">
         <p class="m-0 mb-1.5 text-[15px] font-semibold text-[#7A271A] flex gap-2 items-center"><physio-icon name="circle-alert" [size]="16" class="text-danger" />{{ summaryTitle }}</p>
         <ul class="m-0 pl-7 flex flex-col gap-0.5">
           <li *ngFor="let s of summary; trackBy: trackByField" class="text-[#7A271A]">
@@ -107,7 +107,7 @@
       <div
         *ngIf="banner as b"
         role="alert"
-        class="border rounded-xl px-4 py-3.5 flex gap-2.5 items-start"
+        class="motion-feedback border rounded-xl px-4 py-3.5 flex gap-2.5 items-start"
         [ngClass]="b.tone === 'danger' ? 'border-dangerBorder bg-dangerSoft' : 'border-[#F0D49B] bg-[#FFFBF2]'"
       >
         <physio-icon [name]="b.icon" [size]="16" class="mt-[3px] flex-none" [ngClass]="b.tone === 'danger' ? 'text-danger' : 'text-[#8A5300]'" />
@@ -127,7 +127,7 @@
             class="h-12 w-full border rounded-xl px-3.5 text-base text-gray-900 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
             [ngClass]="errorFor('name') ? 'border-danger ring-1 ring-danger' : 'border-gray-300 focus:border-primary'"
           />
-          <span *ngIf="errorFor('name')" id="ct-name-err" class="text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('name') }}</span>
+          <span *ngIf="errorFor('name')" id="ct-name-err" class="motion-feedback text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('name') }}</span>
         </div>
 
         <div class="flex flex-col gap-1.5 min-w-0">
@@ -139,7 +139,7 @@
             class="h-12 w-full border rounded-xl px-3.5 text-base text-gray-900 bg-surface placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/20"
             [ngClass]="errorFor('phone') ? 'border-danger ring-1 ring-danger' : 'border-gray-300 focus:border-primary'"
           />
-          <span *ngIf="errorFor('phone')" id="ct-phone-err" class="text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('phone') }}</span>
+          <span *ngIf="errorFor('phone')" id="ct-phone-err" class="motion-feedback text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('phone') }}</span>
         </div>
 
         <div class="flex flex-col gap-1.5 min-w-0">
@@ -151,7 +151,7 @@
             class="h-12 w-full border rounded-xl px-3.5 text-base text-gray-900 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
             [ngClass]="errorFor('email') ? 'border-danger ring-1 ring-danger' : 'border-gray-300 focus:border-primary'"
           />
-          <span *ngIf="errorFor('email')" id="ct-email-err" class="text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('email') }}</span>
+          <span *ngIf="errorFor('email')" id="ct-email-err" class="motion-feedback text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('email') }}</span>
         </div>
 
         <div class="flex flex-col gap-1.5 min-w-0">
@@ -178,7 +178,7 @@
           <option value="">No preference</option>
           <option *ngFor="let c of clinics" [value]="c.id">{{ c.name }}</option>
         </select>
-        <span *ngIf="errorFor('clinic')" id="ct-clinic-err" class="text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('clinic') }}</span>
+        <span *ngIf="errorFor('clinic')" id="ct-clinic-err" class="motion-feedback text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('clinic') }}</span>
       </div>
 
       <div class="flex flex-col gap-1.5">
@@ -194,7 +194,7 @@
           [ngClass]="errorFor('message') ? 'border-danger ring-1 ring-danger' : 'border-gray-300 focus:border-primary'"
         ></textarea>
         <span id="ct-message-hint" class="text-[13px] leading-[19px] text-gray-700">Please don't include medical records or detailed health information.</span>
-        <span *ngIf="errorFor('message')" id="ct-message-err" class="text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('message') }}</span>
+        <span *ngIf="errorFor('message')" id="ct-message-err" class="motion-feedback text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('message') }}</span>
       </div>
 
       <div class="flex flex-col gap-1.5">
@@ -211,7 +211,7 @@
           <span>I agree that {{ tenant.name }} can use these details to respond to my enquiry, as described in the
             <a routerLink="/privacy" fragment="s4" target="_blank" class="text-primaryDeep underline font-medium">Privacy Policy</a>.</span>
         </label>
-        <span *ngIf="errorFor('consent')" id="ct-consent-err" class="text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('consent') }}</span>
+        <span *ngIf="errorFor('consent')" id="ct-consent-err" class="motion-feedback text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('consent') }}</span>
       </div>
 
       <!-- Honeypot: hidden from people and assistive tech; bots that fill it are ignored server-side. -->

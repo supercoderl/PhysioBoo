@@ -16,7 +16,9 @@ import { AutoAnimateDirective } from "./directives/auto-animate.directive";
 import { DropdownDirective } from "./directives/dropdown.directive";
 import { BooErrorDirective } from "./directives/error.directive";
 import { ImageFallbackDirective } from "./directives/image-fallback.directive";
+import { ImgFadeDirective } from "./directives/img-fade.directive";
 import { ParticlesDirective } from "./directives/particles.directive";
+import { RevealDirective } from "./directives/reveal.directive";
 import { CustomScrollbarDirective } from "./directives/scrollbar.directive";
 import { SHARED_PIPES, SHARED_ZORRO_MODULES } from "./shared-providers";
 
@@ -46,6 +48,8 @@ export const SharedModule = [
     BooErrorDirective,
     DropdownDirective,
     ImageFallbackDirective,
-    AutoAnimateDirective
+    AutoAnimateDirective,
+    RevealDirective,
+    ImgFadeDirective
     // #endregion
 ];

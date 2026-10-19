@@ -8,7 +8,9 @@ import { PublicServiceService } from '../../../services/public/public-service.se
 import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
 import { EmptyStateComponent } from '../../../components/ui/empty-state.component';
 import { ErrorStateComponent } from '../../../components/ui/error-state.component';
+import { chipPop, drawerSheet } from '../../../shared/animations/motion.animation';
 import { SharedModule } from '../../../shared/shared-imports';
+import { motionState } from '../../../shared/utils/motion.utils';
 import { PublicOption } from '../../../shared/types/public-doctor.types';
 import { PublicService } from '../../../shared/types/public-service.types';
 
@@ -40,9 +42,13 @@ const EMPTY_QUERY: Query = { q: '', clinic: '', page: 1 };
   selector: 'app-service',
   standalone: true,
   imports: [SharedModule, BooButtonComponent, ServiceCardComponent, EmptyStateComponent, ErrorStateComponent],
-  templateUrl: './service.component.html'
+  templateUrl: './service.component.html',
+  animations: [chipPop, drawerSheet]
 })
 export class ServiceComponent implements OnInit, OnDestroy {
+  /** 'reduced' limits chips and drawers to a short opacity fade. */
+  readonly motion = motionState();
+
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly serviceSrv = inject(PublicServiceService);

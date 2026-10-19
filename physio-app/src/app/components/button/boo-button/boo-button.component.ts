@@ -36,7 +36,7 @@ const DS_VARIANT: Record<BooButtonVariant, string> = {
   link: 'border-0 !px-1.5 bg-transparent text-primaryDeep underline underline-offset-2 hover:text-primary',
 };
 
-const DS_BASE = 'relative inline-flex items-center justify-center gap-2 whitespace-nowrap max-w-full font-semibold leading-none no-underline select-none cursor-pointer transition-colors duration-150';
+const DS_BASE = 'relative inline-flex items-center justify-center gap-2 whitespace-nowrap max-w-full font-semibold leading-none no-underline select-none cursor-pointer transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-150 ease-in-out';
 
 @Component({
   selector: 'button[boo-button], a[boo-button]',

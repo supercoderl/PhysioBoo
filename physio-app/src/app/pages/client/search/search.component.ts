@@ -16,7 +16,9 @@ import { PublicArticle } from '../../../shared/types/public-article.types';
 import { PublicDoctor, PublicOption } from '../../../shared/types/public-doctor.types';
 import { PublicHospital } from '../../../shared/types/public-hospital.types';
 import { PublicService } from '../../../shared/types/public-service.types';
+import { chipPop } from '../../../shared/animations/motion.animation';
 import { SharedModule } from '../../../shared/shared-imports';
+import { motionState } from '../../../shared/utils/motion.utils';
 import { SearchResultComponent, SearchResultRow } from './search-result.component';
 
 type Kind = 'doctors' | 'services' | 'clinics' | 'articles';
@@ -93,8 +95,11 @@ const CATEGORY_OPTIONS = Object.keys(ArticleCategory).filter(k => Number.isNaN(N
   standalone: true,
   imports: [BooButtonComponent, SharedModule, SearchResultComponent, InlineErrorComponent],
   templateUrl: './search.component.html',
+  animations: [chipPop],
 })
 export class SearchComponent implements OnInit, OnDestroy {
+  readonly motion = motionState();
+
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly doctorSrv = inject(PublicDoctorService);

@@ -76,7 +76,8 @@
     appearance="panel"
     icon="cloud-off"
     title="We couldn't load services"
-    description="Check your connection and try again. Your search and filters are kept."
+    [description]="failure.description"
+    [showRetry]="failure.retryable"
     retryLabel="Try again"
     (retry)="retry()"
   />

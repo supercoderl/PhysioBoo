@@ -15,7 +15,8 @@
       <label for="blog-search" class="text-sm font-semibold text-gray-900">Search articles</label>
       <div class="flex gap-2">
         <div class="relative flex-1 min-w-0">
-          <physio-icon name="search" [size]="18" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" />
+          <!-- Position a wrapper, not <physio-icon>: its `class` input is also applied to the inner span, which doubled the offset. -->
+          <span aria-hidden="true" class="absolute left-4 top-1/2 -translate-y-1/2 flex text-gray-600 pointer-events-none"><physio-icon name="search" [size]="18" /></span>
           <input
             id="blog-search"
             name="q"

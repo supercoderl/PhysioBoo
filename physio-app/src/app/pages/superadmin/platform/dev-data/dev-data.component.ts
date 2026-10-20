@@ -5,6 +5,7 @@ import { SuperadminPageHeaderComponent } from "../../../../components/layout/sup
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { DevDataService } from "../../../../services/admin/dev-data.service";
 import { HospitalGroupService } from "../../../../services/admin/hospital-group.service";
+import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DevDataModule, DevDataModuleList, DevDataModuleStatus } from "../../../../shared/types/dev-data.types";
@@ -13,6 +14,14 @@ import { BooButtonAdminComponent } from "../../../../components/button/boo-butto
 const DEFAULT_ROWS = 50;
 const TENANT_PAGE_SIZE = 100;
 const DEV_TENANT_NAME = 'PhysioBoo Rehabilitation Hospital';
+/** Key of the one-click module on the server (DemoFacilityModule): it runs every other module in dependency order. */
+const DEMO_FACILITY_KEY = 'demo-facility';
+
+/** Plain names for created tables whose key is not a module key or reads badly as a camelCase word. */
+const TABLE_LABELS: Record<string, string> = {
+    doctorSpecialties: 'doctor specialties',
+    appointmentTypes: 'appointment types',
+};
 
 const FIELD = 'w-full h-[42px] px-3 rounded-[10px] border border-borderGray bg-surface text-[14px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30';
 const CARD = 'bg-surface rounded-[14px] border border-borderGray';
@@ -107,9 +116,21 @@ const CARD = 'bg-surface rounded-[14px] border border-borderGray';
                             [lastResult]="results()[module.key] || ''"
                             [readyKeys]="readyKeys()"
                             [disabled]="!canGenerate()"
-                            (generate)="generate($event)"
+                            (generate)="requestGenerate($event)"
                         ></superadmin-dev-data-module-card>
                     </div>
+
+                    <section *ngIf="hasGenerated()" [class]="card + ' p-4 space-y-2'" aria-labelledby="dev-data-inspect">
+                        <h3 id="dev-data-inspect" class="text-[14px] font-medium text-regular m-0">Inspect the generated data</h3>
+                        <p class="text-[12px] text-secondary m-0">
+                            Open these screens signed in as an admin of the selected tenant: the owner account belongs to no tenant, so it sees none of these rows.
+                        </p>
+                        <div class="flex flex-wrap gap-x-4 gap-y-1">
+                            <a routerLink="/admin/overview/dashboard" class="text-[13px] font-semibold text-primary">Dashboard</a>
+                            <a routerLink="/admin/reception/booking/list" class="text-[13px] font-semibold text-primary">Appointments</a>
+                            <a routerLink="/superadmin/tenants/hospital-group" class="text-[13px] font-semibold text-primary">Tenants</a>
+                        </div>
+                    </section>
                 </ng-container>
             </ng-container>
 
@@ -132,6 +153,7 @@ export class SuperadminDevDataComponent implements OnInit {
     private readonly devDataSrv = inject(DevDataService);
     private readonly hospitalGroupSrv = inject(HospitalGroupService);
     private readonly toastSrv = inject(ToastService);
+    private readonly dialogSrv = inject(DialogService);
     // #endregion
 
     // #region Inputs, Outputs, Properties
@@ -154,6 +176,7 @@ export class SuperadminDevDataComponent implements OnInit {
 
     labels = computed(() => Object.fromEntries(this.modules().map(m => [m.key, m.label])));
     /** Modules generated in this session; a module's dependency chip is "ready" once its parent is in here. */
+    hasGenerated = computed(() => Object.values(this.statuses()).includes('done'));
     readyKeys = computed(() => Object.entries(this.statuses()).filter(([, status]) => status === 'done').map(([key]) => key));
     rowsValid = computed(() => {
         const n = this.rows();
@@ -214,7 +237,28 @@ export class SuperadminDevDataComponent implements OnInit {
         this.results.set({});
     }
 
-    generate(moduleKey: string): void {
+    /** The one-click facility writes to many tables at once, so it explains itself and asks first; single modules run directly. */
+    requestGenerate(moduleKey: string): void {
+        if (!this.canGenerate()) return;
+        if (moduleKey !== DEMO_FACILITY_KEY) {
+            this.generate(moduleKey);
+            return;
+        }
+
+        const tenant = this.tenantOptions().find(t => t.value === this.tenantId())?.label ?? 'the selected tenant';
+        this.dialogSrv.confirm(
+            `This builds a complete demo facility in "${tenant}": branches, departments, rooms, doctors with schedules, staff, services, ` +
+            `${this.rows()} patients and about ${Math.min((this.rows() ?? 0) * 3, this.maxRows())} appointments (past and upcoming). ` +
+            'Parts the tenant already has are reused, nothing existing is changed or deleted, and no message is sent. ' +
+            'Generated accounts have no usable password. Everything is written in one transaction: if anything fails, nothing is kept.',
+            () => this.generate(moduleKey),
+            'Generate demo facility',
+            'warning',
+            'Generate'
+        );
+    }
+
+    private generate(moduleKey: string): void {
         const tenantId = this.tenantId();
         const count = this.rows();
         if (!this.canGenerate() || !tenantId || count === null) return;
@@ -231,7 +275,7 @@ export class SuperadminDevDataComponent implements OnInit {
                     this.setStatus(moduleKey, 'failed');
                     return;
                 }
-                const message = this.describe(res.data.created);
+                const message = this.describe(res.data.created, res.data.reused ?? []);
                 this.setStatus(moduleKey, 'done');
                 this.results.update(current => ({ ...current, [moduleKey]: message }));
                 this.toastSrv.success(message);
@@ -252,10 +296,18 @@ export class SuperadminDevDataComponent implements OnInit {
         this.statuses.update(current => ({ ...current, [moduleKey]: status }));
     }
 
-    /** "Created 20 departments, 40 rooms, 2 branches": one entry per table that received rows. */
-    private describe(created: Record<string, number>): string {
-        const parts = Object.entries(created).map(([key, n]) => `${n} ${(this.labels()[key] ?? key).toLowerCase()}`);
-        return parts.length ? `Created ${parts.join(', ')}` : 'Nothing was created';
+    /** "Created 20 departments, 40 rooms. Reused: patients": one entry per table that received rows, plus what already existed. */
+    private describe(created: Record<string, number>, reused: string[]): string {
+        const parts = Object.entries(created).map(([key, n]) => `${n} ${this.tableLabel(key)}`);
+        const reusedParts = reused.map(key => this.tableLabel(key));
+
+        if (!parts.length && !reusedParts.length) return 'Nothing was created';
+        if (!parts.length) return `Nothing new: ${reusedParts.join(', ')} already existed`;
+        return `Created ${parts.join(', ')}${reusedParts.length ? `. Reused: ${reusedParts.join(', ')}` : ''}`;
+    }
+
+    private tableLabel(key: string): string {
+        return TABLE_LABELS[key] ?? (this.labels()[key] ?? key).toLowerCase();
     }
     // #endregion
 }

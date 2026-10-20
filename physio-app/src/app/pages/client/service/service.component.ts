@@ -7,6 +7,7 @@ import { ServiceCardComponent } from '../../../components/layout/client/service/
 import { PublicServiceService } from '../../../services/public/public-service.service';
 import { BooBreadcrumbComponent, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooFilterChipsComponent, BooPaginationComponent, BooSearchFieldComponent, BooSheetComponent } from '@physioboo/ui';
 import { SharedModule } from '../../../shared/shared-imports';
+import { GENERIC_PUBLIC_FAILURE, PublicFailure, describePublicFailure } from '../../../shared/utils/http.utils';
 import { PublicOption } from '../../../shared/types/public-doctor.types';
 import { PublicService } from '../../../shared/types/public-service.types';
 
@@ -56,6 +57,7 @@ export class ServiceComponent implements OnInit {
   query: Query = { ...EMPTY_QUERY };
   qInput = '';
   state: ListState = 'loading';
+  failure: PublicFailure = GENERIC_PUBLIC_FAILURE;
   services: PublicService[] = [];
   total = 0;
   totalPages = 1;
@@ -212,6 +214,7 @@ export class ServiceComponent implements OnInit {
     }).pipe(
       tap(res => {
         if (!res.success || !res.data) {
+          this.failure = GENERIC_PUBLIC_FAILURE;
           this.state = 'error';
           return;
         }
@@ -222,7 +225,8 @@ export class ServiceComponent implements OnInit {
         // A page past the end (e.g. an old link) falls back to the last page that has results.
         if (!this.services.length && q.page > 1 && this.total > 0) this.navigate({ page: this.totalPages }, true);
       }),
-      catchError(() => {
+      catchError(err => {
+        this.failure = describePublicFailure(err, 'service search');
         this.state = 'error';
         return of(null);
       })

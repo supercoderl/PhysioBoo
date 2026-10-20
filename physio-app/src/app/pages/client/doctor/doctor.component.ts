@@ -7,6 +7,7 @@ import { BooBreadcrumbComponent, BooButtonComponent, BooEmptyStateComponent, Boo
 import { DoctorCardComponent } from '../../../components/layout/client/doctor/doctor-card.component';
 import { PublicDoctorService } from '../../../services/public/public-doctor.service';
 import { SharedModule } from '../../../shared/shared-imports';
+import { GENERIC_PUBLIC_FAILURE, PublicFailure, describePublicFailure } from '../../../shared/utils/http.utils';
 import { PublicDoctor, PublicOption } from '../../../shared/types/public-doctor.types';
 
 type ListState = 'loading' | 'results' | 'empty' | 'error';
@@ -58,6 +59,7 @@ export class DoctorComponent implements OnInit {
   query: Query = { ...EMPTY_QUERY };
   qInput = '';
   state: ListState = 'loading';
+  failure: PublicFailure = GENERIC_PUBLIC_FAILURE;
   doctors: PublicDoctor[] = [];
   total = 0;
   totalPages = 1;
@@ -239,6 +241,7 @@ export class DoctorComponent implements OnInit {
     }).pipe(
       tap(res => {
         if (!res.success || !res.data) {
+          this.failure = GENERIC_PUBLIC_FAILURE;
           this.state = 'error';
           return;
         }
@@ -249,7 +252,8 @@ export class DoctorComponent implements OnInit {
         // A page past the end (e.g. an old link) falls back to the last page that has results.
         if (!this.doctors.length && q.page > 1 && this.total > 0) this.navigate({ page: this.totalPages }, true);
       }),
-      catchError(() => {
+      catchError(err => {
+        this.failure = describePublicFailure(err, 'doctor search');
         this.state = 'error';
         return of(null);
       })

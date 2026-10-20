@@ -8,6 +8,7 @@ import { PublicHospitalService } from '../../../services/public/public-hospital.
 import { HOSPITAL_TYPE_LABELS, HospitalType } from '../../../shared/enums/hospital-type';
 import { BooBreadcrumbComponent, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooFilterChipsComponent, BooPaginationComponent, BooSearchFieldComponent, BooSheetComponent } from '@physioboo/ui';
 import { SharedModule } from '../../../shared/shared-imports';
+import { GENERIC_PUBLIC_FAILURE, PublicFailure, describePublicFailure } from '../../../shared/utils/http.utils';
 import { PublicHospital } from '../../../shared/types/public-hospital.types';
 
 type ListState = 'loading' | 'results' | 'empty' | 'error';
@@ -59,6 +60,7 @@ export class HospitalComponent implements OnInit {
   query: Query = { ...EMPTY_QUERY };
   qInput = '';
   state: ListState = 'loading';
+  failure: PublicFailure = GENERIC_PUBLIC_FAILURE;
   hospitals: PublicHospital[] = [];
   total = 0;
   totalPages = 1;
@@ -209,6 +211,7 @@ export class HospitalComponent implements OnInit {
     }).pipe(
       tap(res => {
         if (!res.success || !res.data) {
+          this.failure = GENERIC_PUBLIC_FAILURE;
           this.state = 'error';
           return;
         }
@@ -219,7 +222,8 @@ export class HospitalComponent implements OnInit {
         // A page past the end (e.g. an old link) falls back to the last page that has results.
         if (!this.hospitals.length && q.page > 1 && this.total > 0) this.navigate({ page: this.totalPages }, true);
       }),
-      catchError(() => {
+      catchError(err => {
+        this.failure = describePublicFailure(err, 'hospital search');
         this.state = 'error';
         return of(null);
       })

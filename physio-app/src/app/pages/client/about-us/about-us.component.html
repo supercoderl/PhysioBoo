@@ -111,11 +111,12 @@
       <p class="text-base leading-[25px] text-gray-700 m-0">Three steps from looking around to getting in touch with a provider.</p>
     </div>
     <!-- Phones: a vertical rail; tablet and up: a horizontal line between the numbers. -->
-    <ol class="list-none m-0 p-0 grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6">
+    <ol class="list-none m-0 p-0 grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-8 lg:gap-10">
       <li *ngFor="let s of steps; let i = index; let last = last" class="flex flex-row md:flex-col gap-4 min-w-0">
-        <div class="flex flex-col md:flex-row items-center gap-3 flex-none">
+        <!-- Connector: gap-3 separates it from its own circle; the negative margin stops it 12px short of the next circle (column gap minus 12px). Phones: vertical, mb-3 keeps the gap above the next circle. -->
+        <div class="flex flex-col md:flex-row items-center gap-3 flex-none md:w-full">
           <span class="w-11 h-11 flex-none rounded-full bg-primary text-white text-[17px] font-semibold flex items-center justify-center">{{ i + 1 }}</span>
-          <span *ngIf="!last" aria-hidden="true" class="flex-1 bg-gray-300 w-0.5 min-h-6 md:w-auto md:h-0.5 md:min-h-0 md:-mr-6"></span>
+          <span *ngIf="!last" aria-hidden="true" class="flex-1 bg-gray-300 w-0.5 min-h-6 mb-3 md:mb-0 md:w-auto md:h-0.5 md:min-h-0 md:-mr-5 lg:-mr-7"></span>
         </div>
         <div class="flex flex-col gap-1.5 pb-7 md:pb-0">
           <span class="font-mono text-xs font-medium tracking-[.04em] text-gray-600">STEP {{ i + 1 }}</span>

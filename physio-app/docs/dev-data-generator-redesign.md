@@ -9,7 +9,43 @@
 > Generated rows are written **straight into the real tables** (`Departments`, `Rooms`, `Hospitals`, …). There is **no `Sys_GeneratedData` table, no migration, no per-module counts and no Clear / Clear all**. There is no undo from the page; reset the development database to start over.
 > Only two endpoints exist: `GET /api/superadmin/dev-data/modules` and `POST /api/superadmin/dev-data/{moduleKey}/generate` (§14.1, §14.3). §14.2, §14.4, §14.5, the Clear and "N generated" parts of §6-§9 and §12-§13 no longer apply; each card shows the last result instead.
 > The backend lives in `PhysioBoo.Infrastructure/Database/DevData/` (one `IDevDataModule` per module, `DevDataService` resolves parents) with `DevDataEndpoints` in Presentation. Rows are saved with `SaveSeedChangesAsync` and an explicit `TenantId`, because `SaveChangesAsync` would stamp the logged-in user's tenant. The owner account has no tenant, so generated rows only show in `/admin` for an admin of the chosen tenant.
-> **Implemented modules:** `hospital-structure` (branches, departments, rooms). Others (patients, doctors, appointments, medicines, prescriptions, admissions, lab, radiology, billing) are added one generator at a time.
+> **Implemented modules:** see **Revision 3** below. Medicines, prescriptions, admissions, lab, radiology and billing are still to be added, one generator at a time.
+
+> **Revision 3 — one-click demo facility (supersedes "Implemented modules" above).**
+>
+> **Why it was incomplete.** Only `hospital-structure` existed, so a tenant ended up with departments and rooms but no doctors, services, schedules, patients or appointments, and every other screen stayed empty. There was no way to build a connected dataset in one action, and running a module twice simply added another batch.
+>
+> **Modules** (all in `PhysioBoo.Infrastructure/Database/DevData/`, one `IDevDataModule` each):
+>
+> | Key | Creates | Depends on |
+> |---|---|---|
+> | `demo-facility` | Nothing itself: runs the eight steps below in order. **Rows = number of patients.** | all below |
+> | `hospital-structure` | Branches (if none), departments, rooms | none |
+> | `master-data` | Medical specialties and appointment types (global, shared by all tenants), only into an empty table | none |
+> | `providers` | Doctors: User + Profile + Doctor (one shared id, as `CreateDoctor`), `DOCTOR` role, department, room, primary `DoctorSpecialty` | structure, master data |
+> | `staff` | Hospital staff roster (nurses, receptionists, technicians…) per department and branch | structure |
+> | `medical-services` | Active services with branch, department link and the doctors of that department | providers |
+> | `schedules` | Five working days per doctor, lunch break, effective 4 months back; only for doctors without one | providers |
+> | `patients` | Profile + patient with a primary doctor, preferred branch, optional insurance | providers |
+> | `appointments` | Past and upcoming visits on free slots | patients, schedules, master data |
+>
+> **Sizing of `demo-facility` for N patients:** 12 departments, max(12, N/4) doctors, max(16, N/3) staff, 16 services, N patients, min(3N, 1000) appointments.
+>
+> **Dependency order and the circular reference.** structure → master data → providers → staff → services → schedules → patients → appointments. `Doctor.PrimarySpecialtyId` points at a `DoctorSpecialty`, which points back at the `Doctor`: the doctor is saved without it, the specialty row is saved, then the link is set.
+>
+> **Consistency rules the generator enforces** (and the integration tests assert): an appointment's department/branch are the doctor's; it falls on a weekday the doctor works, inside working hours and outside the break; no doctor or patient is booked twice at one time; it is not before the patient registered; Completed and NoShow are in the past, Scheduled and Confirmed in the future, Cancelled carries a reason and a time in the past; completed visits update the patient's last visit and visit count. Services are `Active` and linked to doctors, doctors are verified and `Active` with an active user, so the public website lists them (`PublicDoctorScope`, `PublicServiceScope`, `PublicHospitalScope`).
+>
+> **Re-runs.** `demo-facility` never deletes or replaces anything. A step whose tenant already has data is **reused**, not repeated, and reported as `reused`; running it again on a populated tenant creates nothing. Single modules keep their "add another batch" behaviour. There is still no undo from the page; reset the development database to start over.
+>
+> **Safety.** The whole run is one transaction (a failure rolls back every step, dependencies included, and surfaces as an error, never as success). Development environment only; the endpoints need `Permissions.System.DevAccess`. All rows carry the chosen tenant's id. Generated accounts share one password hash of a random value that was discarded, so no generated account has a login anyone knows; emails use `@dev.physioboo.test`, phones are `+1 555`, names are fictional. Nothing is sent, charged or called.
+>
+> **UI.** The `demo-facility` card comes first. Clicking it opens a confirmation that lists what will be created and states that nothing existing is changed. The result line lists created tables and, after "Reused:", what was already there; warnings appear as toasts; failures are toasted by the HTTP interceptor and the card shows `Failed`. After a success, links to the dashboard, appointments and tenants appear (sign in as an admin of that tenant to see the rows).
+>
+> **API change.** `POST …/{moduleKey}/generate` now also returns `reused: string[]` (`DevDataResult.Reused`).
+>
+> **Not generated, and why:** user accounts for staff (a `HospitalStaff` row has no user in this domain), patient user accounts (`Patient.UserId` is optional), doctor leave, medicines/inventory, prescriptions, medical records, admissions and beds, lab and radiology orders, bills and payments, insurance claims, CRM, CMS content and notifications (separate modules still to add: each needs its own consistent parents, and invented financial or clinical records would only inflate counts). Specialties and appointment types are created only when their tables are empty.
+>
+> **Tests.** `PhysioBoo.Infrastructure.IntegrationTest/DevDataGeneratorTests.cs` (needs `PHYSIOBOO_TEST_PG`, a disposable PostgreSQL server): entity coverage and relationships, idempotent re-run, tenant isolation, production refusal, validation errors, rollback after a failure.
 
 ---
 

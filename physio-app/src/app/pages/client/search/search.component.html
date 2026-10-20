@@ -10,7 +10,7 @@
     <form role="search" (submit)="submit($event)" class="flex flex-col md:flex-row gap-2.5 max-w-[820px]">
       <div class="relative flex-1 min-w-0">
         <label for="sr-q" class="sr-only">Search doctors, specialties, services, clinics and articles</label>
-        <physio-icon name="search" [size]="20" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" />
+        <span aria-hidden="true" class="absolute left-4 top-1/2 -translate-y-1/2 flex text-gray-600 pointer-events-none"><physio-icon name="search" [size]="20" /></span>
         <input
           #searchInput
           id="sr-q"

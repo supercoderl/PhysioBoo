@@ -31,7 +31,7 @@ import { BooIconComponent } from '../icon/icon.component';
         [attr.maxlength]="maxlength"
         [disabled]="disabled"
         autocomplete="off"
-        class="border-0 outline-none text-base w-full bg-transparent text-gray-900 placeholder:text-gray-500 [&::-webkit-search-cancel-button]:hidden"
+        class="border-0 outline-none focus:outline-none text-base w-full bg-transparent text-gray-900 placeholder:text-gray-500 [&::-webkit-search-cancel-button]:hidden"
       />
       <button
         *ngIf="value"

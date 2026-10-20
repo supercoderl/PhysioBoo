@@ -61,9 +61,21 @@ export class ClientComponent implements OnDestroy, OnInit {
             this.firstActivation = false;
             return;
         }
+        this.resetScroll();
         const el = this.page.nativeElement;
         el.classList.remove('motion-route');
         void el.offsetWidth;
         el.classList.add('motion-route');
+    }
+
+    /**
+     * The router keeps the window scroll when the page component changes, so opening a page from a scrolled one left the
+     * new page's heading above the viewport. Start every new page at the top, except for links to a fragment (the page
+     * scrolls to its own section) and back/forward navigation (the browser restores its position).
+     */
+    private resetScroll() {
+        const nav = this.router.getCurrentNavigation();
+        if (nav?.trigger === 'popstate' || nav?.extractedUrl.fragment) return;
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     }
 }

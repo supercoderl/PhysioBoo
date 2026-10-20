@@ -1,7 +1,6 @@
 import { Router } from "@angular/router";
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -10,7 +9,7 @@ import { TreatmentImagingOrderRow } from "../../../../../shared/types/treatment-
 @Component({
   selector: 'treatment-imaging-tab',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -68,7 +67,7 @@ export class TreatmentImagingTabComponent implements OnChanges {
     });
   }
 
-  statusTone(status: TreatmentImagingOrderRow['status']): BadgeTone {
+  statusTone(status: TreatmentImagingOrderRow['status']): BooBadgeTone {
     switch (status) {
       case 'Completed': return 'success';
       case 'InProgress': return 'primary';

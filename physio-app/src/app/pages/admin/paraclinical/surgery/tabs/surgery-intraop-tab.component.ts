@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { SurgeryCase, SurgeryRow } from "../../../../../shared/types/surgery.types";
@@ -7,7 +7,7 @@ import { SurgeryCase, SurgeryRow } from "../../../../../shared/types/surgery.typ
 @Component({
   selector: 'surgery-intraop-tab',
   standalone: true,
-  imports: [SharedModule,EmptyStateComponent],
+  imports: [SharedModule,BooEmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>

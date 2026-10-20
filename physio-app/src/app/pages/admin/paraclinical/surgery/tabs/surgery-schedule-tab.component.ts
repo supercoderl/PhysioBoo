@@ -1,8 +1,6 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -14,7 +12,7 @@ type ViewMode = 'table' | 'timeline' | 'calendar';
 @Component({
   selector: 'surgery-schedule-tab',
   standalone: true,
-  imports: [SharedModule, BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule, BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent],
   template: `
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <div class="flex flex-wrap items-center gap-3">
@@ -248,7 +246,7 @@ export class SurgeryScheduleTabComponent implements OnInit {
     return days.map(({ label, items }) => ({ label, items: items.sort((a, b) => new Date(a.scheduledStart).getTime() - new Date(b.scheduledStart).getTime()) }));
   }
 
-  priorityTone(priority: SurgeryPriority): BadgeTone {
+  priorityTone(priority: SurgeryPriority): BooBadgeTone {
     switch (priority) {
       case 'Emergency': return 'danger';
       case 'Urgent': return 'warning';
@@ -256,7 +254,7 @@ export class SurgeryScheduleTabComponent implements OnInit {
     }
   }
 
-  statusTone(status: SurgeryStatus): BadgeTone {
+  statusTone(status: SurgeryStatus): BooBadgeTone {
     switch (status) {
       case 'Discharged': return 'success';
       case 'InProgress': return 'warning';

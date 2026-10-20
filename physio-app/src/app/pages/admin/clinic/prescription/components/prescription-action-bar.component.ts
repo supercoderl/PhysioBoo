@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooStatusBadgeComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PrescriptionDraft, PrescriptionRxStatus } from "../../../../../shared/types/prescription-rx.types";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
@@ -7,7 +7,7 @@ import { BooButtonAdminComponent } from "../../../../../components/button/boo-bu
 @Component({
     selector: 'rx-action-bar',
     standalone: true,
-    imports: [SharedModule,StatusBadgeComponent, BooButtonAdminComponent],
+    imports: [SharedModule,BooStatusBadgeComponent, BooButtonAdminComponent],
     template: `
     <div class="sticky top-0 z-30 bg-surface border-b border-gray-200 shadow-sm">
       <div class="px-6 py-3 flex items-center justify-between gap-4 flex-wrap">

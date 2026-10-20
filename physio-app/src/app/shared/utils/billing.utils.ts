@@ -1,8 +1,8 @@
-import { BadgeTone } from "../../components/ui/status-badge.component";
+import { BooBadgeTone } from '@physioboo/ui';
 import { SubscriptionInvoiceStatus, SubscriptionStatus } from "../types/billing.types";
 
 /** Badge tone for a subscription or invoice status. */
-export function billingStatusTone(status: SubscriptionStatus | SubscriptionInvoiceStatus | string): BadgeTone {
+export function billingStatusTone(status: SubscriptionStatus | SubscriptionInvoiceStatus | string): BooBadgeTone {
     switch (status) {
         case 'Active': case 'Paid': return 'success';
         case 'Trial': return 'primary';

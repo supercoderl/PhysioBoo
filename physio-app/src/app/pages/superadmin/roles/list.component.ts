@@ -2,12 +2,10 @@ import { Component, OnInit, computed, signal } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { finalize, firstValueFrom } from "rxjs";
 import { BooButtonAdminComponent } from "../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
+import { BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { UserPermissionRoleDrawerComponent } from "../../../components/layout/admin/system/user-permission/role-drawer.component";
 import { SuperadminPageHeaderComponent } from "../../../components/layout/superadmin/shared/superadmin-page-header.component";
-import { EmptyStateComponent } from "../../../components/ui/empty-state.component";
 import { StatCardComponent } from "../../../components/ui/stat-card.component";
-import { StatusBadgeComponent } from "../../../components/ui/status-badge.component";
 import { BooActionAdminComponent } from "../../../components/table/boo-table-admin/boo-action-admin.component";
 import { BooFilterAdminComponent } from "../../../components/table/boo-table-admin/boo-filter-admin.component";
 import { BooSortAdminComponent } from "../../../components/table/boo-table-admin/boo-sort-admin.component";
@@ -38,8 +36,8 @@ import { IconUtils } from "../../../shared/utils/icon.utils";
         BooActionAdminComponent,
         SuperadminPageHeaderComponent,
         StatCardComponent,
-        StatusBadgeComponent,
-        EmptyStateComponent,
+        BooStatusBadgeComponent,
+        BooEmptyStateComponent,
         UserPermissionRoleDrawerComponent
     ],
     templateUrl: './list.component.html',

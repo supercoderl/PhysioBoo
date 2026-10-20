@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DispenseWorkspace } from "../../../../shared/types/dispensing.types";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
@@ -7,7 +7,7 @@ import { BooButtonAdminComponent } from "../../../../components/button/boo-butto
 @Component({
     selector: 'dispense-summary-panel',
     standalone: true,
-    imports: [SharedModule,EmptyStateComponent, BooButtonAdminComponent],
+    imports: [SharedModule,BooEmptyStateComponent, BooButtonAdminComponent],
     template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60">

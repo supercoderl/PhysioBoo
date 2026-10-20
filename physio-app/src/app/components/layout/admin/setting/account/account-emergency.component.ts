@@ -1,7 +1,7 @@
 import { Component, Input } from "@angular/core";
 import { FormGroup } from "@angular/forms";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 
 @Component({
     selector: 'admin-account-emergency',

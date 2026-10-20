@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../shared/shared-imports";
 import {
   DispenseItemStatus,
@@ -21,7 +20,7 @@ interface FlatWarning extends ClinicalWarning {
 @Component({
   selector: 'dispense-picking-panel',
   standalone: true,
-  imports: [SharedModule, StatusBadgeComponent, EmptyStateComponent, DispenseProgressStepperComponent, BooButtonAdminComponent, BooTextareaComponent],
+  imports: [SharedModule, BooStatusBadgeComponent, BooEmptyStateComponent, DispenseProgressStepperComponent, BooButtonAdminComponent, BooTextareaComponent],
   template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <boo-empty-state *ngIf="!workspace" icon="clipboard" title="Select a prescription from the queue to begin verification"
@@ -176,7 +175,7 @@ export class DispensePickingPanelComponent {
     input.value = '';
   }
 
-  severityTone(severity: string): BadgeTone {
+  severityTone(severity: string): BooBadgeTone {
     switch (severity) {
       case 'Critical': return 'danger';
       case 'High': return 'danger';
@@ -186,7 +185,7 @@ export class DispensePickingPanelComponent {
     }
   }
 
-  itemStatusTone(status: DispenseItemStatus): BadgeTone {
+  itemStatusTone(status: DispenseItemStatus): BooBadgeTone {
     switch (status) {
       case 'NotPicked': return 'neutral';
       case 'Picked': return 'primary';

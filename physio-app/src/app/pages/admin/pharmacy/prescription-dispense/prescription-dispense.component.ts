@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit, signal } from "@angular/core";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooErrorStateComponent } from '@physioboo/ui';
 import { DispensingService } from "../../../../services/admin/dispensing.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -23,7 +23,7 @@ import { DispenseSummaryPanelComponent } from "./dispense-summary-panel.componen
     standalone: true,
     imports: [
         SharedModule,
-        ErrorStateComponent,
+        BooErrorStateComponent,
         DispenseQueuePanelComponent,
         DispensePickingPanelComponent,
         DispenseSummaryPanelComponent,

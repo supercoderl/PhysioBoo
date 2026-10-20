@@ -1,16 +1,15 @@
 import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angular/core";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent, BooInputComponent } from '@physioboo/ui';
 import { RetailPosService } from "../../../../services/admin/retail-pos.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailCustomer } from "../../../../shared/types/retail-pos.types";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
 
 @Component({
   selector: 'retail-customer-lookup-drawer',
   standalone: true,
-  imports: [SharedModule,DrawerComponent, EmptyStateComponent, BooButtonAdminComponent, BooInputComponent],
+  imports: [SharedModule,DrawerComponent, BooEmptyStateComponent, BooButtonAdminComponent, BooInputComponent],
   template: `
     <drawer [isOpen]="isOpen" (close)="close.emit()">
       <div class="p-5">

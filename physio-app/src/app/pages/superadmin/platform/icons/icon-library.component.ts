@@ -1,7 +1,8 @@
 import { isPlatformBrowser } from "@angular/common";
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, PLATFORM_ID, ViewChild, computed, inject, signal } from "@angular/core";
 import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
-import { IconComponent, PHYSIO_ICON_NAMES } from "physioboo-icons";
+import { BooIconComponent } from '@physioboo/ui';
+import { PHYSIO_ICON_NAMES } from '../../../../shared/icons/icon-names';
 import { SuperadminPageHeaderComponent } from "../../../../components/layout/superadmin/shared/superadmin-page-header.component";
 import { ToastService } from "../../../../services/common/toast.service";
 
@@ -20,7 +21,7 @@ interface IconSource {
 @Component({
     selector: 'superadmin-icon-library',
     standalone: true,
-    imports: [IconComponent, SuperadminPageHeaderComponent],
+    imports: [BooIconComponent, SuperadminPageHeaderComponent],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <!-- relative: contains the sr-only elements so they cannot extend the document past the shell's overflow-hidden -->

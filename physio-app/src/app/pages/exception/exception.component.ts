@@ -3,7 +3,7 @@ import { Component, DestroyRef, OnInit, PLATFORM_ID, inject } from '@angular/cor
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest } from 'rxjs';
-import { BooButtonComponent } from '../../components/button/boo-button/boo-button.component';
+import { BooButtonComponent } from '@physioboo/ui';
 import { AuthService } from '../../services/auth/auth.service';
 import { SharedModule } from '../../shared/shared-imports';
 import { canReturnTo, homeRouteFor } from '../../shared/utils/role.utils';

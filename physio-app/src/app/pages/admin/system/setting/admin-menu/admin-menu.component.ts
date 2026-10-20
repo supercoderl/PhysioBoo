@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { catchError, of } from "rxjs";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
 import { SettingAdminMenuDrawerComponent } from "../../../../../components/layout/admin/setting/admin-menu/admin-menu-drawer.component";
 import { SettingAdminMenuTreeCardComponent } from "../../../../../components/layout/admin/setting/admin-menu/admin-menu-tree-card.component";

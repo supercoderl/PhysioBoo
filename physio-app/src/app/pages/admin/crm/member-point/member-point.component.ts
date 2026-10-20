@@ -15,10 +15,9 @@ import { Patient } from "../../../../shared/types/patient.types";
 import { Reward } from "../../../../shared/types/reward.types";
 import { PointTransaction } from "../../../../shared/types/transaction.types";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
-import { BooCheckboxComponent } from "../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
 
 type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
 

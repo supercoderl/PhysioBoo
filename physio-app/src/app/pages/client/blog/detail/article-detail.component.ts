@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, catchError, map, merge, of, switchMap, tap } from 'rxjs';
-import { BooButtonComponent } from '../../../../components/button/boo-button/boo-button.component';
+import { BooBreadcrumbComponent, BooButtonComponent } from '@physioboo/ui';
 import { ArticleCardComponent } from '../../../../components/layout/client/article/article-card.component';
 import { PublicArticleService } from '../../../../services/public/public-article.service';
 import { ArticleCategory } from '../../../../shared/enums/article';
@@ -33,7 +33,7 @@ const OG_TAGS = ['og:title', 'og:description', 'og:image', 'og:type'];
 @Component({
   selector: 'app-article-detail',
   standalone: true,
-  imports: [BooButtonComponent, SharedModule, ArticleCardComponent],
+  imports: [BooButtonComponent, SharedModule, ArticleCardComponent, BooBreadcrumbComponent],
   templateUrl: './article-detail.component.html',
 })
 export class ArticleDetailComponent implements OnInit, OnDestroy {

@@ -5,10 +5,8 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { catchError, forkJoin, map, of, throwError } from "rxjs";
 import { CommonCategoryHospitalGroupDrawerComponent } from "../../../../components/layout/admin/system/common-category/hospital-group/hospital-group-drawer.component";
 import { SuperadminTab, SuperadminTabsComponent } from "../../../../components/layout/superadmin/shared/superadmin-tabs.component";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
-import { StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { BillingService } from "../../../../services/admin/billing.service";
 import { HospitalGroupService } from "../../../../services/admin/hospital-group.service";
 import { HospitalService } from "../../../../services/admin/hospital.service";
@@ -37,9 +35,9 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
         SharedModule,
         SuperadminTabsComponent,
         StatCardComponent,
-        StatusBadgeComponent,
-        EmptyStateComponent,
-        ErrorStateComponent,
+        BooStatusBadgeComponent,
+        BooEmptyStateComponent,
+        BooErrorStateComponent,
         CommonCategoryHospitalGroupDrawerComponent
     ],
     host: { class: 'block h-full min-h-0' },

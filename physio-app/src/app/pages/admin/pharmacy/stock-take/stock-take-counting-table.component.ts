@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from "@angular/core";
 import { Subject, debounceTime } from "rxjs";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../shared/shared-imports";
 import { STOCK_TAKE_REASONS, StockTakeItem } from "../../../../shared/types/stock-take.types";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
@@ -8,7 +8,7 @@ import { BooButtonAdminComponent } from "../../../../components/button/boo-butto
 @Component({
     selector: 'stock-take-counting-table',
     standalone: true,
-    imports: [SharedModule,EmptyStateComponent, BooButtonAdminComponent],
+    imports: [SharedModule,BooEmptyStateComponent, BooButtonAdminComponent],
     template: `
     <div class="h-full flex flex-col bg-surface border border-borderGray/60 rounded-2 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex items-center gap-3">

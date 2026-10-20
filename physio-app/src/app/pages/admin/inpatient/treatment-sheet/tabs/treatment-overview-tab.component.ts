@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { forkJoin } from "rxjs";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ClinicalAlert, TreatmentOrder, TreatmentTimelineEntry } from "../../../../../shared/types/treatment-sheet.types";
@@ -8,7 +8,7 @@ import { ClinicalAlert, TreatmentOrder, TreatmentTimelineEntry } from "../../../
 @Component({
   selector: 'treatment-overview-tab',
   standalone: true,
-  imports: [SharedModule, EmptyStateComponent],
+  imports: [SharedModule, BooEmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>

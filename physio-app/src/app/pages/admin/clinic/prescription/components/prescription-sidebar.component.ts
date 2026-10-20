@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
-import { StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooStatusBadgeComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../../shared/shared-imports";
 import {
   ClinicalWarningSeverity,
@@ -23,7 +23,7 @@ interface AlertEntry {
 @Component({
   selector: 'rx-sidebar',
   standalone: true,
-  imports: [SharedModule,BooTextareaComponent, StatusBadgeComponent, BooButtonAdminComponent],
+  imports: [SharedModule,BooTextareaComponent, BooStatusBadgeComponent, BooButtonAdminComponent],
   template: `
     <div class="space-y-4 sticky top-[72px]">
       <!-- Diagnosis recap -->

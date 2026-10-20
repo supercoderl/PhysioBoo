@@ -3,9 +3,7 @@ import { Component, DestroyRef, ElementRef, OnInit, PLATFORM_ID, ViewChild, inje
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subject, catchError, map, of, startWith, switchMap } from 'rxjs';
-import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
-import { InlineErrorComponent, InlineErrorState } from '../../../components/ui/inline-error.component';
-import { EmptyStateComponent } from '../../../components/ui/empty-state.component';
+import { BooButtonComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooInlineErrorState } from '@physioboo/ui';
 import { ArticleCardComponent } from '../../../components/layout/client/article/article-card.component';
 import { DoctorCardComponent } from '../../../components/layout/client/doctor/doctor-card.component';
 import { ClinicCardComponent } from '../../../components/layout/client/hospital/clinic-card.component';
@@ -38,7 +36,7 @@ export interface HomeSection<T> {
   state: 'loading' | 'results' | 'empty' | 'error';
   items: T[];
   /** State of the section's InlineError while it is in `error`. */
-  retry: InlineErrorState;
+  retry: BooInlineErrorState;
 }
 
 export interface HomeSpecialty extends PublicOption {
@@ -57,8 +55,8 @@ function loadingSection<T>(): HomeSection<T> {
   imports: [
     SharedModule,
     BooButtonComponent,
-    InlineErrorComponent,
-    EmptyStateComponent,
+    BooInlineErrorComponent,
+    BooEmptyStateComponent,
     DoctorCardComponent,
     ClinicCardComponent,
     ArticleCardComponent,

@@ -1,12 +1,12 @@
 import { Component, Input } from "@angular/core";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { QueuePatient } from "../../../../../shared/types/doctor-desk.types";
 
 @Component({
     selector: 'completed-list',
     standalone: true,
-    imports: [SharedModule,EmptyStateComponent],
+    imports: [SharedModule,BooEmptyStateComponent],
     template: `
         <div class="bg-surface rounded-2 border border-borderGray/60">
             <div class="flex items-center justify-between px-5 py-3.5 border-b border-borderGray/60">

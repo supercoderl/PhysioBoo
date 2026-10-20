@@ -2,8 +2,7 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { MenuItem } from "../../../../shared/types/menu.types";
 import { isKnownMenuIcon, menuPermissionOf } from "../../../../shared/utils/menu.utils";
-import { EmptyStateComponent } from "../../../ui/empty-state.component";
-import { StatusBadgeComponent } from "../../../ui/status-badge.component";
+import { BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
 
 export interface MenuRowEvent {
@@ -20,7 +19,7 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
 @Component({
     selector: 'superadmin-menu-tree',
     standalone: true,
-    imports: [SharedModule, StatusBadgeComponent, EmptyStateComponent, BooButtonAdminComponent],
+    imports: [SharedModule, BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonAdminComponent],
     template: `
         <div *ngIf="loading" class="space-y-3" aria-busy="true">
             <div *ngFor="let _ of [1, 2, 3]" class="h-[120px] rounded-2 border border-borderGray/60 bg-surface animate-pulse motion-reduce:animate-none"></div>

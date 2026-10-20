@@ -1,13 +1,13 @@
 import { AfterContentInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { SharedModule } from '../../../shared/shared-imports';
-import { LoadingSpinnerComponent } from "../../loading/spinner/spinner.component";
+import { BooSpinnerComponent } from '@physioboo/ui';
 
 @Component({
   selector: 'button-icon',
   standalone: true,
   imports: [
     SharedModule,
-    LoadingSpinnerComponent
+    BooSpinnerComponent
   ],
   template: `
     <button
@@ -29,7 +29,7 @@ import { LoadingSpinnerComponent } from "../../loading/spinner/spinner.component
         [size]="icon.size || 16"
         [class]="icon.class"
       />
-      <loading-spinner 
+      <boo-spinner 
         *ngIf="loading" 
         position="relative"
         strokeColor="#c3c3c3"

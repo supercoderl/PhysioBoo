@@ -17,8 +17,7 @@ import {
 } from '../../../../shared/types/print-template.types';
 import { convertEnumToSelection } from '../../../../shared/utils/common';
 import { BooButtonAdminComponent } from '../../../../components/button/boo-button-admin/boo-button-admin.component';
-import { BooInputComponent } from '../../../../components/input/boo-input/boo-input.component';
-import { BooCheckboxComponent } from '../../../../components/checkbox/boo-checkbox/boo-checkbox.component';
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 
 type EditField = 'header' | 'body' | 'footer' | 'css';
 

@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { SharedModule } from '../../../../shared/shared-imports';
-import { BooButtonComponent } from '../../../button/boo-button/boo-button.component';
+import { BooButtonComponent } from '@physioboo/ui';
 import { PublicDoctor } from '../../../../shared/types/public-doctor.types';
 
 /**

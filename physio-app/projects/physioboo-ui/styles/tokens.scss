@@ -1,0 +1,90 @@
+// PhysioBoo design tokens, shared by @physioboo/ui and the apps that use it.
+// Include this stylesheet globally (angular.json "styles") before the app's own styles.
+
+/* Rose accent on warm neutrals. The --twc-* values are space separated RGB so Tailwind can add alpha;
+   the --color-* values below are the same palette as hex for plain CSS. Keep the two in sync. */
+:root {
+  /* Light mode */
+  --twc-bg-header: 255 255 255; /* #FFFFFF */
+  --twc-primary: 225 29 72; /* #E11D48 */
+  --twc-primary-hover: 190 18 60; /* #BE123C */
+  --twc-primary-pressed: 159 18 57; /* #9F1239 */
+  --twc-primary-soft: 255 233 238; /* #FFE9EE */
+  --twc-primary-deep: 159 18 57; /* #9F1239 (text on primary-soft) */
+  --twc-logo: 244 63 94; /* #F43F5E */
+  --twc-secondary: 113 96 106; /* #71606A (descriptions, labels) */
+  --twc-neutral: 38 20 26; /* #26141A */
+  --twc-border: 239 227 231; /* #EFE3E7 */
+  --twc-row-divider: 244 244 242; /* #F4F4F2 */
+  --twc-brand-dark: 63 33 41; /* #3F2129 (sidebar item text) */
+  --twc-info: 255 233 238; /* #FFE9EE */
+  --twc-info2: 253 243 245; /* #FDF3F5 */
+  --twc-danger: 180 35 24; /* #B42318 (destructive; distinct from the rose accent) */
+  --twc-danger-border: 243 199 194; /* #F3C7C2 */
+  --twc-danger-soft: 254 243 242; /* #FEF3F2 */
+  --bg-surface: 255 255 255; /* #FFFFFF */
+  --twc-menu: 253 243 245; /* #FDF3F5 (sidebar) */
+  --twc-sidebar-active: 253 217 225; /* #FDD9E1 */
+  --twc-sidebar-hover: 251 231 236; /* #FBE7EC */
+  --twc-sidebar-group: 169 138 147; /* #A98A93 */
+  --twc-sidebar-divider: 243 225 230; /* #F3E1E6 */
+  --twc-regular: 38 20 26; /* #26141A (text primary) */
+  --twc-body: 253 248 249; /* #FDF8F9 (page) */
+  --twc-placeholder: 161 161 170; /* #A1A1AA (placeholder, disabled, table headers) */
+
+  /* Palette as hex (single source for plain CSS, SVG and inline styles) */
+  --color-primary: #E11D48;
+  --color-primary-hover: #BE123C;
+  --color-primary-pressed: #9F1239;
+  --color-primary-soft: #FFE9EE;
+  --color-primary-active-soft: #FDD9E1;
+  --color-primary-deep: #9F1239;
+  --color-bg: #FDF8F9;
+  --color-surface: #FFFFFF;
+  --color-border: #EFE3E7;
+  --color-text: #26141A;
+  --color-text-secondary: #71606A;
+  --color-text-muted: #A1A1AA;
+}
+
+:root.dark {
+  --twc-bg-header: 20 14 16; /* #140E10 */
+  --twc-primary: 251 113 133; /* #FB7185 */
+  --twc-primary-hover: 253 164 175; /* #FDA4AF */
+  --twc-primary-pressed: 254 205 211; /* #FECDD3 */
+  --twc-primary-soft: 63 24 33; /* #3F1821 */
+  --twc-primary-deep: 254 205 211; /* #FECDD3 */
+  --twc-logo: 251 113 133; /* #FB7185 */
+  --twc-secondary: 190 170 178; /* #BEAAB2 */
+  --twc-neutral: 233 220 225; /* #E9DCE1 */
+  --twc-border: 58 40 46; /* #3A282E */
+  --twc-row-divider: 44 31 36; /* #2C1F24 */
+  --twc-brand-dark: 240 214 221; /* #F0D6DD */
+  --twc-info: 63 24 33; /* #3F1821 */
+  --twc-info2: 45 22 28; /* #2D161C */
+  --twc-danger: 240 120 110; /* #F0786E */
+  --twc-danger-border: 120 50 46; /* #78322E */
+  --twc-danger-soft: 58 26 24; /* #3A1A18 */
+  --bg-surface: 28 20 23; /* #1C1417 */
+  --twc-menu: 24 16 19; /* #181013 */
+  --twc-sidebar-active: 74 30 40; /* #4A1E28 */
+  --twc-sidebar-hover: 48 26 32; /* #301A20 */
+  --twc-sidebar-group: 150 126 134; /* #967E86 */
+  --twc-sidebar-divider: 52 36 42; /* #34242A */
+  --twc-regular: 244 232 236; /* #F4E8EC */
+  --twc-body: 16 11 13; /* #100B0D */
+  --twc-placeholder: 140 122 130; /* #8C7A82 */
+
+  --color-primary: #FB7185;
+  --color-primary-hover: #FDA4AF;
+  --color-primary-pressed: #FECDD3;
+  --color-primary-soft: #3F1821;
+  --color-primary-active-soft: #4A1E28;
+  --color-primary-deep: #FECDD3;
+  --color-bg: #100B0D;
+  --color-surface: #1C1417;
+  --color-border: #3A282E;
+  --color-text: #F4E8EC;
+  --color-text-secondary: #BEAAB2;
+  --color-text-muted: #8C7A82;
+}

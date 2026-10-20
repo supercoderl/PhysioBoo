@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from "@angular/core";
 import { Subject, debounceTime, switchMap } from "rxjs";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooErrorStateComponent } from '@physioboo/ui';
 import { PrescriptionService } from "../../../../services/admin/prescription.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
@@ -31,7 +31,7 @@ import { BooButtonAdminComponent } from "../../../../components/button/boo-butto
     imports: [
         SharedModule,
 
-        ErrorStateComponent,
+        BooErrorStateComponent,
         PrescriptionActionBarComponent,
         PrescriptionPatientSummaryComponent,
         PrescriptionDiagnosisSectionComponent,

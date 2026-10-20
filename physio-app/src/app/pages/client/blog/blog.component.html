@@ -2,13 +2,7 @@
 <section aria-labelledby="blog-title" class="bg-gray-50 border-b border-gray-200">
   <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 pb-6 md:pt-8 md:pb-9 lg:pt-10 lg:pb-11 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] gap-5 md:gap-6 lg:gap-14 items-end">
     <div class="min-w-0 flex flex-col gap-3.5">
-      <nav aria-label="Breadcrumb">
-        <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600">
-          <li><a routerLink="/" class="text-gray-700 hover:text-primaryDeep">Home</a></li>
-          <li aria-hidden="true" class="flex"><physio-icon name="chevron-right" [size]="13" /></li>
-          <li aria-current="page" class="text-gray-900 font-medium">Blog</li>
-        </ol>
-      </nav>
+      <boo-breadcrumb [items]="[{ label: 'Home', link: '/' }, { label: 'Blog' }]" />
       <h1 id="blog-title" class="text-[30px] leading-[38px] md:text-4xl md:leading-[44px] lg:text-[44px] lg:leading-[52px] font-semibold tracking-[-0.02em] text-gray-900 m-0 text-balance">
         Health Insights &amp; Advice
       </h1>
@@ -164,29 +158,13 @@
         <li *ngFor="let a of articles; trackBy: trackById" class="motion-fade"><article-card [article]="a" [showMeta]="true" ctaLabel="Read more" /></li>
       </ul>
 
-      <nav *ngIf="totalPages > 1" aria-label="Pagination" class="mt-8 md:mt-10 lg:mt-12 pt-6 border-t border-gray-200 flex justify-between items-center gap-3">
-        <button boo-button variant="secondary" (click)="goToPage(query.page - 1)" [disabled]="query.page <= 1" class="!gap-1.5">
-          <physio-icon name="chevron-left" [size]="16" />Previous
-        </button>
-        <ol class="hidden md:flex list-none m-0 p-0 gap-1">
-          <li *ngFor="let p of pages">
-            <span *ngIf="p === null" aria-hidden="true" class="w-11 h-11 flex items-center justify-center text-gray-600">…</span>
-            <button
-              *ngIf="p !== null"
-              boo-button
-              [variant]="p === query.page ? 'primary' : 'secondary'"
-              (click)="goToPage(p)"
-              [attr.aria-current]="p === query.page ? 'page' : null"
-              [attr.aria-label]="'Page ' + p"
-              class="min-w-11 !px-2"
-            >{{ p }}</button>
-          </li>
-        </ol>
-        <span class="md:hidden text-sm font-medium text-gray-800">Page {{ query.page }} of {{ totalPages }}</span>
-        <button boo-button variant="secondary" (click)="goToPage(query.page + 1)" [disabled]="query.page >= totalPages" class="!gap-1.5">
-          Next<physio-icon name="chevron-right" [size]="16" />
-        </button>
-      </nav>
+      <boo-pagination
+        class="mt-8 md:mt-10 lg:mt-12 pt-6 border-t border-gray-200"
+        appearance="labelled"
+        [page]="query.page"
+        [totalPages]="totalPages"
+        (pageChange)="goToPage($event)"
+      />
     </ng-container>
   </div>
 </section>

@@ -5,7 +5,7 @@ import { BooButtonAdminComponent } from "../../../../components/button/boo-butto
 import { CommonCategoryHospitalGroupDrawerComponent } from "../../../../components/layout/admin/system/common-category/hospital-group/hospital-group-drawer.component";
 import { SuperadminPageHeaderComponent } from "../../../../components/layout/superadmin/shared/superadmin-page-header.component";
 import { SuperadminTenantTableCardComponent } from "../../../../components/layout/superadmin/tenants/tenant-table-card.component";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooErrorStateComponent } from '@physioboo/ui';
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { HospitalGroupService } from "../../../../services/admin/hospital-group.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -24,7 +24,7 @@ import { HospitalGroup } from "../../../../shared/types/support.types";
         SuperadminPageHeaderComponent,
         SuperadminTenantTableCardComponent,
         StatCardComponent,
-        ErrorStateComponent,
+        BooErrorStateComponent,
         CommonCategoryHospitalGroupDrawerComponent
     ],
     host: { class: 'block h-full min-h-0' },

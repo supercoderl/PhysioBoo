@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
-import { FormWrapperComponent } from "../../../components/form/boo-form/boo-form.component";
-import { BooInputComponent } from '../../../components/input/boo-input/boo-input.component';
+import { BooButtonComponent, BooFormComponent, BooInputComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../components/select/boo-select/boo-select.component";
 import { TenantOnboardingService } from '../../../services/admin/tenant-onboarding.service';
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
@@ -17,7 +15,7 @@ import { RegisterTenantRequest } from '../../../shared/types/tenant.types';
   standalone: true,
   imports: [
     SharedModule,
-    FormWrapperComponent,
+    BooFormComponent,
     BooButtonComponent,
     BooInputComponent,
     BooSelectComponent,

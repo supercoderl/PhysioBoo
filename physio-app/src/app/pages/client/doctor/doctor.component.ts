@@ -1,16 +1,12 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, DestroyRef, ElementRef, HostListener, OnDestroy, OnInit, PLATFORM_ID, ViewChild, inject } from '@angular/core';
+import { Component, DestroyRef, ElementRef, OnInit, PLATFORM_ID, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { Subject, catchError, debounceTime, distinctUntilChanged, map, merge, of, switchMap, tap } from 'rxjs';
-import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
+import { BooBreadcrumbComponent, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooFilterChipsComponent, BooPaginationComponent, BooSearchFieldComponent, BooSheetComponent } from '@physioboo/ui';
 import { DoctorCardComponent } from '../../../components/layout/client/doctor/doctor-card.component';
-import { EmptyStateComponent } from '../../../components/ui/empty-state.component';
-import { ErrorStateComponent } from '../../../components/ui/error-state.component';
 import { PublicDoctorService } from '../../../services/public/public-doctor.service';
-import { chipPop, drawerSheet } from '../../../shared/animations/motion.animation';
 import { SharedModule } from '../../../shared/shared-imports';
-import { motionState } from '../../../shared/utils/motion.utils';
 import { PublicDoctor, PublicOption } from '../../../shared/types/public-doctor.types';
 
 type ListState = 'loading' | 'results' | 'empty' | 'error';
@@ -43,21 +39,19 @@ const EMPTY_QUERY: Query = { q: '', specialty: '', facility: '', online: false, 
 @Component({
   selector: 'app-doctor',
   standalone: true,
-  imports: [SharedModule, BooButtonComponent, DoctorCardComponent, EmptyStateComponent, ErrorStateComponent],
-  templateUrl: './doctor.component.html',
-  animations: [chipPop, drawerSheet]
+  imports: [
+    SharedModule, BooButtonComponent, DoctorCardComponent, BooEmptyStateComponent, BooErrorStateComponent, BooBreadcrumbComponent,
+    BooSearchFieldComponent, BooFilterChipsComponent, BooPaginationComponent, BooSheetComponent
+  ],
+  templateUrl: './doctor.component.html'
 })
-export class DoctorComponent implements OnInit, OnDestroy {
-  /** 'reduced' limits chips and drawers to a short opacity fade. */
-  readonly motion = motionState();
-
+export class DoctorComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly doctorSrv = inject(PublicDoctorService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  @ViewChild('drawerClose', { read: ElementRef }) private drawerClose?: ElementRef<HTMLButtonElement>;
   @ViewChild('filterButton', { read: ElementRef }) private filterButton?: ElementRef<HTMLButtonElement>;
   @ViewChild('results') private results?: ElementRef<HTMLElement>;
 
@@ -117,10 +111,6 @@ export class DoctorComponent implements OnInit, OnDestroy {
       switchMap(q => this.fetch(q)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.lockScroll(false);
   }
 
   // #region Search and filters
@@ -211,20 +201,6 @@ export class DoctorComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Pagination
-  /** Page numbers to render; `null` is an ellipsis. Short lists show every page. */
-  get pages(): (number | null)[] {
-    const total = this.totalPages, current = this.query.page;
-    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-    const set = new Set([1, total, current - 1, current, current + 1].filter(p => p >= 1 && p <= total));
-    const sorted = [...set].sort((a, b) => a - b);
-    const out: (number | null)[] = [];
-    sorted.forEach((p, i) => {
-      if (i > 0 && p - sorted[i - 1] > 1) out.push(null);
-      out.push(p);
-    });
-    return out;
-  }
-
   goToPage(page: number): void {
     if (page < 1 || page > this.totalPages || page === this.query.page) return;
     this.navigate({ page });
@@ -233,22 +209,17 @@ export class DoctorComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Mobile filter drawer
+  /** The sheet returns focus here when it closes. */
+  get filterButtonElement(): HTMLElement | undefined {
+    return this.filterButton?.nativeElement;
+  }
+
   openDrawer(): void {
     this.drawerOpen = true;
-    this.lockScroll(true);
-    setTimeout(() => this.drawerClose?.nativeElement.focus());
   }
 
-  @HostListener('document:keydown.escape')
   closeDrawer(): void {
-    if (!this.drawerOpen) return;
     this.drawerOpen = false;
-    this.lockScroll(false);
-    setTimeout(() => this.filterButton?.nativeElement.focus());
-  }
-
-  private lockScroll(lock: boolean): void {
-    if (this.isBrowser) document.body.style.overflow = lock ? 'hidden' : '';
   }
   // #endregion
 
@@ -323,9 +294,4 @@ export class DoctorComponent implements OnInit, OnDestroy {
     return options.find(o => o.id === id)?.name ?? fallback;
   }
   // #endregion
-
-  /** Rows are rebuilt by a getter on every check; tracking by label keeps the same DOM nodes. */
-  trackByLabel(_: number, item: { label: string }): string {
-    return item.label;
-  }
 }

@@ -1,4 +1,4 @@
-import { IconComponent } from 'physioboo-icons';
+import { BooIconComponent } from '@physioboo/ui';
 import { Component } from '@angular/core';
 import { delay, finalize, tap } from 'rxjs';
 import { LocalLoadingService } from '../../../../services/common/local-loading.service';
@@ -11,7 +11,7 @@ import { SwitchComponent } from "../../../switch/switch.component";
 @Component({
   selector: 'admin-cloud',
   standalone: true,
-  imports: [DividerComponent, SwitchComponent, ClockComponent, ButtonIconComponent, IconComponent],
+  imports: [DividerComponent, SwitchComponent, ClockComponent, ButtonIconComponent, BooIconComponent],
   templateUrl: './cloud.component.html'
 })
 export class AdminCloudComponent {

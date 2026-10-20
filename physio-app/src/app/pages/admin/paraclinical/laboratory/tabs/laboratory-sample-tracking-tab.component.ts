@@ -1,6 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { LaboratoryService } from "../../../../../services/admin/laboratory.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -19,7 +18,7 @@ const STAGE_LABELS: Record<LabSampleTimelineEvent['stage'], string> = {
 @Component({
   selector: 'laboratory-sample-tracking-tab',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent, BooButtonAdminComponent, ButtonIconComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonAdminComponent, ButtonIconComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -95,7 +94,7 @@ export class LaboratorySampleTrackingTabComponent implements OnInit {
     this.expanded.set(this.expanded() === id ? null : id);
   }
 
-  collectionTone(status: SampleCollectionStatus): BadgeTone {
+  collectionTone(status: SampleCollectionStatus): BooBadgeTone {
     switch (status) {
       case 'Collected': case 'Received': return 'success';
       case 'InTransit': return 'primary';

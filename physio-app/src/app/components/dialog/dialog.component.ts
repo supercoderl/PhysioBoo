@@ -4,7 +4,8 @@ import { Router } from '@angular/router';
 import { DialogService } from '../../services/common/dialog.service';
 import { SharedModule } from '../../shared/shared-imports'; // Nơi chứa CommonModule, Icons...
 import { DialogType } from '../../shared/types/dialog.types';
-import { isPublicUrl, motionState } from '../../shared/utils/motion.utils';
+import { booMotionState } from '@physioboo/ui';
+import { isPublicUrl } from '../../shared/utils/motion.utils';
 import { BooButtonAdminComponent } from '../button/boo-button-admin/boo-button-admin.component';
 
 @Component({
@@ -114,7 +115,7 @@ export class DialogComponent {
   // #region Inputs, Outputs, Properties
   dialogService = inject(DialogService);
   private readonly router = inject(Router);
-  private readonly motion = motionState();
+  private readonly motion = booMotionState();
 
   /** Public pages get the public motion (and no backdrop blur); every other area keeps the original behaviour. */
   get mode(): 'admin' | 'full' | 'reduced' {

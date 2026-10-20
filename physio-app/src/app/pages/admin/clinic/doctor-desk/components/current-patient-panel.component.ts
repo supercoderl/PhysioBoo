@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal } from "@angular/core";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { QueuePatient } from "../../../../../shared/types/doctor-desk.types";
 
@@ -10,7 +9,7 @@ export type CurrentPatientAction = 'complete' | 'transfer' | 'record' | 'print';
 @Component({
     selector: 'current-patient-panel',
     standalone: true,
-    imports: [SharedModule, BooButtonAdminComponent, EmptyStateComponent, StatusBadgeComponent],
+    imports: [SharedModule, BooButtonAdminComponent, BooEmptyStateComponent, BooStatusBadgeComponent],
     template: `
         <div class="bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
             <div class="flex items-center justify-between px-5 py-3.5 border-b border-borderGray/60">

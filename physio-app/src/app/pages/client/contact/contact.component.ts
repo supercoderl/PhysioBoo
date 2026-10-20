@@ -2,7 +2,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, ElementRef, OnInit, PLATFORM_ID, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
+import { BooBreadcrumbComponent, BooButtonComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { ClinicCardComponent } from '../../../components/layout/client/hospital/clinic-card.component';
 import { PublicContactService } from '../../../services/public/public-contact.service';
 import { PublicHospitalService } from '../../../services/public/public-hospital.service';
@@ -48,7 +48,7 @@ const CLINIC_CARDS = 3;
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [BooButtonComponent, SharedModule, ClinicCardComponent],
+  imports: [BooButtonComponent, SharedModule, ClinicCardComponent, BooBreadcrumbComponent, BooFieldErrorComponent],
   templateUrl: './contact.component.html',
 })
 export class ContactComponent implements OnInit {

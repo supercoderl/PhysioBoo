@@ -1,9 +1,8 @@
 import { Component, OnDestroy, OnInit, computed, signal } from "@angular/core";
 import { Subject, catchError, debounceTime, distinctUntilChanged, finalize, of, switchMap, takeUntil } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent } from "../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
-import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { AdmissionService } from "../../../../services/admin/admission.service";

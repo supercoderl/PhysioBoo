@@ -30,13 +30,12 @@
 <!-- Unavailable: unknown, draft, archived and deleted articles look the same -->
 <ng-container *ngIf="state === 'notfound'">
   <div class="bg-gray-50 border-b border-gray-200">
-    <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4">
-      <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600">
-        <li><a routerLink="/" class="text-primaryDeep font-medium underline decoration-[#F3C1CD] underline-offset-[3px] hover:text-primaryHover">Home</a></li>
-        <li aria-hidden="true">/</li>
-        <li><a routerLink="/blog" class="text-primaryDeep font-medium underline decoration-[#F3C1CD] underline-offset-[3px] hover:text-primaryHover">Blog</a></li>
-      </ol>
-    </nav>
+    <boo-breadcrumb
+      class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4"
+      separator="slash"
+      linkStyle="underline"
+      [items]="[{ label: 'Home', link: '/' }, { label: 'Blog', link: '/blog' }]"
+    />
   </div>
   <div class="max-w-[640px] mx-auto px-6 pt-[88px] pb-24 text-center">
     <physio-icon name="file-x" [size]="36" class="text-gray-600 inline-flex" />
@@ -67,15 +66,13 @@
 <ng-container *ngIf="state === 'live' && article as a">
   <!-- Breadcrumb -->
   <div class="bg-gray-50 border-b border-gray-200">
-    <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4">
-      <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600 min-w-0">
-        <li class="flex-none"><a routerLink="/" class="text-primaryDeep font-medium underline decoration-[#F3C1CD] underline-offset-[3px] hover:text-primaryHover">Home</a></li>
-        <li aria-hidden="true" class="flex-none">/</li>
-        <li class="flex-none"><a routerLink="/blog" class="text-primaryDeep font-medium underline decoration-[#F3C1CD] underline-offset-[3px] hover:text-primaryHover">Blog</a></li>
-        <li aria-hidden="true" class="flex-none">/</li>
-        <li aria-current="page" [title]="a.title" class="min-w-0 flex-1 text-gray-900 font-medium truncate">{{ a.title }}</li>
-      </ol>
-    </nav>
+    <boo-breadcrumb
+      class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4"
+      separator="slash"
+      linkStyle="underline"
+      [truncate]="true"
+      [items]="[{ label: 'Home', link: '/' }, { label: 'Blog', link: '/blog' }, { label: a.title }]"
+    />
   </div>
 
   <article aria-labelledby="art-h">

@@ -13,10 +13,8 @@ import {
 import { billingStatusLabel, billingStatusTone, formatMoney } from "../../../../shared/utils/billing.utils";
 import { DrawerComponent } from "../../../drawer/drawer.component";
 import { BooSelectComponent } from "../../../select/boo-select/boo-select.component";
-import { ErrorStateComponent } from "../../../ui/error-state.component";
-import { StatusBadgeComponent } from "../../../ui/status-badge.component";
+import { BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../input/boo-input/boo-input.component";
 import { BooTextareaComponent } from "../../../textarea/boo-textarea/boo-textarea.component";
 
 const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
@@ -24,7 +22,7 @@ const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface t
 @Component({
     selector: 'superadmin-tenant-subscription-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooSelectComponent, StatusBadgeComponent, ErrorStateComponent, BooButtonAdminComponent, BooInputComponent, BooTextareaComponent],
+    imports: [SharedModule, DrawerComponent, BooSelectComponent, BooStatusBadgeComponent, BooErrorStateComponent, BooButtonAdminComponent, BooInputComponent, BooTextareaComponent],
     template: `
         <drawer [isOpen]="isOpen" (close)="close.emit()">
             <div

@@ -7,7 +7,7 @@ import { MaritalStatus } from "../../../../../shared/enums/marital-status";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { UserProfileBase } from "../../../../../shared/types/core.types";
 import { BooDatepickerComponent } from "../../../../date-picker/boo-date-picker.component";
-import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 
 @Component({

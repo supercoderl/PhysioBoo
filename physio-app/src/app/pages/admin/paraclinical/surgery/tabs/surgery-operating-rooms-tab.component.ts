@@ -1,6 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { OperatingRoom, OperatingRoomStatus } from "../../../../../shared/types/surgery.types";
@@ -8,7 +7,7 @@ import { OperatingRoom, OperatingRoomStatus } from "../../../../../shared/types/
 @Component({
   selector: 'surgery-operating-rooms-tab',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -61,7 +60,7 @@ export class SurgeryOperatingRoomsTabComponent implements OnInit {
     });
   }
 
-  statusTone(status: OperatingRoomStatus): BadgeTone {
+  statusTone(status: OperatingRoomStatus): BooBadgeTone {
     switch (status) {
       case 'Available': case 'Ready': return 'success';
       case 'Preparing': case 'Cleaning': return 'primary';

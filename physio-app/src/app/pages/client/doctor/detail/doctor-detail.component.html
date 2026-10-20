@@ -49,15 +49,11 @@
 <ng-container *ngIf="state === 'live' && doctor as d">
   <!-- Breadcrumb -->
   <div class="bg-gray-50 border-b border-gray-200">
-    <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4">
-      <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600 flex-wrap">
-        <li><a routerLink="/" class="text-gray-700 hover:text-primaryDeep">Home</a></li>
-        <li aria-hidden="true" class="flex"><physio-icon name="chevron-right" [size]="13" /></li>
-        <li><a routerLink="/doctor" class="text-gray-700 hover:text-primaryDeep">Doctors</a></li>
-        <li aria-hidden="true" class="flex"><physio-icon name="chevron-right" [size]="13" /></li>
-        <li aria-current="page" class="text-gray-900 font-medium">{{ d.fullName }}</li>
-      </ol>
-    </nav>
+    <boo-breadcrumb
+      class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4"
+      [wrap]="true"
+      [items]="[{ label: 'Home', link: '/' }, { label: 'Doctors', link: '/doctor' }, { label: d.fullName }]"
+    />
   </div>
 
   <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_400px] gap-10 lg:gap-14 items-start">
@@ -211,7 +207,7 @@
               <option value="">Choose a facility</option>
               <option *ngFor="let o of d.facilities" [value]="o.id">{{ o.name }}</option>
             </select>
-            <span *ngIf="errorFor('facility')" id="rq-facility-err" class="motion-feedback text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('facility') }}</span>
+            <boo-field-error *ngIf="errorFor('facility')" id="rq-facility-err">{{ errorFor('facility') }}</boo-field-error>
           </div>
           <p *ngIf="singleFacility as only" class="m-0 text-sm text-gray-700 flex gap-2 items-center">
             <physio-icon name="building-2" [size]="15" class="text-gray-600" />At {{ only.name }}
@@ -233,7 +229,7 @@
               <option value="">Choose a service</option>
               <option *ngFor="let s of d.serviceOptions" [value]="s.id">{{ s.name }}</option>
             </select>
-            <span *ngIf="errorFor('service')" id="rq-service-err" class="motion-feedback text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('service') }}</span>
+            <boo-field-error *ngIf="errorFor('service')" id="rq-service-err">{{ errorFor('service') }}</boo-field-error>
           </div>
 
           <div class="flex flex-col gap-1.5">
@@ -251,7 +247,7 @@
               class="h-12 border rounded-xl px-3.5 text-base text-gray-900 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
               [ngClass]="errorFor('name') ? 'border-danger' : 'border-gray-300 focus:border-primary'"
             />
-            <span *ngIf="errorFor('name')" id="rq-name-err" class="motion-feedback text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('name') }}</span>
+            <boo-field-error *ngIf="errorFor('name')" id="rq-name-err">{{ errorFor('name') }}</boo-field-error>
           </div>
 
           <div class="flex flex-col gap-1.5">
@@ -272,7 +268,7 @@
               class="h-12 border rounded-xl px-3.5 text-base text-gray-900 bg-surface placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/20"
               [ngClass]="errorFor('phone') ? 'border-danger' : 'border-gray-300 focus:border-primary'"
             />
-            <span *ngIf="errorFor('phone')" id="rq-phone-err" class="motion-feedback text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('phone') }}</span>
+            <boo-field-error *ngIf="errorFor('phone')" id="rq-phone-err">{{ errorFor('phone') }}</boo-field-error>
           </div>
 
           <div class="flex flex-col gap-1.5">
@@ -291,7 +287,7 @@
               class="h-12 border rounded-xl px-3.5 text-base text-gray-900 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
               [ngClass]="errorFor('email') ? 'border-danger' : 'border-gray-300 focus:border-primary'"
             />
-            <span *ngIf="errorFor('email')" id="rq-email-err" class="motion-feedback text-[13px] text-danger flex gap-1.5 items-center"><physio-icon name="circle-alert" [size]="14" />{{ errorFor('email') }}</span>
+            <boo-field-error *ngIf="errorFor('email')" id="rq-email-err">{{ errorFor('email') }}</boo-field-error>
           </div>
 
           <!-- Honeypot: hidden from people and assistive tech; bots that fill it are ignored server-side. -->

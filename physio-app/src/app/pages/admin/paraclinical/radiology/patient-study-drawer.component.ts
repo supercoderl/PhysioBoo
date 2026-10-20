@@ -2,8 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angu
 import { Router } from "@angular/router";
 import { forkJoin } from "rxjs";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { RadiologyService } from "../../../../services/admin/radiology.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -14,7 +13,7 @@ import { ButtonIconComponent } from "../../../../components/button/button-icon/b
 @Component({
   selector: 'radiology-patient-study-drawer',
   standalone: true,
-  imports: [SharedModule, DrawerComponent,StatusBadgeComponent, EmptyStateComponent, ButtonIconComponent],
+  imports: [SharedModule, DrawerComponent,BooStatusBadgeComponent, BooEmptyStateComponent, ButtonIconComponent],
   template: `
     <drawer [isOpen]="isOpen" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
@@ -104,7 +103,7 @@ export class RadiologyPatientStudyDrawerComponent implements OnChanges {
     return o.examinations.map(e => e.examinationName).join(', ');
   }
 
-  reportStatusTone(status: ReportStatus): BadgeTone {
+  reportStatusTone(status: ReportStatus): BooBadgeTone {
     switch (status) {
       case 'Released': case 'Verified': return 'success';
       case 'PendingVerification': case 'Reporting': return 'warning';

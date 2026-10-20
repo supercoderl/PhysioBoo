@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { BooActionAdminComponent } from "../../../../components/table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent } from "../../../../components/table/boo-table-admin/boo-table-admin.component";
-import { StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooStatusBadgeComponent } from '@physioboo/ui';
 import { ColumnDefDirective } from "../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { ActionItem, PaginationData } from "../../../../shared/types/common";
@@ -10,7 +10,7 @@ import { StockTake, StockTakeStatus, stockTakeStatusLabel, stockTakeStatusTone }
 @Component({
   selector: 'stock-take-table-card',
   standalone: true,
-  imports: [SharedModule, BooTableAdminComponent, ColumnDefDirective, BooActionAdminComponent, StatusBadgeComponent],
+  imports: [SharedModule, BooTableAdminComponent, ColumnDefDirective, BooActionAdminComponent, BooStatusBadgeComponent],
   host: { class: 'block h-full min-h-0' },
   template: `
     <div class="bg-surface rounded-2 border border-borderGray/60 h-full overflow-hidden">

@@ -1,6 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -9,7 +8,7 @@ import { QueueEntry, QueueStatus, RadiologyPriority } from "../../../../../share
 @Component({
   selector: 'radiology-queue-tab',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -88,7 +87,7 @@ export class RadiologyQueueTabComponent implements OnInit {
     });
   }
 
-  priorityTone(priority: RadiologyPriority): BadgeTone {
+  priorityTone(priority: RadiologyPriority): BooBadgeTone {
     switch (priority) {
       case 'Stat': return 'danger';
       case 'Urgent': return 'warning';

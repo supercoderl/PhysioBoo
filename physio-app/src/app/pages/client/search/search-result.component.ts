@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
+import { BooButtonComponent } from '@physioboo/ui';
 import { SharedModule } from '../../../shared/shared-imports';
 
 export type SearchResultKind = 'doctor' | 'service' | 'clinic' | 'article';

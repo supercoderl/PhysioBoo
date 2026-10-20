@@ -1,8 +1,6 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { LaboratoryService } from "../../../../../services/admin/laboratory.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { LabOrderRow, LabOrderStatus, LabPriority, LabVerificationStatus, SampleCollectionStatus } from "../../../../../shared/types/laboratory.types";
@@ -10,7 +8,7 @@ import { LabOrderRow, LabOrderStatus, LabPriority, LabVerificationStatus, Sample
 @Component({
   selector: 'laboratory-orders-tab',
   standalone: true,
-  imports: [SharedModule,BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent],
   template: `
     <div class="flex flex-wrap items-center gap-3 mb-4">
       <boo-input label="Search order #, patient, MRN..." size="small" (search)="onSearch($event)"></boo-input>
@@ -156,7 +154,7 @@ export class LaboratoryOrdersTabComponent implements OnInit {
     return Array.from(map.entries()).map(([key, items]) => ({ key, items }));
   }
 
-  priorityTone(priority: LabPriority): BadgeTone {
+  priorityTone(priority: LabPriority): BooBadgeTone {
     switch (priority) {
       case 'Stat': return 'danger';
       case 'Urgent': return 'warning';
@@ -164,7 +162,7 @@ export class LaboratoryOrdersTabComponent implements OnInit {
     }
   }
 
-  collectionTone(status: SampleCollectionStatus): BadgeTone {
+  collectionTone(status: SampleCollectionStatus): BooBadgeTone {
     switch (status) {
       case 'Collected': case 'Received': return 'success';
       case 'InTransit': return 'primary';
@@ -173,7 +171,7 @@ export class LaboratoryOrdersTabComponent implements OnInit {
     }
   }
 
-  labStatusTone(status: LabOrderStatus): BadgeTone {
+  labStatusTone(status: LabOrderStatus): BooBadgeTone {
     switch (status) {
       case 'Completed': return 'success';
       case 'Processing': case 'QualityCheck': return 'primary';
@@ -182,7 +180,7 @@ export class LaboratoryOrdersTabComponent implements OnInit {
     }
   }
 
-  verificationTone(status: LabVerificationStatus): BadgeTone {
+  verificationTone(status: LabVerificationStatus): BooBadgeTone {
     switch (status) {
       case 'Verified': return 'success';
       case 'PendingVerification': return 'warning';

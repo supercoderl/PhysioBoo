@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges, signal } from "@angular/core";
 import { Color, ScaleType } from '@swimlane/ngx-charts';
 import { curveCatmullRom } from 'd3-shape';
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { StockInsight } from "../../../../shared/types/inventory-management.types";
@@ -9,7 +9,7 @@ import { StockInsight } from "../../../../shared/types/inventory-management.type
 @Component({
     selector: 'inventory-intelligence-panel',
     standalone: true,
-    imports: [SharedModule,EmptyStateComponent],
+    imports: [SharedModule,BooEmptyStateComponent],
     template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60">

@@ -5,8 +5,7 @@ import { SuperadminAuditLogDrawerComponent } from "../../../../components/layout
 import { SuperadminPageHeaderComponent } from "../../../../components/layout/superadmin/shared/superadmin-page-header.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BooTableAdminComponent } from "../../../../components/table/boo-table-admin/boo-table-admin.component";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
-import { StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { AuditLogService } from "../../../../services/admin/audit-log.service";
 import { ColumnDefDirective } from "../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -14,7 +13,6 @@ import { AuditLog } from "../../../../shared/types/audit-log.types";
 import { PaginationData } from "../../../../shared/types/common";
 import { auditActionTone } from "../../../../shared/utils/audit-log.utils";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
 
 const ACTIONS = ['Create', 'Update', 'Delete', 'SoftDelete'];
 
@@ -29,8 +27,8 @@ const ACTIONS = ['Create', 'Update', 'Delete', 'SoftDelete'];
         BooDatepickerComponent,
         BooTableAdminComponent,
         ColumnDefDirective,
-        StatusBadgeComponent,
-        ErrorStateComponent,
+        BooStatusBadgeComponent,
+        BooErrorStateComponent,
         BooButtonAdminComponent,
         BooInputComponent
     ],

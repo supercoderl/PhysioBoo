@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, catchError, filter, map, merge, of, switchMap, tap } from 'rxjs';
-import { BooButtonComponent } from '../../../../components/button/boo-button/boo-button.component';
+import { BooBreadcrumbComponent, BooButtonComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { DoctorCardComponent } from '../../../../components/layout/client/doctor/doctor-card.component';
 import { PublicDoctorService } from '../../../../services/public/public-doctor.service';
 import { SharedModule } from '../../../../shared/shared-imports';
@@ -40,7 +40,7 @@ const SERVER_FIELD_ERRORS: Record<string, { field: RequestField; message: string
 @Component({
   selector: 'app-doctor-detail',
   standalone: true,
-  imports: [BooButtonComponent, SharedModule, DoctorCardComponent],
+  imports: [BooButtonComponent, SharedModule, DoctorCardComponent, BooBreadcrumbComponent, BooFieldErrorComponent],
   templateUrl: './doctor-detail.component.html',
   styles: `
     .ph-stripes { background: repeating-linear-gradient(135deg, #F3EAED 0 10px, #F9F4F6 10px 20px); }

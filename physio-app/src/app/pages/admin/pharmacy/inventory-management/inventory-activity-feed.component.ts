@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { StockMovementEvent, StockMovementType } from "../../../../shared/types/inventory-management.types";
@@ -19,7 +19,7 @@ const MOVEMENT_ICON: Record<StockMovementType, string> = {
 @Component({
   selector: 'inventory-activity-feed',
   standalone: true,
-  imports: [SharedModule, EmptyStateComponent],
+  imports: [SharedModule, BooEmptyStateComponent],
   template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60">

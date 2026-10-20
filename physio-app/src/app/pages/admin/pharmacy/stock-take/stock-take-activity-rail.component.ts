@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { StockTakeService } from "../../../../services/admin/stock-take.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { StockTakeActivity, StockTakeActivityType, StockTakeKpis } from "../../../../shared/types/stock-take.types";
@@ -18,7 +18,7 @@ const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
 @Component({
   selector: 'stock-take-activity-rail',
   standalone: true,
-  imports: [SharedModule, EmptyStateComponent],
+  imports: [SharedModule, BooEmptyStateComponent],
   template: `
     <div class="sticky top-4 space-y-3">
       <div class="bg-surface border border-borderGray/60 rounded-2 p-3.5">

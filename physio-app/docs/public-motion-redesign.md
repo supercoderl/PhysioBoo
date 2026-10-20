@@ -186,7 +186,7 @@ Focus trapping, Escape, backdrop click: unchanged.
 
 1. **`styles.scss`** — motion tokens (`:root`), `.motion-reveal` / `.motion-reveal.is-visible`, `.motion-stagger > *` delay via `--i`, `.motion-lift` (card hover/focus-within), `.motion-img` (scale), `.motion-press`, and one `@media (prefers-reduced-motion: reduce)` block that neutralises them.
 2. **`shared/directives/reveal.directive.ts`** — `[appReveal]` (and `[appRevealStagger]`): `IntersectionObserver`, runs outside Angular zone, `isPlatformBrowser` guard (SSR renders visible), one-shot unobserve, safety timeout, respects `matchMedia('(prefers-reduced-motion)')`. Registered in `SharedModule`.
-3. **`shared/animations/`** — add `motion.animation.ts` (menu, sheet, fade triggers, reduced-motion aware) alongside the existing `dropdown.animation.ts`.
+3. **`@physioboo/ui`** — menu, sheet and chip triggers plus the reduced-motion check live in `projects/physioboo-ui/src/lib/motion/motion.ts`, so the library's filter chips and bottom sheet animate themselves.
 4. **`img` fade** — small `[appImgFade]` directive (adds `is-loaded` on `load`; skips if `complete`).
 5. Edit existing: `boo-button` (class strings), four cards, `header`, `footer` links, listing templates (chips, drawer, results wrapper), Home FAQ, Contact/Doctor Detail forms, `toast`, `global-dialog`.
 
@@ -225,8 +225,9 @@ Focus trapping, Escape, backdrop click: unchanged.
 | Tokens, `.motion-*` classes, reduced-motion and print rules | `src/styles.scss` (bottom section) |
 | Scroll reveal (`appReveal`, `appRevealStagger`) | `src/app/shared/directives/reveal.directive.ts` |
 | Image fade (`img[appImgFade]`) | `src/app/shared/directives/img-fade.directive.ts` |
-| Menu, chip and drawer triggers | `src/app/shared/animations/motion.animation.ts` |
-| `motionState()`, `prefersReducedMotion()`, `isPublicUrl()` | `src/app/shared/utils/motion.utils.ts` |
+| Menu, chip and drawer triggers (`booMenuPop`, `booMenuPanel`, `booChipPop`, `booDrawerSheet`) | `@physioboo/ui`: `projects/physioboo-ui/src/lib/motion/motion.ts` |
+| `booMotionState()`, `booPrefersReducedMotion()` | `@physioboo/ui`: `projects/physioboo-ui/src/lib/motion/motion.ts` |
+| `isPublicUrl()` | `src/app/shared/utils/motion.utils.ts` |
 | Public scope (`.public-motion`) and route fade | `src/app/pages/client/client.component.ts` |
 
 ### Scoping

@@ -6,7 +6,7 @@ import { ActionItem, PaginationData } from "../../../../shared/types/common";
 import { billingStatusLabel, billingStatusTone, formatMoney } from "../../../../shared/utils/billing.utils";
 import { BooActionAdminComponent } from "../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent, FilterConfig } from "../../../table/boo-table-admin/boo-table-admin.component";
-import { StatusBadgeComponent } from "../../../ui/status-badge.component";
+import { BooStatusBadgeComponent } from '@physioboo/ui';
 
 @Component({
   selector: 'superadmin-subscription-table-card',
@@ -16,7 +16,7 @@ import { StatusBadgeComponent } from "../../../ui/status-badge.component";
     BooTableAdminComponent,
     ColumnDefDirective,
     BooActionAdminComponent,
-    StatusBadgeComponent
+    BooStatusBadgeComponent
   ],
   host: { class: 'block h-full min-h-0' },
   template: `

@@ -8,7 +8,7 @@ import { FilterConfig } from '../../../shared/types/filter.types';
 import { SortOption } from '../../../shared/types/sort';
 import { BulkAction, GroupableColumn, SavedView, TableComment } from '../../../shared/types/table.types';
 import { PHYSIO_BOO_ANIMATION } from '../../../shared/utils/animation.utils';
-import { BooInputComponent } from "../../input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { PaginationComponent } from "./boo-pagination-admin.component";
 export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
 

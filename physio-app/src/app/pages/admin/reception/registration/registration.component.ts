@@ -9,7 +9,7 @@ import { Gender } from "src/app/shared/enums/gender";
 import { MaritalStatus } from "src/app/shared/enums/marital-status";
 import { LoadingKeys } from "src/app/shared/types/loading";
 import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
-import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { PatientService } from "../../../../services/admin/patient.service";
@@ -22,7 +22,6 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { CreatePatientRequest } from "../../../../shared/types/patient.types";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
-import { BooCheckboxComponent } from "../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
 
 type StepId = 'personal' | 'contact' | 'medical' | 'review';
 

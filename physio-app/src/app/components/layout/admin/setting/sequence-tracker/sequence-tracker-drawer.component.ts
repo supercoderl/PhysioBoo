@@ -9,7 +9,7 @@ import { SharedModule } from "../../../../../shared/shared-imports";
 import { SequenceTracker } from "../../../../../shared/types/system.types";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 
 @Component({

@@ -1,7 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { LaboratoryService } from "../../../../../services/admin/laboratory.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
@@ -12,7 +10,7 @@ import { LabResultEntry, LabResultFlag, LabVerificationStatus } from "../../../.
 @Component({
   selector: 'laboratory-result-verification-tab',
   standalone: true,
-  imports: [SharedModule,BooInputComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooInputComponent, BooStatusBadgeComponent, BooEmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -106,7 +104,7 @@ export class LaboratoryResultVerificationTabComponent implements OnInit {
     });
   }
 
-  flagTone(flag: LabResultFlag): BadgeTone {
+  flagTone(flag: LabResultFlag): BooBadgeTone {
     switch (flag) {
       case 'N': return 'neutral';
       case 'H': case 'L': return 'warning';
@@ -114,7 +112,7 @@ export class LaboratoryResultVerificationTabComponent implements OnInit {
     }
   }
 
-  verificationTone(status: LabVerificationStatus): BadgeTone {
+  verificationTone(status: LabVerificationStatus): BooBadgeTone {
     switch (status) {
       case 'Verified': return 'success';
       case 'PendingVerification': return 'warning';

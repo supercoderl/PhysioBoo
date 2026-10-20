@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooErrorStateComponent } from '@physioboo/ui';
 import { CashierService } from "../../../../services/admin/cashier.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
@@ -29,7 +29,7 @@ type LeftTab = 'invoices' | 'activity';
   standalone: true,
   imports: [
     SharedModule,
-    ErrorStateComponent,
+    BooErrorStateComponent,
     CashierSearchPanelComponent,
     CashierInvoiceTableComponent,
     CashierInvoiceDetailPanelComponent,

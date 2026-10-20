@@ -1,8 +1,7 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -13,7 +12,7 @@ import { BooButtonAdminComponent } from "../../../../../components/button/boo-bu
 @Component({
   selector: 'treatment-notes-tab',
   standalone: true,
-  imports: [SharedModule,BooSelectComponent, BooTextareaComponent, StatusBadgeComponent, EmptyStateComponent, BooButtonAdminComponent],
+  imports: [SharedModule,BooSelectComponent, BooTextareaComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonAdminComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg p-4 mb-4">
       <h3 class="text-sm font-semibold text-primary mb-3">Add Progress Note</h3>
@@ -90,7 +89,7 @@ export class TreatmentNotesTabComponent implements OnChanges {
     });
   }
 
-  typeTone(type: ProgressNoteType): BadgeTone {
+  typeTone(type: ProgressNoteType): BooBadgeTone {
     switch (type) {
       case 'Doctor': return 'success';
       case 'Consultation': return 'warning';

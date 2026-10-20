@@ -1,9 +1,7 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -20,7 +18,7 @@ function nextQuarterHour(): string {
 @Component({
   selector: 'treatment-orders-tab',
   standalone: true,
-  imports: [SharedModule, BooButtonAdminComponent, BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule, BooButtonAdminComponent, BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent],
   template: `
     <div class="flex flex-wrap items-center gap-3 mb-4">
       <boo-input label="Search orders..." size="small" (search)="onSearch($event)"></boo-input>
@@ -201,7 +199,7 @@ export class TreatmentOrdersTabComponent implements OnChanges {
     return Array.from(map.entries()).map(([key, items]) => ({ key, items }));
   }
 
-  priorityTone(priority: OrderPriority): BadgeTone {
+  priorityTone(priority: OrderPriority): BooBadgeTone {
     switch (priority) {
       case 'Stat': return 'danger';
       case 'Urgent': return 'warning';
@@ -209,7 +207,7 @@ export class TreatmentOrdersTabComponent implements OnChanges {
     }
   }
 
-  statusTone(status: OrderStatus): BadgeTone {
+  statusTone(status: OrderStatus): BooBadgeTone {
     switch (status) {
       case 'Active': return 'success';
       case 'Completed': return 'success';

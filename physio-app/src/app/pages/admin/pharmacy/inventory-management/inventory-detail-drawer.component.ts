@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signa
 import { Color, ScaleType } from '@swimlane/ngx-charts';
 import { curveCatmullRom } from 'd3-shape';
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -14,7 +14,7 @@ type DrawerTab = 'Summary' | 'Batches' | 'Trends' | 'Purchase' | 'Dispensing' | 
 @Component({
     selector: 'inventory-detail-drawer',
     standalone: true,
-    imports: [SharedModule,DrawerComponent, EmptyStateComponent, BooButtonAdminComponent],
+    imports: [SharedModule,DrawerComponent, BooEmptyStateComponent, BooButtonAdminComponent],
     template: `
     <drawer [isOpen]="isOpen" (close)="close.emit()">
       <div class="flex flex-col h-full" *ngIf="detail">

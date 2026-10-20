@@ -10,8 +10,7 @@ import { CreateWardRequest, Ward } from "../../../../../shared/types/ward.types"
 import { DrawerComponent } from "../../../../drawer/drawer.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
-import { BooCheckboxComponent } from "../../../../checkbox/boo-checkbox/boo-checkbox.component";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 
 /**
  * Ward and bed set-up for the bed map: add, rename and delete wards; add and delete beds.

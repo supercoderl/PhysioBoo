@@ -1,6 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { LaboratoryService } from "../../../../../services/admin/laboratory.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -9,7 +8,7 @@ import { LabAlertSeverity, LabCriticalAlert } from "../../../../../shared/types/
 @Component({
   selector: 'laboratory-critical-alerts-tab',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -65,7 +64,7 @@ export class LaboratoryCriticalAlertsTabComponent implements OnInit {
     return [...this.alerts()].sort((a, b) => order[a.severity] - order[b.severity]);
   }
 
-  severityTone(severity: LabAlertSeverity): BadgeTone {
+  severityTone(severity: LabAlertSeverity): BooBadgeTone {
     switch (severity) {
       case 'Critical': return 'danger';
       case 'High': return 'danger';

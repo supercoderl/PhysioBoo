@@ -1,6 +1,6 @@
 import { CdkDragDrop, transferArrayItem } from "@angular/cdk/drag-drop";
 import { Component, OnInit, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -10,7 +10,7 @@ import { ScheduleSlot } from "../../../../../shared/types/radiology.types";
 @Component({
   selector: 'radiology-scheduling-tab',
   standalone: true,
-  imports: [SharedModule,EmptyStateComponent],
+  imports: [SharedModule,BooEmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>

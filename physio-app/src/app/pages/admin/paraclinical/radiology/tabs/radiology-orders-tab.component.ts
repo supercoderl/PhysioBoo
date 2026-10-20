@@ -1,8 +1,6 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -11,7 +9,7 @@ import { ImagingOrderRow, ImagingOrderStatus, RadiologyPriority, ReportStatus } 
 @Component({
   selector: 'radiology-orders-tab',
   standalone: true,
-  imports: [SharedModule,BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent],
   template: `
     <div class="flex flex-wrap items-center gap-3 mb-4">
       <boo-input label="Search order #, patient, MRN..." size="small" (search)="onSearch($event)"></boo-input>
@@ -186,7 +184,7 @@ export class RadiologyOrdersTabComponent implements OnInit {
     return Array.from(map.entries()).map(([key, items]) => ({ key, items }));
   }
 
-  priorityTone(priority: RadiologyPriority): BadgeTone {
+  priorityTone(priority: RadiologyPriority): BooBadgeTone {
     switch (priority) {
       case 'Stat': return 'danger';
       case 'Urgent': return 'warning';
@@ -194,7 +192,7 @@ export class RadiologyOrdersTabComponent implements OnInit {
     }
   }
 
-  statusTone(status: ImagingOrderStatus): BadgeTone {
+  statusTone(status: ImagingOrderStatus): BooBadgeTone {
     switch (status) {
       case 'ImagingCompleted': case 'ImageUploaded': return 'success';
       case 'InProgress': case 'Arrived': return 'primary';
@@ -203,7 +201,7 @@ export class RadiologyOrdersTabComponent implements OnInit {
     }
   }
 
-  reportStatusTone(status: ReportStatus): BadgeTone {
+  reportStatusTone(status: ReportStatus): BooBadgeTone {
     switch (status) {
       case 'Released': case 'Verified': return 'success';
       case 'PendingVerification': case 'Reporting': return 'warning';

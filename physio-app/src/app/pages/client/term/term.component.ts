@@ -1,7 +1,7 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
+import { BooBreadcrumbComponent, BooButtonComponent } from '@physioboo/ui';
 import { SharedModule } from '../../../shared/shared-imports';
 import {
   TERMS_CONTACT_ROWS,
@@ -48,7 +48,7 @@ const SCROLL_OFFSET = 24;
 @Component({
   selector: 'app-term',
   standalone: true,
-  imports: [BooButtonComponent, SharedModule],
+  imports: [BooButtonComponent, SharedModule, BooBreadcrumbComponent],
   templateUrl: './term.component.html',
 })
 export class TermComponent implements AfterViewInit, OnDestroy {

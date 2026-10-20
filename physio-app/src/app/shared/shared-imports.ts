@@ -10,7 +10,7 @@ import { NzIconModule } from "ng-zorro-antd/icon";
 import { NzLayoutModule } from "ng-zorro-antd/layout";
 import { NzMenuModule } from "ng-zorro-antd/menu";
 import { LottieComponent } from "ngx-lottie";
-import { IconComponent } from "physioboo-icons";
+import { BooIconComponent } from '@physioboo/ui';
 import { PhysioAnimationComponent } from "../components/animations/physio-animation.component";
 import { AutoAnimateDirective } from "./directives/auto-animate.directive";
 import { DropdownDirective } from "./directives/dropdown.directive";
@@ -39,7 +39,7 @@ export const SharedModule = [
     ...SHARED_ZORRO_MODULES,
     ...SHARED_PIPES,
     LottieComponent,
-    IconComponent,
+    BooIconComponent,
     PhysioAnimationComponent,
 
     // #region Directives

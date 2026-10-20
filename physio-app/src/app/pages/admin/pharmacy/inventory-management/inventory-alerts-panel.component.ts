@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -10,7 +9,7 @@ import { BooButtonAdminComponent } from "../../../../components/button/boo-butto
 @Component({
     selector: 'inventory-alerts-panel',
     standalone: true,
-    imports: [SharedModule,EmptyStateComponent, StatusBadgeComponent, BooButtonAdminComponent],
+    imports: [SharedModule,BooEmptyStateComponent, BooStatusBadgeComponent, BooButtonAdminComponent],
     template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex items-center justify-between">
@@ -80,7 +79,7 @@ export class InventoryAlertsPanelComponent implements OnInit, OnChanges {
         this.toastSrv.success('Alert acknowledged');
     }
 
-    severityTone(severity: InventoryAlertSeverity): BadgeTone {
+    severityTone(severity: InventoryAlertSeverity): BooBadgeTone {
         switch (severity) {
             case 'Critical': return 'danger';
             case 'High': return 'danger';

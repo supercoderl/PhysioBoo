@@ -1,8 +1,7 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { finalize, forkJoin } from "rxjs";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooBadgeTone, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { SurgeryService } from "../../../../services/admin/surgery.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -28,8 +27,8 @@ const LOADING_KEY = 'surgery';
   standalone: true,
   imports: [
     SharedModule,
-    ErrorStateComponent,
-    StatusBadgeComponent,
+    BooErrorStateComponent,
+    BooStatusBadgeComponent,
     StatCardComponent,
     SurgeryDashboardTabComponent,
     SurgeryScheduleTabComponent,
@@ -204,7 +203,7 @@ export class AdminSurgeryComponent implements OnInit {
     return [...this.alerts()].sort((a, b) => order[a.severity] - order[b.severity]);
   }
 
-  alertTone(severity: SurgeryAlertSeverity): BadgeTone {
+  alertTone(severity: SurgeryAlertSeverity): BooBadgeTone {
     switch (severity) {
       case 'Critical': return 'danger';
       case 'High': return 'danger';

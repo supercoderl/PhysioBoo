@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output, computed, signal } from "@angular/core";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
-import { StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { RxMedicationItem, RxMedicationStatus } from "../../../../../shared/types/prescription-rx.types";
 import { formatCurrency, severityIcon, severityRank, totalDailyDosesOf } from "../prescription-rx.util";
@@ -11,7 +10,7 @@ type EditableField = 'dose' | 'frequency' | 'durationDays' | 'quantity' | 'instr
 @Component({
   selector: 'rx-medication-table',
   standalone: true,
-  imports: [SharedModule, BooInputComponent, StatusBadgeComponent, BooButtonAdminComponent],
+  imports: [SharedModule, BooInputComponent, BooStatusBadgeComponent, BooButtonAdminComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg flex flex-col">
       <!-- Toolbar -->

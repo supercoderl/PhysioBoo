@@ -1,10 +1,9 @@
 import { formatDate, isPlatformBrowser } from '@angular/common';
-import { Component, DestroyRef, ElementRef, HostListener, LOCALE_ID, OnDestroy, OnInit, PLATFORM_ID, ViewChild, inject } from '@angular/core';
+import { Component, DestroyRef, ElementRef, LOCALE_ID, OnInit, PLATFORM_ID, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { EMPTY, Observable, Subject, catchError, map, merge, mergeMap, of, switchMap, takeUntil, tap, throwError } from 'rxjs';
-import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
-import { InlineErrorComponent, InlineErrorState } from '../../../components/ui/inline-error.component';
+import { BooBreadcrumbComponent, BooButtonComponent, BooFilterChipsComponent, BooInlineErrorComponent, BooInlineErrorState, BooPaginationComponent, BooSheetComponent } from '@physioboo/ui';
 import { PublicArticleService } from '../../../services/public/public-article.service';
 import { PublicDoctorService } from '../../../services/public/public-doctor.service';
 import { PublicHospitalService } from '../../../services/public/public-hospital.service';
@@ -16,9 +15,7 @@ import { PublicArticle } from '../../../shared/types/public-article.types';
 import { PublicDoctor, PublicOption } from '../../../shared/types/public-doctor.types';
 import { PublicHospital } from '../../../shared/types/public-hospital.types';
 import { PublicService } from '../../../shared/types/public-service.types';
-import { chipPop } from '../../../shared/animations/motion.animation';
 import { SharedModule } from '../../../shared/shared-imports';
-import { motionState } from '../../../shared/utils/motion.utils';
 import { SearchResultComponent, SearchResultRow } from './search-result.component';
 
 type Kind = 'doctors' | 'services' | 'clinics' | 'articles';
@@ -45,7 +42,7 @@ interface Section {
   status: 'loading' | 'ok' | 'error';
   total: number;
   rows: SearchResultRow[];
-  retry: InlineErrorState;
+  retry: BooInlineErrorState;
 }
 
 interface Chip {
@@ -93,13 +90,13 @@ const CATEGORY_OPTIONS = Object.keys(ArticleCategory).filter(k => Number.isNaN(N
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [BooButtonComponent, SharedModule, SearchResultComponent, InlineErrorComponent],
+  imports: [
+    BooButtonComponent, SharedModule, SearchResultComponent, BooInlineErrorComponent, BooBreadcrumbComponent,
+    BooFilterChipsComponent, BooPaginationComponent, BooSheetComponent
+  ],
   templateUrl: './search.component.html',
-  animations: [chipPop],
 })
-export class SearchComponent implements OnInit, OnDestroy {
-  readonly motion = motionState();
-
+export class SearchComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly doctorSrv = inject(PublicDoctorService);
@@ -111,7 +108,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   @ViewChild('searchInput') private searchInput?: ElementRef<HTMLInputElement>;
-  @ViewChild('sheetClose', { read: ElementRef }) private sheetClose?: ElementRef<HTMLButtonElement>;
   @ViewChild('filterButton', { read: ElementRef }) private filterButton?: ElementRef<HTMLButtonElement>;
   @ViewChild('results') private results?: ElementRef<HTMLElement>;
 
@@ -195,10 +191,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       if (q.q !== this.overviewQ) this.overview$.next(q.q);
       this.tab$.next(q.tab === 'all' ? null : q);
     });
-  }
-
-  ngOnDestroy(): void {
-    this.lockScroll(false);
   }
 
   // #region Search
@@ -407,19 +399,18 @@ export class SearchComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Mobile filter sheet
+  /** The sheet returns focus here when it closes. */
+  get filterButtonElement(): HTMLElement | undefined {
+    return this.filterButton?.nativeElement;
+  }
+
   openSheet(): void {
     this.draft = this.pickFilters(this.query);
     this.sheetOpen = true;
-    this.lockScroll(true);
-    setTimeout(() => this.sheetClose?.nativeElement.focus());
   }
 
-  @HostListener('document:keydown.escape')
   closeSheet(): void {
-    if (!this.sheetOpen) return;
     this.sheetOpen = false;
-    this.lockScroll(false);
-    setTimeout(() => this.filterButton?.nativeElement.focus());
   }
 
   applySheet(): void {
@@ -431,27 +422,9 @@ export class SearchComponent implements OnInit, OnDestroy {
   clearDraft(): void {
     this.draft = { ...NO_FILTERS };
   }
-
-  private lockScroll(lock: boolean): void {
-    if (this.isBrowser) document.body.style.overflow = lock ? 'hidden' : '';
-  }
   // #endregion
 
   // #region Pagination
-  /** Page numbers to render; `null` is an ellipsis. Short lists show every page. */
-  get pages(): (number | null)[] {
-    const total = this.totalPages, current = this.query.page;
-    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-    const set = new Set([1, total, current - 1, current, current + 1].filter(p => p >= 1 && p <= total));
-    const sorted = [...set].sort((a, b) => a - b);
-    const out: (number | null)[] = [];
-    sorted.forEach((p, i) => {
-      if (i > 0 && p - sorted[i - 1] > 1) out.push(null);
-      out.push(p);
-    });
-    return out;
-  }
-
   goToPage(page: number): void {
     if (page < 1 || page > this.totalPages || page === this.query.page) return;
     this.navigate({ ...this.query, page });

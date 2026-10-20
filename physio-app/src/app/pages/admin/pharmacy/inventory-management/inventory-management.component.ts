@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { Router } from "@angular/router";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooErrorStateComponent } from '@physioboo/ui';
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -31,7 +31,7 @@ import { ButtonIconComponent } from "../../../../components/button/button-icon/b
     imports: [
         SharedModule,
 
-        ErrorStateComponent,
+        BooErrorStateComponent,
         InventoryKpiStripComponent,
         InventoryExplorerPanelComponent,
         InventoryIntelligencePanelComponent,

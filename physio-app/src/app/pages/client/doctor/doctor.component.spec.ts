@@ -1,6 +1,7 @@
 import { DestroyRef, Injector, PLATFORM_ID, runInInjectionContext } from '@angular/core';
 import { ActivatedRoute, Params, Router, convertToParamMap } from '@angular/router';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { booPageRange } from '@physioboo/ui';
 import { PublicDoctorService } from '../../../services/public/public-doctor.service';
 import { PublicDoctor } from '../../../shared/types/public-doctor.types';
 import { DoctorComponent } from './doctor.component';
@@ -139,7 +140,7 @@ describe('DoctorComponent (public doctor listing)', () => {
     it('windows long pagination and ignores out-of-range pages', () => {
         const { cmp, navigations } = setup({ page: '6' }, () => of({ success: true, data: { items: [doctor(1)], totalCount: 12 * 12 } }));
         expect(cmp.totalPages).toBe(12);
-        expect(cmp.pages).toEqual([1, null, 5, 6, 7, null, 12]);
+        expect(booPageRange(cmp.query.page, cmp.totalPages)).toEqual([1, null, 5, 6, 7, null, 12]);
         const before = navigations.length;
         cmp.goToPage(0);
         cmp.goToPage(13);

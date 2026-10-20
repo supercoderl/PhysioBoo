@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
+import { BooBreadcrumbComponent, BooButtonComponent } from '@physioboo/ui';
 import { SharedModule } from '../../../shared/shared-imports';
 import {
   ABOUT_CAPABILITIES,
@@ -21,7 +21,7 @@ import { ValueCardComponent } from './value-card.component';
 @Component({
   selector: 'app-about-us',
   standalone: true,
-  imports: [BooButtonComponent, SharedModule, ValueCardComponent, ExploreCardComponent],
+  imports: [BooButtonComponent, SharedModule, ValueCardComponent, ExploreCardComponent, BooBreadcrumbComponent],
   templateUrl: './about-us.component.html',
 })
 export class AboutUsComponent {

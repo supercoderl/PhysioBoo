@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Params, Router, UrlTree } from '@angular/router';
 import { Subject, catchError, map, merge, of, switchMap, tap } from 'rxjs';
-import { BooButtonComponent } from '../../../../components/button/boo-button/boo-button.component';
+import { BooBreadcrumbComponent, BooButtonComponent } from '@physioboo/ui';
 import { DoctorCardComponent } from '../../../../components/layout/client/doctor/doctor-card.component';
 import { PublicDoctorService } from '../../../../services/public/public-doctor.service';
 import { PublicHospitalService } from '../../../../services/public/public-hospital.service';
@@ -36,7 +36,7 @@ const DOCTOR_PREVIEW = 4;
 @Component({
   selector: 'app-hospital-detail',
   standalone: true,
-  imports: [BooButtonComponent, SharedModule, DoctorCardComponent],
+  imports: [BooButtonComponent, SharedModule, DoctorCardComponent, BooBreadcrumbComponent],
   templateUrl: './hospital-detail.component.html',
   styles: `
     .ph-stripes { background: repeating-linear-gradient(135deg, #F3EAED 0 10px, #F9F4F6 10px 20px); }

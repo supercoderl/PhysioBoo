@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooStatusBadgeComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { RxPatientSummary } from "../../../../../shared/types/prescription-rx.types";
 import { calcBmi } from "../prescription-rx.util";
@@ -13,7 +13,7 @@ interface WarningBadge {
 @Component({
   selector: 'rx-patient-summary',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent],
+  imports: [SharedModule,BooStatusBadgeComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg" *ngIf="patient">
       <div class="px-5 py-4 flex flex-wrap items-start gap-6" *ngIf="!collapsed">

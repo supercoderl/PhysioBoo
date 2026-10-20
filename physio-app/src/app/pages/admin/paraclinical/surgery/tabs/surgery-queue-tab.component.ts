@@ -1,6 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -12,7 +11,7 @@ const QUEUE_STATUSES: SurgeryStatus[] = ['Scheduled', 'PatientArrived', 'PreOpRe
 @Component({
   selector: 'surgery-queue-tab',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -97,7 +96,7 @@ export class SurgeryQueueTabComponent implements OnInit {
     return `${done}/${applicable.length}`;
   }
 
-  statusTone(status: SurgeryStatus): BadgeTone {
+  statusTone(status: SurgeryStatus): BooBadgeTone {
     switch (status) {
       case 'PreOpReady': case 'AnesthesiaStarted': return 'primary';
       case 'PatientArrived': return 'warning';

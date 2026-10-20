@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooStatusBadgeComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../shared/shared-imports";
 import { ClaimPriority, ClaimStatus, InsuranceClaimCard } from "../../../../shared/types/insurance-claims.types";
 
-const STATUS_TONE: Record<ClaimStatus, BadgeTone> = {
+const STATUS_TONE: Record<ClaimStatus, BooBadgeTone> = {
   Draft: 'neutral',
   WaitingDocuments: 'warning',
   ReadyToSubmit: 'primary',
@@ -39,7 +39,7 @@ const PRIORITY_COLOR: Record<ClaimPriority, string> = {
 @Component({
   selector: 'insurance-claim-card',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent],
+  imports: [SharedModule,BooStatusBadgeComponent],
   template: `
     <div
       class="group relative flex gap-0 bg-[var(--ic-ivory)] border rounded-1.5 cursor-pointer transition-all duration-150 overflow-hidden"
@@ -109,7 +109,7 @@ export class InsuranceClaimCardComponent {
   @Output() approve = new EventEmitter<string>();
   @Output() reject = new EventEmitter<string>();
 
-  get statusTone(): BadgeTone {
+  get statusTone(): BooBadgeTone {
     return STATUS_TONE[this.claim.status];
   }
 

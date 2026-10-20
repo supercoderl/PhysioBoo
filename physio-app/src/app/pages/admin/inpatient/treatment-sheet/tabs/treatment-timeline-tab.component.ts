@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { TimelineCategory, TimelineRangeKey, TreatmentTimelineEntry } from "../../../../../shared/types/treatment-sheet.types";
@@ -8,7 +8,7 @@ import { TimelineCategory, TimelineRangeKey, TreatmentTimelineEntry } from "../.
 @Component({
   selector: 'treatment-timeline-tab',
   standalone: true,
-  imports: [SharedModule,BooSelectComponent, EmptyStateComponent],
+  imports: [SharedModule,BooSelectComponent, BooEmptyStateComponent],
   template: `
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <h3 class="text-sm font-semibold text-primary m-0">Treatment Timeline</h3>

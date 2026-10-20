@@ -1,10 +1,8 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { finalize, forkJoin } from "rxjs";
-import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
+import { BooBadgeTone, BooCheckboxComponent, BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { AdmissionService } from "../../../../services/admin/admission.service";
 import { NursingService } from "../../../../services/admin/nursing.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
@@ -13,12 +11,11 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { AcuityLevel, AlertSeverity, NursingAlert, NursingAssignmentFilter, NursingPatient, NursingStats, ShiftCode } from "../../../../shared/types/nursing.types";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
-import { BooCheckboxComponent } from "../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
 
 @Component({
   selector: 'admin-nursing-dashboard',
   standalone: true,
-  imports: [SharedModule, BooInputComponent, BooSelectComponent, StatusBadgeComponent, ErrorStateComponent, BooButtonAdminComponent, ButtonIconComponent, BooCheckboxComponent],
+  imports: [SharedModule, BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooErrorStateComponent, BooButtonAdminComponent, ButtonIconComponent, BooCheckboxComponent],
   template: `
     <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto">
@@ -316,7 +313,7 @@ export class AdminNursingDashboardComponent implements OnInit {
   applyFilters(): void { /* filters apply client-side against the loaded snapshot */ }
   onSearch(query: string): void { this.filter.search = query; }
 
-  acuityTone(acuity: NursingPatient['acuity']): BadgeTone {
+  acuityTone(acuity: NursingPatient['acuity']): BooBadgeTone {
     switch (acuity) {
       case 'Critical': return 'danger';
       case 'High': return 'warning';

@@ -6,13 +6,7 @@
 <!-- Hero: breadcrumb, title, lead, actions, photo -->
 <section aria-labelledby="ab-h1" class="bg-gray-50 border-b border-gray-200">
   <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 pb-8 md:pt-6 md:pb-10 lg:pt-7 lg:pb-14 flex flex-col gap-5">
-    <nav aria-label="Breadcrumb">
-      <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600">
-        <li><a routerLink="/" class="text-gray-700 hover:text-primaryDeep">Home</a></li>
-        <li aria-hidden="true">/</li>
-        <li aria-current="page" class="text-gray-900 font-medium">About Us</li>
-      </ol>
-    </nav>
+    <boo-breadcrumb separator="slash" [items]="[{ label: 'Home', link: '/' }, { label: 'About Us' }]" />
 
     <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] gap-6 md:gap-8 lg:gap-14 items-center">
       <div class="flex flex-col gap-3.5 min-w-0">

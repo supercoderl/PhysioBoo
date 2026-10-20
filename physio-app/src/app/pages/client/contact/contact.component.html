@@ -1,13 +1,7 @@
 <!-- Intro: breadcrumb, title, lead -->
 <section class="bg-gray-50 border-b border-gray-200">
   <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 pb-7 md:pt-6 md:pb-9 lg:pt-7 lg:pb-10 flex flex-col gap-3.5">
-    <nav aria-label="Breadcrumb">
-      <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600">
-        <li><a routerLink="/" class="text-gray-700 hover:text-primaryDeep">Home</a></li>
-        <li aria-hidden="true">/</li>
-        <li aria-current="page" class="text-gray-900 font-medium">Contact</li>
-      </ol>
-    </nav>
+    <boo-breadcrumb separator="slash" [items]="[{ label: 'Home', link: '/' }, { label: 'Contact' }]" />
 
     <div class="flex gap-6 items-center justify-between flex-wrap">
       <div class="max-w-[640px] flex flex-col gap-2.5">
@@ -127,7 +121,7 @@
             class="h-12 w-full border rounded-xl px-3.5 text-base text-gray-900 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
             [ngClass]="errorFor('name') ? 'border-danger ring-1 ring-danger' : 'border-gray-300 focus:border-primary'"
           />
-          <span *ngIf="errorFor('name')" id="ct-name-err" class="motion-feedback text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('name') }}</span>
+          <boo-field-error *ngIf="errorFor('name')" id="ct-name-err">{{ errorFor('name') }}</boo-field-error>
         </div>
 
         <div class="flex flex-col gap-1.5 min-w-0">
@@ -139,7 +133,7 @@
             class="h-12 w-full border rounded-xl px-3.5 text-base text-gray-900 bg-surface placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/20"
             [ngClass]="errorFor('phone') ? 'border-danger ring-1 ring-danger' : 'border-gray-300 focus:border-primary'"
           />
-          <span *ngIf="errorFor('phone')" id="ct-phone-err" class="motion-feedback text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('phone') }}</span>
+          <boo-field-error *ngIf="errorFor('phone')" id="ct-phone-err">{{ errorFor('phone') }}</boo-field-error>
         </div>
 
         <div class="flex flex-col gap-1.5 min-w-0">
@@ -151,7 +145,7 @@
             class="h-12 w-full border rounded-xl px-3.5 text-base text-gray-900 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
             [ngClass]="errorFor('email') ? 'border-danger ring-1 ring-danger' : 'border-gray-300 focus:border-primary'"
           />
-          <span *ngIf="errorFor('email')" id="ct-email-err" class="motion-feedback text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('email') }}</span>
+          <boo-field-error *ngIf="errorFor('email')" id="ct-email-err">{{ errorFor('email') }}</boo-field-error>
         </div>
 
         <div class="flex flex-col gap-1.5 min-w-0">
@@ -178,7 +172,7 @@
           <option value="">No preference</option>
           <option *ngFor="let c of clinics" [value]="c.id">{{ c.name }}</option>
         </select>
-        <span *ngIf="errorFor('clinic')" id="ct-clinic-err" class="motion-feedback text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('clinic') }}</span>
+        <boo-field-error *ngIf="errorFor('clinic')" id="ct-clinic-err">{{ errorFor('clinic') }}</boo-field-error>
       </div>
 
       <div class="flex flex-col gap-1.5">
@@ -194,7 +188,7 @@
           [ngClass]="errorFor('message') ? 'border-danger ring-1 ring-danger' : 'border-gray-300 focus:border-primary'"
         ></textarea>
         <span id="ct-message-hint" class="text-[13px] leading-[19px] text-gray-700">Please don't include medical records or detailed health information.</span>
-        <span *ngIf="errorFor('message')" id="ct-message-err" class="motion-feedback text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('message') }}</span>
+        <boo-field-error *ngIf="errorFor('message')" id="ct-message-err">{{ errorFor('message') }}</boo-field-error>
       </div>
 
       <div class="flex flex-col gap-1.5">
@@ -211,7 +205,7 @@
           <span>I agree that {{ tenant.name }} can use these details to respond to my enquiry, as described in the
             <a routerLink="/privacy" fragment="s4" target="_blank" class="text-primaryDeep underline font-medium">Privacy Policy</a>.</span>
         </label>
-        <span *ngIf="errorFor('consent')" id="ct-consent-err" class="motion-feedback text-[13px] leading-[19px] text-danger flex gap-1.5 items-start"><physio-icon name="circle-alert" [size]="14" class="mt-[3px] flex-none" />{{ errorFor('consent') }}</span>
+        <boo-field-error *ngIf="errorFor('consent')" id="ct-consent-err">{{ errorFor('consent') }}</boo-field-error>
       </div>
 
       <!-- Honeypot: hidden from people and assistive tech; bots that fill it are ignored server-side. -->

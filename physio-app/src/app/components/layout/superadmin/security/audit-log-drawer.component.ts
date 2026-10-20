@@ -5,14 +5,13 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { AuditLog } from "../../../../shared/types/audit-log.types";
 import { auditActionTone, auditChanges } from "../../../../shared/utils/audit-log.utils";
 import { DrawerComponent } from "../../../drawer/drawer.component";
-import { ErrorStateComponent } from "../../../ui/error-state.component";
-import { StatusBadgeComponent } from "../../../ui/status-badge.component";
+import { BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 
 /** Full detail of one audit entry: who, when, from where, and the column-by-column change. */
 @Component({
     selector: 'superadmin-audit-log-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, StatusBadgeComponent, ErrorStateComponent],
+    imports: [SharedModule, DrawerComponent, BooStatusBadgeComponent, BooErrorStateComponent],
     template: `
         <drawer [isOpen]="isOpen" (close)="close.emit()">
             <div

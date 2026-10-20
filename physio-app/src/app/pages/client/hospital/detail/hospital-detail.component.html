@@ -46,15 +46,11 @@
 <ng-container *ngIf="state === 'live' && clinic as c">
   <!-- Breadcrumb -->
   <div class="bg-gray-50 border-b border-gray-200">
-    <nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4">
-      <ol class="list-none m-0 p-0 flex gap-2 items-center text-sm text-gray-600 flex-wrap">
-        <li><a routerLink="/" class="text-gray-700 hover:text-primaryDeep">Home</a></li>
-        <li aria-hidden="true" class="flex"><physio-icon name="chevron-right" [size]="13" /></li>
-        <li><a routerLink="/hospitals" [queryParams]="backQuery" class="text-gray-700 hover:text-primaryDeep">Clinics</a></li>
-        <li aria-hidden="true" class="flex"><physio-icon name="chevron-right" [size]="13" /></li>
-        <li aria-current="page" class="text-gray-900 font-medium">{{ c.name }}</li>
-      </ol>
-    </nav>
+    <boo-breadcrumb
+      class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4"
+      [wrap]="true"
+      [items]="[{ label: 'Home', link: '/' }, { label: 'Clinics', link: '/hospitals', queryParams: backQuery }, { label: c.name }]"
+    />
   </div>
 
   <!-- Photo -->

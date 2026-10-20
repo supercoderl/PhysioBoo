@@ -1,7 +1,7 @@
 import { Component, HostListener, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminBreadcrumbComponent } from "../../../../components/breadcrumb/admin-breadcrumb.component";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { BooCheckboxComponent, BooEmptyStateComponent, BooInputComponent } from '@physioboo/ui';
 import { AcademyService } from '../../../../services/admin/academy.service';
 import { AuthService } from '../../../../services/auth/auth.service';
 import { DialogService } from '../../../../services/common/dialog.service';
@@ -10,9 +10,7 @@ import { Permissions } from '../../../../shared/constants/permission.constant';
 import { SharedModule } from '../../../../shared/shared-imports';
 import { Course, Lesson } from '../../../../shared/types/academy.types';
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
-import { BooCheckboxComponent } from "../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
 
 interface CourseDraft { title: string; category: string; description: string; isPublished: boolean; }
 interface LessonDraft { id: string | null; title: string; content: string; durationMinutes: number; }
@@ -23,7 +21,7 @@ interface LessonDraft { id: string | null; title: string; content: string; durat
   imports: [
     AdminBreadcrumbComponent,
     SharedModule,
-    EmptyStateComponent,
+    BooEmptyStateComponent,
     BooButtonAdminComponent,
     BooInputComponent,
     BooTextareaComponent,

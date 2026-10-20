@@ -5,9 +5,8 @@ import { Role } from "../../../../../shared/types/role.types";
 import { ColorUtils } from "../../../../../shared/utils/color.utils";
 import { IconUtils } from "../../../../../shared/utils/icon.utils";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent } from "../../../../checkbox/boo-checkbox/boo-checkbox.component";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
 
 @Component({

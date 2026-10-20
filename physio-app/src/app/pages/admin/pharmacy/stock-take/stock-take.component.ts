@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { Router } from "@angular/router";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooErrorStateComponent } from '@physioboo/ui';
 import { StockTakeService } from "../../../../services/admin/stock-take.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -23,7 +23,7 @@ import { StockTakeTableCardComponent } from "./stock-take-table-card.component";
     standalone: true,
     imports: [
         SharedModule,
-        ErrorStateComponent,
+        BooErrorStateComponent,
         StockTakeHeroHeaderComponent,
         StockTakeFilterBarComponent,
         StockTakeTableCardComponent,

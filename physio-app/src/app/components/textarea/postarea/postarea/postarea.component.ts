@@ -1,10 +1,10 @@
-import { IconComponent } from 'physioboo-icons';
+import { BooIconComponent } from '@physioboo/ui';
 import { Component } from '@angular/core';
 
 @Component({
   selector: 'postarea',
   standalone: true,
-  imports: [IconComponent],
+  imports: [BooIconComponent],
   templateUrl: './postarea.component.html'
 })
 export class PostareaComponent {

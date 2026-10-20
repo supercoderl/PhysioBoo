@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit, signal } from '@angular/core';
 import { AdminBreadcrumbComponent } from "../../../../../components/breadcrumb/admin-breadcrumb.component";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { ScrumboardService } from '../../../../../services/admin/scrumboard.service';
 import { ToastService } from '../../../../../services/common/toast.service';
 import { SharedModule } from '../../../../../shared/shared-imports';
@@ -14,7 +14,7 @@ import { BooTextareaComponent } from "../../../../../components/textarea/boo-tex
   imports: [
     AdminBreadcrumbComponent,
     SharedModule,
-    EmptyStateComponent,
+    BooEmptyStateComponent,
     BooButtonAdminComponent,
     BooTextareaComponent
   ],

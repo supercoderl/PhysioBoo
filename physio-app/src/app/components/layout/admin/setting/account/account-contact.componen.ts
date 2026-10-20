@@ -1,7 +1,7 @@
 import { Component, Input } from "@angular/core";
 import { FormGroup } from "@angular/forms";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 import { BooDatepickerComponent } from "../../../../date-picker/boo-date-picker.component";
 import { PreferredCommunication } from "../../../../../shared/enums/preferred-communication";

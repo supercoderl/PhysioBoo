@@ -9,9 +9,8 @@ import { PatientType, RiskLevel } from "../../../../../shared/enums/patient";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { CreatePatientRequest, Patient, UpdatePatientRequest } from "../../../../../shared/types/patient.types";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent } from "../../../../checkbox/boo-checkbox/boo-checkbox.component";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
 

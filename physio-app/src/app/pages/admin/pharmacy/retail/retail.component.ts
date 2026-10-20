@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit, ViewChild, signal } from "@angular/core";
 import { forkJoin } from "rxjs";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooErrorStateComponent } from '@physioboo/ui';
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { RetailPosService, nextLineItemId } from "../../../../services/admin/retail-pos.service";
 import { DialogService } from "../../../../services/common/dialog.service";
@@ -28,7 +28,7 @@ import { BooButtonAdminComponent } from "../../../../components/button/boo-butto
   standalone: true,
   imports: [
     SharedModule,
-    ErrorStateComponent,
+    BooErrorStateComponent,
     StatCardComponent,
     RetailCatalogPanelComponent,
     RetailCartPanelComponent,

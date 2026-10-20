@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../shared/shared-imports";
 import {
   ClaimActionMode,
@@ -12,7 +11,7 @@ import { BooButtonAdminComponent } from "../../../../components/button/boo-butto
 
 type InspectorTab = 'overview' | 'documents' | 'medical' | 'billing' | 'timeline' | 'communication' | 'notes' | 'audit';
 
-const DOC_STATUS_TONE: Record<DocumentStatus, BadgeTone> = {
+const DOC_STATUS_TONE: Record<DocumentStatus, BooBadgeTone> = {
   Uploaded: 'primary',
   Missing: 'warning',
   Verified: 'success',
@@ -21,7 +20,7 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BadgeTone> = {
 @Component({
   selector: 'insurance-claim-detail-panel',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent, EmptyStateComponent, BooButtonAdminComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonAdminComponent],
   template: `
     <section class="h-full flex flex-col bg-[var(--ic-ivory)] border-l border-[var(--ic-warm-gray-200)] min-w-0">
       <!-- Idle -->
@@ -251,7 +250,7 @@ export class InsuranceClaimDetailPanelComponent implements OnChanges {
     return this.claim?.status === 'Approved';
   }
 
-  docTone(status: DocumentStatus): BadgeTone {
+  docTone(status: DocumentStatus): BooBadgeTone {
     return DOC_STATUS_TONE[status];
   }
 

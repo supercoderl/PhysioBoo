@@ -3,9 +3,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Role } from 'src/app/shared/enums/role';
-import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
-import { FormWrapperComponent } from "../../../components/form/boo-form/boo-form.component";
-import { BooInputComponent } from '../../../components/input/boo-input/boo-input.component';
+import { BooButtonComponent, BooFormComponent, BooInputComponent } from '@physioboo/ui';
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
 import { ToastService } from '../../../services/common/toast.service';
 import { BASE_API } from '../../../shared/api/base';
@@ -18,7 +16,7 @@ import { generateUUID } from '../../../shared/utils/common';
   standalone: true,
   imports: [
     SharedModule,
-    FormWrapperComponent,
+    BooFormComponent,
     BooButtonComponent,
     BooInputComponent,
   ],

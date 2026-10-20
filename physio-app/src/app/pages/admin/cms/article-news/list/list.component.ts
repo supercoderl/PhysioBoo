@@ -5,7 +5,7 @@ import { ButtonIconComponent } from "../../../../../components/button/button-ico
 import { CmsArticleNewsDrawerComponent } from "../../../../../components/layout/admin/cms/article-news/article-news-drawer.component";
 import { CmsArticleNewsTableCardComponent } from "../../../../../components/layout/admin/cms/article-news/article-news-table-card.component";
 import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { BooDateAdminComponent } from "../../../../../components/table/boo-table-admin/boo-date-admin.component";
 import { BooFilterAdminComponent } from "../../../../../components/table/boo-table-admin/boo-filter-admin.component";

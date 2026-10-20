@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { RetailPosService } from "../../../../services/admin/retail-pos.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -11,7 +11,7 @@ type ResultMode = 'Search' | RetailSuggestionMode;
 @Component({
   selector: 'retail-catalog-panel',
   standalone: true,
-  imports: [SharedModule,EmptyStateComponent, BooButtonAdminComponent],
+  imports: [SharedModule,BooEmptyStateComponent, BooButtonAdminComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg flex flex-col h-full">
       <!-- Search + barcode -->

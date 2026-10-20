@@ -1,7 +1,7 @@
 import { Component, ElementRef, forwardRef, inject, Injector, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared-imports';
-import { validationMessage } from '../../../shared/utils/validation-message';
+import { booValidationMessage } from '@physioboo/ui';
 
 @Component({
   selector: 'boo-textarea',
@@ -85,7 +85,7 @@ export class BooTextareaComponent {
 
   /** Validation message of the bound form control, shown once it has been touched (e.g. by a failed save). */
   get errorText(): string | null {
-    return validationMessage(this.injector.get(NgControl, null, { self: true, optional: true })?.control, this.label);
+    return booValidationMessage(this.injector.get(NgControl, null, { self: true, optional: true })?.control, this.label);
   }
 
 

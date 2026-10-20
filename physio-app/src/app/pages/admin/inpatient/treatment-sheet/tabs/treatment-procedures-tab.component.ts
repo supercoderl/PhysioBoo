@@ -1,7 +1,5 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -12,7 +10,7 @@ import { BooButtonAdminComponent } from "../../../../../components/button/boo-bu
 @Component({
   selector: 'treatment-procedures-tab',
   standalone: true,
-  imports: [SharedModule,BooInputComponent, StatusBadgeComponent, EmptyStateComponent, BooButtonAdminComponent],
+  imports: [SharedModule,BooInputComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonAdminComponent],
   template: `
     <div class="flex items-center justify-between mb-3">
       <h3 class="text-sm font-semibold text-primary m-0">Procedures</h3>
@@ -102,7 +100,7 @@ export class TreatmentProceduresTabComponent implements OnChanges {
     });
   }
 
-  statusTone(status: TreatmentProcedureRow['status']): BadgeTone {
+  statusTone(status: TreatmentProcedureRow['status']): BooBadgeTone {
     switch (status) {
       case 'Completed': return 'success';
       case 'InProgress': return 'primary';

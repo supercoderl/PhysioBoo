@@ -5,7 +5,7 @@ import { MenuRowEvent, SuperadminMenuTreeComponent } from "../../../components/l
 import { SuperadminMenuDrawerComponent } from "../../../components/layout/superadmin/access/menu-drawer.component";
 import { SuperadminPageHeaderComponent } from "../../../components/layout/superadmin/shared/superadmin-page-header.component";
 import { SuperadminTab, SuperadminTabsComponent } from "../../../components/layout/superadmin/shared/superadmin-tabs.component";
-import { ErrorStateComponent } from "../../../components/ui/error-state.component";
+import { BooErrorStateComponent } from '@physioboo/ui';
 import { MenuService } from "../../../services/admin/menu.service";
 import { PermissionService } from "../../../services/admin/permission.service";
 import { DialogService } from "../../../services/common/dialog.service";
@@ -29,7 +29,7 @@ import { MenuArea, menuAreaOf } from "../../../shared/utils/menu.utils";
         SuperadminTabsComponent,
         SuperadminMenuTreeComponent,
         SuperadminMenuDrawerComponent,
-        ErrorStateComponent
+        BooErrorStateComponent
     ],
     host: { class: 'block h-full min-h-0' },
     template: `

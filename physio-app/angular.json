@@ -36,6 +36,7 @@
             ],
             "styles": [
               "src/theme.less",
+              "projects/physioboo-ui/styles/tokens.scss",
               "src/styles.scss",
               "node_modules/slick-carousel/slick/slick.scss",
               "node_modules/slick-carousel/slick/slick-theme.scss"
@@ -112,9 +113,43 @@
               "src/assets"
             ],
             "styles": [
+              "projects/physioboo-ui/styles/tokens.scss",
               "src/styles.scss"
             ],
             "scripts": []
+          }
+        }
+      }
+    },
+    "physioboo-ui": {
+      "projectType": "library",
+      "root": "projects/physioboo-ui",
+      "sourceRoot": "projects/physioboo-ui/src",
+      "prefix": "boo",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/physioboo-ui/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/physioboo-ui/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/physioboo-ui/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/physioboo-ui/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
           }
         }
       }

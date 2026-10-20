@@ -8,9 +8,8 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { SaveSubscriptionPlanRequest, SubscriptionPlan } from "../../../../shared/types/billing.types";
 import { DrawerComponent } from "../../../drawer/drawer.component";
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../input/boo-input/boo-input.component";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { BooTextareaComponent } from "../../../textarea/boo-textarea/boo-textarea.component";
-import { BooCheckboxComponent } from "../../../checkbox/boo-checkbox/boo-checkbox.component";
 
 const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:bg-black/5 disabled:cursor-not-allowed';
 

@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooStatusBadgeComponent } from '@physioboo/ui';
 import { NursingService } from "../../../../../services/admin/nursing.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
@@ -11,7 +11,7 @@ import { BooButtonAdminComponent } from "../../../../../components/button/boo-bu
 @Component({
   selector: 'nursing-mar-tab',
   standalone: true,
-  imports: [SharedModule,StatusBadgeComponent, BooButtonAdminComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooButtonAdminComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -73,7 +73,7 @@ export class NursingMarTabComponent implements OnChanges {
     });
   }
 
-  statusTone(status: MarEntry['status']): BadgeTone {
+  statusTone(status: MarEntry['status']): BooBadgeTone {
     switch (status) {
       case 'Given': return 'success';
       case 'Missed': return 'danger';

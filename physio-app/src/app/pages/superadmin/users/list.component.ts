@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { firstValueFrom } from "rxjs";
 import { BooButtonAdminComponent } from "../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { UserPermissionUserDrawerComponent } from "../../../components/layout/admin/system/user-permission/user-drawer.component";
 import { SuperadminPageHeaderComponent } from "../../../components/layout/superadmin/shared/superadmin-page-header.component";
 import { SuperadminUserTableCardComponent } from "../../../components/layout/superadmin/users/user-table-card.component";

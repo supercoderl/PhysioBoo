@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { StockTakeService } from "../../../../services/admin/stock-take.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { StockTake, StockTakeItem } from "../../../../shared/types/stock-take.types";
@@ -7,7 +7,7 @@ import { StockTake, StockTakeItem } from "../../../../shared/types/stock-take.ty
 @Component({
     selector: 'stock-take-difference-dialog',
     standalone: true,
-    imports: [SharedModule,EmptyStateComponent],
+    imports: [SharedModule,BooEmptyStateComponent],
     template: `
     <div *ngIf="isOpen" class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="close.emit()"></div>

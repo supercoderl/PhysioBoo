@@ -1,9 +1,7 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
@@ -25,7 +23,7 @@ type ViewMode = 'table' | 'timeline';
 @Component({
   selector: 'treatment-medications-tab',
   standalone: true,
-  imports: [SharedModule, BooButtonAdminComponent, BooInputComponent, BooSelectComponent, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule, BooButtonAdminComponent, BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent],
   template: `
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-sm font-semibold text-primary m-0">Medication Administration Record</h3>
@@ -175,7 +173,7 @@ export class TreatmentMedicationsTabComponent implements OnChanges {
     });
   }
 
-  statusTone(status: MedicationAdministration['status']): BadgeTone {
+  statusTone(status: MedicationAdministration['status']): BooBadgeTone {
     switch (status) {
       case 'Given': return 'success';
       case 'Missed': return 'danger';

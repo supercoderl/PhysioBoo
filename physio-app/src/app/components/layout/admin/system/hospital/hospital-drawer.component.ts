@@ -8,10 +8,9 @@ import { HOSPITAL_TYPE_LABELS, HospitalType } from "../../../../../shared/enums/
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { Hospital, SaveHospitalRequest } from "../../../../../shared/types/support.types";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent } from "../../../../checkbox/boo-checkbox/boo-checkbox.component";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { BooDatepickerComponent } from "../../../../date-picker/boo-date-picker.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
 

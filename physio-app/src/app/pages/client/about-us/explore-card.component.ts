@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
+import { BooButtonComponent } from '@physioboo/ui';
 import { SharedModule } from '../../../shared/shared-imports';
 
 /** Entry point card linking to a listing page (design: ExploreCard.dc.html). */

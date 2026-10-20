@@ -3,10 +3,7 @@ import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom, take } from 'rxjs';
-import { BooCheckboxComponent } from 'src/app/components/checkbox/boo-checkbox/boo-checkbox.component';
-import { BooButtonComponent } from "../../../components/button/boo-button/boo-button.component";
-import { FormWrapperComponent } from '../../../components/form/boo-form/boo-form.component';
-import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
+import { BooButtonComponent, BooCheckboxComponent, BooFormComponent, BooInputComponent } from '@physioboo/ui';
 import { AuthService } from '../../../services/auth/auth.service';
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
 import { ToastService } from '../../../services/common/toast.service';
@@ -24,7 +21,7 @@ import { AppValidators } from '../../../shared/validator/validator-config.valida
 
     BooButtonComponent,
     BooCheckboxComponent,
-    FormWrapperComponent,
+    BooFormComponent,
     GoogleSigninButtonModule
   ],
   templateUrl: './login.component.html'

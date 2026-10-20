@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import { SharedModule } from "../../../../../../shared/shared-imports";
-import { BooInputComponent } from "../../../../../input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { SwitchComponent } from "../../../../../switch/switch.component";
 import { PatientType } from "../../../../../../shared/enums/patient";
 import { BooSelectComponent } from "../../../../../select/boo-select/boo-select.component";

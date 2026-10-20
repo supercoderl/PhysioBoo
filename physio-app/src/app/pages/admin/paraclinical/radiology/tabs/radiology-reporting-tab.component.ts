@@ -2,20 +2,18 @@ import { Component, OnDestroy, OnInit, signal } from "@angular/core";
 import { Subject, debounceTime } from "rxjs";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
-import { EmptyStateComponent } from "../../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooCheckboxComponent, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ImagingOrderRow, RadiologyReport, RadiologyReportTemplate, ReportStatus } from "../../../../../shared/types/radiology.types";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent } from "../../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
 
 @Component({
   selector: 'radiology-reporting-tab',
   standalone: true,
-  imports: [SharedModule,BooSelectComponent, BooTextareaComponent, StatusBadgeComponent, EmptyStateComponent, BooButtonAdminComponent, BooCheckboxComponent],
+  imports: [SharedModule,BooSelectComponent, BooTextareaComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonAdminComponent, BooCheckboxComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
@@ -211,7 +209,7 @@ export class RadiologyReportingTabComponent implements OnInit, OnDestroy {
     });
   }
 
-  reportStatusTone(status: ReportStatus): BadgeTone {
+  reportStatusTone(status: ReportStatus): BooBadgeTone {
     switch (status) {
       case 'Released': case 'Verified': return 'success';
       case 'PendingVerification': case 'Reporting': return 'warning';

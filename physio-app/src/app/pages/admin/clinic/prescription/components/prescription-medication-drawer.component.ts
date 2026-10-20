@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { Subject, debounceTime, switchMap } from "rxjs";
-import { BooCheckboxComponent } from "../../../../../components/checkbox/boo-checkbox/boo-checkbox.component";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { DrawerComponent } from "../../../../../components/drawer/drawer.component";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
 import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { PrescriptionService } from "../../../../../services/admin/prescription.service";
 import { SharedModule } from "../../../../../shared/shared-imports";

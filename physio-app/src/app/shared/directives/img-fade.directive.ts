@@ -1,6 +1,6 @@
 import { AfterViewInit, Directive, ElementRef, inject, NgZone, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { prefersReducedMotion } from '../utils/motion.utils';
+import { booPrefersReducedMotion } from '@physioboo/ui';
 
 /**
  * Fades an <img> in once it has loaded (public site motion system). Images that are already complete (cache, SSR
@@ -18,7 +18,7 @@ export class ImgFadeDirective implements AfterViewInit {
 
     ngAfterViewInit(): void {
         const img = this.el.nativeElement;
-        if (!this.isBrowser || img.complete || prefersReducedMotion()) return;
+        if (!this.isBrowser || img.complete || booPrefersReducedMotion()) return;
         img.classList.add('motion-img', 'motion-img-pending');
         this.zone.runOutsideAngular(() => {
             const done = () => img.classList.remove('motion-img-pending');

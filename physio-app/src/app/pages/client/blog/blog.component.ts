@@ -7,9 +7,7 @@ import { Subject, catchError, map, merge, of, switchMap, tap } from 'rxjs';
 import { ArticleCardComponent } from '../../../components/layout/client/article/article-card.component';
 import { PublicArticleService } from '../../../services/public/public-article.service';
 import { ArticleCategory } from '../../../shared/enums/article';
-import { BooButtonComponent } from '../../../components/button/boo-button/boo-button.component';
-import { EmptyStateComponent } from '../../../components/ui/empty-state.component';
-import { ErrorStateComponent } from '../../../components/ui/error-state.component';
+import { BooBreadcrumbComponent, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooPaginationComponent } from '@physioboo/ui';
 import { SharedModule } from '../../../shared/shared-imports';
 import { PublicArticle } from '../../../shared/types/public-article.types';
 
@@ -50,7 +48,7 @@ const CATEGORIES: CategoryChip[] = [
 @Component({
   selector: 'app-blog',
   standalone: true,
-  imports: [SharedModule, BooButtonComponent, ArticleCardComponent, EmptyStateComponent, ErrorStateComponent],
+  imports: [SharedModule, BooButtonComponent, ArticleCardComponent, BooEmptyStateComponent, BooErrorStateComponent, BooBreadcrumbComponent, BooPaginationComponent],
   templateUrl: './blog.component.html'
 })
 export class BlogComponent implements OnInit, OnDestroy {
@@ -210,20 +208,6 @@ export class BlogComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Pagination
-  /** Page numbers to render; `null` is an ellipsis. Short lists show every page. */
-  get pages(): (number | null)[] {
-    const total = this.totalPages, current = this.query.page;
-    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-    const set = new Set([1, total, current - 1, current, current + 1].filter(p => p >= 1 && p <= total));
-    const sorted = [...set].sort((a, b) => a - b);
-    const out: (number | null)[] = [];
-    sorted.forEach((p, i) => {
-      if (i > 0 && p - sorted[i - 1] > 1) out.push(null);
-      out.push(p);
-    });
-    return out;
-  }
-
   goToPage(page: number): void {
     if (page < 1 || page > this.totalPages || page === this.query.page) return;
     this.navigate({ page });

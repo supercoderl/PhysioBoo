@@ -6,7 +6,7 @@ import { MasterDataColumn } from "../../../../shared/types/master-data.types";
 import { SortOption } from "../../../../shared/types/sort";
 import { BooActionAdminComponent } from "../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent, FilterConfig } from "../../../table/boo-table-admin/boo-table-admin.component";
-import { StatusBadgeComponent } from "../../../ui/status-badge.component";
+import { BooStatusBadgeComponent } from '@physioboo/ui';
 
 /** Table for any Master Data catalog: a clickable name column, the configured columns, and row actions. */
 @Component({
@@ -17,7 +17,7 @@ import { StatusBadgeComponent } from "../../../ui/status-badge.component";
     BooTableAdminComponent,
     ColumnDefDirective,
     BooActionAdminComponent,
-    StatusBadgeComponent
+    BooStatusBadgeComponent
   ],
   host: { class: 'block h-full min-h-0' },
   template: `

@@ -1,4 +1,4 @@
-import { PHYSIO_ICON_NAMES } from "physioboo-icons";
+import { PHYSIO_ICON_NAMES } from '../icons/icon-names';
 import { MenuItem } from "../types/menu.types";
 
 export type MenuArea = 'superadmin' | 'admin';

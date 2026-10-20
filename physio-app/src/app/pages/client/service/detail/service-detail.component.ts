@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Params, Router, UrlTree } from '@angular/router';
 import { Subject, catchError, map, merge, of, switchMap, tap } from 'rxjs';
-import { BooButtonComponent } from '../../../../components/button/boo-button/boo-button.component';
+import { BooBreadcrumbComponent, BooButtonComponent } from '@physioboo/ui';
 import { DoctorCardComponent } from '../../../../components/layout/client/doctor/doctor-card.component';
 import { ClinicCardComponent } from '../../../../components/layout/client/hospital/clinic-card.component';
 import { PublicServiceService } from '../../../../services/public/public-service.service';
@@ -28,7 +28,7 @@ const FLASH_MS = 1400;
 @Component({
   selector: 'app-service-detail',
   standalone: true,
-  imports: [BooButtonComponent, SharedModule, ClinicCardComponent, DoctorCardComponent],
+  imports: [BooButtonComponent, SharedModule, ClinicCardComponent, DoctorCardComponent, BooBreadcrumbComponent],
   templateUrl: './service-detail.component.html',
   styles: `
     .ph-stripes { background: repeating-linear-gradient(135deg, #F3EAED 0 10px, #F9F4F6 10px 20px); }

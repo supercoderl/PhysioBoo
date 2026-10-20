@@ -9,10 +9,9 @@ import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DrawerComponent } from "../../../drawer/drawer.component";
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../input/boo-input/boo-input.component";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../textarea/boo-textarea/boo-textarea.component";
-import { BooCheckboxComponent } from "../../../checkbox/boo-checkbox/boo-checkbox.component";
 
 export type ClinicalAction = 'lab' | 'imaging' | 'note';
 type Priority = 'Routine' | 'Urgent' | 'Stat';

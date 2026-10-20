@@ -12,7 +12,7 @@ import { DrawerComponent } from "../../../drawer/drawer.component";
 import { BooIconSelectComponent } from "../../../select/boo-icon-select/boo-icon-select.component";
 import { BooSelectComponent } from "../../../select/boo-select/boo-select.component";
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent } from "../../../checkbox/boo-checkbox/boo-checkbox.component";
+import { BooCheckboxComponent } from '@physioboo/ui';
 
 const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 

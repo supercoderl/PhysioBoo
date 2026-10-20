@@ -1,7 +1,6 @@
 import { Component, OnInit, computed, signal } from "@angular/core";
 import { finalize, forkJoin } from "rxjs";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooEmptyStateComponent, BooErrorStateComponent } from '@physioboo/ui';
 import { InsuranceClaimsService } from "../../../../services/admin/insurance-claims.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -33,8 +32,8 @@ const LOADING_KEY = 'insurance-claims-workspace';
   imports: [
     SharedModule,
 
-    EmptyStateComponent,
-    ErrorStateComponent,
+    BooEmptyStateComponent,
+    BooErrorStateComponent,
     InsuranceProvidersTreeComponent,
     InsuranceWorkflowRailComponent,
     InsuranceClaimCardComponent,

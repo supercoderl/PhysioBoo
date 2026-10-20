@@ -1,7 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
-import { EmptyStateComponent } from '../../../components/ui/empty-state.component';
-import { ErrorStateComponent } from '../../../components/ui/error-state.component';
+import { BooEmptyStateComponent, BooErrorStateComponent } from '@physioboo/ui';
 import { UserService } from '../../../services/admin/user.service';
 import { AuthService } from '../../../services/auth/auth.service';
 import { SharedModule } from '../../../shared/shared-imports';
@@ -19,7 +18,7 @@ interface DetailRow {
 @Component({
     selector: 'patient-overview',
     standalone: true,
-    imports: [SharedModule, EmptyStateComponent, ErrorStateComponent],
+    imports: [SharedModule, BooEmptyStateComponent, BooErrorStateComponent],
     template: `
         <div class="py-6 flex flex-col gap-6">
             <header class="flex flex-col gap-2">

@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailCart, RetailCartLineItem } from "../../../../shared/types/retail-pos.types";
 
 @Component({
   selector: 'retail-cart-panel',
   standalone: true,
-  imports: [SharedModule,EmptyStateComponent],
+  imports: [SharedModule,BooEmptyStateComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg flex flex-col h-full">
       <div class="p-3 border-b border-gray-200 flex items-center justify-between">

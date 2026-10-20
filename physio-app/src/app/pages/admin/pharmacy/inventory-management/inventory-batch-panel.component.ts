@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -10,7 +9,7 @@ import { BatchLifecycleStatus, WarehouseBatch } from "../../../../shared/types/i
 @Component({
   selector: 'inventory-batch-panel',
   standalone: true,
-  imports: [SharedModule, EmptyStateComponent, StatusBadgeComponent],
+  imports: [SharedModule, BooEmptyStateComponent, BooStatusBadgeComponent],
   template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex items-center justify-between">
@@ -119,7 +118,7 @@ export class InventoryBatchPanelComponent implements OnChanges {
     );
   }
 
-  statusTone(status: BatchLifecycleStatus): BadgeTone {
+  statusTone(status: BatchLifecycleStatus): BooBadgeTone {
     switch (status) {
       case 'Active': return 'success';
       case 'Reserved': return 'primary';

@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
-import { StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { StockTakeService } from "../../../../services/admin/stock-take.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { StockTake, StockTakeActivity, StockTakeActivityType, stockTakeStatusLabel, stockTakeStatusTone } from "../../../../shared/types/stock-take.types";
@@ -14,7 +13,7 @@ const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
 @Component({
   selector: 'stock-take-history-drawer',
   standalone: true,
-  imports: [SharedModule, DrawerComponent, EmptyStateComponent, StatusBadgeComponent],
+  imports: [SharedModule, DrawerComponent, BooEmptyStateComponent, BooStatusBadgeComponent],
   template: `
     <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="close.emit()">
       <div class="flex flex-col h-full bg-surface">

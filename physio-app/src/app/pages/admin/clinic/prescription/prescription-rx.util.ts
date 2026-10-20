@@ -1,7 +1,7 @@
-import { BadgeTone } from "../../../../components/ui/status-badge.component";
+import { BooBadgeTone } from '@physioboo/ui';
 import { ClinicalWarningSeverity, RxMedicationItem } from "../../../../shared/types/prescription-rx.types";
 
-export function severityTone(severity: ClinicalWarningSeverity): BadgeTone {
+export function severityTone(severity: ClinicalWarningSeverity): BooBadgeTone {
     switch (severity) {
         case 'Critical': return 'danger';
         case 'High': return 'danger';

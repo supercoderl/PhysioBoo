@@ -1,6 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -13,7 +12,7 @@ type ResultMode = 'All' | 'Favorites' | 'Recent';
 @Component({
     selector: 'inventory-explorer-panel',
     standalone: true,
-    imports: [SharedModule,EmptyStateComponent, StatusBadgeComponent, WarehouseHeatMapComponent],
+    imports: [SharedModule,BooEmptyStateComponent, BooStatusBadgeComponent, WarehouseHeatMapComponent],
     template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 space-y-2">
@@ -200,7 +199,7 @@ export class InventoryExplorerPanelComponent implements OnInit {
         return 'Out of Stock';
     }
 
-    statusTone(status: InventoryStockStatus): BadgeTone {
+    statusTone(status: InventoryStockStatus): BooBadgeTone {
         if (status === 'InStock') return 'success';
         if (status === 'LowStock') return 'warning';
         return 'danger';

@@ -1,8 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { SurgeryService } from "../../../../services/admin/surgery.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -20,7 +19,7 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
 @Component({
   selector: 'surgery-detail-drawer',
   standalone: true,
-  imports: [SharedModule, DrawerComponent, StatusBadgeComponent, EmptyStateComponent, ButtonIconComponent],
+  imports: [SharedModule, DrawerComponent, BooStatusBadgeComponent, BooEmptyStateComponent, ButtonIconComponent],
   template: `
     <drawer [isOpen]="isOpen" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
@@ -159,7 +158,7 @@ export class SurgeryDetailDrawerComponent implements OnChanges {
     });
   }
 
-  consentTone(status: string): BadgeTone {
+  consentTone(status: string): BooBadgeTone {
     switch (status) {
       case 'Signed': return 'success';
       case 'Pending': return 'warning';
@@ -167,7 +166,7 @@ export class SurgeryDetailDrawerComponent implements OnChanges {
     }
   }
 
-  equipmentTone(status: EquipmentStatus): BadgeTone {
+  equipmentTone(status: EquipmentStatus): BooBadgeTone {
     switch (status) {
       case 'Available': case 'Reserved': return 'success';
       case 'InUse': return 'primary';

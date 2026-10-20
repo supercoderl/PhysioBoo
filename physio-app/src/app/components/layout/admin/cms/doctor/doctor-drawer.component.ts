@@ -16,7 +16,7 @@ import { Doctor } from "../../../../../shared/types/medical-staff.types";
 import { convertEnumToSelection } from "../../../../../shared/utils/common";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooInputComponent } from "../../../../input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { BooJsonInputComponent } from "../../../../input/boo-json-input/boo-json-input.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";

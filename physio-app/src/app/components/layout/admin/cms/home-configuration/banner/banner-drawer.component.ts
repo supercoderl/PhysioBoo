@@ -8,9 +8,8 @@ import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREAT
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { Banner } from "../../../../../../shared/types/banner.types";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent } from "../../../../../checkbox/boo-checkbox/boo-checkbox.component";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
-import { BooInputComponent } from "../../../../../input/boo-input/boo-input.component";
 import { BooUploadComponent } from "../../../../../upload/boo-upload/boo-upload.component";
 
 @Component({

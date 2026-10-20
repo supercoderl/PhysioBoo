@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { hospitalTypeLabel } from '../../../../shared/enums/hospital-type';
 import { SharedModule } from '../../../../shared/shared-imports';
-import { BooButtonComponent } from '../../../button/boo-button/boo-button.component';
+import { BooButtonComponent } from '@physioboo/ui';
 import { PublicHospital } from '../../../../shared/types/public-hospital.types';
 
 /**

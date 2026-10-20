@@ -1,7 +1,6 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
-import { StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { NursingService } from "../../../../services/admin/nursing.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { NursingPatient } from "../../../../shared/types/nursing.types";
@@ -19,8 +18,8 @@ type TabKey = 'overview' | 'vitals' | 'mar' | 'io' | 'tasks' | 'notes';
   standalone: true,
   imports: [
     SharedModule,
-    ErrorStateComponent,
-    StatusBadgeComponent,
+    BooErrorStateComponent,
+    BooStatusBadgeComponent,
     NursingOverviewTabComponent,
     NursingVitalsTabComponent,
     NursingMarTabComponent,

@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooErrorStateComponent } from '@physioboo/ui';
 import { NursingService } from "../../../../services/admin/nursing.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -14,7 +14,7 @@ type SbarKey = 'situation' | 'background' | 'assessment' | 'recommendation';
 @Component({
     selector: 'admin-nursing-handover',
     standalone: true,
-    imports: [SharedModule,BooSelectComponent, ErrorStateComponent, BooButtonAdminComponent, BooTextareaComponent],
+    imports: [SharedModule,BooSelectComponent, BooErrorStateComponent, BooButtonAdminComponent, BooTextareaComponent],
     template: `
     <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div class="max-w-5xl mx-auto">

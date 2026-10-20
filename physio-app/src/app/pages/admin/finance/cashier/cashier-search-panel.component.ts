@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output, signal } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { CashierInvoiceStatus } from "../../../../shared/types/cashier.types";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
 
 interface StatusChip {

@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { forkJoin } from "rxjs";
 import { ClinicalAction, ClinicalActionDrawerComponent } from "../../../../components/layout/admin/clinic/clinical-action-drawer.component";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooErrorStateComponent } from '@physioboo/ui';
 import { MedicalRecordService } from "../../../../services/admin/medical-record.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import {
@@ -46,7 +46,7 @@ interface TabDef {
     imports: [
         ClinicalActionDrawerComponent,
         SharedModule,
-        ErrorStateComponent,
+        BooErrorStateComponent,
         PatientContextHeaderComponent,
         ClinicalSnapshotComponent,
         OverviewTabComponent,

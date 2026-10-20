@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from "@angular/core";
 import { catchError, of } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { HomeConfigBannerDrawerComponent } from "../../../../../components/layout/admin/cms/home-configuration/banner/banner-drawer.component";
 import { HomeConfigBannerTableCardComponent } from "../../../../../components/layout/admin/cms/home-configuration/banner/banner-table-card.component";
 import { BooSortAdminComponent } from "../../../../../components/table/boo-table-admin/boo-sort-admin.component";

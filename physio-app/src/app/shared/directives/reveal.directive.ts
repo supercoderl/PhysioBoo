@@ -1,6 +1,6 @@
 import { AfterViewInit, Directive, ElementRef, inject, Input, NgZone, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { prefersReducedMotion } from '../utils/motion.utils';
+import { booPrefersReducedMotion } from '@physioboo/ui';
 
 const STAGGER_MS = 60;
 const STAGGER_MAX = 6;
@@ -27,7 +27,7 @@ export class RevealDirective implements AfterViewInit, OnDestroy {
     private cleanupTimer?: number;
 
     ngAfterViewInit(): void {
-        if (!this.isBrowser || typeof IntersectionObserver === 'undefined' || prefersReducedMotion()) return;
+        if (!this.isBrowser || typeof IntersectionObserver === 'undefined' || booPrefersReducedMotion()) return;
         const host = this.el.nativeElement;
         // Already on screen (or above it, e.g. after a reload mid-page): nothing to animate.
         if (host.getBoundingClientRect().top < window.innerHeight * 0.92) return;

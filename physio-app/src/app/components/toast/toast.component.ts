@@ -3,7 +3,8 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastService } from '../../services/common/toast.service';
 import { SharedModule } from '../../shared/shared-imports';
-import { isPublicUrl, motionState } from '../../shared/utils/motion.utils';
+import { booMotionState } from '@physioboo/ui';
+import { isPublicUrl } from '../../shared/utils/motion.utils';
 import { Toast, ToastType } from '../../shared/types/toast.types';
 
 @Component({
@@ -101,7 +102,7 @@ export class ToastComponent {
     // #region Inputs, Outputs, Properties
     toastService = inject(ToastService);
     private readonly router = inject(Router);
-    private readonly motion = motionState();
+    private readonly motion = booMotionState();
 
     /** Public pages get the public motion; every other area keeps the original behaviour. */
     get mode(): 'admin' | 'full' | 'reduced' {

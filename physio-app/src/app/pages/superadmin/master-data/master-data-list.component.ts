@@ -5,7 +5,7 @@ import { finalize } from "rxjs";
 import { BooButtonAdminComponent } from "../../../components/button/boo-button-admin/boo-button-admin.component";
 import { SuperadminMasterDataTableCardComponent } from "../../../components/layout/superadmin/master-data/master-data-table-card.component";
 import { SuperadminPageHeaderComponent } from "../../../components/layout/superadmin/shared/superadmin-page-header.component";
-import { ErrorStateComponent } from "../../../components/ui/error-state.component";
+import { BooErrorStateComponent } from '@physioboo/ui';
 import { AuthService } from "../../../services/auth/auth.service";
 import { MasterDataRegistry } from "../../../services/admin/master-data.registry";
 import { DialogService } from "../../../services/common/dialog.service";
@@ -38,7 +38,7 @@ const SORT_OPTIONS: SortOption[] = [
         BooButtonAdminComponent,
         SuperadminPageHeaderComponent,
         SuperadminMasterDataTableCardComponent,
-        ErrorStateComponent
+        BooErrorStateComponent
     ],
     host: { class: 'block h-full min-h-0' },
     template: `

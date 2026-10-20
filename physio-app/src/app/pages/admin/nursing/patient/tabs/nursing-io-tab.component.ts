@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { NursingService } from "../../../../../services/admin/nursing.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";

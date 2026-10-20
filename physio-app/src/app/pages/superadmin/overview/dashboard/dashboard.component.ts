@@ -1,9 +1,7 @@
 import { Component, inject, OnInit, signal } from "@angular/core";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { SuperadminPageHeaderComponent } from "../../../../components/layout/superadmin/shared/superadmin-page-header.component";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
-import { StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { PlatformService } from "../../../../services/admin/platform.service";
 import { AuthService } from "../../../../services/auth/auth.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -24,9 +22,9 @@ interface QuickAction {
         SharedModule,
         BooButtonAdminComponent,
         SuperadminPageHeaderComponent,
-        StatusBadgeComponent,
-        EmptyStateComponent,
-        ErrorStateComponent
+        BooStatusBadgeComponent,
+        BooEmptyStateComponent,
+        BooErrorStateComponent
     ],
     template: `
         <div class="space-y-5">

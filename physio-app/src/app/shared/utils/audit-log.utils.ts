@@ -1,7 +1,7 @@
-import { BadgeTone } from "../../components/ui/status-badge.component";
+import { BooBadgeTone } from '@physioboo/ui';
 import { AuditLog, AuditLogChange } from "../types/audit-log.types";
 
-export function auditActionTone(action: string): BadgeTone {
+export function auditActionTone(action: string): BooBadgeTone {
     switch (action) {
         case 'Create': return 'success';
         case 'Update': return 'primary';

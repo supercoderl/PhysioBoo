@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { StockMovementEvent, StockMovementType } from "../../../../shared/types/inventory-management.types";
@@ -25,7 +25,7 @@ interface DayGroup {
 @Component({
   selector: 'inventory-timeline-panel',
   standalone: true,
-  imports: [SharedModule, EmptyStateComponent, BooSelectComponent],
+  imports: [SharedModule, BooEmptyStateComponent, BooSelectComponent],
   template: `
     <div class="bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex flex-wrap items-center justify-between gap-2">

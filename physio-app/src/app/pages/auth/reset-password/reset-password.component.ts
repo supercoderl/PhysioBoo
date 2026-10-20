@@ -2,9 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { BooButtonComponent } from "../../../components/button/boo-button/boo-button.component";
-import { FormWrapperComponent } from "../../../components/form/boo-form/boo-form.component";
-import { BooInputComponent } from "../../../components/input/boo-input/boo-input.component";
+import { BooButtonComponent, BooFormComponent, BooInputComponent } from '@physioboo/ui';
 import { AuthService } from '../../../services/auth/auth.service';
 import { LocalLoadingService } from '../../../services/common/local-loading.service';
 import { SharedModule } from '../../../shared/shared-imports';
@@ -26,7 +24,7 @@ function strongPassword(control: AbstractControl): ValidationErrors | null {
     BooButtonComponent,
     BooInputComponent,
     SharedModule,
-    FormWrapperComponent
+    BooFormComponent
   ],
   templateUrl: './reset-password.component.html'
 })

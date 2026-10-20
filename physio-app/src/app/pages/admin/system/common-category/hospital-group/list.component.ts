@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
 import { CommonCategoryHospitalGroupDrawerComponent } from "../../../../../components/layout/admin/system/common-category/hospital-group/hospital-group-drawer.component";
 import { CommonCategoryHospitalGroupTableCardComponent } from "../../../../../components/layout/admin/system/common-category/hospital-group/hospital-group-table-card.component";

@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
+import { BooEmptyStateComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../shared/shared-imports";
 import { WarehouseZone } from "../../../../shared/types/inventory-management.types";
 
 @Component({
     selector: 'warehouse-heatmap',
     standalone: true,
-    imports: [SharedModule,EmptyStateComponent],
+    imports: [SharedModule,BooEmptyStateComponent],
     template: `
     <boo-empty-state *ngIf="!zones.length" icon="layout-grid" title="No warehouse zones configured"></boo-empty-state>
 

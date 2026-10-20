@@ -2,15 +2,13 @@ import { Component, computed, inject, OnInit, signal } from "@angular/core";
 import { finalize } from "rxjs";
 import { SuperadminPageHeaderComponent } from "../../../../components/layout/superadmin/shared/superadmin-page-header.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooEmptyStateComponent, BooErrorStateComponent, BooInputComponent } from '@physioboo/ui';
 import { ImportResourceResult, ResourceService } from "../../../../services/admin/resource.service";
 import { InitService } from "../../../../services/common/init.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { Language } from "../../../../shared/types/sys-language.types";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
 
 interface ResourceRow {
     key: string;
@@ -33,7 +31,7 @@ function flatten(value: unknown, prefix = ''): ResourceRow[] {
 @Component({
     selector: 'superadmin-localization',
     standalone: true,
-    imports: [SharedModule, SuperadminPageHeaderComponent, BooSelectComponent, EmptyStateComponent, ErrorStateComponent, BooButtonAdminComponent, BooInputComponent],
+    imports: [SharedModule, SuperadminPageHeaderComponent, BooSelectComponent, BooEmptyStateComponent, BooErrorStateComponent, BooButtonAdminComponent, BooInputComponent],
     template: `
         <div class="space-y-5">
             <superadmin-page-header

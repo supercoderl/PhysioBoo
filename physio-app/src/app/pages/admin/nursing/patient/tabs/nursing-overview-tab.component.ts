@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { forkJoin } from "rxjs";
-import { StatusBadgeComponent } from "../../../../../components/ui/status-badge.component";
+import { BooStatusBadgeComponent } from '@physioboo/ui';
 import { NursingService } from "../../../../../services/admin/nursing.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { IntakeOutputEntry, NursingTask, VitalsReading } from "../../../../../shared/types/nursing.types";
@@ -8,7 +8,7 @@ import { IntakeOutputEntry, NursingTask, VitalsReading } from "../../../../../sh
 @Component({
   selector: 'nursing-overview-tab',
   standalone: true,
-  imports: [SharedModule, StatusBadgeComponent],
+  imports: [SharedModule, BooStatusBadgeComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>

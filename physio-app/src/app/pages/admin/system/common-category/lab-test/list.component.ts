@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, signal, ViewChild } from "@angular/core"
 import { catchError, forkJoin, of } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
-import { BooInputComponent } from "../../../../../components/input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
 import { CommonCategoryLabTestDrawerComponent } from "../../../../../components/layout/admin/system/common-category/lab-test/lab-test-drawer.component";
 import { CommonCategoryLabTestTableCardComponent } from "../../../../../components/layout/admin/system/common-category/lab-test/lab-test-table-card.component";

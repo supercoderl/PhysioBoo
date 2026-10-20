@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { SharedModule } from '../../../../shared/shared-imports';
-import { BooButtonComponent } from '../../../button/boo-button/boo-button.component';
+import { BooButtonComponent } from '@physioboo/ui';
 import { PublicService } from '../../../../shared/types/public-service.types';
 
 /**

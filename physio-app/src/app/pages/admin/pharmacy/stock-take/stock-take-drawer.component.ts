@@ -4,7 +4,7 @@ import { firstValueFrom } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { BooInputComponent } from "../../../../components/input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { DepartmentService } from "../../../../services/admin/department.service";

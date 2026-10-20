@@ -1,13 +1,12 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { EmptyStateComponent } from "../../../../components/ui/empty-state.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DispenseQueueItem, DispenseQueueStatus } from "../../../../shared/types/dispensing.types";
 
 @Component({
   selector: 'dispense-queue-panel',
   standalone: true,
-  imports: [SharedModule, StatusBadgeComponent, EmptyStateComponent],
+  imports: [SharedModule, BooStatusBadgeComponent, BooEmptyStateComponent],
   template: `
     <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
       <div class="p-3 border-b border-borderGray/60 flex flex-col gap-2">
@@ -80,7 +79,7 @@ export class DispenseQueuePanelComponent {
     return 'bg-gray-300';
   }
 
-  statusTone(status: DispenseQueueStatus): BadgeTone {
+  statusTone(status: DispenseQueueStatus): BooBadgeTone {
     switch (status) {
       case 'Waiting': return 'neutral';
       case 'Verifying': return 'primary';

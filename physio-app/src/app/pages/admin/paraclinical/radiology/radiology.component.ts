@@ -1,9 +1,8 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { finalize, forkJoin } from "rxjs";
-import { ErrorStateComponent } from "../../../../components/ui/error-state.component";
+import { BooBadgeTone, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
-import { BadgeTone, StatusBadgeComponent } from "../../../../components/ui/status-badge.component";
 import { RadiologyService } from "../../../../services/admin/radiology.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -29,8 +28,8 @@ const LOADING_KEY = 'radiology';
   imports: [
     SharedModule,
 
-    ErrorStateComponent,
-    StatusBadgeComponent,
+    BooErrorStateComponent,
+    BooStatusBadgeComponent,
     StatCardComponent,
     RadiologyDashboardTabComponent,
     RadiologyOrdersTabComponent,
@@ -189,7 +188,7 @@ export class AdminRadiologyComponent implements OnInit {
     return [...this.alerts()].sort((a, b) => order[a.severity] - order[b.severity]);
   }
 
-  alertTone(severity: RadiologyAlertSeverity): BadgeTone {
+  alertTone(severity: RadiologyAlertSeverity): BooBadgeTone {
     switch (severity) {
       case 'Critical': return 'danger';
       case 'High': return 'danger';

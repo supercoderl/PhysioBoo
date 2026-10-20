@@ -13,7 +13,7 @@ import { EMPTY_LOCATION_VALUE } from "../../../../../../shared/types/location.ty
 import { HospitalGroup } from "../../../../../../shared/types/support.types";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
-import { BooInputComponent } from "../../../../../input/boo-input/boo-input.component";
+import { BooInputComponent } from '@physioboo/ui';
 import { BooLocationSelectComponent } from "../../../../../select/boo-location-select/boo-location-select.component";
 import { BooSelectComponent } from "../../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";

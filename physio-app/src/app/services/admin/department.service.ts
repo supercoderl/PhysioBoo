@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpContext } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
@@ -9,8 +9,8 @@ import { Department } from "../../shared/types/operation.types";
 export class DepartmentService {
     constructor(private http: HttpClient) { }
 
-    search(request: PagedRequest<DepartmentFilter>) {
-        return this.http.post<PagedResponse<PaginationData<Department>>>(BASE_API.DEPARTMENT.SEARCH, request);
+    search(request: PagedRequest<DepartmentFilter>, context?: HttpContext) {
+        return this.http.post<PagedResponse<PaginationData<Department>>>(BASE_API.DEPARTMENT.SEARCH, request, { context });
     }
 
     search_by_id(id: string) {

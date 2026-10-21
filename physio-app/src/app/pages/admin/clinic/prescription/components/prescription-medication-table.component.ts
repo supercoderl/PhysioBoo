@@ -1,370 +1,145 @@
-import { Component, EventEmitter, Input, Output, computed, signal } from "@angular/core";
-import { BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
-import { SharedModule } from "../../../../../shared/shared-imports";
-import { RxMedicationItem, RxMedicationStatus } from "../../../../../shared/types/prescription-rx.types";
-import { formatCurrency, severityIcon, severityRank, totalDailyDosesOf } from "../prescription-rx.util";
-import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { NgFor, NgIf } from '@angular/common';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { BooButtonComponent, BooEmptyStateComponent, BooIconComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { StoredClinicalWarning, normalizeWarningSeverity, warningTypeLabel } from '../../../../../shared/types/prescription-rx.types';
+import { PrescriptionLine, formatAmount, lineTotal, mealLabel, severityTone, timingLabel } from '../prescription-rx.util';
 
-type EditableField = 'dose' | 'frequency' | 'durationDays' | 'quantity' | 'instructions';
-
+/** Medication lines of a prescription with their warnings. Editing is reported to the page; nothing is saved here. */
 @Component({
-  selector: 'rx-medication-table',
-  standalone: true,
-  imports: [SharedModule, BooInputComponent, BooStatusBadgeComponent, BooButtonAdminComponent],
-  template: `
-    <div class="bg-surface border border-gray-200 rounded-lg flex flex-col">
-      <!-- Toolbar -->
-      <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 flex-wrap">
-        <div class="w-56">
-          <boo-input placeholder="Search medication..." [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" size="small"></boo-input>
-        </div>
-        <button *ngFor="let f of statusFilters" type="button" (click)="statusFilter.set(f)"
-          class="px-2.5 py-1 text-xs rounded-full transition-colors"
-          [ngClass]="statusFilter() === f ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'">
-          {{ f }}
-        </button>
-        <button type="button" (click)="insuranceOnly.set(!insuranceOnly())"
-          class="px-2.5 py-1 text-xs rounded-full transition-colors"
-          [ngClass]="insuranceOnly() ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'">
-          Insurance covered
-        </button>
-        <button type="button" (click)="controlledOnly.set(!controlledOnly())"
-          class="px-2.5 py-1 text-xs rounded-full transition-colors"
-          [ngClass]="controlledOnly() ? 'bg-rose-600 text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'">
-          Controlled
-        </button>
-
-        <boo-button-admin *ngIf="editable" (click)="addMedication.emit()" textColor="white" padding="8px 14px" [fontSize]="14" [radius]="8" fontWeight="600" [gap]="6" class="ml-auto">
-          <physio-icon name="plus" [size]="16"></physio-icon> Add Medication
-        </boo-button-admin>
-      </div>
-
-      <!-- Table -->
-      <div class="overflow-auto max-h-[55vh]" *ngIf="filtered().length">
-        <table class="w-full text-sm border-collapse">
-          <thead class="sticky top-0 z-10 bg-gray-50 text-left text-xs text-secondary">
-            <tr>
-              <th class="sticky left-0 z-20 bg-gray-50 px-4 py-2.5 font-semibold uppercase tracking-wider cursor-pointer min-w-[200px]" (click)="toggleSort('name')">Medication</th>
-              <th class="px-3 py-2.5 font-semibold uppercase tracking-wider">Strength</th>
-              <th class="px-3 py-2.5 font-semibold uppercase tracking-wider">Form</th>
-              <th class="px-3 py-2.5 font-semibold uppercase tracking-wider">Route</th>
-              <th class="px-3 py-2.5 font-semibold uppercase tracking-wider">Dose</th>
-              <th class="px-3 py-2.5 font-semibold uppercase tracking-wider">Frequency</th>
-              <th class="px-2 py-2.5 font-semibold uppercase tracking-wider text-center" title="Morning">AM</th>
-              <th class="px-2 py-2.5 font-semibold uppercase tracking-wider text-center" title="Noon">Noon</th>
-              <th class="px-2 py-2.5 font-semibold uppercase tracking-wider text-center" title="Afternoon">Aft.</th>
-              <th class="px-2 py-2.5 font-semibold uppercase tracking-wider text-center" title="Evening">Eve.</th>
-              <th class="px-3 py-2.5 font-semibold uppercase tracking-wider text-right">Duration</th>
-              <th class="px-3 py-2.5 font-semibold uppercase tracking-wider text-right cursor-pointer" (click)="toggleSort('quantity')">Qty</th>
-              <th class="px-3 py-2.5 font-semibold uppercase tracking-wider min-w-[160px]">Instructions</th>
-              <th class="px-3 py-2.5 font-semibold uppercase tracking-wider">Insurance</th>
-              <th class="px-3 py-2.5 font-semibold uppercase tracking-wider">Stock</th>
-              <th class="px-3 py-2.5 font-semibold uppercase tracking-wider">Warnings</th>
-              <th class="px-3 py-2.5 font-semibold uppercase tracking-wider cursor-pointer" (click)="toggleSort('status')">Status</th>
-              <th class="px-3 py-2.5 font-semibold uppercase tracking-wider text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100">
-            <tr *ngFor="let item of filtered()" [id]="'rx-row-' + item.id" class="hover:bg-gray-50/60">
-              <!-- Medication identity + badges -->
-              <td class="sticky left-0 z-10 bg-surface px-4 py-2.5 align-top">
-                <div class="font-medium text-primary">{{ item.name }}</div>
-                <div *ngIf="item.genericName" class="text-xs text-secondary italic">{{ item.genericName }}</div>
-                <div class="flex gap-1 flex-wrap mt-1">
-                  <span *ngFor="let b of rowBadges(item).slice(0,3)" class="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded" [ngClass]="b.cls">{{ b.label }}</span>
-                  <span *ngIf="rowBadges(item).length > 3" class="text-[10px] text-secondary px-1">+{{ rowBadges(item).length - 3 }}</span>
+    selector: 'rx-medication-table',
+    standalone: true,
+    imports: [NgIf, NgFor, BooButtonComponent, BooEmptyStateComponent, BooIconComponent, BooStatusBadgeComponent],
+    template: `
+        <section class="bg-surface border border-borderGray rounded-xl" aria-labelledby="rx-meds-title">
+            <header class="px-5 py-3 border-b border-rowDivider flex flex-wrap items-center justify-between gap-2">
+                <h2 id="rx-meds-title" class="m-0 text-sm font-semibold text-regular">
+                    Medications <span class="text-secondary font-normal">({{ lines.length }})</span>
+                </h2>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button *ngIf="lines.length" type="button" boo-button variant="secondary" size="sm" [loading]="checking" [disabled]="checking" (click)="check.emit()">
+                        <physio-icon *ngIf="!checking" name="shield-check" [size]="15" aria-hidden="true" />Check warnings
+                    </button>
+                    <button *ngIf="editable" type="button" boo-button variant="primary" size="sm" (click)="add.emit()">
+                        <physio-icon name="plus" [size]="15" aria-hidden="true" />Add medication
+                    </button>
                 </div>
-              </td>
-              <td class="px-3 py-2.5 align-top text-secondary">{{ item.strength || '—' }}</td>
-              <td class="px-3 py-2.5 align-top text-secondary">{{ item.dosageForm || '—' }}</td>
-              <td class="px-3 py-2.5 align-top text-secondary">{{ item.route || '—' }}</td>
+            </header>
 
-              <!-- Dose (inline edit) -->
-              <td class="px-3 py-2.5 align-top">
-                <ng-container *ngIf="isEditing(item.id, 'dose'); else doseView">
-                  <input class="w-20 border border-primary rounded px-1.5 py-1 text-sm" [(ngModel)]="editBuffer"
-                    (keydown.enter)="commitEdit(item)" (keydown.escape)="cancelEdit()" (blur)="commitEdit(item)" autofocus>
-                </ng-container>
-                <ng-template #doseView>
-                  <span class="text-primary" [class.cursor-pointer]="editable" (click)="startEdit(item, 'dose', item.dose)">{{ item.dose }}</span>
-                </ng-template>
-              </td>
+            <boo-empty-state
+                *ngIf="!lines.length"
+                appearance="panel"
+                icon="pill"
+                title="No medications yet"
+                [description]="editable ? 'Use Add medication to start this prescription.' : 'This prescription has no medications.'"
+                [headingLevel]="3"
+            />
 
-              <!-- Frequency (inline edit) -->
-              <td class="px-3 py-2.5 align-top">
-                <ng-container *ngIf="isEditing(item.id, 'frequency'); else freqView">
-                  <input class="w-20 border border-primary rounded px-1.5 py-1 text-sm" [(ngModel)]="editBuffer"
-                    (keydown.enter)="commitEdit(item)" (keydown.escape)="cancelEdit()" (blur)="commitEdit(item)" autofocus>
-                </ng-container>
-                <ng-template #freqView>
-                  <span class="text-primary" [class.cursor-pointer]="editable" (click)="startEdit(item, 'frequency', item.frequency)">{{ item.frequency }}</span>
-                </ng-template>
-              </td>
-
-              <td class="px-2 py-2.5 align-top text-center"><physio-icon *ngIf="item.timing.morning" name="check" [size]="14" class="text-[#059669]"></physio-icon></td>
-              <td class="px-2 py-2.5 align-top text-center"><physio-icon *ngIf="item.timing.noon" name="check" [size]="14" class="text-[#059669]"></physio-icon></td>
-              <td class="px-2 py-2.5 align-top text-center"><physio-icon *ngIf="item.timing.afternoon" name="check" [size]="14" class="text-[#059669]"></physio-icon></td>
-              <td class="px-2 py-2.5 align-top text-center"><physio-icon *ngIf="item.timing.evening" name="check" [size]="14" class="text-[#059669]"></physio-icon></td>
-
-              <!-- Duration (inline edit) -->
-              <td class="px-3 py-2.5 align-top text-right">
-                <ng-container *ngIf="isEditing(item.id, 'durationDays'); else durView">
-                  <input type="number" class="w-16 border border-primary rounded px-1.5 py-1 text-sm text-right" [(ngModel)]="editBuffer"
-                    (keydown.enter)="commitEdit(item)" (keydown.escape)="cancelEdit()" (blur)="commitEdit(item)" autofocus>
-                </ng-container>
-                <ng-template #durView>
-                  <span class="text-secondary" [class.cursor-pointer]="editable" (click)="startEdit(item, 'durationDays', item.durationDays)">{{ item.durationDays }}d</span>
-                </ng-template>
-              </td>
-
-              <!-- Quantity (inline edit) -->
-              <td class="px-3 py-2.5 align-top text-right">
-                <ng-container *ngIf="isEditing(item.id, 'quantity'); else qtyView">
-                  <input type="number" class="w-16 border border-primary rounded px-1.5 py-1 text-sm text-right" [(ngModel)]="editBuffer"
-                    (keydown.enter)="commitEdit(item)" (keydown.escape)="cancelEdit()" (blur)="commitEdit(item)" autofocus>
-                </ng-container>
-                <ng-template #qtyView>
-                  <span class="font-medium text-primary" [class.cursor-pointer]="editable" (click)="startEdit(item, 'quantity', item.quantity)">{{ item.quantity }}</span>
-                </ng-template>
-              </td>
-
-              <!-- Instructions (inline edit) -->
-              <td class="px-3 py-2.5 align-top max-w-[200px]">
-                <ng-container *ngIf="isEditing(item.id, 'instructions'); else instrView">
-                  <input class="w-full border border-primary rounded px-1.5 py-1 text-sm" [(ngModel)]="editBuffer"
-                    (keydown.enter)="commitEdit(item)" (keydown.escape)="cancelEdit()" (blur)="commitEdit(item)" autofocus>
-                </ng-container>
-                <ng-template #instrView>
-                  <span class="text-secondary truncate block" [title]="item.instructions || ''" [class.cursor-pointer]="editable" (click)="startEdit(item, 'instructions', item.instructions || '')">{{ item.instructions || '—' }}</span>
-                </ng-template>
-              </td>
-
-              <td class="px-3 py-2.5 align-top">
-                <boo-status-badge [label]="item.insuranceCovered ? 'Covered' : 'Not Covered'" [tone]="item.insuranceCovered ? 'success' : 'neutral'"></boo-status-badge>
-              </td>
-              <td class="px-3 py-2.5 align-top">
-                <boo-status-badge [label]="stockLabel(item)" [tone]="stockTone(item)" [dotted]="true"></boo-status-badge>
-              </td>
-
-              <!-- Clinical warnings -->
-              <td class="px-3 py-2.5 align-top">
-                <div class="flex items-center gap-1" *ngIf="item.warnings.length">
-                  <span *ngFor="let w of topWarnings(item)" class="relative group cursor-pointer">
-                    <physio-icon [name]="severityIcon(w.severity)" [size]="16" [style.color]="warningColor(w.severity)"></physio-icon>
-                    <span class="pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-1 w-max max-w-[240px] bg-gray-900 text-white text-[11px] rounded px-2 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-40">
-                      <strong>{{ w.severity }}:</strong> {{ w.message }}
-                      <span *ngIf="w.recommendation" class="block mt-0.5 text-gray-300">{{ w.recommendation }}</span>
-                    </span>
-                  </span>
-                  <span *ngIf="item.warnings.length > 2" class="text-[11px] text-secondary">+{{ item.warnings.length - 2 }}</span>
-                </div>
-                <span *ngIf="!item.warnings.length" class="text-secondary text-xs">—</span>
-              </td>
-
-              <td class="px-3 py-2.5 align-top">
-                <boo-status-badge [label]="item.status" [tone]="statusTone(item.status)"></boo-status-badge>
-              </td>
-
-              <td class="px-3 py-2.5 align-top text-right whitespace-nowrap">
-                <button *ngIf="editable" type="button" (click)="editMedication.emit(item)" class="text-secondary hover:text-primary p-1" title="Edit">
-                  <physio-icon name="pencil" [size]="15"></physio-icon>
-                </button>
-                <button *ngIf="editable && item.medicineId" type="button" (click)="favoriteMedication.emit(item)" class="text-secondary hover:text-amber-500 p-1" title="Add to favorites">
-                  <physio-icon name="star" [size]="15"></physio-icon>
-                </button>
-                <button *ngIf="editable" type="button" (click)="duplicateItem(item)" class="text-secondary hover:text-primary p-1" title="Duplicate">
-                  <physio-icon name="copy" [size]="15"></physio-icon>
-                </button>
-                <button *ngIf="editable" type="button" (click)="removeItem(item)" class="text-secondary hover:text-rose-600 p-1" title="Remove">
-                  <physio-icon name="trash" [size]="15"></physio-icon>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Empty state -->
-      <div *ngIf="!filtered().length" class="py-14 text-center">
-        <physio-icon name="clipboard" [size]="40" [class]="'text-gray-300 mx-auto mb-3'"></physio-icon>
-        <p class="text-secondary text-sm mb-3">{{ itemsSignal().length ? 'No medications match the current filters.' : 'No medications added yet.' }}</p>
-        <boo-button-admin *ngIf="editable && !itemsSignal().length" (click)="addMedication.emit()" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="600">
-          Add First Medication
-        </boo-button-admin>
-      </div>
-
-      <!-- Summary strip -->
-      <div class="px-4 py-3 border-t border-gray-100 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-center bg-gray-50/60 rounded-b-lg">
-        <div><div class="text-xs text-secondary">Medications</div><div class="font-bold text-primary">{{ summary().totalMedications }}</div></div>
-        <div><div class="text-xs text-secondary">Total Qty</div><div class="font-bold text-primary">{{ summary().totalQuantity }}</div></div>
-        <div><div class="text-xs text-secondary">Daily Doses</div><div class="font-bold text-primary">{{ summary().totalDailyDoses }}</div></div>
-        <div><div class="text-xs text-secondary">Est. Cost</div><div class="font-bold text-primary">{{ fmt(summary().estimatedCost) }}</div></div>
-        <div><div class="text-xs text-secondary">Insurance</div><div class="font-bold text-emerald-600">{{ fmt(summary().insuranceCoverageAmount) }} ({{ summary().insuranceCoveragePercent }}%)</div></div>
-        <div><div class="text-xs text-secondary">Patient Pays</div><div class="font-bold text-primary">{{ fmt(summary().patientPayment) }}</div></div>
-      </div>
-    </div>
-  `,
+            <div *ngIf="lines.length" class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <caption class="sr-only">Medications on this prescription</caption>
+                    <thead class="bg-gray-50 text-left text-xs text-secondary">
+                        <tr>
+                            <th scope="col" class="px-5 py-2 font-semibold">Medication</th>
+                            <th scope="col" class="px-3 py-2 font-semibold">Dose and schedule</th>
+                            <th scope="col" class="px-3 py-2 font-semibold text-right">Duration</th>
+                            <th scope="col" class="px-3 py-2 font-semibold text-right">Quantity</th>
+                            <th scope="col" class="px-3 py-2 font-semibold text-right">Price</th>
+                            <th *ngIf="editable" scope="col" class="px-5 py-2 font-semibold text-right"><span class="sr-only">Actions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let line of lines; trackBy: trackLine">
+                            <tr class="align-top border-t border-rowDivider">
+                                <td class="px-5 py-3">
+                                    <p class="m-0 font-medium text-regular">{{ line.input.medicineName }}</p>
+                                    <p class="m-0 text-xs text-secondary">
+                                        {{ line.input.genericName || 'No generic name' }}<ng-container *ngIf="line.input.strength"> · {{ line.input.strength }}</ng-container><ng-container *ngIf="line.input.dosageForm"> · {{ line.input.dosageForm }}</ng-container>
+                                    </p>
+                                    <p *ngIf="!line.input.id" class="m-0 mt-1 text-xs text-warning">Not saved yet</p>
+                                </td>
+                                <td class="px-3 py-3">
+                                    <p class="m-0 text-regular">{{ line.input.dosageInstructions }} · {{ line.input.frequency }}</p>
+                                    <p *ngIf="schedule(line) as s" class="m-0 text-xs text-secondary">{{ s }}</p>
+                                    <p *ngIf="line.input.routeOfAdministration" class="m-0 text-xs text-secondary">Route: {{ line.input.routeOfAdministration }}</p>
+                                    <p *ngIf="line.input.specialInstructions" class="m-0 mt-1 text-xs text-secondary">{{ line.input.specialInstructions }}</p>
+                                </td>
+                                <td class="px-3 py-3 text-right tabular-nums whitespace-nowrap">{{ line.input.durationInDays }} d</td>
+                                <td class="px-3 py-3 text-right tabular-nums whitespace-nowrap">
+                                    {{ line.input.quantityPrescribed }} {{ line.input.unit }}
+                                    <span *ngIf="line.quantityDispensed" class="block text-xs text-secondary">{{ line.quantityDispensed }} dispensed</span>
+                                </td>
+                                <td class="px-3 py-3 text-right tabular-nums whitespace-nowrap">
+                                    {{ amount(line.input.pricePerUnit) }}
+                                    <span class="block text-xs text-secondary">Total {{ amount(total(line)) }}</span>
+                                </td>
+                                <td *ngIf="editable" class="px-5 py-3 text-right whitespace-nowrap">
+                                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" [attr.aria-label]="'Edit ' + line.input.medicineName" (click)="edit.emit(line)">
+                                        <physio-icon name="pencil" [size]="16" />
+                                    </button>
+                                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" [attr.aria-label]="'Remove ' + line.input.medicineName" (click)="remove.emit(line)">
+                                        <physio-icon name="trash" [size]="16" />
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr *ngIf="warningsOf(line).length">
+                                <td [attr.colspan]="editable ? 6 : 5" class="px-5 pb-3 pt-0">
+                                    <ul class="m-0 p-0 list-none flex flex-col gap-1.5" [attr.aria-label]="'Warnings for ' + line.input.medicineName">
+                                        <li *ngFor="let w of warningsOf(line)" class="flex items-start gap-2 rounded-lg bg-gray-50 px-3 py-2 text-xs">
+                                            <boo-status-badge [label]="severity(w)" [tone]="tone(w)" />
+                                            <span class="min-w-0">
+                                                <span class="font-medium text-regular">{{ typeLabel(w) }}:</span> {{ w.message }}
+                                                <span *ngIf="w.recommendedAction" class="block text-secondary">{{ w.recommendedAction }}</span>
+                                                <span *ngIf="w.acknowledgedAt" class="block text-secondary">Acknowledged</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    `,
 })
 export class PrescriptionMedicationTableComponent {
-  @Input() set items(v: RxMedicationItem[]) { this._items.set(v ?? []); }
-  itemsSignal() { return this._items(); }
-  @Input() editable = true;
+    @Input() lines: PrescriptionLine[] = [];
+    @Input() editable = false;
+    @Input() checking = false;
+    @Output() add = new EventEmitter<void>();
+    @Output() edit = new EventEmitter<PrescriptionLine>();
+    @Output() remove = new EventEmitter<PrescriptionLine>();
+    @Output() check = new EventEmitter<void>();
 
-  @Output() itemsChange = new EventEmitter<RxMedicationItem[]>();
-  @Output() addMedication = new EventEmitter<void>();
-  @Output() editMedication = new EventEmitter<RxMedicationItem>();
-  @Output() favoriteMedication = new EventEmitter<RxMedicationItem>();
+    trackLine = (_: number, line: PrescriptionLine) => line.key;
 
-  private _items = signal<RxMedicationItem[]>([]);
-
-  searchTerm = signal('');
-  statusFilter = signal<'All' | RxMedicationStatus>('All');
-  insuranceOnly = signal(false);
-  controlledOnly = signal(false);
-  sortKey = signal<'name' | 'quantity' | 'status'>('name');
-  sortDir = signal<1 | -1>(1);
-
-  readonly statusFilters: ('All' | RxMedicationStatus)[] = ['All', 'Active', 'Held', 'Discontinued'];
-  readonly severityIcon = severityIcon;
-
-  editingId: string | null = null;
-  editingField: EditableField | null = null;
-  editBuffer: string | number = '';
-
-  filtered = computed(() => {
-    const term = this.searchTerm().toLowerCase().trim();
-    const status = this.statusFilter();
-    const insOnly = this.insuranceOnly();
-    const ctrlOnly = this.controlledOnly();
-    const key = this.sortKey();
-    const dir = this.sortDir();
-
-    let list = this._items().filter(i => {
-      if (term && !`${i.name} ${i.genericName} ${i.brandName}`.toLowerCase().includes(term)) return false;
-      if (status !== 'All' && i.status !== status) return false;
-      if (insOnly && !i.insuranceCovered) return false;
-      if (ctrlOnly && !i.isControlledSubstance) return false;
-      return true;
-    });
-
-    list = [...list].sort((a, b) => {
-      if (key === 'name') return a.name.localeCompare(b.name) * dir;
-      if (key === 'quantity') return (a.quantity - b.quantity) * dir;
-      return a.status.localeCompare(b.status) * dir;
-    });
-
-    return list;
-  });
-
-  summary = computed(() => {
-    const list = this._items();
-    const totalQuantity = list.reduce((s, i) => s + i.quantity, 0);
-    const totalDailyDoses = list.reduce((s, i) => s + totalDailyDosesOf(i), 0);
-    const estimatedCost = list.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
-    const insuranceCoverageAmount = list.filter(i => i.insuranceCovered).reduce((s, i) => s + i.quantity * i.unitPrice * 0.8, 0);
-    return {
-      totalMedications: list.length,
-      totalQuantity,
-      totalDailyDoses,
-      estimatedCost,
-      insuranceCoverageAmount,
-      insuranceCoveragePercent: estimatedCost ? Math.round((insuranceCoverageAmount / estimatedCost) * 100) : 0,
-      patientPayment: estimatedCost - insuranceCoverageAmount,
-    };
-  });
-
-  fmt(amount: number) { return formatCurrency(amount, 'VND'); }
-
-  toggleSort(key: 'name' | 'quantity' | 'status') {
-    if (this.sortKey() === key) this.sortDir.set(this.sortDir() === 1 ? -1 : 1);
-    else { this.sortKey.set(key); this.sortDir.set(1); }
-  }
-
-  rowBadges(item: RxMedicationItem) {
-    const out: { label: string; cls: string }[] = [];
-    if (item.isAntibiotic) out.push({ label: 'Antibiotic', cls: 'bg-primarySoft text-primaryHover' });
-    if (item.isControlledSubstance) out.push({ label: 'Controlled', cls: 'bg-rose-50 text-rose-700' });
-    if (item.isHighAlert) out.push({ label: 'High Alert', cls: 'bg-orange-50 text-orange-700' });
-    if (item.isOtc) out.push({ label: 'OTC', cls: 'bg-gray-100 text-secondary' });
-    if (item.isPrescriptionOnly) out.push({ label: 'Rx Only', cls: 'bg-gray-100 text-secondary' });
-    if (item.isCustomMedication) out.push({ label: 'Not catalog-verified', cls: 'bg-amber-50 text-amber-700' });
-    return out;
-  }
-
-  stockLabel(item: RxMedicationItem) {
-    switch (item.stockStatus) {
-      case 'InStock': return 'In Stock';
-      case 'Low': return 'Low Stock';
-      default: return 'Out of Stock';
+    amount(n: number): string {
+        return formatAmount(n);
     }
-  }
 
-  stockTone(item: RxMedicationItem): 'success' | 'warning' | 'danger' {
-    switch (item.stockStatus) {
-      case 'InStock': return 'success';
-      case 'Low': return 'warning';
-      default: return 'danger';
+    total(line: PrescriptionLine): number {
+        return lineTotal(line.input);
     }
-  }
 
-  statusTone(status: RxMedicationStatus): 'success' | 'warning' | 'neutral' {
-    switch (status) {
-      case 'Active': return 'success';
-      case 'Held': return 'warning';
-      default: return 'neutral';
+    /** "Morning, Evening · After meals" or an empty string. */
+    schedule(line: PrescriptionLine): string {
+        return [timingLabel(line.input), mealLabel(line.input.beforeAfterMeal)].filter(Boolean).join(' · ');
     }
-  }
 
-  topWarnings(item: RxMedicationItem) {
-    return [...item.warnings].sort((a, b) => severityRank(b.severity) - severityRank(a.severity)).slice(0, 2);
-  }
-
-  warningColor(sev: string) {
-    switch (sev) {
-      case 'Critical': return '#dc2626';
-      case 'High': return '#ea580c';
-      case 'Medium': return '#d97706';
-      case 'Low': return '#E11D48';
-      default: return '#85757D';
+    /** Stored warnings first, then the result of the last check (a check result replaces nothing that is stored). */
+    warningsOf(line: PrescriptionLine): StoredClinicalWarning[] {
+        return [...line.stored, ...(line.checked ?? [])];
     }
-  }
 
-  isEditing(id: string, field: EditableField) {
-    return this.editingId === id && this.editingField === field;
-  }
+    severity(w: StoredClinicalWarning): string {
+        return normalizeWarningSeverity(w.severity);
+    }
 
-  startEdit(item: RxMedicationItem, field: EditableField, value: string | number) {
-    if (!this.editable) return;
-    this.editingId = item.id;
-    this.editingField = field;
-    this.editBuffer = value;
-  }
+    tone(w: StoredClinicalWarning) {
+        return severityTone(normalizeWarningSeverity(w.severity));
+    }
 
-  cancelEdit() {
-    this.editingId = null;
-    this.editingField = null;
-  }
-
-  commitEdit(item: RxMedicationItem) {
-    if (!this.editingField) return;
-    const field = this.editingField;
-    const value = field === 'durationDays' || field === 'quantity' ? Number(this.editBuffer) || 0 : String(this.editBuffer);
-    const next = this._items().map(i => i.id === item.id ? { ...i, [field]: value } : i);
-    this._items.set(next);
-    this.itemsChange.emit(next);
-    this.cancelEdit();
-  }
-
-  duplicateItem(item: RxMedicationItem) {
-    const copy: RxMedicationItem = { ...item, id: `${item.id}-copy-${Date.now()}`, warnings: [...item.warnings] };
-    const next = [...this._items(), copy];
-    this._items.set(next);
-    this.itemsChange.emit(next);
-  }
-
-  removeItem(item: RxMedicationItem) {
-    const next = this._items().filter(i => i.id !== item.id);
-    this._items.set(next);
-    this.itemsChange.emit(next);
-  }
+    typeLabel(w: StoredClinicalWarning): string {
+        return warningTypeLabel(w.type);
+    }
 }

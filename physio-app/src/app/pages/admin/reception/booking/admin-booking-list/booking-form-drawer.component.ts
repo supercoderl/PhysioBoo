@@ -4,7 +4,7 @@ import { Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, O
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { BooButtonComponent, BooIconComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooIconComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { Observable, combineLatest, merge, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, finalize, map, startWith, switchMap, tap } from 'rxjs/operators';
 import { DrawerComponent } from '../../../../../components/drawer/drawer.component';
@@ -13,6 +13,9 @@ import { AppointmentService } from '../../../../../services/admin/appointment.se
 import { DepartmentService } from '../../../../../services/admin/department.service';
 import { DoctorService } from '../../../../../services/admin/doctor.service';
 import { HospitalService } from '../../../../../services/admin/hospital.service';
+import { BooSelectComponent } from '../../../../../components/select/boo-select/boo-select.component';
+import { BooDatepickerComponent } from '../../../../../components/date-picker/boo-date-picker.component';
+import { BooTextareaComponent } from '../../../../../components/textarea/boo-textarea/boo-textarea.component';
 import { PatientService } from '../../../../../services/admin/patient.service';
 import { DialogService } from '../../../../../services/common/dialog.service';
 import { CustomScrollbarDirective } from '../../../../../shared/directives/scrollbar.directive';
@@ -58,7 +61,7 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
 @Component({
     selector: 'booking-form-drawer',
     standalone: true,
-    imports: [NgIf, NgFor, ReactiveFormsModule, RouterLink, DrawerComponent, BooButtonComponent, BooIconComponent, BooStatusBadgeComponent, CustomScrollbarDirective],
+    imports: [NgIf, NgFor, ReactiveFormsModule, RouterLink, DrawerComponent, BooButtonComponent, BooIconComponent, BooInputComponent, BooStatusBadgeComponent, BooSelectComponent, BooDatepickerComponent, BooTextareaComponent, CustomScrollbarDirective],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" (close)="discard()">
             <form
@@ -170,38 +173,26 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="min-w-0">
                                 <label for="bf-hospital" class="block mb-1 text-[13px] font-medium text-regular">Facility <span class="text-danger" aria-hidden="true">*</span></label>
-                                <select id="bf-hospital" formControlName="hospitalId" [class]="field" [attr.aria-invalid]="showError('hospitalId') ? true : null" aria-describedby="bf-hospital-msg">
-                                    <option value="" disabled>{{ hospitals.loading ? 'Loading…' : 'Select a facility' }}</option>
-                                    <option *ngFor="let h of hospitals.items; trackBy: trackById" [value]="h.id">{{ h.name }}</option>
-                                </select>
-                                <p id="bf-hospital-msg" *ngIf="hospitals.error || showError('hospitalId')" class="m-0 mt-1 text-xs text-danger">{{ hospitals.error || 'Select a facility.' }}</p>
+                                <boo-select id="bf-hospital" formControlName="hospitalId" label="Facility" required [options]="hospitals.items" bindLabel="name" bindValue="id" />
+                                <p id="bf-hospital-msg" *ngIf="hospitals.error" class="m-0 mt-1 text-xs text-danger">{{ hospitals.error }}</p>
                             </div>
                             <div class="min-w-0">
                                 <label for="bf-department" class="block mb-1 text-[13px] font-medium text-regular">Department <span class="text-danger" aria-hidden="true">*</span></label>
-                                <select id="bf-department" formControlName="departmentId" [class]="field" [attr.aria-invalid]="showError('departmentId') ? true : null" aria-describedby="bf-department-msg">
-                                    <option value="" disabled>{{ departmentPlaceholder }}</option>
-                                    <option *ngFor="let d of hospitalDepartments; trackBy: trackById" [value]="d.id">{{ d.name }}</option>
-                                </select>
-                                <p id="bf-department-msg" *ngIf="departments.error || showError('departmentId')" class="m-0 mt-1 text-xs text-danger">{{ departments.error || 'Select a department.' }}</p>
+                                <boo-select id="bf-department" formControlName="departmentId" label="Department" required [options]="hospitalDepartments" bindLabel="name" bindValue="id" />
+                                <p id="bf-department-msg" *ngIf="departments.error || departments.loading || !form.controls.hospitalId.value || !hospitalDepartments.length" class="m-0 mt-1 text-xs" [class.text-danger]="departments.error" [class.text-secondary]="!departments.error">{{ departments.error || departmentPlaceholder }}</p>
                             </div>
                             <div class="min-w-0">
                                 <label for="bf-type" class="block mb-1 text-[13px] font-medium text-regular">Appointment type <span class="text-danger" aria-hidden="true">*</span></label>
-                                <select id="bf-type" formControlName="appointmentTypeId" [class]="field" [attr.aria-invalid]="showError('appointmentTypeId') ? true : null" aria-describedby="bf-type-msg">
-                                    <option value="" disabled>{{ types.loading ? 'Loading…' : 'Select a type' }}</option>
-                                    <option *ngFor="let t of types.items; trackBy: trackById" [value]="t.id">{{ t.name }}<ng-container *ngIf="t.defaultDuration"> · {{ t.defaultDuration }} min</ng-container></option>
-                                </select>
-                                <p id="bf-type-msg" *ngIf="types.error || showError('appointmentTypeId')" class="m-0 mt-1 text-xs text-danger">{{ types.error || 'Select an appointment type.' }}</p>
+                                <boo-select id="bf-type" formControlName="appointmentTypeId" label="Appointment type" required [options]="typeOptions" bindLabel="name" bindValue="id" />
+                                <p id="bf-type-msg" *ngIf="types.error" class="m-0 mt-1 text-xs text-danger">{{ types.error }}</p>
                                 <p *ngIf="selectedType?.requiresPreparation && selectedType?.preparationInstructions" class="m-0 mt-1 text-xs text-secondary">
                                     <span class="font-semibold text-regular">Preparation:</span> {{ selectedType?.preparationInstructions }}
                                 </p>
                             </div>
                             <div class="min-w-0">
                                 <label for="bf-doctor" class="block mb-1 text-[13px] font-medium text-regular">Doctor <span class="text-danger" aria-hidden="true">*</span></label>
-                                <select id="bf-doctor" formControlName="doctorId" [class]="field" [attr.aria-invalid]="showError('doctorId') ? true : null" aria-describedby="bf-doctor-msg">
-                                    <option value="" disabled>{{ doctors.loading ? 'Loading…' : 'Select a doctor' }}</option>
-                                    <option *ngFor="let d of doctors.items; trackBy: trackById" [value]="d.id">{{ d.fullName }}</option>
-                                </select>
-                                <p id="bf-doctor-msg" *ngIf="doctors.error || showError('doctorId')" class="m-0 mt-1 text-xs text-danger">{{ doctors.error || 'Select a doctor.' }}</p>
+                                <boo-select id="bf-doctor" formControlName="doctorId" label="Doctor" required [options]="doctors.items" bindLabel="fullName" bindValue="id" />
+                                <p id="bf-doctor-msg" *ngIf="doctors.error" class="m-0 mt-1 text-xs text-danger">{{ doctors.error }}</p>
                             </div>
                         </div>
                     </fieldset>
@@ -214,7 +205,7 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div class="min-w-0">
                                 <label for="bf-date" class="block mb-1 text-[13px] font-medium text-regular">Date <span class="text-danger" aria-hidden="true">*</span></label>
-                                <input id="bf-date" type="date" formControlName="scheduledDate" [min]="today" [class]="field" [attr.aria-invalid]="showError('scheduledDate') ? true : null" aria-describedby="bf-date-msg" />
+                                <boo-datepicker id="bf-date" formControlName="scheduledDate" label="Date" required [min]="today" />
                                 <p id="bf-date-msg" *ngIf="showError('scheduledDate')" class="m-0 mt-1 text-xs text-danger">{{ form.controls.scheduledDate.hasError('past') ? 'Pick today or a later date.' : 'Pick a date.' }}</p>
                             </div>
                             <div class="min-w-0">
@@ -261,15 +252,15 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
                         <div class="flex flex-col gap-4">
                             <div>
                                 <label for="bf-complaint" class="block mb-1 text-[13px] font-medium text-regular">Chief complaint</label>
-                                <input id="bf-complaint" type="text" formControlName="chiefComplaint" maxlength="500" placeholder="e.g. Lower back pain for two weeks" [class]="field" autocomplete="off" />
+                                <boo-input name="bf-complaint" formControlName="chiefComplaint" [maxlength]="500" label="e.g. Lower back pain for two weeks" />
                             </div>
                             <div>
                                 <label for="bf-reason" class="block mb-1 text-[13px] font-medium text-regular">Reason for visit</label>
-                                <textarea id="bf-reason" formControlName="reasonForVisit" rows="2" maxlength="1000" [class]="area"></textarea>
+                                <boo-textarea id="bf-reason" formControlName="reasonForVisit" label="Reason for visit" [rows]="2" [maxlength]="1000" />
                             </div>
                             <div>
                                 <label for="bf-notes" class="block mb-1 text-[13px] font-medium text-regular">Notes for the care team</label>
-                                <textarea id="bf-notes" formControlName="preAppointmentNotes" rows="2" maxlength="1000" placeholder="Visible to staff only" [class]="area"></textarea>
+                                <boo-textarea id="bf-notes" formControlName="preAppointmentNotes" label="Visible to staff only" [rows]="2" [maxlength]="1000" />
                             </div>
                         </div>
                     </fieldset>
@@ -347,6 +338,11 @@ export class BookingFormDrawerComponent implements OnInit, OnChanges {
 
     get selectedType(): AppointmentType | undefined {
         return this.types.items.find(t => t.id === this.form.controls.appointmentTypeId.value);
+    }
+
+    /** Appointment types as select options, with the default duration in the label. */
+    get typeOptions(): { id: string; name: string }[] {
+        return this.types.items.map(t => ({ id: t.id, name: t.defaultDuration ? `${t.name} · ${t.defaultDuration} min` : t.name }));
     }
 
     get departmentPlaceholder(): string {

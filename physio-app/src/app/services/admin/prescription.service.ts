@@ -1,20 +1,16 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { createHttpContext } from "../../shared/contexts/option.context";
-import { PagedResponse } from "../../shared/types/common";
+import { PagedResponse, PaginationData } from "../../shared/types/common";
 import { LoadingKeys } from "../../shared/types/loading";
 import {
-    AddFavoriteMedicationRequest,
-    ClinicalWarning,
-    CreatePrescriptionTemplateRequest,
-    FavoriteMedication,
-    MedicineCatalogItem,
-    PrescriptionDraft,
-    PrescriptionSummaryTotals,
-    PrescriptionTemplate,
-    RecentPrescriptionSummary,
-    RxMedicationItem,
+    CdsCheckRequest,
+    CdsCheckResult,
+    MedicineSearchResult,
+    PatientPrescriptionRow,
+    Prescription,
+    UpdatePrescriptionRequest,
 } from "../../shared/types/prescription-rx.types";
 
 @Injectable({ providedIn: 'root' })
@@ -24,70 +20,34 @@ export class PrescriptionService {
   // #endregion
 
   // #region Methods
-  getDraft(prescriptionId: string) {
-    return this.http.get<PagedResponse<PrescriptionDraft>>(BASE_API.PRESCRIPTION_RX.DRAFT(prescriptionId), { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.GET_DRAFT }) });
+  /** Loads and mutations report their own errors in the page, so the global error toast is skipped for loads only. */
+  get(id: string) {
+    return this.http.get<PagedResponse<Prescription>>(BASE_API.PRESCRIPTION_RX.BY_ID(id), { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.GET, skipErrorToast: true }) });
   }
 
-  saveDraft(draft: PrescriptionDraft) {
-    return this.http.put<PagedResponse<PrescriptionDraft>>(BASE_API.PRESCRIPTION_RX.UPDATE(draft.id), draft, { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.SAVE_DRAFT }) });
+  update(request: UpdatePrescriptionRequest) {
+    return this.http.put<PagedResponse<string>>(BASE_API.PRESCRIPTION_RX.BY_ID(request.id), request, { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.SAVE }) });
   }
 
-  issue(draft: PrescriptionDraft) {
-    return this.http.post<PagedResponse<PrescriptionDraft>>(BASE_API.PRESCRIPTION_RX.ISSUE(draft.id), draft, { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.ISSUE }) });
+  issue(id: string) {
+    return this.http.post<PagedResponse<string>>(BASE_API.PRESCRIPTION_RX.ISSUE(id), null, { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.ISSUE }) });
   }
 
-  cancel(draft: PrescriptionDraft, reason: string) {
-    return this.http.post<PagedResponse<PrescriptionDraft>>(BASE_API.PRESCRIPTION_RX.CANCEL(draft.id), { reason }, { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.CANCEL }) });
+  cancel(id: string, reason: string) {
+    return this.http.post<PagedResponse<string>>(BASE_API.PRESCRIPTION_RX.CANCEL(id), { reason }, { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.CANCEL }) });
   }
 
-  searchMedicines(query: string) {
-    const url = `${BASE_API.PRESCRIPTION_RX.MEDICINE_SEARCH}?query=${encodeURIComponent(query)}`;
-    return this.http.get<PagedResponse<MedicineCatalogItem[]>>(url, { context: createHttpContext({ loadingKey: LoadingKeys.MEDICINE.SEARCH }) });
+  checkWarnings(request: CdsCheckRequest) {
+    return this.http.post<PagedResponse<CdsCheckResult>>(BASE_API.PRESCRIPTION_RX.CDS_CHECK, request, { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.CDS_CHECK }) });
   }
 
-  checkClinicalWarnings(patientId: string, items: RxMedicationItem[]) {
-    return this.http.post<PagedResponse<Record<string, ClinicalWarning[]>>>(
-      BASE_API.PRESCRIPTION_RX.CDS_CHECK,
-      { patientId, items },
-      { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.CDS_CHECK }) }
-    );
+  searchMedicines(search: string) {
+    const params = new HttpParams().set('search', search).set('pageNumber', 1).set('pageSize', 15);
+    return this.http.get<PagedResponse<PaginationData<MedicineSearchResult>>>(BASE_API.PRESCRIPTION_RX.MEDICINE_SEARCH, { params, context: createHttpContext({ loadingKey: LoadingKeys.MEDICINE.SEARCH, skipErrorToast: true }) });
   }
 
-  getCostEstimate(prescriptionId: string, items: RxMedicationItem[]) {
-    return this.http.post<PagedResponse<PrescriptionSummaryTotals>>(
-      BASE_API.PRESCRIPTION_RX.COST_ESTIMATE(prescriptionId),
-      { items },
-      { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.COST_ESTIMATE }) }
-    );
+  getPatientPrescriptions(patientId: string) {
+    return this.http.get<PagedResponse<PaginationData<PatientPrescriptionRow>>>(BASE_API.PRESCRIPTION_RX.PATIENT_PRESCRIPTIONS(patientId), { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.LIST, skipErrorToast: true }) });
   }
-
-  getRecentPrescriptions(patientId: string) {
-    return this.http.get<PagedResponse<RecentPrescriptionSummary[]>>(BASE_API.PRESCRIPTION_RX.RECENT(patientId), { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.RECENT }) });
-  }
-
-  getFavorites(doctorId: string) {
-    return this.http.get<PagedResponse<FavoriteMedication[]>>(BASE_API.PRESCRIPTION_RX.FAVORITES(doctorId), { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.FAVORITES }) });
-  }
-
-  addFavorite(doctorId: string, payload: AddFavoriteMedicationRequest) {
-    return this.http.post<PagedResponse<FavoriteMedication | null>>(BASE_API.PRESCRIPTION_RX.FAVORITES(doctorId), payload, { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.FAVORITES }) });
-  }
-
-  removeFavorite(doctorId: string, favoriteId: string) {
-    return this.http.delete<PagedResponse<string>>(BASE_API.PRESCRIPTION_RX.FAVORITE_DELETE(doctorId, favoriteId), { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.FAVORITES }) });
-  }
-
-  createTemplate(payload: CreatePrescriptionTemplateRequest) {
-    return this.http.post<PagedResponse<PrescriptionTemplate | null>>(BASE_API.PRESCRIPTION_RX.TEMPLATE_CREATE, payload, { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.TEMPLATES }) });
-  }
-
-  deleteTemplate(templateId: string) {
-    return this.http.delete<PagedResponse<string>>(BASE_API.PRESCRIPTION_RX.TEMPLATE_DELETE(templateId), { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.TEMPLATES }) });
-  }
-
-  getTemplates(doctorId: string) {
-    return this.http.get<PagedResponse<PrescriptionTemplate[]>>(BASE_API.PRESCRIPTION_RX.TEMPLATES(doctorId), { context: createHttpContext({ loadingKey: LoadingKeys.PRESCRIPTION.TEMPLATES }) });
-  }
-
   // #endregion
 }

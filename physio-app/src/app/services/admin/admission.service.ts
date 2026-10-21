@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpContext } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { Admission, CreateAdmissionRequest, DischargeAdmissionRequest, UpdateAdmissionRequest } from "../../shared/types/admission.types";
@@ -9,12 +9,12 @@ import { AdmissionFilter } from "../../shared/types/filter.types";
 export class AdmissionService {
     constructor(private http: HttpClient) { }
 
-    search(request: PagedRequest<AdmissionFilter>) {
-        return this.http.post<PagedResponse<PaginationData<Admission>>>(BASE_API.ADMISSION.SEARCH, request);
+    search(request: PagedRequest<AdmissionFilter>, context?: HttpContext) {
+        return this.http.post<PagedResponse<PaginationData<Admission>>>(BASE_API.ADMISSION.SEARCH, request, { context });
     }
 
-    search_by_id(id: string) {
-        return this.http.get<PagedResponse<Admission | null>>(`${BASE_API.ADMISSION.BASE}/${id}`);
+    search_by_id(id: string, context?: HttpContext) {
+        return this.http.get<PagedResponse<Admission | null>>(`${BASE_API.ADMISSION.BASE}/${id}`, { context });
     }
 
     create(params: CreateAdmissionRequest) {

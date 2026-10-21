@@ -1,197 +1,238 @@
-import { Component, DestroyRef, OnInit, computed, inject, signal } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
-import { switchMap, timer } from "rxjs";
-import { AppointmentService } from "src/app/services/admin/appointment.service";
-import { StatCardComponent } from "../../../../components/ui/stat-card.component";
-import { DoctorDeskService } from "../../../../services/admin/doctor-desk.service";
-import { LocalLoadingService } from "../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../services/common/toast.service";
-import { SharedModule } from "../../../../shared/shared-imports";
-import { PagedResponse } from "../../../../shared/types/common";
-import { DoctorDeskSnapshot, QueuePatient, StatDef } from "../../../../shared/types/doctor-desk.types";
-import { LoadingKeys } from "../../../../shared/types/loading";
-import { CompletedListComponent } from "./components/completed-list.component";
-import { CurrentPatientAction, CurrentPatientPanelComponent } from "./components/current-patient-panel.component";
-import { DeskHeaderComponent } from "./components/desk-header.component";
-import { WaitingQueuePanelComponent } from "./components/waiting-queue-panel.component";
+import { DatePipe, DOCUMENT, NgFor, NgIf, isPlatformBrowser } from '@angular/common';
+import { HttpContext, HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+    BooButtonComponent,
+    BooEmptyStateComponent,
+    BooErrorStateComponent,
+    BooIconComponent,
+    BooInlineErrorComponent,
+    BooInlineErrorState,
+} from '@physioboo/ui';
+import { Subject, interval, of } from 'rxjs';
+import { catchError, finalize, map, switchMap } from 'rxjs/operators';
+import { AdminBreadcrumbComponent } from '../../../../components/breadcrumb/admin-breadcrumb.component';
+import { StatCardComponent } from '../../../../components/ui/stat-card.component';
+import { AppointmentService } from '../../../../services/admin/appointment.service';
+import { DoctorDeskService } from '../../../../services/admin/doctor-desk.service';
+import { AuthService } from '../../../../services/auth/auth.service';
+import { ToastService } from '../../../../services/common/toast.service';
+import { Permissions } from '../../../../shared/constants/permission.constant';
+import { SKIP_ERROR_TOAST } from '../../../../shared/contexts/option.context';
+import { DoctorDeskSnapshot, QueuePatient } from '../../../../shared/types/doctor-desk.types';
+import { CompleteConsultationDrawerComponent } from './components/complete-consultation-drawer.component';
+import { CompletedListComponent } from './components/completed-list.component';
+import { ConsultationPanelComponent } from './components/consultation-panel.component';
+import { WaitingQueuePanelComponent } from './components/waiting-queue-panel.component';
 
+type LoadError = 'forbidden' | 'noProfile' | 'failed';
+
+const POLL_MS = 30_000;
+
+/**
+ * Doctor desk: today's visits of the signed-in doctor, from the doctor-desk snapshot API. A visit's place on the page
+ * comes only from the status the server returns (checked in = waiting, in progress = with the doctor, completed), so a
+ * reload shows the same state. Starting and completing a consultation use the appointment status and complete APIs.
+ */
 @Component({
     selector: 'admin-doctor-desk',
     standalone: true,
     imports: [
-        SharedModule,
+        NgIf,
+        NgFor,
+        DatePipe,
+        AdminBreadcrumbComponent,
+        BooButtonComponent,
+        BooEmptyStateComponent,
+        BooErrorStateComponent,
+        BooIconComponent,
+        BooInlineErrorComponent,
         StatCardComponent,
-        DeskHeaderComponent,
-        CurrentPatientPanelComponent,
+        ConsultationPanelComponent,
         WaitingQueuePanelComponent,
         CompletedListComponent,
+        CompleteConsultationDrawerComponent,
     ],
     templateUrl: './doctor-desk.component.html',
-    host: { class: 'block h-full min-h-0 bg-body' },
+    host: { class: 'flex flex-col min-h-full' },
 })
 export class AdminDoctorDeskComponent implements OnInit {
     // #region Inputs, Outputs, Properties
-    private readonly POLL_INTERVAL_MS = 30_000;
-    snapshot = signal<DoctorDeskSnapshot>({ context: { doctorName: '', department: '', room: '', shift: '', isOnline: false }, patients: [] });
-    currentPatient = signal<QueuePatient | null>(null);
-    showCompleteModal = signal(false);
-    completeForm = new FormGroup({
-        diagnosis: new FormControl('', Validators.required),
-        treatmentPlan: new FormControl(''),
-        followUpDate: new FormControl(''),
-        doctorNotes: new FormControl(''),
-    });
-
-    context = computed(() => this.snapshot().context);
-
-    waitingPatients = computed(() =>
-        this.snapshot()?.patients
-            .filter(p => p.status === 'waiting')
-            .sort((a, b) => (a.priority === b.priority ? 0 : a.priority === 'urgent' ? -1 : 1))
-    );
-    completedPatients = computed(() => this.snapshot()?.patients.filter(p => p.status === 'completed'));
-
-    readonly stats: StatDef[] = [
-        { label: 'Patients Today', icon: 'users-round', tone: 'primary', value: () => this.snapshot()?.patients.length || 0 },
-        { label: 'Waiting', icon: 'clock', tone: 'warning', value: () => this.waitingPatients()?.length || 0 },
-        { label: 'In Consultation', icon: 'stethoscope', tone: 'primary', value: () => this.currentPatient() ? 1 : 0 },
-        { label: 'Completed', icon: 'check-circle', tone: 'success', value: () => this.completedPatients()?.length || 0 },
-        { label: 'Urgent', icon: 'triangle-alert', tone: 'danger', value: () => this.waitingPatients()?.filter(p => p.priority === 'urgent').length || 0 },
-    ];
-
-    LoadingKeys = LoadingKeys;
-    // #endregion
-
-    // #region Inject Services
     private readonly doctorDeskSrv = inject(DoctorDeskService);
     private readonly appointmentSrv = inject(AppointmentService);
+    private readonly authSrv = inject(AuthService);
     private readonly toastSrv = inject(ToastService);
-    private readonly router = inject(Router);
     private readonly destroyRef = inject(DestroyRef);
-    protected readonly loadingSrv = inject(LocalLoadingService);
+    private readonly document = inject(DOCUMENT);
+    private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
+    readonly today = new Date();
+
+    /** Null until the first successful load. */
+    readonly snapshot = signal<DoctorDeskSnapshot | null>(null);
+    readonly context = computed(() => this.snapshot()?.context ?? null);
+    readonly inConsultation = computed(() => (this.snapshot()?.patients ?? []).filter(p => p.status === 'inprogress'));
+    readonly completedPatients = computed(() => (this.snapshot()?.patients ?? []).filter(p => p.status === 'completed'));
+    /** Urgent first; the server already lists visits by check-in time and the sort is stable. */
+    readonly waitingPatients = computed(() =>
+        (this.snapshot()?.patients ?? [])
+            .filter(p => p.status === 'checkedin')
+            .sort((a, b) => Number(b.priority === 'urgent') - Number(a.priority === 'urgent')));
+    readonly urgentWaiting = computed(() => this.waitingPatients().filter(p => p.priority === 'urgent').length);
+
+    loading = false;
+    loadError: LoadError | null = null;
+    refreshErrorState: BooInlineErrorState = 'default';
+    lastUpdated: Date | null = null;
+
+    /** Appointment whose consultation is being started. */
+    startingId: string | null = null;
+    /** The visit the completion drawer is for; kept while the drawer slides out so its header doesn't blank. */
+    completing: QueuePatient | null = null;
+    completeOpen = false;
+
+    canStart = false;
+    canComplete = false;
+    recordLink: string | null = null;
+
+    private readonly load$ = new Subject<void>();
+    private readonly silent = new HttpContext().set(SKIP_ERROR_TOAST, true);
     // #endregion
 
     // #region Init (Lifecycle + Setup)
     ngOnInit(): void {
-        timer(0, this.POLL_INTERVAL_MS).pipe(
-            takeUntilDestroyed(this.destroyRef),
-            switchMap(() => this.doctorDeskSrv.getSnapshot())
-        ).subscribe({
-            next: (res) => this.applySnapshot(res),
-            error: () => this.toastSrv.error('Failed to load queue')
-        })
+        this.authSrv.permissions$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(perms => this.applyPermissions(perms ?? []));
+
+        // switchMap drops a response the user has already refreshed past; the error is caught per request so the stream lives on.
+        this.load$
+            .pipe(
+                switchMap(() => {
+                    this.loading = true;
+                    return this.doctorDeskSrv.getSnapshot(this.silent).pipe(
+                        map(res => res?.success && res.data ? { data: res.data, error: null } : { data: null, error: 'failed' as LoadError }),
+                        catchError((err: HttpErrorResponse) => of({ data: null, error: this.errorKind(err) })),
+                        finalize(() => this.loading = false),
+                    );
+                }),
+                takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe(({ data, error }) => this.applyResult(data, error));
+
+        this.load();
+
+        if (this.isBrowser) {
+            // Check-ins and other screens move the queue, so refresh while the tab is visible and nothing is in flight.
+            interval(POLL_MS)
+                .pipe(takeUntilDestroyed(this.destroyRef))
+                .subscribe(() => {
+                    if (!this.document.hidden && !this.loading && !this.startingId && !this.loadError) this.load();
+                });
+        }
     }
     // #endregion
 
-    // #region Snapshot loading
-    private applySnapshot(res: PagedResponse<DoctorDeskSnapshot>): void {
-        if (res.success) {
-            if (!res.data) {
-                this.toastSrv.error('No data received from server');
-                window.history.back();
-                return;
-            }
-            this.snapshot.set(res.data);
+    // #region Getters
+    /** Why Call is unavailable, or null. One consultation at a time keeps "With you" unambiguous. */
+    get callBlockedReason(): string | null {
+        return this.inConsultation().length ? 'Complete the consultation in progress before calling the next patient.' : null;
+    }
+
+    get errorTitle(): string {
+        switch (this.loadError) {
+            case 'forbidden': return 'You don’t have access to the doctor desk';
+            case 'noProfile': return 'This account has no doctor profile';
+            default: return 'We couldn’t load the doctor desk';
         }
     }
 
-    refreshSnapshot(): void {
-        this.doctorDeskSrv.getSnapshot().subscribe({
-            next: (res) => this.applySnapshot(res),
-            error: () => this.toastSrv.error('Failed to refresh queue')
-        });
+    get errorDescription(): string {
+        switch (this.loadError) {
+            case 'forbidden': return 'Ask an administrator to grant the doctor desk permission.';
+            case 'noProfile': return 'The doctor desk lists the signed-in doctor’s visits. Ask an administrator to link your user to a doctor profile.';
+            default: return 'Something went wrong while loading today’s visits. Try again.';
+        }
     }
     // #endregion
 
     // #region Methods
-    callNextPatient(): void {
-        const next = this.waitingPatients()?.[0];
-        if (!next) return;
-        this.startConsultation(next);
+    load(): void {
+        if (this.snapshot() && this.loadError === 'failed') this.refreshErrorState = 'retrying';
+        this.load$.next();
     }
 
     callPatient(patient: QueuePatient): void {
-        this.startConsultation(patient);
-    }
-
-    private startConsultation(patient: QueuePatient): void {
-        this.appointmentSrv
-            .updateStatus(patient.appointmentId, 'InProgress')
+        if (this.startingId || this.callBlockedReason) return;
+        this.startingId = patient.appointmentId;
+        // Failures are reported by the global HTTP error toast; the patient stays in the queue.
+        this.appointmentSrv.updateStatus(patient.appointmentId, 'InProgress')
+            .pipe(finalize(() => this.startingId = null), takeUntilDestroyed(this.destroyRef))
             .subscribe({
                 next: () => {
-                    const consultationStartedAt = new Date().toISOString();
-                    this.snapshot.update(s => ({
-                        ...s,
-                        patients: s.patients.map(p =>
-                            p.id === patient.id
-                                ? { ...p, status: 'in-consultation', consultationStartedAt }
-                                : p
-                        ),
-                    }));
-                    this.currentPatient.set({
-                        ...patient,
-                        status: 'in-consultation',
-                        consultationStartedAt
-                    });
+                    this.setStatus(patient.appointmentId, 'inprogress');
+                    this.toastSrv.success(`${patient.name || 'Patient'} · ${patient.queueNumber}`, 'Consultation started');
+                    this.load();
                 },
-                error: () => this.toastSrv.error('Failed to start consultation')
+                error: () => undefined,
             });
     }
 
-    onCurrentPatientAction(action: CurrentPatientAction): void {
-        const current = this.currentPatient();
-        if (!current) return;
+    openComplete(patient: QueuePatient): void {
+        this.completing = patient;
+        this.completeOpen = true;
+    }
 
-        switch (action) {
-            case 'complete':
-                this.showCompleteModal.set(true);
-                break;
-            case 'transfer':
-                this.snapshot.update(s => ({
-                    ...s,
-                    patients: s.patients.map(p => p.id === current.id ? { ...p, status: 'waiting' } : p),
-                }));
-                this.currentPatient.set(null);
-                this.toastSrv.success('Patient returned to queue for transfer');
-                break;
-            case 'record':
-                this.router.navigate(['/admin/clinic/medical-record'], { queryParams: { patientId: current.patientId } });
-                break;
-            case 'print':
-                this.toastSrv.success('Printing prescription…');
-                break;
+    closeComplete(): void {
+        this.completeOpen = false;
+    }
+
+    onCompleted(patient: QueuePatient): void {
+        this.completeOpen = false;
+        this.setStatus(patient.appointmentId, 'completed');
+        this.load();
+    }
+
+    trackById(_: number, p: QueuePatient): string {
+        return p.appointmentId;
+    }
+    // #endregion
+
+    // #region Helpers
+    private applyResult(data: DoctorDeskSnapshot | null, error: LoadError | null): void {
+        if (data) {
+            this.snapshot.set(data);
+            this.loadError = null;
+            this.refreshErrorState = 'default';
+            this.lastUpdated = new Date();
+            return;
         }
+        // A failed refresh keeps the previous visits on screen; a failed first load shows the error state.
+        this.refreshErrorState = this.snapshot() && this.refreshErrorState === 'retrying' ? 'failed' : 'default';
+        this.loadError = error ?? 'failed';
     }
 
-    onConfirmComplete(): void {
-        if (this.completeForm.invalid) return;
-        const current = this.currentPatient();
-        if (!current) return;
+    /** Moves a visit now so the page doesn't wait for the reload; the reload then confirms it. */
+    private setStatus(appointmentId: string, status: string): void {
+        this.snapshot.update(s => s && ({
+            ...s,
+            patients: s.patients.map(p => p.appointmentId === appointmentId ? { ...p, status } : p),
+        }));
+    }
 
-        const formValue = this.completeForm.value;
-        this.appointmentSrv
-            .completeConsultation(current.appointmentId, {
-                diagnosis: formValue.diagnosis ?? '',
-                treatmentPlan: formValue.treatmentPlan ?? '',
-                followUpDate: formValue.followUpDate ?? '',
-                doctorNotes: formValue.doctorNotes ?? '',
-            })
-            .subscribe({
-                next: () => {
-                    this.snapshot.update(s => ({
-                        ...s,
-                        patients: s.patients.map(p => p.id === current.id ? { ...p, status: 'completed' } : p),
-                    }));
-                    this.currentPatient.set(null);
-                    this.showCompleteModal.set(false);
-                    this.completeForm.reset();
-                    this.toastSrv.success('Consultation completed');
-                    this.refreshSnapshot();
-                },
-                error: () => this.toastSrv.error('Failed to complete consultation')
-            });
+    private errorKind(err: HttpErrorResponse): LoadError {
+        if (err?.status === 403) return 'forbidden';
+        // The API answers "not found" when the signed-in user has no doctor record.
+        if (err?.status === 404) return 'noProfile';
+        return 'failed';
+    }
+
+    private applyPermissions(perms: string[]): void {
+        // Each action follows the permission its API enforces.
+        this.canStart = perms.includes(Permissions.Scheduling.AppointmentUpdate);
+        this.canComplete = perms.includes(Permissions.Scheduling.EncounterComplete);
+        this.recordLink = perms.includes(Permissions.Clinical.MedicalRecordRead) ? '/admin/clinic/medical-record' : null;
     }
     // #endregion
 }

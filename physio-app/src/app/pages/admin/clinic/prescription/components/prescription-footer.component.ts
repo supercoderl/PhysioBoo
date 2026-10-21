@@ -1,39 +1,45 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { SharedModule } from "../../../../../shared/shared-imports";
-import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { NgIf } from '@angular/common';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { BooButtonComponent, BooIconComponent } from '@physioboo/ui';
 
+/** Sticky action bar. Which actions show follows the prescription's status and the user's permissions. */
 @Component({
     selector: 'rx-footer',
     standalone: true,
-    imports: [SharedModule, BooButtonAdminComponent],
+    imports: [NgIf, BooButtonComponent, BooIconComponent],
     template: `
-    <div class="sticky bottom-0 z-30 bg-surface border-t border-gray-200 shadow-[0_-2px_8px_rgba(0,0,0,0.04)] px-6 py-3 flex items-center justify-end gap-2">
-      <span *ngIf="autosaveLabel" class="text-xs text-secondary mr-auto flex items-center gap-1.5">
-        <physio-icon name="cloud" [size]="14"></physio-icon> {{ autosaveLabel }}
-      </span>
-      <ng-container *ngIf="editable">
-        <boo-button-admin (click)="saveDraft.emit()" [disabled]="saving" background="transparent" textColor="rgb(var(--twc-secondary))" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="500">Save Draft</boo-button-admin>
-        <boo-button-admin (click)="preview.emit()" background="transparent" textColor="rgb(var(--twc-secondary))" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="500">Preview</boo-button-admin>
-        <boo-button-admin (click)="print.emit()" background="transparent" textColor="rgb(var(--twc-secondary))" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="500">Print</boo-button-admin>
-        <boo-button-admin (click)="issue.emit()" [disabled]="!canIssue" [title]="!canIssue ? 'Add at least one medication before issuing' : ''" textColor="white" padding="8px 20px" [fontSize]="14" [radius]="8" fontWeight="600">
-          Issue Prescription
-        </boo-button-admin>
-      </ng-container>
-      <ng-container *ngIf="!editable">
-        <boo-button-admin (click)="preview.emit()" background="transparent" textColor="rgb(var(--twc-secondary))" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="500">Preview</boo-button-admin>
-        <boo-button-admin (click)="print.emit()" background="transparent" textColor="rgb(var(--twc-secondary))" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="500">Print</boo-button-admin>
-      </ng-container>
-    </div>
-  `,
+        <div class="sticky bottom-0 z-30">
+            <div class="bg-surface border border-borderGray rounded-xl shadow-[0_-2px_8px_rgba(0,0,0,0.04)] px-4 py-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                <p class="m-0 text-xs text-secondary mr-auto" aria-live="polite">
+                    <ng-container *ngIf="issueBlockedReason && canIssue; else totalText">{{ issueBlockedReason }}</ng-container>
+                    <ng-template #totalText>Lines total <span class="font-semibold text-regular tabular-nums">{{ total }}</span></ng-template>
+                </p>
+                <button *ngIf="canCancel" type="button" boo-button variant="outline" size="sm" [disabled]="busy" (click)="cancel.emit()">
+                    <physio-icon name="ban" [size]="15" aria-hidden="true" />Cancel prescription
+                </button>
+                <button *ngIf="canEdit" type="button" boo-button variant="secondary" size="sm" [loading]="saving" [disabled]="busy || !dirty" (click)="save.emit()">
+                    <physio-icon *ngIf="!saving" name="check-circle" [size]="15" aria-hidden="true" />Save changes
+                </button>
+                <button *ngIf="canIssue" type="button" boo-button variant="primary" size="sm" [loading]="issuing" [disabled]="busy || !!issueBlockedReason" (click)="issue.emit()">
+                    <physio-icon *ngIf="!issuing" name="file-text" [size]="15" aria-hidden="true" />Issue prescription
+                </button>
+            </div>
+        </div>
+    `,
 })
 export class PrescriptionFooterComponent {
-    @Input() editable = true;
-    @Input() saving = false;
+    @Input() total = '';
+    @Input() canEdit = false;
     @Input() canIssue = false;
-    @Input() autosaveLabel = '';
-
-    @Output() saveDraft = new EventEmitter<void>();
-    @Output() preview = new EventEmitter<void>();
-    @Output() print = new EventEmitter<void>();
+    @Input() canCancel = false;
+    @Input() dirty = false;
+    @Input() saving = false;
+    @Input() issuing = false;
+    /** Any request in flight; every action is disabled meanwhile so nothing is submitted twice. */
+    @Input() busy = false;
+    /** Why Issue is unavailable right now, or null. */
+    @Input() issueBlockedReason: string | null = null;
+    @Output() save = new EventEmitter<void>();
     @Output() issue = new EventEmitter<void>();
+    @Output() cancel = new EventEmitter<void>();
 }

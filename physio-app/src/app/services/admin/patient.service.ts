@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpContext } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
@@ -13,8 +13,8 @@ export class PatientService {
         return this.http.post<PagedResponse<PaginationData<Patient>>>(BASE_API.PATIENT.SEARCH, request);
     }
 
-    search_by_id(id: string) {
-        return this.http.get<PagedResponse<Patient | null>>(`${BASE_API.PATIENT.BASE}/${id}`);
+    search_by_id(id: string, context?: HttpContext) {
+        return this.http.get<PagedResponse<Patient | null>>(`${BASE_API.PATIENT.BASE}/${id}`, { context });
     }
 
     create(params: CreatePatientRequest) {

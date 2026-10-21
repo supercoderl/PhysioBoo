@@ -1,8 +1,6 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpContext } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { BASE_API } from "src/app/shared/api/base";
-import { LoadingKeys } from "src/app/shared/types/loading";
-import { createHttpContext } from "../../shared/contexts/option.context";
 import { PagedResponse } from "../../shared/types/common";
 import { DoctorDeskSnapshot } from "../../shared/types/doctor-desk.types";
 
@@ -13,10 +11,9 @@ export class DoctorDeskService {
     // #endregion
 
     // #region Methods
-    getSnapshot() {
-        return this.http.get<PagedResponse<DoctorDeskSnapshot>>(BASE_API.DOCTOR_DESK.SNAPSHOT, {
-            context: createHttpContext({ loadingKey: LoadingKeys.DOCTOR_DESK.SNAPSHOT }),
-        });
+    /** Today's checked-in, in-progress and completed visits of the signed-in doctor. */
+    getSnapshot(context?: HttpContext) {
+        return this.http.get<PagedResponse<DoctorDeskSnapshot>>(BASE_API.DOCTOR_DESK.SNAPSHOT, { context });
     }
     // #endregion
 }

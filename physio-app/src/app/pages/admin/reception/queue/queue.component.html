@@ -41,40 +41,27 @@
           <button boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Previous day" (click)="shiftDay(-1)">
             <physio-icon name="chevron-left" [size]="16" />
           </button>
-          <input
-            type="date"
-            [(ngModel)]="date"
-            (ngModelChange)="onScopeChange()"
-            aria-label="Queue date"
-            class="h-9 px-2.5 rounded-lg border border-borderGray bg-surface text-sm text-regular tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
-          />
+          <div class="w-40">
+            <boo-datepicker size="small" label="Queue date" [(ngModel)]="date" (ngModelChange)="onScopeChange()" />
+          </div>
           <button boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Next day" (click)="shiftDay(1)">
             <physio-icon name="chevron-right" [size]="16" />
           </button>
-          <button
-            type="button"
-            class="h-9 px-3 rounded-lg border border-borderGray text-xs font-semibold whitespace-nowrap cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            [class.bg-primarySoft]="isLive"
-            [class.text-primaryDeep]="isLive"
-            [class.border-primary]="isLive"
-            [class.text-secondary]="!isLive"
-            [attr.aria-pressed]="isLive"
-            (click)="goToday()"
-          >Today</button>
+          <button type="button" boo-button [variant]="isLive ? 'soft' : 'secondary'" size="sm" [attr.aria-pressed]="isLive" (click)="goToday()">Today</button>
         </div>
       </div>
 
       <label class="flex flex-col min-w-0 w-full sm:w-56">
         <span class="mb-1 text-xs font-medium text-secondary">Doctor</span>
-        <select
+        <boo-select
+          size="small"
+          [options]="doctorOptions"
+          bindLabel="fullName"
+          bindValue="id"
           [(ngModel)]="doctorId"
           (ngModelChange)="onScopeChange()"
           [disabled]="doctorsLoading || !!doctorsError"
-          class="h-9 w-full min-w-0 px-2.5 rounded-lg border border-borderGray bg-surface text-sm text-regular focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60"
-        >
-          <option value="">{{ doctorsLoading ? 'Loading doctors…' : 'All doctors' }}</option>
-          <option *ngFor="let d of doctors" [value]="d.id">{{ d.fullName || 'Unnamed doctor' }}</option>
-        </select>
+        />
       </label>
 
       <label class="flex flex-col min-w-0 flex-1 basis-56">
@@ -90,13 +77,9 @@
             autocomplete="off"
             class="flex-1 min-w-0 h-full border-0 bg-transparent text-sm text-regular placeholder:text-placeholder outline-none [&::-webkit-search-cancel-button]:hidden"
           />
-          <button
-            *ngIf="query"
-            type="button"
-            class="w-6 h-6 flex-none inline-flex items-center justify-center rounded-md text-secondary cursor-pointer hover:bg-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            aria-label="Clear search"
-            (click)="clearQuery()"
-          ><physio-icon name="x" [size]="14" /></button>
+          <button *ngIf="query" type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Clear search" (click)="clearQuery()">
+            <physio-icon name="x" [size]="14" />
+          </button>
         </span>
       </label>
     </div>
@@ -180,12 +163,14 @@
                 <button
                   *ngIf="canUpdate && canCheckInIt(a)"
                   type="button"
-                  class="h-8 px-2.5 inline-flex items-center gap-1.5 rounded-lg border border-borderGray bg-surface text-xs font-semibold text-regular cursor-pointer hover:border-primary hover:text-primaryDeep disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                  [disabled]="busyIds.has(a.id)"
+                  boo-button
+                  variant="secondary"
+                  size="sm"
+                  [loading]="busyIds.has(a.id)"
                   [attr.aria-label]="'Check in ' + (a.patientName || 'patient')"
                   (click)="runAction(a, 'checkIn')"
                 >
-                  <physio-icon [name]="busyIds.has(a.id) ? 'loader-circle' : 'user-check'" [size]="14" [class.animate-spin]="busyIds.has(a.id)" />
+                  <physio-icon *ngIf="!busyIds.has(a.id)" name="user-check" [size]="14" />
                   <span class="hidden lg:inline">Check in</span>
                 </button>
               </td>

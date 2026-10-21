@@ -1,11 +1,8 @@
 /**
- * Rich prescription-workspace types for the enterprise Prescription redesign.
- * Kept separate from shared/types/medication.ts and shared/types/prescription.ts
- * (used by treatment-sheet, print-template, prescription-dispense) so those
- * pages keep working against the thinner legacy shape.
+ * Prescription workspace types, mirroring PrescriptionDraftViewModel and its request models.
+ * ClinicalWarning* are also used by the dispensing screens, which keep their own warning shape.
+ * Enums travel as numbers (the API has no JSON enum converter); the normalise* helpers accept numbers or names.
  */
-
-export type PrescriptionRxStatus = 'Draft' | 'Issued' | 'Cancelled' | 'Expired';
 
 export type ClinicalWarningSeverity = 'Info' | 'Low' | 'Medium' | 'High' | 'Critical';
 
@@ -30,182 +27,170 @@ export interface ClinicalWarning {
     acknowledged: boolean;
 }
 
-export type StockStatus = 'InStock' | 'Low' | 'OutOfStock';
-export type RxMedicationStatus = 'Active' | 'Held' | 'Discontinued';
-export type DoseTiming = 'morning' | 'noon' | 'afternoon' | 'evening';
+export type PrescriptionStatus = 'Draft' | 'Issued' | 'Dispensed' | 'PartiallyDispensed' | 'Expired' | 'Cancelled';
+export type BeforeAfterMeal = 'Before' | 'After' | 'None';
 
-export interface RxMedicationItem {
+/** Server enum order: PrescriptionStatus, BeforeAfterMeal. */
+export const PRESCRIPTION_STATUSES: PrescriptionStatus[] = ['Draft', 'Issued', 'Dispensed', 'PartiallyDispensed', 'Expired', 'Cancelled'];
+export const BEFORE_AFTER_MEALS: BeforeAfterMeal[] = ['Before', 'After', 'None'];
+
+/** Warning as stored on a prescription item (ClinicalWarningViewModel). */
+export interface StoredClinicalWarning {
     id: string;
-    medicineId: string | null;
-    name: string;
+    type: number | string;
+    severity: number | string;
+    message: string;
+    recommendedAction?: string | null;
+    acknowledgedBy?: string | null;
+    acknowledgedAt?: string | null;
+}
+
+export interface PrescriptionItem {
+    id: string;
+    medicineId: string;
+    medicineName: string;
     genericName?: string | null;
-    brandName?: string | null;
     strength?: string | null;
     dosageForm?: string | null;
-    route?: string | null;
-    dose: string;
+    quantityPrescribed: number;
+    quantityDispensed: number;
+    dosageInstructions: string;
     frequency: string;
-    timing: Partial<Record<DoseTiming, boolean>>;
-    beforeMeal: boolean;
-    afterMeal: boolean;
-    prn: boolean;
-    durationDays: number;
-    quantity: number;
+    durationInDays: number;
+    routeOfAdministration?: string | null;
+    specialInstructions?: string | null;
+    pricePerUnit: number;
+    totalPrice: number;
+    isControlledSubstance: boolean;
+    timingMorning: boolean;
+    timingNoon: boolean;
+    timingAfternoon: boolean;
+    timingEvening: boolean;
+    isPrn: boolean;
+    beforeAfterMeal: number | BeforeAfterMeal;
     unit: string;
     refillCount: number;
-    instructions?: string | null;
-    pharmacyNotes?: string | null;
-    insuranceCovered: boolean;
-    stockStatus: StockStatus;
-    isControlledSubstance: boolean;
-    isAntibiotic: boolean;
-    isHighAlert: boolean;
-    isOtc: boolean;
-    isPrescriptionOnly: boolean;
-    isCustomMedication: boolean;
-    status: RxMedicationStatus;
-    unitPrice: number;
-    warnings: ClinicalWarning[];
+    isInsuranceCovered: boolean;
+    isCatalogVerified: boolean;
+    clinicalWarnings: StoredClinicalWarning[];
 }
 
-export interface RxRiskFlags {
-    drugAllergy: boolean;
-    pregnancy: boolean;
-    pediatric: boolean;
-    elderly: boolean;
-    highRisk: boolean;
-    controlledRestricted: boolean;
-}
-
-export interface RxPatientSummary {
-    patientId: string;
-    avatarUrl?: string | null;
-    fullName: string;
-    gender: string;
-    ageYears: number;
-    dateOfBirth: string;
-    heightCm?: number | null;
-    weightKg?: number | null;
-    bloodType?: string | null;
-    phone?: string | null;
-    insuranceProvider?: string | null;
-    insuranceCovered: boolean;
-    allergies: string[];
-    chronicConditions: string[];
-    primaryDiagnosis?: string | null;
-    flags: RxRiskFlags;
-}
-
-export interface RxDiagnosisEntry {
-    code: string;
-    description: string;
-}
-
-export interface PrescriptionDoctor {
-    doctorId: string;
-    fullName: string;
-    department: string;
-    licenseNumber: string;
-    avatarUrl?: string | null;
-}
-
-export interface PrescriptionSummaryTotals {
-    totalMedications: number;
-    totalQuantity: number;
-    totalDailyDoses: number;
-    estimatedCost: number;
-    insuranceCoverageAmount: number;
-    insuranceCoveragePercent: number;
-    patientPayment: number;
-    currency: string;
-}
-
-export interface PrescriptionDraft {
+export interface Prescription {
     id: string;
     prescriptionNumber: string;
-    status: PrescriptionRxStatus;
-    createdAt: string;
-    visitId: string;
-    queueNumber: string;
-    doctor: PrescriptionDoctor;
-    patient: RxPatientSummary;
-    primaryDiagnosis: RxDiagnosisEntry | null;
-    secondaryDiagnoses: RxDiagnosisEntry[];
-    clinicalNotes: string;
-    symptoms: string;
-    doctorNotes: string;
-    items: RxMedicationItem[];
-}
-
-export interface MedicineCatalogItem {
-    id: string;
-    name: string;
-    genericName: string;
-    brandName: string;
-    strength: string;
-    dosageForm: string;
-    route: string;
-    stock: number;
-    stockStatus: StockStatus;
-    insuranceCovered: boolean;
-    unitPrice: number;
-    isControlledSubstance: boolean;
-    isAntibiotic: boolean;
-    isHighAlert: boolean;
-    isOtc: boolean;
-    isPrescriptionOnly: boolean;
-}
-
-export interface FavoriteMedication {
-    id: string;
-    medicineId: string;
-    name: string;
-    strength: string;
-    dose: string;
-    frequency: string;
-    durationDays: number;
-    quantity: number;
-    unit: string;
-}
-
-export interface PrescriptionTemplate {
-    id: string;
-    name: string;
-    description: string;
-    itemCount: number;
-    items: Omit<RxMedicationItem, 'id' | 'warnings'>[];
-}
-
-export interface AddFavoriteMedicationRequest {
-    medicineId: string;
-    dose?: string | null;
-    frequency?: string | null;
-    durationDays?: number | null;
-}
-
-export interface CreatePrescriptionTemplateRequest {
+    patientId: string;
+    patientName: string;
     doctorId: string;
-    name: string;
-    description?: string | null;
+    doctorName: string;
+    appointmentId: string;
+    medicalRecordId: string;
+    status: number | PrescriptionStatus;
+    prescriptionDate: string;
+    diagnosis?: string | null;
+    instructions?: string | null;
+    totalAmount: number;
+    validUntil?: string | null;
+    refillCount: number;
+    maxRefills: number;
+    reasonCancel?: string | null;
+    cancelledAt?: string | null;
+    issuedAt?: string | null;
+    items: PrescriptionItem[];
+}
+
+/** One line of the editable item list. `id` is null for a line that has not been saved yet. */
+export interface PrescriptionItemInput {
+    id: string | null;
+    medicineId: string;
+    medicineName: string;
+    genericName: string | null;
+    strength: string | null;
+    dosageForm: string | null;
+    quantityPrescribed: number;
+    dosageInstructions: string;
+    frequency: string;
+    durationInDays: number;
+    routeOfAdministration: string | null;
+    specialInstructions: string | null;
+    pricePerUnit: number;
+    timingMorning: boolean;
+    timingNoon: boolean;
+    timingAfternoon: boolean;
+    timingEvening: boolean;
+    isPrn: boolean;
+    /** Sent as the enum number: 0 Before, 1 After, 2 None. */
+    beforeAfterMeal: number;
+    unit: string;
+    refillCount: number;
+    isInsuranceCovered: boolean;
+    isCatalogVerified: boolean;
+}
+
+export interface UpdatePrescriptionRequest {
+    id: string;
+    diagnosis: string | null;
+    instructions: string | null;
+    items: PrescriptionItemInput[];
+}
+
+export interface CdsCheckRequest {
+    patientId: string;
+    excludePrescriptionId: string | null;
     items: {
+        itemKey: string;
         medicineId: string;
-        dose: string;
+        medicineName: string;
+        genericName: string | null;
+        dosageInstructions: string;
         frequency: string;
-        durationDays: number;
-        quantity: number;
-        unit: string;
-        route?: string | null;
-        timing: Partial<Record<DoseTiming, boolean>>;
-        beforeMeal: boolean;
-        afterMeal: boolean;
-        prn: boolean;
+        durationInDays: number;
     }[];
 }
 
-export interface RecentPrescriptionSummary {
+/** Warning returned by the check endpoint (ClinicalWarningViewModel, not yet stored). */
+export type CdsCheckResult = Record<string, StoredClinicalWarning[]>;
+
+/** Medicine search row (MedicineStockViewModel); carries no strength, form, unit or price. */
+export interface MedicineSearchResult {
+    id: string;
+    name: string;
+    genericName?: string | null;
+    currentStock: number;
+    status: string;
+    category?: string | null;
+}
+
+/** Row of GET /api/medical-records/{patientId}/prescriptions (PrescriptionViewModel). */
+export interface PatientPrescriptionRow {
     id: string;
     prescriptionNumber: string;
-    date: string;
-    status: PrescriptionRxStatus;
-    medicationNames: string[];
+    prescriptionDate: string;
+    doctorName: string;
+    diagnosis?: string | null;
+    status: number | PrescriptionStatus;
+    totalAmount: number;
+    prescriptionItemRows: { id: string; medicineName: string }[];
+}
+
+export function normalizePrescriptionStatus(value: number | string): PrescriptionStatus {
+    return typeof value === 'number' ? (PRESCRIPTION_STATUSES[value] ?? 'Draft') : (value as PrescriptionStatus);
+}
+
+export function beforeAfterMealToNumber(value: number | string): number {
+    const index = typeof value === 'number' ? value : BEFORE_AFTER_MEALS.indexOf(value as BeforeAfterMeal);
+    return index < 0 || index >= BEFORE_AFTER_MEALS.length ? 2 : index;
+}
+
+/** Server Severity: 1 Mild, 2 Moderate, 3 Severe, 4 Critical. */
+export type WarningSeverityName = 'Mild' | 'Moderate' | 'Severe' | 'Critical';
+const WARNING_SEVERITIES: Record<number, WarningSeverityName> = { 1: 'Mild', 2: 'Moderate', 3: 'Severe', 4: 'Critical' };
+
+export function normalizeWarningSeverity(value: number | string): WarningSeverityName {
+    return typeof value === 'number' ? (WARNING_SEVERITIES[value] ?? 'Mild') : (value as WarningSeverityName);
+}
+
+const WARNING_TYPES = ['Drug interaction', 'Duplicate medication', 'Allergy', 'Contraindication', 'High dose', 'Low dose', 'Pregnancy', 'Pediatric', 'Renal adjustment', 'Liver adjustment'];
+
+export function warningTypeLabel(value: number | string): string {
+    return typeof value === 'number' ? (WARNING_TYPES[value] ?? 'Warning') : String(value);
 }

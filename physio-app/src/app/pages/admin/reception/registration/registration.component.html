@@ -1,816 +1,274 @@
-<admin-content-header>
-  <div class="max-w-2xl mx-auto py-12">
-    <div
-      class="bg-surface rounded-2xl border border-gray-200 p-10 text-center shadow-sm"
-    >
-      <div
-        class="w-20 h-20 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-4"
-      >
-        <physio-animation name="registration" size="64px" />
-      </div>
-      <h2 class="text-2xl font-bold text-gray-900 m-0 mb-1">
-        Registration complete
-      </h2>
-      <p class="text-sm text-gray-500 mb-6">
-        <span class="font-medium text-gray-800">asdasd</span> is now in the
-        system.
+<div class="flex-1 flex flex-col gap-4 min-w-0 pt-3 pb-5">
+  <admin-breadcrumb />
+
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div class="min-w-0">
+      <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Patient registration</h1>
+      <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">
+        Check that the patient isn't already registered, then enter their details.
       </p>
-
-      <div
-        class="bg-primary/5 border border-primary/20 rounded-lg p-4 inline-flex items-center gap-3 mb-6"
-      >
-        <physio-icon name="badge" [class]="'w-5 h-5 text-primary'" />
-        <div class="text-left">
-          <div
-            class="text-[11px] uppercase tracking-wider text-primary/70 font-semibold"
-          >
-            Patient ID
-          </div>
-          <div class="font-mono text-base font-bold text-primary">asdasd</div>
-        </div>
-      </div>
-
-      <div class="flex flex-col sm:flex-row gap-2 justify-center">
-        <boo-button-admin (click)="printIntakeForm()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="10px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
-          <physio-icon name="printer" />
-          Print intake form
-        </boo-button-admin>
-        <boo-button-admin (click)="goToPatient()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="10px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
-          <physio-icon name="external-link" />
-          Open patient record
-        </boo-button-admin>
-        <boo-button-admin (click)="registerAnother()" textColor="white" padding="10px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
-          <physio-icon name="user-plus" />
-          Register another patient
-        </boo-button-admin>
-      </div>
     </div>
-  </div>
-  <ng-container
-    *ngIf="
-      registeredPatientNumber() || registeredPatientId() as id;
-      else wizard
-    "
-  >
-    <div class="max-w-2xl mx-auto py-12">
-      <div
-        class="bg-surface rounded-2xl border border-gray-200 p-10 text-center shadow-sm"
-      >
-        <div
-          class="w-16 h-16 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-4"
-        >
-          <physio-animation name="registration" size="64px" />
-        </div>
-        <h2 class="text-2xl font-bold text-gray-900 m-0 mb-1">
-          Registration complete
-        </h2>
-        <p class="text-sm text-gray-500 mb-6">
-          <span class="font-medium text-gray-800">{{ fullName() }}</span> is now
-          in the system.
-        </p>
+    <a *ngIf="canBook" boo-button variant="secondary" size="sm" routerLink="/admin/reception/booking/list">
+      <physio-icon name="calendar-days" [size]="15" aria-hidden="true" />Bookings
+    </a>
+  </header>
 
-        <div
-          class="bg-primary/5 border border-primary/20 rounded-lg p-4 inline-flex items-center gap-3 mb-6"
-        >
-          <physio-icon name="badge" [class]="'w-5 h-5 text-primary'" />
-          <div class="text-left">
-            <div
-              class="text-[11px] uppercase tracking-wider text-primary/70 font-semibold"
-            >
-              Patient ID
-            </div>
-            <div class="font-mono text-base font-bold text-primary">
-              {{ id }}
-            </div>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row gap-2 justify-center">
-          <boo-button-admin (click)="printIntakeForm()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="10px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
-            <physio-icon name="printer" />
-            Print intake form
-          </boo-button-admin>
-          <boo-button-admin (click)="goToPatient()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="10px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
-            <physio-icon name="external-link" />
-            Open patient record
-          </boo-button-admin>
-          <boo-button-admin (click)="registerAnother()" textColor="white" padding="10px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
-            <physio-icon name="user-plus" />
-            Register another patient
-          </boo-button-admin>
-        </div>
-      </div>
-    </div>
-  </ng-container>
-  <ng-template #wizard>
-    <div class="flex flex-col mb-6">
-      <div class="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <p class="tracking-tight font-bold leading-none text-[22px] m-0">
-            Patient Registration
-          </p>
-          <p class="text-sm text-gray-500 mt-1">
-            Collect intake information across {{ steps.length }} short steps.
+  <!-- Reused list of existing patients (search results and the duplicate warning) -->
+  <ng-template #patientList let-items let-label="label">
+    <ul class="m-0 p-0 list-none divide-y divide-rowDivider rounded-lg border border-borderGray bg-surface" [attr.aria-label]="label">
+      <li *ngFor="let p of items; trackBy: trackById" class="flex flex-wrap items-center gap-x-4 gap-y-1 px-3 py-2.5">
+        <div class="min-w-0 flex-1 basis-48">
+          <p class="m-0 text-sm font-semibold text-regular truncate">{{ p.fullName || 'Unnamed patient' }}</p>
+          <p class="m-0 text-xs text-secondary tabular-nums truncate">
+            {{ p.patientNumber }}<ng-container *ngIf="p.phone"> · {{ p.phone }}</ng-container><ng-container *ngIf="p.email"> · {{ p.email }}</ng-container>
           </p>
         </div>
-        <button
-          type="button"
-          (click)="resetForm()"
-          class="text-sm text-gray-500 hover:text-red-600 hover:underline transition-colors"
-        >
-          Discard
-        </button>
-      </div>
-      <div class="mt-5 grid grid-cols-4 gap-2">
-        <ng-container *ngFor="let s of steps; let i = index">
-          <button
-            type="button"
-            (click)="goTo(i)"
-            class="flex flex-col items-start gap-1 text-left p-3 rounded-lg border transition-all"
-            [ngClass]="
-              i === currentStepIdx()
-                ? 'border-primary bg-primary/5'
-                : 'border-gray-200 bg-surface'
-            "
-          >
-            <div class="flex items-center gap-2 w-full">
-              <span
-                class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
-                [class.bg-primary]="i <= currentStepIdx()"
-                [class.text-white]="i <= currentStepIdx()"
-                [class.bg-gray-100]="i > currentStepIdx()"
-                [class.text-gray-400]="i > currentStepIdx()"
-              >
-                <physio-icon
-                  *ngIf="i < currentStepIdx()"
-                  [size]="14"
-                  [strokeWidth]="2"
-                  name="check"
-                  class="text-white"
-                />
-                <span *ngIf="i >= currentStepIdx()">{{ i + 1 }}</span>
-              </span>
-              <span
-                class="text-sm font-medium truncate"
-                [class.text-primary]="i === currentStepIdx()"
-                [class.text-gray-900]="i < currentStepIdx()"
-                [class.text-gray-500]="i > currentStepIdx()"
-              >
-                {{ s.label }}
-              </span>
-            </div>
-            <span class="text-[11px] text-gray-500 truncate w-full">{{
-              s.description
-            }}</span>
-          </button>
-        </ng-container>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
-      <form
-        [formGroup]="form"
-        (ngSubmit)="onSubmit()"
-        class="bg-surface rounded-lg border border-gray-200"
-      >
-        <div *ngIf="currentStep().id === 'personal'">
-          <div class="p-5 border-b border-gray-100">
-            <h2 class="text-base font-semibold text-gray-900 mb-1">
-              Personal information
-            </h2>
-            <p class="text-sm text-gray-500">
-              Basic identity details. Required to create the patient record.
-            </p>
-          </div>
-          <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700"
-                >First name <span class="text-red-500">*</span></span
-              >
-              <boo-input
-                label="Enter first name"
-                formControlName="firstName"
-                booError
-              />
-            </label>
-            <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700"
-                >Last name <span class="text-red-500">*</span></span
-              >
-              <boo-input
-                label="Enter last name"
-                formControlName="lastName"
-                booError
-              />
-            </label>
-            <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700"
-                >Date of birth <span class="text-red-500">*</span></span
-              >
-              <boo-datepicker
-                label="Select date"
-                disableFuture
-                formControlName="dateOfBirth"
-              />
-              <span
-                *ngIf="ageFromDob() !== null"
-                class="text-[11px] text-gray-500"
-                >Age: {{ ageFromDob() }} years</span
-              >
-            </label>
-            <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700"
-                >Gender <span class="text-red-500">*</span></span
-              >
-              <boo-select
-                label="Select gender"
-                formControlName="gender"
-                [options]="genderOptions"
-              />
-            </label>
-            <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700">Blood group</span>
-              <boo-select
-                label="Optional"
-                formControlName="bloodGroup"
-                [options]="bloodGroupOptions"
-              />
-            </label>
-            <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700"
-                >Marital status</span
-              >
-              <boo-select
-                label="Optional"
-                formControlName="maritalStatus"
-                [options]="maritalOptions"
-              />
-            </label>
-          </div>
-        </div>
-
-        <div *ngIf="currentStep().id === 'contact'">
-          <div class="p-5 border-b border-gray-100">
-            <h2 class="text-base font-semibold text-gray-900 mb-1">
-              Contact information
-            </h2>
-            <p class="text-sm text-gray-500">
-              How we reach the patient and their emergency contact.
-            </p>
-          </div>
-          <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700"
-                >Email <span class="text-red-500">*</span></span
-              >
-              <boo-input
-                label="patient@example.com"
-                formControlName="email"
-                booError
-              />
-              <span
-                *ngIf="
-                  ctrl('email')?.errors?.['email'] && ctrl('email')?.touched
-                "
-                class="text-[11px] text-red-500"
-                >Enter a valid email address</span
-              >
-            </label>
-            <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700"
-                >Phone <span class="text-red-500">*</span></span
-              >
-              <boo-input
-                label="+84 123 456 789"
-                formControlName="phone"
-                booError
-              />
-              <span
-                *ngIf="
-                  ctrl('phone')?.errors?.['pattern'] && ctrl('phone')?.touched
-                "
-                class="text-[11px] text-red-500"
-                >Enter a valid phone number</span
-              >
-            </label>
-            <label
-              class="flex flex-col gap-1 md:col-span-2 pt-2 border-t border-gray-100 mt-2"
-            >
-              <span
-                class="text-[11px] font-semibold uppercase tracking-wider text-gray-400"
-                >Emergency contact</span
-              >
-            </label>
-            <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700"
-                >Name <span class="text-red-500">*</span></span
-              >
-              <boo-input
-                label="Full name"
-                formControlName="emergencyContactName"
-                booError
-              />
-            </label>
-            <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700"
-                >Phone <span class="text-red-500">*</span></span
-              >
-              <boo-input
-                label="+84 …"
-                formControlName="emergencyContactPhone"
-                booError
-              />
-            </label>
-
-            <label
-              class="flex flex-col gap-1 md:col-span-2 pt-2 border-t border-gray-100 mt-2"
-            >
-              <span
-                class="text-[11px] font-semibold uppercase tracking-wider text-gray-400"
-                >Address</span
-              >
-            </label>
-            <label class="flex flex-col gap-1 md:col-span-2">
-              <span class="text-xs font-medium text-gray-700"
-                >Street address <span class="text-red-500">*</span></span
-              >
-              <boo-textarea [rows]="2" formControlName="address" label="Street, ward, district" />
-            </label>
-            <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700"
-                >City <span class="text-red-500">*</span></span
-              >
-              <boo-input label="City" formControlName="city" booError />
-            </label>
-            <label class="flex flex-col gap-1">
-              <span class="text-xs font-medium text-gray-700"
-                >Postal code <span class="text-red-500">*</span></span
-              >
-              <boo-input
-                label="Postal code"
-                formControlName="postalCode"
-                booError
-              />
-            </label>
-          </div>
-        </div>
-
-        <div *ngIf="currentStep().id === 'medical'">
-          <div class="p-5 border-b border-gray-100">
-            <h2 class="text-base font-semibold text-gray-900 mb-1">
-              Medical, insurance &amp; care
-            </h2>
-            <p class="text-sm text-gray-500">
-              Primary doctor is required; everything else is optional but
-              recommended.
-            </p>
-          </div>
-          <div class="p-5 grid grid-cols-1 gap-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Primary doctor <span class="text-red-500">*</span></span
-                >
-                <boo-input
-                  label="Doctor ID"
-                  formControlName="primaryDoctorId"
-                  booError
-                />
-                <span
-                  *ngIf="isFieldInvalid('primaryDoctorId')"
-                  class="text-[11px] text-red-500"
-                  >Required</span
-                >
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Referred by</span
-                >
-                <boo-input
-                  label="Referring doctor ID"
-                  formControlName="referredBy"
-                />
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Referral hospital</span
-                >
-                <boo-input
-                  label="Hospital ID"
-                  formControlName="referralHospitalId"
-                />
-              </label>
-            </div>
-            <div class="border-t border-gray-100 pt-4 grid grid-cols-1 gap-3">
-              <span
-                class="text-[11px] font-semibold uppercase tracking-wider text-gray-400"
-                >Medical history</span
-              >
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Known allergies</span
-                >
-                <boo-textarea [rows]="2" formControlName="allergyInformation" label="Medications, food, latex, etc." />
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Medical history</span
-                >
-                <boo-textarea [rows]="3" formControlName="medicalHistory" label="Chronic conditions, prior diagnoses…" />
-              </label>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <label class="flex flex-col gap-1">
-                  <span class="text-xs font-medium text-gray-700"
-                    >Family history</span
-                  >
-                  <boo-textarea [rows]="2" formControlName="familyHistory" label="Hereditary conditions…" />
-                </label>
-                <label class="flex flex-col gap-1">
-                  <span class="text-xs font-medium text-gray-700"
-                    >Surgical history</span
-                  >
-                  <boo-textarea [rows]="2" formControlName="surgicalHistory" label="Past surgeries, year…" />
-                </label>
-              </div>
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Current medications</span
-                >
-                <boo-textarea [rows]="2" formControlName="currentMedications" label="Drug · dosage · frequency" />
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Lifestyle notes</span
-                >
-                <boo-textarea [rows]="2" formControlName="lifestyleNotes" label="Smoker, alcohol use, exercise…" />
-              </label>
-            </div>
-            <div
-              class="border-t border-gray-100 pt-4 grid grid-cols-1 md:grid-cols-2 gap-3"
-            >
-              <span
-                class="md:col-span-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400"
-                >Insurance</span
-              >
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Provider</span>
-                <boo-input
-                  label="Optional"
-                  formControlName="insuranceProvider"
-                />
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700">Policy #</span>
-                <boo-input
-                  label="Optional"
-                  formControlName="insurancePolicyNumber"
-                />
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Expiry date</span
-                >
-                <boo-datepicker
-                  label="Select date"
-                  formControlName="insuranceExpiryDate"
-                />
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Coverage amount</span
-                >
-                <boo-input type="number" formControlName="insuranceCoverageAmount" label="0" />
-              </label>
-            </div>
-            <div
-              class="border-t border-gray-100 pt-4 grid grid-cols-1 md:grid-cols-2 gap-3"
-            >
-              <span
-                class="md:col-span-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400"
-                >Demographics &amp; preferences</span
-              >
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Occupation</span
-                >
-                <boo-input label="e.g. Teacher" formControlName="occupation" />
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Annual income range</span
-                >
-                <boo-select
-                  label="Prefer not to say"
-                  formControlName="annualIncomeRange"
-                  [options]="incomeRangeOptions"
-                />
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Preferred hospital</span
-                >
-                <boo-input
-                  label="Hospital ID"
-                  formControlName="preferredHospitalId"
-                />
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Preferred doctor</span
-                >
-                <boo-input
-                  label="Doctor ID"
-                  formControlName="preferredDoctorId"
-                />
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Preferred appointment time</span
-                >
-                <boo-select
-                  label="Select"
-                  formControlName="preferredAppointmentTime"
-                  [options]="appointmentTimeOptions"
-                />
-              </label>
-              <label class="flex flex-col gap-1">
-                <span class="text-xs font-medium text-gray-700"
-                  >Communication preferences</span
-                >
-                <boo-select
-                  label="Select"
-                  formControlName="communicationPreferences"
-                  [options]="communicationOptions"
-                />
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div *ngIf="currentStep().id === 'review'">
-          <div class="p-5 border-b border-gray-100">
-            <h2 class="text-base font-semibold text-gray-900 mb-1">
-              Review &amp; confirm
-            </h2>
-            <p class="text-sm text-gray-500">
-              Double-check before creating the patient record.
-            </p>
-          </div>
-          <div class="p-5 space-y-5">
-            <div
-              class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm"
-            >
-              <div class="md:col-span-2 mb-1">
-                <span
-                  class="text-[11px] font-semibold uppercase tracking-wider text-gray-400"
-                  >Personal</span
-                >
-              </div>
-              <div>
-                <span class="text-gray-500">Name:</span>
-                <b class="text-gray-900">{{ fullName() }}</b>
-              </div>
-              <div>
-                <span class="text-gray-500">Age:</span>
-                {{ ageFromDob() !== null ? ageFromDob() + " years" : "—" }}
-              </div>
-              <div>
-                <span class="text-gray-500">Gender:</span>
-                {{ formValue().gender || "—" }}
-              </div>
-              <div>
-                <span class="text-gray-500">Blood:</span>
-                {{ formValue().bloodGroup || "—" }}
-              </div>
-
-              <div
-                class="md:col-span-2 mt-2 mb-1 pt-2 border-t border-gray-100"
-              >
-                <span
-                  class="text-[11px] font-semibold uppercase tracking-wider text-gray-400"
-                  >Contact</span
-                >
-              </div>
-              <div>
-                <span class="text-gray-500">Email:</span>
-                {{ formValue().email }}
-              </div>
-              <div>
-                <span class="text-gray-500">Phone:</span>
-                {{ formValue().phone }}
-              </div>
-              <div class="md:col-span-2">
-                <span class="text-gray-500">Address:</span>
-                {{ formValue().address }}, {{ formValue().city }}
-                {{ formValue().postalCode }}
-              </div>
-              <div>
-                <span class="text-gray-500">Emergency:</span>
-                {{ formValue().emergencyContactName }}
-              </div>
-              <div>
-                <span class="text-gray-500">Emergency phone:</span>
-                {{ formValue().emergencyContactPhone }}
-              </div>
-
-              <div
-                class="md:col-span-2 mt-2 mb-1 pt-2 border-t border-gray-100"
-              >
-                <span
-                  class="text-[11px] font-semibold uppercase tracking-wider text-gray-400"
-                  >Medical &amp; insurance</span
-                >
-              </div>
-              <div>
-                <span class="text-gray-500">Primary doctor:</span>
-                {{ formValue().primaryDoctorId || "—" }}
-              </div>
-              <div>
-                <span class="text-gray-500">Referred by:</span>
-                {{ formValue().referredBy || "—" }}
-              </div>
-              <div class="md:col-span-2">
-                <span class="text-gray-500">Allergies:</span>
-                {{ formValue().allergyInformation || "—" }}
-              </div>
-              <div class="md:col-span-2">
-                <span class="text-gray-500">Medical history:</span>
-                {{ formValue().medicalHistory || "—" }}
-              </div>
-              <div class="md:col-span-2">
-                <span class="text-gray-500">Family history:</span>
-                {{ formValue().familyHistory || "—" }}
-              </div>
-              <div class="md:col-span-2">
-                <span class="text-gray-500">Surgical history:</span>
-                {{ formValue().surgicalHistory || "—" }}
-              </div>
-              <div class="md:col-span-2">
-                <span class="text-gray-500">Medications:</span>
-                {{ formValue().currentMedications || "—" }}
-              </div>
-              <div class="md:col-span-2">
-                <span class="text-gray-500">Lifestyle:</span>
-                {{ formValue().lifestyleNotes || "—" }}
-              </div>
-              <div>
-                <span class="text-gray-500">Insurance:</span>
-                {{ formValue().insuranceProvider || "—" }}
-              </div>
-              <div>
-                <span class="text-gray-500">Policy #:</span>
-                {{ formValue().insurancePolicyNumber || "—" }}
-              </div>
-              <div>
-                <span class="text-gray-500">Occupation:</span>
-                {{ formValue().occupation || "—" }}
-              </div>
-              <div>
-                <span class="text-gray-500">Pref. time:</span>
-                {{ formValue().preferredAppointmentTime || "—" }}
-              </div>
-            </div>
-
-            <boo-checkbox formControlName="agreeToTerms" class="pt-3 border-t border-gray-100">
-              <span class="text-sm text-gray-700">
-                I confirm the information above is accurate and the patient has
-                agreed to our
-                <a class="text-primary hover:underline" href="#">terms</a> and
-                <a class="text-primary hover:underline" href="#"
-                  >privacy policy</a
-                >.
-                <span class="text-red-500">*</span>
-              </span>
-            </boo-checkbox>
-            <span
-              *ngIf="isFieldInvalid('agreeToTerms')"
-              class="block text-[11px] text-red-500 -mt-2"
-            >
-              You must confirm before registering
-            </span>
-          </div>
-        </div>
-
-        <div
-          class="px-5 py-4 border-t border-gray-100 flex items-center justify-between gap-2 bg-gray-50/50 rounded-b-lg"
-        >
-          <boo-button-admin (click)="prev()" [disabled]="currentStepIdx() === 0" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="6">
-            <physio-icon name="arrow-left" />
-            Previous
-          </boo-button-admin>
-
-          <span class="text-xs text-gray-500">
-            Step {{ currentStepIdx() + 1 }} of {{ steps.length }}
-          </span>
-
-          <boo-button-admin *ngIf="currentStep().id !== 'review'" (click)="next()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="6">
-            Next
-            <physio-icon name="arrow-right" class="text-white" />
-          </boo-button-admin>
-          <button
-            *ngIf="currentStep().id === 'review'"
-            type="submit"
-            [disabled]="
-              loadingSrv.isLoading(LoadingKeys.PATIENT.CREATE) || form.invalid
-            "
-            class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <physio-icon
-              *ngIf="loadingSrv.isLoading(LoadingKeys.PATIENT.CREATE)"
-              name="loader-circle"
-              [class]="'w-4 h-4 animate-spin text-white'"
-            />
-            <physio-icon
-              *ngIf="!loadingSrv.isLoading(LoadingKeys.PATIENT.CREATE)"
-              name="user-plus"
-              class="text-white"
-            />
-            <span>{{
-              loadingSrv.isLoading(LoadingKeys.PATIENT.CREATE)
-                ? "Registering…"
-                : "Register patient"
-            }}</span>
-          </button>
-        </div>
-      </form>
-
-      <aside class="bg-surface rounded-lg border border-gray-200 sticky top-4">
-        <div class="p-5 border-b border-gray-100">
-          <div class="flex items-center gap-3">
-            <div
-              class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-base font-bold shrink-0"
-            >
-              {{ initials() }}
-            </div>
-            <div class="min-w-0">
-              <div class="text-sm font-semibold text-gray-900 truncate">
-                {{ fullName() }}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="p-5 space-y-3 text-xs">
-          <div class="flex items-center justify-between">
-            <span class="text-gray-500">Age</span>
-            <span class="font-medium text-gray-900">{{
-              ageFromDob() !== null ? ageFromDob() + " yrs" : "—"
-            }}</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-gray-500">Gender</span>
-            <span class="font-medium text-gray-900 capitalize">{{
-              formValue().gender || "—"
-            }}</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-gray-500">Blood</span>
-            <span class="font-medium text-gray-900">{{
-              formValue().bloodGroup || "—"
-            }}</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-gray-500">Phone</span>
-            <span class="font-medium text-gray-900 truncate ml-2">{{
-              formValue().phone || "—"
-            }}</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-gray-500">Email</span>
-            <span class="font-medium text-gray-900 truncate ml-2">{{
-              formValue().email || "—"
-            }}</span>
-          </div>
-        </div>
-
-        <div class="px-5 py-4 border-t border-gray-100">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs text-gray-500">Progress</span>
-            <span class="text-xs font-medium text-gray-900"
-              >{{ progress() | number: "1.0-0" }}%</span
-            >
-          </div>
-          <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden">
-            <div
-              class="h-full bg-primary transition-all duration-300"
-              [style.width.%]="progress()"
-            ></div>
-          </div>
-        </div>
-
-        <div class="px-5 py-4 border-t border-gray-100">
-          <div class="flex items-start gap-2 text-xs text-gray-500">
-            <physio-icon
-              name="info"
-              [class]="'w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5'"
-            />
-            <p class="m-0">
-              A Patient ID is assigned when registration completes. The preview
-              is approximate.
-            </p>
-          </div>
-        </div>
-      </aside>
+        <p *ngIf="p.registrationDate" class="m-0 text-xs text-secondary tabular-nums">Registered {{ p.registrationDate | date: 'd MMM y' }}</p>
+      </li>
+    </ul>
+    <div class="flex flex-wrap items-center gap-2 mt-2">
+      <a *ngIf="canBook" boo-button variant="secondary" size="sm" routerLink="/admin/reception/booking/list">
+        <physio-icon name="calendar-days" [size]="15" aria-hidden="true" />Book from the bookings page
+      </a>
+      <a *ngIf="canReadPatients" boo-button variant="ghost" size="sm" routerLink="/admin/crm/patient">
+        <physio-icon name="users" [size]="15" aria-hidden="true" />Open patient records
+      </a>
     </div>
   </ng-template>
-</admin-content-header>
+
+  <!-- Registered -->
+  <section
+    *ngIf="registered as r; else registrationTpl"
+    id="reg-done"
+    tabindex="-1"
+    class="bg-surface border border-borderGray rounded-xl p-6 sm:p-8 text-center max-w-xl w-full mx-auto focus:outline-none"
+    role="status"
+    aria-live="polite"
+  >
+    <span class="w-12 h-12 mx-auto mb-3 rounded-full bg-primarySoft text-primaryDeep inline-flex items-center justify-center" aria-hidden="true">
+      <physio-icon name="check" [size]="24" />
+    </span>
+    <h2 class="m-0 text-lg font-semibold text-regular">{{ r.name }} is registered</h2>
+    <p class="m-0 mt-1 text-sm text-secondary">
+      Patient no.
+      <span class="font-semibold text-regular tabular-nums">{{ r.patientNumber || '…' }}</span>
+    </p>
+    <div class="flex flex-col sm:flex-row gap-2 justify-center mt-5">
+      <a *ngIf="canBook" boo-button variant="primary" routerLink="/admin/reception/booking/list">
+        <physio-icon name="calendar-days" [size]="16" aria-hidden="true" />Go to bookings
+      </a>
+      <a *ngIf="canReadPatients" boo-button variant="secondary" routerLink="/admin/crm/patient">
+        <physio-icon name="users" [size]="16" aria-hidden="true" />Patient records
+      </a>
+      <button type="button" boo-button variant="secondary" (click)="registerAnother()">
+        <physio-icon name="user-plus" [size]="16" aria-hidden="true" />Register another
+      </button>
+    </div>
+  </section>
+
+  <ng-template #registrationTpl>
+    <!-- Existing patient lookup -->
+    <section class="bg-surface border border-borderGray rounded-xl p-4" aria-labelledby="reg-find-title">
+      <h2 id="reg-find-title" class="m-0 text-sm font-semibold text-regular">Find an existing patient</h2>
+      <p class="m-0 mt-0.5 mb-3 text-xs text-secondary">Search by name, patient number or phone before creating a new record.</p>
+
+      <boo-search-field
+        label="Search existing patients"
+        placeholder="Name, patient no. or phone"
+        [formControl]="searchQuery"
+        [busy]="searching"
+        (clear)="clearSearch()"
+        aria-describedby="reg-find-status"
+      />
+
+      <p id="reg-find-status" class="m-0 mt-1.5 text-xs" [class.text-danger]="searchError" [class.text-secondary]="!searchError" aria-live="polite">
+        <ng-container *ngIf="searchError; else statusTpl">
+          {{ searchError }}
+          <button type="button" boo-button variant="link" size="sm" (click)="retrySearch()">Try again</button>
+        </ng-container>
+        <ng-template #statusTpl>
+          <ng-container *ngIf="searchedNothing">No patient matches “{{ searchedTerm }}”. You can register them below.</ng-container>
+          <ng-container *ngIf="!searchedNothing && !searchResults.length">{{ searchQuery.value ? searchHint : '' }}</ng-container>
+          <ng-container *ngIf="searchResults.length">
+            {{ searchResults.length }} {{ searchResults.length === 1 ? 'patient' : 'patients' }} found. Check these before registering.
+          </ng-container>
+        </ng-template>
+      </p>
+
+      <div *ngIf="searchResults.length" class="mt-2">
+        <ng-container *ngTemplateOutlet="patientList; context: { $implicit: searchResults, label: 'Matching patients' }" />
+      </div>
+    </section>
+
+    <!-- New patient -->
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="flex flex-col gap-4" [attr.aria-busy]="submitting">
+      <p class="m-0 text-xs text-secondary">Fields marked <span class="text-danger">*</span> are required.</p>
+
+      <!-- Duplicate warning -->
+      <div
+        *ngIf="matches.length"
+        id="reg-matches"
+        tabindex="-1"
+        role="alert"
+        class="rounded-xl border border-amber-300 bg-amber-50 p-4 focus:outline-none"
+      >
+        <div class="flex items-start gap-2">
+          <physio-icon name="circle-alert" [size]="18" class="flex-none mt-0.5 text-amber-700" aria-hidden="true" />
+          <div class="min-w-0">
+            <p class="m-0 text-sm font-semibold text-regular">
+              {{ matches.length === 1 ? 'A patient' : matches.length + ' patients' }} already {{ matches.length === 1 ? 'has' : 'have' }} this phone number
+            </p>
+            <p class="m-0 mt-0.5 text-xs text-secondary">If this is the same person, don't register them again. Otherwise press “Register anyway”.</p>
+          </div>
+        </div>
+        <div class="mt-3">
+          <ng-container *ngTemplateOutlet="patientList; context: { $implicit: matches, label: 'Patients with this phone number' }" />
+        </div>
+      </div>
+
+      <!-- Patient -->
+      <fieldset class="m-0 bg-surface border border-borderGray rounded-xl p-4 min-w-0">
+        <legend class="px-1 text-sm font-semibold text-regular">Patient</legend>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-1">
+          <div class="min-w-0">
+            <label for="reg-first-name" class="block mb-1 text-[13px] font-medium text-regular">First name <span class="text-danger" aria-hidden="true">*</span></label>
+            <boo-input name="reg-first-name" formControlName="firstName" label="First name" [maxlength]="100" required />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-last-name" class="block mb-1 text-[13px] font-medium text-regular">Last name <span class="text-danger" aria-hidden="true">*</span></label>
+            <boo-input name="reg-last-name" formControlName="lastName" label="Last name" [maxlength]="100" required />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-dob" class="block mb-1 text-[13px] font-medium text-regular">Date of birth <span class="text-danger" aria-hidden="true">*</span></label>
+            <boo-datepicker id="reg-dob" formControlName="dateOfBirth" label="Select date" required disableFuture [min]="minDob" />
+            <p id="reg-dob-msg" class="m-0 mt-1 text-xs" [class.text-danger]="showError('dateOfBirth')" [class.text-secondary]="!showError('dateOfBirth')">
+              <ng-container *ngIf="showError('dateOfBirth'); else ageTpl">{{ form.controls.dateOfBirth.hasError('required') ? 'Date of birth is required.' : 'Date of birth must be between 1900 and today.' }}</ng-container>
+              <ng-template #ageTpl><ng-container *ngIf="age() !== null; else dobHint">{{ age() }} years old</ng-container><ng-template #dobHint>Between 1900 and today.</ng-template></ng-template>
+            </p>
+          </div>
+          <div class="min-w-0">
+            <label for="reg-gender" class="block mb-1 text-[13px] font-medium text-regular">Gender <span class="text-danger" aria-hidden="true">*</span></label>
+            <boo-select id="reg-gender" formControlName="gender" label="Gender" required [options]="genders" />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-blood" class="block mb-1 text-[13px] font-medium text-regular">Blood group <span class="text-danger" aria-hidden="true">*</span></label>
+            <boo-select id="reg-blood" formControlName="bloodGroup" label="Blood group" required [options]="bloodGroups" />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-marital" class="block mb-1 text-[13px] font-medium text-regular">Marital status <span class="text-danger" aria-hidden="true">*</span></label>
+            <boo-select id="reg-marital" formControlName="maritalStatus" label="Marital status" required [options]="maritalStatuses" />
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Contact -->
+      <fieldset class="m-0 bg-surface border border-borderGray rounded-xl p-4 min-w-0">
+        <legend class="px-1 text-sm font-semibold text-regular">Contact</legend>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-1">
+          <div class="min-w-0">
+            <label for="reg-phone" class="block mb-1 text-[13px] font-medium text-regular">Phone <span class="text-danger" aria-hidden="true">*</span></label>
+            <boo-input name="reg-phone" formControlName="phone" label="+84 912 345 678" type="tel" [maxlength]="20" required />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-email" class="block mb-1 text-[13px] font-medium text-regular">Email <span class="text-danger" aria-hidden="true">*</span></label>
+            <boo-input name="reg-email" formControlName="email" label="name@example.com" type="email" [maxlength]="255" required />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-ec-name" class="block mb-1 text-[13px] font-medium text-regular">Emergency contact name</label>
+            <boo-input name="reg-ec-name" formControlName="emergencyContactName" label="Emergency contact name" [maxlength]="255" />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-ec-phone" class="block mb-1 text-[13px] font-medium text-regular">Emergency contact phone</label>
+            <boo-input name="reg-ec-phone" formControlName="emergencyContactPhone" label="Emergency contact phone" type="tel" [maxlength]="20" />
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Care -->
+      <fieldset class="m-0 bg-surface border border-borderGray rounded-xl p-4 min-w-0">
+        <legend class="px-1 text-sm font-semibold text-regular">Care</legend>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-1">
+          <div class="min-w-0">
+            <label for="reg-doctor" class="block mb-1 text-[13px] font-medium text-regular">Primary doctor <span class="text-danger" aria-hidden="true">*</span></label>
+            <boo-select id="reg-doctor" formControlName="primaryDoctorId" label="Primary doctor" required [options]="doctors" bindLabel="fullName" bindValue="id" />
+            <p id="reg-doctor-msg" *ngIf="noDoctors" class="m-0 mt-1 text-xs text-danger">No doctors are set up yet, so a primary doctor can’t be chosen.</p>
+          </div>
+          <div class="min-w-0">
+            <label for="reg-occupation" class="block mb-1 text-[13px] font-medium text-regular">Occupation</label>
+            <boo-input name="reg-occupation" formControlName="occupation" label="Occupation" [maxlength]="255" />
+          </div>
+        </div>
+        <boo-inline-error *ngIf="doctorsError" class="block mt-3" what="the doctor list" [compact]="true" [state]="doctorsLoading ? 'retrying' : 'default'" (retry)="loadDoctors()" />
+      </fieldset>
+
+      <!-- Optional: insurance -->
+      <details class="group bg-surface border border-borderGray rounded-xl">
+        <summary class="flex items-center justify-between gap-3 px-4 py-3 cursor-pointer list-none rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 [&::-webkit-details-marker]:hidden">
+          <span class="text-sm font-semibold text-regular">Insurance <span class="font-normal text-secondary">· optional</span></span>
+          <physio-icon name="chevron-down" [size]="16" class="text-secondary transition-transform group-open:rotate-180" aria-hidden="true" />
+        </summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 pb-4">
+          <div class="min-w-0">
+            <label for="reg-ins-provider" class="block mb-1 text-[13px] font-medium text-regular">Provider</label>
+            <boo-input name="reg-ins-provider" formControlName="insuranceProvider" label="Provider" [maxlength]="255" />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-ins-policy" class="block mb-1 text-[13px] font-medium text-regular">Policy number</label>
+            <boo-input name="reg-ins-policy" formControlName="insurancePolicyNumber" label="Policy number" [maxlength]="100" />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-ins-expiry" class="block mb-1 text-[13px] font-medium text-regular">Expiry date</label>
+            <boo-datepicker id="reg-ins-expiry" formControlName="insuranceExpiryDate" label="Select date" />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-ins-coverage" class="block mb-1 text-[13px] font-medium text-regular">Coverage amount</label>
+            <boo-input name="reg-ins-coverage" formControlName="insuranceCoverageAmount" label="Coverage amount" type="number" />
+          </div>
+        </div>
+      </details>
+
+      <!-- Optional: medical background -->
+      <details class="group bg-surface border border-borderGray rounded-xl">
+        <summary class="flex items-center justify-between gap-3 px-4 py-3 cursor-pointer list-none rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 [&::-webkit-details-marker]:hidden">
+          <span class="text-sm font-semibold text-regular">Medical background <span class="font-normal text-secondary">· optional</span></span>
+          <physio-icon name="chevron-down" [size]="16" class="text-secondary transition-transform group-open:rotate-180" aria-hidden="true" />
+        </summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 pb-4">
+          <div class="min-w-0 sm:col-span-2">
+            <label for="reg-allergy" class="block mb-1 text-[13px] font-medium text-regular">Known allergies</label>
+            <boo-textarea id="reg-allergy" formControlName="allergyInformation" [rows]="2" label="Known allergies" />
+          </div>
+          <div class="min-w-0 sm:col-span-2">
+            <label for="reg-history" class="block mb-1 text-[13px] font-medium text-regular">Medical history</label>
+            <boo-textarea id="reg-history" formControlName="medicalHistory" [rows]="3" label="Medical history" />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-family" class="block mb-1 text-[13px] font-medium text-regular">Family history</label>
+            <boo-textarea id="reg-family" formControlName="familyHistory" [rows]="2" label="Family history" />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-surgical" class="block mb-1 text-[13px] font-medium text-regular">Surgical history</label>
+            <boo-textarea id="reg-surgical" formControlName="surgicalHistory" [rows]="2" label="Surgical history" />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-meds" class="block mb-1 text-[13px] font-medium text-regular">Current medications</label>
+            <boo-textarea id="reg-meds" formControlName="currentMedications" [rows]="2" label="Current medications" />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-lifestyle" class="block mb-1 text-[13px] font-medium text-regular">Lifestyle notes</label>
+            <boo-textarea id="reg-lifestyle" formControlName="lifestyleNotes" [rows]="2" label="Lifestyle notes" />
+          </div>
+        </div>
+      </details>
+
+      <!-- Actions -->
+      <div class="sticky bottom-0 z-10 -mx-1 px-1 py-3 bg-body/95 backdrop-blur border-t border-borderGray flex flex-wrap items-center justify-end gap-2">
+        <p *ngIf="matches.length" class="m-0 mr-auto text-xs text-secondary">Same person? Don't register again.</p>
+        <button type="submit" boo-button variant="primary" [loading]="submitting" [disabled]="submitting || noDoctors">
+          <physio-icon *ngIf="!submitting" name="user-plus" [size]="16" aria-hidden="true" />
+          {{ submitting ? 'Registering…' : matches.length ? 'Register anyway' : 'Register patient' }}
+        </button>
+      </div>
+    </form>
+  </ng-template>
+</div>

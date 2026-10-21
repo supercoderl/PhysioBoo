@@ -34,31 +34,13 @@
       <h2 id="booking-list-title" class="sr-only">Booking list</h2>
       <fieldset class="m-0 p-0 border-0 min-w-0 flex flex-wrap items-end gap-2">
         <legend class="float-left w-full mb-1 text-xs font-medium text-secondary">Booked between</legend>
-        <label class="flex flex-col min-w-0">
-          <span class="sr-only">From</span>
-          <input
-            type="date"
-            [(ngModel)]="from"
-            (ngModelChange)="onRangeChange()"
-            [max]="to || today"
-            [attr.aria-invalid]="rangeInvalid ? true : null"
-            aria-describedby="booking-range-msg"
-            class="h-9 px-2.5 rounded-lg border border-borderGray bg-surface text-sm text-regular tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 aria-[invalid=true]:border-danger"
-          />
-        </label>
+        <div class="w-40">
+          <boo-datepicker size="small" label="From" [max]="to || today" [(ngModel)]="from" (ngModelChange)="onRangeChange()" />
+        </div>
         <span class="h-9 flex items-center text-secondary text-sm" aria-hidden="true">–</span>
-        <label class="flex flex-col min-w-0">
-          <span class="sr-only">To</span>
-          <input
-            type="date"
-            [(ngModel)]="to"
-            (ngModelChange)="onRangeChange()"
-            [min]="from"
-            [attr.aria-invalid]="rangeInvalid ? true : null"
-            aria-describedby="booking-range-msg"
-            class="h-9 px-2.5 rounded-lg border border-borderGray bg-surface text-sm text-regular tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 aria-[invalid=true]:border-danger"
-          />
-        </label>
+        <div class="w-40">
+          <boo-datepicker size="small" label="To" [min]="from" [(ngModel)]="to" (ngModelChange)="onRangeChange()" />
+        </div>
         <div class="flex items-center gap-1 p-0.5 rounded-lg bg-body border border-borderGray" role="group" aria-label="Quick ranges">
           <button
             *ngFor="let p of presets"
@@ -130,7 +112,10 @@
                   <button
                     *ngIf="canConfirmIt(a)"
                     type="button"
-                    class="w-8 h-8 inline-flex items-center justify-center rounded-lg text-secondary cursor-pointer hover:bg-primarySoft hover:text-primaryDeep disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
                     [disabled]="busyIds.has(a.id)"
                     [attr.aria-label]="'Confirm booking for ' + (a.patientName || 'patient')"
                     title="Confirm"
@@ -139,18 +124,24 @@
                   <button
                     *ngIf="canCheckInIt(a)"
                     type="button"
-                    class="h-8 px-2.5 inline-flex items-center gap-1.5 rounded-lg border border-borderGray bg-surface text-xs font-semibold text-regular cursor-pointer hover:border-primary hover:text-primaryDeep disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                    [disabled]="busyIds.has(a.id)"
+                    boo-button
+                    variant="secondary"
+                    size="sm"
+                    [loading]="busyIds.has(a.id)"
                     [attr.aria-label]="'Check in ' + (a.patientName || 'patient')"
                     (click)="runAction(a, 'checkIn')"
                   >
-                    <physio-icon [name]="busyIds.has(a.id) ? 'loader-circle' : 'user-check'" [size]="14" [class.animate-spin]="busyIds.has(a.id)" />
+                    <physio-icon *ngIf="!busyIds.has(a.id)" name="user-check" [size]="14" />
                     <span class="hidden lg:inline">Check in</span>
                   </button>
                   <button
                     *ngIf="canCancelIt(a)"
                     type="button"
-                    class="w-8 h-8 inline-flex items-center justify-center rounded-lg text-secondary cursor-pointer hover:bg-rose-50 hover:text-danger disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    class="!text-danger"
                     [disabled]="busyIds.has(a.id)"
                     [attr.aria-label]="'Cancel booking for ' + (a.patientName || 'patient')"
                     title="Cancel booking"

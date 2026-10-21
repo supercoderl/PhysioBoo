@@ -1,35 +1,102 @@
-<div class="flex flex-col h-full min-h-0 p-5 gap-4">
+<div class="flex-1 flex flex-col gap-4 min-w-0 pt-3 pb-5">
+  <admin-breadcrumb />
 
-  <!-- Loading skeleton -->
-  <div *ngIf="loadingSrv.isLoading(LoadingKeys.DOCTOR_DESK.SNAPSHOT)" class="flex-1 flex items-center justify-center">
-    <div class="text-center">
-      <physio-icon name="loader" [class]="'w-8 h-8 text-primary animate-spin mx-auto mb-3'"></physio-icon>
-      <div class="text-sm text-secondary">Loading doctor desk…</div>
+  <!-- Page header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div class="min-w-0">
+      <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Doctor desk</h1>
+      <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">
+        <ng-container *ngIf="context() as ctx">
+          <span class="font-medium text-regular">{{ ctx.doctorName || 'Doctor' }}</span>
+          <ng-container *ngIf="ctx.department"><span aria-hidden="true"> · </span>{{ ctx.department }}</ng-container>
+          <ng-container *ngIf="ctx.room"><span aria-hidden="true"> · </span>Room {{ ctx.room }}</ng-container>
+          <span aria-hidden="true"> · </span>
+        </ng-container>{{ today | date: 'EEEE, d MMM y' }}
+      </p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <p *ngIf="lastUpdated" class="m-0 text-xs text-secondary tabular-nums" aria-live="polite">
+        Updated {{ lastUpdated | date: 'HH:mm' }}<span aria-hidden="true"> · </span>auto-refreshes
+      </p>
+      <button boo-button variant="secondary" size="sm" [loading]="loading" (click)="load()">
+        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      </button>
+    </div>
+  </header>
+
+  <!-- First load -->
+  <div *ngIf="!snapshot() && !loadError" class="flex flex-col gap-4" role="status" aria-busy="true" aria-label="Loading doctor desk">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div *ngFor="let n of [1, 2, 3, 4]" class="h-[68px] rounded-xl bg-surface border border-borderGray animate-pulse"></div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="lg:col-span-2 h-64 rounded-xl bg-surface border border-borderGray animate-pulse"></div>
+      <div class="h-64 rounded-xl bg-surface border border-borderGray animate-pulse"></div>
     </div>
   </div>
 
-  <ng-container *ngIf="!loadingSrv.isLoading(LoadingKeys.DOCTOR_DESK.SNAPSHOT) && context() as ctx">
-    <!-- Compact header -->
-    <desk-header [context]="ctx"></desk-header>
+  <!-- First load failed -->
+  <div *ngIf="!snapshot() && loadError" class="bg-surface border border-borderGray rounded-xl">
+    <boo-error-state
+      icon="triangle-alert"
+      [title]="errorTitle"
+      [description]="errorDescription"
+      [showRetry]="loadError === 'failed'"
+      (retry)="load()"
+    />
+  </div>
 
-    <!-- KPI strip -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-      <boo-stat-card *ngFor="let s of stats" [label]="s.label" [value]="s.value()" [icon]="s.icon"
-        [tone]="s.tone"></boo-stat-card>
+  <ng-container *ngIf="snapshot()">
+    <!-- A refresh failed while the previous visits are still on screen -->
+    <boo-inline-error *ngIf="loadError" what="the latest visits" [state]="refreshErrorState" (retry)="load()" />
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <boo-stat-card label="Waiting" icon="clock" tone="warning" [value]="waitingPatients().length" />
+      <boo-stat-card label="With you" icon="stethoscope" tone="primary" [value]="inConsultation().length" />
+      <boo-stat-card label="Completed" icon="check-circle" tone="success" [value]="completedPatients().length" />
+      <boo-stat-card label="Urgent waiting" icon="triangle-alert" tone="danger" [value]="urgentWaiting()" />
     </div>
 
-    <!-- Main content -->
-    <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <div class="lg:col-span-2 flex flex-col gap-4 min-h-0 overflow-y-auto" custom-scrollbar>
-        <current-patient-panel [patient]="currentPatient()" (action)="onCurrentPatientAction($event)"
-          (callNext)="callNextPatient()"></current-patient-panel>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start" [attr.aria-busy]="loading">
+      <div class="lg:col-span-2 flex flex-col gap-4 min-w-0">
+        <section aria-labelledby="dd-with-you-title" class="flex flex-col gap-3">
+          <h2 id="dd-with-you-title" class="m-0 text-sm font-semibold text-regular">With you</h2>
 
-        <completed-list [patients]="completedPatients()"></completed-list>
+          <consultation-panel
+            *ngFor="let p of inConsultation(); trackBy: trackById"
+            [patient]="p"
+            [canComplete]="canComplete"
+            [recordLink]="recordLink"
+            (complete)="openComplete($event)"
+          />
+
+          <div *ngIf="!inConsultation().length" class="bg-surface border border-borderGray rounded-xl">
+            <boo-empty-state
+              icon="user-round"
+              title="No patient in consultation"
+              [description]="waitingPatients().length ? (canStart ? 'Call a waiting patient to start a consultation.' : 'Patients are waiting, but your account can’t start consultations.') : 'Patients appear here once reception checks them in.'"
+            />
+          </div>
+        </section>
+
+        <completed-list [patients]="completedPatients()" />
       </div>
 
-      <div class="lg:col-span-1 min-h-0">
-        <waiting-queue-panel [patients]="waitingPatients()" (call)="callPatient($event)"></waiting-queue-panel>
-      </div>
+      <waiting-queue-panel
+        class="min-w-0"
+        [patients]="waitingPatients()"
+        [canCall]="canStart"
+        [busyAppointmentId]="startingId"
+        [callBlockedReason]="callBlockedReason"
+        (call)="callPatient($event)"
+      />
     </div>
   </ng-container>
 </div>
+
+<complete-consultation-drawer
+  [isOpen]="completeOpen"
+  [patient]="completing"
+  (close)="closeComplete()"
+  (completed)="onCompleted($event)"
+/>

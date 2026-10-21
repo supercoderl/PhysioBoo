@@ -15,6 +15,8 @@ import {
 } from '@physioboo/ui';
 import { Subject, from, interval, of } from 'rxjs';
 import { catchError, finalize, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
+import { BooDatepickerComponent } from '../../../../components/date-picker/boo-date-picker.component';
+import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
 import { AdminBreadcrumbComponent } from '../../../../components/breadcrumb/admin-breadcrumb.component';
 import { AppointmentService } from '../../../../services/admin/appointment.service';
 import { DoctorService } from '../../../../services/admin/doctor.service';
@@ -101,6 +103,8 @@ function fold(text: string | null | undefined): string {
         RouterLink,
         AdminBreadcrumbComponent,
         BooButtonComponent,
+        BooDatepickerComponent,
+        BooSelectComponent,
         BooIconComponent,
         BooStatusBadgeComponent,
         BooEmptyStateComponent,
@@ -207,6 +211,12 @@ export class AdminQueueComponent implements OnInit {
     /** Today's queue: lateness and auto-refresh apply. */
     get isLive(): boolean {
         return this.date === this.today;
+    }
+
+    /** "All doctors" first (empty id), then each doctor; the select shows the first entry while loading. */
+    get doctorOptions(): { id: string; fullName: string }[] {
+        const all = this.doctorsLoading ? 'Loading doctors…' : 'All doctors';
+        return [{ id: '', fullName: all }, ...this.doctors.map(d => ({ id: d.id, fullName: d.fullName || 'Unnamed doctor' }))];
     }
 
     get scopeLabel(): string {

@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpContext } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { AssignPatientRequest, Bed, BedHistoryEntry, CreateBedRequest, DischargeRequest, UpdateBedRequest } from "../../shared/types/bed.types";
@@ -14,12 +14,12 @@ export class BedMapService {
         return this.http.get<PagedResponse<Ward[]>>(BASE_API.BED_MAP.WARDS);
     }
 
-    snapshot() {
-        return this.http.get<PagedResponse<BedMapSnapshot>>(BASE_API.BED_MAP.SNAPSHOT);
+    snapshot(context?: HttpContext) {
+        return this.http.get<PagedResponse<BedMapSnapshot>>(BASE_API.BED_MAP.SNAPSHOT, { context });
     }
 
-    stats() {
-        return this.http.get<PagedResponse<BedMapStats>>(BASE_API.BED_MAP.STATS);
+    stats(context?: HttpContext) {
+        return this.http.get<PagedResponse<BedMapStats>>(BASE_API.BED_MAP.STATS, { context });
     }
 
     search(request: PagedRequest<BedFilter>) {
@@ -38,8 +38,8 @@ export class BedMapService {
         return this.http.post<PagedResponse<string>>(BASE_API.BED_MAP.DISCHARGE(bedId), params);
     }
 
-    history(bedId: string) {
-        return this.http.get<PagedResponse<BedHistoryEntry[]>>(BASE_API.BED_MAP.HISTORY(bedId));
+    history(bedId: string, context?: HttpContext) {
+        return this.http.get<PagedResponse<BedHistoryEntry[]>>(BASE_API.BED_MAP.HISTORY(bedId), { context });
     }
 
     // Ward and bed management (no UI yet; used to populate the map).

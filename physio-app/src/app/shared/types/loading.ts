@@ -17,15 +17,12 @@ export const LoadingKeys = {
         RESET_PASSWORD: 'user-reset-password'
     },
     PRESCRIPTION: {
-        GET_DRAFT: 'prescription-get-draft',
-        SAVE_DRAFT: 'prescription-save-draft',
+        GET: 'prescription-get',
+        LIST: 'prescription-list',
+        SAVE: 'prescription-save',
         ISSUE: 'prescription-issue',
         CANCEL: 'prescription-cancel',
-        CDS_CHECK: 'prescription-cds-check',
-        COST_ESTIMATE: 'prescription-cost-estimate',
-        RECENT: 'prescription-recent',
-        FAVORITES: 'prescription-favorites',
-        TEMPLATES: 'prescription-templates'
+        CDS_CHECK: 'prescription-cds-check'
     },
     MEDICINE: {
         SEARCH: 'medicine-search'
@@ -281,9 +278,6 @@ export const LoadingKeys = {
         HOLD: 'dispensing-hold',
         CANCEL: 'dispensing-cancel',
         COMPLETE: 'dispensing-complete'
-    },
-    DOCTOR_DESK: {
-        SNAPSHOT: 'doctor-desk-snapshot'
     },
     APPOINTMENT: {
         SEARCH: 'appointment-search',

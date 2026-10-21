@@ -7,9 +7,9 @@ import { LocalLoadingService } from "../../../../../services/common/local-loadin
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { Bed } from "../../../../../shared/types/bed.types";
-import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
+import { BooDatepickerComponent } from "../../../../date-picker/boo-date-picker.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
 
@@ -19,9 +19,9 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
     imports: [
         SharedModule,
         DrawerComponent,
-        BooInputComponent,
+        BooDatepickerComponent,
         BooTextareaComponent,
-        BooButtonAdminComponent,
+        BooButtonComponent,
         BooSelectComponent
     ],
     template: `
@@ -32,7 +32,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                         <h2 class="text-xl font-bold text-primary leading-none mb-1">Assign Patient</h2>
                         <p class="text-sm text-secondary m-0" *ngIf="bed">Bed {{ bed.number }} &middot; {{ bed.wardName }}</p>
                     </div>
-                    <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+                    <button boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Close" (click)="onClose()">
                         <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
@@ -45,17 +45,17 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                     <div class="p-6 space-y-4">
                         <boo-select label="Patient" formControlName="patientId" required
                             [options]="patientOptions" bindLabel="label" bindValue="value"></boo-select>
-                        <boo-input type="date" label="Expected Discharge Date" formControlName="expectedDischargeDate"></boo-input>
+                        <boo-datepicker label="Expected Discharge Date" formControlName="expectedDischargeDate" [disablePast]="true"></boo-datepicker>
                         <boo-textarea label="Notes" formControlName="notes" placeholder="Optional admission notes"></boo-textarea>
                     </div>
                 </div>
 
                 <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end z-20 sticky bottom-0">
                     <div class="flex gap-3">
-                        <boo-button-admin background="transparent" (click)="onClose()">Cancel</boo-button-admin>
-                        <boo-button-admin textColor="white" (click)="onAssign()" [loading]="loadingSrv.isLoading('bed-assign')">
+                        <button type="button" boo-button variant="ghost" size="sm" (click)="onClose()">Cancel</button>
+                        <button type="button" boo-button variant="primary" size="sm" (click)="onAssign()" [loading]="loadingSrv.isLoading('bed-assign')">
                             Assign Bed
-                        </boo-button-admin>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -67,7 +67,8 @@ export class BedMapAssignDrawerComponent implements OnChanges {
     @Input() isOpen = false;
     @Input() bed: Bed | null = null;
     @Output() close = new EventEmitter<void>();
-    @Output() assignSuccess = new EventEmitter<Bed>();
+    /** The patient is assigned; the bed map reloads, so no bed is passed back. */
+    @Output() assignSuccess = new EventEmitter<void>();
 
     form: FormGroup;
     patientOptions: { label: string; value: string }[] = [];
@@ -102,7 +103,7 @@ export class BedMapAssignDrawerComponent implements OnChanges {
             .subscribe(_res => {
                 if (_res.success && _res.data) {
                     this.patientOptions = _res.data.items.map(p => ({
-                        label: p.patientNumber,
+                        label: p.fullName ? `${p.fullName} (${p.patientNumber})` : p.patientNumber,
                         value: p.id
                     }));
                 }
@@ -124,13 +125,7 @@ export class BedMapAssignDrawerComponent implements OnChanges {
 
             if (response.success) {
                 this.toastSrv.success('Patient assigned to bed');
-                this.assignSuccess.emit({
-                    ...this.bed,
-                    status: 'Occupied',
-                    patientId: formData.patientId,
-                    expectedDischargeDate: formData.expectedDischargeDate,
-                    notes: formData.notes
-                });
+                this.assignSuccess.emit();
             } else {
                 this.toastSrv.error('Unable to assign patient');
             }

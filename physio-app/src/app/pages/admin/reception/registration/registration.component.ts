@@ -1,400 +1,426 @@
-import { Component, computed, inject, Signal, signal } from "@angular/core";
-import { toSignal } from "@angular/core/rxjs-interop";
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
-import { firstValueFrom } from "rxjs";
-import { LocalLoadingService } from "src/app/services/common/local-loading.service";
-import { BloodGroup } from "src/app/shared/enums/blood-group";
-import { Gender } from "src/app/shared/enums/gender";
-import { MaritalStatus } from "src/app/shared/enums/marital-status";
-import { LoadingKeys } from "src/app/shared/types/loading";
-import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
-import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
-import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
-import { PatientService } from "../../../../services/admin/patient.service";
-import { PrintService } from "../../../../services/common/print.service";
-import { randomEmail, randomPhone, randomText } from "../../../../services/common/random.service";
-import { ToastService } from "../../../../services/common/toast.service";
-import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING } from "../../../../shared/constants/error.constant";
-import { DEFAULT_DATE_OF_BIRTH, DEFAULT_DOCTOR_ID } from "../../../../shared/constants/value.constant";
-import { SharedModule } from "../../../../shared/shared-imports";
-import { CreatePatientRequest } from "../../../../shared/types/patient.types";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
+import { DatePipe, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
+import { HttpContext, HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, ElementRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { BooButtonComponent, BooIconComponent, BooInlineErrorComponent, BooInputComponent, BooSearchFieldComponent } from '@physioboo/ui';
+import { catchError, debounceTime, distinctUntilChanged, finalize, map, of, switchMap, tap } from 'rxjs';
+import { BooDatepickerComponent } from '../../../../components/date-picker/boo-date-picker.component';
+import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
+import { BooTextareaComponent } from '../../../../components/textarea/boo-textarea/boo-textarea.component';
+import { AdminBreadcrumbComponent } from '../../../../components/breadcrumb/admin-breadcrumb.component';
+import { DoctorService } from '../../../../services/admin/doctor.service';
+import { PatientService } from '../../../../services/admin/patient.service';
+import { AuthService } from '../../../../services/auth/auth.service';
+import { ToastService } from '../../../../services/common/toast.service';
+import { Permissions } from '../../../../shared/constants/permission.constant';
+import { SKIP_ERROR_TOAST } from '../../../../shared/contexts/option.context';
+import { BloodGroup } from '../../../../shared/enums/blood-group';
+import { Gender } from '../../../../shared/enums/gender';
+import { MaritalStatus } from '../../../../shared/enums/marital-status';
+import { Doctor } from '../../../../shared/types/medical-staff.types';
+import { Patient, RegisterPatientRequest } from '../../../../shared/types/patient.types';
 
-type StepId = 'personal' | 'contact' | 'medical' | 'review';
+const FIELD = 'w-full h-10 px-3 rounded-lg border border-borderGray bg-surface text-sm text-regular placeholder:text-placeholder transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary/70 disabled:bg-black/5 disabled:cursor-not-allowed aria-[invalid=true]:border-danger';
+const AREA = 'w-full px-3 py-2 rounded-lg border border-borderGray bg-surface text-sm text-regular placeholder:text-placeholder resize-y focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary/70 aria-[invalid=true]:border-danger';
 
-interface Step {
-  id: StepId;
-  label: string;
-  icon: string;
-  description: string;
-  fields: string[];
+const DOCTOR_LOOKUP_SIZE = 200;
+const MATCH_RESULTS = 6;
+const MIN_QUERY = 2;
+const MIN_DOB = '1900-01-01';
+
+/** Same pattern the server applies to phone numbers (CreatePatientCommandValidation). */
+const PHONE_PATTERN = /^\+?[0-9][0-9\s\-().]{5,19}$/;
+
+const GENDERS = [
+    { value: Gender.Male, label: 'Male' },
+    { value: Gender.Female, label: 'Female' },
+    { value: Gender.Other, label: 'Other' },
+    { value: Gender.PreferNotToSay, label: 'Prefer not to say' },
+];
+
+const BLOOD_GROUPS = [
+    { value: BloodGroup.A_Positive, label: 'A+' },
+    { value: BloodGroup.A_Negative, label: 'A−' },
+    { value: BloodGroup.B_Positive, label: 'B+' },
+    { value: BloodGroup.B_Negative, label: 'B−' },
+    { value: BloodGroup.AB_Positive, label: 'AB+' },
+    { value: BloodGroup.AB_Negative, label: 'AB−' },
+    { value: BloodGroup.O_Positive, label: 'O+' },
+    { value: BloodGroup.O_Negative, label: 'O−' },
+];
+
+const MARITAL_STATUSES = [
+    { value: MaritalStatus.Single, label: 'Single' },
+    { value: MaritalStatus.Married, label: 'Married' },
+    { value: MaritalStatus.Divorced, label: 'Divorced' },
+    { value: MaritalStatus.Widowed, label: 'Widowed' },
+];
+
+type MatchKind = 'search' | 'submit';
+
+interface Registered {
+    id: string;
+    name: string;
+    patientNumber: string | null;
 }
 
+function validDob(control: AbstractControl<string>): ValidationErrors | null {
+    const v = control.value;
+    if (!v) return null;
+    if (v < MIN_DOB || v > new Date().toISOString().slice(0, 10)) return { dobRange: true };
+    return null;
+}
+
+/**
+ * Reception patient registration (POST /api/patients). The page first lets staff look for an existing patient
+ * (POST /api/patients/search). The server has no duplicate rule of its own, so on submit the page searches the
+ * entered phone number and, when someone matches, asks staff to confirm before creating another record.
+ * Failures are reported by the global HTTP error toast and the form keeps what was entered.
+ */
 @Component({
-  selector: 'admin-registration',
-  standalone: true,
-  imports: [
-    SharedModule,
-    ReactiveFormsModule,
-    AdminContentHeaderComponent,
-    BooInputComponent,
-    BooDatepickerComponent,
-    BooSelectComponent,
-    BooButtonAdminComponent,
-    BooTextareaComponent,
-    BooCheckboxComponent
-  ],
-  host: { class: 'block h-full min-h-0' },
-  templateUrl: './registration.component.html'
+    selector: 'admin-registration',
+    standalone: true,
+    imports: [
+        NgIf,
+        NgFor,
+        NgTemplateOutlet,
+        DatePipe,
+        ReactiveFormsModule,
+        RouterLink,
+        AdminBreadcrumbComponent,
+        BooButtonComponent,
+        BooIconComponent,
+        BooInlineErrorComponent,
+        BooInputComponent,
+        BooSearchFieldComponent,
+        BooSelectComponent,
+        BooDatepickerComponent,
+        BooTextareaComponent,
+    ],
+    templateUrl: './registration.component.html',
+    host: { class: 'flex flex-col min-h-full' },
 })
-export class AdminRegistrationComponent {
-  // #region Inject Services
-  loadingSrv = inject(LocalLoadingService);
-  fb = inject(FormBuilder);
-  router = inject(Router);
-  toastSrv = inject(ToastService);
-  printSrv = inject(PrintService);
-  patientSrv = inject(PatientService);
-  // #endregion
+export class AdminRegistrationComponent implements OnInit {
+    // #region Inject Services
+    private readonly fb = inject(FormBuilder);
+    private readonly patientSrv = inject(PatientService);
+    private readonly doctorSrv = inject(DoctorService);
+    private readonly authSrv = inject(AuthService);
+    private readonly toastSrv = inject(ToastService);
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+    // #endregion
 
-  // #Inputs, Outputs, Properties
-  LoadingKeys = LoadingKeys;
-  form: FormGroup;
-  formValue: Signal<any>;
+    // #region Inputs, Outputs, Properties
+    readonly field = FIELD;
+    readonly area = AREA;
+    readonly genders = GENDERS;
+    readonly bloodGroups = BLOOD_GROUPS;
+    readonly maritalStatuses = MARITAL_STATUSES;
+    readonly minDob = MIN_DOB;
+    readonly today = new Date().toISOString().slice(0, 10);
 
-  steps: Step[] = [
-    {
-      id: 'personal', label: 'Personal', icon: 'user', description: 'Name, DOB, gender',
-      fields: ['firstName', 'lastName', 'dateOfBirth', 'gender']
-    },
-    {
-      id: 'contact', label: 'Contact', icon: 'email', description: 'Email, phone, address',
-      fields: ['email', 'phone', 'emergencyContactName', 'emergencyContactPhone', 'address', 'city', 'postalCode']
-    },
-    {
-      id: 'medical', label: 'Medical', icon: 'stethoscope', description: 'History, insurance, primary doctor',
-      fields: ['primaryDoctorId']
-    },
-    {
-      id: 'review', label: 'Review', icon: 'circle-check', description: 'Confirm & register',
-      fields: ['agreeToTerms']
-    }
-  ];
-
-  incomeRangeOptions = [
-    { label: 'Under $10,000', value: 'under-10k' },
-    { label: '$10,000 - $30,000', value: '10k-30k' },
-    { label: '$30,000 - $60,000', value: '30k-60k' },
-    { label: '$60,000 - $100,000', value: '60k-100k' },
-    { label: 'Over $100,000', value: 'over-100k' },
-    { label: 'Prefer not to say', value: 'undisclosed' },
-  ];
-
-  appointmentTimeOptions = [
-    { label: 'Morning (8:00-12:00)', value: 'morning' },
-    { label: 'Afternoon (12:00-17:00)', value: 'afternoon' },
-    { label: 'Evening (17:00-20:00)', value: 'evening' },
-    { label: 'Any time', value: 'any' },
-  ];
-
-  communicationOptions = [
-    { label: 'Email', value: 'email' },
-    { label: 'SMS', value: 'sms' },
-    { label: 'Phone call', value: 'phone' },
-    { label: 'In-app', value: 'in-app' },
-  ];
-
-  currentStepIdx = signal(0);
-  registeredPatientId = signal<string | null>(null);
-  registeredPatientNumber = signal<string | null>(null);
-
-  genderOptions = Object.keys(Gender).filter(key => isNaN(Number(key))).map(key => ({
-    label: key,
-    value: Gender[key as keyof typeof Gender]
-  }));
-
-  bloodGroupOptions = Object.keys(BloodGroup).filter(key => isNaN(Number(key))).map(key => ({
-    label: key,
-    value: BloodGroup[key as keyof typeof BloodGroup]
-  }));;
-  maritalOptions = Object.keys(MaritalStatus).filter(key => isNaN(Number(key))).map(key => ({
-    label: key,
-    value: MaritalStatus[key as keyof typeof MaritalStatus]
-  }));;
-
-  currentStep = computed(() => this.steps[this.currentStepIdx()]);
-  progress = computed(() => ((this.currentStepIdx() + 1) / this.steps.length) * 100);
-  fullName = computed(() => {
-    const v = this.formValue();
-    return [v.firstName, v.lastName].filter(Boolean).join(' ') || '—';
-  });
-  initials = computed(() => {
-    const v = this.formValue();
-    const a = (v.firstName || '').trim().charAt(0).toUpperCase();
-    const b = (v.lastName || '').trim().charAt(0).toUpperCase();
-    return (a + b) || '?';
-  });
-  ageFromDob = computed(() => {
-    const dob = this.formValue().dateOfBirth;
-    if (!dob) return null;
-    const d = new Date(dob);
-    if (isNaN(d.getTime())) return null;
-    const now = new Date();
-    let age = now.getFullYear() - d.getFullYear();
-    const m = now.getMonth() - d.getMonth();
-    if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
-    return age >= 0 && age < 150 ? age : null;
-  });
-
-  isStepValid = (idx: number): boolean => {
-    return this.steps[idx].fields.every(name => this.form.get(name)?.valid);
-  };
-
-  isFieldInvalid(name: string): boolean {
-    const c = this.form.get(name);
-    return !!(c && c.invalid && (c.dirty || c.touched));
-  }
-  // #endregion
-
-  // #region Init (Lifecycle + Setups)
-  constructor() {
-    this.form = this.fb.group({
-      // Personal
-      firstName: this.fb.nonNullable.control(randomText(6), Validators.required),
-      lastName: this.fb.nonNullable.control(randomText(6), Validators.required),
-      dateOfBirth: this.fb.nonNullable.control<string | null>(DEFAULT_DATE_OF_BIRTH, Validators.required),
-      gender: this.fb.nonNullable.control(Gender.Male, Validators.required),
-      bloodGroup: this.fb.nonNullable.control(BloodGroup.A_Positive),
-      maritalStatus: this.fb.nonNullable.control(MaritalStatus.Single),
-
-      // Contact
-      email: this.fb.nonNullable.control(randomEmail(), [Validators.required, Validators.email]),
-      phone: this.fb.nonNullable.control(randomPhone(), [Validators.required, Validators.pattern(/^[+\d][\d\s().-]{6,}$/)]),
-      emergencyContactName: this.fb.nonNullable.control(randomText(8), Validators.required),
-      emergencyContactPhone: this.fb.nonNullable.control(randomPhone(), [Validators.required, Validators.pattern(/^[+\d][\d\s().-]{6,}$/)]),
-      address: this.fb.nonNullable.control(randomText(15), Validators.required),
-      city: this.fb.nonNullable.control(randomText(6), Validators.required),
-      postalCode: this.fb.nonNullable.control(randomText(6), Validators.required),
-
-      // Medical narratives
-      allergyInformation: this.fb.nonNullable.control(''),
-      medicalHistory: this.fb.nonNullable.control(''),
-      familyHistory: this.fb.nonNullable.control(''),
-      surgicalHistory: this.fb.nonNullable.control(''),
-      currentMedications: this.fb.nonNullable.control(''),
-      lifestyleNotes: this.fb.nonNullable.control(''),
-
-      // Patient profile (server DTO fields)
-      primaryDoctorId: this.fb.control<string | null>(DEFAULT_DOCTOR_ID, Validators.required),
-      referredBy: this.fb.control<string | null>(null),
-      referralHospitalId: this.fb.control<string | null>(null),
-
-      // Insurance (note server typo: "Inssurance")
-      insuranceProvider: this.fb.nonNullable.control(''),
-      insurancePolicyNumber: this.fb.nonNullable.control(''),
-      insuranceExpiryDate: this.fb.control<string | null>(null),
-      insuranceCoverageAmount: this.fb.control<number | null>(null),
-
-      // Demographics & preferences
-      occupation: this.fb.nonNullable.control(''),
-      annualIncomeRange: this.fb.nonNullable.control(''),
-      preferredHospitalId: this.fb.control<string | null>(null),
-      preferredDoctorId: this.fb.control<string | null>(null),
-      preferredAppointmentTime: this.fb.nonNullable.control(''),
-      communicationPreferences: this.fb.nonNullable.control(''),
-
-      // Terms (review step)
-      agreeToTerms: this.fb.nonNullable.control(false, Validators.requiredTrue),
+    readonly form = this.fb.nonNullable.group({
+        firstName: ['', [Validators.required, Validators.maxLength(100)]],
+        lastName: ['', [Validators.required, Validators.maxLength(100)]],
+        dateOfBirth: ['', [Validators.required, validDob]],
+        gender: this.fb.control<Gender | null>(null, Validators.required),
+        bloodGroup: this.fb.control<BloodGroup | null>(null, Validators.required),
+        maritalStatus: this.fb.control<MaritalStatus | null>(null, Validators.required),
+        email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
+        phone: ['', [Validators.required, Validators.maxLength(20), Validators.pattern(PHONE_PATTERN)]],
+        emergencyContactName: ['', Validators.maxLength(255)],
+        emergencyContactPhone: ['', [Validators.maxLength(20), Validators.pattern(PHONE_PATTERN)]],
+        primaryDoctorId: ['', Validators.required],
+        occupation: ['', Validators.maxLength(255)],
+        insuranceProvider: ['', Validators.maxLength(255)],
+        insurancePolicyNumber: ['', Validators.maxLength(100)],
+        insuranceExpiryDate: [''],
+        insuranceCoverageAmount: ['', Validators.min(0)],
+        allergyInformation: [''],
+        medicalHistory: [''],
+        familyHistory: [''],
+        surgicalHistory: [''],
+        currentMedications: [''],
+        lifestyleNotes: [''],
     });
 
-    this.formValue = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
-  }
+    // Existing-patient lookup (top of the page)
+    readonly searchQuery = this.fb.nonNullable.control('');
+    searchResults: Patient[] = [];
+    searching = false;
+    searchedTerm = '';
+    searchError: string | null = null;
 
-  // #endregion
+    // Possible duplicates found when submitting; the next submit is the staff's confirmation.
+    matches: Patient[] = [];
+    matchesConfirmed = false;
 
-  // #region Navigation
-  goTo(idx: number): void {
-    if (idx < this.currentStepIdx()) {
-      this.currentStepIdx.set(idx);
-      return;
+    doctors: Doctor[] = [];
+    doctorsLoading = false;
+    doctorsError: string | null = null;
+
+    submitting = false;
+    registered: Registered | null = null;
+
+    canReadPatients = false;
+    canBook = false;
+
+    private readonly silent = new HttpContext().set(SKIP_ERROR_TOAST, true);
+    // #endregion
+
+    // #region Init (Lifecycle + Setup)
+    ngOnInit(): void {
+        this.authSrv.permissions$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(perms => {
+                this.canReadPatients = (perms ?? []).includes(Permissions.Reception.PatientRead);
+                this.canBook = (perms ?? []).includes(Permissions.Reception.BookingRead);
+            });
+
+        this.watchSearch();
+        this.loadDoctors();
+
+        // An edit to the phone number invalidates a confirmation given for the previous one.
+        this.form.controls.phone.valueChanges
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => this.clearMatches());
     }
-    for (let i = this.currentStepIdx(); i < idx; i++) {
-      if (!this.isStepValid(i)) {
-        this.markStepTouched(i);
-        this.currentStepIdx.set(i);
-        this.toastSrv.error('Please complete the current step first');
-        return;
-      }
-    }
-    this.currentStepIdx.set(idx);
-  }
+    // #endregion
 
-  next(): void {
-    const idx = this.currentStepIdx();
-    if (!this.isStepValid(idx)) {
-      this.markStepTouched(idx);
-      this.toastSrv.error('Please complete all required fields');
-      return;
-    }
-    if (idx < this.steps.length - 1) this.currentStepIdx.set(idx + 1);
-  }
-
-  prev(): void {
-    if (this.currentStepIdx() > 0) this.currentStepIdx.set(this.currentStepIdx() - 1);
-  }
-
-  private markStepTouched(idx: number): void {
-    for (const f of this.steps[idx].fields) {
-      this.form.get(f)?.markAsTouched();
-    }
-  }
-  // #endregion
-
-  // #region Submit
-  async onSubmit(): Promise<void> {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      this.toastSrv.error('Please complete all required fields');
-      const firstInvalidStep = this.steps.findIndex((_, i) => !this.isStepValid(i));
-      if (firstInvalidStep >= 0) this.currentStepIdx.set(firstInvalidStep);
-      return;
+    // #region Getters
+    get selectedDoctorName(): string {
+        return this.doctors.find(d => d.id === this.form.controls.primaryDoctorId.value)?.fullName ?? '';
     }
 
-    try {
-      const createRes = await firstValueFrom(this.patientSrv.create(this.buildRequestBody()));
-      if (!createRes?.success || !createRes.data) {
-        this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-        return;
-      }
-      const patientId = createRes.data;
-      const detailRes = await firstValueFrom(
-        this.patientSrv.search_by_id(patientId)
-      );
-      const patientNumber = detailRes?.data?.patientNumber ?? patientId;
-      this.registeredPatientId.set(patientId);
-      this.registeredPatientNumber.set(patientNumber);
-      this.toastSrv.success(`Patient ${this.fullName()} registered — ${patientNumber}`);
-    } catch {
-      this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+    get noDoctors(): boolean {
+        return !this.doctorsLoading && !this.doctorsError && this.doctors.length === 0;
     }
-  }
 
-  private buildRequestBody(): CreatePatientRequest {
-    const v = this.formValue();
-    return ({
-      profile: {
-        firstName: v.firstName,
-        lastName: v.lastName,
-        dateOfBirth: v.dateOfBirth,
-        gender: v.gender,
-        bloodGroup: v.bloodGroup,
-        maritalStatus: v.maritalStatus,
-        email: v.email,
-        phone: v.phone,
-        emergencyContactName: v.emergencyContactName,
-        emergencyContactPhone: v.emergencyContactPhone,
-        address: v.address,
-        city: v.city,
-        postalCode: v.postalCode,
-      },
-      primaryDoctorId: v.primaryDoctorId,
-      referredBy: v.referredBy || null,
-      referralHospitalId: v.referralHospitalId || null,
-      inssuranceProvider: this.nullIfBlank(v.insuranceProvider),
-      inssurancePolicyNumber: this.nullIfBlank(v.insurancePolicyNumber),
-      inssuranceExpiryDate: v.insuranceExpiryDate || null,
-      inssuranceCoverageAmount: v.insuranceCoverageAmount ?? null,
-      medicalHistory: this.nullIfBlank(v.medicalHistory),
-      familyHistory: this.nullIfBlank(v.familyHistory),
-      surgicalHistory: this.nullIfBlank(v.surgicalHistory),
-      allergyInformation: this.nullIfBlank(v.allergyInformation),
-      currentMedications: this.nullIfBlank(v.currentMedications),
-      lifestyleNotes: this.nullIfBlank(v.lifestyleNotes),
-      occupation: this.nullIfBlank(v.occupation),
-      annualIncomeRange: this.nullIfBlank(v.annualIncomeRange),
-      preferredHospitalId: v.preferredHospitalId || null,
-      preferredDoctorId: v.preferredDoctorId || null,
-      preferredAppointmentTime: this.nullIfBlank(v.preferredAppointmentTime),
-      communicationPreferences: this.nullIfBlank(v.communicationPreferences),
-    } as unknown as CreatePatientRequest);
-  }
-
-  private nullIfBlank(s: string | null | undefined): string | null {
-    return s && s.trim() ? s : null;
-  }
-
-  resetForm(): void {
-    if (!confirm('Discard all entered information?')) return;
-    this.form.reset({
-      firstName: '', lastName: '', dateOfBirth: null,
-      gender: '', bloodGroup: '', maritalStatus: '',
-      email: '', phone: '',
-      emergencyContactName: '', emergencyContactPhone: '',
-      address: '', city: '', postalCode: '',
-      allergyInformation: '', medicalHistory: '', familyHistory: '',
-      surgicalHistory: '', currentMedications: '', lifestyleNotes: '',
-      primaryDoctorId: null, referredBy: null, referralHospitalId: null,
-      insuranceProvider: '', insurancePolicyNumber: '',
-      insuranceExpiryDate: null, insuranceCoverageAmount: null,
-      occupation: '', annualIncomeRange: '',
-      preferredHospitalId: null, preferredDoctorId: null,
-      preferredAppointmentTime: '', communicationPreferences: '',
-      agreeToTerms: false,
-    });
-    this.currentStepIdx.set(0);
-    this.registeredPatientId.set(null);
-  }
-
-  registerAnother(): void {
-    this.resetForm();
-  }
-
-  goToPatient(): void {
-    const id = this.registeredPatientId();
-    if (id) this.router.navigate(['/admin/crm/patient', id]);
-  }
-
-  printIntakeForm(): void {
-    const id = this.registeredPatientId();
-    if (id) {
-      const v = this.form.getRawValue();
-      this.printSrv.print('clinical.intake.standard', {
-        patient: {
-          id,
-          name: this.fullName(),
-          age: this.ageFromDob(),
-          gender: v.gender,
-          bloodType: v.bloodGroup,
-          phone: v.phone,
-          address: v.address
-        },
-        contact: {
-          email: v.email,
-          emergencyName: v.emergencyContactName,
-          emergencyPhone: v.emergencyContactPhone
-        },
-        medical: {
-          allergies: v.allergies,
-          history: v.medicalHistory,
-          medications: v.currentMedications
-        },
-        insurance: {
-          provider: v.insuranceProvider,
-          policyNumber: v.policyNumber
-        },
-        documentNumber: id,
-        date: new Date().toLocaleDateString()
-      }).catch(() => this.toastSrv.error('Printing failed — template may not exist yet'));
+    get searchHint(): string {
+        const q = this.searchQuery.value.trim();
+        if (q.length < MIN_QUERY) return `Type at least ${MIN_QUERY} characters to search.`;
+        return '';
     }
-  }
-  // #endregion
 
-  // #region Helpers for template
-  ctrl(name: string): AbstractControl | null {
-    return this.form.get(name);
-  }
-  // #endregion
+    get searchedNothing(): boolean {
+        return !this.searching && !this.searchError && !!this.searchedTerm && this.searchResults.length === 0;
+    }
+
+    age(): number | null {
+        const dob = this.form.controls.dateOfBirth.value;
+        if (!dob || this.form.controls.dateOfBirth.invalid) return null;
+        const d = new Date(dob);
+        const now = new Date();
+        let age = now.getFullYear() - d.getFullYear();
+        if (now.getMonth() < d.getMonth() || (now.getMonth() === d.getMonth() && now.getDate() < d.getDate())) age--;
+        return age >= 0 ? age : null;
+    }
+    // #endregion
+
+    // #region Validation state
+    showError(name: keyof AdminRegistrationComponent['form']['controls']): boolean {
+        const c = this.form.controls[name];
+        return c.invalid && (c.touched || c.dirty);
+    }
+    // #endregion
+
+    // #region Existing patient lookup
+    private watchSearch(): void {
+        this.searchQuery.valueChanges.pipe(
+            map(v => v.trim()),
+            debounceTime(300),
+            distinctUntilChanged(),
+            tap(() => this.searchError = null),
+            // switchMap drops the response of a term the user has already typed past.
+            switchMap(term => {
+                if (term.length < MIN_QUERY) {
+                    this.searching = false;
+                    this.searchedTerm = '';
+                    return of<Patient[]>([]);
+                }
+                this.searching = true;
+                return this.findPatients(term, 'search').pipe(
+                    tap(() => this.searchedTerm = term),
+                    finalize(() => this.searching = false),
+                );
+            }),
+            takeUntilDestroyed(this.destroyRef),
+        ).subscribe(items => this.searchResults = items);
+    }
+
+    private findPatients(term: string, kind: MatchKind) {
+        return this.patientSrv.search({
+            pageNumber: 1,
+            pageSize: MATCH_RESULTS,
+            search: term,
+            filter: { start: '', end: '', patientType: null, riskLevel: null, isVip: null, isChronicPatient: null },
+        }).pipe(
+            map(res => res?.success ? res.data?.items ?? [] : []),
+            catchError((err: HttpErrorResponse) => {
+                if (kind === 'search') {
+                    this.searchError = err?.status === 403 ? "You don't have access to patient records." : 'Patient search failed. Try again.';
+                }
+                return of<Patient[]>([]);
+            }),
+        );
+    }
+
+    clearSearch(): void {
+        this.searchQuery.setValue('');
+    }
+
+    retrySearch(): void {
+        const q = this.searchQuery.value;
+        this.searchQuery.setValue('');
+        this.searchQuery.setValue(q);
+    }
+    // #endregion
+
+    // #region Lookups
+    loadDoctors(): void {
+        this.doctorsLoading = true;
+        this.doctorsError = null;
+        this.doctorSrv.search({ pageNumber: 1, pageSize: DOCTOR_LOOKUP_SIZE, filter: { start: '', end: '' } })
+            .pipe(finalize(() => this.doctorsLoading = false), takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: res => {
+                    if (!res?.success) {
+                        this.doctorsError = "Couldn't load doctors.";
+                        return;
+                    }
+                    this.doctors = (res.data?.items ?? []).slice().sort((a, b) => (a.fullName ?? '').localeCompare(b.fullName ?? ''));
+                },
+                error: (err: HttpErrorResponse) => this.doctorsError = err?.status === 403 ? "You don't have access to the doctor list." : "Couldn't load doctors.",
+            });
+    }
+    // #endregion
+
+    // #region Submit
+    submit(): void {
+        if (this.submitting) return;
+        this.form.markAllAsTouched();
+        if (this.form.invalid) {
+            setTimeout(() => this.host.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+            return;
+        }
+
+        if (this.matchesConfirmed) {
+            this.create();
+            return;
+        }
+
+        // Look for someone already registered with this phone number before creating another record.
+        this.submitting = true;
+        this.findPatients(this.form.controls.phone.value.trim(), 'submit')
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(found => {
+                if (found.length) {
+                    this.matches = found;
+                    this.matchesConfirmed = true;
+                    this.submitting = false;
+                    setTimeout(() => this.host.querySelector<HTMLElement>('#reg-matches')?.focus());
+                    return;
+                }
+                this.create();
+            });
+    }
+
+    private create(): void {
+        const request = this.buildRequest();
+        this.submitting = true;
+        this.patientSrv.create(request)
+            .pipe(finalize(() => this.submitting = false), takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: res => {
+                    if (!res?.success || !res.data) return;
+                    const name = `${request.profile.firstName} ${request.profile.lastName}`;
+                    this.registered = { id: res.data, name, patientNumber: null };
+                    this.toastSrv.success(`${name} is registered.`);
+                    this.loadPatientNumber(res.data);
+                    setTimeout(() => this.host.querySelector<HTMLElement>('#reg-done')?.focus());
+                },
+                // The global HTTP error toast reports the failure; the form keeps what was entered.
+                error: () => undefined,
+            });
+    }
+
+    /** The create response only returns the new id, so read the generated patient number back. */
+    private loadPatientNumber(id: string): void {
+        this.patientSrv.search_by_id(id, this.silent)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: res => {
+                    if (this.registered?.id === id) this.registered = { ...this.registered, patientNumber: res?.data?.patientNumber ?? null };
+                },
+                error: () => undefined,
+            });
+    }
+
+    private buildRequest(): RegisterPatientRequest {
+        const v = this.form.getRawValue();
+        return {
+            profile: {
+                firstName: v.firstName.trim(),
+                lastName: v.lastName.trim(),
+                dateOfBirth: v.dateOfBirth,
+                gender: v.gender!,
+                bloodGroup: v.bloodGroup!,
+                maritalStatus: v.maritalStatus!,
+                email: v.email.trim(),
+                phone: v.phone.trim(),
+                emergencyContactName: this.text(v.emergencyContactName),
+                emergencyContactPhone: this.text(v.emergencyContactPhone),
+                // The server accepts these but does not store them yet, so the form does not collect them.
+                address: null,
+                city: null,
+                postalCode: null,
+            },
+            primaryDoctorId: v.primaryDoctorId,
+            referredBy: null,
+            referralHospitalId: null,
+            inssuranceProvider: this.text(v.insuranceProvider),
+            inssurancePolicyNumber: this.text(v.insurancePolicyNumber),
+            inssuranceExpiryDate: v.insuranceExpiryDate || null,
+            inssuranceCoverageAmount: v.insuranceCoverageAmount === '' || v.insuranceCoverageAmount == null ? null : Number(v.insuranceCoverageAmount),
+            medicalHistory: this.text(v.medicalHistory),
+            familyHistory: this.text(v.familyHistory),
+            surgicalHistory: this.text(v.surgicalHistory),
+            allergyInformation: this.text(v.allergyInformation),
+            currentMedications: this.text(v.currentMedications),
+            lifestyleNotes: this.text(v.lifestyleNotes),
+            occupation: this.text(v.occupation),
+            annualIncomeRange: null,
+            preferredHospitalId: null,
+            preferredDoctorId: null,
+            preferredAppointmentTime: null,
+            communicationPreferences: null,
+        };
+    }
+
+    private text(s: string): string | null {
+        return s.trim() || null;
+    }
+
+    clearMatches(): void {
+        this.matches = [];
+        this.matchesConfirmed = false;
+    }
+    // #endregion
+
+    // #region Actions
+    registerAnother(): void {
+        this.registered = null;
+        this.clearMatches();
+        this.form.reset();
+        this.searchQuery.setValue('');
+        setTimeout(() => this.host.querySelector<HTMLElement>('#reg-first-name')?.focus());
+    }
+
+    trackById(_: number, item: { id: string }): string {
+        return item.id;
+    }
+    // #endregion
 }

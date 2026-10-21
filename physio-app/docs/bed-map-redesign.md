@@ -84,3 +84,14 @@ All responses are wrapped in `ResponseMessage<T>`. Enums are strings.
 JSON shapes: `shared/types/bed.types.ts`, `ward.types.ts`.
 
 Error codes: `BED_NOT_AVAILABLE`, `BED_NOT_OCCUPIED`, `BED_OCCUPIED`, `BED_PATIENT_ALREADY_ASSIGNED`, `BED_DUPLICATE_NUMBER`, `WARD_HAS_BEDS`, `WARD_DUPLICATE_CODE`, `OBJECT_NOT_FOUND`.
+
+# Implementation notes (bed map page)
+
+`pages/admin/inpatient/bed-map/`: `bed-map.component` (page), `bed-detail-drawer.component` (bed detail, stay history, assign / discharge), `bed-map.utils.ts` (status tones, room grouping).
+
+- Data: `GET /snapshot` and `GET /stats` (stats failing alone leaves the counts blank, never derived). The snapshot is the single source for beds; assign and discharge refetch instead of patching local state.
+- Status tiles are the status filter; ward, floor and bed-type are `boo-select`; search is `boo-search-field` (bed, room, patient name or number); active filters show as `boo-filter-chips`. All filtering is client-side on the snapshot.
+- Beds are grouped ward → room (natural sort); beds without a room number share one group.
+- States: skeleton, `boo-error-state` (failed, with retry), `boo-error-state` without retry (403), `boo-inline-error` (refresh failed over a loaded map), `boo-empty-state` (no wards / no filter match).
+- Permissions: assign and discharge need `inpatient:bed:assign`; "Wards & beds" needs `inpatient:bed:manage`; the nursing-record link needs `inpatient:nursing:read`.
+- Not supported by the backend, so not in the UI: transferring a patient between beds, a deep link to a single admission, bed-type / room filters on the server.

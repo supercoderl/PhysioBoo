@@ -1,457 +1,340 @@
-import { Component, OnInit } from "@angular/core";
-import { finalize, firstValueFrom, forkJoin } from "rxjs";
-import { BedMapAssignDrawerComponent } from "../../../../components/layout/admin/inpatient/bed-map/bed-assign-drawer.component";
-import { BedMapManageDrawerComponent } from "../../../../components/layout/admin/inpatient/bed-map/bed-manage-drawer.component";
-import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
-import { BedMapService } from "../../../../services/admin/bed-map.service";
-import { LocalLoadingService } from "../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../services/common/toast.service";
-import { SharedModule } from "../../../../shared/shared-imports";
-import { Bed, BedHistoryEntry, BedStatus } from "../../../../shared/types/bed.types";
-import { BedFilter } from "../../../../shared/types/filter.types";
-import { BedMapStats, Ward } from "../../../../shared/types/ward.types";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
+import { DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { HttpContext, HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import {
+    BooButtonComponent,
+    BooEmptyStateComponent,
+    BooErrorStateComponent,
+    BooFilterChip,
+    BooFilterChipsComponent,
+    BooIconComponent,
+    BooInlineErrorComponent,
+    BooInlineErrorState,
+    BooSearchFieldComponent,
+    BooStatusBadgeComponent,
+} from '@physioboo/ui';
+import { catchError, finalize, forkJoin, map, of } from 'rxjs';
+import { AdminBreadcrumbComponent } from '../../../../components/breadcrumb/admin-breadcrumb.component';
+import { BedMapAssignDrawerComponent } from '../../../../components/layout/admin/inpatient/bed-map/bed-assign-drawer.component';
+import { BedMapManageDrawerComponent } from '../../../../components/layout/admin/inpatient/bed-map/bed-manage-drawer.component';
+import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
+import { BedMapService } from '../../../../services/admin/bed-map.service';
+import { AuthService } from '../../../../services/auth/auth.service';
+import { DialogService } from '../../../../services/common/dialog.service';
+import { ToastService } from '../../../../services/common/toast.service';
+import { Permissions } from '../../../../shared/constants/permission.constant';
+import { SKIP_ERROR_TOAST } from '../../../../shared/contexts/option.context';
+import { Bed, BedStatus } from '../../../../shared/types/bed.types';
+import { BedMapSnapshot, BedMapStats, Ward } from '../../../../shared/types/ward.types';
+import { BedDetailDrawerComponent } from './bed-detail-drawer.component';
+import { WardGroup, bedStatus, groupByRoom, wardOccupancy } from './bed-map.utils';
+
+type LoadError = 'forbidden' | 'failed';
+type SnapshotResult = { snapshot: BedMapSnapshot } | { status: number };
+type FilterKey = 'search' | 'ward' | 'floor' | 'bedType' | 'status';
+
+interface FilterChip extends BooFilterChip {
+    key: FilterKey;
+}
+
+interface StatusTile {
+    key: BedStatus | null;
+    label: string;
+    count: number | null;
+}
+
+/** "All" entry of a select; the select binds a null value to it. */
+const ALL = null;
 
 @Component({
-  selector: 'admin-bed-map',
-  standalone: true,
-  imports: [
-    SharedModule,
-
-    BooSelectComponent,
-    BedMapAssignDrawerComponent,
-    BedMapManageDrawerComponent,
-    BooButtonAdminComponent,
-    ButtonIconComponent
-  ],
-  template: `
-        <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-7xl mx-auto">
-        <!-- Header Section -->
-        <div class="mb-6 flex items-center justify-between">
-          <div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Bed Management System</h2>
-            <p class="text-gray-600">Real-time bed occupancy and availability</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button-icon [icon]="{ name: 'settings-2', size: 16 }" (onClick)="manageOpen = true"> Wards & beds </button-icon>
-            <button-icon [icon]="{ name: 'refresh', size: 16 }" [loading]="loadingSrv.isLoading('bed-map-snapshot')" [disabled]="loadingSrv.isLoading('bed-map-snapshot')" (onClick)="refresh()">
-              Refresh
-            </button-icon>
-          </div>
-        </div>
-        <bed-map-manage-drawer [isOpen]="manageOpen" (close)="manageOpen = false" (changed)="refresh()" />
-
-        <!-- Error State -->
-        <div *ngIf="hasError && !loadingSrv.isLoading('bed-map-snapshot')" class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <physio-icon name="warning-circle" [size]="20" class="text-red-500"></physio-icon>
-            <span class="text-red-700 text-sm">Unable to load the bed map. Please try again.</span>
-          </div>
-          <boo-button-admin (click)="refresh()" background="#DC2626" textColor="white" [fontSize]="14" [radius]="8">Retry</boo-button-admin>
-        </div>
-
-        <!-- Loading State (initial) -->
-        <div *ngIf="loadingSrv.isLoading('bed-map-snapshot') && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3">
-          <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
-          <span class="text-gray-500 text-sm">Loading bed map...</span>
-        </div>
-
-        <ng-container *ngIf="!hasError && hasLoadedOnce">
-          <!-- Statistics Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="bg-surface rounded-lg shadow-md p-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-sm text-gray-600 mb-1">Total Beds</p>
-                  <p class="text-3xl font-bold text-gray-800">{{ stats?.totalBeds ?? 0 }}</p>
-                </div>
-                <div class="w-12 h-12 bg-primarySoft rounded-full flex items-center justify-center">
-                  <physio-icon name="bed" [size]="24" class="text-primary"></physio-icon>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-surface rounded-lg shadow-md p-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-sm text-gray-600 mb-1">Available</p>
-                  <p class="text-3xl font-bold text-green-600">{{ stats?.availableBeds ?? 0 }}</p>
-                </div>
-                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <physio-icon name="check-circle" [size]="24" class="text-green-600"></physio-icon>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-surface rounded-lg shadow-md p-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-sm text-gray-600 mb-1">Occupied</p>
-                  <p class="text-3xl font-bold text-red-600">{{ stats?.occupiedBeds ?? 0 }}</p>
-                </div>
-                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                  <physio-icon name="user" [size]="24" class="text-red-600"></physio-icon>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-surface rounded-lg shadow-md p-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-sm text-gray-600 mb-1">Occupancy Rate</p>
-                  <p class="text-3xl font-bold text-purple-600">{{ stats?.occupancyRate ?? 0 }}%</p>
-                </div>
-                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                  <physio-icon name="activity" [size]="24" class="text-purple-600"></physio-icon>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Filters -->
-          <div class="bg-surface rounded-lg shadow-md p-4 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <boo-select label="Ward" [(ngModel)]="filter.wardId" [options]="wardOptions" bindLabel="label" bindValue="value"></boo-select>
-              <boo-select label="Status" [(ngModel)]="filter.status" [options]="statusOptions" bindLabel="label" bindValue="value"></boo-select>
-              <boo-select label="Floor" [(ngModel)]="filter.floor" [options]="floorOptions" bindLabel="label" bindValue="value"></boo-select>
-              <div class="flex items-end">
-                <boo-button-admin (click)="applyFilters()" textColor="white" padding="8px 16px" [radius]="8" buttonClass="w-full" class="w-full">
-                  Apply Filters
-                </boo-button-admin>
-              </div>
-            </div>
-          </div>
-
-          <!-- Legend -->
-          <div class="bg-surface rounded-lg shadow-md p-4 mb-6">
-            <h3 class="text-sm font-semibold text-gray-700 mb-3">Bed Status Legend</h3>
-            <div class="flex flex-wrap gap-4">
-              <div class="flex items-center">
-                <div class="w-8 h-8 bg-green-500 rounded mr-2"></div>
-                <span class="text-sm text-gray-700">Available</span>
-              </div>
-              <div class="flex items-center">
-                <div class="w-8 h-8 bg-red-500 rounded mr-2"></div>
-                <span class="text-sm text-gray-700">Occupied</span>
-              </div>
-              <div class="flex items-center">
-                <div class="w-8 h-8 bg-yellow-500 rounded mr-2"></div>
-                <span class="text-sm text-gray-700">Maintenance</span>
-              </div>
-              <div class="flex items-center">
-                <div class="w-8 h-8 bg-primary rounded mr-2"></div>
-                <span class="text-sm text-gray-700">Reserved</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Empty State -->
-          <div *ngIf="filteredWards.length === 0" class="bg-surface rounded-lg shadow-md p-12 flex flex-col items-center justify-center text-center">
-            <physio-icon name="inbox" [size]="36" [class]="'text-gray-300 mb-3'"></physio-icon>
-            <p class="text-gray-500 text-sm">No beds match the selected filters.</p>
-          </div>
-
-          <!-- Ward Cards with Bed Maps -->
-          <div class="space-y-6">
-            <div *ngFor="let ward of filteredWards" class="bg-surface rounded-lg shadow-md overflow-hidden">
-              <div class="bg-gray-100 px-6 py-4 border-b border-gray-200">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <h3 class="text-lg font-semibold text-gray-800">{{ ward.name }}</h3>
-                    <p class="text-sm text-gray-600">Floor {{ ward.floor }} &bull; {{ ward.availableBeds }} of {{ ward.totalBeds }} beds available</p>
-                  </div>
-                  <div class="flex items-center space-x-2">
-                    <div class="text-right mr-4">
-                      <div class="text-sm text-gray-600">Occupancy</div>
-                      <div class="text-lg font-bold text-gray-800">{{ getWardOccupancyRate(ward) }}%</div>
-                    </div>
-                    <div class="w-16 h-16">
-                      <svg class="transform -rotate-90 w-16 h-16">
-                        <circle cx="32" cy="32" r="28" stroke="#EFE3E7" stroke-width="8" fill="none" />
-                        <circle cx="32" cy="32" r="28" [attr.stroke]="getWardOccupancyRate(ward) > 80 ? '#ef4444' : getWardOccupancyRate(ward) > 50 ? '#f59e0b' : '#10b981'" stroke-width="8" fill="none" [attr.stroke-dasharray]="175.93" [attr.stroke-dashoffset]="175.93 - (175.93 * getWardOccupancyRate(ward) / 100)" stroke-linecap="round" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="p-6">
-                <div *ngIf="getWardBeds(ward).length === 0" class="text-sm text-gray-400 text-center py-6">No beds match the selected filters in this ward.</div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                  <div *ngFor="let bed of getWardBeds(ward)"
-                       (click)="selectBed(bed)"
-                       [ngClass]="{
-                         'bg-green-500 hover:bg-green-600': bed.status === 'Available',
-                         'bg-red-500 hover:bg-red-600': bed.status === 'Occupied',
-                         'bg-yellow-500 hover:bg-yellow-600': bed.status === 'Maintenance',
-                         'bg-primary hover:bg-primary': bed.status === 'Reserved'
-                       }"
-                       class="cursor-pointer transition-all transform hover:scale-105 rounded-lg p-4 text-white shadow-md">
-                    <div class="text-center">
-                      <div class="font-bold text-lg mb-1">{{ bed.number }}</div>
-                      <div class="text-xs opacity-90">{{ bed.status }}</div>
-                      <div *ngIf="bed.patientName" class="text-xs mt-2 opacity-90 truncate">{{ bed.patientName }}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ng-container>
-
-        <!-- Selected Bed Details Modal -->
-        <div *ngIf="selectedBed" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div class="bg-surface rounded-lg shadow-xl max-w-md w-full p-6">
-            <div class="flex justify-between items-start mb-4">
-              <h3 class="text-xl font-bold text-gray-800">Bed Details</h3>
-              <button (click)="closeBedDetails()" class="text-gray-400 hover:text-gray-600">
-                <physio-icon name="x" [size]="20"></physio-icon>
-              </button>
-            </div>
-
-            <div class="space-y-3">
-              <div class="flex justify-between py-2 border-b border-gray-200">
-                <span class="text-gray-600">Bed Number:</span>
-                <span class="font-semibold text-gray-800">{{ selectedBed.number }}</span>
-              </div>
-              <div class="flex justify-between py-2 border-b border-gray-200">
-                <span class="text-gray-600">Status:</span>
-                <span
-                  [ngClass]="{
-                    'bg-green-100 text-green-800': selectedBed.status === 'Available',
-                    'bg-red-100 text-red-800': selectedBed.status === 'Occupied',
-                    'bg-yellow-100 text-yellow-800': selectedBed.status === 'Maintenance',
-                    'bg-primarySoft text-primaryPressed': selectedBed.status === 'Reserved'
-                  }"
-                  class="px-3 py-1 rounded-full text-sm font-semibold">
-                  {{ selectedBed.status }}
-                </span>
-              </div>
-              <div *ngIf="selectedBed.patientName" class="flex justify-between py-2 border-b border-gray-200">
-                <span class="text-gray-600">Patient Name:</span>
-                <span class="font-semibold text-gray-800">{{ selectedBed.patientName }}</span>
-              </div>
-              <div *ngIf="selectedBed.patientNumber" class="flex justify-between py-2 border-b border-gray-200">
-                <span class="text-gray-600">Patient ID:</span>
-                <span class="font-semibold text-gray-800">{{ selectedBed.patientNumber }}</span>
-              </div>
-              <div *ngIf="selectedBed.admissionDate" class="flex justify-between py-2 border-b border-gray-200">
-                <span class="text-gray-600">Admission Date:</span>
-                <span class="font-semibold text-gray-800">{{ selectedBed.admissionDate }}</span>
-              </div>
-            </div>
-
-            <!-- History -->
-            <div *ngIf="showHistory" class="mt-4 border-t border-gray-200 pt-4">
-              <div *ngIf="loadingSrv.isLoading('bed-history')" class="text-sm text-gray-400 text-center py-3">Loading history...</div>
-              <div *ngIf="!loadingSrv.isLoading('bed-history') && history.length === 0" class="text-sm text-gray-400 text-center py-3">No history for this bed.</div>
-              <div *ngFor="let entry of history" class="flex justify-between py-1.5 text-sm">
-                <span class="text-gray-600">{{ entry.patientName }}</span>
-                <span class="text-gray-500">{{ entry.admissionDate }} &rarr; {{ entry.dischargeDate ?? 'present' }}</span>
-              </div>
-            </div>
-
-            <div class="mt-6 flex space-x-3">
-              <boo-button-admin *ngIf="selectedBed.status === 'Available'" (click)="openAssignDrawer()" textColor="white" padding="8px 16px" [radius]="8" buttonClass="w-full" class="flex-1">
-                Assign Patient
-              </boo-button-admin>
-              <boo-button-admin *ngIf="selectedBed.status === 'Occupied'" (click)="confirmDischarge()" [disabled]="loadingSrv.isLoading('bed-discharge')" background="#16A34A" textColor="white" padding="8px 16px" [radius]="8" buttonClass="w-full" class="flex-1">
-                Discharge Patient
-              </boo-button-admin>
-              <boo-button-admin (click)="toggleHistory()" background="#85757D" textColor="white" padding="8px 16px" [radius]="8" buttonClass="w-full" class="flex-1">
-                View History
-              </boo-button-admin>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <bed-map-assign-drawer
-      [isOpen]="isAssignDrawerOpen"
-      [bed]="selectedBed"
-      (close)="isAssignDrawerOpen = false"
-      (assignSuccess)="onAssignSuccess($event)">
-    </bed-map-assign-drawer>
-    `
+    selector: 'admin-bed-map',
+    standalone: true,
+    imports: [
+        NgIf,
+        NgFor,
+        NgClass,
+        DatePipe,
+        FormsModule,
+        BooButtonComponent,
+        BooEmptyStateComponent,
+        BooErrorStateComponent,
+        BooFilterChipsComponent,
+        BooIconComponent,
+        BooInlineErrorComponent,
+        BooSearchFieldComponent,
+        BooStatusBadgeComponent,
+        BooSelectComponent,
+        AdminBreadcrumbComponent,
+        BedDetailDrawerComponent,
+        BedMapAssignDrawerComponent,
+        BedMapManageDrawerComponent,
+    ],
+    templateUrl: './bed-map.component.html',
 })
 export class AdminBedMapComponent implements OnInit {
-  manageOpen = false;
-  // #region Inputs, Outputs, Properties
-  wards: Ward[] = [];
-  beds: Bed[] = [];
-  stats: BedMapStats | null = null;
-  selectedBed: Bed | null = null;
-  history: BedHistoryEntry[] = [];
-  showHistory = false;
-  isAssignDrawerOpen = false;
-  hasError = false;
-  hasLoadedOnce = false;
+    // #region Inputs, Outputs, Properties
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly silent = new HttpContext().set(SKIP_ERROR_TOAST, true);
 
-  filter: BedFilter = { wardId: null, status: null, floor: null };
+    wards: Ward[] = [];
+    beds: Bed[] = [];
+    stats: BedMapStats | null = null;
 
-  statusOptions: { label: string; value: BedStatus | null }[] = [
-    { label: 'All Status', value: null },
-    { label: 'Available', value: 'Available' },
-    { label: 'Occupied', value: 'Occupied' },
-    { label: 'Maintenance', value: 'Maintenance' },
-    { label: 'Reserved', value: 'Reserved' }
-  ];
-  // #endregion
+    loading = false;
+    /** At least one snapshot has been received; from then on a failed refresh keeps the previous map on screen. */
+    loaded = false;
+    loadError: LoadError | null = null;
+    refreshErrorState: BooInlineErrorState = 'default';
+    lastUpdated: Date | null = null;
 
-  constructor(
-    private bedMapSrv: BedMapService,
-    private toastSrv: ToastService,
-    protected loadingSrv: LocalLoadingService
-  ) { }
+    query = '';
+    wardId: string | null = ALL;
+    floor: number | null = ALL;
+    bedType: string | null = ALL;
+    status: BedStatus | null = ALL;
 
-  // #region Init (Lifecycle + Setup)
-  ngOnInit(): void {
-    this.loadSnapshot();
-  }
-  // #endregion
+    groups: WardGroup[] = [];
+    chips: FilterChip[] = [];
+    statusTiles: StatusTile[] = [];
+    wardOptions: { label: string; value: string | null }[] = [];
+    floorOptions: { label: string; value: number | null }[] = [];
+    typeOptions: { label: string; value: string | null }[] = [];
 
-  // #region Methods
-  get wardOptions(): { label: string; value: string | null }[] {
-    return [{ label: 'All Wards', value: null }, ...this.wards.map(w => ({ label: w.name, value: w.id }))];
-  }
+    selectedBed: Bed | null = null;
+    assignOpen = false;
+    manageOpen = false;
+    busy = false;
+    private returnFocus: HTMLElement | null = null;
 
-  get floorOptions(): { label: string; value: number | null }[] {
-    const floors = Array.from(new Set(this.wards.map(w => w.floor))).sort((a, b) => a - b);
-    return [{ label: 'All Floors', value: null }, ...floors.map(f => ({ label: `Floor ${f}`, value: f }))];
-  }
+    canAssign = false;
+    canManage = false;
+    nursingLink: string | null = null;
 
-  get filteredWards(): Ward[] {
-    let filtered = this.wards;
-    if (this.filter.wardId) filtered = filtered.filter(w => w.id === this.filter.wardId);
-    if (this.filter.floor != null) filtered = filtered.filter(w => w.floor === this.filter.floor);
-    return filtered.filter(w => this.getWardBeds(w).length > 0 || (!this.filter.status && !this.filter.wardId && !this.filter.floor));
-  }
+    readonly statusOf = bedStatus;
+    readonly wardOccupancy = wardOccupancy;
+    readonly skeletonTiles = Array.from({ length: 6 });
+    readonly skeletonBeds = Array.from({ length: 8 });
+    // #endregion
 
-  getWardBeds(ward: Ward): Bed[] {
-    let beds = this.beds.filter(b => b.wardId === ward.id);
-    if (this.filter.status) beds = beds.filter(b => b.status === this.filter.status);
-    return beds;
-  }
+    constructor(
+        private bedMapSrv: BedMapService,
+        private authSrv: AuthService,
+        private dialogSrv: DialogService,
+        private toastSrv: ToastService,
+    ) { }
 
-  getWardOccupancyRate(ward: Ward): number {
-    return ward.totalBeds > 0 ? Math.round((ward.occupiedBeds / ward.totalBeds) * 100) : 0;
-  }
+    // #region Init (Lifecycle + Setup)
+    ngOnInit(): void {
+        this.authSrv.permissions$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(perms => this.applyPermissions(perms ?? []));
 
-  loadSnapshot(): void {
-    this.hasError = false;
-    this.loadingSrv.setLoading('bed-map-snapshot', true);
-
-    forkJoin({
-      snapshot: this.bedMapSrv.snapshot(),
-      stats: this.bedMapSrv.stats()
-    })
-      .pipe(finalize(() => this.loadingSrv.setLoading('bed-map-snapshot', false)))
-      .subscribe({
-        next: ({ snapshot, stats }) => {
-          if (snapshot.success && snapshot.data) {
-            this.wards = snapshot.data.wards;
-            this.beds = snapshot.data.beds;
-          }
-          if (stats.success && stats.data) {
-            this.stats = stats.data;
-          }
-          this.hasLoadedOnce = true;
-        },
-        error: () => {
-          this.hasError = true;
-          this.hasLoadedOnce = true;
-        }
-      });
-  }
-
-  refresh(): void {
-    this.loadSnapshot();
-  }
-
-  applyFilters(): void {
-    // Filters are applied client-side against the loaded snapshot.
-  }
-
-  selectBed(bed: Bed): void {
-    this.selectedBed = bed;
-    this.showHistory = false;
-    this.history = [];
-  }
-
-  closeBedDetails(): void {
-    this.selectedBed = null;
-    this.showHistory = false;
-  }
-
-  toggleHistory(): void {
-    if (!this.selectedBed) return;
-    this.showHistory = !this.showHistory;
-    if (this.showHistory) this.loadHistory(this.selectedBed.id);
-  }
-
-  loadHistory(bedId: string): void {
-    this.loadingSrv.setLoading('bed-history', true);
-    this.bedMapSrv.history(bedId)
-      .pipe(finalize(() => this.loadingSrv.setLoading('bed-history', false)))
-      .subscribe(_res => {
-        this.history = _res.success && _res.data ? _res.data : [];
-      });
-  }
-
-  openAssignDrawer(): void {
-    this.isAssignDrawerOpen = true;
-  }
-
-  onAssignSuccess(updatedBed: Bed): void {
-    this.isAssignDrawerOpen = false;
-    this.applyBedUpdate(updatedBed);
-    this.selectedBed = updatedBed;
-  }
-
-  async confirmDischarge(): Promise<void> {
-    if (!this.selectedBed) return;
-    const bed = this.selectedBed;
-
-    this.toastSrv.confirm(
-      `Discharge ${bed.patientName ?? 'this patient'} from bed ${bed.number}?`,
-      async () => {
-        this.loadingSrv.setLoading('bed-discharge', true);
-        try {
-          const response = await firstValueFrom(this.bedMapSrv.discharge(bed.id, {}));
-          if (response.success) {
-            this.toastSrv.success('Patient discharged');
-            const updatedBed: Bed = { ...bed, status: 'Available', patientId: null, patientName: null, patientNumber: null, admissionDate: null, expectedDischargeDate: null };
-            this.applyBedUpdate(updatedBed);
-            this.selectedBed = updatedBed;
-          } else {
-            this.toastSrv.error('Unable to discharge patient');
-          }
-        } catch {
-          this.toastSrv.error('Unable to discharge patient');
-        } finally {
-          this.loadingSrv.setLoading('bed-discharge', false);
-        }
-      },
-      undefined,
-      'Discharge'
-    );
-  }
-
-  private applyBedUpdate(updatedBed: Bed): void {
-    const ward = this.wards.find(w => w.id === updatedBed.wardId);
-    const previousBed = this.beds.find(b => b.id === updatedBed.id);
-
-    this.beds = this.beds.map(b => b.id === updatedBed.id ? updatedBed : b);
-
-    if (ward && previousBed && previousBed.status !== updatedBed.status) {
-      if (previousBed.status === 'Occupied') ward.occupiedBeds--;
-      if (previousBed.status === 'Available') ward.availableBeds--;
-      if (updatedBed.status === 'Occupied') ward.occupiedBeds++;
-      if (updatedBed.status === 'Available') ward.availableBeds++;
+        this.statusTiles = this.buildTiles();
+        this.load();
     }
-  }
-  // #endregion
+    // #endregion
+
+    // #region Methods
+    load(): void {
+        if (this.loading) return;
+        this.refreshErrorState = this.loadError ? 'retrying' : 'default';
+        this.loading = true;
+        this.loadError = null;
+
+        forkJoin({
+            // Stats are secondary: when only they fail the map still shows, with the counts left blank.
+            result: this.bedMapSrv.snapshot(this.silent).pipe(
+                map((res): SnapshotResult => res.success && res.data ? { snapshot: res.data } : { status: 0 }),
+                catchError((err: HttpErrorResponse) => of<SnapshotResult>({ status: err?.status ?? 0 })),
+            ),
+            stats: this.bedMapSrv.stats(this.silent).pipe(
+                map(res => res.success && res.data ? res.data : null),
+                catchError(() => of(null)),
+            ),
+        })
+            .pipe(finalize(() => this.loading = false))
+            .subscribe(({ result, stats }) => {
+                if (!('snapshot' in result)) {
+                    this.loadError = result.status === 403 ? 'forbidden' : 'failed';
+                    this.refreshErrorState = 'failed';
+                    // A forbidden response means the map is no longer allowed on screen, even a previous one.
+                    if (this.loadError === 'forbidden') this.reset();
+                    return;
+                }
+                this.wards = result.snapshot.wards;
+                this.beds = result.snapshot.beds;
+                this.stats = stats;
+                this.loaded = true;
+                this.lastUpdated = new Date();
+                // Keep the open drawer in step with the refreshed bed; close it if the bed is gone.
+                this.selectedBed = this.selectedBed ? this.beds.find(b => b.id === this.selectedBed!.id) ?? null : null;
+                if (!this.selectedBed) this.assignOpen = false;
+                this.buildOptions();
+                this.statusTiles = this.buildTiles();
+                this.applyFilters();
+            });
+    }
+
+    applyFilters(): void {
+        const q = this.query.trim().toLowerCase();
+        const match = (b: Bed): boolean =>
+            (!this.status || b.status === this.status)
+            && (!this.bedType || b.bedType === this.bedType)
+            && (!q || [b.number, b.roomNumber, b.patientName, b.patientNumber].some(v => !!v && v.toLowerCase().includes(q)));
+        const filtering = !!(q || this.status || this.bedType);
+
+        const bedsByWard = new Map<string, Bed[]>();
+        for (const bed of this.beds) {
+            if (!match(bed)) continue;
+            const list = bedsByWard.get(bed.wardId);
+            if (list) list.push(bed);
+            else bedsByWard.set(bed.wardId, [bed]);
+        }
+
+        this.groups = this.wards
+            .filter(w => (!this.wardId || w.id === this.wardId) && (this.floor === null || w.floor === this.floor))
+            // A ward with no match is hidden while a bed-level filter is on, but an empty ward still shows otherwise.
+            .filter(w => !filtering || bedsByWard.has(w.id))
+            .map(ward => {
+                const list = bedsByWard.get(ward.id) ?? [];
+                return { ward, rooms: groupByRoom(list), bedCount: list.length };
+            });
+        this.chips = this.buildChips();
+    }
+
+    toggleStatus(key: BedStatus | null): void {
+        this.status = key === null || this.status === key ? ALL : key;
+        this.applyFilters();
+    }
+
+    removeChip(chip: FilterChip): void {
+        switch (chip.key) {
+            case 'search': this.query = ''; break;
+            case 'ward': this.wardId = ALL; break;
+            case 'floor': this.floor = ALL; break;
+            case 'bedType': this.bedType = ALL; break;
+            case 'status': this.status = ALL; break;
+        }
+        this.applyFilters();
+    }
+
+    clearFilters(): void {
+        this.query = '';
+        this.wardId = ALL;
+        this.floor = ALL;
+        this.bedType = ALL;
+        this.status = ALL;
+        this.applyFilters();
+    }
+
+    openBed(bed: Bed, event: Event): void {
+        this.returnFocus = event.currentTarget as HTMLElement;
+        this.selectedBed = bed;
+    }
+
+    closeBed(): void {
+        this.selectedBed = null;
+        this.assignOpen = false;
+        this.returnFocus?.focus();
+        this.returnFocus = null;
+    }
+
+    onAssigned(): void {
+        this.assignOpen = false;
+        this.load();
+    }
+
+    confirmDischarge(bed: Bed): void {
+        if (this.busy) return;
+        this.dialogSrv.confirm(
+            `Discharge ${bed.patientName || 'this patient'} from bed ${bed.number}? The bed becomes available.`,
+            () => this.discharge(bed),
+            'Discharge patient',
+            'warning',
+            'Discharge',
+            'Keep patient',
+        );
+    }
+
+    bedLabel(bed: Bed): string {
+        const parts = [`Bed ${bed.number}`, bedStatus(bed.status).label, bed.bedType];
+        if (bed.patientName) parts.push(bed.patientName);
+        if (bed.isolationRequired) parts.push('isolation required');
+        return parts.join(', ');
+    }
+
+    trackById(_: number, bed: Bed): string {
+        return bed.id;
+    }
+
+    trackByWard(_: number, group: WardGroup): string {
+        return group.ward.id;
+    }
+
+    trackByKey(_: number, tile: StatusTile): string {
+        return tile.key ?? 'all';
+    }
+
+    private discharge(bed: Bed): void {
+        this.busy = true;
+        this.bedMapSrv.discharge(bed.id, {})
+            .pipe(finalize(() => this.busy = false))
+            .subscribe(res => {
+                if (res.success) {
+                    this.toastSrv.success('Patient discharged');
+                    this.load();
+                } else {
+                    this.toastSrv.error('Unable to discharge patient');
+                }
+            });
+    }
+
+    private reset(): void {
+        this.wards = [];
+        this.beds = [];
+        this.stats = null;
+        this.loaded = false;
+        this.selectedBed = null;
+        this.assignOpen = false;
+        this.applyFilters();
+    }
+
+    private buildTiles(): StatusTile[] {
+        const s = this.stats;
+        return [
+            { key: ALL, label: 'All beds', count: s?.totalBeds ?? null },
+            { key: 'Available', label: 'Available', count: s?.availableBeds ?? null },
+            { key: 'Occupied', label: 'Occupied', count: s?.occupiedBeds ?? null },
+            { key: 'Maintenance', label: 'Maintenance', count: s?.maintenanceBeds ?? null },
+            { key: 'Reserved', label: 'Reserved', count: s?.reservedBeds ?? null },
+        ];
+    }
+
+    private buildOptions(): void {
+        const floors = Array.from(new Set(this.wards.map(w => w.floor))).sort((a, b) => a - b);
+        const types = Array.from(new Set(this.beds.map(b => b.bedType))).sort((a, b) => a.localeCompare(b));
+        this.wardOptions = [{ label: 'All wards', value: ALL }, ...this.wards.map(w => ({ label: w.name, value: w.id }))];
+        this.floorOptions = [{ label: 'All floors', value: ALL }, ...floors.map(f => ({ label: `Floor ${f}`, value: f }))];
+        this.typeOptions = [{ label: 'All types', value: ALL }, ...types.map(t => ({ label: t, value: t }))];
+    }
+
+    private buildChips(): FilterChip[] {
+        const chips: FilterChip[] = [];
+        if (this.query.trim()) chips.push({ key: 'search', label: `Search: ${this.query.trim()}` });
+        if (this.wardId) chips.push({ key: 'ward', label: this.wardOptions.find(o => o.value === this.wardId)?.label ?? 'Ward' });
+        if (this.floor !== null) chips.push({ key: 'floor', label: `Floor ${this.floor}` });
+        if (this.bedType) chips.push({ key: 'bedType', label: this.bedType });
+        if (this.status) chips.push({ key: 'status', label: bedStatus(this.status).label });
+        return chips;
+    }
+
+    private applyPermissions(perms: string[]): void {
+        // Assign and discharge share Inpatient.BedAssign; ward and bed set-up is Inpatient.BedManage.
+        this.canAssign = perms.includes(Permissions.Inpatient.BedAssign);
+        this.canManage = perms.includes(Permissions.Inpatient.BedManage);
+        this.nursingLink = perms.includes(Permissions.Inpatient.NursingRead) ? '/admin/nursing/patient' : null;
+    }
+    // #endregion
 }

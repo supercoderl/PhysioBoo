@@ -1,454 +1,401 @@
-import { Component, OnDestroy, OnInit, computed, inject, signal } from "@angular/core";
-import { Subject, debounceTime, switchMap } from "rxjs";
-import { BooErrorStateComponent } from '@physioboo/ui';
-import { PrescriptionService } from "../../../../services/admin/prescription.service";
-import { DialogService } from "../../../../services/common/dialog.service";
-import { LocalLoadingService } from "../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../services/common/toast.service";
-import { SharedModule } from "../../../../shared/shared-imports";
-import { LoadingKeys } from "../../../../shared/types/loading";
+import { HttpErrorResponse } from '@angular/common/http';
+import { NgIf } from '@angular/common';
+import { Component, DestroyRef, HostListener, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
-    FavoriteMedication,
-    PrescriptionDraft,
-    PrescriptionTemplate,
-    RecentPrescriptionSummary,
-    RxDiagnosisEntry,
-    RxMedicationItem,
-} from "../../../../shared/types/prescription-rx.types";
-import { PrescriptionActionBarComponent } from "./components/prescription-action-bar.component";
-import { PrescriptionDiagnosisSectionComponent } from "./components/prescription-diagnosis-section.component";
-import { PrescriptionFooterComponent } from "./components/prescription-footer.component";
-import { PrescriptionMedicationDrawerComponent } from "./components/prescription-medication-drawer.component";
-import { PrescriptionMedicationTableComponent } from "./components/prescription-medication-table.component";
-import { PrescriptionPatientSummaryComponent } from "./components/prescription-patient-summary.component";
-import { PrescriptionSidebarComponent } from "./components/prescription-sidebar.component";
-import { hasUnacknowledgedAtOrAbove, severityRank } from "./prescription-rx.util";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+    BooButtonComponent,
+    BooEmptyStateComponent,
+    BooErrorStateComponent,
+    BooIconComponent,
+    BooInlineErrorComponent,
+} from '@physioboo/ui';
+import { Subscription, combineLatest, filter, finalize, take } from 'rxjs';
+import { AdminBreadcrumbComponent } from '../../../../components/breadcrumb/admin-breadcrumb.component';
+import { PrescriptionService } from '../../../../services/admin/prescription.service';
+import { AuthService } from '../../../../services/auth/auth.service';
+import { DialogService } from '../../../../services/common/dialog.service';
+import { ToastService } from '../../../../services/common/toast.service';
+import { Permissions } from '../../../../shared/constants/permission.constant';
+import {
+    CdsCheckRequest,
+    PatientPrescriptionRow,
+    Prescription,
+    PrescriptionItemInput,
+    PrescriptionStatus,
+    normalizePrescriptionStatus,
+} from '../../../../shared/types/prescription-rx.types';
+import { PrescriptionActionBarComponent } from './components/prescription-action-bar.component';
+import { PrescriptionCancelDrawerComponent } from './components/prescription-cancel-drawer.component';
+import { PrescriptionDiagnosisSectionComponent, RX_TEXT_MAX } from './components/prescription-diagnosis-section.component';
+import { PrescriptionFooterComponent } from './components/prescription-footer.component';
+import { PrescriptionMedicationDrawerComponent } from './components/prescription-medication-drawer.component';
+import { PrescriptionMedicationTableComponent } from './components/prescription-medication-table.component';
+import { PrescriptionPatientListComponent } from './components/prescription-patient-list.component';
+import { PrescriptionPatientSummaryComponent } from './components/prescription-patient-summary.component';
+import { PrescriptionLine, formatAmount, isUnacknowledgedCritical, lineTotal, newLineKey, toLine } from './prescription-rx.util';
 
+type LoadError = 'forbidden' | 'notFound' | 'failed';
+type Busy = 'save' | 'issue' | 'cancel' | 'check';
+type Mode = 'empty' | 'patient' | 'detail';
+
+const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Prescription workspace. `?id=` opens one prescription (view, edit while Draft, issue, cancel); `?patientId=` lists the
+ * patient's prescriptions to pick from. Creating a prescription is not offered: the create API needs a medical record
+ * id, a hospital id and a prescription number that no existing API provides for a visit (see docs/prescription-redesign.md).
+ */
 @Component({
     selector: 'admin-prescription',
     standalone: true,
     imports: [
-        SharedModule,
-
+        NgIf,
+        AdminBreadcrumbComponent,
+        BooButtonComponent,
+        BooEmptyStateComponent,
         BooErrorStateComponent,
+        BooIconComponent,
+        BooInlineErrorComponent,
         PrescriptionActionBarComponent,
         PrescriptionPatientSummaryComponent,
         PrescriptionDiagnosisSectionComponent,
         PrescriptionMedicationTableComponent,
-        PrescriptionSidebarComponent,
         PrescriptionMedicationDrawerComponent,
+        PrescriptionCancelDrawerComponent,
+        PrescriptionPatientListComponent,
         PrescriptionFooterComponent,
-        BooButtonAdminComponent
     ],
-    template: `
-    <div class="min-h-screen bg-gray-50 flex flex-col">
-      <div *ngIf="loadingSrv.isLoading(LoadingKeys.PRESCRIPTION.GET_DRAFT)" class="p-6 max-w-7xl mx-auto w-full space-y-4">
-        <div class="h-16 bg-gray-200 rounded-lg animate-pulse"></div>
-        <div class="h-24 bg-gray-200 rounded-lg animate-pulse"></div>
-        <div class="h-96 bg-gray-200 rounded-lg animate-pulse"></div>
-      </div>
-
-      <div *ngIf="!loadingSrv.isLoading(LoadingKeys.PRESCRIPTION.GET_DRAFT) && error()" class="p-6 max-w-7xl mx-auto w-full">
-        <boo-error-state title="Couldn't load prescription" [description]="error()" (retry)="retryLoad()"></boo-error-state>
-      </div>
-
-      <ng-container *ngIf="!loadingSrv.isLoading(LoadingKeys.PRESCRIPTION.GET_DRAFT) && !error() && draft() as d">
-        <rx-action-bar
-          [draft]="d" [editable]="editable()" [saving]="loadingSrv.isLoading(LoadingKeys.PRESCRIPTION.SAVE_DRAFT)" [canIssue]="canIssue()"
-          (saveDraft)="saveDraft()" (preview)="openPreview()" (print)="printRx()" (issue)="issueRx()" (cancel)="cancelRx()">
-        </rx-action-bar>
-
-        <div class="flex-1 max-w-7xl mx-auto w-full p-6 space-y-4">
-          <rx-patient-summary [patient]="d.patient"></rx-patient-summary>
-
-          <rx-diagnosis-section
-            [primaryDiagnosis]="d.primaryDiagnosis" [secondaryDiagnoses]="d.secondaryDiagnoses"
-            [symptoms]="d.symptoms" [clinicalNotes]="d.clinicalNotes" [editable]="editable()"
-            (primaryDiagnosisChange)="updatePrimaryDiagnosis($event)"
-            (secondaryDiagnosesChange)="updateSecondaryDiagnoses($event)"
-            (symptomsChange)="updateSymptoms($event)"
-            (clinicalNotesChange)="updateClinicalNotes($event)">
-          </rx-diagnosis-section>
-
-          <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 items-start">
-            <rx-medication-table
-              [items]="d.items" [editable]="editable()"
-              (itemsChange)="updateItems($event)"
-              (addMedication)="openAddDrawer()"
-              (editMedication)="openEditDrawer($event)"
-              (favoriteMedication)="addToFavorites($event)">
-            </rx-medication-table>
-
-            <rx-sidebar
-              [items]="d.items" [primaryDiagnosis]="d.primaryDiagnosis" [secondaryDiagnoses]="d.secondaryDiagnoses"
-              [recent]="recent()" [favorites]="favorites()" [templates]="templates()" [doctorNotes]="d.doctorNotes" [editable]="editable()"
-              (scrollToRow)="scrollToRow($event)"
-              (applyFavorite)="applyFavorite($event)"
-              (applyTemplate)="applyTemplate($event)"
-              (removeFavorite)="removeFavorite($event)"
-              (deleteTemplate)="deleteTemplate($event)"
-              (saveTemplate)="saveAsTemplate($event)"
-              (doctorNotesChange)="updateDoctorNotes($event)">
-            </rx-sidebar>
-          </div>
-        </div>
-
-        <rx-footer
-          [editable]="editable()" [saving]="loadingSrv.isLoading(LoadingKeys.PRESCRIPTION.ISSUE)" [canIssue]="canIssue()" [autosaveLabel]="autosaveLabel()"
-          (saveDraft)="saveDraft()" (preview)="openPreview()" (print)="printRx()" (issue)="issueRx()">
-        </rx-footer>
-      </ng-container>
-      <rx-medication-drawer
-        [isOpen]="drawerOpen()" [editingItem]="editingItem()" [patientId]="draft()?.patient?.patientId || ''"
-        (close)="closeDrawer()" (save)="onDrawerSave($event)">
-      </rx-medication-drawer>
-      <div *ngIf="previewOpen()" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-6" (click)="previewOpen.set(false)">
-        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8" (click)="$event.stopPropagation()" id="rx-print-area">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-primary">Prescription Preview</h2>
-            <button (click)="previewOpen.set(false)" class="text-secondary hover:text-primary"><physio-icon name="x" [size]="20"></physio-icon></button>
-          </div>
-          <ng-container *ngIf="draft() as d">
-            <div class="text-sm text-secondary mb-1">{{ d.prescriptionNumber }} · {{ d.createdAt | date:'mediumDate' }}</div>
-            <div class="font-semibold text-primary">{{ d.doctor.fullName }} — {{ d.doctor.department }}</div>
-            <div class="h-px bg-gray-200 my-4"></div>
-            <div class="font-semibold text-primary">{{ d.patient.fullName }}</div>
-            <div class="text-sm text-secondary">{{ d.patient.gender }} · {{ d.patient.ageYears }}y</div>
-            <div *ngIf="d.primaryDiagnosis" class="text-sm mt-2"><strong>Diagnosis:</strong> {{ d.primaryDiagnosis.code }} — {{ d.primaryDiagnosis.description }}</div>
-            <div class="h-px bg-gray-200 my-4"></div>
-            <table class="w-full text-sm">
-              <thead><tr class="text-left text-xs text-secondary uppercase"><th class="py-1">Medication</th><th class="py-1">Dose</th><th class="py-1">Frequency</th><th class="py-1">Duration</th><th class="py-1 text-right">Qty</th></tr></thead>
-              <tbody>
-                <tr *ngFor="let i of d.items" class="border-t border-gray-100">
-                  <td class="py-2">{{ i.name }} <span class="text-secondary">{{ i.strength }}</span></td>
-                  <td class="py-2">{{ i.dose }}</td>
-                  <td class="py-2">{{ i.frequency }}</td>
-                  <td class="py-2">{{ i.durationDays }}d</td>
-                  <td class="py-2 text-right">{{ i.quantity }} {{ i.unit }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </ng-container>
-          <div class="mt-6 flex justify-end gap-2">
-            <boo-button-admin (click)="printRx()" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="600">Print</boo-button-admin>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
+    templateUrl: './prescription.component.html',
+    host: { class: 'flex flex-col min-h-full' },
 })
-export class AdminPrescriptionComponent implements OnInit, OnDestroy {
+export class AdminPrescriptionComponent implements OnInit {
     // #region Inputs, Outputs, Properties
-    draft = signal<PrescriptionDraft | null>(null);
-    autosaveLabel = signal('');
-    previewOpen = signal(false);
-    drawerOpen = signal(false);
-    editingItem = signal<RxMedicationItem | null>(null);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly fb = inject(FormBuilder);
+    private readonly rxSrv = inject(PrescriptionService);
+    private readonly authSrv = inject(AuthService);
+    private readonly dialogSrv = inject(DialogService);
+    private readonly toastSrv = inject(ToastService);
+    private readonly destroyRef = inject(DestroyRef);
 
-    recent = signal<RecentPrescriptionSummary[]>([]);
-    favorites = signal<FavoriteMedication[]>([]);
-    templates = signal<PrescriptionTemplate[]>([]);
-    error = signal<string | null>(null);
+    @ViewChild(PrescriptionCancelDrawerComponent) cancelDrawer?: PrescriptionCancelDrawerComponent;
 
-    editable = computed(() => this.draft()?.status === 'Draft');
-    canIssue = computed(() => this.editable() && (this.draft()?.items.length ?? 0) > 0);
+    mode: Mode = 'empty';
+    loading = signal(false);
+    loadError = signal<LoadError | null>(null);
+    busy = signal<Busy | null>(null);
 
-    private autosave$ = new Subject<void>();
-    private prescriptionId = 'new';
+    prescription = signal<Prescription | null>(null);
+    lines = signal<PrescriptionLine[]>([]);
+    patientRows = signal<PatientPrescriptionRow[]>([]);
+    private linesDirty = signal(false);
 
-    LoadingKeys = LoadingKeys;
-    // #endregion
+    drawerOpen = false;
+    editingLine: PrescriptionLine | null = null;
+    cancelOpen = false;
 
-    // #region Inject Services
-    private rxSrv = inject(PrescriptionService);
-    private dialogSrv = inject(DialogService);
-    private toastSrv = inject(ToastService);
-    protected loadingSrv = inject(LocalLoadingService);
+    readonly form = this.fb.nonNullable.group({
+        diagnosis: ['', Validators.maxLength(RX_TEXT_MAX)],
+        instructions: ['', Validators.maxLength(RX_TEXT_MAX)],
+    });
+
+    private perms = signal<string[]>([]);
+    canUpdate = computed(() => this.perms().includes(Permissions.Pharmacy.PrescriptionUpdate));
+    canIssuePerm = computed(() => this.perms().includes(Permissions.Pharmacy.PrescriptionIssue));
+    canCancelPerm = computed(() => this.perms().includes(Permissions.Pharmacy.PrescriptionCancel));
+    canSearchMedicines = computed(() => this.perms().includes(Permissions.Pharmacy.MedicineInventoryRead));
+    canListPatientRx = computed(() => this.perms().includes(Permissions.Clinical.MedicalRecordViewPrescriptions));
+
+    status = computed<PrescriptionStatus | null>(() => {
+        const p = this.prescription();
+        return p ? normalizePrescriptionStatus(p.status) : null;
+    });
+    /** Only a Draft can be edited, and only by users the update API allows. */
+    editable = computed(() => this.status() === 'Draft' && this.canUpdate());
+    showIssue = computed(() => this.status() === 'Draft' && this.canIssuePerm());
+    showCancel = computed(() => (this.status() === 'Draft' || this.status() === 'Issued') && this.canCancelPerm());
+    linesTotal = computed(() => formatAmount(this.lines().reduce((sum, l) => sum + lineTotal(l.input), 0)));
+    existingMedicineIds = computed(() => this.lines().map(l => l.input.medicineId));
+    criticalLines = computed(() => this.lines().filter(l => l.stored.some(isUnacknowledgedCritical)));
+
+    private loadSub?: Subscription;
     // #endregion
 
     // #region Init (Lifecycle + Setup)
     ngOnInit(): void {
-        this.loadDraft();
+        const perms$ = this.authSrv.permissions$.pipe(filter((p): p is string[] => p !== null));
+        perms$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(p => this.perms.set(p));
 
-        this.autosave$.pipe(
-            debounceTime(1200),
-            switchMap(() => {
-                const d = this.draft();
-                if (!d) throw new Error('no draft');
-                return this.rxSrv.saveDraft(d);
-            }),
-        ).subscribe({
-            next: () => { this.autosaveLabel.set('Saved ' + new Date().toLocaleTimeString()); },
-        });
+        // Permissions are awaited once so the first load knows what the user may call; later changes only update the flags.
+        combineLatest([this.route.queryParamMap, perms$.pipe(take(1))])
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(([q]) => this.open(q.get('id'), q.get('patientId')));
     }
 
-    ngOnDestroy(): void {
-        this.autosave$.complete();
+    /** Warns before a reload or tab close would throw away unsaved edits. */
+    @HostListener('window:beforeunload', ['$event'])
+    onBeforeUnload(event: BeforeUnloadEvent): void {
+        if (this.dirty) event.preventDefault();
     }
     // #endregion
 
     // #region Methods
-    private loadDraft(): void {
-        this.error.set(null);
-        this.rxSrv.getDraft(this.prescriptionId).subscribe({
-            next: res => {
-                this.draft.set(res.data);
-                const patientId = res.data.patient.patientId;
-                const doctorId = res.data.doctor.doctorId;
-                this.rxSrv.getRecentPrescriptions(patientId).subscribe(r => this.recent.set(r.data ?? []));
-                this.rxSrv.getFavorites(doctorId).subscribe(r => this.favorites.set(r.data ?? []));
-                this.rxSrv.getTemplates(doctorId).subscribe(r => this.templates.set(r.data ?? []));
-            },
-            error: () => {
-                this.error.set('Failed to load the prescription. Please try again.');
-            },
-        });
+    get dirty(): boolean {
+        return this.mode === 'detail' && this.editable() && (this.linesDirty() || this.form.dirty);
     }
 
-    retryLoad(): void {
-        this.loadDraft();
+    /** Why Issue is unavailable right now, or null. A method because it reads the form's dirty flag, which is not a signal. */
+    issueBlockedReason(): string | null {
+        if (this.dirty) return 'Save your changes before issuing.';
+        if (!this.prescription()?.items.length) return 'Add a medication before issuing.';
+        const n = this.criticalLines().length;
+        return n ? `${n} medication${n > 1 ? 's have' : ' has'} an unacknowledged critical warning. Remove ${n > 1 ? 'them' : 'it'} to issue.` : null;
     }
 
-    private patch(fn: (d: PrescriptionDraft) => PrescriptionDraft) {
-        const current = this.draft();
-        if (!current) return;
-        this.draft.set(fn(current));
-        this.autosave$.next();
-    }
+    private open(id: string | null, patientId: string | null): void {
+        this.loadSub?.unsubscribe();
+        this.prescription.set(null);
+        this.lines.set([]);
+        this.patientRows.set([]);
+        this.linesDirty.set(false);
+        this.loadError.set(null);
+        this.drawerOpen = false;
+        this.cancelOpen = false;
+        this.form.reset();
 
-    updatePrimaryDiagnosis(v: RxDiagnosisEntry | null) {
-        this.patch(d => ({ ...d, primaryDiagnosis: v }));
-    }
-
-    updateSecondaryDiagnoses(v: RxDiagnosisEntry[]) {
-        this.patch(d => ({ ...d, secondaryDiagnoses: v }));
-    }
-
-    updateSymptoms(v: string) {
-        this.patch(d => ({ ...d, symptoms: v }));
-    }
-
-    updateClinicalNotes(v: string) {
-        this.patch(d => ({ ...d, clinicalNotes: v }));
-    }
-
-    updateDoctorNotes(v: string) {
-        this.patch(d => ({ ...d, doctorNotes: v }));
-    }
-
-    updateItems(items: RxMedicationItem[]) {
-        this.patch(d => ({ ...d, items }));
-        this.refreshCds(items);
-    }
-
-    private refreshCds(items: RxMedicationItem[]) {
-        const patientId = this.draft()?.patient.patientId;
-        if (!patientId || !items.length) return;
-        this.rxSrv.checkClinicalWarnings(patientId, items).subscribe(res => {
-            const map = res.data ?? {};
-            this.patch(d => ({ ...d, items: d.items.map(i => ({ ...i, warnings: map[i.id] ?? i.warnings })) }));
-        });
-    }
-
-    openAddDrawer() {
-        this.editingItem.set(null);
-        this.drawerOpen.set(true);
-    }
-
-    openEditDrawer(item: RxMedicationItem) {
-        this.editingItem.set(item);
-        this.drawerOpen.set(true);
-    }
-
-    closeDrawer() {
-        this.drawerOpen.set(false);
-        this.editingItem.set(null);
-    }
-
-    onDrawerSave(payload: { item: RxMedicationItem; continueAdding: boolean }) {
-        this.patch(d => {
-            const exists = d.items.some(i => i.id === payload.item.id);
-            const items = exists ? d.items.map(i => i.id === payload.item.id ? payload.item : i) : [...d.items, payload.item];
-            return { ...d, items };
-        });
-        this.refreshCds(this.draft()?.items ?? []);
-        if (!payload.continueAdding) this.closeDrawer();
-        else this.editingItem.set(null);
-        this.toastSrv.success(`${payload.item.name} added to prescription`);
-    }
-
-    applyFavorite(fav: FavoriteMedication) {
-        const item: RxMedicationItem = {
-            id: `med-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-            medicineId: fav.medicineId,
-            name: fav.name,
-            genericName: fav.name,
-            brandName: null,
-            strength: fav.strength,
-            dosageForm: null,
-            route: 'Oral',
-            dose: fav.dose,
-            frequency: fav.frequency,
-            timing: {},
-            beforeMeal: false,
-            afterMeal: false,
-            prn: fav.frequency === 'PRN',
-            durationDays: fav.durationDays,
-            quantity: fav.quantity,
-            unit: fav.unit,
-            refillCount: 0,
-            instructions: null,
-            pharmacyNotes: null,
-            insuranceCovered: true,
-            stockStatus: 'InStock',
-            isControlledSubstance: false,
-            isAntibiotic: false,
-            isHighAlert: false,
-            isOtc: false,
-            isPrescriptionOnly: true,
-            isCustomMedication: false,
-            status: 'Active',
-            unitPrice: 0,
-            warnings: [],
-        };
-        this.patch(d => ({ ...d, items: [...d.items, item] }));
-        this.refreshCds(this.draft()?.items ?? []);
-        this.toastSrv.success(`${fav.name} added from favorites`);
-    }
-
-    applyTemplate(tpl: PrescriptionTemplate) {
-        const items: RxMedicationItem[] = tpl.items.map(i => ({
-            ...i,
-            id: `med-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-            warnings: [],
-        }));
-        this.patch(d => ({ ...d, items: [...d.items, ...items] }));
-        this.refreshCds(this.draft()?.items ?? []);
-        this.toastSrv.success(`${tpl.name} template applied (${items.length} medications)`);
-    }
-
-    addToFavorites(item: RxMedicationItem) {
-        const d = this.draft();
-        if (!d || !item.medicineId) return;
-        this.rxSrv.addFavorite(d.doctor.doctorId, {
-            medicineId: item.medicineId,
-            dose: item.dose,
-            frequency: item.frequency,
-            durationDays: item.durationDays,
-        }).subscribe(res => {
-            if (!res.success || !res.data) return;
-            const fav = res.data;
-            this.favorites.update(list => [...list.filter(f => f.id !== fav.id), fav].sort((a, b) => a.name.localeCompare(b.name)));
-            this.toastSrv.success(`${item.name} saved to favorites`);
-        });
-    }
-
-    removeFavorite(fav: FavoriteMedication) {
-        const d = this.draft();
-        if (!d) return;
-        this.rxSrv.removeFavorite(d.doctor.doctorId, fav.id).subscribe(res => {
-            if (res.success) this.favorites.update(list => list.filter(f => f.id !== fav.id));
-        });
-    }
-
-    saveAsTemplate(name: string) {
-        const d = this.draft();
-        if (!d) return;
-        // Only catalog medications can be templated; custom free-text lines are skipped.
-        const lines = d.items.filter(i => !!i.medicineId);
-        if (!lines.length) {
-            this.toastSrv.error('Add at least one catalog medication before saving a template');
-            return;
+        if (id) {
+            this.mode = 'detail';
+            if (GUID.test(id)) this.loadDetail(id);
+            else this.loadError.set('notFound');
+        } else if (patientId) {
+            this.mode = 'patient';
+            if (!GUID.test(patientId)) this.loadError.set('notFound');
+            else if (!this.canListPatientRx()) this.loadError.set('forbidden');
+            else this.loadPatient(patientId);
+        } else {
+            this.mode = 'empty';
         }
-        this.rxSrv.createTemplate({
-            doctorId: d.doctor.doctorId,
-            name,
-            items: lines.map(i => ({
-                medicineId: i.medicineId!,
-                dose: i.dose,
-                frequency: i.frequency,
-                durationDays: i.durationDays,
-                quantity: i.quantity,
-                unit: i.unit,
-                route: i.route ?? null,
-                timing: i.timing,
-                beforeMeal: i.beforeMeal,
-                afterMeal: i.afterMeal,
-                prn: i.prn,
+    }
+
+    private errorKind(err: HttpErrorResponse): LoadError {
+        if (err?.status === 403) return 'forbidden';
+        if (err?.status === 404) return 'notFound';
+        return 'failed';
+    }
+
+    loadDetail(id: string): void {
+        this.loadSub?.unsubscribe();
+        this.loading.set(true);
+        this.loadError.set(null);
+        this.loadSub = this.rxSrv.get(id)
+            .pipe(finalize(() => this.loading.set(false)), takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: res => {
+                    if (!res.data) { this.loadError.set('notFound'); return; }
+                    this.apply(res.data);
+                },
+                error: err => this.loadError.set(this.errorKind(err)),
+            });
+    }
+
+    private loadPatient(patientId: string): void {
+        this.loadSub?.unsubscribe();
+        this.loading.set(true);
+        this.loadError.set(null);
+        this.loadSub = this.rxSrv.getPatientPrescriptions(patientId)
+            .pipe(finalize(() => this.loading.set(false)), takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: res => this.patientRows.set(res.data?.items ?? []),
+                error: err => this.loadError.set(this.errorKind(err)),
+            });
+    }
+
+    /** Puts the server copy on screen and clears every local edit. */
+    private apply(p: Prescription): void {
+        this.prescription.set(p);
+        this.lines.set((p.items ?? []).map(toLine));
+        this.form.reset({ diagnosis: p.diagnosis ?? '', instructions: p.instructions ?? '' });
+        this.linesDirty.set(false);
+    }
+
+    retry(): void {
+        const q = this.route.snapshot.queryParamMap;
+        this.open(q.get('id'), q.get('patientId'));
+    }
+
+    refresh(): void {
+        const id = this.prescription()?.id ?? this.route.snapshot.queryParamMap.get('id');
+        if (!id || this.loading() || this.busy()) return;
+        if (this.dirty) this.dialogSrv.confirmUnsavedChanges(() => this.loadDetail(id));
+        else this.loadDetail(id);
+    }
+
+    openPrescription(id: string): void {
+        this.router.navigate([], { queryParams: { id }, relativeTo: this.route });
+    }
+
+    backToPatient(): void {
+        const patientId = this.prescription()?.patientId;
+        if (!patientId) return;
+        const go = () => this.router.navigate([], { queryParams: { patientId }, relativeTo: this.route });
+        if (this.dirty) this.dialogSrv.confirmUnsavedChanges(go);
+        else go();
+    }
+
+    // Medication lines
+    openAdd(): void {
+        this.editingLine = null;
+        this.drawerOpen = true;
+    }
+
+    openEdit(line: PrescriptionLine): void {
+        this.editingLine = line;
+        this.drawerOpen = true;
+    }
+
+    closeDrawer(): void {
+        this.drawerOpen = false;
+    }
+
+    onItemSaved(input: PrescriptionItemInput): void {
+        const editing = this.editingLine;
+        if (editing) {
+            this.lines.update(ls => ls.map(l => l.key === editing.key ? { ...l, input, checked: null } : l));
+        } else {
+            this.lines.update(ls => [...ls, { key: newLineKey(), input, stored: [], checked: null, quantityDispensed: 0 }]);
+        }
+        this.linesDirty.set(true);
+        this.drawerOpen = false;
+    }
+
+    removeLine(line: PrescriptionLine): void {
+        this.dialogSrv.confirm(
+            `Remove ${line.input.medicineName} from this prescription? It is deleted from the saved prescription when you save changes.`,
+            () => {
+                this.lines.update(ls => ls.filter(l => l.key !== line.key));
+                this.linesDirty.set(true);
+            },
+            'Remove medication',
+            'warning',
+            'Remove',
+            'Keep',
+        );
+    }
+
+    checkWarnings(): void {
+        const p = this.prescription();
+        const lines = this.lines();
+        if (!p || !lines.length || this.busy()) return;
+        const request: CdsCheckRequest = {
+            patientId: p.patientId,
+            excludePrescriptionId: p.id,
+            items: lines.map(l => ({
+                itemKey: l.key,
+                medicineId: l.input.medicineId,
+                medicineName: l.input.medicineName,
+                genericName: l.input.genericName,
+                dosageInstructions: l.input.dosageInstructions,
+                frequency: l.input.frequency,
+                durationInDays: l.input.durationInDays,
             })),
-        }).subscribe(res => {
-            if (!res.success || !res.data) return;
-            const tpl = res.data;
-            this.templates.update(list => [...list, tpl].sort((a, b) => a.name.localeCompare(b.name)));
-            const skipped = d.items.length - lines.length;
-            this.toastSrv.success(`Template "${name}" saved${skipped ? ` (${skipped} custom line(s) skipped)` : ''}`);
-        });
-    }
-
-    deleteTemplate(tpl: PrescriptionTemplate) {
-        this.dialogSrv.confirmDelete(() => {
-            this.rxSrv.deleteTemplate(tpl.id).subscribe(res => {
-                if (res.success) this.templates.update(list => list.filter(t => t.id !== tpl.id));
+        };
+        this.busy.set('check');
+        this.rxSrv.checkWarnings(request)
+            .pipe(finalize(() => this.busy.set(null)), takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: res => {
+                    const byKey = new Map(Object.entries(res.data ?? {}).map(([k, v]) => [k.toLowerCase(), v]));
+                    this.lines.update(ls => ls.map(l => ({ ...l, checked: byKey.get(l.key.toLowerCase()) ?? [] })));
+                    const found = this.lines().reduce((n, l) => n + (l.checked?.length ?? 0), 0);
+                    if (found) this.toastSrv.info(`${found} warning${found > 1 ? 's' : ''} found. See the medication list.`);
+                    else this.toastSrv.success('No warnings found.');
+                },
+                error: () => undefined,
             });
-        }, `template "${tpl.name}"`);
     }
 
-    scrollToRow(itemId: string) {
-        document.getElementById('rx-row-' + itemId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    saveDraft() {
-        const d = this.draft();
-        if (!d) return;
-        this.rxSrv.saveDraft(d).subscribe({
-            next: () => { this.autosaveLabel.set('Saved ' + new Date().toLocaleTimeString()); this.toastSrv.success('Prescription saved as draft'); },
-            error: () => { this.toastSrv.error('Could not save draft'); },
-        });
-    }
-
-    openPreview() {
-        this.previewOpen.set(true);
-    }
-
-    printRx() {
-        window.print();
-    }
-
-    issueRx() {
-        const d = this.draft();
-        if (!d) return;
-        if (!d.items.length) {
-            this.toastSrv.error('Add at least one medication before issuing');
-            return;
-        }
-        const hasCritical = hasUnacknowledgedAtOrAbove(d.items, severityRank('Critical'));
-        if (hasCritical) {
-            this.toastSrv.error('Resolve or acknowledge all Critical warnings before issuing');
-            return;
-        }
-        const unacknowledgedMedium = hasUnacknowledgedAtOrAbove(d.items, severityRank('Medium'));
-        const message = unacknowledgedMedium
-            ? `This prescription has unacknowledged clinical warnings. Issue ${d.items.length} medication(s) anyway?`
-            : `Issue this prescription with ${d.items.length} medication(s)? This action cannot be undone.`;
-
-        this.dialogSrv.confirm(message, () => {
-            this.rxSrv.issue(d).subscribe({
-                next: res => { this.draft.set(res.data); this.toastSrv.success('Prescription issued successfully'); },
-                error: () => this.toastSrv.error('Failed to issue prescription'),
+    // Save, issue, cancel. Failures are reported by the global HTTP error toast; every form keeps what was entered.
+    save(): void {
+        const p = this.prescription();
+        if (!p || this.busy() || !this.editable() || !this.dirty) return;
+        this.form.markAllAsTouched();
+        if (this.form.invalid) return;
+        const v = this.form.getRawValue();
+        this.busy.set('save');
+        this.rxSrv.update({
+            id: p.id,
+            diagnosis: v.diagnosis.trim() || null,
+            instructions: v.instructions.trim() || null,
+            items: this.lines().map(l => l.input),
+        })
+            .pipe(finalize(() => this.busy.set(null)), takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: () => {
+                    this.toastSrv.success('Prescription saved.');
+                    // The server copy is now the truth; mark clean first so a failed reload does not show a false "unsaved" state.
+                    this.form.markAsPristine();
+                    this.linesDirty.set(false);
+                    this.loadDetail(p.id);
+                },
+                error: () => undefined,
             });
-        }, 'Issue Prescription', 'warning', 'Issue', 'Keep Editing');
     }
 
-    cancelRx() {
-        const d = this.draft();
-        if (!d) return;
-        this.dialogSrv.confirmDelete(() => {
-            this.rxSrv.cancel(d, 'Cancelled by doctor').subscribe({
-                next: res => { this.draft.set(res.data); this.toastSrv.success('Prescription cancelled'); },
-                error: () => this.toastSrv.error('Failed to cancel prescription'),
+    confirmIssue(): void {
+        const p = this.prescription();
+        if (!p || this.busy() || !this.showIssue() || this.issueBlockedReason()) return;
+        const n = p.items.length;
+        this.dialogSrv.confirm(
+            `Issue ${p.prescriptionNumber} with ${n} medication${n > 1 ? 's' : ''}? An issued prescription can no longer be edited.`,
+            () => this.issue(p.id),
+            'Issue prescription',
+            'warning',
+            'Issue',
+            'Keep editing',
+        );
+    }
+
+    private issue(id: string): void {
+        if (this.busy()) return;
+        this.busy.set('issue');
+        this.rxSrv.issue(id)
+            .pipe(finalize(() => this.busy.set(null)), takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: () => {
+                    this.toastSrv.success('Prescription issued.');
+                    this.loadDetail(id);
+                },
+                error: () => undefined,
             });
-        }, 'this prescription');
+    }
+
+    openCancel(): void {
+        if (this.busy() || !this.showCancel()) return;
+        this.cancelOpen = true;
+    }
+
+    closeCancel(): void {
+        this.cancelOpen = false;
+    }
+
+    cancelPrescription(reason: string): void {
+        const p = this.prescription();
+        if (!p || this.busy()) return;
+        this.busy.set('cancel');
+        this.rxSrv.cancel(p.id, reason)
+            .pipe(finalize(() => this.busy.set(null)), takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: () => {
+                    this.toastSrv.success('Prescription cancelled.');
+                    this.cancelOpen = false;
+                    this.cancelDrawer?.reset();
+                    this.loadDetail(p.id);
+                },
+                error: () => undefined,
+            });
     }
     // #endregion
 }

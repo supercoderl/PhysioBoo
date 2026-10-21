@@ -61,7 +61,9 @@ export interface CreateAppointmentRequest {
 
 export interface CompleteConsultationRequest {
   diagnosis: string;
-  treatmentPlan: string;
-  followUpDate: string;
-  doctorNotes: string;
+  treatmentPlan: string | null;
+  /** YYYY-MM-DD, or null: the server parses any non-null value as a date. */
+  followUpDate: string | null;
+  // The server does not store doctor notes yet; the Doctor Desk leaves this out.
+  doctorNotes?: string;
 }

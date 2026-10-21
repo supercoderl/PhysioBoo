@@ -1,3 +1,6 @@
+import { BloodGroup } from "../enums/blood-group";
+import { Gender } from "../enums/gender";
+import { MaritalStatus } from "../enums/marital-status";
 import { PatientType, RiskLevel } from "../enums/patient";
 
 /**
@@ -82,6 +85,28 @@ export interface CreatePatientRequest {
   preferredDoctorId: string | null;
   preferredAppointmentTime: string | null;
   communicationPreferences: string | null;
+}
+
+/** Mirrors server CreatePatientProfileViewModel. Enums travel as their numeric values. */
+export interface CreatePatientProfile {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  gender: Gender;
+  bloodGroup: BloodGroup;
+  maritalStatus: MaritalStatus;
+  email: string;
+  phone: string;
+  emergencyContactName: string | null;
+  emergencyContactPhone: string | null;
+  address: string | null;
+  city: string | null;
+  postalCode: string | null;
+}
+
+/** The create body the server requires: the patient fields plus the profile of the person. */
+export interface RegisterPatientRequest extends CreatePatientRequest {
+  profile: CreatePatientProfile;
 }
 
 /** Mirrors server UpdatePatientViewModel. */

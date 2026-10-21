@@ -15,6 +15,7 @@ import {
 } from '@physioboo/ui';
 import { Subject, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
+import { BooDatepickerComponent } from '../../../../../components/date-picker/boo-date-picker.component';
 import { AdminBreadcrumbComponent } from '../../../../../components/breadcrumb/admin-breadcrumb.component';
 import { AppointmentService } from '../../../../../services/admin/appointment.service';
 import { AuthService } from '../../../../../services/auth/auth.service';
@@ -59,6 +60,7 @@ const ACTION_COPY: Record<BookingAction, { status: AppointmentStatus; done: stri
         AdminBreadcrumbComponent,
         BooButtonComponent,
         BooIconComponent,
+        BooDatepickerComponent,
         BooStatusBadgeComponent,
         BooPaginationComponent,
         BooEmptyStateComponent,

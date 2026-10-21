@@ -1,7 +1,8 @@
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpContext, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { Observable, tap } from "rxjs";
 import { BASE_API } from "../../shared/api/base";
+import { SKIP_ERROR_TOAST } from "../../shared/contexts/option.context";
 import { PagedResponse } from "../../shared/types/common";
 import {
     DashboardOverviewQuery,
@@ -19,7 +20,11 @@ export class DashboardOverviewService {
         let params = new HttpParams();
         if (query?.date) params = params.set('date', query.date);
         if (query?.shift) params = params.set('shift', query.shift);
-        return this.http.get<PagedResponse<DashboardOverviewSnapshot>>(BASE_API.DASHBOARD.OVERVIEW, { params });
+        // The page shows its own error state for the overview, so the global error toast is skipped.
+        return this.http.get<PagedResponse<DashboardOverviewSnapshot>>(BASE_API.DASHBOARD.OVERVIEW, {
+            params,
+            context: new HttpContext().set(SKIP_ERROR_TOAST, true)
+        });
     }
 
     dismissAlert(alertId: string, resolutionNote?: string): Observable<PagedResponse<string>> {

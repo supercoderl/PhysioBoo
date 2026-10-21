@@ -525,6 +525,7 @@ export const BASE_API = {
     BASE: '/api/appointments',
     SEARCH: '/api/appointments/search',
     STATUS: (id: string) => `/api/appointments/${id}/status`,
+    DOCTOR_DAILY: (doctorId: string) => `/api/appointments/doctor/${doctorId}/daily`,
   },
   /** Anonymous endpoints for the public website (tenant-scoped server-side, public fields only). */
   PUBLIC: {

@@ -1,7 +1,7 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpContext } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
-import { AppointmentFilter, AppointmentRecord, AppointmentStatus, CompleteConsultationRequest } from "../../shared/types/appointment.types";
+import { AppointmentFilter, AppointmentRecord, AppointmentStatus, CompleteConsultationRequest, CreateAppointmentRequest } from "../../shared/types/appointment.types";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
 
 // Order must match PhysioBoo.Domain.Enums.AppointmentStatus on the backend (serialized as its numeric index).
@@ -15,6 +15,16 @@ export class AppointmentService {
 
     search(request: PagedRequest<AppointmentFilter>) {
         return this.http.post<PagedResponse<PaginationData<AppointmentRecord>>>(BASE_API.APPOINTMENT.SEARCH, request);
+    }
+
+    /** Returns the new appointment's id. */
+    create(request: CreateAppointmentRequest) {
+        return this.http.post<PagedResponse<string>>(BASE_API.APPOINTMENT.BASE, request);
+    }
+
+    /** One doctor's appointments on a date (YYYY-MM-DD), by scheduled date. */
+    doctorDaily(doctorId: string, date: string, context?: HttpContext) {
+        return this.http.get<PagedResponse<AppointmentRecord[]>>(BASE_API.APPOINTMENT.DOCTOR_DAILY(doctorId), { params: { date }, context });
     }
 
     updateStatus(id: string, status: AppointmentStatus) {

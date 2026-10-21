@@ -184,6 +184,10 @@ export const Permissions = {
     Academy: {
         CourseManage: "academy:course:manage",
     },
+    Dashboard: {
+        OverviewRead: "dashboard:overview:read",
+        AlertDismiss: "dashboard:alert:dismiss",
+    },
     Inpatient: {
         BedRead: "inpatient:bed:read",
         BedAssign: "inpatient:bed:assign",

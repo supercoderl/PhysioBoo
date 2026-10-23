@@ -244,3 +244,15 @@ Prerequisites: permissions `inpatient:treatment-sheet:read | write` on the right
 - [x] `TREATMENT_SHEET` block in `src/app/shared/api/base.ts`
 - [x] Route kept at `/admin/inpatient/treatment-sheet` (patient resolved via route/query param, same pattern as Medical Record)
 - [x] Components: shell + 8 tabs (Overview, Timeline, Orders, Medications, Procedures, Laboratory, Imaging, Notes)
+
+---
+
+## 15. Implementation Notes (2026-10-23)
+
+- **Patient context.** The page no longer falls back to a hard-coded patient. With no `patientId` (route or query param) it shows an admitted-patient selector (`POST /api/admissions/search`, status `Admitted`, first 100 by admission date). A value that is not a GUID, or a patient without an `Admitted` admission (summary returns 404), shows an explanatory state with "Choose another patient". Switching patient discards every tab draft.
+- **Writes.** Forms and write actions follow `inpatient:treatment-sheet:write`; without it the sheet is read-only. Forms start empty (no default type, priority, route, status or time) and are marked with an **Unsaved draft** badge; saved rows are the only entries in the tables. A failed save keeps the draft; submit is blocked while a save is in flight. Write tabs stay mounted after first open so drafts survive tab switches.
+- **Medication doses.** Open doses (Scheduled/Held) can be recorded Given, Missed, Refused or (Scheduled only) Held, as the backend allows; the row shown afterwards is the server's response.
+- **Procedures.** Name, department, status and scheduled date/time are required; completion time is sent only for Completed and must not precede the scheduled time (backend rule).
+- **Date/time input.** `boo-datepicker` (date) + `boo-input type="time"`. There is no shared date-time picker.
+- **Read states.** Every tab has loading, empty, error and retry states; lists load the first 50 rows and say when more exist.
+- **Known backend limits.** Write endpoints verify the patient exists but not an active admission; no endpoint edits or deletes an order, note or procedure, or changes a diagnosis; there are no vitals/observation endpoints.

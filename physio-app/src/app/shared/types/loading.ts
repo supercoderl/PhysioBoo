@@ -51,6 +51,7 @@ export const LoadingKeys = {
         ACKNOWLEDGE: 'surgery-acknowledge',
         CASES_SEARCH: 'surgery-cases-search',
         CASE_DETAIL: 'surgery-case-detail',
+        CASE_CREATE: 'surgery-case-create',
         CASE_CANCEL: 'surgery-case-cancel',
         ROOMS: 'surgery-rooms',
         ROOM_STATUS: 'surgery-room-status',

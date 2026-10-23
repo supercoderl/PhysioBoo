@@ -1,6 +1,6 @@
 import { Router } from "@angular/router";
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -9,15 +9,17 @@ import { TreatmentImagingOrderRow } from "../../../../../shared/types/treatment-
 @Component({
   selector: 'treatment-imaging-tab',
   standalone: true,
-  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent],
+  imports: [SharedModule, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
-    <div *ngIf="!isLoading() && !studies().length"><boo-empty-state icon="scan" title="No imaging requests"></boo-empty-state></div>
+    <boo-error-state *ngIf="!isLoading() && loadError()" title="Couldn't load imaging requests" [description]="loadError()" appearance="panel" (retry)="load()"></boo-error-state>
 
-    <div *ngIf="!isLoading() && studies().length" class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
+    <div *ngIf="!isLoading() && !loadError() && !studies().length"><boo-empty-state icon="scan" title="No imaging requests"></boo-empty-state></div>
+
+    <div *ngIf="!isLoading() && !loadError() && studies().length" class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
       <table class="w-full text-sm">
         <thead class="bg-gray-100 text-gray-600 text-xs uppercase">
           <tr>
@@ -54,16 +56,25 @@ export class TreatmentImagingTabComponent implements OnChanges {
   @Input({ required: true }) patientId!: string;
 
   isLoading = signal(true);
+  loadError = signal<string | null>(null);
   studies = signal<TreatmentImagingOrderRow[]>([]);
 
   constructor(private srv: TreatmentSheetService, private toastSrv: ToastService, private router: Router) { }
 
   ngOnChanges(): void {
+    this.load();
+  }
+
+  load(): void {
     if (!this.patientId) return;
     this.isLoading.set(true);
+    this.loadError.set(null);
     this.srv.getImagingOrders(this.patientId).subscribe({
-      next: (res) => { if (res.success) this.studies.set(res.data.items); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false),
+      next: (res) => {
+        if (res.success) this.studies.set(res.data.items); else this.loadError.set('The imaging requests could not be loaded.');
+        this.isLoading.set(false);
+      },
+      error: () => { this.loadError.set('The imaging requests could not be loaded.'); this.isLoading.set(false); },
     });
   }
 

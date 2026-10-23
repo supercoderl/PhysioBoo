@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
-import { BooEmptyStateComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooErrorStateComponent } from '@physioboo/ui';
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { TimelineCategory, TimelineRangeKey, TreatmentTimelineEntry } from "../../../../../shared/types/treatment-sheet.types";
@@ -8,7 +8,7 @@ import { TimelineCategory, TimelineRangeKey, TreatmentTimelineEntry } from "../.
 @Component({
   selector: 'treatment-timeline-tab',
   standalone: true,
-  imports: [SharedModule,BooSelectComponent, BooEmptyStateComponent],
+  imports: [SharedModule, BooSelectComponent, BooEmptyStateComponent, BooErrorStateComponent],
   template: `
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <h3 class="text-sm font-semibold text-primary m-0">Treatment Timeline</h3>
@@ -19,9 +19,11 @@ import { TimelineCategory, TimelineRangeKey, TreatmentTimelineEntry } from "../.
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
-    <div *ngIf="!isLoading() && !entries().length"><boo-empty-state icon="history" title="No timeline entries" description="Nothing recorded for this range yet."></boo-empty-state></div>
+    <boo-error-state *ngIf="!isLoading() && loadError()" title="Couldn't load the timeline" [description]="loadError()" appearance="panel" (retry)="load()"></boo-error-state>
 
-    <ol *ngIf="!isLoading() && entries().length" class="relative border-l border-gray-200 ml-2 space-y-5">
+    <div *ngIf="!isLoading() && !loadError() && !entries().length"><boo-empty-state icon="history" title="No timeline entries" description="Nothing recorded for this range yet."></boo-empty-state></div>
+
+    <ol *ngIf="!isLoading() && !loadError() && entries().length" class="relative border-l border-gray-200 ml-2 space-y-5">
       <li *ngFor="let e of entries()" class="ml-4">
         <span class="absolute -left-[5px] w-2.5 h-2.5 rounded-full bg-primary mt-1.5"></span>
         <div class="flex items-center gap-2 mb-0.5">
@@ -38,6 +40,7 @@ export class TreatmentTimelineTabComponent implements OnChanges {
   @Input({ required: true }) patientId!: string;
 
   isLoading = signal(true);
+  loadError = signal<string | null>(null);
   entries = signal<TreatmentTimelineEntry[]>([]);
   range: TimelineRangeKey = 'Today';
 
@@ -56,9 +59,13 @@ export class TreatmentTimelineTabComponent implements OnChanges {
 
   load(): void {
     this.isLoading.set(true);
+    this.loadError.set(null);
     this.srv.getTimeline(this.patientId, { range: this.range }).subscribe({
-      next: (res) => { if (res.success) this.entries.set(res.data); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false),
+      next: (res) => {
+        if (res.success) this.entries.set(res.data); else this.loadError.set('The timeline could not be loaded.');
+        this.isLoading.set(false);
+      },
+      error: () => { this.loadError.set('The timeline could not be loaded.'); this.isLoading.set(false); },
     });
   }
 

@@ -1,8 +1,15 @@
-import { Component, OnInit, signal } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { HttpContext, HttpErrorResponse } from "@angular/common/http";
+import { Component, DestroyRef, OnInit, inject, signal } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { ActivatedRoute, Router } from "@angular/router";
 import { finalize, forkJoin } from "rxjs";
-import { BooBadgeTone, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
+import { AdmissionService } from "../../../../services/admin/admission.service";
+import { AuthService } from "../../../../services/auth/auth.service";
+import { SKIP_ERROR_TOAST } from "../../../../shared/contexts/option.context";
+import { Permissions } from "../../../../shared/constants/permission.constant";
 import { TreatmentSheetService } from "../../../../services/admin/treatment-sheet.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -23,6 +30,7 @@ import { ButtonIconComponent } from "../../../../components/button/button-icon/b
 type TabKey = 'overview' | 'timeline' | 'orders' | 'medications' | 'procedures' | 'laboratory' | 'imaging' | 'notes';
 
 const LOADING_KEY = 'treatment-sheet';
+const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 @Component({
   selector: 'admin-treatment-sheet',
@@ -30,7 +38,9 @@ const LOADING_KEY = 'treatment-sheet';
   imports: [
     SharedModule,
 
+    BooEmptyStateComponent,
     BooErrorStateComponent,
+    BooSelectComponent,
     BooStatusBadgeComponent,
     StatCardComponent,
     TreatmentOverviewTabComponent,
@@ -46,18 +56,33 @@ const LOADING_KEY = 'treatment-sheet';
   ],
   host: { class: 'block min-h-screen bg-gray-50' },
   template: `
+    <!-- No patient selected -->
+    <div *ngIf="!patientId" class="max-w-xl mx-auto px-4 sm:px-6 pt-12">
+      <boo-error-state *ngIf="patientsError()" title="Couldn't load admitted patients" [description]="patientsError()" (retry)="loadAdmittedPatients()"></boo-error-state>
+      <ng-container *ngIf="!patientsError()">
+        <boo-empty-state icon="clipboard-list" title="Select an inpatient" description="Choose a currently admitted patient to open their treatment sheet."></boo-empty-state>
+        <boo-select label="Admitted patient" [options]="patientOptions()" [ngModel]="null" (ngModelChange)="selectPatient($event)"></boo-select>
+        <p *ngIf="patientsLoading()" class="text-xs text-secondary mt-2" aria-live="polite">Loading admitted patients...</p>
+        <p *ngIf="!patientsLoading() && !patientOptions().length" class="text-xs text-secondary mt-2">There are no admitted patients.</p>
+      </ng-container>
+    </div>
+
     <!-- Loading -->
-    <div *ngIf="loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3">
+    <div *ngIf="patientId && loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3">
       <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
       <span class="text-gray-500 text-sm">Loading treatment sheet...</span>
     </div>
 
     <!-- Error -->
-    <div *ngIf="error() && !loadingSrv.isLoading(LOADING_KEY)" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-      <boo-error-state title="Couldn't load the treatment sheet" [description]="error()" (retry)="retryLoad()"></boo-error-state>
+    <div *ngIf="patientId && error() && !loadingSrv.isLoading(LOADING_KEY)" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <boo-empty-state *ngIf="noActiveStay()" icon="bed" title="No active inpatient stay" [description]="error()"></boo-empty-state>
+      <boo-error-state *ngIf="!noActiveStay()" title="Couldn't load the treatment sheet" [description]="error()" (retry)="retryLoad()"></boo-error-state>
+      <div class="mt-4 flex justify-center">
+        <button-icon [icon]="{ name: 'users', size: 16 }" (onClick)="changePatient()"> Choose another patient </button-icon>
+      </div>
     </div>
 
-    <ng-container *ngIf="!error() && hasLoadedOnce">
+    <ng-container *ngIf="patientId && !error() && hasLoadedOnce">
       <!-- Sticky patient summary header -->
       <div class="sticky top-0 z-20 bg-surface shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-start justify-between gap-4">
@@ -68,10 +93,10 @@ const LOADING_KEY = 'treatment-sheet';
             <div class="min-w-0">
               <div class="text-lg font-semibold text-gray-800 truncate">{{ summary()?.fullName }}</div>
               <div class="text-xs text-secondary">
-                MRN {{ summary()?.mrn }} · Visit {{ summary()?.visitNumber }} · Bed {{ summary()?.bedNumber }} · {{ summary()?.wardName }} · {{ summary()?.departmentName }}
+                MRN {{ summary()?.mrn }} · Visit {{ summary()?.visitNumber }} · Bed {{ summary()?.bedNumber || '—' }} · {{ summary()?.wardName || '—' }} · {{ summary()?.departmentName }}
               </div>
               <div class="text-xs text-secondary mt-0.5">
-                Admitted {{ summary()?.admissionDate | date:'mediumDate' }} · LOS {{ lengthOfStayDays() }} day(s) · Attending: {{ summary()?.attendingDoctorName }}
+                Admitted {{ summary()?.admissionDate | date:'mediumDate' }} · LOS {{ lengthOfStayDays() }} day(s) · Attending: {{ summary()?.attendingDoctorName || '—' }}
               </div>
               <div class="flex flex-wrap gap-1.5 mt-2">
                 <boo-status-badge *ngIf="summary()?.primaryDiagnosis" [label]="summary()!.primaryDiagnosis!" tone="primary"></boo-status-badge>
@@ -80,7 +105,8 @@ const LOADING_KEY = 'treatment-sheet';
               </div>
             </div>
           </div>
-          <div class="flex items-center gap-2 shrink-0">
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <button-icon [icon]="{ name: 'users', size: 16 }" (onClick)="changePatient()"> Change patient </button-icon>
             <button-icon [icon]="{ name: 'printer', size: 16 }" (onClick)="printSheet()"> Print Sheet </button-icon>
             <button-icon [icon]="{ name: 'file-down', size: 16 }" (onClick)="exportPdf()"> Export PDF </button-icon>
           </div>
@@ -109,14 +135,14 @@ const LOADING_KEY = 'treatment-sheet';
               </div>
               <p class="text-xs text-gray-700 mt-1">{{ a.message }}</p>
             </div>
-            <button (click)="acknowledgeAlert(a)" class="text-gray-400 hover:text-gray-600" aria-label="Acknowledge alert">
+            <button *ngIf="canWrite" type="button" (click)="acknowledgeAlert(a)" class="text-gray-400 hover:text-gray-600" aria-label="Acknowledge alert">
               <physio-icon name="x" [size]="16"></physio-icon>
             </button>
           </div>
         </div>
 
         <!-- Stats strip -->
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">clipboard
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
           <boo-stat-card label="Active Orders" [value]="stats()?.activeOrders ?? 0" icon="clipboard-list" tone="primary"></boo-stat-card>
           <boo-stat-card label="Completed Orders" [value]="stats()?.completedOrders ?? 0" icon="circle-check" tone="success"></boo-stat-card>
           <boo-stat-card label="Pending Orders" [value]="stats()?.pendingOrders ?? 0" icon="clock" tone="neutral"></boo-stat-card>
@@ -127,7 +153,7 @@ const LOADING_KEY = 'treatment-sheet';
         </div>
 
         <!-- Quick actions -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div *ngIf="canWrite" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           <boo-button-admin (click)="setTab('orders')" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="12px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="8" buttonClass="w-full" class="w-full">
             <physio-icon name="circle-plus" [size]="18" class="text-primary"></physio-icon> Add Order
           </boo-button-admin>
@@ -142,15 +168,15 @@ const LOADING_KEY = 'treatment-sheet';
           </boo-button-admin>
         </div>
 
-        <!-- Tab content -->
+        <!-- Tab content. Tabs with forms stay mounted once opened so unsaved entries survive tab switches. -->
         <treatment-overview-tab *ngIf="activeTab() === 'overview'" [patientId]="patientId" />
         <treatment-timeline-tab *ngIf="activeTab() === 'timeline'" [patientId]="patientId" />
-        <treatment-orders-tab *ngIf="activeTab() === 'orders'" [patientId]="patientId" />
-        <treatment-medications-tab *ngIf="activeTab() === 'medications'" [patientId]="patientId" />
-        <treatment-procedures-tab *ngIf="activeTab() === 'procedures'" [patientId]="patientId" />
+        <treatment-orders-tab *ngIf="visited().has('orders')" [hidden]="activeTab() !== 'orders'" [patientId]="patientId" [canWrite]="canWrite" (changed)="refreshSideData()" />
+        <treatment-medications-tab *ngIf="visited().has('medications')" [hidden]="activeTab() !== 'medications'" [patientId]="patientId" [canWrite]="canWrite" (changed)="refreshSideData()" />
+        <treatment-procedures-tab *ngIf="visited().has('procedures')" [hidden]="activeTab() !== 'procedures'" [patientId]="patientId" [canWrite]="canWrite" (changed)="refreshSideData()" />
         <treatment-laboratory-tab *ngIf="activeTab() === 'laboratory'" [patientId]="patientId" />
         <treatment-imaging-tab *ngIf="activeTab() === 'imaging'" [patientId]="patientId" />
-        <treatment-notes-tab *ngIf="activeTab() === 'notes'" [patientId]="patientId" />
+        <treatment-notes-tab *ngIf="visited().has('notes')" [hidden]="activeTab() !== 'notes'" [patientId]="patientId" [canWrite]="canWrite" (changed)="refreshSideData()" />
       </main>
     </ng-container>
   `,
@@ -158,14 +184,25 @@ const LOADING_KEY = 'treatment-sheet';
 export class AdminTreatmentSheetComponent implements OnInit {
   readonly LOADING_KEY = LOADING_KEY;
 
-  patientId!: string;
+  patientId: string | null = null;
   summary = signal<TreatmentPatientSummary | null>(null);
   stats = signal<TreatmentStats | null>(null);
   alerts = signal<ClinicalAlert[]>([]);
   activeTab = signal<TabKey>('overview');
+  visited = signal<ReadonlySet<TabKey>>(new Set());
 
   error = signal<string | null>(null);
+  noActiveStay = signal(false);
   hasLoadedOnce = false;
+
+  patientOptions = signal<{ label: string; value: string }[]>([]);
+  patientsLoading = signal(false);
+  patientsError = signal<string | null>(null);
+
+  readonly canWrite = inject(AuthService).hasPermission(Permissions.Inpatient.TreatmentSheetWrite);
+
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly silent = new HttpContext().set(SKIP_ERROR_TOAST, true);
 
   readonly tabs: { key: TabKey; label: string; icon: string }[] = [
     { key: 'overview', label: 'Overview', icon: 'layout-dashboard' },
@@ -180,20 +217,76 @@ export class AdminTreatmentSheetComponent implements OnInit {
 
   constructor(
     private srv: TreatmentSheetService,
+    private admissionSrv: AdmissionService,
     private route: ActivatedRoute,
+    private router: Router,
     private toastSrv: ToastService,
     protected loadingSrv: LocalLoadingService,
   ) { }
 
   ngOnInit(): void {
-    this.patientId = this.route.snapshot.paramMap.get('patientId')
-      ?? this.route.snapshot.queryParamMap.get('patientId')
-      ?? 'pat-1001';
-    this.load();
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(q => this.openPatient(this.route.snapshot.paramMap.get('patientId') ?? q.get('patientId')));
+  }
+
+  /** Switches the sheet to another patient, discarding everything (including tab drafts) held for the previous one. */
+  private openPatient(id: string | null): void {
+    if (id === this.patientId && (id === null || this.hasLoadedOnce)) return;
+    this.patientId = id;
+    this.summary.set(null);
+    this.stats.set(null);
+    this.alerts.set([]);
+    this.activeTab.set('overview');
+    this.visited.set(new Set());
+    this.noActiveStay.set(false);
+    this.error.set(null);
+    this.hasLoadedOnce = false;
+
+    if (!id) {
+      this.loadAdmittedPatients();
+    } else if (!GUID.test(id)) {
+      this.error.set('This link does not identify a patient. Choose an admitted patient instead.');
+      this.hasLoadedOnce = true;
+    } else {
+      this.load();
+    }
+  }
+
+  loadAdmittedPatients(): void {
+    this.patientsLoading.set(true);
+    this.patientsError.set(null);
+    this.admissionSrv.search({
+      pageNumber: 1,
+      pageSize: 100,
+      sort: 'admittedat',
+      filter: { start: null, end: null, status: 'Admitted', type: null, departmentId: null },
+    }, this.silent)
+      .pipe(finalize(() => this.patientsLoading.set(false)))
+      .subscribe({
+        next: res => {
+          if (!res.success || !res.data) { this.patientsError.set('The admitted patient list could not be loaded.'); return; }
+          this.patientOptions.set(res.data.items.map(a => ({
+            label: `${a.patientName} · ${a.patientNumber}${a.bedNumber ? ` · Bed ${a.bedNumber}` : ''}`,
+            value: a.patientId,
+          })));
+        },
+        error: () => this.patientsError.set('The admitted patient list could not be loaded.'),
+      });
+  }
+
+  selectPatient(patientId: string | null): void {
+    if (patientId) this.router.navigate([], { relativeTo: this.route, queryParams: { patientId }, queryParamsHandling: 'merge' });
+  }
+
+  changePatient(): void {
+    this.router.navigate([], { relativeTo: this.route, queryParams: { patientId: null }, queryParamsHandling: 'merge' });
   }
 
   load(): void {
+    if (!this.patientId) return;
     this.error.set(null);
+    this.noActiveStay.set(false);
     this.loadingSrv.setLoading(LOADING_KEY, true);
 
     forkJoin({
@@ -204,23 +297,48 @@ export class AdminTreatmentSheetComponent implements OnInit {
       .pipe(finalize(() => this.loadingSrv.setLoading(LOADING_KEY, false)))
       .subscribe({
         next: ({ summary, stats, alerts }) => {
-          if (summary.success) this.summary.set(summary.data);
-          if (stats.success) this.stats.set(stats.data);
-          if (alerts.success) this.alerts.set(alerts.data.filter(a => !a.acknowledged));
+          if (!summary.success || !summary.data) {
+            this.error.set('Failed to load the treatment sheet for this patient. Please try again.');
+          } else {
+            this.summary.set(summary.data);
+            if (stats.success) this.stats.set(stats.data);
+            if (alerts.success) this.alerts.set(alerts.data.filter(a => !a.acknowledged));
+          }
           this.hasLoadedOnce = true;
         },
-        error: () => {
-          this.error.set('Failed to load the treatment sheet for this patient. Please try again.');
+        error: (err: HttpErrorResponse) => {
+          if (err.status === 404) {
+            this.noActiveStay.set(true);
+            this.error.set('This patient has no active admission, so there is no treatment sheet to show.');
+          } else {
+            this.error.set('Failed to load the treatment sheet for this patient. Please try again.');
+          }
           this.hasLoadedOnce = true;
         },
       });
   }
 
+  /** Re-reads the counters and alerts after a tab saved something; on failure the numbers already shown stay. */
+  refreshSideData(): void {
+    if (!this.patientId) return;
+    forkJoin({ stats: this.srv.getStats(this.patientId), alerts: this.srv.getAlerts(this.patientId) })
+      .subscribe({
+        next: ({ stats, alerts }) => {
+          if (stats.success) this.stats.set(stats.data);
+          if (alerts.success) this.alerts.set(alerts.data.filter(a => !a.acknowledged));
+        },
+      });
+  }
+
   retryLoad(): void {
+    this.hasLoadedOnce = false;
     this.load();
   }
 
-  setTab(key: TabKey): void { this.activeTab.set(key); }
+  setTab(key: TabKey): void {
+    this.activeTab.set(key);
+    this.visited.update(v => new Set(v).add(key));
+  }
 
   lengthOfStayDays(): number {
     const admitted = this.summary()?.admissionDate;
@@ -278,10 +396,11 @@ export class AdminTreatmentSheetComponent implements OnInit {
   }
 
   acknowledgeAlert(alert: ClinicalAlert): void {
+    if (!this.canWrite) return;
     this.srv.acknowledgeAlert(alert.id).subscribe(res => {
       if (res.success) {
         this.alerts.set(this.alerts().filter(a => a.id !== alert.id));
-        if (this.stats()) this.stats.update(s => s ? { ...s, criticalAlerts: Math.max(0, s.criticalAlerts - (alert.severity === 'Critical' ? 1 : 0)) } : s);
+        this.refreshSideData();
         this.toastSrv.success('Alert acknowledged');
       } else {
         this.toastSrv.error('Unable to acknowledge alert');
@@ -296,11 +415,12 @@ export class AdminTreatmentSheetComponent implements OnInit {
   /** Treatment sheet (orders, medication record, notes) printed via the browser — "Save as PDF" exports it. */
   exportPdf(): void {
     const p = this.summary();
-    if (!p) return;
+    const patientId = this.patientId;
+    if (!p || !patientId) return;
     forkJoin({
-      orders: this.srv.getOrders(this.patientId),
-      meds: this.srv.getMedications(this.patientId),
-      notes: this.srv.getNotes(this.patientId),
+      orders: this.srv.getOrders(patientId),
+      meds: this.srv.getMedications(patientId),
+      notes: this.srv.getNotes(patientId),
     }).subscribe({
       next: ({ orders, meds, notes }) => {
         const when = (v?: string | null) => v ? new Date(v).toLocaleString() : '';

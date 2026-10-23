@@ -260,3 +260,24 @@ All endpoints assume hospital/tenant scoping via existing auth middleware (not r
 - [x] `LABORATORY` block in `src/app/shared/api/base.ts`
 - [x] Route kept at `/admin/paraclinical/laboratory`
 - [x] Components: shell + 5 tabs (Dashboard, Orders, Sample Collection & Tracking, Result Entry & Verification, Critical Alerts) + Patient Result Drawer
+
+## Implementation notes — workflow pass (2026-10-23)
+
+Implemented against the existing `/api/laboratory/*` endpoints only; no new endpoints were assumed.
+
+- **Permissions.** `lab:sample:manage` (collect, recollect, reject specimen), `lab:result:enter` (enter/edit result), `lab:result:verify` (approve, reject, return) and `lab:alert:acknowledge` are now in `Permissions.Lab`. Actions the user cannot perform are not rendered; the page shows a permission-denied state without `lab:lab-order:read`.
+- **Reasons are required.** Recollect, reject specimen, reject result and return-for-review open `laboratory-reason-drawer` (reason required, max 500, matching the server validators). The earlier hardcoded reasons are gone.
+- **Collect** opens `laboratory-collect-drawer` (container type max 64, collector max 150; blank collector records the signed-in user server-side).
+- **Result entry.** `laboratory-result-entry-drawer` (value required max 200, comments max 2000). The value is sent exactly as typed. The server computes the flag and resets verification to pending, so the list is reloaded after saving instead of patched locally. First values are entered from the specimen row because `/results/search` only returns items that already have a value.
+- **Failures keep input.** Drawers stay open with the typed text while a request is in flight or after it fails; one request runs at a time.
+- **Lists.** The search endpoints are paged only (newest first, max 500). Filtering and 25/20-per-page pagination are client-side over that page, with a notice when `totalCount` exceeds what was loaded. Order details open in `laboratory-order-detail-drawer`.
+- **Removed.** The "New Order" header button had no handler; ordering lives in the treatment sheet and medical record. Replaced by Refresh.
+- **Fixed.** The critical-result donut multiplied the rate by 5.
+
+### Backend gaps
+- No server-side filters (status, priority, department, date range, text) on the list endpoints.
+- Specimen list has no verification status, unit or reference range; `/results/search` omits items without a value; attachments are always empty.
+- Write endpoints return only the item id, so the UI reloads to show stored state.
+
+### Shared UI gaps (`@physioboo/ui`)
+No select, date-picker or textarea is exported. The page uses the app-level `boo-select`, `boo-textarea` and `drawer`; no date filter is offered (the server cannot filter by date). `boo-button` has no danger variant, so destructive buttons use `classname` overrides.

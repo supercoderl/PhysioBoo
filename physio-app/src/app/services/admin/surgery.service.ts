@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { createHttpContext } from "../../shared/contexts/option.context";
@@ -6,6 +6,7 @@ import { PagedResponse, PaginationData } from "../../shared/types/common";
 import { LoadingKeys } from "../../shared/types/loading";
 import {
   ChecklistItemStatus,
+  CreateSurgeryRequest,
   EquipmentItem,
   OperatingRoom,
   OperatingRoomStatus,
@@ -14,7 +15,9 @@ import {
   SurgeryCriticalAlert,
   SurgeryDashboardTrend,
   SurgeryPatientSummary,
+  SurgeryRange,
   SurgeryRow,
+  SurgerySearchParams,
   SurgeryStats,
   SurgeryTimelineStage,
   SurgicalTeamMember,
@@ -32,12 +35,12 @@ export class SurgeryService {
   // #endregion
 
   // #region Methods
-  getStats() {
-    return this.http.get<PagedResponse<SurgeryStats>>(BASE_API.SURGERY.STATS, { context: createHttpContext({ loadingKey: LoadingKeys.SURGERY.STATS }) });
+  getStats(range: SurgeryRange) {
+    return this.http.get<PagedResponse<SurgeryStats>>(BASE_API.SURGERY.STATS, { params: { range }, context: createHttpContext({ loadingKey: LoadingKeys.SURGERY.STATS }) });
   }
 
-  getTrends() {
-    return this.http.get<PagedResponse<SurgeryDashboardTrend>>(BASE_API.SURGERY.TRENDS, { context: createHttpContext({ loadingKey: LoadingKeys.SURGERY.TRENDS }) });
+  getTrends(range: SurgeryRange) {
+    return this.http.get<PagedResponse<SurgeryDashboardTrend>>(BASE_API.SURGERY.TRENDS, { params: { range }, context: createHttpContext({ loadingKey: LoadingKeys.SURGERY.TRENDS }) });
   }
 
   getAlerts() {
@@ -48,8 +51,16 @@ export class SurgeryService {
     return this.http.post<PagedResponse<string>>(BASE_API.SURGERY.ALERT_ACKNOWLEDGE(alertId), {}, { context: createHttpContext({ loadingKey: LoadingKeys.SURGERY.ACKNOWLEDGE }) });
   }
 
-  getCases() {
-    return this.http.get<PagedResponse<PaginationData<SurgeryRow>>>(BASE_API.SURGERY.CASES_SEARCH, { context: createHttpContext({ loadingKey: LoadingKeys.SURGERY.CASES_SEARCH }) });
+  getCases(query: SurgerySearchParams = {}) {
+    let params = new HttpParams();
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== null && value !== undefined && value !== '') params = params.set(key, String(value));
+    }
+    return this.http.get<PagedResponse<PaginationData<SurgeryRow>>>(BASE_API.SURGERY.CASES_SEARCH, { params, context: createHttpContext({ loadingKey: LoadingKeys.SURGERY.CASES_SEARCH }) });
+  }
+
+  createCase(request: CreateSurgeryRequest) {
+    return this.http.post<PagedResponse<SurgeryCase>>(BASE_API.SURGERY.CASE_CREATE, request, { context: createHttpContext({ loadingKey: LoadingKeys.SURGERY.CASE_CREATE }) });
   }
 
   getCaseDetail(surgeryId: string) {

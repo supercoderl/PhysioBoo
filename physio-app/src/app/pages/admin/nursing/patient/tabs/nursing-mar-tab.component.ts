@@ -1,76 +1,143 @@
-import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooBadgeTone, BooStatusBadgeComponent } from '@physioboo/ui';
+import { DatePipe, NgFor, NgIf } from "@angular/common";
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, signal } from "@angular/core";
+import {
+  BooBadgeTone, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooIconComponent,
+  BooInlineErrorComponent, BooPaginationComponent, BooStatusBadgeComponent
+} from '@physioboo/ui';
+import { finalize } from "rxjs";
 import { NursingService } from "../../../../../services/admin/nursing.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
-import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../services/common/toast.service";
-import { SharedModule } from "../../../../../shared/shared-imports";
 import { MarEntry } from "../../../../../shared/types/nursing.types";
-import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'nursing-mar-tab',
   standalone: true,
-  imports: [SharedModule,BooStatusBadgeComponent, BooButtonAdminComponent],
+  imports: [
+    NgIf, NgFor, DatePipe,
+    BooButtonComponent, BooIconComponent, BooEmptyStateComponent, BooErrorStateComponent, BooInlineErrorComponent,
+    BooPaginationComponent, BooStatusBadgeComponent,
+  ],
   template: `
-    <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
-    </div>
+    <div *ngIf="loading()" aria-hidden="true" class="h-48 rounded-xl border border-borderGray bg-surface animate-pulse"></div>
+    <span *ngIf="loading()" class="sr-only" role="status">Loading medications…</span>
 
-    <div *ngIf="!isLoading()" class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
-      <table class="w-full text-sm">
-        <thead class="bg-gray-100 text-gray-600 text-xs uppercase">
-          <tr>
-            <th class="px-4 py-3 text-left">Medication</th>
-            <th class="px-4 py-3 text-left">Dosage</th>
-            <th class="px-4 py-3 text-left">Route</th>
-            <th class="px-4 py-3 text-left">Scheduled</th>
-            <th class="px-4 py-3 text-left">Status</th>
-            <th class="px-4 py-3 text-left">Given By</th>
-            <th class="px-4 py-3 text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          <tr *ngFor="let m of entries()">
-            <td class="px-4 py-3 font-medium text-gray-800">{{ m.medicationName }}</td>
-            <td class="px-4 py-3">{{ m.dosage }}</td>
-            <td class="px-4 py-3">{{ m.route }}</td>
-            <td class="px-4 py-3">{{ m.scheduledAt | date:'short' }}</td>
-            <td class="px-4 py-3"><boo-status-badge [label]="m.status" [tone]="statusTone(m.status)"></boo-status-badge></td>
-            <td class="px-4 py-3 text-gray-500">{{ m.givenBy ?? '—' }}</td>
-            <td class="px-4 py-3">
-              <div *ngIf="m.status === 'Due'" class="flex gap-2">
-                <boo-button-admin (click)="markGiven(m)" [disabled]="loadingSrv.isLoading('mar-' + m.id)" background="#059669" textColor="white" padding="4px 10px" [fontSize]="12" [radius]="4">Given</boo-button-admin>
-                <boo-button-admin (click)="markMissed(m)" [disabled]="loadingSrv.isLoading('mar-' + m.id)" background="#EFE3E7" textColor="#55434B" padding="4px 10px" [fontSize]="12" [radius]="4">Missed</boo-button-admin>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div *ngIf="!entries().length" class="px-5 py-8 text-center text-xs text-secondary">No medications scheduled.</div>
+    <boo-error-state *ngIf="!loading() && error() && !entries().length" appearance="panel" [headingLevel]="3"
+      title="We couldn't load the medications" description="Check your connection and try again." retryLabel="Try again" (retry)="load()" />
+
+    <div *ngIf="!loading() && (!error() || entries().length)" class="flex flex-col gap-4">
+      <boo-inline-error *ngIf="error()" what="the medication record" (retry)="load()" />
+
+      <div *ngIf="hasAllergies" role="note" class="px-4 py-2.5 rounded-lg border border-dangerBorder bg-dangerSoft text-sm text-danger flex items-start gap-2">
+        <physio-icon name="triangle-alert" [size]="16" class="flex-none mt-0.5" aria-hidden="true" />
+        <span>This patient has a recorded allergy. Check it before giving any medication.</span>
+      </div>
+
+      <h2 class="m-0 text-sm font-semibold text-regular">Medication administration record</h2>
+
+      <boo-empty-state *ngIf="!entries().length" icon="pill" title="No medications scheduled" description="No doses have been scheduled for this patient." />
+
+      <div *ngIf="entries().length" class="bg-surface border border-borderGray rounded-xl overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <caption class="sr-only">Medication doses, newest first</caption>
+          <thead class="text-xs text-secondary border-b border-rowDivider">
+            <tr>
+              <th scope="col" class="px-4 py-2.5 font-medium">Medication</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Dose</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Route</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Scheduled</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Administered</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Note</th>
+              <th *ngIf="canWrite" scope="col" class="px-4 py-2.5 font-medium"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-rowDivider">
+            <tr *ngFor="let m of entries(); trackBy: trackById">
+              <th scope="row" class="px-4 py-2.5 font-medium text-regular">{{ m.medicationName }}</th>
+              <td class="px-4 py-2.5">{{ m.dosage }}</td>
+              <td class="px-4 py-2.5">{{ m.route }}</td>
+              <td class="px-4 py-2.5 tabular-nums whitespace-nowrap">{{ m.scheduledAt | date: 'MMM d, HH:mm' }}</td>
+              <td class="px-4 py-2.5">
+                <div class="flex flex-wrap gap-1">
+                  <boo-status-badge [label]="m.status" [tone]="statusTone(m.status)" [dotted]="true" />
+                  <boo-status-badge *ngIf="isLate(m)" label="Late" tone="danger" />
+                </div>
+              </td>
+              <td class="px-4 py-2.5 text-secondary">
+                <ng-container *ngIf="m.givenBy || m.givenAt; else none">
+                  <span class="tabular-nums" *ngIf="m.givenAt">{{ m.givenAt | date: 'MMM d, HH:mm' }}</span>
+                  <span *ngIf="m.givenBy"> · {{ m.givenBy }}</span>
+                </ng-container>
+                <ng-template #none>—</ng-template>
+              </td>
+              <td class="px-4 py-2.5 text-secondary">{{ m.reason || '—' }}</td>
+              <td *ngIf="canWrite" class="px-4 py-2.5">
+                <div *ngIf="m.status === 'Due'" class="flex justify-end gap-1.5">
+                  <button boo-button variant="primary" size="sm" [loading]="busy.has(m.id)" [disabled]="busy.has(m.id)" (click)="confirmGiven(m)">
+                    Given<span class="sr-only"> {{ m.medicationName }}</span>
+                  </button>
+                  <button boo-button variant="outline" size="sm" [disabled]="busy.has(m.id)" (click)="confirmMissed(m)">
+                    Missed<span class="sr-only"> {{ m.medicationName }}</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <boo-pagination *ngIf="totalPages > 1" [page]="page" [totalPages]="totalPages" (pageChange)="goTo($event)" />
     </div>
   `,
 })
 export class NursingMarTabComponent implements OnChanges {
+  // #region Inputs, Outputs, Properties
   @Input({ required: true }) patientId!: string;
+  @Input() refreshKey = 0;
+  @Input() canWrite = false;
+  @Input() hasAllergies = false;
+  /** A dose was recorded, so the patient header (medications due) is out of date. */
+  @Output() changed = new EventEmitter<void>();
 
-  isLoading = signal(true);
+  private readonly srv = inject(NursingService);
+  private readonly toastSrv = inject(ToastService);
+  private readonly dialogSrv = inject(DialogService);
+
+  loading = signal(true);
+  error = signal(false);
   entries = signal<MarEntry[]>([]);
+  page = 1;
+  totalPages = 1;
+  /** Doses with a request in flight; a second click on the same dose is ignored. */
+  busy = new Set<string>();
+  // #endregion
 
-  constructor(
-    private srv: NursingService,
-    private toastSrv: ToastService,
-    private dialogSrv: DialogService,
-    protected loadingSrv: LocalLoadingService,
-  ) { }
-
-  ngOnChanges(): void {
+  ngOnChanges(changes: SimpleChanges): void {
     if (!this.patientId) return;
-    this.isLoading.set(true);
-    this.srv.getMar(this.patientId).subscribe({
-      next: (res) => { if (res.success) this.entries.set(res.data.items); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false),
+    if (changes['patientId']) this.page = 1;
+    if (changes['patientId'] || changes['refreshKey']) this.load();
+  }
+
+  load(): void {
+    if (!this.entries().length) this.loading.set(true);
+    this.error.set(false);
+    const requested = this.patientId;
+    this.srv.getMar(requested, this.page).pipe(finalize(() => this.loading.set(false))).subscribe({
+      next: res => {
+        if (requested !== this.patientId) return;
+        if (!res.success) { this.error.set(true); return; }
+        this.entries.set(res.data.items);
+        this.totalPages = res.data.totalPages || 1;
+      },
+      error: () => this.error.set(true),
     });
+  }
+
+  goTo(page: number): void {
+    if (page === this.page) return;
+    this.page = page;
+    this.load();
   }
 
   statusTone(status: MarEntry['status']): BooBadgeTone {
@@ -82,36 +149,51 @@ export class NursingMarTabComponent implements OnChanges {
     }
   }
 
-  markGiven(entry: MarEntry): void {
-    this.updateStatus(entry, 'Given');
+  isLate(entry: MarEntry): boolean {
+    return entry.status === 'Due' && new Date(entry.scheduledAt).getTime() < Date.now();
   }
 
-  markMissed(entry: MarEntry): void {
+  // #region Recording a dose
+  confirmGiven(entry: MarEntry): void {
     this.dialogSrv.confirm(
-      `Confirm ${entry.medicationName} (${entry.dosage}) was not administered.`,
-      () => this.updateStatus(entry, 'Missed', 'Not administered'),
-      'Mark dose as missed?',
+      `Confirm you gave ${entry.medicationName}, ${entry.dosage} by ${entry.route}.${this.hasAllergies ? ' This patient has a recorded allergy.' : ''}`,
+      () => this.updateStatus(entry, 'Given'),
+      'Record dose as given?',
       'warning',
-      'Mark Missed',
+      'Mark given',
     );
   }
 
-  private updateStatus(entry: MarEntry, status: MarEntry['status'], reason?: string): void {
-    const key = 'mar-' + entry.id;
-    this.loadingSrv.setLoading(key, true);
-    this.srv.updateMarStatus(entry.id, status, reason).subscribe({
-      next: (res) => {
-        this.loadingSrv.setLoading(key, false);
-        if (res.success) {
-          this.entries.set(this.entries().map(e => e.id === entry.id
-            ? { ...e, status, givenAt: status === 'Given' ? new Date().toISOString() : e.givenAt, givenBy: status === 'Given' ? 'You' : e.givenBy, reason }
-            : e));
-          this.toastSrv.success(`Dose marked as ${status.toLowerCase()}`);
-        } else {
-          this.toastSrv.error('Unable to update dose status');
-        }
+  confirmMissed(entry: MarEntry): void {
+    this.dialogSrv.confirm(
+      `Confirm ${entry.medicationName} (${entry.dosage}) was not given.`,
+      () => this.updateStatus(entry, 'Missed'),
+      'Record dose as missed?',
+      'warning',
+      'Mark missed',
+    );
+  }
+
+  private updateStatus(entry: MarEntry, status: 'Given' | 'Missed'): void {
+    if (this.busy.has(entry.id)) return;
+    this.busy = new Set(this.busy).add(entry.id);
+    this.srv.updateMarStatus(entry.id, status).pipe(
+      finalize(() => {
+        const next = new Set(this.busy);
+        next.delete(entry.id);
+        this.busy = next;
+      })
+    ).subscribe({
+      next: res => {
+        if (!res.success || !res.data) { this.toastSrv.error('Unable to update the dose'); return; }
+        // The server stamps the time and the nurse, so show what it returned.
+        this.entries.set(this.entries().map(e => e.id === entry.id ? res.data : e));
+        this.toastSrv.success(`Dose marked as ${status.toLowerCase()}`);
+        this.changed.emit();
       },
-      error: () => { this.loadingSrv.setLoading(key, false); this.toastSrv.error('Unable to update dose status'); },
     });
   }
+  // #endregion
+
+  trackById = (_: number, item: { id: string }) => item.id;
 }

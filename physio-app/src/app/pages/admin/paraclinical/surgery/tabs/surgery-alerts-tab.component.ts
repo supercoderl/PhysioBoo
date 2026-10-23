@@ -1,7 +1,10 @@
-import { Component, OnInit, signal } from "@angular/core";
+import { Component, OnInit, inject, signal } from "@angular/core";
+import { finalize } from "rxjs";
 import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { AuthService } from "../../../../../services/auth/auth.service";
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
 import { ToastService } from "../../../../../services/common/toast.service";
+import { Permissions } from "../../../../../shared/constants/permission.constant";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { SurgeryAlertSeverity, SurgeryCriticalAlert } from "../../../../../shared/types/surgery.types";
 
@@ -38,7 +41,7 @@ import { SurgeryAlertSeverity, SurgeryCriticalAlert } from "../../../../../share
             <td class="px-4 py-3 text-gray-500">{{ a.suggestedAction }}</td>
             <td class="px-4 py-3 text-gray-500">{{ a.raisedAt | date:'short' }}</td>
             <td class="px-4 py-3">
-              <button (click)="acknowledge(a)" class="text-primary text-xs font-semibold hover:underline">Acknowledge</button>
+              <button *ngIf="canAcknowledge" type="button" [disabled]="acknowledgingId() !== null" (click)="acknowledge(a)" class="text-primary text-xs font-semibold hover:underline">Acknowledge</button>
             </td>
           </tr>
         </tbody>
@@ -49,6 +52,10 @@ import { SurgeryAlertSeverity, SurgeryCriticalAlert } from "../../../../../share
 export class SurgeryAlertsTabComponent implements OnInit {
   isLoading = signal(true);
   alerts = signal<SurgeryCriticalAlert[]>([]);
+
+  private readonly authSrv = inject(AuthService);
+  readonly canAcknowledge = this.authSrv.hasPermission(Permissions.Surgery.SurgeryUpdate);
+  acknowledgingId = signal<string | null>(null);
 
   constructor(private srv: SurgeryService, private toastSrv: ToastService) { }
 
@@ -74,7 +81,9 @@ export class SurgeryAlertsTabComponent implements OnInit {
   }
 
   acknowledge(alert: SurgeryCriticalAlert): void {
-    this.srv.acknowledgeAlert(alert.id).subscribe(res => {
+    if (this.acknowledgingId()) return;
+    this.acknowledgingId.set(alert.id);
+    this.srv.acknowledgeAlert(alert.id).pipe(finalize(() => this.acknowledgingId.set(null))).subscribe(res => {
       if (res.success) {
         this.alerts.set(this.alerts().filter(a => a.id !== alert.id));
         this.toastSrv.success('Alert acknowledged');

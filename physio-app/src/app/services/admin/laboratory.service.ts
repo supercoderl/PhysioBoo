@@ -32,7 +32,7 @@ export class LaboratoryService {
   }
 
   getTrends() {
-    return this.http.get<PagedResponse<LabDashboardTrend>>(BASE_API.LABORATORY.TRENDS, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.TRENDS }) });
+    return this.http.get<PagedResponse<LabDashboardTrend>>(BASE_API.LABORATORY.TRENDS, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.TRENDS, skipErrorToast: true }) });
   }
 
   getAlerts() {
@@ -43,44 +43,48 @@ export class LaboratoryService {
     return this.http.post<PagedResponse<string>>(BASE_API.LABORATORY.ALERT_ACKNOWLEDGE(alertId), {}, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.ALERT_ACKNOWLEDGE }) });
   }
 
+  // The list endpoints are paged only (newest first, up to 500 rows); the workspace tabs filter that page client-side.
+  // The tabs render their own error + retry state, so a failed read doesn't also raise a toast.
   getOrders() {
-    return this.http.get<PagedResponse<PaginationData<LabOrderRow>>>(BASE_API.LABORATORY.ORDERS_SEARCH, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.ORDERS }) });
+    return this.http.get<PagedResponse<PaginationData<LabOrderRow>>>(BASE_API.LABORATORY.ORDERS_SEARCH, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.ORDERS, skipErrorToast: true }) });
   }
 
   getSamples() {
-    return this.http.get<PagedResponse<PaginationData<LabSample>>>(BASE_API.LABORATORY.SAMPLES_SEARCH, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.SAMPLES }) });
+    return this.http.get<PagedResponse<PaginationData<LabSample>>>(BASE_API.LABORATORY.SAMPLES_SEARCH, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.SAMPLES, skipErrorToast: true }) });
   }
 
-  markSampleCollected(sampleId: string, collectorName: string, containerType: string) {
-    return this.http.patch<PagedResponse<LabSample>>(BASE_API.LABORATORY.SAMPLE_COLLECT(sampleId), { collectorName, containerType }, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.SAMPLES_COLLECT }) });
+  /** An empty collector name makes the server record the signed-in user. */
+  markSampleCollected(sampleId: string, collectorName: string | null, containerType: string | null) {
+    return this.http.patch<PagedResponse<string>>(BASE_API.LABORATORY.SAMPLE_COLLECT(sampleId), { collectorName, containerType }, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.SAMPLES_COLLECT }) });
   }
 
   recollectSample(sampleId: string, reason: string) {
-    return this.http.post<PagedResponse<LabSample>>(BASE_API.LABORATORY.SAMPLE_RECOLLECT(sampleId), { reason }, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.SAMPLES_RECOLLECT }) });
+    return this.http.post<PagedResponse<string>>(BASE_API.LABORATORY.SAMPLE_RECOLLECT(sampleId), { reason }, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.SAMPLES_RECOLLECT }) });
   }
 
   rejectSample(sampleId: string, reason: string) {
-    return this.http.post<PagedResponse<LabSample>>(BASE_API.LABORATORY.SAMPLE_REJECT(sampleId), { reason }, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.SAMPLES_REJECT }) });
+    return this.http.post<PagedResponse<string>>(BASE_API.LABORATORY.SAMPLE_REJECT(sampleId), { reason }, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.SAMPLES_REJECT }) });
   }
 
   getResults() {
-    return this.http.get<PagedResponse<PaginationData<LabResultEntry>>>(BASE_API.LABORATORY.RESULTS_SEARCH, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.RESULTS_SEARCH }) });
+    return this.http.get<PagedResponse<PaginationData<LabResultEntry>>>(BASE_API.LABORATORY.RESULTS_SEARCH, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.RESULTS_SEARCH, skipErrorToast: true }) });
   }
 
-  updateResultValue(resultId: string, value: string, comments?: string) {
-    return this.http.patch<PagedResponse<LabResultEntry>>(BASE_API.LABORATORY.RESULT_UPDATE(resultId), { value, comments }, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.RESULT_UPDATE }) });
+  /** The server computes the flag from the reference range, so callers reload the result afterwards. */
+  updateResultValue(resultId: string, value: string, comments?: string | null) {
+    return this.http.patch<PagedResponse<string>>(BASE_API.LABORATORY.RESULT_UPDATE(resultId), { value, comments }, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.RESULT_UPDATE }) });
   }
 
   approveResult(resultId: string) {
-    return this.http.post<PagedResponse<LabResultEntry>>(BASE_API.LABORATORY.RESULT_APPROVE(resultId), {}, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.RESULT_APPROVE }) });
+    return this.http.post<PagedResponse<string>>(BASE_API.LABORATORY.RESULT_APPROVE(resultId), {}, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.RESULT_APPROVE }) });
   }
 
   rejectResult(resultId: string, reason: string) {
-    return this.http.post<PagedResponse<LabResultEntry>>(BASE_API.LABORATORY.RESULT_REJECT(resultId), { reason }, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.RESULT_REJECT }) });
+    return this.http.post<PagedResponse<string>>(BASE_API.LABORATORY.RESULT_REJECT(resultId), { reason }, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.RESULT_REJECT }) });
   }
 
   returnResultForReview(resultId: string, reason: string) {
-    return this.http.post<PagedResponse<LabResultEntry>>(BASE_API.LABORATORY.RESULT_RETURN_FOR_REVIEW(resultId), { reason }, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.RESULT_RETURN_FOR_REVIEW }) });
+    return this.http.post<PagedResponse<string>>(BASE_API.LABORATORY.RESULT_RETURN_FOR_REVIEW(resultId), { reason }, { context: createHttpContext({ loadingKey: LoadingKeys.LABORATORY.RESULT_RETURN_FOR_REVIEW }) });
   }
 
   getPatientSummary(patientId: string) {

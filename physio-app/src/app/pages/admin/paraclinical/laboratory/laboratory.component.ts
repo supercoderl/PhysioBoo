@@ -1,11 +1,13 @@
-import { Component, OnInit, signal } from "@angular/core";
+import { Component, OnInit, inject, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { finalize, forkJoin } from "rxjs";
-import { BooBadgeTone, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { LaboratoryService } from "../../../../services/admin/laboratory.service";
+import { AuthService } from "../../../../services/auth/auth.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
+import { Permissions } from "../../../../shared/constants/permission.constant";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { LabAlertSeverity, LabCriticalAlert, LabStats } from "../../../../shared/types/laboratory.types";
 import { LaboratoryPatientResultDrawerComponent } from "./patient-result-drawer.component";
@@ -14,7 +16,7 @@ import { LaboratoryDashboardTabComponent } from "./tabs/laboratory-dashboard-tab
 import { LaboratoryOrdersTabComponent } from "./tabs/laboratory-orders-tab.component";
 import { LaboratoryResultVerificationTabComponent } from "./tabs/laboratory-result-verification-tab.component";
 import { LaboratorySampleTrackingTabComponent } from "./tabs/laboratory-sample-tracking-tab.component";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { alertTone } from "./laboratory-display";
 
 type TabKey = 'dashboard' | 'orders' | 'sample-tracking' | 'result-verification' | 'critical-alerts';
 
@@ -35,22 +37,29 @@ const LOADING_KEY = 'laboratory';
     LaboratoryResultVerificationTabComponent,
     LaboratoryCriticalAlertsTabComponent,
     LaboratoryPatientResultDrawerComponent,
-    BooButtonAdminComponent
+    BooButtonComponent,
+    BooEmptyStateComponent
   ],
   host: { class: 'block min-h-screen bg-gray-50' },
   template: `
+    <!-- No access -->
+    <div *ngIf="!canRead" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <boo-empty-state appearance="panel" icon="lock" title="You don't have access to the laboratory"
+        description="Ask an administrator for the laboratory order read permission." />
+    </div>
+
     <!-- Loading -->
-    <div *ngIf="loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3">
+    <div *ngIf="canRead && loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3" role="status">
       <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
       <span class="text-gray-500 text-sm">Loading laboratory workspace...</span>
     </div>
 
     <!-- Error -->
-    <div *ngIf="error() && !loadingSrv.isLoading(LOADING_KEY)" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div *ngIf="canRead && error() && !loadingSrv.isLoading(LOADING_KEY)" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
       <boo-error-state title="Couldn't load laboratory workspace" [description]="error()" (retry)="retryLoad()"></boo-error-state>
     </div>
 
-    <ng-container *ngIf="!error() && hasLoadedOnce">
+    <ng-container *ngIf="canRead && !error() && hasLoadedOnce">
       <!-- Sticky module header -->
       <div class="sticky top-0 z-20 bg-surface shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
@@ -58,9 +67,9 @@ const LOADING_KEY = 'laboratory';
             <h1 class="text-lg font-semibold text-gray-800">Laboratory</h1>
             <p class="text-xs text-secondary">Laboratory Information System — orders, samples, results, and verification</p>
           </div>
-          <boo-button-admin textColor="white" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="8">
-            <physio-icon name="circle-plus" [size]="16"></physio-icon> New Order
-          </boo-button-admin>
+          <button boo-button variant="secondary" size="sm" type="button" [loading]="refreshing()" (click)="refresh()">
+            <physio-icon name="refresh-cw" [size]="16"></physio-icon> Refresh
+          </button>
         </div>
 
         <!-- Tab nav -->
@@ -84,7 +93,8 @@ const LOADING_KEY = 'laboratory';
               <boo-status-badge [label]="a.severity" [tone]="alertTone(a.severity)"></boo-status-badge>
               <p class="text-xs text-gray-700 mt-1">{{ a.description }}</p>
             </div>
-            <button (click)="acknowledgeAlert(a)" class="text-gray-400 hover:text-gray-600" aria-label="Acknowledge alert">
+            <button *ngIf="canAcknowledge" type="button" (click)="acknowledgeAlert(a)" [disabled]="acknowledgingId() === a.id"
+              class="text-gray-400 hover:text-gray-600 disabled:opacity-40" [attr.aria-label]="'Acknowledge ' + a.severity + ' alert'">
               <physio-icon name="x" [size]="16"></physio-icon>
             </button>
           </div>
@@ -103,11 +113,11 @@ const LOADING_KEY = 'laboratory';
         </div>
 
         <!-- Tab content -->
-        <laboratory-dashboard-tab *ngIf="activeTab() === 'dashboard'" />
-        <laboratory-orders-tab *ngIf="activeTab() === 'orders'" (viewPatient)="openPatientDrawer($event)" />
-        <laboratory-sample-tracking-tab *ngIf="activeTab() === 'sample-tracking'" />
-        <laboratory-result-verification-tab *ngIf="activeTab() === 'result-verification'" />
-        <laboratory-critical-alerts-tab *ngIf="activeTab() === 'critical-alerts'" />
+        <laboratory-dashboard-tab *ngIf="activeTab() === 'dashboard'" [refreshKey]="refreshKey()" />
+        <laboratory-orders-tab *ngIf="activeTab() === 'orders'" [refreshKey]="refreshKey()" (viewPatient)="openPatientDrawer($event)" />
+        <laboratory-sample-tracking-tab *ngIf="activeTab() === 'sample-tracking'" [refreshKey]="refreshKey()" (changed)="reloadSummary()" />
+        <laboratory-result-verification-tab *ngIf="activeTab() === 'result-verification'" [refreshKey]="refreshKey()" (changed)="reloadSummary()" />
+        <laboratory-critical-alerts-tab *ngIf="activeTab() === 'critical-alerts'" [refreshKey]="refreshKey()" (changed)="reloadSummary()" />
       </main>
     </ng-container>
 
@@ -125,6 +135,16 @@ export class AdminLaboratoryComponent implements OnInit {
 
   error = signal<string | null>(null);
   hasLoadedOnce = false;
+  /** Bumped by Refresh so the open tab reloads its list in place. */
+  refreshKey = signal(0);
+  refreshing = signal(false);
+  acknowledgingId = signal<string | null>(null);
+
+  private readonly authSrv = inject(AuthService);
+
+  readonly canRead = this.authSrv.hasPermission(Permissions.Lab.LabOrderRead);
+  readonly canAcknowledge = this.authSrv.hasPermission(Permissions.Lab.AlertAcknowledge);
+  readonly alertTone = alertTone;
 
   readonly tabs: { key: TabKey; label: string; icon: string }[] = [
     { key: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
@@ -142,6 +162,7 @@ export class AdminLaboratoryComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    if (!this.canRead) return;
     this.load();
     // Deep link from the treatment sheet, surgery or medical record: ?patient=<id or MRN>
     const patient = this.route.snapshot.queryParamMap.get('patient');
@@ -172,20 +193,30 @@ export class AdminLaboratoryComponent implements OnInit {
 
   retryLoad(): void { this.load(); }
 
+  /** Reloads the counters and the alert banner after a tab changed something, without a loading state. */
+  reloadSummary(): void {
+    forkJoin({ stats: this.srv.getStats(), alerts: this.srv.getAlerts() })
+      .pipe(finalize(() => this.refreshing.set(false)))
+      .subscribe({
+        next: ({ stats, alerts }) => {
+          if (stats.success) this.stats.set(stats.data);
+          if (alerts.success) this.alerts.set(alerts.data.filter(a => !a.acknowledged));
+        },
+      });
+  }
+
+  refresh(): void {
+    if (this.refreshing()) return;
+    this.refreshing.set(true);
+    this.refreshKey.update(k => k + 1);
+    this.reloadSummary();
+  }
+
   setTab(key: TabKey): void { this.activeTab.set(key); }
 
   alertsBySeverity(): LabCriticalAlert[] {
     const order: Record<LabAlertSeverity, number> = { Critical: 0, High: 1, Warning: 2, Information: 3 };
     return [...this.alerts()].sort((a, b) => order[a.severity] - order[b.severity]);
-  }
-
-  alertTone(severity: LabAlertSeverity): BooBadgeTone {
-    switch (severity) {
-      case 'Critical': return 'danger';
-      case 'High': return 'danger';
-      case 'Warning': return 'warning';
-      default: return 'primary';
-    }
   }
 
   alertBorderClass(severity: LabAlertSeverity): string {
@@ -207,13 +238,13 @@ export class AdminLaboratoryComponent implements OnInit {
   }
 
   acknowledgeAlert(alert: LabCriticalAlert): void {
-    this.srv.acknowledgeAlert(alert.id).subscribe(res => {
+    if (this.acknowledgingId()) return;
+    this.acknowledgingId.set(alert.id);
+    this.srv.acknowledgeAlert(alert.id).pipe(finalize(() => this.acknowledgingId.set(null))).subscribe(res => {
       if (res.success) {
-        this.alerts.set(this.alerts().filter(a => a.id !== alert.id));
-        if (this.stats() && alert.severity === 'Critical') {
-          this.stats.update(s => s ? { ...s, criticalResults: Math.max(0, s.criticalResults - 1) } : s);
-        }
         this.toastSrv.success('Alert acknowledged');
+        this.refreshKey.update(k => k + 1);
+        this.reloadSummary();
       } else {
         this.toastSrv.error('Unable to acknowledge alert');
       }

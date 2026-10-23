@@ -1,4 +1,6 @@
-import { Component, OnInit, signal } from "@angular/core";
+import { Component, Input, OnChanges, SimpleChanges, signal } from "@angular/core";
+import { BooErrorStateComponent } from '@physioboo/ui';
+import { finalize } from "rxjs";
 import { LaboratoryService } from "../../../../../services/admin/laboratory.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { LabDashboardTrend } from "../../../../../shared/types/laboratory.types";
@@ -6,13 +8,16 @@ import { LabDashboardTrend } from "../../../../../shared/types/laboratory.types"
 @Component({
   selector: 'laboratory-dashboard-tab',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooErrorStateComponent],
   template: `
+    <boo-error-state *ngIf="!isLoading() && error()" appearance="panel" icon="cloud-off" title="We couldn't load the dashboard"
+      description="Check your connection and try again." retryLabel="Try again" (retry)="load()" />
+
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
-    <div *ngIf="!isLoading() && trend()" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div *ngIf="!isLoading() && !error() && trend()" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <!-- Daily Orders -->
       <div class="bg-surface border border-gray-200 rounded-lg p-4">
         <div class="text-sm font-semibold text-gray-800 mb-3">Daily Orders</div>
@@ -72,7 +77,7 @@ import { LabDashboardTrend } from "../../../../../shared/types/laboratory.types"
         </div>
         <div>
           <div class="text-sm font-semibold text-gray-800">Critical Result Rate</div>
-          <p class="text-xs text-gray-500 mt-1">Share of completed tests flagged as critical or panic value over the selected period.</p>
+          <p class="text-xs text-gray-500 mt-1">Share of completed tests flagged as critical or panic value.</p>
         </div>
       </div>
 
@@ -92,16 +97,28 @@ import { LabDashboardTrend } from "../../../../../shared/types/laboratory.types"
     </div>
   `,
 })
-export class LaboratoryDashboardTabComponent implements OnInit {
+export class LaboratoryDashboardTabComponent implements OnChanges {
+  @Input() refreshKey = 0;
+
   isLoading = signal(true);
+  error = signal(false);
   trend = signal<LabDashboardTrend | null>(null);
 
   constructor(private srv: LaboratoryService) { }
 
-  ngOnInit(): void {
-    this.srv.getTrends().subscribe({
-      next: (res) => { if (res.success) this.trend.set(res.data); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false),
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['refreshKey']) this.load();
+  }
+
+  load(): void {
+    if (!this.trend()) this.isLoading.set(true);
+    this.error.set(false);
+    this.srv.getTrends().pipe(finalize(() => this.isLoading.set(false))).subscribe({
+      next: res => {
+        if (!res.success) { this.error.set(true); return; }
+        this.trend.set(res.data);
+      },
+      error: () => this.error.set(true),
     });
   }
 
@@ -115,7 +132,7 @@ export class LaboratoryDashboardTabComponent implements OnInit {
 
   donutBackground(): string {
     const rate = this.trend()?.criticalResultRate ?? 0;
-    const deg = Math.min(360, (rate / 100) * 360 * 5);
+    const deg = Math.min(360, (rate / 100) * 360);
     return `conic-gradient(rgb(225 29 72) ${deg}deg, rgb(229 231 235) ${deg}deg)`;
   }
 }

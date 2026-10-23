@@ -1,33 +1,44 @@
-import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { BooBadgeTone, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, signal } from "@angular/core";
+import {
+  BooBadgeTone, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooPaginationComponent,
+  BooSearchFieldComponent, BooStatusBadgeComponent,
+} from '@physioboo/ui';
+import { Subject, Subscription, debounceTime, distinctUntilChanged, finalize } from "rxjs";
+import { BooDatepickerComponent } from "../../../../../components/date-picker/boo-date-picker.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
-import { DialogService } from "../../../../../services/common/dialog.service";
-import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { SurgeryPriority, SurgeryRow, SurgeryStatus } from "../../../../../shared/types/surgery.types";
+import { SurgeryPriority, SurgerySearchParams, SurgeryRow, SurgeryStatus } from "../../../../../shared/types/surgery.types";
 
 type ViewMode = 'table' | 'timeline' | 'calendar';
+
+const PAGE_SIZE = 20;
+const SEARCH_DEBOUNCE_MS = 400;
 
 @Component({
   selector: 'surgery-schedule-tab',
   standalone: true,
-  imports: [SharedModule, BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent],
+  imports: [
+    SharedModule, BooSearchFieldComponent, BooSelectComponent, BooDatepickerComponent, BooButtonComponent, BooPaginationComponent,
+    BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent,
+  ],
   template: `
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-      <div class="flex flex-wrap items-center gap-3">
-        <boo-input label="Search surgery #, patient, MRN..." size="small" (search)="onSearch($event)"></boo-input>
-        <boo-select label="Priority" [(ngModel)]="priorityFilter" [options]="priorityOptions" bindLabel="label" bindValue="value"></boo-select>
-        <boo-select label="Status" [(ngModel)]="statusFilter" [options]="statusOptions" bindLabel="label" bindValue="value"></boo-select>
-        <button (click)="emergencyOnly = !emergencyOnly"
-          class="px-3 py-2 rounded-lg text-xs font-semibold border transition-colors"
-          [ngClass]="emergencyOnly ? 'bg-rose-50 border-rose-300 text-rose-700' : 'bg-surface border-gray-200 text-gray-600'">
-          Emergency Only
+    <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
+      <div class="flex flex-wrap items-end gap-3">
+        <boo-search-field class="w-full md:w-72" label="Search surgeries" placeholder="Surgery #, patient or MRN"
+          [(ngModel)]="search" (ngModelChange)="searchInput$.next($event)" (clear)="search = ''; applyFilters()" />
+        <boo-select class="w-44" label="Priority" [(ngModel)]="priorityFilter" (ngModelChange)="applyFilters()" [options]="priorityOptions" bindLabel="label" bindValue="value"></boo-select>
+        <boo-select class="w-52" label="Status" [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()" [options]="statusOptions" bindLabel="label" bindValue="value"></boo-select>
+        <boo-datepicker class="w-44" label="From" [(ngModel)]="dateFrom" (ngModelChange)="applyFilters()" [max]="dateTo"></boo-datepicker>
+        <boo-datepicker class="w-44" label="To" [(ngModel)]="dateTo" (ngModelChange)="applyFilters()" [min]="dateFrom"></boo-datepicker>
+        <button boo-button variant="secondary" size="sm" type="button" [attr.aria-pressed]="emergencyOnly" (click)="toggleEmergency()">Emergency only</button>
+        <button boo-button variant="ghost" size="sm" type="button" [disabled]="isLoading()" (click)="load()">
+          <physio-icon name="refresh-cw" [size]="14"></physio-icon> Refresh
         </button>
       </div>
 
-      <div class="flex items-center bg-gray-100 rounded-lg p-0.5">
-        <button *ngFor="let v of viewModes" type="button" (click)="viewMode.set(v.key)"
+      <div class="flex items-center bg-gray-100 rounded-lg p-0.5" role="group" aria-label="Schedule view">
+        <button *ngFor="let v of viewModes" type="button" (click)="viewMode.set(v.key)" [attr.aria-pressed]="viewMode() === v.key"
           class="px-3 py-1.5 text-xs font-semibold rounded-md transition-colors flex items-center gap-1.5"
           [ngClass]="viewMode() === v.key ? 'bg-surface text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'">
           <physio-icon [name]="v.icon" [size]="14"></physio-icon> {{ v.label }}
@@ -35,18 +46,20 @@ type ViewMode = 'table' | 'timeline' | 'calendar';
       </div>
     </div>
 
-    <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
-    </div>
+    <div *ngIf="isLoading() && !cases().length" aria-hidden="true" class="h-64 rounded-xl border border-borderGray bg-surface animate-pulse"></div>
+    <span *ngIf="isLoading()" class="sr-only" role="status">Loading surgeries…</span>
 
-    <div *ngIf="!isLoading() && !filtered().length">
-      <boo-empty-state icon="filter" title="No surgeries match these filters">
-        <button (click)="clearFilters()" class="text-primary text-xs font-semibold hover:underline">Clear Filters</button>
-      </boo-empty-state>
-    </div>
+    <boo-error-state *ngIf="!isLoading() && error()" appearance="panel" icon="cloud-off" title="We couldn't load the surgery schedule"
+      description="Check your connection and try again." retryLabel="Try again" (retry)="load()" />
+
+    <boo-empty-state *ngIf="!isLoading() && !error() && !cases().length" icon="filter" appearance="panel"
+      [title]="hasFilters() ? 'No surgeries match these filters' : 'No surgeries scheduled'"
+      [description]="hasFilters() ? 'Try a different search or clear the filters.' : (canSchedule ? 'Use Schedule Surgery to book the first case.' : 'Scheduled surgeries appear here.')">
+      <button *ngIf="hasFilters()" boo-button variant="outline" size="sm" type="button" (click)="clearFilters()">Clear filters</button>
+    </boo-empty-state>
 
     <!-- Table view -->
-    <div *ngIf="!isLoading() && filtered().length && viewMode() === 'table'" class="bg-surface border border-gray-200 rounded-lg overflow-hidden overflow-x-auto">
+    <div *ngIf="!error() && cases().length && viewMode() === 'table'" class="bg-surface border border-gray-200 rounded-lg overflow-hidden overflow-x-auto">
       <table class="w-full text-sm">
         <thead class="bg-gray-100 text-gray-600 text-xs uppercase">
           <tr>
@@ -59,11 +72,11 @@ type ViewMode = 'table' | 'timeline' | 'calendar';
             <th class="px-4 py-3 text-left">Duration</th>
             <th class="px-4 py-3 text-left">Priority</th>
             <th class="px-4 py-3 text-left">Status</th>
-            <th class="px-4 py-3 text-left">Actions</th>
+            <th scope="col" class="px-4 py-3 text-left"><span class="sr-only">Actions</span></th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
-          <tr *ngFor="let s of filtered()" class="hover:bg-gray-50" [ngClass]="hasConflict(s) ? 'bg-rose-50' : ''">
+          <tr *ngFor="let s of cases()" class="hover:bg-gray-50" [ngClass]="hasConflict(s) ? 'bg-rose-50' : ''">
             <td class="px-4 py-3 font-medium text-gray-800">{{ s.surgeryNumber }}</td>
             <td class="px-4 py-3">{{ s.patientName }}<div class="text-xs text-gray-400">{{ s.mrn }}</div></td>
             <td class="px-4 py-3 text-gray-700">{{ s.procedure }}</td>
@@ -79,8 +92,8 @@ type ViewMode = 'table' | 'timeline' | 'calendar';
             <td class="px-4 py-3"><boo-status-badge [label]="s.status" [tone]="statusTone(s.status)"></boo-status-badge></td>
             <td class="px-4 py-3">
               <div class="flex items-center gap-3">
-                <button (click)="viewCase.emit(s.id)" class="text-primary text-xs font-semibold hover:underline">View</button>
-                <button *ngIf="s.status !== 'Cancelled' && s.status !== 'Discharged'" (click)="cancel(s)" class="text-rose-600 text-xs font-semibold hover:underline">Cancel</button>
+                <button type="button" (click)="viewCase.emit(s.id)" class="text-primary text-xs font-semibold hover:underline">View</button>
+                <button *ngIf="canSchedule && s.status !== 'Cancelled' && s.status !== 'Discharged'" type="button" (click)="cancelCase.emit(s)" class="text-rose-600 text-xs font-semibold hover:underline">Cancel</button>
               </div>
             </td>
           </tr>
@@ -89,7 +102,7 @@ type ViewMode = 'table' | 'timeline' | 'calendar';
     </div>
 
     <!-- Timeline view: per-room swimlane for today -->
-    <div *ngIf="!isLoading() && filtered().length && viewMode() === 'timeline'" class="bg-surface border border-gray-200 rounded-lg p-4 overflow-x-auto">
+    <div *ngIf="!error() && cases().length && viewMode() === 'timeline'" class="bg-surface border border-gray-200 rounded-lg p-4 overflow-x-auto">
       <div class="min-w-[900px]">
         <div class="flex items-center text-[11px] text-gray-400 pl-28 mb-2">
           <span *ngFor="let h of hourMarks" class="flex-1 text-center">{{ h }}</span>
@@ -111,7 +124,7 @@ type ViewMode = 'table' | 'timeline' | 'calendar';
     </div>
 
     <!-- Calendar view: surgeries grouped by day -->
-    <div *ngIf="!isLoading() && filtered().length && viewMode() === 'calendar'" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-3">
+    <div *ngIf="!error() && cases().length && viewMode() === 'calendar'" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-3">
       <div *ngFor="let day of calendarDays()" class="bg-surface border border-gray-200 rounded-lg p-3 min-h-[140px]">
         <div class="text-xs font-semibold text-gray-700 mb-2">{{ day.label }}</div>
         <div *ngIf="!day.items.length" class="text-[11px] text-gray-400">No surgeries</div>
@@ -122,19 +135,38 @@ type ViewMode = 'table' | 'timeline' | 'calendar';
         </button>
       </div>
     </div>
+
+    <div *ngIf="!error() && cases().length" class="flex flex-wrap items-center justify-between gap-3 mt-4">
+      <p class="m-0 text-xs text-secondary" role="status">Showing {{ cases().length }} of {{ total() }} surgeries, oldest scheduled first. Timeline and calendar show this page only.</p>
+      <boo-pagination *ngIf="totalPages() > 1" [page]="page()" [totalPages]="totalPages()" (pageChange)="goTo($event)" />
+    </div>
   `,
 })
-export class SurgeryScheduleTabComponent implements OnInit {
+export class SurgeryScheduleTabComponent implements OnInit, OnChanges, OnDestroy {
+  /** Bumped by the parent after a case is created or cancelled so the list reloads. */
+  @Input() refreshKey = 0;
+  @Input() canSchedule = false;
   @Output() viewCase = new EventEmitter<string>();
+  @Output() cancelCase = new EventEmitter<SurgeryRow>();
 
   isLoading = signal(true);
+  error = signal(false);
   cases = signal<SurgeryRow[]>([]);
+  total = signal(0);
+  page = signal(1);
+  totalPages = signal(1);
   viewMode = signal<ViewMode>('table');
 
   search = '';
   priorityFilter: SurgeryPriority | null = null;
   statusFilter: SurgeryStatus | null = null;
   emergencyOnly = false;
+  dateFrom: string | null = null;
+  dateTo: string | null = null;
+  readonly searchInput$ = new Subject<string>();
+  private searchSub?: Subscription;
+  private requestSub?: Subscription;
+  private initialised = false;
 
   readonly hourMarks = ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
 
@@ -157,34 +189,77 @@ export class SurgeryScheduleTabComponent implements OnInit {
     { label: 'Delayed', value: 'Delayed' }, { label: 'Cancelled', value: 'Cancelled' },
   ];
 
-  constructor(private srv: SurgeryService, private toastSrv: ToastService, private dialogSrv: DialogService) { }
+  constructor(private srv: SurgeryService) { }
 
   ngOnInit(): void {
-    this.srv.getCases().subscribe({
-      next: (res) => { if (res.success) this.cases.set(res.data.items); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false),
+    this.searchSub = this.searchInput$.pipe(debounceTime(SEARCH_DEBOUNCE_MS), distinctUntilChanged()).subscribe(() => this.applyFilters());
+    this.initialised = true;
+    this.load();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.initialised && changes['refreshKey'] && !changes['refreshKey'].firstChange) this.load();
+  }
+
+  ngOnDestroy(): void {
+    this.searchSub?.unsubscribe();
+    this.requestSub?.unsubscribe();
+  }
+
+  load(): void {
+    const query: SurgerySearchParams = {
+      search: this.search.trim() || null,
+      priority: this.priorityFilter,
+      status: this.statusFilter,
+      emergencyOnly: this.emergencyOnly || null,
+      dateFrom: this.dateFrom,
+      dateTo: this.dateTo,
+      pageNumber: this.page(),
+      pageSize: PAGE_SIZE,
+    };
+
+    this.isLoading.set(true);
+    this.error.set(false);
+    // A newer request supersedes an older one so a slow response cannot overwrite fresh filters.
+    this.requestSub?.unsubscribe();
+    this.requestSub = this.srv.getCases(query).pipe(finalize(() => this.isLoading.set(false))).subscribe({
+      next: res => {
+        if (!res.success) { this.error.set(true); return; }
+        this.cases.set(res.data.items);
+        this.total.set(res.data.totalCount);
+        this.totalPages.set(Math.max(1, res.data.totalPages));
+      },
+      error: () => this.error.set(true),
     });
   }
 
-  onSearch(query: string): void { this.search = query; }
+  applyFilters(): void {
+    this.page.set(1);
+    this.load();
+  }
+
+  goTo(page: number): void {
+    this.page.set(page);
+    this.load();
+  }
+
+  toggleEmergency(): void {
+    this.emergencyOnly = !this.emergencyOnly;
+    this.applyFilters();
+  }
+
+  hasFilters(): boolean {
+    return !!(this.search.trim() || this.priorityFilter || this.statusFilter || this.emergencyOnly || this.dateFrom || this.dateTo);
+  }
 
   clearFilters(): void {
     this.search = '';
     this.priorityFilter = null;
     this.statusFilter = null;
     this.emergencyOnly = false;
-  }
-
-  filtered(): SurgeryRow[] {
-    let list = this.cases();
-    if (this.priorityFilter) list = list.filter(s => s.priority === this.priorityFilter);
-    if (this.statusFilter) list = list.filter(s => s.status === this.statusFilter);
-    if (this.emergencyOnly) list = list.filter(s => s.priority === 'Emergency');
-    if (this.search) {
-      const q = this.search.toLowerCase();
-      list = list.filter(s => s.surgeryNumber.toLowerCase().includes(q) || s.patientName.toLowerCase().includes(q) || s.mrn.toLowerCase().includes(q));
-    }
-    return list;
+    this.dateFrom = null;
+    this.dateTo = null;
+    this.applyFilters();
   }
 
   hasConflict(s: SurgeryRow): boolean {
@@ -200,7 +275,7 @@ export class SurgeryScheduleTabComponent implements OnInit {
 
   timelineLanes(): { room: string; items: SurgeryRow[] }[] {
     const map = new Map<string, SurgeryRow[]>();
-    for (const s of this.filtered()) map.set(s.operatingRoomNumber, [...(map.get(s.operatingRoomNumber) ?? []), s]);
+    for (const s of this.cases()) map.set(s.operatingRoomNumber, [...(map.get(s.operatingRoomNumber) ?? []), s]);
     return Array.from(map.entries()).map(([room, items]) => ({ room, items })).sort((a, b) => a.room.localeCompare(b.room));
   }
 
@@ -238,7 +313,7 @@ export class SurgeryScheduleTabComponent implements OnInit {
       const d = new Date(today.getTime() + i * 86_400_000);
       days.push({ label: d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }), date: d, items: [] });
     }
-    for (const s of this.filtered()) {
+    for (const s of this.cases()) {
       const d = new Date(s.scheduledStart); d.setHours(0, 0, 0, 0);
       const day = days.find(x => x.date.getTime() === d.getTime());
       if (day) day.items.push(s);
@@ -262,24 +337,5 @@ export class SurgeryScheduleTabComponent implements OnInit {
       case 'ProcedureCompleted': case 'Recovery': case 'PreOpReady': case 'AnesthesiaStarted': return 'primary';
       default: return 'neutral';
     }
-  }
-
-  cancel(s: SurgeryRow): void {
-    this.dialogSrv.confirm(
-      `Cancel ${s.procedure} for ${s.patientName}? This cannot be undone.`,
-      () => {
-        this.srv.cancelCase(s.id, 'Cancelled from Schedule tab').subscribe(res => {
-          if (res.success) {
-            this.cases.update(list => list.map(x => x.id === s.id ? { ...x, status: 'Cancelled' as const } : x));
-            this.toastSrv.success('Surgery cancelled');
-          } else {
-            this.toastSrv.error('Unable to cancel surgery');
-          }
-        });
-      },
-      'Cancel Surgery',
-      'danger',
-      'Cancel Surgery',
-    );
   }
 }

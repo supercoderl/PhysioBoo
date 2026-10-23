@@ -1,10 +1,13 @@
-import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, Output, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { finalize } from "rxjs";
+import { BooBadgeTone, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { AuthService } from "../../../../services/auth/auth.service";
 import { SurgeryService } from "../../../../services/admin/surgery.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
+import { Permissions } from "../../../../shared/constants/permission.constant";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { EquipmentStatus, SurgeryCase, SurgeryTimelineStage } from "../../../../shared/types/surgery.types";
 import { escapeHtml, printHtmlDocument } from "../../../../shared/utils/print.utils";
@@ -19,7 +22,7 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
 @Component({
   selector: 'surgery-detail-drawer',
   standalone: true,
-  imports: [SharedModule, DrawerComponent, BooStatusBadgeComponent, BooEmptyStateComponent, ButtonIconComponent],
+  imports: [SharedModule, DrawerComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent, BooButtonComponent, ButtonIconComponent],
   template: `
     <drawer [isOpen]="isOpen" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
@@ -38,7 +41,10 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
             <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
           </div>
 
-          <ng-container *ngIf="!isLoading() && detail() as c">
+          <boo-error-state *ngIf="!isLoading() && loadError()" class="block p-6" appearance="panel" icon="cloud-off"
+            title="We couldn't load this surgery" description="Check your connection and try again." retryLabel="Try again" (retry)="load()" />
+
+          <ng-container *ngIf="!isLoading() && !loadError() && detail() as c">
             <!-- Patient summary -->
             <div class="px-6 py-5 border-b border-gray-100">
               <div class="flex items-center justify-between mb-3">
@@ -109,7 +115,13 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
 
             <!-- Surgical timeline -->
             <div class="px-6 py-5 border-b border-gray-100">
-              <h3 class="text-sm font-semibold text-gray-800 mb-3">Surgical Timeline</h3>
+              <div class="flex items-center justify-between gap-3 mb-3">
+                <h3 class="m-0 text-sm font-semibold text-gray-800">Surgical Timeline</h3>
+                <button *ngIf="canUpdate && nextStage(c) as next" type="button" boo-button variant="outline" size="sm"
+                  [disabled]="advancing()" [loading]="advancing()" (click)="confirmAdvance(c, next)">
+                  Record {{ STAGE_LABELS[next] }}
+                </button>
+              </div>
               <div class="flex items-center overflow-x-auto pb-1">
                 <ng-container *ngFor="let ev of c.timeline; let last = last">
                   <div class="flex flex-col items-center gap-1 shrink-0 w-24">
@@ -142,8 +154,16 @@ export class SurgeryDetailDrawerComponent implements OnChanges {
   @Input() surgeryId: string | null = null;
   @Output() close = new EventEmitter<void>();
 
+  /** The detail changed on the server (a stage was recorded); the parent reloads its lists. */
+  @Output() changed = new EventEmitter<void>();
+
   isLoading = signal(true);
+  loadError = signal(false);
+  advancing = signal(false);
   detail = signal<SurgeryCase | null>(null);
+
+  private readonly authSrv = inject(AuthService);
+  readonly canUpdate = this.authSrv.hasPermission(Permissions.Surgery.SurgeryUpdate);
 
   readonly STAGE_LABELS = STAGE_LABELS;
 
@@ -151,10 +171,45 @@ export class SurgeryDetailDrawerComponent implements OnChanges {
 
   ngOnChanges(): void {
     if (!this.isOpen || !this.surgeryId) return;
+    this.detail.set(null);
+    this.load();
+  }
+
+  load(): void {
+    if (!this.surgeryId) return;
     this.isLoading.set(true);
-    this.srv.getCaseDetail(this.surgeryId).subscribe({
-      next: (res) => { if (res.success) this.detail.set(res.data); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false),
+    this.loadError.set(false);
+    this.srv.getCaseDetail(this.surgeryId).pipe(finalize(() => this.isLoading.set(false))).subscribe({
+      next: (res) => { if (res.success && res.data) this.detail.set(res.data); else this.loadError.set(true); },
+      error: () => this.loadError.set(true),
+    });
+  }
+
+  /** The first stage after the latest recorded one; stages only move forward and a cancelled or discharged case is closed. */
+  nextStage(c: SurgeryCase): SurgeryTimelineStage | null {
+    if (c.status === 'Cancelled' || c.status === 'Discharged') return null;
+    const latest = c.timeline.reduce((acc, ev, i) => (ev.occurredAt ? i : acc), -1);
+    return c.timeline[latest + 1]?.stage ?? null;
+  }
+
+  confirmAdvance(c: SurgeryCase, stage: SurgeryTimelineStage): void {
+    if (this.advancing()) return;
+    this.dialogSrv.confirm(
+      `Record "${STAGE_LABELS[stage]}" for ${c.patientName} (${c.surgeryNumber}) at the current time? Stages cannot be reverted.`,
+      () => this.advance(c.id, stage),
+      'Record Stage',
+      'warning',
+      'Record',
+    );
+  }
+
+  private advance(surgeryId: string, stage: SurgeryTimelineStage): void {
+    this.advancing.set(true);
+    this.srv.advanceTimelineStage(surgeryId, stage).pipe(finalize(() => this.advancing.set(false))).subscribe(res => {
+      if (!res.success) return;
+      this.toastSrv.success(`${STAGE_LABELS[stage]} recorded`);
+      this.changed.emit();
+      this.load();
     });
   }
 

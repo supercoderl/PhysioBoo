@@ -164,3 +164,41 @@ export interface SurgeryFilter {
   dateFrom?: string | null;
   dateTo?: string | null;
 }
+
+export type SurgeryRange = 'today' | 'week' | 'month';
+
+/** Query string of GET /api/surgery/cases/search; every field is optional. */
+export interface SurgerySearchParams {
+  search?: string | null;
+  operatingRoom?: string | null;
+  department?: string | null;
+  surgeon?: string | null;
+  status?: string | null;
+  priority?: SurgeryPriority | null;
+  emergencyOnly?: boolean | null;
+  dateFrom?: string | null;
+  dateTo?: string | null;
+  pageNumber?: number;
+  pageSize?: number;
+}
+
+export interface CreateSurgeryTeamMemberRequest {
+  staffId: string;
+  role: SurgicalTeamRole;
+}
+
+/** Body of POST /api/surgery/cases. scheduledStart is a local date-time without offset. */
+export interface CreateSurgeryRequest {
+  patientId: string;
+  procedure: string;
+  surgeryType: string;
+  departmentId: string | null;
+  operatingRoomId: string;
+  scheduledStart: string;
+  estimatedDurationMinutes: number;
+  priority: SurgeryPriority;
+  diagnosis: string;
+  consentStatus: ConsentStatus | null;
+  riskAssessment: string | null;
+  team: CreateSurgeryTeamMemberRequest[];
+}

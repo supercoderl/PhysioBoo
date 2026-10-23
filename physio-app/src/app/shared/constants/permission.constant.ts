@@ -85,6 +85,10 @@ export const Permissions = {
         LabOrderItemCreate: "lab:lab-order-item:create",
         LabReportRead: "lab:lab-report:read",
         LabReportCreate: "lab:lab-report:create",
+        SampleManage: "lab:sample:manage",
+        ResultEnter: "lab:result:enter",
+        ResultVerify: "lab:result:verify",
+        AlertAcknowledge: "lab:alert:acknowledge",
     },
     Imaging: {
         ImagingOrderRead: "imaging:imaging-order:read",

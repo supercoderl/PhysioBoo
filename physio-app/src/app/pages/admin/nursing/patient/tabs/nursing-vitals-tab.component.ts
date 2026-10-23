@@ -1,118 +1,183 @@
-import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooInputComponent } from '@physioboo/ui';
+import { DatePipe, NgClass, NgFor, NgIf } from "@angular/common";
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, signal } from "@angular/core";
+import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import {
+  BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooIconComponent, BooInlineErrorComponent,
+  BooInputComponent, BooPaginationComponent, BooStatusBadgeComponent
+} from '@physioboo/ui';
+import { finalize } from "rxjs";
 import { NursingService } from "../../../../../services/admin/nursing.service";
-import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../services/common/toast.service";
-import { SharedModule } from "../../../../../shared/shared-imports";
-import { VitalsReading } from "../../../../../shared/types/nursing.types";
-import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { AddVitalsRequest, VitalsReading } from "../../../../../shared/types/nursing.types";
+
+type VitalField = keyof AddVitalsRequest;
+
+/** Ranges the server accepts; a value outside them is rejected there, so it is caught here first. */
+const FIELDS: { key: VitalField; label: string; unit: string; min: number; max: number }[] = [
+  { key: 'bloodPressureSystolic', label: 'Systolic', unit: 'mmHg', min: 40, max: 300 },
+  { key: 'bloodPressureDiastolic', label: 'Diastolic', unit: 'mmHg', min: 20, max: 200 },
+  { key: 'heartRate', label: 'Heart rate', unit: 'bpm', min: 20, max: 300 },
+  { key: 'temperature', label: 'Temperature', unit: '°C', min: 30, max: 45 },
+  { key: 'respiratoryRate', label: 'Respiratory rate', unit: '/min', min: 4, max: 80 },
+  { key: 'spo2', label: 'SpO2', unit: '%', min: 40, max: 100 },
+];
 
 @Component({
   selector: 'nursing-vitals-tab',
   standalone: true,
-  imports: [SharedModule,BooInputComponent, BooButtonAdminComponent],
+  imports: [
+    NgIf, NgFor, NgClass, DatePipe, ReactiveFormsModule,
+    BooButtonComponent, BooIconComponent, BooInputComponent, BooEmptyStateComponent, BooErrorStateComponent,
+    BooInlineErrorComponent, BooPaginationComponent, BooStatusBadgeComponent,
+  ],
   template: `
-    <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
-    </div>
+    <div *ngIf="loading()" aria-hidden="true" class="h-48 rounded-xl border border-borderGray bg-surface animate-pulse"></div>
+    <span *ngIf="loading()" class="sr-only" role="status">Loading vital signs…</span>
 
-    <div *ngIf="!isLoading()">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-primary m-0">Vitals History</h3>
-        <boo-button-admin (click)="showForm = !showForm" textColor="white" [fontSize]="12" [radius]="8" fontWeight="600">
-          {{ showForm ? 'Cancel' : 'Add Reading' }}
-        </boo-button-admin>
+    <boo-error-state *ngIf="!loading() && error() && !readings().length" appearance="panel" [headingLevel]="3"
+      title="We couldn't load the vital signs" description="Check your connection and try again." retryLabel="Try again" (retry)="load()" />
+
+    <div *ngIf="!loading() && (!error() || readings().length)" class="flex flex-col gap-4">
+      <boo-inline-error *ngIf="error()" what="the vitals history" (retry)="load()" />
+
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 class="m-0 text-sm font-semibold text-regular">Vital signs history</h2>
+        <button *ngIf="canWrite" boo-button variant="primary" size="sm" [attr.aria-expanded]="showForm" (click)="showForm = !showForm">
+          <physio-icon [name]="showForm ? 'x' : 'plus'" [size]="15" aria-hidden="true" />{{ showForm ? 'Cancel' : 'Record vitals' }}
+        </button>
       </div>
 
-      <form *ngIf="showForm" (ngSubmit)="submit()" class="bg-surface border border-gray-200 rounded-lg p-4 mb-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-        <boo-input label="BP Systolic" type="number" [(ngModel)]="form.bloodPressureSystolic" name="systolic"></boo-input>
-        <boo-input label="BP Diastolic" type="number" [(ngModel)]="form.bloodPressureDiastolic" name="diastolic"></boo-input>
-        <boo-input label="Heart Rate" type="number" [(ngModel)]="form.heartRate" name="hr"></boo-input>
-        <boo-input label="Temperature" type="number" [(ngModel)]="form.temperature" name="temp"></boo-input>
-        <boo-input label="Respiratory Rate" type="number" [(ngModel)]="form.respiratoryRate" name="rr"></boo-input>
-        <boo-input label="SpO2" type="number" [(ngModel)]="form.spo2" name="spo2"></boo-input>
-        <div class="col-span-2 flex items-end">
-          <button type="submit" [disabled]="loadingSrv.isLoading('vitals-add')" class="w-full px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 disabled:opacity-50">
-            Save Reading
-          </button>
+      <form *ngIf="canWrite && showForm" [formGroup]="form" (ngSubmit)="submit()" novalidate aria-label="Record vital signs"
+        class="bg-surface border border-borderGray rounded-xl p-4 flex flex-col gap-3">
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+          <div *ngFor="let f of fields">
+            <boo-input [formControlName]="f.key" [name]="f.key" type="number" [label]="f.label + ' (' + f.unit + ')'" [required]="true" />
+            <p class="m-0 mt-1 text-xs text-secondary">{{ f.min }}–{{ f.max }} {{ f.unit }}</p>
+          </div>
+        </div>
+        <p class="m-0 text-xs text-secondary">The time and your name are recorded automatically. Abnormal values raise an alert.</p>
+        <div class="flex justify-end gap-2">
+          <button type="button" boo-button variant="outline" size="sm" [disabled]="saving" (click)="cancel()">Cancel</button>
+          <button type="submit" boo-button variant="primary" size="sm" [loading]="saving">Save reading</button>
         </div>
       </form>
 
-      <div class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
-        <table class="w-full text-sm">
-          <thead class="bg-gray-100 text-gray-600 text-xs uppercase">
+      <boo-empty-state *ngIf="!readings().length" icon="activity" title="No vital signs recorded"
+        [description]="canWrite ? 'Record the first reading for this patient.' : 'No readings have been recorded for this patient.'" />
+
+      <div *ngIf="readings().length" class="bg-surface border border-borderGray rounded-xl overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <caption class="sr-only">Vital signs, newest first</caption>
+          <thead class="text-xs text-secondary border-b border-rowDivider">
             <tr>
-              <th class="px-4 py-3 text-left">Time</th>
-              <th class="px-4 py-3 text-left">BP</th>
-              <th class="px-4 py-3 text-left">HR</th>
-              <th class="px-4 py-3 text-left">Temp</th>
-              <th class="px-4 py-3 text-left">RR</th>
-              <th class="px-4 py-3 text-left">SpO2</th>
-              <th class="px-4 py-3 text-left">Recorded By</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Time</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">BP (mmHg)</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">HR (bpm)</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Temp (°C)</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">RR (/min)</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">SpO2 (%)</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Flag</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Recorded by</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100">
-            <tr *ngFor="let v of readings()" [ngClass]="v.isAbnormal ? 'bg-amber-50' : ''">
-              <td class="px-4 py-3">{{ v.recordedAt | date:'short' }}</td>
-              <td class="px-4 py-3">{{ v.bloodPressureSystolic }}/{{ v.bloodPressureDiastolic }}</td>
-              <td class="px-4 py-3">{{ v.heartRate }}</td>
-              <td class="px-4 py-3">{{ v.temperature }}°C</td>
-              <td class="px-4 py-3">{{ v.respiratoryRate }}</td>
-              <td class="px-4 py-3">{{ v.spo2 }}%</td>
-              <td class="px-4 py-3 text-gray-500">{{ v.recordedBy }}</td>
+          <tbody class="divide-y divide-rowDivider">
+            <tr *ngFor="let v of readings(); trackBy: trackById" [ngClass]="v.isAbnormal ? 'bg-amber-50' : ''">
+              <th scope="row" class="px-4 py-2.5 font-normal tabular-nums whitespace-nowrap">{{ v.recordedAt | date: 'MMM d, HH:mm' }}</th>
+              <td class="px-4 py-2.5 tabular-nums">{{ v.bloodPressureSystolic }}/{{ v.bloodPressureDiastolic }}</td>
+              <td class="px-4 py-2.5 tabular-nums">{{ v.heartRate }}</td>
+              <td class="px-4 py-2.5 tabular-nums">{{ v.temperature }}</td>
+              <td class="px-4 py-2.5 tabular-nums">{{ v.respiratoryRate }}</td>
+              <td class="px-4 py-2.5 tabular-nums">{{ v.spo2 }}</td>
+              <td class="px-4 py-2.5"><boo-status-badge *ngIf="v.isAbnormal" label="Abnormal" tone="warning" [dotted]="true" /></td>
+              <td class="px-4 py-2.5 text-secondary">{{ v.recordedBy }}</td>
             </tr>
           </tbody>
         </table>
-        <div *ngIf="!readings().length" class="px-5 py-8 text-center text-xs text-secondary">No vitals recorded yet.</div>
       </div>
+
+      <boo-pagination *ngIf="totalPages > 1" [page]="page" [totalPages]="totalPages" (pageChange)="goTo($event)" />
     </div>
   `,
 })
 export class NursingVitalsTabComponent implements OnChanges {
+  // #region Inputs, Outputs, Properties
   @Input({ required: true }) patientId!: string;
+  @Input() refreshKey = 0;
+  @Input() canWrite = false;
+  /** A reading was saved, so the patient header (last vitals, alerts) is out of date. */
+  @Output() changed = new EventEmitter<void>();
 
-  isLoading = signal(true);
+  private readonly srv = inject(NursingService);
+  private readonly toastSrv = inject(ToastService);
+  private readonly fb = inject(FormBuilder);
+
+  loading = signal(true);
+  error = signal(false);
   readings = signal<VitalsReading[]>([]);
+  page = 1;
+  totalPages = 1;
+
   showForm = false;
-  form: Partial<VitalsReading> = {};
+  saving = false;
+  readonly fields = FIELDS;
+  readonly form = this.fb.group(Object.fromEntries(
+    FIELDS.map(f => [f.key, this.fb.control<number | string | null>(null, [Validators.required, Validators.min(f.min), Validators.max(f.max)])])
+  ));
+  // #endregion
 
-  constructor(private srv: NursingService, private toastSrv: ToastService, protected loadingSrv: LocalLoadingService) { }
-
-  ngOnChanges(): void {
+  ngOnChanges(changes: SimpleChanges): void {
     if (!this.patientId) return;
-    this.isLoading.set(true);
-    this.srv.getVitals(this.patientId).subscribe({
-      next: (res) => { if (res.success) this.readings.set(res.data.items); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false),
+    if (changes['patientId']) this.page = 1;
+    if (changes['patientId'] || changes['refreshKey']) this.load();
+  }
+
+  load(): void {
+    // Show the skeleton only while there is nothing to keep on screen.
+    if (!this.readings().length) this.loading.set(true);
+    this.error.set(false);
+    const requested = this.patientId;
+    this.srv.getVitals(requested, this.page).pipe(finalize(() => this.loading.set(false))).subscribe({
+      next: res => {
+        if (requested !== this.patientId) return;
+        if (!res.success) { this.error.set(true); return; }
+        this.readings.set(res.data.items);
+        this.totalPages = res.data.totalPages || 1;
+      },
+      error: () => this.error.set(true),
     });
+  }
+
+  goTo(page: number): void {
+    if (page === this.page) return;
+    this.page = page;
+    this.load();
+  }
+
+  cancel(): void {
+    this.showForm = false;
+    this.form.reset();
   }
 
   submit(): void {
-    this.loadingSrv.setLoading('vitals-add', true);
-    const reading = {
-      recordedAt: new Date().toISOString(),
-      recordedBy: 'You',
-      bloodPressureSystolic: this.form.bloodPressureSystolic ?? 0,
-      bloodPressureDiastolic: this.form.bloodPressureDiastolic ?? 0,
-      heartRate: this.form.heartRate ?? 0,
-      temperature: this.form.temperature ?? 0,
-      respiratoryRate: this.form.respiratoryRate ?? 0,
-      spo2: this.form.spo2 ?? 0,
-      isAbnormal: false,
-    };
-    this.srv.addVitalsReading(this.patientId, reading).subscribe({
-      next: (res) => {
-        this.loadingSrv.setLoading('vitals-add', false);
-        if (res.success) {
-          this.readings.set([res.data, ...this.readings()]);
-          this.toastSrv.success('Vitals reading saved');
-          this.showForm = false;
-          this.form = {};
-        } else {
-          this.toastSrv.error('Unable to save vitals reading');
-        }
+    if (this.saving) return;
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+
+    const v = this.form.getRawValue();
+    const reading = Object.fromEntries(FIELDS.map(f => [f.key, Number(v[f.key])])) as unknown as AddVitalsRequest;
+    this.saving = true;
+    this.srv.addVitalsReading(this.patientId, reading).pipe(finalize(() => this.saving = false)).subscribe({
+      next: res => {
+        // On failure the form keeps what was typed so the nurse can correct and resubmit.
+        if (!res.success) { this.toastSrv.error('Unable to save the vital signs'); return; }
+        this.toastSrv.success('Vital signs saved');
+        this.showForm = false;
+        this.form.reset();
+        this.page = 1;
+        this.load();
+        this.changed.emit();
       },
-      error: () => { this.loadingSrv.setLoading('vitals-add', false); this.toastSrv.error('Unable to save vitals reading'); },
     });
   }
+
+  trackById = (_: number, item: { id: string }) => item.id;
 }

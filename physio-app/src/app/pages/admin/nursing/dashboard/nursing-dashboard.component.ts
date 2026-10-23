@@ -1,320 +1,363 @@
-import { Component, OnInit, signal } from "@angular/core";
-import { Router } from "@angular/router";
-import { finalize, forkJoin } from "rxjs";
-import { BooBadgeTone, BooCheckboxComponent, BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
-import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
-import { AdmissionService } from "../../../../services/admin/admission.service";
-import { NursingService } from "../../../../services/admin/nursing.service";
-import { LocalLoadingService } from "../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../services/common/toast.service";
-import { SharedModule } from "../../../../shared/shared-imports";
-import { AcuityLevel, AlertSeverity, NursingAlert, NursingAssignmentFilter, NursingPatient, NursingStats, ShiftCode } from "../../../../shared/types/nursing.types";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
+import { DatePipe, NgFor, NgIf } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import {
+  BooButtonComponent, BooBadgeTone, BooCheckboxComponent, BooEmptyStateComponent, BooErrorStateComponent,
+  BooIconComponent, BooInlineErrorComponent, BooInlineErrorState, BooSearchFieldComponent, BooStatusBadgeComponent
+} from '@physioboo/ui';
+import { Observable, Subscription, catchError, finalize, forkJoin, map, of } from 'rxjs';
+import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
+import { AdmissionService } from '../../../../services/admin/admission.service';
+import { NursingService } from '../../../../services/admin/nursing.service';
+import { AuthService } from '../../../../services/auth/auth.service';
+import { DialogService } from '../../../../services/common/dialog.service';
+import { ToastService } from '../../../../services/common/toast.service';
+import { Permissions } from '../../../../shared/constants/permission.constant';
+import {
+  AcuityLevel, AlertSeverity, NursingAlert, NursingPatient, NursingStats, ShiftCode, ShiftHandoverCard
+} from '../../../../shared/types/nursing.types';
+import { DashboardKpi, DashboardKpiTileComponent } from '../../overview/dashboard/sections/dashboard-kpi-tile.component';
+import { DashboardPanelComponent } from '../../overview/dashboard/sections/dashboard-panel.component';
+
+type LoadError = 'forbidden' | 'failed';
+type RiskFilter = 'FallRisk' | 'Isolation' | 'Emergency' | null;
+type TaskFilter = 'Overdue' | null;
+
+/** One dashboard source: a failed request keeps the previously loaded data of that source. */
+type SourceResult<T> = { ok: true; data: T } | { ok: false; status: number };
+
+interface WardSummary {
+  id: string;
+  name: string;
+  patients: number;
+  medicationsDue: number;
+}
+
+interface NursingLinks {
+  handover: string;
+  beds: string | null;
+  treatmentSheet: string | null;
+}
 
 @Component({
   selector: 'admin-nursing-dashboard',
   standalone: true,
-  imports: [SharedModule, BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooErrorStateComponent, BooButtonAdminComponent, ButtonIconComponent, BooCheckboxComponent],
-  template: `
-    <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Nursing Dashboard</h2>
-            <p class="text-gray-600">My assigned patients for this shift</p>
-          </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <boo-select label="Shift" [(ngModel)]="shift" (ngModelChange)="onShiftChange()" [options]="shiftOptions" bindLabel="label" bindValue="value"></boo-select>
-            <boo-select label="Ward" [(ngModel)]="filter.wardId" (ngModelChange)="applyFilters()" [options]="wardOptions" bindLabel="label" bindValue="value"></boo-select>
-            <boo-input label="Search patient or bed..." size="small" (search)="onSearch($event)"></boo-input>
-            <boo-button-admin (click)="toggleAssign()" textColor="white" padding="8px 16px" [radius]="8" [gap]="8">
-              <physio-icon name="user-plus" [size]="16"></physio-icon>
-              Assign patient
-            </boo-button-admin>
-            <button-icon [icon]="{ name: 'refresh', size: 16 }" [loading]="loadingSrv.isLoading('nursing-dashboard')" [disabled]="loadingSrv.isLoading('nursing-dashboard')" (onClick)="refresh()">
-              Refresh
-            </button-icon>
-          </div>
-        </div>
-
-        <!-- Assign patient -->
-        <div *ngIf="assignOpen()" class="mb-6 bg-surface rounded-lg shadow-md p-5">
-          <h3 class="text-sm font-semibold text-gray-800 mb-3">Assign an admitted patient to you for the {{ shift }} shift</h3>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-            <boo-select label="Patient" [(ngModel)]="assignForm.admissionId" [options]="admissionOptions()" bindLabel="label" bindValue="value"></boo-select>
-            <boo-select label="Acuity" [(ngModel)]="assignForm.acuity" [options]="acuityOptions" bindLabel="label" bindValue="value"></boo-select>
-            <boo-checkbox [(ngModel)]="assignForm.fallRisk"><span class="text-gray-700">Fall risk</span></boo-checkbox>
-            <div class="flex gap-2 justify-end">
-              <boo-button-admin (click)="assignOpen.set(false)" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 16px" [fontSize]="14" [radius]="8">Cancel</boo-button-admin>
-              <boo-button-admin (click)="assign()" [disabled]="!assignForm.admissionId || assigning()" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8">
-                {{ assigning() ? 'Assigning…' : 'Assign' }}
-              </boo-button-admin>
-            </div>
-          </div>
-          <p *ngIf="!admissionOptions().length" class="text-xs text-gray-500 mt-2">No admitted patients found.</p>
-        </div>
-
-        <!-- Error -->
-        <div *ngIf="error() && !loadingSrv.isLoading('nursing-dashboard')" class="mb-6">
-          <boo-error-state title="Couldn't load nursing dashboard" [description]="error()" (retry)="refresh()"></boo-error-state>
-        </div>
-
-        <!-- Loading -->
-        <div *ngIf="loadingSrv.isLoading('nursing-dashboard') && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3">
-          <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
-          <span class="text-gray-500 text-sm">Loading nursing dashboard...</span>
-        </div>
-
-        <ng-container *ngIf="!error() && hasLoadedOnce">
-          <!-- Stats strip -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="bg-surface rounded-lg shadow-md p-6">
-              <div class="flex items-center justify-between">
-                <div><p class="text-sm text-gray-600 mb-1">Assigned Patients</p><p class="text-3xl font-bold text-gray-800">{{ stats?.assignedPatients ?? 0 }}</p></div>
-                <div class="w-12 h-12 bg-primarySoft rounded-full flex items-center justify-center"><physio-icon name="users" [size]="24" class="text-primary"></physio-icon></div>
-              </div>
-            </div>
-            <div class="bg-surface rounded-lg shadow-md p-6">
-              <div class="flex items-center justify-between">
-                <div><p class="text-sm text-gray-600 mb-1">Open Tasks</p><p class="text-3xl font-bold text-gray-800">{{ stats?.openTasks ?? 0 }}</p></div>
-                <div class="w-12 h-12 bg-primarySoft rounded-full flex items-center justify-center"><physio-icon name="clipboard" [size]="24" class="text-primary"></physio-icon></div>
-              </div>
-            </div>
-            <div class="bg-surface rounded-lg shadow-md p-6">
-              <div class="flex items-center justify-between">
-                <div><p class="text-sm text-gray-600 mb-1">Overdue Tasks</p><p class="text-3xl font-bold text-red-600">{{ stats?.overdueTasks ?? 0 }}</p></div>
-                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center"><physio-icon name="alarm-clock" [size]="24" class="text-red-600"></physio-icon></div>
-              </div>
-            </div>
-            <div class="bg-surface rounded-lg shadow-md p-6">
-              <div class="flex items-center justify-between">
-                <div><p class="text-sm text-gray-600 mb-1">Active Alerts</p><p class="text-3xl font-bold text-amber-600">{{ stats?.activeAlerts ?? 0 }}</p></div>
-                <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center"><physio-icon name="bell" [size]="24" class="text-amber-600"></physio-icon></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Clinical alerts banner -->
-          <div *ngIf="alerts.length > 0" class="mb-6 flex gap-3 overflow-x-auto pb-1" aria-live="polite">
-            <div *ngFor="let a of alerts" class="shrink-0 min-w-[260px] bg-surface border rounded-lg p-3 flex items-start gap-2"
-              [ngClass]="alertBorderClass(a.severity)">
-              <physio-icon [name]="alertIcon(a.type)" [size]="18" [ngClass]="alertIconClass(a.severity)"></physio-icon>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold text-gray-800 truncate">{{ a.patientName }}</span>
-                  <boo-status-badge [label]="a.bedNumber" tone="neutral"></boo-status-badge>
-                </div>
-                <p class="text-xs text-gray-600 mt-0.5">{{ a.message }}</p>
-              </div>
-              <button (click)="acknowledgeAlert(a)" class="text-gray-400 hover:text-gray-600" aria-label="Acknowledge alert">
-                <physio-icon name="x" [size]="16"></physio-icon>
-              </button>
-            </div>
-          </div>
-
-          <!-- Filters -->
-          <div class="bg-surface rounded-lg shadow-md p-4 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <boo-select label="Risk Flag" [(ngModel)]="filter.riskFlag" (ngModelChange)="applyFilters()" [options]="riskOptions" bindLabel="label" bindValue="value"></boo-select>
-              <boo-select label="Task State" [(ngModel)]="filter.taskState" (ngModelChange)="applyFilters()" [options]="taskStateOptions" bindLabel="label" bindValue="value"></boo-select>
-            </div>
-          </div>
-
-          <!-- Empty state -->
-          <div *ngIf="filteredPatients.length === 0" class="bg-surface rounded-lg shadow-md p-12 flex flex-col items-center justify-center text-center">
-            <physio-icon name="inbox" [size]="36" [class]="'text-gray-300 mb-3'"></physio-icon>
-            <p class="text-gray-500 text-sm">No patients assigned for this shift.</p>
-          </div>
-
-          <!-- Patient list -->
-          <div *ngIf="filteredPatients.length > 0" class="bg-surface rounded-lg shadow-md overflow-hidden">
-            <table class="w-full text-sm">
-              <thead class="bg-gray-100 text-gray-600 text-xs uppercase">
-                <tr>
-                  <th class="px-4 py-3 text-left">Patient</th>
-                  <th class="px-4 py-3 text-left">Bed</th>
-                  <th class="px-4 py-3 text-left">Risk</th>
-                  <th class="px-4 py-3 text-left">Acuity</th>
-                  <th class="px-4 py-3 text-left">Next Task</th>
-                  <th class="px-4 py-3 text-left">MAR Due</th>
-                  <th class="px-4 py-3 text-left">Last Vitals</th>
-                  <th class="px-4 py-3 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100">
-                <tr *ngFor="let p of filteredPatients" tabindex="0" (click)="openChart(p)" (keydown.enter)="openChart(p)"
-                  class="hover:bg-gray-50 cursor-pointer focus:outline-none focus:bg-gray-50">
-                  <td class="px-4 py-3">
-                    <div class="font-semibold text-gray-800">{{ p.patientName }}</div>
-                    <div class="text-xs text-gray-500">{{ p.patientNumber }}</div>
-                  </td>
-                  <td class="px-4 py-3 text-gray-700">{{ p.wardName }} · {{ p.bedNumber }}</td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-wrap gap-1">
-                      <boo-status-badge *ngIf="p.risk.fallRisk" label="Fall Risk" tone="warning" [dotted]="true"></boo-status-badge>
-                      <boo-status-badge *ngIf="p.risk.isolationRequired" label="Isolation" tone="primary" [dotted]="true"></boo-status-badge>
-                      <boo-status-badge *ngIf="p.risk.isEmergency" label="Emergency" tone="danger" [dotted]="true"></boo-status-badge>
-                      <boo-status-badge *ngIf="p.risk.hasAllergies" label="Allergy" tone="danger" [dotted]="true"></boo-status-badge>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3"><boo-status-badge [label]="p.acuity" [tone]="acuityTone(p.acuity)"></boo-status-badge></td>
-                  <td class="px-4 py-3" [ngClass]="isOverdue(p.nextTaskDueAt) ? 'text-red-600 font-medium' : 'text-gray-700'">
-                    {{ p.nextTaskLabel ?? '—' }}
-                  </td>
-                  <td class="px-4 py-3 text-gray-700">{{ p.marDueCount }}</td>
-                  <td class="px-4 py-3" [ngClass]="isStale(p.lastVitalsAt) ? 'text-amber-600' : 'text-gray-700'">
-                    {{ p.lastVitalsAt ? (p.lastVitalsAt | date:'shortTime') : 'No readings' }}
-                  </td>
-                  <td class="px-4 py-3">
-                    <button (click)="openChart(p); $event.stopPropagation()" class="text-primary text-xs font-semibold hover:underline">Open chart</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </ng-container>
-      </div>
-    </div>
-    `
+  imports: [
+    NgIf, NgFor, DatePipe, FormsModule, RouterLink,
+    BooButtonComponent, BooIconComponent, BooEmptyStateComponent, BooErrorStateComponent, BooInlineErrorComponent,
+    BooStatusBadgeComponent, BooSearchFieldComponent, BooCheckboxComponent, BooSelectComponent,
+    DashboardKpiTileComponent, DashboardPanelComponent,
+  ],
+  templateUrl: './nursing-dashboard.component.html',
 })
 export class AdminNursingDashboardComponent implements OnInit {
+  // #region Inputs, Outputs, Properties
+  private readonly nursingSrv = inject(NursingService);
+  private readonly admissionSrv = inject(AdmissionService);
+  private readonly authSrv = inject(AuthService);
+  private readonly dialogSrv = inject(DialogService);
+  private readonly toastSrv = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  private loadSub?: Subscription;
+
+  shift: ShiftCode = 'Day';
   patients: NursingPatient[] = [];
   stats: NursingStats | null = null;
   alerts: NursingAlert[] = [];
-  error = signal<string | null>(null);
-  hasLoadedOnce = false;
+  /** Cards handed over to the selected shift; null until the handover source has loaded once. */
+  handoverCards: ShiftHandoverCard[] | null = null;
 
-  shift: ShiftCode = 'Day';
-  filter: NursingAssignmentFilter = { shift: 'Day', wardId: null, search: null, riskFlag: null, taskState: null };
+  loading = false;
+  /** Set once any source has loaded for the selected shift; until then the skeleton or a blocking error shows. */
+  loaded = false;
+  loadError: LoadError | null = null;
+  /** A refresh failed in whole or part while older figures are still on screen. */
+  refreshFailed = false;
+  refreshErrorState: BooInlineErrorState = 'default';
+  updatedAt: Date | null = null;
+  /** Clock the due times are compared against; fixed at load so tiles and rows agree. */
+  private loadedAt = Date.now();
 
-  shiftOptions: { label: string; value: ShiftCode }[] = [
-    { label: 'Day', value: 'Day' },
-    { label: 'Evening', value: 'Evening' },
-    { label: 'Night', value: 'Night' },
+  wardId: string | null = null;
+  riskFilter: RiskFilter = null;
+  taskFilter: TaskFilter = null;
+  search = '';
+
+  canAcknowledge = false;
+  canAssign = false;
+  links: NursingLinks = { handover: '/admin/nursing/handover', beds: null, treatmentSheet: null };
+  acknowledgingIds = new Set<string>();
+
+  assignOpen = false;
+  assigning = false;
+  loadingAdmissions = false;
+  admissionOptions: { label: string; value: string }[] = [];
+  assignForm: { admissionId: string | null; acuity: AcuityLevel; fallRisk: boolean } = { admissionId: null, acuity: 'Medium', fallRisk: false };
+
+  readonly skeletonTiles = Array.from({ length: 5 });
+  readonly skeletonRows = Array.from({ length: 4 });
+  readonly shiftOptions: { label: string; value: ShiftCode }[] = [
+    { label: 'Day shift', value: 'Day' },
+    { label: 'Evening shift', value: 'Evening' },
+    { label: 'Night shift', value: 'Night' },
   ];
-
-  riskOptions: { label: string; value: NursingAssignmentFilter['riskFlag'] }[] = [
-    { label: 'All Risk Flags', value: null },
-    { label: 'Fall Risk', value: 'FallRisk' },
+  readonly riskOptions: { label: string; value: RiskFilter }[] = [
+    { label: 'All risk flags', value: null },
+    { label: 'Fall risk', value: 'FallRisk' },
     { label: 'Isolation', value: 'Isolation' },
     { label: 'Emergency', value: 'Emergency' },
   ];
-
-  taskStateOptions: { label: string; value: NursingAssignmentFilter['taskState'] }[] = [
-    { label: 'All Tasks', value: null },
-    { label: 'Overdue', value: 'Overdue' },
-    { label: 'Due Soon', value: 'DueSoon' },
+  readonly taskOptions: { label: string; value: TaskFilter }[] = [
+    { label: 'All tasks', value: null },
+    { label: 'Overdue next task', value: 'Overdue' },
   ];
-
-  assignOpen = signal(false);
-  assigning = signal(false);
-  admissionOptions = signal<{ label: string; value: string }[]>([]);
-  assignForm: { admissionId: string | null; acuity: AcuityLevel; fallRisk: boolean } = { admissionId: null, acuity: 'Medium', fallRisk: false };
   readonly acuityOptions: { label: string; value: AcuityLevel }[] = [
     { label: 'Low', value: 'Low' }, { label: 'Medium', value: 'Medium' },
     { label: 'High', value: 'High' }, { label: 'Critical', value: 'Critical' },
   ];
-
-  constructor(
-    private admissionSrv: AdmissionService,
-    private nursingSrv: NursingService,
-    private router: Router,
-    private toastSrv: ToastService,
-    protected loadingSrv: LocalLoadingService,
-  ) { }
+  // #endregion
 
   ngOnInit(): void {
+    // Permissions arrive with the profile; actions and links follow them if they load after the page.
+    this.authSrv.permissions$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(perms => this.applyPermissions(perms ?? []));
     this.load();
   }
 
+  // #region Derived data
+  get kpis(): DashboardKpi[] {
+    const s = this.stats;
+    const pendingHandover = this.pendingHandovers.length;
+    return [
+      { key: 'patients', label: 'Assigned patients', icon: 'users', value: s ? `${s.assignedPatients}` : '—', detail: `${this.shift} shift` },
+      { key: 'tasks', label: 'Open tasks', icon: 'clipboard-list', value: s ? `${s.openTasks}` : '—', detail: 'Pending nursing tasks' },
+      {
+        key: 'overdue', label: 'Overdue tasks', icon: 'alarm-clock', value: s ? `${s.overdueTasks}` : '—',
+        detail: 'Pending past their due time', tone: s && s.overdueTasks > 0 ? 'attention' : 'default',
+      },
+      {
+        key: 'alerts', label: 'Open alerts', icon: 'bell', value: s ? `${s.activeAlerts}` : '—',
+        detail: 'Not yet acknowledged', tone: s && s.activeAlerts > 0 ? 'attention' : 'default',
+      },
+      {
+        key: 'handover', label: 'Handover to acknowledge', icon: 'users', value: this.handoverCards ? `${pendingHandover}` : '—',
+        detail: this.handoverCards ? `${this.handoverCards.length} card${this.handoverCards.length === 1 ? '' : 's'} for this shift` : 'Unavailable',
+        link: this.links.handover,
+      },
+    ];
+  }
+
+  get pendingHandovers(): ShiftHandoverCard[] {
+    return (this.handoverCards ?? []).filter(c => !c.acknowledged);
+  }
+
+  get wards(): WardSummary[] {
+    const byWard = new Map<string, WardSummary>();
+    for (const p of this.patients) {
+      const ward = byWard.get(p.wardId) ?? { id: p.wardId, name: p.wardName, patients: 0, medicationsDue: 0 };
+      ward.patients += 1;
+      ward.medicationsDue += p.marDueCount;
+      byWard.set(p.wardId, ward);
+    }
+    return Array.from(byWard.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
   get wardOptions(): { label: string; value: string | null }[] {
-    const wards = Array.from(new Map(this.patients.map(p => [p.wardId, p.wardName])).entries());
-    return [{ label: 'All Wards', value: null }, ...wards.map(([id, name]) => ({ label: name, value: id }))];
+    return [{ label: 'All wards', value: null }, ...this.wards.map(w => ({ label: w.name, value: w.id }))];
   }
 
   get filteredPatients(): NursingPatient[] {
-    let list = this.patients;
-    if (this.filter.wardId) list = list.filter(p => p.wardId === this.filter.wardId);
-    if (this.filter.search) {
-      const q = this.filter.search.toLowerCase();
-      list = list.filter(p => p.patientName.toLowerCase().includes(q) || p.bedNumber.toLowerCase().includes(q));
-    }
-    if (this.filter.riskFlag === 'FallRisk') list = list.filter(p => p.risk.fallRisk);
-    if (this.filter.riskFlag === 'Isolation') list = list.filter(p => p.risk.isolationRequired);
-    if (this.filter.riskFlag === 'Emergency') list = list.filter(p => p.risk.isEmergency);
-    if (this.filter.taskState === 'Overdue') list = list.filter(p => this.isOverdue(p.nextTaskDueAt));
-    if (this.filter.taskState === 'DueSoon') list = list.filter(p => !this.isOverdue(p.nextTaskDueAt) && p.nextTaskDueAt != null);
-    return list;
+    const q = this.search.trim().toLowerCase();
+    return this.patients.filter(p =>
+      (!this.wardId || p.wardId === this.wardId)
+      && (!q || p.patientName.toLowerCase().includes(q) || p.bedNumber.toLowerCase().includes(q) || p.patientNumber.toLowerCase().includes(q))
+      && (this.riskFilter !== 'FallRisk' || p.risk.fallRisk)
+      && (this.riskFilter !== 'Isolation' || p.risk.isolationRequired)
+      && (this.riskFilter !== 'Emergency' || p.risk.isEmergency)
+      && (this.taskFilter !== 'Overdue' || this.isOverdue(p.nextTaskDueAt))
+    );
   }
 
-  load(): void {
-    this.error.set(null);
-    this.filter.shift = this.shift;
-    this.loadingSrv.setLoading('nursing-dashboard', true);
+  get hasFilters(): boolean {
+    return !!(this.wardId || this.riskFilter || this.taskFilter || this.search.trim());
+  }
+  // #endregion
 
-    forkJoin({
-      assignments: this.nursingSrv.getAssignments(this.filter),
-      stats: this.nursingSrv.getStats(this.shift),
-      alerts: this.nursingSrv.getAlerts(this.shift),
+  // #region Loading
+  load(): void {
+    this.loadSub?.unsubscribe();
+    const retryingAfterError = this.loaded && this.refreshFailed;
+    this.loading = true;
+    if (retryingAfterError) this.refreshErrorState = 'retrying';
+
+    const shift = this.shift;
+    this.loadSub = forkJoin({
+      assignments: this.source(this.nursingSrv.getAssignments({ shift }).pipe(map(r => r.data))),
+      stats: this.source(this.nursingSrv.getStats(shift).pipe(map(r => r.data))),
+      alerts: this.source(this.nursingSrv.getAlerts(shift).pipe(map(r => r.data))),
+      handover: this.source(this.nursingSrv.getHandoverCards(this.previousShift(shift), null, true).pipe(map(r => r.data))),
     })
-      .pipe(finalize(() => this.loadingSrv.setLoading('nursing-dashboard', false)))
-      .subscribe({
-        next: ({ assignments, stats, alerts }) => {
-          if (assignments.success) this.patients = assignments.data;
-          if (stats.success) this.stats = stats.data;
-          if (alerts.success) this.alerts = alerts.data.filter(a => !a.acknowledged);
-          this.hasLoadedOnce = true;
-        },
-        error: () => {
-          this.error.set('Failed to load the nursing dashboard. Please try again.');
-          this.hasLoadedOnce = true;
-        },
+      .pipe(finalize(() => this.loading = false), takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ assignments, stats, alerts, handover }) => {
+        const results = [assignments, stats, alerts, handover];
+        const failures = results.filter((r): r is { ok: false; status: number } => !r.ok);
+
+        if (assignments.ok) this.patients = assignments.data ?? [];
+        if (stats.ok) this.stats = stats.data ?? null;
+        if (alerts.ok) this.alerts = (alerts.data ?? []).filter(a => !a.acknowledged);
+        if (handover.ok) this.handoverCards = (handover.data ?? []).filter(c => c.incomingShift === shift);
+
+        if (failures.length < results.length) {
+          this.loaded = true;
+          this.loadError = null;
+          this.updatedAt = new Date();
+          this.loadedAt = Date.now();
+        } else if (!this.loaded) {
+          this.loadError = failures.every(f => f.status === 403) ? 'forbidden' : 'failed';
+        }
+        this.refreshFailed = this.loaded && failures.length > 0;
+        this.refreshErrorState = this.refreshFailed && retryingAfterError ? 'failed' : 'default';
       });
   }
 
-  refresh(): void { this.load(); }
+  onShiftChange(shift: ShiftCode): void {
+    if (shift === this.shift) return;
+    this.shift = shift;
+    // Another shift's figures would be misleading under the new heading, so start from scratch.
+    this.patients = [];
+    this.stats = null;
+    this.alerts = [];
+    this.handoverCards = null;
+    this.loaded = false;
+    this.loadError = null;
+    this.refreshFailed = false;
+    this.wardId = null;
+    this.load();
+  }
 
+  private source<T>(request: Observable<T>): Observable<SourceResult<T>> {
+    return request.pipe(
+      map(data => ({ ok: true, data }) as SourceResult<T>),
+      catchError((err: HttpErrorResponse) => of<SourceResult<T>>({ ok: false, status: err?.status ?? 0 }))
+    );
+  }
+
+  private previousShift(shift: ShiftCode): ShiftCode {
+    return shift === 'Day' ? 'Night' : shift === 'Evening' ? 'Day' : 'Evening';
+  }
+  // #endregion
+
+  // #region Filters
+  clearFilters(): void {
+    this.wardId = null;
+    this.riskFilter = null;
+    this.taskFilter = null;
+    this.search = '';
+  }
+
+  filterByWard(wardId: string): void {
+    this.wardId = this.wardId === wardId ? null : wardId;
+  }
+  // #endregion
+
+  // #region Alerts
+  confirmAcknowledge(alert: NursingAlert): void {
+    this.dialogSrv.confirm(
+      `Acknowledge this alert for ${alert.patientName} (bed ${alert.bedNumber})? It will be marked as handled and removed from the list.`,
+      () => this.acknowledge(alert),
+      'Acknowledge alert',
+      alert.severity === 'Critical' ? 'danger' : 'warning',
+      'Acknowledge',
+    );
+  }
+
+  private acknowledge(alert: NursingAlert): void {
+    if (this.acknowledgingIds.has(alert.id)) return;
+    this.acknowledgingIds = new Set(this.acknowledgingIds).add(alert.id);
+
+    this.nursingSrv.acknowledgeAlert(alert.id)
+      .pipe(
+        finalize(() => {
+          const next = new Set(this.acknowledgingIds);
+          next.delete(alert.id);
+          this.acknowledgingIds = next;
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: res => {
+          if (!res.success) { this.toastSrv.error('Unable to acknowledge the alert'); return; }
+          this.alerts = this.alerts.filter(a => a.id !== alert.id);
+          if (this.stats) this.stats = { ...this.stats, activeAlerts: Math.max(0, this.stats.activeAlerts - 1) };
+          this.toastSrv.success('Alert acknowledged');
+        },
+        error: () => this.toastSrv.error('Unable to acknowledge the alert'),
+      });
+  }
+  // #endregion
+
+  // #region Assignment
   toggleAssign(): void {
-    this.assignOpen.set(!this.assignOpen());
-    if (!this.assignOpen() || this.admissionOptions().length) return;
+    this.assignOpen = !this.assignOpen;
+    if (!this.assignOpen || this.admissionOptions.length || this.loadingAdmissions) return;
+    this.loadingAdmissions = true;
     this.admissionSrv.search({
       pageNumber: 1, pageSize: 200, search: '', sort: '-admittedAt',
       filter: { start: null, end: null, status: 'Admitted', type: null, departmentId: null }
-    }).subscribe({
-      next: res => {
-        if (res.success) this.admissionOptions.set(res.data.items.map(a => ({ label: `${a.patientName} · ${a.admissionNumber}`, value: a.id })));
-      },
-      error: () => this.toastSrv.error('Failed to load admitted patients')
-    });
+    })
+      .pipe(finalize(() => this.loadingAdmissions = false), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: res => {
+          if (res.success) this.admissionOptions = res.data.items.map(a => ({ label: `${a.patientName} · ${a.admissionNumber}`, value: a.id }));
+        },
+        error: () => this.toastSrv.error('Failed to load admitted patients'),
+      });
   }
 
   assign(): void {
-    if (!this.assignForm.admissionId || this.assigning()) return;
-    this.assigning.set(true);
+    if (!this.assignForm.admissionId || this.assigning) return;
+    this.assigning = true;
     this.nursingSrv.createAssignment({
       admissionId: this.assignForm.admissionId,
       shift: this.shift,
       acuity: this.assignForm.acuity,
       fallRisk: this.assignForm.fallRisk,
-    }).pipe(finalize(() => this.assigning.set(false))).subscribe({
-      next: res => {
-        if (!res.success) { this.toastSrv.error('Unable to assign the patient'); return; }
-        this.toastSrv.success('Patient assigned');
-        this.assignForm = { admissionId: null, acuity: 'Medium', fallRisk: false };
-        this.assignOpen.set(false);
-        this.load();
-      },
-      error: () => this.toastSrv.error('Unable to assign the patient')
-    });
+    })
+      .pipe(finalize(() => this.assigning = false), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: res => {
+          if (!res.success) { this.toastSrv.error('Unable to assign the patient'); return; }
+          this.toastSrv.success('Patient assigned');
+          this.assignForm = { admissionId: null, acuity: 'Medium', fallRisk: false };
+          this.assignOpen = false;
+          this.load();
+        },
+        error: () => this.toastSrv.error('Unable to assign the patient'),
+      });
   }
-  onShiftChange(): void { this.load(); }
-  applyFilters(): void { /* filters apply client-side against the loaded snapshot */ }
-  onSearch(query: string): void { this.filter.search = query; }
+  // #endregion
 
-  acuityTone(acuity: NursingPatient['acuity']): BooBadgeTone {
+  // #region Helpers
+  isOverdue(dueAt?: string | null): boolean {
+    return !!dueAt && new Date(dueAt).getTime() < this.loadedAt;
+  }
+
+  acuityTone(acuity: AcuityLevel): BooBadgeTone {
     switch (acuity) {
+      case 'Critical': return 'danger';
+      case 'High': return 'warning';
+      case 'Medium': return 'primary';
+      default: return 'neutral';
+    }
+  }
+
+  severityTone(severity: AlertSeverity): BooBadgeTone {
+    switch (severity) {
       case 'Critical': return 'danger';
       case 'High': return 'warning';
       case 'Medium': return 'primary';
@@ -332,43 +375,18 @@ export class AdminNursingDashboardComponent implements OnInit {
     }
   }
 
-  alertBorderClass(severity: AlertSeverity): string {
-    switch (severity) {
-      case 'Critical': return 'border-red-300';
-      case 'High': return 'border-amber-300';
-      default: return 'border-gray-200';
-    }
-  }
+  trackById = (_: number, item: { id: string }) => item.id;
+  trackByKey = (_: number, item: { key: string }) => item.key;
 
-  alertIconClass(severity: AlertSeverity): string {
-    switch (severity) {
-      case 'Critical': return 'text-red-600';
-      case 'High': return 'text-amber-600';
-      default: return 'text-gray-500';
-    }
+  private applyPermissions(perms: string[]): void {
+    const can = (code: string) => perms.includes(code);
+    this.canAcknowledge = can(Permissions.Inpatient.NursingWrite);
+    this.canAssign = can(Permissions.Inpatient.NursingManage);
+    this.links = {
+      handover: '/admin/nursing/handover',
+      beds: can(Permissions.Inpatient.BedRead) ? '/admin/inpatient/bed-map' : null,
+      treatmentSheet: can(Permissions.Inpatient.TreatmentSheetRead) ? '/admin/inpatient/treatment-sheet' : null,
+    };
   }
-
-  isOverdue(dueAt?: string | null): boolean {
-    return !!dueAt && new Date(dueAt).getTime() < Date.now();
-  }
-
-  isStale(lastVitalsAt?: string | null): boolean {
-    return !lastVitalsAt || (Date.now() - new Date(lastVitalsAt).getTime()) > 4 * 3_600_000;
-  }
-
-  openChart(patient: NursingPatient): void {
-    this.router.navigate(['/admin/nursing/patient', patient.patientId]);
-  }
-
-  acknowledgeAlert(alert: NursingAlert): void {
-    this.nursingSrv.acknowledgeAlert(alert.id).subscribe(res => {
-      if (res.success) {
-        this.alerts = this.alerts.filter(a => a.id !== alert.id);
-        if (this.stats) this.stats.activeAlerts = Math.max(0, this.stats.activeAlerts - 1);
-        this.toastSrv.success('Alert acknowledged');
-      } else {
-        this.toastSrv.error('Unable to acknowledge alert');
-      }
-    });
-  }
+  // #endregion
 }

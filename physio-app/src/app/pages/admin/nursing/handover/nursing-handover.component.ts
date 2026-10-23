@@ -1,178 +1,314 @@
-import { Component, OnInit, signal } from "@angular/core";
-import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
-import { BooErrorStateComponent } from '@physioboo/ui';
-import { NursingService } from "../../../../services/admin/nursing.service";
-import { LocalLoadingService } from "../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../services/common/toast.service";
-import { SharedModule } from "../../../../shared/shared-imports";
-import { ShiftCode, ShiftHandoverCard } from "../../../../shared/types/nursing.types";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
+import { DatePipe, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import {
+  BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooIconComponent, BooInlineErrorComponent,
+  BooInlineErrorState, BooSearchFieldComponent, BooStatusBadgeComponent
+} from '@physioboo/ui';
+import { Subscription, finalize } from 'rxjs';
+import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
+import { BooTextareaComponent } from '../../../../components/textarea/boo-textarea/boo-textarea.component';
+import { NursingService } from '../../../../services/admin/nursing.service';
+import { AuthService } from '../../../../services/auth/auth.service';
+import { DialogService } from '../../../../services/common/dialog.service';
+import { ToastService } from '../../../../services/common/toast.service';
+import { Permissions } from '../../../../shared/constants/permission.constant';
+import { ShiftCode, ShiftHandoverCard } from '../../../../shared/types/nursing.types';
+import { DashboardKpi, DashboardKpiTileComponent } from '../../overview/dashboard/sections/dashboard-kpi-tile.component';
+import { DashboardPanelComponent } from '../../overview/dashboard/sections/dashboard-panel.component';
 
+type LoadError = 'forbidden' | 'failed';
 type SbarKey = 'situation' | 'background' | 'assessment' | 'recommendation';
+type SbarDraft = Record<SbarKey, string>;
+type StatusFilter = 'Pending' | 'Acknowledged' | null;
+
+/** Server limit of every SBAR section (UpdateHandoverCommandValidation). */
+const SBAR_MAX_LENGTH = 2000;
 
 @Component({
-    selector: 'admin-nursing-handover',
-    standalone: true,
-    imports: [SharedModule,BooSelectComponent, BooErrorStateComponent, BooButtonAdminComponent, BooTextareaComponent],
-    template: `
-    <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-5xl mx-auto">
-        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Shift Handover</h2>
-            <p class="text-gray-600">SBAR handover from outgoing to incoming shift</p>
-          </div>
-          <boo-select label="Outgoing Shift" [(ngModel)]="outgoingShift" (ngModelChange)="load()" [options]="shiftOptions" bindLabel="label" bindValue="value"></boo-select>
-        </div>
-
-        <div *ngIf="loadingSrv.isLoading('handover')" class="flex flex-col items-center justify-center py-24 gap-3">
-          <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
-          <span class="text-gray-500 text-sm">Loading handover...</span>
-        </div>
-
-        <div *ngIf="!loadingSrv.isLoading('handover') && error()">
-          <boo-error-state title="Couldn't load handover" [description]="error()" (retry)="retryLoad()"></boo-error-state>
-        </div>
-
-        <div *ngIf="!loadingSrv.isLoading('handover') && !error() && cards.length === 0" class="bg-surface rounded-lg shadow-md p-12 flex flex-col items-center justify-center text-center">
-          <physio-icon name="inbox" [size]="36" [class]="'text-gray-300 mb-3'"></physio-icon>
-          <p class="text-gray-500 text-sm">No handover cards for this shift.</p>
-        </div>
-
-        <div *ngIf="!loadingSrv.isLoading('handover') && !error() && cards.length > 0" class="space-y-4">
-          <div *ngFor="let c of cards" class="bg-surface rounded-lg shadow-md p-5">
-            <div class="flex items-center justify-between mb-3">
-              <div>
-                <span class="font-semibold text-gray-800">{{ c.patientName }}</span>
-                <span class="text-xs text-gray-500 ml-2">Bed {{ c.bedNumber }} · {{ c.outgoingShift }} → {{ c.incomingShift }}</span>
-              </div>
-              <span *ngIf="c.acknowledged" class="text-xs font-semibold text-emerald-600 flex items-center gap-1">
-                <physio-icon name="check-circle" [size]="14"></physio-icon> Acknowledged
-              </span>
-            </div>
-            <dl *ngIf="editingId() !== c.id" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-              <div><dt class="text-xs text-gray-500 mb-0.5">Situation</dt><dd class="text-gray-800 m-0 whitespace-pre-line">{{ c.situation }}</dd></div>
-              <div><dt class="text-xs text-gray-500 mb-0.5">Background</dt><dd class="text-gray-800 m-0 whitespace-pre-line">{{ c.background }}</dd></div>
-              <div><dt class="text-xs text-gray-500 mb-0.5">Assessment</dt><dd class="text-gray-800 m-0 whitespace-pre-line">{{ c.assessment }}</dd></div>
-              <div><dt class="text-xs text-gray-500 mb-0.5">Recommendation</dt><dd class="text-gray-800 m-0 whitespace-pre-line">{{ c.recommendation }}</dd></div>
-            </dl>
-            <div *ngIf="editingId() === c.id" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-              <div *ngFor="let f of sbarFields" class="flex flex-col gap-1">
-                <label [for]="f.key + '-' + c.id" class="text-xs text-gray-500">{{ f.label }}</label>
-                <boo-textarea [rows]="3" [maxlength]="2000" [(ngModel)]="draft[f.key]" [name]="f.key + '-' + c.id" [id]="f.key + '-' + c.id"></boo-textarea>
-              </div>
-            </div>
-            <div class="mt-4 flex justify-end gap-2" *ngIf="!c.acknowledged">
-              <ng-container *ngIf="editingId() !== c.id; else editActions">
-                <boo-button-admin (click)="startEdit(c)" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 16px" [fontSize]="14" [radius]="8">
-                  Edit SBAR
-                </boo-button-admin>
-                <boo-button-admin (click)="acknowledge(c)" [disabled]="loadingSrv.isLoading('ack-' + c.id)" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8">
-                  Acknowledge
-                </boo-button-admin>
-              </ng-container>
-              <ng-template #editActions>
-                <boo-button-admin (click)="editingId.set(null)" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 16px" [fontSize]="14" [radius]="8">Cancel</boo-button-admin>
-                <boo-button-admin (click)="saveEdit(c)" [disabled]="savingEdit()" textColor="white" padding="8px 16px" [fontSize]="14" [radius]="8">
-                  {{ savingEdit() ? 'Saving…' : 'Save' }}
-                </boo-button-admin>
-              </ng-template>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    `
+  selector: 'admin-nursing-handover',
+  standalone: true,
+  imports: [
+    NgIf, NgFor, NgTemplateOutlet, DatePipe, FormsModule, RouterLink,
+    BooButtonComponent, BooIconComponent, BooEmptyStateComponent, BooErrorStateComponent, BooInlineErrorComponent,
+    BooStatusBadgeComponent, BooSearchFieldComponent, BooSelectComponent, BooTextareaComponent,
+    DashboardKpiTileComponent, DashboardPanelComponent,
+  ],
+  templateUrl: './nursing-handover.component.html',
 })
 export class AdminNursingHandoverComponent implements OnInit {
-    cards: ShiftHandoverCard[] = [];
+  // #region Inputs, Outputs, Properties
+  private readonly nursingSrv = inject(NursingService);
+  private readonly authSrv = inject(AuthService);
+  private readonly dialogSrv = inject(DialogService);
+  private readonly toastSrv = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
 
-    readonly sbarFields: { key: SbarKey; label: string }[] = [
-        { key: 'situation', label: 'Situation' },
-        { key: 'background', label: 'Background' },
-        { key: 'assessment', label: 'Assessment' },
-        { key: 'recommendation', label: 'Recommendation' },
+  private loadSub?: Subscription;
+
+  /** The shift handing over; the cards are addressed to the shift that follows it. */
+  outgoingShift: ShiftCode = 'Day';
+  /** Null until the first successful load of the selected shift. */
+  cards: ShiftHandoverCard[] | null = null;
+
+  loading = false;
+  loadError: LoadError | null = null;
+  /** A refresh failed while older cards are still on screen. */
+  refreshFailed = false;
+  refreshErrorState: BooInlineErrorState = 'default';
+  updatedAt: Date | null = null;
+
+  search = '';
+  statusFilter: StatusFilter = null;
+
+  canWrite = false;
+
+  editingId: string | null = null;
+  draft: SbarDraft = this.emptyDraft();
+  /** Shown only after a save attempt, so the form is not flagged before the nurse has typed anything. */
+  showDraftErrors = false;
+  savingId: string | null = null;
+  acknowledgingIds = new Set<string>();
+
+  readonly skeletonRows = Array.from({ length: 3 });
+  readonly maxLength = SBAR_MAX_LENGTH;
+  readonly shiftOptions: { label: string; value: ShiftCode }[] = [
+    { label: 'Day shift', value: 'Day' },
+    { label: 'Evening shift', value: 'Evening' },
+    { label: 'Night shift', value: 'Night' },
+  ];
+  readonly statusOptions: { label: string; value: StatusFilter }[] = [
+    { label: 'All cards', value: null },
+    { label: 'To acknowledge', value: 'Pending' },
+    { label: 'Acknowledged', value: 'Acknowledged' },
+  ];
+  readonly sbarFields: { key: SbarKey; label: string }[] = [
+    { key: 'situation', label: 'Situation' },
+    { key: 'background', label: 'Background' },
+    { key: 'assessment', label: 'Assessment' },
+    { key: 'recommendation', label: 'Recommendation' },
+  ];
+  // #endregion
+
+  ngOnInit(): void {
+    // Permissions arrive with the profile; the actions follow them if they load after the page.
+    this.authSrv.permissions$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(perms => this.canWrite = (perms ?? []).includes(Permissions.Inpatient.NursingWrite));
+    this.load();
+  }
+
+  // #region Derived data
+  get incomingShift(): ShiftCode {
+    return this.outgoingShift === 'Day' ? 'Evening' : this.outgoingShift === 'Evening' ? 'Night' : 'Day';
+  }
+
+  get pendingCards(): ShiftHandoverCard[] {
+    return this.visibleCards.filter(c => !c.acknowledged);
+  }
+
+  get acknowledgedCards(): ShiftHandoverCard[] {
+    return this.visibleCards.filter(c => c.acknowledged);
+  }
+
+  get visibleCards(): ShiftHandoverCard[] {
+    const q = this.search.trim().toLowerCase();
+    return (this.cards ?? []).filter(c =>
+      (!q || c.patientName.toLowerCase().includes(q) || c.bedNumber.toLowerCase().includes(q))
+      && (this.statusFilter !== 'Pending' || !c.acknowledged)
+      && (this.statusFilter !== 'Acknowledged' || c.acknowledged)
+    );
+  }
+
+  get hasFilters(): boolean {
+    return !!(this.search.trim() || this.statusFilter);
+  }
+
+  get kpis(): DashboardKpi[] {
+    const all = this.cards ?? [];
+    const pending = all.filter(c => !c.acknowledged).length;
+    return [
+      { key: 'total', label: 'Handover cards', icon: 'clipboard-list', value: `${all.length}`, detail: `${this.outgoingShift} → ${this.incomingShift} shift` },
+      { key: 'pending', label: 'To acknowledge', icon: 'clock', value: `${pending}`, detail: 'Waiting for the incoming nurse', tone: pending > 0 ? 'attention' : 'default' },
+      { key: 'done', label: 'Acknowledged', icon: 'check', value: `${all.length - pending}`, detail: 'Locked against edits' },
     ];
-    editingId = signal<string | null>(null);
-    savingEdit = signal(false);
-    draft: Record<SbarKey, string> = { situation: '', background: '', assessment: '', recommendation: '' };
-    error = signal<string | null>(null);
-    outgoingShift: ShiftCode = 'Day';
+  }
 
-    shiftOptions: { label: string; value: ShiftCode }[] = [
-        { label: 'Day', value: 'Day' },
-        { label: 'Evening', value: 'Evening' },
-        { label: 'Night', value: 'Night' },
-    ];
+  /** Whether the draft being edited differs from the saved card. */
+  get draftDirty(): boolean {
+    const card = this.cards?.find(c => c.id === this.editingId);
+    return !!card && this.sbarFields.some(f => this.draft[f.key] !== card[f.key]);
+  }
 
-    constructor(
-        private srv: NursingService,
-        private toastSrv: ToastService,
-        protected loadingSrv: LocalLoadingService,
-    ) { }
+  draftError(key: SbarKey): string | null {
+    if (!this.showDraftErrors) return null;
+    const value = this.draft[key];
+    const label = this.sbarFields.find(f => f.key === key)!.label;
+    if (!value.trim()) return `${label} is required.`;
+    if (value.length > SBAR_MAX_LENGTH) return `${label} may not exceed ${SBAR_MAX_LENGTH} characters.`;
+    return null;
+  }
+  // #endregion
 
-    ngOnInit(): void {
-        this.load();
+  // #region Loading
+  load(): void {
+    this.loadSub?.unsubscribe();
+    const retryingAfterError = !!this.cards && this.refreshFailed;
+    this.loading = true;
+    if (retryingAfterError) this.refreshErrorState = 'retrying';
+
+    const shift = this.outgoingShift;
+    this.loadSub = this.nursingSrv.getHandoverCards(shift, null, true)
+      .pipe(finalize(() => this.loading = false), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: res => {
+          if (!res.success) { this.onLoadFailed(0, retryingAfterError); return; }
+          this.cards = res.data ?? [];
+          this.loadError = null;
+          this.refreshFailed = false;
+          this.refreshErrorState = 'default';
+          this.updatedAt = new Date();
+          // An open edit survives a refresh only while its card is still unacknowledged.
+          if (this.editingId && this.cards.find(c => c.id === this.editingId)?.acknowledged !== false) this.stopEditing();
+        },
+        error: (err: HttpErrorResponse) => this.onLoadFailed(err?.status ?? 0, retryingAfterError),
+      });
+  }
+
+  private onLoadFailed(status: number, retryingAfterError: boolean): void {
+    if (this.cards) {
+      this.refreshFailed = true;
+      this.refreshErrorState = retryingAfterError ? 'failed' : 'default';
+    } else {
+      this.loadError = status === 403 ? 'forbidden' : 'failed';
     }
+  }
 
-    load(): void {
-        this.error.set(null);
-        this.loadingSrv.setLoading('handover', true);
-        this.srv.getHandoverCards(this.outgoingShift).subscribe({
-            next: (res) => {
-                this.loadingSrv.setLoading('handover', false);
-                if (res.success) this.cards = res.data;
-            },
-            error: () => {
-                this.loadingSrv.setLoading('handover', false);
-                this.error.set('Failed to load handover cards. Please try again.');
-            },
-        });
+  onShiftChange(shift: ShiftCode): void {
+    if (shift === this.outgoingShift) return;
+    // The select is disabled while a card is being edited, so no draft can be lost here.
+    this.outgoingShift = shift;
+    // Another shift's cards would be misleading under the new heading, so start from scratch.
+    this.cards = null;
+    this.loadError = null;
+    this.refreshFailed = false;
+    this.updatedAt = null;
+    this.search = '';
+    this.statusFilter = null;
+    this.load();
+  }
+
+  clearFilters(): void {
+    this.search = '';
+    this.statusFilter = null;
+  }
+  // #endregion
+
+  // #region Editing
+  startEdit(card: ShiftHandoverCard): void {
+    const begin = () => {
+      this.draft = { situation: card.situation, background: card.background, assessment: card.assessment, recommendation: card.recommendation };
+      this.showDraftErrors = false;
+      this.editingId = card.id;
+    };
+    if (this.editingId && this.editingId !== card.id && this.draftDirty) {
+      this.dialogSrv.confirmUnsavedChanges(begin);
+      return;
     }
+    begin();
+  }
 
-    retryLoad(): void { this.load(); }
-
-    startEdit(card: ShiftHandoverCard): void {
-        this.draft = { situation: card.situation, background: card.background, assessment: card.assessment, recommendation: card.recommendation };
-        this.editingId.set(card.id);
+  cancelEdit(): void {
+    if (this.draftDirty) {
+      this.dialogSrv.confirmUnsavedChanges(() => this.stopEditing());
+      return;
     }
+    this.stopEditing();
+  }
 
-    saveEdit(card: ShiftHandoverCard): void {
-        if (Object.values(this.draft).some(v => !v.trim())) {
-            this.toastSrv.error('All four SBAR sections are required');
-            return;
-        }
-        this.savingEdit.set(true);
-        this.srv.updateHandover(card.id, this.draft).subscribe({
-            next: (res) => {
-                this.savingEdit.set(false);
-                if (res.success && res.data) {
-                    this.cards = this.cards.map(c => c.id === card.id ? res.data : c);
-                    this.editingId.set(null);
-                    this.toastSrv.success('Handover updated');
-                } else {
-                    this.toastSrv.error('Unable to update handover');
-                }
-            },
-            error: () => { this.savingEdit.set(false); this.toastSrv.error('Unable to update handover'); },
-        });
+  saveEdit(card: ShiftHandoverCard): void {
+    if (this.savingId) return;
+    this.showDraftErrors = true;
+    if (this.sbarFields.some(f => this.draftError(f.key))) {
+      this.toastSrv.error('Complete every SBAR section before saving');
+      return;
     }
+    this.savingId = card.id;
+    this.nursingSrv.updateHandover(card.id, {
+      situation: this.draft.situation.trim(),
+      background: this.draft.background.trim(),
+      assessment: this.draft.assessment.trim(),
+      recommendation: this.draft.recommendation.trim(),
+    })
+      .pipe(finalize(() => this.savingId = null), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: res => {
+          // On failure the draft stays as typed so the nurse can retry.
+          if (!res.success || !res.data) { this.toastSrv.error('Unable to update the handover'); return; }
+          this.replaceCard(res.data);
+          this.stopEditing();
+          this.toastSrv.success('Handover updated');
+        },
+        error: () => this.toastSrv.error('Unable to update the handover'),
+      });
+  }
 
-    acknowledge(card: ShiftHandoverCard): void {
-        const key = 'ack-' + card.id;
-        this.loadingSrv.setLoading(key, true);
-        this.srv.acknowledgeHandover(card.id, 'You').subscribe({
-            next: (res) => {
-                this.loadingSrv.setLoading(key, false);
-                if (res.success) {
-                    this.cards = this.cards.map(c => c.id === card.id ? (res.data ?? { ...c, acknowledged: true }) : c);
-                    this.toastSrv.success('Handover acknowledged');
-                } else {
-                    this.toastSrv.error('Unable to acknowledge handover');
-                }
-            },
-            error: () => { this.loadingSrv.setLoading(key, false); this.toastSrv.error('Unable to acknowledge handover'); },
-        });
-    }
+  private stopEditing(): void {
+    this.editingId = null;
+    this.showDraftErrors = false;
+    this.draft = this.emptyDraft();
+  }
+  // #endregion
+
+  // #region Acknowledge
+  confirmAcknowledge(card: ShiftHandoverCard): void {
+    this.dialogSrv.confirm(
+      `Acknowledge the handover for ${card.patientName} (bed ${card.bedNumber})? It is recorded under your name and the card can no longer be edited.`,
+      () => this.acknowledge(card),
+      'Acknowledge handover',
+      'warning',
+      'Acknowledge',
+    );
+  }
+
+  private acknowledge(card: ShiftHandoverCard): void {
+    if (this.acknowledgingIds.has(card.id)) return;
+    this.acknowledgingIds = new Set(this.acknowledgingIds).add(card.id);
+
+    this.nursingSrv.acknowledgeHandover(card.id)
+      .pipe(
+        finalize(() => {
+          const next = new Set(this.acknowledgingIds);
+          next.delete(card.id);
+          this.acknowledgingIds = next;
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: res => {
+          if (!res.success || !res.data) { this.toastSrv.error('Unable to acknowledge the handover'); return; }
+          this.replaceCard(res.data);
+          if (this.editingId === card.id) this.stopEditing();
+          this.toastSrv.success('Handover acknowledged');
+        },
+        error: () => this.toastSrv.error('Unable to acknowledge the handover'),
+      });
+  }
+  // #endregion
+
+  // #region Helpers
+  private replaceCard(updated: ShiftHandoverCard): void {
+    this.cards = (this.cards ?? []).map(c => c.id === updated.id ? updated : c);
+  }
+
+  private emptyDraft(): SbarDraft {
+    return { situation: '', background: '', assessment: '', recommendation: '' };
+  }
+
+  trackById = (_: number, item: { id: string }) => item.id;
+  trackByKey = (_: number, item: { key: string }) => item.key;
+  // #endregion
 }

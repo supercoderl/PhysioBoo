@@ -256,7 +256,7 @@ All 17 endpoints above exist (`NursingEndpoints.cs`). Enums travel as strings. P
 - **Scheduled doses** are created by `POST /api/nursing/patients/{id}/mar`. Generating them from prescriptions is a follow-up.
 - **Notes** are one shared feed (doctor, nursing, consultation); this endpoint returns all of them.
 - **Alerts:** acknowledging is idempotent; the signed-in user is recorded.
-- **Handover:** `GET /handover` first creates any missing SBAR card for that outgoing shift's assignments, composed from the stay, last vitals, open alerts, pending tasks and doses due. `acknowledge` records the signed-in user (the client's `acknowledgedBy` is ignored). There is no endpoint to edit the SBAR text yet.
+- **Handover:** `GET /handover` first creates any missing SBAR card for that outgoing shift's assignments, composed from the stay, last vitals, open alerts, pending tasks and doses due. `acknowledge` records the signed-in user (the client's `acknowledgedBy` is ignored). `PATCH /handover/{cardId}` edits the SBAR text until the card is acknowledged (each section non-blank, max 2000 characters). The page has no date picker or ward filter because the endpoint takes neither a date nor ward names.
 
 Prerequisites: permissions `inpatient:nursing:read | write | manage` on the right roles; at least one active admission and one assignment to see data.
 

@@ -1,12 +1,14 @@
-import { Component, OnInit, signal } from "@angular/core";
+import { Component, OnInit, inject, signal } from "@angular/core";
 import { finalize, forkJoin } from "rxjs";
-import { BooBadgeTone, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooButtonComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
+import { AuthService } from "../../../../services/auth/auth.service";
 import { SurgeryService } from "../../../../services/admin/surgery.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
+import { Permissions } from "../../../../shared/constants/permission.constant";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { SurgeryAlertSeverity, SurgeryCriticalAlert, SurgeryStats } from "../../../../shared/types/surgery.types";
+import { SurgeryAlertSeverity, SurgeryCriticalAlert, SurgeryRange, SurgeryRow, SurgeryStats } from "../../../../shared/types/surgery.types";
 import { SurgeryDetailDrawerComponent } from "./surgery-detail-drawer.component";
 import { SurgeryAlertsTabComponent } from "./tabs/surgery-alerts-tab.component";
 import { SurgeryDashboardTabComponent } from "./tabs/surgery-dashboard-tab.component";
@@ -15,11 +17,10 @@ import { SurgeryOperatingRoomsTabComponent } from "./tabs/surgery-operating-room
 import { SurgeryPostopTabComponent } from "./tabs/surgery-postop-tab.component";
 import { SurgeryQueueTabComponent } from "./tabs/surgery-queue-tab.component";
 import { SurgeryScheduleTabComponent } from "./tabs/surgery-schedule-tab.component";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { SurgeryCancelDrawerComponent } from "./surgery-cancel-drawer.component";
+import { SurgeryCreateDrawerComponent } from "./surgery-create-drawer.component";
 
 type TabKey = 'dashboard' | 'schedule' | 'rooms' | 'queue' | 'intraop' | 'postop' | 'alerts';
-type DateRange = 'today' | 'week' | 'month';
-
 const LOADING_KEY = 'surgery';
 
 @Component({
@@ -38,22 +39,30 @@ const LOADING_KEY = 'surgery';
     SurgeryPostopTabComponent,
     SurgeryAlertsTabComponent,
     SurgeryDetailDrawerComponent,
-    BooButtonAdminComponent
+    SurgeryCreateDrawerComponent,
+    SurgeryCancelDrawerComponent,
+    BooButtonComponent,
   ],
   host: { class: 'block min-h-screen bg-gray-50' },
   template: `
+    <!-- Permission denied -->
+    <div *ngIf="!canRead" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <boo-error-state icon="lock" title="You don't have access to Surgery" [showRetry]="false"
+        description="Ask an administrator for the surgery case read permission."></boo-error-state>
+    </div>
+
     <!-- Loading -->
-    <div *ngIf="loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3">
+    <div *ngIf="canRead && loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" role="status" class="flex flex-col items-center justify-center py-24 gap-3">
       <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
       <span class="text-gray-500 text-sm">Loading operating room workspace...</span>
     </div>
 
     <!-- Error -->
-    <div *ngIf="error() && !loadingSrv.isLoading(LOADING_KEY)" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div *ngIf="canRead && error() && !loadingSrv.isLoading(LOADING_KEY)" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
       <boo-error-state title="Couldn't load the surgery workspace" [description]="error()" (retry)="retryLoad()"></boo-error-state>
     </div>
 
-    <ng-container *ngIf="!error() && hasLoadedOnce">
+    <ng-container *ngIf="canRead && !error() && hasLoadedOnce">
       <!-- Sticky module header -->
       <div class="sticky top-0 z-20 bg-surface shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
@@ -62,16 +71,19 @@ const LOADING_KEY = 'surgery';
             <p class="text-xs text-secondary">Operating Room Management System — scheduling, OR status, and perioperative tracking</p>
           </div>
           <div class="flex items-center gap-2">
-            <div class="flex items-center bg-gray-100 rounded-lg p-0.5">
-              <button *ngFor="let r of dateRanges" type="button" (click)="setRange(r.key)"
+            <div class="flex items-center bg-gray-100 rounded-lg p-0.5" role="group" aria-label="Statistics period">
+              <button *ngFor="let r of dateRanges" type="button" (click)="setRange(r.key)" [attr.aria-pressed]="range() === r.key"
                 class="px-3 py-1.5 text-xs font-semibold rounded-md transition-colors"
                 [ngClass]="range() === r.key ? 'bg-surface text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'">
                 {{ r.label }}
               </button>
             </div>
-            <boo-button-admin textColor="white" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="500" [gap]="8">
+            <button boo-button variant="ghost" size="sm" type="button" [disabled]="loadingSrv.isLoading(LOADING_KEY)" (click)="refresh()">
+              <physio-icon name="refresh-cw" [size]="14"></physio-icon> Refresh
+            </button>
+            <button *ngIf="canSchedule" boo-button variant="primary" size="sm" type="button" (click)="createOpen.set(true)">
               <physio-icon name="circle-plus" [size]="16"></physio-icon> Schedule Surgery
-            </boo-button-admin>
+            </button>
           </div>
         </div>
 
@@ -96,7 +108,7 @@ const LOADING_KEY = 'surgery';
               <boo-status-badge [label]="a.severity" [tone]="alertTone(a.severity)"></boo-status-badge>
               <p class="text-xs text-gray-700 mt-1">{{ a.description }}</p>
             </div>
-            <button (click)="acknowledgeAlert(a)" class="text-gray-400 hover:text-gray-600" aria-label="Acknowledge alert">
+            <button *ngIf="canUpdate" type="button" (click)="acknowledgeAlert(a)" [disabled]="acknowledgingId() !== null" class="text-gray-400 hover:text-gray-600" aria-label="Acknowledge alert">
               <physio-icon name="x" [size]="16"></physio-icon>
             </button>
           </div>
@@ -116,8 +128,8 @@ const LOADING_KEY = 'surgery';
         </div>
 
         <!-- Tab content -->
-        <surgery-dashboard-tab *ngIf="activeTab() === 'dashboard'" />
-        <surgery-schedule-tab *ngIf="activeTab() === 'schedule'" (viewCase)="openDrawer($event)" />
+        <surgery-dashboard-tab *ngIf="activeTab() === 'dashboard'" [range]="range()" [refreshKey]="refreshKey()" />
+        <surgery-schedule-tab *ngIf="activeTab() === 'schedule'" [refreshKey]="refreshKey()" [canSchedule]="canSchedule" (viewCase)="openDrawer($event)" (cancelCase)="cancelTarget.set($event)" />
         <surgery-operating-rooms-tab *ngIf="activeTab() === 'rooms'" (viewCase)="openDrawer($event)" />
         <surgery-queue-tab *ngIf="activeTab() === 'queue'" (viewCase)="openDrawer($event)" />
         <surgery-intraop-tab *ngIf="activeTab() === 'intraop'" (viewCase)="openDrawer($event)" />
@@ -126,16 +138,28 @@ const LOADING_KEY = 'surgery';
       </main>
     </ng-container>
 
-    <surgery-detail-drawer [isOpen]="drawerOpen()" [surgeryId]="drawerSurgeryId()" (close)="closeDrawer()" />
+    <surgery-detail-drawer [isOpen]="drawerOpen()" [surgeryId]="drawerSurgeryId()" (close)="closeDrawer()" (changed)="refresh()" />
+    <surgery-create-drawer [isOpen]="createOpen()" (close)="createOpen.set(false)" (created)="onCreated()" />
+    <surgery-cancel-drawer [isOpen]="!!cancelTarget()" [surgery]="cancelTarget()" (close)="cancelTarget.set(null)" (cancelled)="onCancelled()" />
   `,
 })
 export class AdminSurgeryComponent implements OnInit {
   readonly LOADING_KEY = LOADING_KEY;
 
+  private readonly authSrv = inject(AuthService);
+  readonly canRead = this.authSrv.hasPermission(Permissions.Surgery.SurgeryRead);
+  readonly canSchedule = this.authSrv.hasPermission(Permissions.Surgery.SurgerySchedule);
+  readonly canUpdate = this.authSrv.hasPermission(Permissions.Surgery.SurgeryUpdate);
+
   stats = signal<SurgeryStats | null>(null);
   alerts = signal<SurgeryCriticalAlert[]>([]);
   activeTab = signal<TabKey>('dashboard');
-  range = signal<DateRange>('today');
+  range = signal<SurgeryRange>('today');
+  createOpen = signal(false);
+  cancelTarget = signal<SurgeryRow | null>(null);
+  acknowledgingId = signal<string | null>(null);
+  /** Bumped after a change on the server so the visible tab reloads its data. */
+  refreshKey = signal(0);
   drawerOpen = signal(false);
   drawerSurgeryId = signal<string | null>(null);
 
@@ -152,7 +176,7 @@ export class AdminSurgeryComponent implements OnInit {
     { key: 'alerts', label: 'Clinical Alerts', icon: 'triangle-alert' },
   ];
 
-  readonly dateRanges: { key: DateRange; label: string }[] = [
+  readonly dateRanges: { key: SurgeryRange; label: string }[] = [
     { key: 'today', label: 'Today' },
     { key: 'week', label: 'Weekly' },
     { key: 'month', label: 'Monthly' },
@@ -165,7 +189,7 @@ export class AdminSurgeryComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.load();
+    if (this.canRead) this.load();
   }
 
   load(): void {
@@ -173,7 +197,7 @@ export class AdminSurgeryComponent implements OnInit {
     this.loadingSrv.setLoading(LOADING_KEY, true);
 
     forkJoin({
-      stats: this.srv.getStats(),
+      stats: this.srv.getStats(this.range()),
       alerts: this.srv.getAlerts(),
     })
       .pipe(finalize(() => this.loadingSrv.setLoading(LOADING_KEY, false)))
@@ -196,7 +220,27 @@ export class AdminSurgeryComponent implements OnInit {
 
   setTab(key: TabKey): void { this.activeTab.set(key); }
 
-  setRange(key: DateRange): void { this.range.set(key); }
+  setRange(key: SurgeryRange): void {
+    if (key === this.range()) return;
+    this.range.set(key);
+    this.load();
+  }
+
+  /** Reloads the header data and the visible tab. */
+  refresh(): void {
+    this.load();
+    this.refreshKey.update(k => k + 1);
+  }
+
+  onCreated(): void {
+    this.createOpen.set(false);
+    this.refresh();
+  }
+
+  onCancelled(): void {
+    this.cancelTarget.set(null);
+    this.refresh();
+  }
 
   alertsBySeverity(): SurgeryCriticalAlert[] {
     const order: Record<SurgeryAlertSeverity, number> = { Critical: 0, High: 1, Warning: 2, Information: 3 };
@@ -231,7 +275,9 @@ export class AdminSurgeryComponent implements OnInit {
   }
 
   acknowledgeAlert(alert: SurgeryCriticalAlert): void {
-    this.srv.acknowledgeAlert(alert.id).subscribe(res => {
+    if (this.acknowledgingId()) return;
+    this.acknowledgingId.set(alert.id);
+    this.srv.acknowledgeAlert(alert.id).pipe(finalize(() => this.acknowledgingId.set(null))).subscribe(res => {
       if (res.success) {
         this.alerts.set(this.alerts().filter(a => a.id !== alert.id));
         this.toastSrv.success('Alert acknowledged');

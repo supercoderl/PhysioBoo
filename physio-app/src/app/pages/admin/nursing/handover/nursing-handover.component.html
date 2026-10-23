@@ -1,0 +1,166 @@
+<div class="py-5 flex flex-col gap-4 min-w-0" [attr.aria-busy]="loading">
+  <!-- Page header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div class="min-w-0">
+      <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Shift handover</h1>
+      <p class="m-0 mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs leading-5 text-secondary">
+        <span>SBAR handover from the {{ outgoingShift }} shift to the {{ incomingShift }} shift</span>
+        <ng-container *ngIf="updatedAt">
+          <span aria-hidden="true">·</span>
+          <span class="inline-flex items-center gap-1" aria-live="polite">
+            <physio-icon name="clock" [size]="12" aria-hidden="true" />Updated {{ updatedAt | date: 'HH:mm' }}
+          </span>
+        </ng-container>
+      </p>
+    </div>
+    <div class="flex flex-wrap items-end gap-2">
+      <div class="w-44">
+        <boo-select label="Outgoing shift" [ngModel]="outgoingShift" (ngModelChange)="onShiftChange($event)"
+          [disabled]="!!editingId" [options]="shiftOptions" bindLabel="label" bindValue="value" />
+      </div>
+      <button boo-button variant="primary" size="sm" [loading]="loading" [disabled]="!!editingId" (click)="load()">
+        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      </button>
+    </div>
+  </header>
+
+  <p *ngIf="editingId" class="m-0 -mt-2 text-xs text-secondary">Save or cancel your edit to change the shift or refresh.</p>
+
+  <!-- A refresh failed while older cards are still on screen -->
+  <boo-inline-error *ngIf="cards && refreshFailed" what="the latest handover cards" [state]="refreshErrorState" (retry)="load()" />
+
+  <ng-container *ngIf="cards; else stateTpl">
+    <!-- Headline figures -->
+    <section aria-label="Handover figures" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <dashboard-kpi-tile *ngFor="let kpi of kpis; trackBy: trackByKey" [kpi]="kpi" />
+    </section>
+
+    <boo-empty-state *ngIf="!cards.length" appearance="panel" icon="inbox" title="No handover cards"
+      [description]="'No patients were assigned to the ' + outgoingShift + ' shift, so there is nothing to hand over.'" />
+
+    <ng-container *ngIf="cards.length">
+      <!-- Search and filters -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+        <div class="md:col-span-2">
+          <boo-search-field label="Search handover cards" placeholder="Search by patient or bed" [(ngModel)]="search" (clear)="search = ''" />
+        </div>
+        <boo-select label="Status" [(ngModel)]="statusFilter" [options]="statusOptions" bindLabel="label" bindValue="value" />
+      </div>
+
+      <boo-empty-state *ngIf="!visibleCards.length" icon="search" title="No cards match" description="Try a different search or clear the filters.">
+        <button *ngIf="hasFilters" boo-button variant="outline" size="sm" (click)="clearFilters()">Clear filters</button>
+      </boo-empty-state>
+
+      <!-- Pending: still to be acknowledged by the incoming shift -->
+      <dashboard-panel *ngIf="pendingCards.length" title="To acknowledge" icon="clock"
+        [caption]="pendingCards.length + (pendingCards.length === 1 ? ' card' : ' cards') + ' waiting for the ' + incomingShift + ' shift'">
+        <ul class="m-0 p-0 list-none divide-y divide-rowDivider">
+          <li *ngFor="let c of pendingCards; trackBy: trackById">
+            <ng-container *ngTemplateOutlet="cardTpl; context: { $implicit: c }" />
+          </li>
+        </ul>
+      </dashboard-panel>
+
+      <!-- Completed: acknowledged and locked -->
+      <dashboard-panel *ngIf="acknowledgedCards.length" title="Acknowledged" icon="check"
+        [caption]="acknowledgedCards.length + (acknowledgedCards.length === 1 ? ' card' : ' cards') + ' signed off'">
+        <ul class="m-0 p-0 list-none divide-y divide-rowDivider">
+          <li *ngFor="let c of acknowledgedCards; trackBy: trackById">
+            <ng-container *ngTemplateOutlet="cardTpl; context: { $implicit: c }" />
+          </li>
+        </ul>
+      </dashboard-panel>
+    </ng-container>
+  </ng-container>
+
+  <!-- One patient's SBAR card -->
+  <ng-template #cardTpl let-c>
+    <article class="px-4 py-4" [attr.aria-label]="'Handover for ' + c.patientName">
+      <div class="flex flex-wrap items-start justify-between gap-2">
+        <div class="min-w-0 flex flex-wrap items-center gap-2">
+          <a [routerLink]="['/admin/nursing/patient', c.patientId]" class="text-sm font-semibold text-regular no-underline hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded">{{ c.patientName }}</a>
+          <boo-status-badge [label]="'Bed ' + c.bedNumber" tone="neutral" />
+          <boo-status-badge [label]="c.outgoingShift + ' → ' + c.incomingShift" tone="primary" />
+        </div>
+        <boo-status-badge *ngIf="c.acknowledged" [label]="c.acknowledgedBy ? 'Acknowledged by ' + c.acknowledgedBy : 'Acknowledged'" tone="success" [dotted]="true" />
+        <boo-status-badge *ngIf="!c.acknowledged" label="To acknowledge" tone="warning" [dotted]="true" />
+      </div>
+
+      <!-- Read view -->
+      <dl *ngIf="editingId !== c.id" class="m-0 mt-3 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+        <div *ngFor="let f of sbarFields" class="min-w-0">
+          <dt class="text-xs font-medium text-secondary mb-0.5">{{ f.label }}</dt>
+          <dd class="m-0 text-regular whitespace-pre-line break-words">{{ c[f.key] }}</dd>
+        </div>
+      </dl>
+
+      <!-- Edit view -->
+      <form *ngIf="editingId === c.id" class="mt-3" (ngSubmit)="saveEdit(c)" novalidate>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div *ngFor="let f of sbarFields" class="flex flex-col gap-1 min-w-0">
+            <label [for]="f.key + '-' + c.id" class="text-xs font-medium text-secondary">{{ f.label }}</label>
+            <boo-textarea [rows]="4" [maxlength]="maxLength" [id]="f.key + '-' + c.id" [name]="f.key + '-' + c.id"
+              [(ngModel)]="draft[f.key]" [disabled]="savingId === c.id" />
+            <p *ngIf="draftError(f.key) as err" class="m-0 text-xs text-danger" role="alert">{{ err }}</p>
+          </div>
+        </div>
+        <div class="mt-3 flex justify-end gap-2">
+          <button type="button" boo-button variant="outline" size="sm" [disabled]="savingId === c.id" (click)="cancelEdit()">Cancel</button>
+          <button type="submit" boo-button variant="primary" size="sm" [loading]="savingId === c.id" [disabled]="!draftDirty">Save changes</button>
+        </div>
+      </form>
+
+      <!-- Actions: only for cards that are still open and only with the nursing write permission -->
+      <div *ngIf="canWrite && !c.acknowledged && editingId !== c.id" class="mt-3 flex justify-end gap-2">
+        <button boo-button variant="outline" size="sm" [disabled]="!!savingId" (click)="startEdit(c)">
+          Edit<span class="sr-only"> handover for {{ c.patientName }}</span>
+        </button>
+        <button boo-button variant="primary" size="sm" [loading]="acknowledgingIds.has(c.id)" (click)="confirmAcknowledge(c)">
+          Acknowledge<span class="sr-only"> handover for {{ c.patientName }}</span>
+        </button>
+      </div>
+    </article>
+  </ng-template>
+
+  <!-- First load: skeleton, access denied or failure -->
+  <ng-template #stateTpl>
+    <ng-container *ngIf="loading || !loadError; else errorTpl">
+      <div class="flex flex-col gap-3" aria-hidden="true">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div *ngFor="let _ of skeletonRows" class="h-[118px] rounded-xl border border-borderGray bg-surface p-4">
+            <div class="h-3 w-24 rounded bg-rowDivider animate-pulse"></div>
+            <div class="mt-3 h-7 w-16 rounded bg-rowDivider animate-pulse"></div>
+            <div class="mt-2.5 h-3 w-32 max-w-full rounded bg-rowDivider animate-pulse"></div>
+          </div>
+        </div>
+        <div class="rounded-xl border border-borderGray bg-surface p-4">
+          <div class="h-4 w-36 rounded bg-rowDivider animate-pulse"></div>
+          <div class="mt-4 flex flex-col gap-3">
+            <div *ngFor="let _ of skeletonRows" class="h-24 rounded-lg bg-rowDivider animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+      <span class="sr-only" role="status">Loading the handover cards…</span>
+    </ng-container>
+  </ng-template>
+
+  <ng-template #errorTpl>
+    <boo-empty-state
+      *ngIf="loadError === 'forbidden'; else failedTpl"
+      appearance="panel"
+      icon="lock"
+      title="You don't have access to shift handover"
+      description="Ask an administrator for the nursing read permission."
+    />
+    <ng-template #failedTpl>
+      <boo-error-state
+        appearance="panel"
+        icon="cloud-off"
+        title="We couldn't load the handover cards"
+        description="Something went wrong while loading the handover. Check your connection and try again."
+        retryLabel="Try again"
+        (retry)="load()"
+      />
+    </ng-template>
+  </ng-template>
+</div>

@@ -86,12 +86,31 @@ export interface MarEntry {
 
 export type IntakeOutputCategory = 'Oral' | 'IV' | 'Urine' | 'Drain' | 'Other';
 
+export type IntakeOutputDirection = 'Intake' | 'Output';
+
 export interface IntakeOutputEntry {
   id: string;
   patientId: string;
   recordedAt: string;
   recordedBy: string;
-  direction: 'Intake' | 'Output';
+  direction: IntakeOutputDirection;
+  category: IntakeOutputCategory;
+  volumeMl: number;
+  notes?: string | null;
+}
+
+/** The server stamps the time and the author, and decides whether the reading is abnormal. */
+export interface AddVitalsRequest {
+  bloodPressureSystolic: number;
+  bloodPressureDiastolic: number;
+  heartRate: number;
+  temperature: number;
+  respiratoryRate: number;
+  spo2: number;
+}
+
+export interface AddIntakeOutputRequest {
+  direction: IntakeOutputDirection;
   category: IntakeOutputCategory;
   volumeMl: number;
   notes?: string | null;

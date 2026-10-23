@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { forkJoin } from "rxjs";
-import { BooEmptyStateComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooErrorStateComponent } from '@physioboo/ui';
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ClinicalAlert, TreatmentOrder, TreatmentTimelineEntry } from "../../../../../shared/types/treatment-sheet.types";
@@ -8,13 +8,15 @@ import { ClinicalAlert, TreatmentOrder, TreatmentTimelineEntry } from "../../../
 @Component({
   selector: 'treatment-overview-tab',
   standalone: true,
-  imports: [SharedModule, BooEmptyStateComponent],
+  imports: [SharedModule, BooEmptyStateComponent, BooErrorStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
-    <div *ngIf="!isLoading()" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <boo-error-state *ngIf="!isLoading() && loadError()" title="Couldn't load the overview" [description]="loadError()" appearance="panel" (retry)="load()"></boo-error-state>
+
+    <div *ngIf="!isLoading() && !loadError()" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div class="bg-surface border border-gray-200 rounded-lg p-4">
         <h3 class="text-sm font-semibold text-primary mb-3">Recent Activity</h3>
         <div *ngIf="!recent().length"><boo-empty-state icon="history" title="No recent activity"></boo-empty-state></div>
@@ -57,6 +59,7 @@ export class TreatmentOverviewTabComponent implements OnChanges {
   @Input({ required: true }) patientId!: string;
 
   isLoading = signal(true);
+  loadError = signal<string | null>(null);
   recent = signal<TreatmentTimelineEntry[]>([]);
   alerts = signal<ClinicalAlert[]>([]);
   orders = signal<TreatmentOrder[]>([]);
@@ -64,8 +67,13 @@ export class TreatmentOverviewTabComponent implements OnChanges {
   constructor(private srv: TreatmentSheetService) { }
 
   ngOnChanges(): void {
+    this.load();
+  }
+
+  load(): void {
     if (!this.patientId) return;
     this.isLoading.set(true);
+    this.loadError.set(null);
     forkJoin({
       timeline: this.srv.getTimeline(this.patientId, { range: 'Last24Hours' }),
       alerts: this.srv.getAlerts(this.patientId),
@@ -77,7 +85,7 @@ export class TreatmentOverviewTabComponent implements OnChanges {
         if (orders.success) this.orders.set(orders.data.items);
         this.isLoading.set(false);
       },
-      error: () => this.isLoading.set(false),
+      error: () => { this.loadError.set('The overview could not be loaded.'); this.isLoading.set(false); },
     });
   }
 

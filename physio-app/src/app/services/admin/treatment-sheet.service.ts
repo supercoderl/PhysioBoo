@@ -33,8 +33,8 @@ export class TreatmentSheetService {
   // #endregion
 
   // Methods
-  getSummary(patientId: string) {
-    return this.http.get<PagedResponse<TreatmentPatientSummary>>(BASE_API.TREATMENT_SHEET.SUMMARY(patientId), { context: createHttpContext({ loadingKey: LoadingKeys.TREATMENT.SUMMARY }) });
+  getSummary(patientId: string, quiet = false) {
+    return this.http.get<PagedResponse<TreatmentPatientSummary>>(BASE_API.TREATMENT_SHEET.SUMMARY(patientId), { context: createHttpContext({ loadingKey: LoadingKeys.TREATMENT.SUMMARY, skipErrorToast: quiet }) });
   }
 
   getStats(patientId: string) {

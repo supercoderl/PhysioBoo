@@ -1,0 +1,237 @@
+<div class="py-5 flex flex-col gap-4 min-w-0" [attr.aria-busy]="loading">
+  <!-- Page header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div class="min-w-0">
+      <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Nursing dashboard</h1>
+      <p class="m-0 mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs leading-5 text-secondary">
+        <span>My assigned patients · {{ shift }} shift</span>
+        <ng-container *ngIf="updatedAt">
+          <span aria-hidden="true">·</span>
+          <span class="inline-flex items-center gap-1" aria-live="polite">
+            <physio-icon name="clock" [size]="12" aria-hidden="true" />Updated {{ updatedAt | date: 'HH:mm' }}
+          </span>
+        </ng-container>
+      </p>
+    </div>
+    <div class="flex flex-wrap items-end gap-2">
+      <div class="w-40">
+        <boo-select label="Shift" [ngModel]="shift" (ngModelChange)="onShiftChange($event)" [options]="shiftOptions" bindLabel="label" bindValue="value" />
+      </div>
+      <button *ngIf="canAssign" boo-button variant="secondary" size="sm" [attr.aria-expanded]="assignOpen" (click)="toggleAssign()">
+        <physio-icon name="user-plus" [size]="15" aria-hidden="true" />Assign patient
+      </button>
+      <button boo-button variant="primary" size="sm" [loading]="loading" (click)="load()">
+        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      </button>
+    </div>
+  </header>
+
+  <!-- Assign an admitted patient (Nursing manage) -->
+  <section *ngIf="canAssign && assignOpen" aria-label="Assign a patient" class="bg-surface border border-borderGray rounded-xl p-4">
+    <h2 class="m-0 mb-3 text-sm font-semibold text-regular">Assign an admitted patient to you for the {{ shift }} shift</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+      <div class="md:col-span-2">
+        <boo-select label="Patient" [(ngModel)]="assignForm.admissionId" [options]="admissionOptions" bindLabel="label" bindValue="value" />
+      </div>
+      <boo-select label="Acuity" [(ngModel)]="assignForm.acuity" [options]="acuityOptions" bindLabel="label" bindValue="value" />
+      <boo-checkbox [(ngModel)]="assignForm.fallRisk"><span class="text-sm text-regular">Fall risk</span></boo-checkbox>
+    </div>
+    <p *ngIf="!loadingAdmissions && !admissionOptions.length" class="m-0 mt-2 text-xs text-secondary">No admitted patients found.</p>
+    <div class="mt-3 flex justify-end gap-2">
+      <button boo-button variant="outline" size="sm" (click)="assignOpen = false">Cancel</button>
+      <button boo-button variant="primary" size="sm" [loading]="assigning" [disabled]="!assignForm.admissionId" (click)="assign()">Assign</button>
+    </div>
+  </section>
+
+  <!-- A refresh failed (in whole or part) while older figures are still on screen -->
+  <boo-inline-error
+    *ngIf="loaded && refreshFailed"
+    what="some of the latest figures"
+    [state]="refreshErrorState"
+    (retry)="load()"
+  />
+
+  <ng-container *ngIf="loaded; else stateTpl">
+    <!-- Headline figures -->
+    <section aria-label="Key figures" class="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-5 gap-3">
+      <dashboard-kpi-tile *ngFor="let kpi of kpis; trackBy: trackByKey" [kpi]="kpi" />
+    </section>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-3">
+      <!-- Open alerts -->
+      <dashboard-panel class="xl:col-span-2" title="Open alerts" icon="bell" [caption]="alerts.length + (alerts.length === 1 ? ' alert' : ' alerts') + ' on your patients'">
+        <boo-empty-state *ngIf="!alerts.length" icon="check" title="No open alerts" description="Your assigned patients have no unacknowledged alerts." />
+        <ul *ngIf="alerts.length" class="m-0 p-0 list-none divide-y divide-rowDivider">
+          <li *ngFor="let a of alerts; trackBy: trackById" class="flex items-start gap-3 px-4 py-3">
+            <physio-icon [name]="alertIcon(a.type)" [size]="18" class="flex-none mt-0.5 text-secondary" aria-hidden="true" />
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <a [routerLink]="['/admin/nursing/patient', a.patientId]" class="text-sm font-semibold text-regular no-underline hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded">{{ a.patientName }}</a>
+                <boo-status-badge [label]="'Bed ' + a.bedNumber" tone="neutral" />
+                <boo-status-badge [label]="a.severity" [tone]="severityTone(a.severity)" [dotted]="true" />
+              </div>
+              <p class="m-0 mt-0.5 text-xs leading-5 text-secondary break-words">{{ a.message }} · {{ a.raisedAt | date: 'MMM d, HH:mm' }}</p>
+            </div>
+            <button *ngIf="canAcknowledge" boo-button variant="outline" size="sm" class="flex-none"
+              [loading]="acknowledgingIds.has(a.id)" (click)="confirmAcknowledge(a)">
+              Acknowledge<span class="sr-only"> alert for {{ a.patientName }}</span>
+            </button>
+          </li>
+        </ul>
+      </dashboard-panel>
+
+      <!-- Handover to this shift -->
+      <dashboard-panel title="Shift handover" icon="users" [caption]="'Handed over to the ' + shift + ' shift'" [link]="links.handover" linkLabel="Open handover">
+        <boo-inline-error *ngIf="!handoverCards" class="m-4" what="the handover cards" [compact]="true" (retry)="load()" />
+        <boo-empty-state *ngIf="handoverCards && !handoverCards.length" icon="inbox" title="No handover cards" description="Nothing has been handed over to this shift yet." />
+        <p *ngIf="handoverCards?.length && !pendingHandovers.length" class="m-0 px-4 py-6 text-center text-sm text-secondary">All {{ handoverCards!.length }} handover cards are acknowledged.</p>
+        <ul *ngIf="pendingHandovers.length" class="m-0 p-0 list-none divide-y divide-rowDivider">
+          <li *ngFor="let c of pendingHandovers; trackBy: trackById" class="flex items-center justify-between gap-2 px-4 py-2.5">
+            <a [routerLink]="['/admin/nursing/patient', c.patientId]" class="min-w-0 text-sm font-medium text-regular no-underline hover:underline truncate focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded">{{ c.patientName }}</a>
+            <span class="flex-none inline-flex items-center gap-2">
+              <boo-status-badge [label]="'Bed ' + c.bedNumber" tone="neutral" />
+              <boo-status-badge label="To acknowledge" tone="warning" />
+            </span>
+          </li>
+        </ul>
+      </dashboard-panel>
+    </div>
+
+    <!-- Ward summary -->
+    <dashboard-panel *ngIf="wards.length" title="Wards" icon="bed" caption="Select a ward to filter the patient list" [link]="links.beds" linkLabel="Bed map">
+      <ul class="m-0 p-3 list-none grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2">
+        <li *ngFor="let w of wards; trackBy: trackById">
+          <button type="button" (click)="filterByWard(w.id)" [attr.aria-pressed]="wardId === w.id"
+            class="w-full text-left px-3 py-2.5 rounded-lg border bg-surface cursor-pointer transition-colors hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            [class.border-primary]="wardId === w.id" [class.border-borderGray]="wardId !== w.id">
+            <span class="block text-sm font-semibold text-regular truncate">{{ w.name }}</span>
+            <span class="block mt-0.5 text-xs text-secondary tabular-nums">
+              {{ w.patients }} patient{{ w.patients === 1 ? '' : 's' }} · {{ w.medicationsDue }} medication{{ w.medicationsDue === 1 ? '' : 's' }} due
+            </span>
+          </button>
+        </li>
+      </ul>
+    </dashboard-panel>
+
+    <!-- Assigned patients -->
+    <dashboard-panel title="Assigned patients" icon="users" [caption]="filteredPatients.length + ' of ' + patients.length + ' shown'">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end px-4 py-3 border-b border-rowDivider">
+        <div class="md:col-span-2">
+          <boo-search-field label="Search patients" placeholder="Search by patient, number or bed" [(ngModel)]="search" (clear)="search = ''" />
+        </div>
+        <boo-select *ngIf="wards.length > 1" label="Ward" [(ngModel)]="wardId" [options]="wardOptions" bindLabel="label" bindValue="value" />
+        <boo-select label="Risk" [(ngModel)]="riskFilter" [options]="riskOptions" bindLabel="label" bindValue="value" />
+        <boo-select label="Tasks" [(ngModel)]="taskFilter" [options]="taskOptions" bindLabel="label" bindValue="value" />
+      </div>
+
+      <boo-empty-state *ngIf="!patients.length" icon="users" title="No patients assigned" [description]="'You have no admitted patients assigned for the ' + shift + ' shift.'" />
+
+      <boo-empty-state *ngIf="patients.length && !filteredPatients.length" icon="search" title="No patients match" description="Try a different search or clear the filters.">
+        <button *ngIf="hasFilters" boo-button variant="outline" size="sm" (click)="clearFilters()">Clear filters</button>
+      </boo-empty-state>
+
+      <div *ngIf="filteredPatients.length" class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <caption class="sr-only">Patients assigned to you for the {{ shift }} shift, most acute first</caption>
+          <thead class="text-xs text-secondary border-b border-rowDivider">
+            <tr>
+              <th scope="col" class="px-4 py-2.5 font-medium">Patient</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Bed</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Risk</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Acuity</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Next task</th>
+              <th scope="col" class="px-4 py-2.5 font-medium text-right">Meds due</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Last vitals</th>
+              <th scope="col" class="px-4 py-2.5 font-medium"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-rowDivider">
+            <tr *ngFor="let p of filteredPatients; trackBy: trackById">
+              <th scope="row" class="px-4 py-3 font-normal">
+                <a [routerLink]="['/admin/nursing/patient', p.patientId]" class="font-semibold text-regular no-underline hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded">{{ p.patientName }}</a>
+                <div class="text-xs text-secondary">{{ p.patientNumber }} · {{ p.age }}y · {{ p.gender }}</div>
+              </th>
+              <td class="px-4 py-3 text-regular whitespace-nowrap">{{ p.wardName }} · {{ p.bedNumber }}</td>
+              <td class="px-4 py-3">
+                <div class="flex flex-wrap gap-1">
+                  <boo-status-badge *ngIf="p.risk.fallRisk" label="Fall risk" tone="warning" [dotted]="true" />
+                  <boo-status-badge *ngIf="p.risk.isolationRequired" [label]="p.risk.isolationType ? 'Isolation · ' + p.risk.isolationType : 'Isolation'" tone="primary" [dotted]="true" />
+                  <boo-status-badge *ngIf="p.risk.isEmergency" label="Emergency" tone="danger" [dotted]="true" />
+                  <boo-status-badge *ngIf="p.risk.hasAllergies" label="Allergy" tone="danger" [dotted]="true" />
+                  <span *ngIf="!p.risk.fallRisk && !p.risk.isolationRequired && !p.risk.isEmergency && !p.risk.hasAllergies" class="text-secondary">None</span>
+                </div>
+              </td>
+              <td class="px-4 py-3"><boo-status-badge [label]="p.acuity" [tone]="acuityTone(p.acuity)" /></td>
+              <td class="px-4 py-3">
+                <ng-container *ngIf="p.nextTaskLabel; else noTask">
+                  <div class="text-regular">{{ p.nextTaskLabel }}</div>
+                  <div class="text-xs tabular-nums" [class.text-danger]="isOverdue(p.nextTaskDueAt)" [class.font-semibold]="isOverdue(p.nextTaskDueAt)" [class.text-secondary]="!isOverdue(p.nextTaskDueAt)">
+                    <ng-container *ngIf="isOverdue(p.nextTaskDueAt)">Overdue · </ng-container>{{ p.nextTaskDueAt | date: 'MMM d, HH:mm' }}
+                  </div>
+                </ng-container>
+                <ng-template #noTask><span class="text-secondary">No pending task</span></ng-template>
+              </td>
+              <td class="px-4 py-3 text-right tabular-nums text-regular">{{ p.marDueCount }}</td>
+              <td class="px-4 py-3 tabular-nums text-regular whitespace-nowrap">
+                <ng-container *ngIf="p.lastVitalsAt; else noVitals">{{ p.lastVitalsAt | date: 'MMM d, HH:mm' }}</ng-container>
+                <ng-template #noVitals><span class="text-secondary">No readings</span></ng-template>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-end gap-1.5">
+                  <a boo-button variant="outline" size="sm" [routerLink]="['/admin/nursing/patient', p.patientId]">
+                    Open chart<span class="sr-only"> for {{ p.patientName }}</span>
+                  </a>
+                  <a *ngIf="links.treatmentSheet as ts" boo-button variant="ghost" size="sm" [routerLink]="ts" [queryParams]="{ patientId: p.patientId }">
+                    Treatment<span class="sr-only"> sheet for {{ p.patientName }}</span>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </dashboard-panel>
+  </ng-container>
+
+  <!-- First load: skeleton, access denied or failure -->
+  <ng-template #stateTpl>
+    <ng-container *ngIf="loading || !loadError; else errorTpl">
+      <div class="flex flex-col gap-3" aria-hidden="true">
+        <div class="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-5 gap-3">
+          <div *ngFor="let _ of skeletonTiles" class="h-[118px] rounded-xl border border-borderGray bg-surface p-4">
+            <div class="h-3 w-24 rounded bg-rowDivider animate-pulse"></div>
+            <div class="mt-3 h-7 w-16 rounded bg-rowDivider animate-pulse"></div>
+            <div class="mt-2.5 h-3 w-32 max-w-full rounded bg-rowDivider animate-pulse"></div>
+          </div>
+        </div>
+        <div class="rounded-xl border border-borderGray bg-surface p-4">
+          <div class="h-4 w-36 rounded bg-rowDivider animate-pulse"></div>
+          <div class="mt-4 flex flex-col gap-3">
+            <div *ngFor="let _ of skeletonRows" class="h-12 rounded-lg bg-rowDivider animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+      <span class="sr-only" role="status">Loading the nursing dashboard…</span>
+    </ng-container>
+  </ng-template>
+
+  <ng-template #errorTpl>
+    <boo-empty-state
+      *ngIf="loadError === 'forbidden'; else failedTpl"
+      appearance="panel"
+      icon="lock"
+      title="You don't have access to the nursing dashboard"
+      description="Ask an administrator for the nursing read permission."
+    />
+    <ng-template #failedTpl>
+      <boo-error-state
+        appearance="panel"
+        icon="cloud-off"
+        title="We couldn't load the nursing dashboard"
+        description="Something went wrong while loading your patients. Check your connection and try again."
+        retryLabel="Try again"
+        (retry)="load()"
+      />
+    </ng-template>
+  </ng-template>
+</div>

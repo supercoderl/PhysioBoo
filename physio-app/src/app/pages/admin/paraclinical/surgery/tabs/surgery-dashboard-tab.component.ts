@@ -1,18 +1,23 @@
-import { Component, OnInit, signal } from "@angular/core";
+import { Component, Input, OnChanges, OnDestroy, signal } from "@angular/core";
+import { BooErrorStateComponent } from '@physioboo/ui';
+import { Subscription, finalize } from "rxjs";
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { SurgeryDashboardTrend } from "../../../../../shared/types/surgery.types";
+import { SurgeryDashboardTrend, SurgeryRange } from "../../../../../shared/types/surgery.types";
 
 @Component({
   selector: 'surgery-dashboard-tab',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooErrorStateComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
       <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
     </div>
 
-    <div *ngIf="!isLoading() && trend()" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <boo-error-state *ngIf="!isLoading() && error()" appearance="panel" icon="cloud-off" title="We couldn't load the surgery trends"
+      description="Check your connection and try again." retryLabel="Try again" (retry)="load()" />
+
+    <div *ngIf="!isLoading() && !error() && trend()" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <!-- OR Utilization by Room -->
       <div class="bg-surface border border-gray-200 rounded-lg p-4">
         <div class="text-sm font-semibold text-gray-800 mb-3">OR Utilization by Room</div>
@@ -102,16 +107,33 @@ import { SurgeryDashboardTrend } from "../../../../../shared/types/surgery.types
     </div>
   `,
 })
-export class SurgeryDashboardTabComponent implements OnInit {
+export class SurgeryDashboardTabComponent implements OnChanges, OnDestroy {
+  @Input() range: SurgeryRange = 'today';
+  @Input() refreshKey = 0;
+
   isLoading = signal(true);
+  error = signal(false);
   trend = signal<SurgeryDashboardTrend | null>(null);
+
+  private requestSub?: Subscription;
 
   constructor(private srv: SurgeryService) { }
 
-  ngOnInit(): void {
-    this.srv.getTrends().subscribe({
-      next: (res) => { if (res.success) this.trend.set(res.data); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false),
+  ngOnChanges(): void {
+    this.load();
+  }
+
+  ngOnDestroy(): void {
+    this.requestSub?.unsubscribe();
+  }
+
+  load(): void {
+    this.isLoading.set(true);
+    this.error.set(false);
+    this.requestSub?.unsubscribe();
+    this.requestSub = this.srv.getTrends(this.range).pipe(finalize(() => this.isLoading.set(false))).subscribe({
+      next: (res) => { if (res.success) this.trend.set(res.data); else this.error.set(true); },
+      error: () => this.error.set(true),
     });
   }
 

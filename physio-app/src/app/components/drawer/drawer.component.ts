@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { DialogService } from '../../services/common/dialog.service';
 import { SharedModule } from '../../shared/shared-imports';
 
@@ -37,7 +37,7 @@ import { SharedModule } from '../../shared/shared-imports';
     </div>
   `
 })
-export class DrawerComponent {
+export class DrawerComponent implements OnInit, OnDestroy {
   // #region Inputs, Outputs, Properties
   @Output() close: EventEmitter<void> = new EventEmitter<void>();
   @Input() isOpen: boolean = false;
@@ -47,7 +47,19 @@ export class DrawerComponent {
   // #endregion
 
   // #region Init (Lifecycle + Setup)
-  constructor(private dialogSrv: DialogService) { }
+  constructor(private dialogSrv: DialogService, private host: ElementRef<HTMLElement>) { }
+
+  /**
+   * Re-parents the drawer to <body>. Page content sits in a lower stacking context than the app header, so a drawer
+   * left inside it would be painted under the header (hiding its title and close button) instead of covering it.
+   */
+  ngOnInit(): void {
+    document.body.appendChild(this.host.nativeElement);
+  }
+
+  ngOnDestroy(): void {
+    this.host.nativeElement.remove();
+  }
   // #endregion
 
   // #region Methods 

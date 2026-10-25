@@ -24,7 +24,7 @@ namespace PhysioBoo.Application.Queries.Doctors.GetById
 
         public async Task<DoctorViewModel?> Handle(GetDoctorByIdQuery request, CancellationToken ct)
         {
-            Doctor? doctor = await _doctorRepository.GetByIdAsync(request.Id, ct: ct);
+            Doctor? doctor = await _doctorRepository.GetByIdAsync(request.Id, includeProperties: "User,User.Profile", ct: ct);
 
             if (doctor == null)
             {

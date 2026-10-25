@@ -1,3 +1,5 @@
+using PhysioBoo.Domain.Enums;
+
 namespace PhysioBoo.Infrastructure.Database.DevData
 {
     /// <summary>Small in-house source of random but plausible values, so the generators need no extra package.</summary>
@@ -8,6 +10,11 @@ namespace PhysioBoo.Infrastructure.Database.DevData
         private static readonly string[] Provinces = { "Central", "North", "South", "East", "West" };
         private static readonly string[] Insurers = { "Aurora Health", "BlueLeaf", "Summit Care", "Unity Mutual" };
         private static readonly string[] Languages = { "English", "Vietnamese", "French", "Spanish" };
+
+        private static readonly string[] FirstNames = { "Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Avery", "Quinn", "Jamie", "Cameron", "Dana", "Elliot", "Harper", "Logan", "Mason", "Nora", "Owen", "Paige", "Reese", "Sasha", "Blake", "Camila", "Daniel", "Elena", "Felix", "Grace", "Hugo", "Isla", "Julian", "Kira", "Leo", "Maya", "Noah", "Olivia", "Priya", "Rafael", "Sofia", "Theo", "Uma", "Victor" };
+        private static readonly string[] LastNames = { "Anderson", "Brooks", "Carter", "Dawson", "Ellis", "Foster", "Grant", "Hayes", "Ingram", "Jensen", "Keller", "Lawson", "Mitchell", "Nolan", "Ortega", "Parker", "Quincy", "Reyes", "Sutton", "Turner", "Underwood", "Vasquez", "Walker", "Xavier", "Young", "Zimmer", "Bennett", "Coleman", "Donovan", "Fletcher" };
+        private static readonly Gender[] Genders = { Gender.Male, Gender.Female };
+        private static readonly BloodGroup[] BloodGroups = Enum.GetValues<BloodGroup>().Where(b => b != BloodGroup.Unknown).ToArray();
 
         private readonly Random _random;
 
@@ -21,6 +28,14 @@ namespace PhysioBoo.Infrastructure.Database.DevData
         public int Between(int min, int max) => _random.Next(min, max + 1);
 
         public bool Chance(double probability) => _random.NextDouble() < probability;
+
+        public string FirstName() => Pick(FirstNames);
+
+        public string LastName() => Pick(LastNames);
+
+        public Gender RandomGender() => Pick(Genders);
+
+        public BloodGroup RandomBloodGroup() => Pick(BloodGroups);
 
         public string City() => Pick(Cities);
 

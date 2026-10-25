@@ -12,7 +12,6 @@ import {
 } from '@physioboo/ui';
 import { Subject, interval, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
-import { AdminBreadcrumbComponent } from '../../../../components/breadcrumb/admin-breadcrumb.component';
 import { StatCardComponent } from '../../../../components/ui/stat-card.component';
 import { AppointmentService } from '../../../../services/admin/appointment.service';
 import { DoctorDeskService } from '../../../../services/admin/doctor-desk.service';
@@ -42,7 +41,6 @@ const POLL_MS = 30_000;
         NgIf,
         NgFor,
         DatePipe,
-        AdminBreadcrumbComponent,
         BooButtonComponent,
         BooEmptyStateComponent,
         BooErrorStateComponent,

@@ -1,4 +1,4 @@
-<div class="flex flex-col h-full min-h-0">
+<div class="flex flex-1 min-h-0 flex-col">
   <!-- Loading skeleton -->
   <div *ngIf="isLoading()" class="flex-1 flex items-center justify-center">
     <div class="text-center">
@@ -14,7 +14,7 @@
 
   <ng-container *ngIf="!isLoading() && !error()">
     <!-- Sticky patient context + snapshot + tab nav -->
-    <div class="sticky top-0 z-20 bg-surface shadow-sm">
+    <div class="mb-4 shrink-0 overflow-hidden rounded-2 border border-borderGray/60 bg-surface">
       <mr-patient-context-header [patient]="patient()" (action)="onQuickAction($event)"></mr-patient-context-header>
       <mr-clinical-snapshot [snapshot]="snapshot()"></mr-clinical-snapshot>
 
@@ -39,7 +39,7 @@
     </div>
 
     <!-- Tab content -->
-    <main class="flex-1 min-h-0 overflow-y-auto p-6" custom-scrollbar>
+    <main class="boo-scrollbar min-h-0 min-w-0 flex-1 overflow-auto pb-5">
       <mr-overview-tab *ngIf="activeTab() === 'overview'" [patient]="patient()" [demographics]="demographics()"
         [history]="history()" [allergies]="allergies()" />
 

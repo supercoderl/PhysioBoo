@@ -267,7 +267,15 @@ namespace PhysioBoo.Infrastructure.Extensions
 
             // Development-only fake data generator (Super Admin > Platform > Dev data); one module per entity group.
             services.AddScoped<IDevDataService, DevDataService>();
+            services.AddScoped<IDevDataModule, DemoFacilityModule>();
             services.AddScoped<IDevDataModule, HospitalStructureModule>();
+            services.AddScoped<IDevDataModule, MasterDataModule>();
+            services.AddScoped<IDevDataModule, ProvidersModule>();
+            services.AddScoped<IDevDataModule, StaffModule>();
+            services.AddScoped<IDevDataModule, MedicalServicesModule>();
+            services.AddScoped<IDevDataModule, SchedulesModule>();
+            services.AddScoped<IDevDataModule, PatientsModule>();
+            services.AddScoped<IDevDataModule, AppointmentsModule>();
             return services;
         }
 

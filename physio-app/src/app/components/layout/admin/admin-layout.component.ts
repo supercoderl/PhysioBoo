@@ -1,9 +1,11 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, OnDestroy } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { NavigationEnd, Router } from "@angular/router";
 import { filter } from "rxjs";
+import { ScrollbarAutoHideService } from "../../../shared/directives/scrollbar-autohide.service";
 import { SharedModule } from "../../../shared/shared-imports";
 import { DrawerProperty, PopoverProperty } from "../../../shared/types/common";
+import { AdminBreadcrumbComponent } from "../../breadcrumb/admin-breadcrumb.component";
 import { DrawerComponent } from "../../drawer/drawer.component";
 import { PopoverComponent } from "../../popover/popover.component";
 import { AdminCloudComponent } from "./cloud/cloud.component";
@@ -17,25 +19,28 @@ import { AdminSizeComponent } from "./size/size.component";
 @Component({
     selector: 'app-admin-layout',
     standalone: true,
+    // The shell owns the viewport: a definite dynamic-viewport height that everything below inherits.
+    host: { class: 'relative block h-dvh overflow-hidden' },
     imports: [
-    SharedModule,
-    AdminLayoutSideBarComponent,
-    AdminMainHeaderComponent,
-    AdminConnectionComponent,
-    DrawerComponent,
-    AdminCloudComponent,
-    PopoverComponent,
-    AdminSizeComponent,
-    AdminLanguageComponent,
-    AdminNotificationComponent
-],
+        SharedModule,
+        AdminLayoutSideBarComponent,
+        AdminMainHeaderComponent,
+        AdminConnectionComponent,
+        DrawerComponent,
+        AdminCloudComponent,
+        PopoverComponent,
+        AdminSizeComponent,
+        AdminLanguageComponent,
+        AdminNotificationComponent,
+        AdminBreadcrumbComponent
+    ],
     template: `
-        <div id="admin-layout" class="flex flex-auto font-sans">
-            <div class="flex min-w-0 flex-auto">
+        <div id="admin-layout" class="flex h-full font-sans">
+            <div class="flex h-full min-w-0 flex-auto">
                 <admin-layout-sidebar [isCollapsed]="isCollapsed" />
                 <main 
                     id="physio-main" 
-                    class="relative z-[2000] flex min-h-svh min-w-0 flex-auto flex-col max-h-svh"
+                    class="relative z-[2000] flex h-full min-h-0 min-w-0 flex-auto flex-col"
                 >
                     <admin-main-header 
                         (collapseEvent)="handleCollapse()"
@@ -44,9 +49,10 @@ import { AdminSizeComponent } from "./size/size.component";
                     />
                     <div class="flex-1 flex flex-col min-h-0 relative z-20">
                         <div class="flex-1 flex flex-col min-h-0 px-4 bg-body overflow-hidden transition-all duration-300">
-                            <div 
+                            <admin-breadcrumb class="block shrink-0 pt-4" />
+                            <div
                                 id="wrapper"
-                                class="flex-1 min-h-0 overflow-auto"
+                                class="boo-scrollbar -mr-4 flex-1 min-h-0 min-w-0 flex flex-col overflow-auto pr-4"
                             >
                                 <router-outlet></router-outlet>
                             </div>
@@ -76,15 +82,10 @@ import { AdminSizeComponent } from "./size/size.component";
             <admin-cloud *ngIf="drawer.type === 'CLOUD'"></admin-cloud>
             <admin-notification *ngIf="drawer.type === 'NOTIFICATION'"></admin-notification>
         </drawer>
-    `,
-    styles: `
-        #wrapper::-webkit-scrollbar {
-            display: none;
-        }
     `
 })
 
-export class AdminLayoutComponent {
+export class AdminLayoutComponent implements OnDestroy {
     @Input() currentPath: string = "";
     isCollapsed: boolean = false;
     drawer: DrawerProperty = {
@@ -98,7 +99,8 @@ export class AdminLayoutComponent {
         data: null,
     }
 
-    constructor(router: Router) {
+    constructor(router: Router, private scrollbarAutoHide: ScrollbarAutoHideService) {
+        this.scrollbarAutoHide.attach();
         // Links inside a drawer or popover navigate away; don't leave the panel over the new page.
         router.events
             .pipe(filter(e => e instanceof NavigationEnd), takeUntilDestroyed())
@@ -106,6 +108,10 @@ export class AdminLayoutComponent {
                 if (this.drawer.isOpen) this.handleCloseDrawer();
                 if (this.popover.isOpen) this.handleClosePopover();
             });
+    }
+
+    ngOnDestroy() {
+        this.scrollbarAutoHide.detach();
     }
 
     handleCollapse() {

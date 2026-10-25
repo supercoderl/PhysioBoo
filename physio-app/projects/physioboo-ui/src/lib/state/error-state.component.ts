@@ -3,10 +3,6 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { BooButtonComponent } from "../button/button.component";
 import { BooIconComponent } from "../icon/icon.component";
 
-/**
- * A request failed. `default` is the compact admin block; `panel` is the full-width block the public listing and
- * detail pages show in place of their results. Extra actions go in the content slot (next to Try again in a panel).
- */
 @Component({
     selector: 'boo-error-state',
     standalone: true,
@@ -14,7 +10,7 @@ import { BooIconComponent } from "../icon/icon.component";
     template: `
         <ng-template #projected><ng-content></ng-content></ng-template>
 
-        <div *ngIf="appearance === 'default'" class="flex flex-col items-center justify-center text-center py-10 px-6">
+        <div *ngIf="appearance === 'default'" class="h-full flex flex-col items-center justify-center text-center py-10 px-6">
             <div class="flex items-center justify-center w-14 h-14 rounded-2 bg-danger/5 mb-4">
                 <physio-icon [name]="icon" [size]="26" class="text-danger"></physio-icon>
             </div>
@@ -56,7 +52,6 @@ export class BooErrorStateComponent {
     @Input() showRetry: boolean = true;
     @Input() retryLabel: string = 'Retry';
     @Input() appearance: 'default' | 'panel' = 'default';
-    /** Heading level of the title in a panel (2 when the panel replaces a page's results, 3 inside a section). */
     @Input() headingLevel: 2 | 3 = 2;
     @Output() retry = new EventEmitter<void>();
 }

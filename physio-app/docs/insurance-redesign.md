@@ -1,0 +1,130 @@
+# Insurance Page Redesign — Insurers + Claims
+
+**Path:** `admin/finance/insurance` (route guard: `admin:insurance-company:read`)
+**Scope:** Frontend only. Every endpoint below already exists in `physio-server`; nothing is mocked or proposed.
+**Related:** `docs/insurance-claims-redesign.md` (the claims workspace, unchanged apart from being hosted as the *Claims* view).
+
+---
+
+## 1. UX Audit & Current Problems
+
+| Finding | Detail |
+|---|---|
+| The page was claims-only | `/admin/finance/insurance` mounted only the claim processing workspace. The insurer records it depends on (contacts, settlement terms, required documents, active flag) could only be edited on a separate System → Common Category page. |
+| Permission mismatch | The route requires `admin:insurance-company:read`, but every claims endpoint requires `finance:insurance-claim:*`. A user with only the route permission saw a page whose requests all returned 403. |
+| Claims mutations not gated | Claims actions are shown regardless of create / update / process permissions (not changed here; see §11). |
+| Old insurer UI | The System page uses a generic table with bulk-selection, saved-view and comment tools that do nothing for insurers, a drawer with a debug JSON filler, a `networkHospitals` field that is a jsonb column edited as free text (invalid JSON fails at the database), and no feedback while saving. |
+
+## 2. Information Architecture
+
+```
+Insurance
+├── Header (title + purpose)
+├── Tabs: Insurers | Claims      (Claims only with finance:insurance-claim:read)
+├── Insurers view
+│   ├── Count + "New insurer" (admin:insurance-company:create)
+│   ├── Filter bar: search · sort · added-from/to · active chips · reset
+│   ├── Insurer list (paged, server side)
+│   └── Insurer panel (key facts → secondary detail)
+│       actions: Edit · Activate/Deactivate (update) · Delete (delete) · View claims
+└── Claims view  = existing claim workspace, optionally scoped to one insurer
+```
+
+## 3. User Journey
+
+1. Open Insurance → Insurers. The first insurer is selected on wide screens.
+2. Search by name/code, narrow by when it was added, sort, page.
+3. Select a row: the panel shows status, claim totals (if permitted), contact, settlement terms, documents, network, terms.
+4. Edit / deactivate / delete in place (each only if permitted). Saving refreshes the row, the panel and the claim counts from the server.
+5. *View claims* switches to the Claims view scoped to that insurer.
+
+## 4. Layout & Wireframe
+
+```
+┌ Insurance ─────────────────────────────────────────────────────────────┐
+│ [ Insurers ][ Claims ]                                                 │
+│ 12 insurers                                            [+ New insurer] │
+├───────────────────────────────────────────────┬────────────────────────┤
+│ Search ____________________  Sort ▾            │ Bao Viet Insurance  ●  │
+│ Added from ▾  Added to ▾   chips   [Reset]     │ INS-0003 · Health      │
+│ ┌ Insurer │ Contact │ Claims terms │ Status ┐   │ [Edit][Deactivate][🗑] │
+│ │ …       │ …       │ 7 days · Cashless │ ●  │   │ Claims 42 / 5 pending  │
+│ └ pagination ───────────────────────────────┘   │ Contact · Settlement   │
+│                                                │ Documents · Network     │
+└───────────────────────────────────────────────┴────────────────────────┘
+```
+Below 1280px the panel opens in the shared drawer instead of a column.
+
+## 5. Component Hierarchy
+
+```
+AdminInsuranceComponent                 shell: heading, tabs, view hand-over
+├── InsuranceCompaniesComponent         Insurers view: state, requests, permissions
+│   ├── InsuranceCompanyFilterBarComponent
+│   ├── InsuranceCompanyListComponent   (boo-table-admin)
+│   ├── InsuranceCompanyPanelComponent
+│   └── InsuranceCompanyFormDrawerComponent  (create / edit)
+└── InsuranceClaimsWorkspaceComponent   previous page body, + [providerId] input
+```
+Shared UI reused: `boo-button`, `boo-input`, `boo-checkbox`, `boo-status-badge`, `boo-filter-chips`, `boo-empty-state`, `boo-error-state`, `physio-icon` (`@physioboo/ui`); `boo-select`, `boo-datepicker`, `boo-textarea`, `boo-table-admin`, `drawer`, `DialogService`, `ToastService`.
+
+## 6. UI Specification
+
+- Columns: Insurer (name, code · type), Contact (person, phone/email), Claims terms (avg. settlement days, Cashless/Reimbursement), Status badge.
+- Form sections: Insurer · Contact · Settlement and coverage · Claim requirements.
+- Validation mirrors the server: name required ≤255; contact person/email/website ≤255, phone `^\+?[0-9][0-9\s\-().]{5,19}$` ≤20, email format, website http(s) URL; max coverage ≥ 0; settlement ratio 0–100; avg. settlement days integer ≥ 0; required documents non-empty on create.
+- `networkHospitals` is a jsonb column. The form edits one hospital per line and writes a JSON string array. A stored value of any other shape is shown read-only and re-sent unchanged.
+- The insurer `code` is generated by the server and is never editable.
+
+## 7. Interaction Design
+
+- Search is debounced (350 ms); filters/sort/page changes cancel the in-flight request.
+- Entering only one of the two dates does not reload and shows a hint (the endpoint needs both).
+- One mutation at a time (`busy`); submit/actions are disabled while it runs.
+- Save failure: the drawer stays open with the entered values (the HTTP interceptor shows the server message). Success: toast, refetch of the insurer by id, list and claim counts.
+- Deactivate asks for confirmation; Delete uses the shared delete confirmation. Closing a dirty form asks to discard.
+
+## 8. Responsive, Accessibility, Performance
+
+- Desktop two-column; below `xl` the panel is a drawer; table scrolls horizontally inside its card; form grids collapse to one column.
+- Tabs use `tablist/tab/tabpanel`, roving tabindex and arrow keys; the form is a labelled `role="dialog"` with `aria-busy`; errors use `role="alert"`; status is text + badge, not colour alone.
+- Server-side paging (10/page); no client-side filtering of a full list.
+
+## 9. Page States
+
+| State | Behaviour |
+|---|---|
+| Loading | Table loading state; panel idle until selection |
+| Empty | "No insurers yet" (with *New insurer* if permitted) or "No insurers match your filters" + Reset |
+| Error | Panel error state with Retry; filters kept |
+| No create/update/delete permission | Corresponding buttons are not rendered |
+| No claim permission | Claims tab and claim totals hidden |
+| Inactive insurer | Badge "Inactive"; claim totals note (the claims tree lists active insurers only) |
+
+## 10. Edge Cases
+
+Deleting the last row of a page returns to the previous page; a selected row that leaves the filtered result stays shown as last seen; a stale non-array `networkHospitals` is preserved; double submits are ignored.
+
+## 11. Backend Limitations (not simulated)
+
+- The search endpoint filters only by free text (name/code) and created-date range. There is **no type or status filter** and no per-insurer statistics, so none is offered; claim totals come from `/api/insurance/providers/tree` (active insurers only).
+- No endpoints exist for policies, coverage rules or insurer-level contracts, so those are not shown.
+- Delete is a soft delete and the handler does not check linked bills/claims.
+- Claim actions in the Claims view are not hidden by `finance:insurance-claim:create/update/process` (pre-existing).
+- The route guard still requires only `admin:insurance-company:read`; a claims-only user cannot reach the page.
+
+## 12. Existing API Contract (used by this page)
+
+| Purpose | Method | URL | Permission | Frontend usage |
+|---|---|---|---|---|
+| Search insurers | POST | `/api/insurance-companies/search` | `admin:insurance-company:read` | List. Body `{pageNumber,pageSize,search,sort,filter:{start,end}}` → `PagedResult<InsuranceCompany>` |
+| Get insurer | GET | `/api/insurance-companies/{id}` | `…:read` | Refresh after save |
+| Create | POST | `/api/insurance-companies` | `admin:insurance-company:create` | Form → `{success,data:id}` |
+| Update | PATCH | `/api/insurance-companies/{id}` | `admin:insurance-company:update` | Form, Activate/Deactivate (full body incl. `isActive`) |
+| Delete | DELETE | `/api/insurance-companies/{id}` | `admin:insurance-company:delete` | Panel (204) |
+| Claim totals per insurer | GET | `/api/insurance/providers/tree` | `finance:insurance-claim:read` | Panel claim totals |
+| Claims | — | `/api/insurance/claims…` | `finance:insurance-claim:*` | Claims view (see `insurance-claims-redesign.md`) |
+
+## 13. Enterprise Recommendations
+
+Add `type` / `isActive` filters and a `GET /api/insurance-companies/stats` to the search endpoint; guard delete against linked bills/claims; gate claim actions by `finance:insurance-claim:*`; accept the route guard as "any of" the two read permissions.

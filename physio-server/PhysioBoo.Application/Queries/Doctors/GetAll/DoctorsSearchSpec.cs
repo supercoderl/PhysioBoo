@@ -14,6 +14,9 @@ namespace PhysioBoo.Application.Queries.Doctors.GetAll
             ISortingExpressionProvider<DoctorViewModel, Doctor> sortingExpressionProvider
         )
         {
+            // The view model reads the avatar and full name from the user and profile.
+            Query.Include(x => x.User!).ThenInclude(u => u.Profile);
+
             // Apply filters
             if (!string.IsNullOrEmpty(q.Request.Search))
             {

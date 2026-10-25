@@ -1,6 +1,5 @@
 import { Component, HostListener, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AdminBreadcrumbComponent } from "../../../../components/breadcrumb/admin-breadcrumb.component";
 import { BooCheckboxComponent, BooEmptyStateComponent, BooInputComponent } from '@physioboo/ui';
 import { AcademyService } from '../../../../services/admin/academy.service';
 import { AuthService } from '../../../../services/auth/auth.service';
@@ -19,7 +18,6 @@ interface LessonDraft { id: string | null; title: string; content: string; durat
   selector: 'app-academy-course',
   standalone: true,
   imports: [
-    AdminBreadcrumbComponent,
     SharedModule,
     BooEmptyStateComponent,
     BooButtonAdminComponent,

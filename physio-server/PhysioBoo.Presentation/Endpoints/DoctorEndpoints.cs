@@ -1,7 +1,9 @@
 
 using PhysioBoo.Application.Commands.Doctors.CreateDoctor;
 using PhysioBoo.Application.Commands.Doctors.DeleteDoctor;
+using PhysioBoo.Application.Commands.Doctors.RemoveDoctorAvatar;
 using PhysioBoo.Application.Commands.Doctors.UpdateDoctor;
+using PhysioBoo.Application.Commands.Doctors.UploadDoctorAvatar;
 using PhysioBoo.Application.Queries.Doctors.GetAll;
 using PhysioBoo.Application.Queries.Doctors.GetById;
 using PhysioBoo.Application.ViewModels.Doctors;
@@ -102,6 +104,47 @@ namespace PhysioBoo.Presentation.Endpoints
             .WithSummary("Update doctor")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization(Permissions.Hr.DoctorUpdate);
+            #endregion
+
+            #region Doctor Avatar
+            group.MapPost("{id:guid}/avatar", async (
+                Guid id,
+                IFormFile file,
+                IMediatorHandler bus,
+                CancellationToken ct
+            ) =>
+            {
+                UploadDoctorAvatarCommand command = new UploadDoctorAvatarCommand(id, file);
+
+                await bus.SendCommandAsync(command);
+
+                return Results.Ok(new ResponseMessage<string?>
+                {
+                    Success = true,
+                    Data = command.AvatarUrl
+                });
+            }).WithName("UploadDoctorAvatar")
+            .WithSummary("Upload or replace a doctor's avatar (JPEG, PNG or WebP, up to 5 MB).")
+            .Produces<ResponseMessage<string?>>(StatusCodes.Status200OK)
+            .Produces<ResponseMessage<string?>>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .DisableAntiforgery()
+            .RequireAuthorization(Permissions.Hr.DoctorUpdate);
+
+            group.MapDelete("{id:guid}/avatar", async (
+                Guid id,
+                IMediatorHandler bus,
+                CancellationToken ct
+            ) =>
+            {
+                await bus.SendCommandAsync(new RemoveDoctorAvatarCommand(id));
+
+                return Results.NoContent();
+            }).WithName("RemoveDoctorAvatar")
+            .WithSummary("Remove a doctor's avatar.")
+            .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .RequireAuthorization(Permissions.Hr.DoctorUpdate);
             #endregion

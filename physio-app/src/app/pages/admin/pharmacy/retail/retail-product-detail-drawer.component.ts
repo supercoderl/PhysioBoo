@@ -1,85 +1,135 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, inject, signal } from "@angular/core";
+import { BooButtonComponent, BooErrorStateComponent } from '@physioboo/ui';
+import { Subscription } from "rxjs";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
 import { RetailPosService } from "../../../../services/admin/retail-pos.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailMedicineDetail } from "../../../../shared/types/retail-pos.types";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { formatRetailMoney } from "../../../../shared/utils/retail-pos.utils";
 
 @Component({
   selector: 'retail-product-detail-drawer',
   standalone: true,
-  imports: [SharedModule,DrawerComponent, BooButtonAdminComponent],
+  imports: [SharedModule, DrawerComponent, BooButtonComponent, BooErrorStateComponent],
   template: `
     <drawer [isOpen]="isOpen" (close)="close.emit()">
-      <div class="p-5" *ngIf="detail">
-        <div class="flex items-start justify-between mb-4">
-          <div>
-            <h2 class="text-lg font-semibold text-gray-900">{{ detail.name }}</h2>
-            <p class="text-sm text-gray-500">{{ detail.genericName }} · {{ detail.strength }} · {{ detail.packageLabel }}</p>
+      <div class="p-5" role="dialog" aria-modal="true" aria-labelledby="retail-detail-title" [attr.aria-hidden]="!isOpen">
+        <div class="flex items-start justify-between gap-3 mb-4">
+          <div class="min-w-0">
+            <h2 id="retail-detail-title" class="text-lg font-semibold text-regular m-0 break-words">{{ detail()?.name || 'Medicine details' }}</h2>
+            <p *ngIf="detail() as d" class="text-sm text-secondary m-0">{{ subtitle(d) }}</p>
           </div>
-          <button type="button" (click)="close.emit()" class="text-gray-400 hover:text-gray-600" aria-label="Close drawer">
+          <button type="button" (click)="close.emit()" class="w-8 h-8 shrink-0 rounded-1.5 flex items-center justify-center text-gray-500 hover:bg-gray-100" aria-label="Close details">
             <physio-icon name="x" [size]="18"></physio-icon>
           </button>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 mb-5 text-sm">
-          <div><span class="text-gray-500 block text-xs">Manufacturer</span>{{ detail.manufacturer }}</div>
-          <div><span class="text-gray-500 block text-xs">Category</span>{{ detail.category }}</div>
-          <div><span class="text-gray-500 block text-xs">Batch No.</span>{{ detail.batchNo }}</div>
-          <div><span class="text-gray-500 block text-xs">Expiry</span>{{ detail.expiryDate }}</div>
-          <div><span class="text-gray-500 block text-xs">Stock</span>{{ detail.stock }} units</div>
-          <div><span class="text-gray-500 block text-xs">Price</span>\${{ detail.price.toFixed(2) }} <span class="text-gray-400 line-through">\${{ detail.mrp.toFixed(2) }}</span></div>
+        <div *ngIf="loading()" class="space-y-3" aria-busy="true">
+          <div *ngFor="let n of [1,2,3,4]" class="h-10 rounded-1.5 bg-gray-50 animate-pulse"></div>
         </div>
 
-        <div class="mb-5" *ngIf="detail.interactionWarnings.length">
-          <h3 class="text-xs font-semibold text-gray-500 uppercase mb-2">Interaction Warnings</h3>
-          <div *ngFor="let w of detail.interactionWarnings" class="bg-rose-50 text-rose-700 text-xs rounded-lg p-2.5 mb-2 flex items-start gap-2">
-            <physio-icon name="triangle-alert" [size]="14" [class]="'mt-0.5 shrink-0'"></physio-icon>
-            <span>{{ w }}</span>
-          </div>
-        </div>
+        <boo-error-state *ngIf="!loading() && error()" title="Couldn't load details" [description]="error()" (retry)="load()"></boo-error-state>
 
-        <div class="mb-5">
-          <h3 class="text-xs font-semibold text-gray-500 uppercase mb-2">Alternative Medicines</h3>
-          <div *ngFor="let alt of detail.alternatives" class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+        <ng-container *ngIf="!loading() && !error() && detail() as d">
+          <dl class="grid grid-cols-2 gap-3 mb-5 text-sm m-0">
+            <div *ngIf="d.manufacturer"><dt class="text-secondary text-xs">Manufacturer</dt><dd class="m-0">{{ d.manufacturer }}</dd></div>
+            <div *ngIf="d.category"><dt class="text-secondary text-xs">Category</dt><dd class="m-0">{{ d.category }}</dd></div>
+            <div *ngIf="d.barcode"><dt class="text-secondary text-xs">Barcode</dt><dd class="m-0">{{ d.barcode }}</dd></div>
+            <div *ngIf="d.batchNo"><dt class="text-secondary text-xs">Next batch to sell</dt><dd class="m-0">{{ d.batchNo }}</dd></div>
+            <div *ngIf="d.expiryDate"><dt class="text-secondary text-xs">Earliest expiry</dt><dd class="m-0">{{ d.expiryDate | date:'mediumDate' }}</dd></div>
+            <div><dt class="text-secondary text-xs">Stock</dt><dd class="m-0">{{ d.stock }} units</dd></div>
             <div>
-              <p class="text-sm text-gray-800">{{ alt.name }}</p>
-              <p class="text-xs text-gray-500">{{ alt.manufacturer }} · {{ alt.stock }} in stock</p>
+              <dt class="text-secondary text-xs">Price</dt>
+              <dd class="m-0">{{ money(d.price) }} <span *ngIf="d.mrp && d.mrp > d.price" class="text-gray-500 line-through">{{ money(d.mrp) }}</span></dd>
             </div>
-            <span class="text-sm font-semibold text-gray-900">\${{ alt.price.toFixed(2) }}</span>
-          </div>
-        </div>
+          </dl>
 
-        <div class="mb-5">
-          <h3 class="text-xs font-semibold text-gray-500 uppercase mb-2">Inventory Movement</h3>
-          <div *ngFor="let mv of detail.inventoryMovements" class="flex items-center justify-between py-1.5 text-xs">
-            <span class="text-gray-500">{{ mv.date | date:'short' }} · {{ mv.reference }}</span>
-            <span [ngClass]="mv.type === 'In' ? 'text-emerald-600' : 'text-rose-600'" class="font-semibold">{{ mv.type === 'In' ? '+' : '-' }}{{ mv.quantity }}</span>
-          </div>
-        </div>
+          <section *ngIf="d.interactionWarnings.length" class="mb-5" aria-label="Interaction warnings">
+            <h3 class="text-xs font-semibold text-secondary uppercase m-0 mb-2">Interaction warnings</h3>
+            <div *ngFor="let w of d.interactionWarnings" class="bg-dangerSoft border border-dangerBorder text-gray-900 text-xs rounded-1.5 p-2.5 mb-2 flex items-start gap-2" role="alert">
+              <physio-icon name="triangle-alert" [size]="14" class="mt-0.5 shrink-0 text-danger"></physio-icon>
+              <span>{{ w }}</span>
+            </div>
+          </section>
 
-        <boo-button-admin (click)="addToCart.emit(detail)" [disabled]="detail.stock === 0" textColor="white" padding="12px 12px" [fontSize]="14" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">
-          {{ detail.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
-        </boo-button-admin>
+          <section class="mb-5" aria-label="Alternative medicines">
+            <h3 class="text-xs font-semibold text-secondary uppercase m-0 mb-2">Alternative medicines</h3>
+            <p *ngIf="!d.alternatives.length" class="text-sm text-secondary m-0">No alternatives on record.</p>
+            <div *ngFor="let alt of d.alternatives" class="flex items-center justify-between gap-3 py-2 border-b border-borderGray/60 last:border-0">
+              <div class="min-w-0">
+                <p class="text-sm text-regular m-0 break-words">{{ alt.name }}</p>
+                <p class="text-xs text-secondary m-0">{{ alt.manufacturer }}<span *ngIf="alt.manufacturer"> · </span>{{ alt.stock }} in stock</p>
+              </div>
+              <span class="text-sm font-semibold text-regular shrink-0">{{ money(alt.price) }}</span>
+            </div>
+          </section>
+
+          <section class="mb-5" aria-label="Inventory movement">
+            <h3 class="text-xs font-semibold text-secondary uppercase m-0 mb-2">Recent inventory movement</h3>
+            <p *ngIf="!d.inventoryMovements.length" class="text-sm text-secondary m-0">No movements recorded.</p>
+            <div *ngFor="let mv of d.inventoryMovements" class="flex items-center justify-between py-1.5 text-xs">
+              <span class="text-secondary">{{ mv.date | date:'short' }}<span *ngIf="mv.reference"> · {{ mv.reference }}</span></span>
+              <span class="font-semibold" [ngClass]="mv.type === 'In' ? 'text-emerald-700' : 'text-danger'">{{ mv.type === 'In' ? '+' : '−' }}{{ mv.quantity }}</span>
+            </div>
+          </section>
+
+          <button boo-button variant="primary" size="md" [block]="true" (click)="addToCart.emit(d)" [disabled]="d.stock <= 0 || addDisabled" [loading]="adding"
+            [attr.title]="addDisabled ? addDisabledReason : null">
+            {{ d.stock <= 0 ? 'Out of stock' : 'Add to cart' }}
+          </button>
+        </ng-container>
       </div>
     </drawer>
   `,
 })
-export class RetailProductDetailDrawerComponent implements OnChanges {
+export class RetailProductDetailDrawerComponent implements OnChanges, OnDestroy {
   @Input() isOpen = false;
   @Input() medicineId: string | null = null;
+  @Input() addDisabled = false;
+  @Input() addDisabledReason = '';
+  @Input() adding = false;
   @Output() close = new EventEmitter<void>();
   @Output() addToCart = new EventEmitter<RetailMedicineDetail>();
 
-  detail: RetailMedicineDetail | null = null;
+  private readonly srv = inject(RetailPosService);
+  private sub?: Subscription;
 
-  constructor(private srv: RetailPosService) { }
+  detail = signal<RetailMedicineDetail | null>(null);
+  loading = signal(false);
+  error = signal<string | null>(null);
 
-  ngOnChanges(): void {
-    if (this.isOpen && this.medicineId) {
-      this.srv.getMedicineDetail(this.medicineId).subscribe(res => {
-        if (res.success) this.detail = res.data;
-      });
-    }
+  ngOnChanges(changes: SimpleChanges): void {
+    if ((changes['isOpen'] || changes['medicineId']) && this.isOpen && this.medicineId) this.load();
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
+  }
+
+  load(): void {
+    if (!this.medicineId) return;
+    this.sub?.unsubscribe();
+    this.detail.set(null);
+    this.error.set(null);
+    this.loading.set(true);
+    this.sub = this.srv.getMedicineDetail(this.medicineId).subscribe({
+      next: res => {
+        this.loading.set(false);
+        if (res.success && res.data) this.detail.set(res.data);
+        else this.error.set('This medicine is no longer available.');
+      },
+      error: () => {
+        this.loading.set(false);
+        this.error.set('Check your connection and try again.');
+      },
+    });
+  }
+
+  subtitle(d: RetailMedicineDetail): string {
+    return [d.genericName, d.strength, d.packageLabel].filter(Boolean).join(' · ');
+  }
+
+  money(amount: number): string {
+    return formatRetailMoney(amount);
   }
 }

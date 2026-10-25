@@ -1,5 +1,4 @@
 import { Component, HostListener, OnInit, signal } from '@angular/core';
-import { AdminBreadcrumbComponent } from "../../../../../components/breadcrumb/admin-breadcrumb.component";
 import { BooEmptyStateComponent } from '@physioboo/ui';
 import { ScrumboardService } from '../../../../../services/admin/scrumboard.service';
 import { ToastService } from '../../../../../services/common/toast.service';
@@ -12,7 +11,6 @@ import { BooTextareaComponent } from "../../../../../components/textarea/boo-tex
   selector: 'app-scrumboard-list',
   standalone: true,
   imports: [
-    AdminBreadcrumbComponent,
     SharedModule,
     BooEmptyStateComponent,
     BooButtonAdminComponent,

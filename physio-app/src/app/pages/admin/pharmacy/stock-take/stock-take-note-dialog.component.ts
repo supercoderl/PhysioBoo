@@ -10,7 +10,7 @@ export type NoteDialogMode = 'approve' | 'reject' | 'cancel';
     standalone: true,
     imports: [SharedModule,BooTextareaComponent, BooButtonAdminComponent],
     template: `
-    <div *ngIf="isOpen" class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+    <div *ngIf="isOpen" class="fixed inset-0 z-[10000] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="stock-take-note-title" (keydown.escape)="onClose()">
       <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="onClose()"></div>
 
       <div class="relative bg-surface rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100">
@@ -19,7 +19,7 @@ export type NoteDialogMode = 'approve' | 'reject' | 'cancel';
             <physio-icon [name]="iconName" [size]="20" [class]="iconColor"></physio-icon>
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-gray-900">{{ title }}</h3>
+            <h3 id="stock-take-note-title" class="text-lg font-semibold text-gray-900">{{ title }}</h3>
             <p class="text-sm text-gray-500 mt-1 leading-relaxed">{{ subtitle }}</p>
           </div>
         </div>
@@ -29,8 +29,8 @@ export type NoteDialogMode = 'approve' | 'reject' | 'cancel';
         </div>
 
         <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3">
-          <boo-button-admin background="transparent" (click)="onClose()">Cancel</boo-button-admin>
-          <boo-button-admin textColor="white" [background]="mode === 'approve' ? 'rgb(var(--twc-primary))' : '#DC2626'" (click)="onConfirm()">{{ confirmLabel }}</boo-button-admin>
+          <boo-button-admin background="transparent" (click)="onClose()">Back</boo-button-admin>
+          <boo-button-admin textColor="white" [background]="mode === 'approve' ? 'rgb(var(--twc-primary))' : '#DC2626'" [disabled]="busy" [loading]="busy" (click)="onConfirm()">{{ confirmLabel }}</boo-button-admin>
         </div>
       </div>
     </div>
@@ -39,6 +39,7 @@ export type NoteDialogMode = 'approve' | 'reject' | 'cancel';
 export class StockTakeNoteDialogComponent implements OnChanges {
     @Input() isOpen = false;
     @Input() mode: NoteDialogMode = 'approve';
+    @Input() busy = false;
     @Output() close = new EventEmitter<void>();
     @Output() confirm = new EventEmitter<string>();
 
@@ -50,17 +51,17 @@ export class StockTakeNoteDialogComponent implements OnChanges {
 
     get title(): string {
         switch (this.mode) {
-            case 'approve': return 'Approve Stock Take';
-            case 'reject': return 'Reject Stock Take';
-            case 'cancel': return 'Cancel Stock Take';
+            case 'approve': return 'Approve stock take';
+            case 'reject': return 'Reject stock take';
+            case 'cancel': return 'Cancel stock take';
         }
     }
 
     get subtitle(): string {
         switch (this.mode) {
-            case 'approve': return 'Confirm the reconciled counts and close this session.';
-            case 'reject': return 'Send this session back to Counting for rework.';
-            case 'cancel': return 'This session will be marked as Cancelled and cannot be resumed.';
+            case 'approve': return 'Approving adjusts the system quantity of every batch whose count differs and records a stock movement for it. This cannot be undone.';
+            case 'reject': return 'The session is closed as Rejected and stock is not adjusted. A rejected session cannot be reopened for counting.';
+            case 'cancel': return 'The session is marked as Cancelled and cannot be resumed. Stock is not adjusted.';
         }
     }
 
@@ -72,7 +73,7 @@ export class StockTakeNoteDialogComponent implements OnChanges {
         switch (this.mode) {
             case 'approve': return 'Approve';
             case 'reject': return 'Reject';
-            case 'cancel': return 'Confirm Cancel';
+            case 'cancel': return 'Cancel session';
         }
     }
 
@@ -92,7 +93,7 @@ export class StockTakeNoteDialogComponent implements OnChanges {
     }
 
     onConfirm(): void {
-        if (this.mode !== 'approve' && !this.note.trim()) return;
+        if (this.busy || (this.mode !== 'approve' && !this.note.trim())) return;
         this.confirm.emit(this.note.trim());
     }
 }

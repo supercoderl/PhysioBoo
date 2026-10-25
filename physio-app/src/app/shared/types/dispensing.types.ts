@@ -57,7 +57,7 @@ export type DispenseItemStatus = 'NotPicked' | 'Picked' | 'Verified' | 'Dispense
 
 export interface BatchOption {
     batchNo: string;
-    expiryDate: string;
+    expiryDate?: string | null;
     quantityAvailable: number;
     location: string;
     isNearExpiry: boolean;
@@ -88,7 +88,7 @@ export interface DispenseMedicationItem {
     status: DispenseItemStatus;
     shelfLocation: string;
     batchNo: string;
-    expiryDate: string;
+    expiryDate?: string | null;
     availableBatches: BatchOption[];
     isControlledSubstance: boolean;
     isHighAlert: boolean;
@@ -166,3 +166,18 @@ export function severityRank(severity: ClinicalWarningSeverity): number {
         default: return 0;
     }
 }
+
+/** Statuses a pharmacist can set directly on a line (the API rejects every other value). */
+export type DispenseSettableItemStatus = 'NotPicked' | 'Picked' | 'OnHold';
+
+export type DispenseWorkspaceTab = 'review' | 'dispense';
+
+/** Everything a medicine card can ask the page to do, so the card needs one output instead of seven. */
+export type DispenseLineAction =
+    | { type: 'status'; item: DispenseMedicationItem; status: DispenseSettableItemStatus }
+    | { type: 'quantity'; item: DispenseMedicationItem; qty: number }
+    | { type: 'batch'; item: DispenseMedicationItem; batchNo: string }
+    | { type: 'scan'; item: DispenseMedicationItem; code: string }
+    | { type: 'reserve'; item: DispenseMedicationItem }
+    | { type: 'substitute'; item: DispenseMedicationItem }
+    | { type: 'details'; item: DispenseMedicationItem };

@@ -1,250 +1,234 @@
-import { Component, OnInit, signal } from "@angular/core";
-import { Router } from "@angular/router";
-import { BooErrorStateComponent } from '@physioboo/ui';
+import { Component, inject, OnDestroy, OnInit, signal } from "@angular/core";
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent } from '@physioboo/ui';
+import { catchError, of, Subject, switchMap, takeUntil } from "rxjs";
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
-import { DialogService } from "../../../../services/common/dialog.service";
-import { ToastService } from "../../../../services/common/toast.service";
+import { MedicineCategoryService } from "../../../../services/admin/medicine-category.service";
 import { SharedModule } from "../../../../shared/shared-imports";
-import {
-    InventoryAlert,
-    InventoryKpis,
-    InventoryMedicineCard,
-    InventoryMedicineDetail,
-    WarehouseBatch,
-    WarehouseZone,
-} from "../../../../shared/types/inventory-management.types";
-import { InventoryActivityFeedComponent } from "./inventory-activity-feed.component";
-import { InventoryAlertsPanelComponent } from "./inventory-alerts-panel.component";
-import { InventoryBatchPanelComponent } from "./inventory-batch-panel.component";
+import { Lookup, PaginationData } from "../../../../shared/types/common";
+import { InventoryKpis, InventoryMedicine } from "../../../../shared/types/inventory-management.types";
 import { InventoryDetailDrawerComponent } from "./inventory-detail-drawer.component";
-import { InventoryDetailPanelComponent } from "./inventory-detail-panel.component";
-import { InventoryExplorerPanelComponent } from "./inventory-explorer-panel.component";
-import { InventoryIntelligencePanelComponent } from "./inventory-intelligence-panel.component";
+import { InventoryFilterBarComponent } from "./inventory-filter-bar.component";
 import { InventoryKpiStripComponent } from "./inventory-kpi-strip.component";
-import { InventoryQuickActionsComponent, QuickOperation } from "./inventory-quick-actions.component";
-import { InventoryTimelinePanelComponent } from "./inventory-timeline-panel.component";
-import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
+import { InventoryMedicineTableComponent } from "./inventory-medicine-table.component";
+
+type LoadState = 'loading' | 'ready' | 'error';
+
+const PAGE_SIZE = 20;
 
 @Component({
     selector: 'admin-inventory-management',
     standalone: true,
     imports: [
         SharedModule,
-
+        BooButtonComponent,
+        BooEmptyStateComponent,
         BooErrorStateComponent,
         InventoryKpiStripComponent,
-        InventoryExplorerPanelComponent,
-        InventoryIntelligencePanelComponent,
-        InventoryActivityFeedComponent,
-        InventoryDetailPanelComponent,
-        InventoryBatchPanelComponent,
-        InventoryAlertsPanelComponent,
-        InventoryTimelinePanelComponent,
+        InventoryFilterBarComponent,
+        InventoryMedicineTableComponent,
         InventoryDetailDrawerComponent,
-        InventoryQuickActionsComponent,
-        ButtonIconComponent
     ],
-    host: { class: 'block min-h-screen bg-gray-50' },
     template: `
-    <div class="sticky top-0 z-20 bg-surface shadow-sm px-4 sm:px-6 py-3 flex items-center justify-between">
-      <div>
-        <h1 class="text-lg font-semibold text-gray-800">Inventory Management</h1>
-        <p class="text-xs text-secondary">Warehouse command center · Last sync {{ lastSync | date:'shortTime' }}</p>
-      </div>
-      <button-icon [icon]="{ name: 'refresh', size: 14 }" (onClick)="refresh()" buttonClass="!rounded-lg text-xs font-semibold"> Refresh </button-icon>
-    </div>
+    <main class="flex flex-1 min-h-0 flex-col gap-5 pb-5">
+      <header class="flex shrink-0 flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div class="min-w-0">
+          <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Inventory</h1>
+          <p class="text-sm text-secondary mt-1 mb-0 max-w-2xl">
+            Medicines, on-hand stock and batches. Open a medicine to receive, adjust, transfer or dispose stock.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button boo-button variant="secondary" (click)="refresh()" [loading]="listState() === 'loading'">
+            <physio-icon name="refresh" [size]="16"></physio-icon>Refresh
+          </button>
+          <a boo-button variant="primary" routerLink="/admin/pharmacy/stock-take">
+            <physio-icon name="clipboard-check" [size]="16"></physio-icon>Stock take
+          </a>
+        </div>
+      </header>
 
-    <main class="px-4 sm:px-6 py-4 space-y-4">
-      <div *ngIf="error()" class="bg-surface rounded-2 border border-borderGray/60">
-        <boo-error-state title="Couldn't load inventory KPIs" [description]="error()" (retry)="retryLoad()"></boo-error-state>
-      </div>
-      <inventory-kpi-strip *ngIf="!error()" [kpis]="kpis()" (kpiClick)="onKpiClick($event)"></inventory-kpi-strip>
+      <inventory-kpi-strip class="shrink-0" [kpis]="kpis()" [error]="kpiState() === 'error'" [retrying]="kpiRetrying()" (retry)="loadKpis(true)"></inventory-kpi-strip>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.4fr_1.1fr_1fr] gap-4">
-        <div class="h-[560px]">
-          <inventory-explorer-panel [selectedId]="selectedMedicineId()" [kpiFilter]="kpiFilter()" (clearKpiFilter)="kpiFilter.set(null)" (select)="onSelectMedicine($event)" (zoneFilter)="onZoneFilter($event)"></inventory-explorer-panel>
-        </div>
-        <div class="h-[560px]">
-          <inventory-intelligence-panel [medicineId]="selectedMedicineId()" [medicineName]="selectedMedicineName()"></inventory-intelligence-panel>
-        </div>
-        <div class="h-[560px] md:col-span-2 lg:col-span-1">
-          <inventory-activity-feed [limit]="8"></inventory-activity-feed>
-        </div>
-      </div>
+      <inventory-filter-bar
+        class="shrink-0"
+        [search]="search"
+        [categoryId]="categoryId"
+        [categories]="categories()"
+        (searchChange)="onSearchChange($event)"
+        (categoryChange)="onCategoryChange($event)"
+        (reset)="onReset()"
+      ></inventory-filter-bar>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1.3fr_1fr] gap-4">
-        <div class="h-[420px]">
-          <inventory-detail-panel [medicineId]="selectedMedicineId()" (viewFullDetail)="openDrawer()"></inventory-detail-panel>
-        </div>
-        <div class="h-[420px] md:col-span-2 lg:col-span-1">
-          <inventory-batch-panel [medicineId]="selectedMedicineId()" (transfer)="onTransfer($event)" (printBarcode)="onPrintBarcode($event)" (batchesChanged)="batches.set($event)"></inventory-batch-panel>
-        </div>
-        <div class="h-[420px]">
-          <inventory-alerts-panel [medicineId]="selectedMedicineId()" (acknowledge)="onAlertAcknowledged($event)"></inventory-alerts-panel>
-        </div>
-      </div>
+      <section class="flex flex-1 min-h-[22rem] flex-col" aria-label="Medicines" [attr.aria-busy]="listState() === 'loading'">
+        <boo-error-state
+          *ngIf="listState() === 'error'"
+          appearance="panel"
+          title="We couldn't load the medicines"
+          description="Check your connection and try again. Your filters are kept."
+          (retry)="loadList()"
+        ></boo-error-state>
 
-      <inventory-timeline-panel></inventory-timeline-panel>
+        <ng-container *ngIf="listState() !== 'error'">
+          <boo-empty-state
+            *ngIf="listState() === 'ready' && !data()?.items?.length"
+            appearance="panel"
+            icon="package-x"
+            [title]="hasFilters ? 'No medicines match your search' : 'No medicines yet'"
+            [description]="hasFilters ? 'Try a different name or barcode, or clear the filters.' : 'Medicines added to the catalogue appear here with their stock.'"
+          >
+            <button *ngIf="hasFilters" boo-button variant="secondary" (click)="onReset()">Reset filters</button>
+          </boo-empty-state>
+
+          <inventory-medicine-table
+            class="flex-1 min-h-0"
+            *ngIf="listState() === 'loading' || data()?.items?.length"
+            [data]="data()"
+            [loading]="listState() === 'loading'"
+            (pageChange)="onPageChange($event)"
+            (view)="openPanel($event)"
+          ></inventory-medicine-table>
+        </ng-container>
+      </section>
     </main>
 
     <inventory-detail-drawer
-      [isOpen]="drawerOpen()"
-      [detail]="drawerDetail()"
-      [batches]="batches()"
-      (close)="drawerOpen.set(false)"
-      (receiveStock)="onQuickAction('Receiving')"
-      (transferStock)="onQuickAction('Transfer')"
-      (adjustQuantity)="onQuickAction('Adjustment')"
-      (reserveStock)="onReserveStock()"
-      (disposeBatchAction)="onDisposeFromDrawer()"
-      (printBarcode)="onPrintBarcodeFromDrawer()"
+      [isOpen]="panelOpen()"
+      [medicine]="selected()"
+      (close)="panelOpen.set(false)"
+      (changed)="onStockChanged()"
     ></inventory-detail-drawer>
-
-    <inventory-quick-actions (select)="onQuickAction($event)"></inventory-quick-actions>
   `,
 })
-export class AdminInventoryManagementComponent implements OnInit {
-    lastSync = new Date();
+export class AdminInventoryManagementComponent implements OnInit, OnDestroy {
+    private readonly srv = inject(InventoryManagementService);
+    private readonly categorySrv = inject(MedicineCategoryService);
 
     kpis = signal<InventoryKpis | null>(null);
-    error = signal<string | null>(null);
-    selectedMedicineId = signal<string | null>(null);
-    /** Destination for batch transfers: the zone last chosen in the warehouse map. */
-    targetZone = signal<WarehouseZone | null>(null);
-    selectedMedicineName = signal<string | null>(null);
-    batches = signal<WarehouseBatch[]>([]);
+    kpiState = signal<LoadState>('loading');
+    kpiRetrying = signal(false);
 
-    drawerOpen = signal(false);
-    drawerDetail = signal<InventoryMedicineDetail | null>(null);
+    data = signal<PaginationData<InventoryMedicine> | null>(null);
+    listState = signal<LoadState>('loading');
+    categories = signal<Lookup[]>([]);
 
-    constructor(
-        private srv: InventoryManagementService,
-        private toastSrv: ToastService,
-        private dialogSrv: DialogService,
-        private router: Router,
-    ) { }
+    search = '';
+    categoryId: string | null = null;
+    pageNumber = 1;
 
-    ngOnInit(): void {
-        this.refresh();
+    selected = signal<InventoryMedicine | null>(null);
+    panelOpen = signal(false);
+
+    private readonly load$ = new Subject<void>();
+    private readonly destroy$ = new Subject<void>();
+
+    get hasFilters(): boolean {
+        return !!this.search.trim() || !!this.categoryId;
     }
 
-    retryLoad(): void {
-        this.refresh();
+    ngOnInit(): void {
+        // switchMap drops the response of a request that a newer search or page change has superseded.
+        this.load$.pipe(
+            switchMap(() => {
+                this.listState.set('loading');
+                return this.srv.searchMedicines({ search: this.search, categoryId: this.categoryId, pageNumber: this.pageNumber, pageSize: PAGE_SIZE })
+                    .pipe(catchError(() => of(null)));
+            }),
+            takeUntil(this.destroy$),
+        ).subscribe(res => {
+            if (!res?.success) {
+                this.listState.set('error');
+                return;
+            }
+            this.data.set(res.data);
+            this.listState.set('ready');
+        });
+
+        this.loadKpis();
+        this.loadCategories();
+        this.loadList();
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    // #region Loading
+    loadList(): void {
+        this.load$.next();
+    }
+
+    loadKpis(retry = false): void {
+        if (retry) this.kpiRetrying.set(true);
+        else this.kpiState.set('loading');
+
+        this.srv.getKpis().subscribe({
+            next: res => {
+                this.kpiRetrying.set(false);
+                if (res.success) {
+                    this.kpis.set(res.data);
+                    this.kpiState.set('ready');
+                } else {
+                    this.kpiState.set('error');
+                }
+            },
+            error: () => { this.kpiRetrying.set(false); this.kpiState.set('error'); },
+        });
+    }
+
+    private loadCategories(): void {
+        this.categorySrv.search({ pageNumber: 1, pageSize: 100, filter: { start: '', end: '' } }).subscribe({
+            next: res => { if (res.success) this.categories.set(res.data.items.map(c => ({ id: c.id, name: c.name }))); },
+            // Without categories the filter is simply empty; search still works.
+            error: () => this.categories.set([]),
+        });
     }
 
     refresh(): void {
-        this.lastSync = new Date();
-        this.error.set(null);
-        this.srv.getKpis().subscribe({
-            next: res => { if (res.success) this.kpis.set(res.data); },
-            error: () => { this.error.set('Failed to load inventory KPIs. Please try again.'); },
-        });
+        this.loadKpis();
+        this.loadList();
+    }
+    // #endregion
+
+    // #region Filters and paging
+    onSearchChange(value: string): void {
+        // Keep the raw text (the input is bound to it); only a change in the trimmed text triggers a search.
+        if (value.trim() === this.search.trim()) return;
+        this.search = value;
+        this.pageNumber = 1;
+        this.loadList();
     }
 
-    // Stock-state tiles filter the explorer list; the other tiles are totals with nothing to filter.
-    kpiFilter = signal<string | null>(null);
-    private readonly filterableKpis = ['lowStock', 'outOfStock', 'nearExpiry', 'expired', 'available'];
-
-    onKpiClick(key: string): void {
-        if (!this.filterableKpis.includes(key)) return;
-        this.kpiFilter.set(this.kpiFilter() === key ? null : key);
+    onCategoryChange(categoryId: string | null): void {
+        if ((categoryId ?? null) === this.categoryId) return;
+        this.categoryId = categoryId ?? null;
+        this.pageNumber = 1;
+        this.loadList();
     }
 
-    onSelectMedicine(med: InventoryMedicineCard): void {
-        this.selectedMedicineId.set(med.id);
-        this.selectedMedicineName.set(med.name);
+    onReset(): void {
+        this.search = '';
+        this.categoryId = null;
+        this.pageNumber = 1;
+        this.loadList();
     }
 
-    onZoneFilter(zone: WarehouseZone): void {
-        this.targetZone.set(zone);
-        this.toastSrv.info(`Showing medicines stored in ${zone.name}`);
+    onPageChange(page: number): void {
+        this.pageNumber = page;
+        this.loadList();
+    }
+    // #endregion
+
+    // #region Detail panel
+    openPanel(medicine: InventoryMedicine): void {
+        this.selected.set(medicine);
+        this.panelOpen.set(true);
     }
 
-    openDrawer(): void {
-        const id = this.selectedMedicineId();
-        if (!id) return;
-        this.srv.getMedicineDetail(id).subscribe(res => {
-            if (res.success) {
-                this.drawerDetail.set(res.data);
-                this.drawerOpen.set(true);
-            }
-        });
+    /** A batch changed: refresh the current page and the overview, keeping filters and page. */
+    onStockChanged(): void {
+        this.loadKpis();
+        this.loadList();
     }
-
-    onTransfer(batch: WarehouseBatch): void {
-        const zone = this.targetZone();
-        if (!zone) {
-            this.toastSrv.info('Pick the destination zone in the warehouse map first, then transfer the batch.');
-            return;
-        }
-        this.dialogSrv.confirm(
-            `Transfer ${batch.availableQuantity} units of batch ${batch.batchNo} to ${zone.name}?`,
-            () => {
-                this.srv.transferBatch(batch.id, { toZoneId: zone.id, quantity: batch.availableQuantity }).subscribe(res => {
-                    if (res.success) this.toastSrv.success(`Batch ${batch.batchNo} moved to ${zone.name}`);
-                });
-            },
-            'Transfer Batch', 'info', 'Transfer', 'Cancel',
-        );
-    }
-
-    onPrintBarcode(batch: WarehouseBatch): void {
-        this.srv.printBarcode(batch.id).subscribe(res => {
-            if (!res.success || !res.data.barcodeImageUrl) return;
-            const win = window.open('', '_blank', 'width=480,height=320');
-            if (!win) {
-                this.toastSrv.error('Allow pop-ups to print barcode labels');
-                return;
-            }
-            win.document.write(`<html><head><title>${batch.batchNo}</title></head><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh"><img src="${res.data.barcodeImageUrl}" onload="window.print();window.close()"></body></html>`);
-            win.document.close();
-        });
-    }
-
-    onAlertAcknowledged(alert: InventoryAlert): void {
-        this.refresh();
-    }
-
-    onReserveStock(): void {
-        const id = this.selectedMedicineId();
-        const batch = this.batches()[0];
-        if (!id || !batch) return;
-        this.srv.reserveBatch(batch.id, { quantity: 1, reference: 'Manual reservation' }).subscribe();
-        this.toastSrv.success('Stock reserved');
-    }
-
-    onDisposeFromDrawer(): void {
-        const batch = this.batches().find(b => b.isExpired) ?? this.batches()[0];
-        if (!batch) return;
-        this.dialogSrv.confirm(
-            `Dispose batch ${batch.batchNo}? This cannot be undone.`,
-            () => {
-                this.srv.disposeBatch(batch.id, { reason: 'Pharmacist disposal', quantity: batch.quantity }).subscribe();
-                this.toastSrv.success(`Batch ${batch.batchNo} disposed`);
-            },
-            'Dispose Batch', 'danger', 'Dispose', 'Cancel',
-        );
-    }
-
-    onPrintBarcodeFromDrawer(): void {
-        const batch = this.batches()[0];
-        if (!batch) return;
-        this.onPrintBarcode(batch);
-    }
-
-    onQuickAction(op: QuickOperation): void {
-        // Stock Count and Inventory Audit are served by the Stock Take module (see docs/inventory-management-redesign.md §15).
-        if (op === 'StockCount' || op === 'Audit') {
-            void this.router.navigate(['/admin/pharmacy/stock-take']);
-            return;
-        }
-
-        // The guided receiving / transfer / adjustment / merge / split wizards are not built yet (docs §18).
-        // Say so instead of reporting a success that did not happen.
-        const labels: Record<QuickOperation, string> = {
-            Receiving: 'Stock Receiving', Transfer: 'Stock Transfer', Adjustment: 'Stock Adjustment',
-            StockCount: 'Stock Count', BatchMerge: 'Batch Merge', BatchSplit: 'Batch Split', Audit: 'Inventory Audit',
-        };
-        this.toastSrv.info(`${labels[op]} is not available yet. Nothing was changed.`, labels[op]);
-    }
+    // #endregion
 }

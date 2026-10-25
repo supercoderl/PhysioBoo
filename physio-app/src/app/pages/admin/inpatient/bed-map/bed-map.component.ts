@@ -16,7 +16,6 @@ import {
     BooStatusBadgeComponent,
 } from '@physioboo/ui';
 import { catchError, finalize, forkJoin, map, of } from 'rxjs';
-import { AdminBreadcrumbComponent } from '../../../../components/breadcrumb/admin-breadcrumb.component';
 import { BedMapAssignDrawerComponent } from '../../../../components/layout/admin/inpatient/bed-map/bed-assign-drawer.component';
 import { BedMapManageDrawerComponent } from '../../../../components/layout/admin/inpatient/bed-map/bed-manage-drawer.component';
 import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
@@ -66,7 +65,6 @@ const ALL = null;
         BooSearchFieldComponent,
         BooStatusBadgeComponent,
         BooSelectComponent,
-        AdminBreadcrumbComponent,
         BedDetailDrawerComponent,
         BedMapAssignDrawerComponent,
         BedMapManageDrawerComponent,

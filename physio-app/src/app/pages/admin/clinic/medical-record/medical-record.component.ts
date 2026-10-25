@@ -45,7 +45,7 @@ interface TabDef {
     standalone: true,
     imports: [
         ClinicalActionDrawerComponent,
-        SharedModule,
+        SharedModule,
         BooErrorStateComponent,
         PatientContextHeaderComponent,
         ClinicalSnapshotComponent,
@@ -59,7 +59,7 @@ interface TabDef {
         BillingTabComponent,
     ],
     templateUrl: './medical-record.component.html',
-    host: { class: 'block h-full min-h-0 bg-gray-50' },
+    host: { class: 'min-h-0' },
 })
 export class AdminMedicalRecordComponent implements OnInit {
     // ─── State ─────────────────────────────────────────────────────────

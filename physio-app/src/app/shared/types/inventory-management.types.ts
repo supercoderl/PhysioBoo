@@ -1,40 +1,21 @@
 /**
- * Warehouse Management Command Center types — see docs/inventory-management-redesign.md.
- * Kept separate from the legacy shared/types/inventory.ts (InventoryItem) and shared/types/stock.ts
- * (StockItem/StockTakeSession), which the unrelated Stock Take module still uses.
- * WarehouseBatch is a superset of dispensing.ts's BatchOption — same fields, plus the extra
- * attributes a warehouse view needs (manufacturing date, reserved qty, supplier, cost, lock state).
+ * Pharmacy inventory types — see docs/inventory-management-redesign.md.
+ * Shapes mirror physio-server's `api/pharmacy/inventory` view models. Kept separate from the legacy
+ * shared/types/inventory.ts (InventoryItem) and shared/types/stock.ts, which the Stock Take module still uses.
  */
+import { BooBadgeTone } from '@physioboo/ui';
 
 export type InventoryStockStatus = 'InStock' | 'LowStock' | 'OutOfStock';
-export type WarehouseZoneType = 'Shelf' | 'Cabinet' | 'Refrigerator' | 'ControlledDrugSafe';
-export type WarehouseActivityLevel = 'Low' | 'Medium' | 'High';
 
-export type StockMovementType =
-    | 'Purchase'
-    | 'Receiving'
-    | 'Transfer'
-    | 'Dispense'
-    | 'RetailSale'
-    | 'Return'
-    | 'Adjustment'
-    | 'Disposal'
-    | 'Expiry';
-
-export type InventoryAlertType =
-    | 'LowStock'
-    | 'OutOfStock'
-    | 'NearExpiry'
-    | 'ExpiredBatch'
-    | 'Overstock'
-    | 'Discrepancy'
-    | 'TemperatureExcursion'
-    | 'ControlledDrug';
-
-export type InventoryAlertSeverity = 'Info' | 'Warning' | 'High' | 'Critical';
-
+/** Same order as the server's `BatchLifecycleStatus` enum, which is serialised as a number. */
 export type BatchLifecycleStatus = 'Active' | 'Reserved' | 'Locked' | 'Disposed' | 'Expired';
+const BATCH_STATUSES: readonly BatchLifecycleStatus[] = ['Active', 'Reserved', 'Locked', 'Disposed', 'Expired'];
 
+export type BatchActionKind = 'receive' | 'adjust' | 'transfer' | 'dispose';
+
+/**
+ * Batch-level counts, not medicine counts: the server evaluates low stock, near expiry and expiry per batch.
+ */
 export interface InventoryKpis {
     totalInventoryValue: number;
     totalMedicines: number;
@@ -48,10 +29,10 @@ export interface InventoryKpis {
     pendingPurchaseOrders: number;
 }
 
-export interface InventoryMedicineCard {
+export interface InventoryMedicine {
     id: string;
     name: string;
-    genericName: string;
+    genericName: string | null;
     currentStock: number;
     safetyStock: number;
     reorderLevel: number;
@@ -59,111 +40,125 @@ export interface InventoryMedicineCard {
     batchCount: number;
     soonestExpiryDate: string | null;
     isNearExpiry: boolean;
-    storageLocation: string;
-    category: string;
-    barcode: string;
-    isFavorite?: boolean;
-    isRecentlyAccessed?: boolean;
-}
-
-export interface InventoryQuickCategory {
-    label: string;
-    value: string;
-    icon: string;
-}
-
-export interface WarehouseBatch {
-    id: string;
-    batchNo: string;
-    medicineId: string;
-    expiryDate: string;
-    manufacturingDate: string;
-    quantity: number;
-    reservedQuantity: number;
-    availableQuantity: number;
-    supplier: string;
-    purchasePrice: number;
-    storageLocation: string;
-    status: BatchLifecycleStatus;
-    isNearExpiry: boolean;
-    isExpired: boolean;
+    storageLocation: string | null;
+    category: string | null;
+    barcode: string | null;
 }
 
 export interface InventoryMedicineDetail {
     id: string;
     name: string;
-    genericName: string;
-    manufacturer: string;
-    category: string;
+    genericName: string | null;
+    manufacturer: string | null;
+    category: string | null;
     currentStock: number;
     safetyStock: number;
     reorderLevel: number;
     status: InventoryStockStatus;
-    unit: string;
+    unit: string | null;
     averageUnitCost: number;
     totalValue: number;
     storageLocations: string[];
 }
 
-export interface WarehouseZone {
+export interface InventoryBatch {
     id: string;
-    name: string;
-    type: WarehouseZoneType;
-    capacityPercent: number;
-    activityLevel: WarehouseActivityLevel;
-    hasExpiringStock: boolean;
-    isEmpty: boolean;
-    isOverstocked: boolean;
-}
-
-export interface StockInsight {
-    id: string;
-    message: string;
-    detail?: string | null;
-    icon: string;
-    tone: 'primary' | 'success' | 'warning' | 'danger' | 'neutral';
-    trend?: number[] | null;
-}
-
-export interface StockMovementEvent {
-    id: string;
-    type: StockMovementType;
+    batchNo: string | null;
     medicineId: string;
-    medicineName: string;
-    batchNo?: string | null;
+    expiryDate: string | null;
+    /** The server fills this from the batch's purchase date. */
+    manufacturingDate: string | null;
     quantity: number;
-    warehouseZone: string;
-    performedBy: string;
-    occurredAt: string;
-    reference?: string | null;
-}
-
-export interface InventoryAlert {
-    id: string;
-    type: InventoryAlertType;
-    severity: InventoryAlertSeverity;
-    medicineId?: string | null;
-    medicineName?: string | null;
-    message: string;
-    recommendation?: string | null;
-    acknowledged: boolean;
-    createdAt: string;
+    reservedQuantity: number;
+    availableQuantity: number;
+    supplier: string | null;
+    purchasePrice: number | null;
+    storageLocation: string | null;
+    status: BatchLifecycleStatus;
+    isNearExpiry: boolean;
+    isExpired: boolean;
 }
 
 export interface InventoryHistoryEntry {
     date: string;
     description: string;
     quantity: number;
-    reference: string;
+    reference: string | null;
     actor: string;
 }
 
-export function alertSeverityRank(severity: InventoryAlertSeverity): number {
-    switch (severity) {
-        case 'Critical': return 4;
-        case 'High': return 3;
-        case 'Warning': return 2;
-        case 'Info': return 1;
-        default: return 0;
+export interface InventoryZone {
+    id: string;
+    name: string;
+}
+
+export interface InventorySearchQuery {
+    search: string;
+    categoryId: string | null;
+    pageNumber: number;
+    pageSize: number;
+}
+
+export interface ReceiveStockPayload {
+    quantity: number;
+    purchasePrice?: number | null;
+    expiryDate?: string | null;
+}
+
+export interface AdjustStockPayload {
+    newQuantity: number;
+    reason: string;
+}
+
+export interface TransferStockPayload {
+    toZoneId: string;
+    quantity: number;
+}
+
+export interface DisposeStockPayload {
+    quantity: number;
+    reason: string;
+}
+
+/** What the batch action dialog hands back once its form is valid. */
+export type BatchActionRequest =
+    | { kind: 'receive'; payload: ReceiveStockPayload }
+    | { kind: 'adjust'; payload: AdjustStockPayload }
+    | { kind: 'transfer'; payload: TransferStockPayload }
+    | { kind: 'dispose'; payload: DisposeStockPayload };
+
+export function normalizeBatchStatus(value: number | string | null | undefined): BatchLifecycleStatus {
+    if (typeof value === 'number') return BATCH_STATUSES[value] ?? 'Active';
+    return BATCH_STATUSES.find(s => s.toLowerCase() === String(value ?? '').toLowerCase()) ?? 'Active';
+}
+
+export function stockStatusLabel(status: InventoryStockStatus): string {
+    switch (status) {
+        case 'OutOfStock': return 'Out of stock';
+        case 'LowStock': return 'Low stock';
+        default: return 'In stock';
     }
+}
+
+export function stockStatusTone(status: InventoryStockStatus): BooBadgeTone {
+    switch (status) {
+        case 'OutOfStock': return 'danger';
+        case 'LowStock': return 'warning';
+        default: return 'success';
+    }
+}
+
+export function batchStatusTone(status: BatchLifecycleStatus): BooBadgeTone {
+    switch (status) {
+        case 'Active': return 'success';
+        case 'Reserved': return 'primary';
+        case 'Locked': return 'warning';
+        case 'Expired': return 'danger';
+        default: return 'neutral';
+    }
+}
+
+/** Units that can be moved, written off or transferred: stock that is not already reserved. */
+export function freeQuantity(batch: Pick<InventoryBatch, 'quantity' | 'reservedQuantity'>): number {
+    return batch.quantity - batch.reservedQuantity;
 }

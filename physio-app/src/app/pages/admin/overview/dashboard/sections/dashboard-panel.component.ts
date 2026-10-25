@@ -15,8 +15,8 @@ import { BooIconComponent } from "@physioboo/ui";
     host: { class: 'block h-full min-w-0' },
     template: `
         <section class="h-full flex flex-col min-w-0 bg-surface border border-borderGray rounded-xl" [attr.aria-labelledby]="headingId">
-            <header class="flex items-start justify-between gap-3 px-4 pt-3.5 pb-3 border-b border-rowDivider">
-                <div class="flex items-start gap-2.5 min-w-0">
+            <header class="flex flex-wrap items-start justify-between gap-x-3 gap-y-2 px-4 pt-3.5 pb-3 border-b border-rowDivider">
+                <div class="flex flex-1 basis-40 items-start gap-2.5 min-w-0">
                     <span class="flex-none mt-0.5 w-7 h-7 rounded-lg bg-primarySoft text-primaryDeep flex items-center justify-center" aria-hidden="true">
                         <physio-icon [name]="icon" [size]="15" />
                     </span>
@@ -25,7 +25,7 @@ import { BooIconComponent } from "@physioboo/ui";
                         <p *ngIf="caption" class="m-0 text-xs leading-4 text-secondary break-words">{{ caption }}</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 flex-none">
+                <div class="flex items-center gap-2 flex-none ml-auto">
                     <ng-content select="[panelActions]"></ng-content>
                     <a
                         *ngIf="link"

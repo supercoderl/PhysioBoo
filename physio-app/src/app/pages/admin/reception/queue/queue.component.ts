@@ -17,7 +17,6 @@ import { Subject, from, interval, of } from 'rxjs';
 import { catchError, finalize, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
 import { BooDatepickerComponent } from '../../../../components/date-picker/boo-date-picker.component';
 import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
-import { AdminBreadcrumbComponent } from '../../../../components/breadcrumb/admin-breadcrumb.component';
 import { AppointmentService } from '../../../../services/admin/appointment.service';
 import { DoctorService } from '../../../../services/admin/doctor.service';
 import { AuthService } from '../../../../services/auth/auth.service';
@@ -101,7 +100,6 @@ function fold(text: string | null | undefined): string {
         DatePipe,
         FormsModule,
         RouterLink,
-        AdminBreadcrumbComponent,
         BooButtonComponent,
         BooDatepickerComponent,
         BooSelectComponent,

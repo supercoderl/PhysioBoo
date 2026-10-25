@@ -1,5 +1,4 @@
-<div class="flex-1 flex flex-col gap-4 min-w-0 pt-3 pb-5">
-  <admin-breadcrumb />
+<div class="flex flex-1 min-h-0 flex-col gap-4 pb-5">
 
   <!-- Page header -->
   <header class="flex flex-wrap items-end justify-between gap-3">
@@ -109,10 +108,10 @@
 
     <!-- Queue -->
     <div class="flex-1 flex flex-col min-w-0 min-h-0" [attr.aria-busy]="loading">
-      <div *ngIf="groups.length; else noRowsTpl" class="overflow-x-auto">
-        <table class="w-full border-collapse text-sm">
+      <div *ngIf="groups.length; else noRowsTpl" class="boo-scrollbar min-h-0 flex-1 overflow-auto">
+        <table class="w-full min-w-[640px] border-collapse text-sm">
           <caption class="sr-only">{{ tabLabel(tab) }} appointments on {{ date | date: 'd MMM y' }}, grouped by stage</caption>
-          <thead>
+          <thead class="sticky top-0 z-10 bg-surface">
             <tr class="text-left text-xs font-medium text-secondary border-b border-rowDivider">
               <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap w-28">Time</th>
               <th scope="col" class="px-4 py-2.5 font-medium">Patient</th>

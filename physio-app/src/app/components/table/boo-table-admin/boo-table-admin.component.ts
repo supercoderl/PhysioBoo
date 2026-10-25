@@ -24,6 +24,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
       ])
     ])
   ],
+  host: { class: 'min-w-0' },
   styles: [`
     :host { display: block; height: 100%; min-height: 0; }
     .shimmer {
@@ -211,7 +212,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
     <div class="flex flex-col h-full bg-surface overflow-hidden border border-gray-200 shadow-sm">
 
       <!-- ── Toolbar ─────────────────────────────────────────────────── -->
-      <div class="flex-none relative w-full border-b border-borderGray bg-surface" style="height: 48px;">
+      <div *ngIf="showToolbar" class="flex-none relative w-full border-b border-borderGray bg-surface" style="height: 48px;">
         <!-- Default toolbar (Lark-style) -->
         <div class="flex items-center justify-between h-12 px-3 gap-2">
           <!-- Left: breadcrumb + Add record + tool icons -->
@@ -519,7 +520,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
 
       <!-- ── Table scroll area ─────────────────────────────────────────── -->
       <div #scrollArea custom-scrollbar class="flex-1 min-h-0 w-full overflow-auto relative">
-        <table class="w-full table-auto border-separate" style="border-spacing: 0;">
+        <table class="w-full table-auto border-separate" style="border-spacing: 0;" [style.min-width]="minTableWidth">
 
           <!-- Header -->
           <thead
@@ -780,6 +781,10 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
   // #region Inputs, Outputs, Properties
   @Input() data: any[] = [];
   @Input() showHeader: boolean = true;
+  /** Pages that provide their own search and refresh above the table turn the built-in toolbar off. */
+  @Input() showToolbar: boolean = true;
+  /** Narrowest the table may get before its scroll area scrolls sideways (e.g. "640px"), so columns stay readable instead of shrinking. */
+  @Input() minTableWidth: string | null = null;
   @Input() showBorder: boolean = true;
   @Input() showFooter: boolean = true;
   @Input() tdClass: string = "";

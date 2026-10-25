@@ -1,409 +1,180 @@
 # Stock Take (Inventory Counting) — Redesign
 
+Pages: `/admin/pharmacy/stock-take` (`AdminStockTakeComponent`) and `/admin/pharmacy/stock-take/:id/count` (`AdminStockTakeCountingComponent`).
+Revision 2 — redesigns both pages as one workflow and aligns them with the backend that now exists (`PhysioBoo.Presentation/Endpoints/StockTakeEndpoints.cs`).
+
 ## 0. Summary
 
-Replace the current `stock-take` page (a single-file, inline-template demo with `alert()`/`confirm()`
-calls, no service layer, and hard-coded rows — see §1) with a full **Stock Take** module: a session
-list/dashboard for pharmacy & warehouse staff to plan, assign, and reconcile physical inventory
-counts, plus a dedicated **Counting Workspace** for performing the count itself.
+A stock take counts the active medicine batches of one warehouse (a hospital) against a snapshot of system quantities, then goes through approval. Approving a count **adjusts stock** (`batch.QuantityAvailable += difference`, plus a stock movement).
 
-Visual identity for this pass: **Floating Panels + Split Layout, Graphite/Amber palette** — a
-charcoal gradient hero header with floating stat chips, a sticky filter bar, a two-column split
-(main table 75% + sticky Activity/Difference rail 25%) instead of Inventory Management's 3-column
-KPI-strip dashboard or Retail's catalog-and-cart layout. The Counting Workspace itself is a
-dedicated split workspace (category tree left, editable grid right, floating summary panel).
+Lifecycle enforced by the backend:
 
-## 1. UX Audit — Current State
+```
+Draft ──start──▶ Counting ──complete──▶ PendingApproval ──approve──▶ Approved (stock adjusted)
+                                                   └─reject──▶ Rejected (final)
+Cancelled: from any status except Approved / Cancelled.   Delete: Draft in the UI (API does not check status).
+```
 
-**File:** `src/app/pages/admin/pharmacy/stock-take/stock-take.component.ts`
+- `start` snapshots every active batch of the warehouse into `StockTakeItem.SystemQty`.
+- `complete` is refused unless the session is `Counting` and **every** item is counted.
+- `Rejected` has no transition back to `Counting`; the earlier "returned to Counting" wording was wrong and is removed.
 
-- Single standalone component, fully inline template/logic, one hard-coded `StockTakeSession` and
-  8 `StockItem` rows — no service layer, no pagination, no drawer, no routing to a counting screen.
-- Filters are plain `<select>`/`<input>` with client-side `Array.filter`, no debounce.
-- A native `<table>` (not `boo-table-admin`) with `[(ngModel)]` on Actual Qty and manual variance
-  math in the template.
-- Every action (`saveCount`, `verifyCount`, `startNewStockTake`, `pauseStockTake`,
-  `completeStockTake`, `scanBarcode`, `exportToExcel`) is an `alert()`/`confirm()` stub —
-  nothing persists, nothing matches `DialogService`/`ToastService` conventions used elsewhere.
-- `StockItem`/`StockTakeSession` (`shared/types/stock.types.ts`) model a single flat count session
-  with no warehouse/department scoping, no assignment, no approval workflow, no batch/reason
-  tracking — cannot represent a real enterprise stock take (many sessions, many warehouses, an
-  approval chain, per-item audit reasons).
-- No relationship to the counting workspace required by the spec (category tree + editable grid);
-  counting happens inline in the same table as the session list.
+## 1. UX Audit — previous state
 
-## 2. Current Problems
+List page: dark hero banner with decorative dots, duplicate "Print" button that only showed a toast, five filter controls in one row, a 640px-high fixed table, a side rail whose "Positive Sessions" repeated the discrepancy count.
+Counting page: full-height shell with a floating summary panel covering the table, native `<select>`/`<input>` controls, autosave every 800 ms, a value difference computed as `difference * 4.2`.
 
-| # | Problem | Impact |
-|---|---|---|
-| 1 | One flat session, no session list/history | Can't plan multiple concurrent counts across warehouses/departments |
-| 2 | No approval workflow | Differences go live with no review — no Approve/Reject/Pending Approval states |
-| 3 | No assignment | No "Assigned To" — can't hand a count off to a specific counter |
-| 4 | Counting mixed into the list table | No dedicated workspace for barcode-driven, category-scoped counting |
-| 5 | `alert()`/`confirm()` | Inconsistent with `DialogService`/`ToastService` used everywhere else |
-| 6 | No service layer | Nothing to swap a real backend into; no loading/error/empty states |
-| 7 | No difference/variance summary | Pharmacist can't see completion %, value impact, or discrepancy count at a glance |
+## 2. Current Problems (found while inspecting code and API)
+
+| # | Problem | Effect |
+|---|---------|--------|
+| 1 | Save sent `{ items: StockTakeItem[] }` (`id`, nullable `actualQty`); the API reads `{ itemId, actualQty:int }`. | Every save was silently ignored (`item == null → continue`). |
+| 2 | `createdBy` / `assignedTo` read from the DTO; API returns `createdByName` / `assignedToName`. | Table columns were empty. |
+| 3 | Counting summary invented a value (`difference * 4.2`). | Wrong money figure. |
+| 4 | `onItemsChange` rebuilt the array without using its argument; autosave posted every 800 ms and wrote one activity row per call. | Activity trail flooded. |
+| 5 | Complete dialog said uncounted items can be submitted "as-is". | API rejects it. |
+| 6 | `GET /api/stock-takes/activities` was called without the required `limit`; `GET /api/users` does not exist. | 400 / 404. |
+| 7 | Print/"sent to printer" toast: API only returns JSON. | False feedback. |
+| 8 | Reject text promised "back to Counting". | Not supported. |
+| 9 | Create/edit sent a null `scheduledDate`; `DateOnly` is required. | 400. |
+| 10 | Action visibility ignored backend permissions (`pharmacy:stock-take:*`). | Buttons that 403. |
 
 ## 3. Information Architecture
 
-```
-Stock Take
-├── List / Dashboard  (route: admin/pharmacy/stock-take)
-│   ├── Hero Header            — title, quick stats chips, Create / Export / Print
-│   ├── Filter Bar              — Warehouse, Department, Date Range, Status, Search
-│   ├── Stock Take Table         — boo-table-admin, per-row action menu
-│   └── Activity Rail (sticky)  — Recent Activities timeline + Difference Summary card
-├── Drawers
-│   ├── Create / Edit Draft Drawer
-│   └── History Drawer          — session audit timeline
-├── Dialogs
-│   ├── Assign Counter Dialog
-│   ├── Note Dialog             — reused for Approve (optional note) / Reject (required reason) / Cancel (required reason)
-│   ├── Complete Counting Dialog — pending-item warning + confirm
-│   └── Difference Detail Dialog — per-item variance breakdown
-└── Counting Workspace  (route: admin/pharmacy/stock-take/:id/count)
-    ├── Sticky Top Bar          — session info, progress stepper, autosave indicator, Complete button
-    ├── Left — Category Tree    — Medicines / Consumables / Medical Supplies / Equipment, search
-    ├── Right — Counting Grid   — barcode scan bar + editable table (Actual Qty, Difference, Reason, Notes)
-    └── Floating Summary Panel  — Total / Counted / Remaining / +Diff / -Diff / Value Diff / Completion %
-```
+- **Stock take list** — overview (KPIs) → find (search + filters) → sessions table → session details (drawer) → act.
+- **Counting** — session identity & progress → categories → items grid → save / submit.
+- The list opens counting through the row action; counting returns to the list.
 
 ## 4. User Journey
 
-1. Pharmacy staff opens **Stock Take** → hero header shows quick stats (Active, Pending Approval,
-   Completed This Month, Total Variance Value); table lists all sessions.
-2. Filters by Warehouse/Department/Status/Date Range or searches by Stock Take No; clicks
-   **Create Stock Take** → drawer collects Warehouse, Department, Scheduled Date, Assigned To, Notes
-   → saves as **Draft**.
-3. From the table row menu: **Start Counting** (Draft → Counting, navigates to the Counting
-   Workspace) or **Continue Counting** (resumes an in-progress session) or **Edit Draft**.
-4. In the Counting Workspace, staff browses/searches the category tree, scans a barcode or types
-   Actual Qty per row; rows with a non-zero difference are highlighted and require a Reason; the
-   floating Summary Panel updates live; an autosave indicator confirms persistence.
-5. Clicks **Complete Counting** → dialog warns about any remaining uncounted items → confirms →
-   session moves to **Pending Approval**.
-6. A supervisor opens the session, reviews the **Difference Detail** dialog (all variances, positive
-   and negative, with reasons), then **Approves** (optional note) or **Rejects** (required reason,
-   session returns to **Counting**).
-7. Staff can **Cancel** a Draft/Counting session (required reason), **View History** (audit
-   timeline drawer), **Print** (print preview) or **Export Excel** at any stage from the table menu.
+1. Create a draft (warehouse, department, date, optional counter) → *Start counting* (confirms the baseline snapshot).
+2. Open the counting page, enter counts (keyboard or barcode), *Save counts* (Ctrl+S).
+3. When nothing is left to count and nothing is unsaved → *Submit for approval*.
+4. An approver reviews *differences*, then approves (stock adjusts) or rejects with a reason.
 
 ## 5. Layout
 
-Desktop (≥1280px), List/Dashboard page:
-
+### List
 ```
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│ HERO HEADER (gradient charcoal) — title · quick-stat chips · Create/Export/Print  │
-├───────────────────────────────────────────────────────────┬──────────────────────┤
-│ FILTER BAR — Warehouse · Department · Date Range · Status  │                      │
-│ · Search                                                    │                      │
-├───────────────────────────────────────────────────────────┤ ACTIVITY RAIL (25%,  │
-│ STOCK TAKE TABLE (75%) — boo-table-admin, sticky footer/   │ sticky)              │
-│ pagination, per-row action menu                             │ · Recent Activities  │
-│                                                               │ · Difference Summary │
-└───────────────────────────────────────────────────────────┴──────────────────────┘
+Title + description                         [Refresh] [Export] [New stock take]
+[Open] [Awaiting approval] [Approved this month] [With discrepancies] [Variance at cost]
+┌ Search │ Reset ───────────────────────────────────────────────┐
+│ Warehouse │ Department │ Status │ From │ To                     │
+│ (filter chips)                                                  │
+└─────────────────────────────────────────────────────────────────┘
+Session ▸ code + "warehouse · department" │ Status │ Progress │ Scheduled │ Counter │ Variance │ [primary] ⋯
 ```
+Row click on the code opens the **details drawer** (facts, progress, status-dependent actions, activity trail).
 
-Counting Workspace (≥1280px):
-
+### Counting
 ```
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│ STICKY TOP BAR — session code · warehouse/dept · progress stepper · autosave ·    │
-│ Complete Counting                                                                  │
-├───────────────────┬────────────────────────────────────────────────────────────┤
-│ CATEGORY TREE      │ COUNTING GRID — barcode bar + editable table                │
-│ (280px)            │ (Item Code, Name, Batch, Expiry, System Qty, Actual Qty,    │
-│ search + tree      │  Difference, Reason, Notes)                                 │
-└───────────────────┴────────────────────────────────────────────────────────────┘
-Floating Summary Panel, bottom-right, collapsible.
+[←] CODE  (status)  warehouse · department · date · counter        [Save counts] [Submit for approval]
+Counted ▮▮▮▯ x / y │ To count │ Over system │ Short of system │ Variance at cost (saved)
+notices: rejected reason · read-only reason · save failed
+┌ Categories ┐ ┌ search │ scan barcode ─────────────────────────────┐
+│ All items  │ │ [All n] [To count n] [Differences n]               │
+│ Category   │ │ Medicine │ Batch/expiry │ System │ Counted │ Diff │ Reason │ Note
+└────────────┘ │ footer: Showing a–b of N         pagination        │
 ```
-
-Tablet (768–1279px): List page filter bar wraps to 2 rows, Activity Rail drops below the table as a
-full-width row. Counting Workspace: category tree collapses into a slide-over triggered by a
-"Categories" chip above the grid.
-
-Mobile (<768px): List page becomes stacked cards (one per session) with the same actions in a
-kebab menu; Counting Workspace grid becomes one editable card per item, category tree becomes a
-bottom-sheet filter.
+Header is sticky from `lg` up; below that it scrolls with the page.
 
 ## 6. Component Hierarchy
 
 ```
-AdminStockTakeComponent (list page)
-├── StockTakeHeroHeaderComponent
-├── StockTakeFilterBarComponent
-├── StockTakeTableCardComponent
-├── StockTakeActivityRailComponent
-├── StockTakeDrawerComponent (create/edit)
-├── StockTakeHistoryDrawerComponent
-├── StockTakeAssignDialogComponent
-├── StockTakeNoteDialogComponent (approve/reject/cancel)
-├── StockTakeCompleteDialogComponent
-└── StockTakeDifferenceDialogComponent
+AdminStockTakeComponent
+├─ StockTakeKpiStripComponent          (boo-stat-card, boo-inline-error)
+├─ StockTakeFilterBarComponent         (boo-input, boo-select, boo-datepicker, boo-filter-chips, boo-button)
+├─ StockTakeTableCardComponent         (boo-table-admin, boo-status-badge, boo-button, boo-action-admin)
+├─ StockTakeDetailDrawerComponent      (drawer, boo-status-badge, boo-empty/error-state)
+├─ StockTakeDrawerComponent            (create / edit draft; drawer, boo-select, boo-datepicker, boo-input, boo-textarea)
+├─ StockTakeAssignDialogComponent · StockTakeNoteDialogComponent · StockTakeDifferenceDialogComponent
+└─ DialogService.confirm               (start, submit, delete)
 
-AdminStockTakeCountingComponent (counting workspace)
-├── StockTakeCategoryTreeComponent
-├── StockTakeCountingTableComponent
-└── StockTakeSummaryPanelComponent
+AdminStockTakeCountingComponent
+├─ StockTakeCountingHeaderComponent    (boo-status-badge, boo-button, button-icon)
+├─ StockTakeCategoryTreeComponent
+└─ StockTakeCountingTableComponent     (boo-input, boo-select)  + boo-pagination, boo-input (search / scan)
+Shared: stock-take-actions.ts (status → allowed actions), stock-take-counting.model.ts (row/edit/validation), stock-take-counting.guard.ts
 ```
+The entry grid is a native `<table>` because each row is an editor with unsaved/invalid state and Enter/arrow navigation; `boo-table-admin` is used for the read-only session list.
 
 ## 7. UI Specification
 
-- **Hero Header**: full-width gradient (graphite → charcoal), white text, 4 floating stat chips
-  (glass, `backdrop-blur`) overlapping the header's bottom edge by half their height, title +
-  subtitle, primary Create button (amber accent) + secondary Export/Print icon buttons.
-- **Filter Bar**: `boo-select` (Warehouse, Department, Status), `boo-datepicker` range (Scheduled
-  Date From/To), `boo-input` search, Reset link.
-- **Table**: `boo-table-admin` with columns per spec (§ Table Columns below); Status →
-  `boo-status-badge`; Completed % → thin progress bar; Difference Value → colored (rose if
-  negative-dominant, emerald if positive, gray if zero); Actions → `boo-action-admin` dropdown,
-  items conditional on status (Continue Counting only if Counting, Approve/Reject only if Pending
-  Approval, etc.).
-- **Activity Rail**: compact vertical timeline (icon + actor + relative time), Difference Summary
-  mini-card (positive/negative/value chips).
-- **Counting Grid**: sticky header row, barcode input pinned above the table (Enter to jump to /
-  focus the matching row), Actual Qty is an inline number input, Difference auto-computed and
-  color-coded, Reason `boo-select` (enabled only when difference ≠ 0, required to save), Notes
-  `boo-input`. Sticky "Save Progress" button + autosave indicator (`Saved 12s ago` / `Saving…`)
-  top-right of the grid.
-- **Category Tree**: expandable nodes with item counts, search box, active node highlighted.
+- Tokens as the inventory page: `bg-surface`, `border-borderGray/60`, `rounded-2`, `text-regular` / `text-secondary`, page width `max-w-[1600px]`.
+- Status → badge tone: Draft/Cancelled neutral, Counting primary, PendingApproval warning, Approved success, Rejected danger.
+- Row state in the grid: unsaved = amber tint + "Unsaved" label; invalid = rose tint + message; counted = green dot + "Counted". State is never colour-only.
+- Difference: signed (`+3`, `-2`), green when over, red when short, `—` until counted. Value differences are shown as USD at purchase cost, labelled "at cost".
 
 ## 8. Interaction Design
 
-- Debounced (300ms) search in both the filter bar and category tree.
-- Editing Actual Qty recomputes Difference and the floating Summary Panel immediately (client-side),
-  then autosaves (debounced) via `updateItems`.
-- Row-level and bulk actions confirm through `DialogService`/the Note Dialog — never native
-  `alert()`/`confirm()`.
-- Keyboard: `Enter` in the barcode field jumps to the matched row and focuses its Actual Qty input;
-  `Tab` moves through Actual Qty → Reason → Notes per row.
+- **Counting rules** (client-side, mirror the API): count is a whole number ≥ 0 (API `int`); every saved item stays counted (a count cannot be cleared); a reason is only offered when `counted − system ≠ 0` and is dropped when the difference returns to 0.
+- **Save**: explicit (button or Ctrl/Cmd+S) — no autosave. Only edited rows are posted. Invalid rows block the save and are revealed. On failure the input is kept and a retry banner shows. On success the stored rows replace the list, edits typed during the request are kept, category progress/summary are re-read.
+- **Duplicate prevention**: one lifecycle call at a time on the list (`acting`); `saving` / `submitting` on counting; buttons disable and show a spinner.
+- **Unsaved changes**: `beforeunload` plus a `canDeactivate` guard (`unsavedChangesGuard`) with the shared confirm dialog.
+- **Submit**: disabled with a stated reason while unsaved or uncounted items remain; fresh server summary shown in the confirm text.
+- **Barcode**: Enter in the scan field jumps to the batch; several batches sharing a barcode are listed together.
+- **Keyboard**: Enter / ↓ / ↑ move between count fields; Esc closes dialogs and drawers.
 
 ## 9. Responsive Behavior
 
-Covered in §5 per breakpoint (desktop split layout → tablet stacked rail/slide-over tree → mobile
-cards/bottom-sheet).
+Desktop first. KPI strip 5 → 3 → 2 columns; filter grid 5 → 2 → 1; the session table and grid scroll horizontally below ~960px; categories stack above the grid below `lg`.
 
 ## 10. Accessibility
 
-- All icon-only buttons carry `aria-label`; status badges convey status via text, not color alone.
-- Difference cells use both color and a `+`/`−` sign, never color alone.
-- Drawers/dialogs trap focus and close on `Esc` (existing `DrawerComponent`/`DialogService` behavior).
-- Interactive targets ≥40×40px; table rows fully keyboard-navigable via existing `boo-table-admin`.
+Landmarks (`main`, labelled `section`/`nav`), `role="dialog"` + `aria-modal` + labelled title on every dialog/drawer, `aria-pressed` on the filter group, `aria-current` on the active category, `role="progressbar"` on progress, `role="status"`/`aria-live` for save state, scan result and notices, `role="alert"` for field errors, `<caption>` + `scope="col"` on the grid. Limitation: `boo-input` shows its label as a floating placeholder and does not associate it with the inner input.
 
 ## 11. Page States
 
-- **Loading**: table shimmer (built into `boo-table-admin`), skeleton stat chips on first load.
-- **Empty**: `boo-empty-state` for no sessions matching filters, and for a category with no items in
-  the Counting Workspace.
-- **Success**: toast on create/assign/approve/reject/complete/cancel.
-- **Error**: `HttpService.getOr/postOr` mock-fallback pattern keeps the UI usable even before the
-  backend exists; real errors still toast via the global interceptor.
-- **Disabled**: Actual Qty/Reason/Notes disabled once a session is Approved/Rejected/Cancelled;
-  Complete Counting disabled until at least one item is counted.
+List: loading (table skeleton), empty (no data / no match, with reset), error (retry, filters kept), KPI error (inline retry).
+Counting: loading skeleton, invalid or unknown id → "not found", 403/other → error with retry, no items, no matches, read-only (not Counting, or no update permission), save failed, saving, saved.
 
 ## 12. Edge Cases
 
-- Session with zero items assigned (empty warehouse/department combination).
-- Actual Qty entered as 0 for an item that legitimately has 0 system stock (difference stays 0, not
-  flagged).
-- Barcode scan matching an item outside the currently selected category (auto-switches category).
-- Completing with items still `pending` — warned, not blocked (matches spec's "Complete Counting"
-  requirement, mirrors `completeStockTake()`'s prior UX intent).
-- Rejected session must show the rejection reason prominently when reopened for re-counting.
+Route id that is not a GUID; API returns `null` for an unknown id; counting page opened for a non-`Counting` session (read-only); rejected sessions are final; a save while another save is running is ignored; stale list responses are dropped (`switchMap`); filter date range constrained (`from ≤ to`); expired batches flagged; items of a medicine without category appear under "All items" only.
 
 ## 13. Performance Considerations
 
-- Table and category tree both paginated/virtualizable via the existing `boo-table-admin` (already
-  supports large datasets); counting grid uses `trackBy` on item id.
-- Actual Qty edits are debounced before hitting `updateItems`, not fired per keystroke.
+Server pagination on the list; client pagination (25 rows) and `trackBy` on the grid; one `computed` pipeline for rows/filters/stats; lookups load once.
 
 ## 14. Scalability
 
-- `StockTakeItem` carries `reason` as a free-form code today; recommended follow-up is a shared
-  `AdjustmentReason` lookup (see §16) shared with Inventory Management's `adjustQuantity` reason
-  field, so variance reasons are reported consistently across modules.
+`GET /items` returns the whole session (one row per active batch). Client paging keeps rendering cheap, but very large warehouses will want server paging (see §16).
 
-## 15. Enterprise Recommendations (follow-up, not built in this pass)
+## 15. Enterprise Recommendations
 
-- Multi-user concurrent counting (two counters on the same session, per-item lock) — out of scope
-  until the backend supports item-level locking.
-- Barcode scanner hardware integration (current input is a text field awaiting Enter, same
-  convention as Retail's barcode field) — real scanner wiring is a backend/device concern.
-- Unify variance "Reason" with Inventory Management's batch adjustment reasons into one shared
-  lookup once both backends exist.
+Persist the cancel reason and the counter id; server-side status checks on `POST /items`; a user lookup endpoint; real print/PDF; a units-based currency instead of fixed USD.
 
-## 16. Components
+## 16. Backend API contract used (implemented — no endpoints invented)
 
-Reused as-is: `BooTableAdminComponent`, `BooActionAdminComponent`, `StatusBadgeComponent`,
-`EmptyStateComponent`, `DrawerComponent`, `DialogService`/`DialogComponent`, `ToastService`,
-`IconComponent` (physio-icon), `BooSelectComponent`, `BooDatepickerComponent`, `BooInputComponent`,
-`PrintPreviewComponent`, `StatCardComponent`.
+| Purpose | Method + URL | Permission | Frontend use |
+|---|---|---|---|
+| Search sessions | `POST /api/stock-takes/search` `{pageNumber,pageSize,search,filter{warehouseId,departmentId,status,dateFrom,dateTo}}` | `pharmacy:stock-take:read` | list |
+| KPIs | `GET /api/stock-takes/kpis` | read | KPI strip |
+| Detail | `GET /api/stock-takes/{id}` (data may be `null`) | read | counting header |
+| Create / update | `POST /api/stock-takes`, `PUT /api/stock-takes/{id}` `{warehouseId?,departmentId,scheduledDate,assignedTo,notes}` | create / update | drawer |
+| Delete | `DELETE /api/stock-takes/{id}` (204) | delete | list |
+| Start / complete / cancel | `POST /{id}/start`, `/complete`, `/cancel {reason}` | update | list, counting |
+| Approve / reject | `POST /{id}/approve {note}`, `/reject {reason}` | approve / reject | list |
+| Assign counter | `POST /{id}/assign {assignedTo}` (due date ignored by API) | update | dialog |
+| Items | `GET /{id}/items` → rows; `POST /{id}/items {items:[{itemId,actualQty,reason,notes}]}` → all rows | read / update | counting |
+| Categories, summary, history | `GET /{id}/categories`, `/summary`, `/history` | read | counting, drawer, dialogs |
+| Export | `POST /api/stock-takes/export` | `pharmacy:stock-take:export` | list |
+| Warehouses | `GET /api/warehouses` | read | filters, drawer |
+| Counter candidates | `POST /api/users/search` | IAM user read | assign dialog, drawer |
 
-New, created only because no existing component covers the need: `StockTakeHeroHeaderComponent`,
-`StockTakeFilterBarComponent`, `StockTakeTableCardComponent`, `StockTakeActivityRailComponent`,
-`StockTakeDrawerComponent`, `StockTakeHistoryDrawerComponent`, `StockTakeAssignDialogComponent`,
-`StockTakeNoteDialogComponent`, `StockTakeCompleteDialogComponent`,
-`StockTakeDifferenceDialogComponent`, `StockTakeCategoryTreeComponent`,
-`StockTakeCountingTableComponent`, `StockTakeSummaryPanelComponent`.
+Route guards (unchanged): list `pharmacy:medicine-inventory:read`, counting `pharmacy:medicine-inventory:create`. Actions are additionally gated by the matching `pharmacy:stock-take:*` permission (constants added to `permission.constant.ts`).
 
----
+### Known backend limitations (not simulated in the UI)
 
-## 17. Backend API Contract (proposed — not implemented)
+1. `POST /items` does not check the session status, so the UI only allows entry while `Counting`.
+2. Rejected is final; there is no way to reopen counting.
+3. `StockTakeViewModel` has no `assignedTo` id, so the edit drawer cannot pre-select the counter (saving without one clears it — stated in the form). Creator/counter are e-mail addresses.
+4. Cancel reason and assign due date are accepted but not stored.
+5. Print returns JSON only, so the print action was removed.
+6. `GET /items` is not paged; value differences use `UnitPurchasePrice` and carry no currency (USD is assumed, as on the inventory page).
+7. No user-lookup endpoint; counter lists need the IAM user permission.
+8. Delete and assign have no status rule server-side; the UI offers delete for Draft only.
 
-### 17.0 Required domain model changes (prerequisite)
+## 17. Implementation Notes
 
-Shared entities (`WarehouseZone`, `StockMovement`, extended `MedicineInventory`) are specified once in `docs/inventory-management-redesign.md` §19.0 — implement there, this module consumes them.
-
-**Scope decision:** `StockTakeItem` is Medicine-only for this pass — it links to `MedicineInventoryId`, not a generic polymorphic item reference. The frontend's `StockTakeCategoryType` (`Medicine | Consumable | MedicalSupply | Equipment`) is broader than the backend will support initially; `Consumable`/`MedicalSupply`/`Equipment` counting is deferred until a real catalog entity exists for those item types — building a polymorphic `ItemId`+`ItemType` reference now would be speculative against nothing to reference.
-
-New entities, none of which exist today:
-
-| Entity | Key fields | Notes |
-|---|---|---|
-| `StockTake` | `Id, HospitalId (backs the frontend's WarehouseId — one hospital = one warehouse, no dedicated Warehouse entity), DepartmentId, CreatedBy, AssignedTo (Guid?), CreatedDate, ScheduledDate, Status (new enum StockTakeStatus: Draft/Counting/PendingApproval/Approved/Rejected/Cancelled), Notes?, RejectionReason?` | `Code` is server-generated (not client-supplied), same pattern as `Prescription.PrescriptionNumber`. `ItemsCount`/`CompletedPercent`/`DifferenceValue` (frontend fields) are computed from child `StockTakeItem` rows, not stored |
-| `StockTakeItem` | `Id, StockTakeId, MedicineInventoryId, SystemQty (snapshot at count start — copy `QuantityAvailable`, don't live-reference it, so mid-count inventory changes elsewhere don't corrupt the count), ActualQty (int?), Reason (string?, one of the app's `STOCK_TAKE_REASONS` values), Notes?, IsCounted (bool)` | `Difference` (frontend field) is computed (`ActualQty - SystemQty`), not stored |
-| `StockTakeActivity` | `Id, StockTakeId, Type (new enum StockTakeActivityType: Created/Assigned/Started/ItemCounted/Completed/Approved/Rejected/Cancelled), Message, Actor (Guid), OccurredAt` | Append-only audit trail scoped to the stock-take lifecycle — separate from `StockMovement`, which tracks quantity changes, not workflow events |
-
-**Approval must reconcile inventory**: when a `StockTake` transitions to `Approved` with a non-zero variance, the handler must write `StockMovement` rows (`Type = Adjustment`) per counted item to bring `MedicineInventory.QuantityAvailable` in line with `ActualQty` — this is the actual link between Stock Take and Inventory, and neither this doc nor the Inventory doc's original API contract specified it explicitly; it's a new requirement surfaced by this domain-model pass.
-
-**Resolved:** `StockTake.HospitalId` backs the frontend's `WarehouseId` field directly (one hospital = one warehouse) — no dedicated `Warehouse` entity. The frontend's `getWarehouses()` lookup (§17.19/doc's "not implemented" list) should be implemented as a thin projection over the existing `Hospital` list, not a new entity/endpoint from scratch. If a hospital later needs multiple physical stock locations, that's a `WarehouseZone`-level concern (already modeled in the Inventory doc §19.0), not a new top-level `Warehouse` entity.
-
-All endpoints are namespaced under `/api/stock-takes` and added to `BASE_API.STOCK_TAKE` in
-`src/app/shared/api/base.ts`. None of these exist yet; the frontend service falls back to bundled
-mock data until they do (same `getOr`/`postOr` pattern as `InventoryManagementService`).
-
-### 17.1 `POST /api/stock-takes/search`
-- **Purpose**: List/Dashboard table.
-- **Request**: `PagedRequest<StockTakeFilter>` (`warehouseId?`, `departmentId?`, `status?`,
-  `dateFrom?`, `dateTo?`, plus `search`/`page`/`pageSize`).
-- **Response**: `PagedResponse<PaginationData<StockTake>>`.
-- **Frontend usage**: `StockTakeService.search(request)` in `AdminStockTakeComponent`.
-
-### 17.2 `GET /api/stock-takes/{id}`
-- **Purpose**: Load a session for the Edit Drawer / Counting Workspace header.
-- **Response**: `PagedResponse<StockTake | null>`.
-- **Frontend usage**: `getById(id)`.
-
-### 17.3 `POST /api/stock-takes`
-- **Purpose**: Create Stock Take (Draft).
-- **Request**: `{ warehouseId, departmentId, scheduledDate, assignedTo?, notes? }`.
-- **Response**: `PagedResponse<string>` (new id).
-- **Frontend usage**: `create(payload)` from `StockTakeDrawerComponent`.
-
-### 17.4 `PUT /api/stock-takes/{id}`
-- **Purpose**: Edit Draft.
-- **Request**: same shape as create.
-- **Response**: `PagedResponse<string>`.
-- **Frontend usage**: `update(id, payload)`.
-
-### 17.5 `DELETE /api/stock-takes/{id}`
-- **Purpose**: Delete a Draft session.
-- **Response**: `PagedResponse<string>`.
-- **Frontend usage**: `delete(id)` from the table row menu.
-
-### 17.6 `POST /api/stock-takes/{id}/start`
-- **Purpose**: Draft → Counting; navigates to the Counting Workspace.
-- **Response**: `PagedResponse<StockTake>`.
-- **Frontend usage**: `start(id)`.
-
-### 17.7 `POST /api/stock-takes/{id}/complete`
-- **Purpose**: Counting → Pending Approval.
-- **Response**: `PagedResponse<StockTake>`.
-- **Frontend usage**: `complete(id)` from `StockTakeCompleteDialogComponent`.
-
-### 17.8 `POST /api/stock-takes/{id}/approve`
-- **Purpose**: Pending Approval → Approved.
-- **Request**: `{ note?: string }`.
-- **Response**: `PagedResponse<StockTake>`.
-- **Frontend usage**: `approve(id, note)` from `StockTakeNoteDialogComponent`.
-
-### 17.9 `POST /api/stock-takes/{id}/reject`
-- **Purpose**: Pending Approval → Rejected (returns to Counting for rework).
-- **Request**: `{ reason: string }`.
-- **Response**: `PagedResponse<StockTake>`.
-- **Frontend usage**: `reject(id, reason)`.
-
-### 17.10 `POST /api/stock-takes/{id}/cancel`
-- **Purpose**: Cancel a Draft/Counting session.
-- **Request**: `{ reason: string }`.
-- **Response**: `PagedResponse<StockTake>`.
-- **Frontend usage**: `cancel(id, reason)`.
-
-### 17.11 `GET /api/stock-takes/{id}/items`
-- **Purpose**: Counting Workspace grid + category tree counts.
-- **Request (query)**: `categoryId?`, `search?`.
-- **Response**: `PagedResponse<StockTakeItem[]>`.
-- **Frontend usage**: `getItems(id, filters)`.
-
-### 17.12 `PUT /api/stock-takes/{id}/items`
-- **Purpose**: Save Actual Qty/Reason/Notes edits (autosave, batched).
-- **Request**: `{ items: Partial<StockTakeItem>[] }`.
-- **Response**: `PagedResponse<StockTakeItem[]>`.
-- **Frontend usage**: `updateItems(id, items)` (debounced from `StockTakeCountingTableComponent`).
-
-### 17.13 `GET /api/stock-takes/{id}/categories`
-- **Purpose**: Category Tree.
-- **Response**: `PagedResponse<StockTakeCategoryNode[]>`.
-- **Frontend usage**: `getCategories(id)`.
-
-### 17.14 `GET /api/stock-takes/{id}/summary`
-- **Purpose**: Floating Summary Panel + Difference Summary card.
-- **Response**: `PagedResponse<StockTakeSummary>`.
-- **Frontend usage**: `getSummary(id)` (also recomputed client-side on each edit for instant feedback).
-
-### 17.15 `GET /api/stock-takes/{id}/history`
-- **Purpose**: History Drawer audit timeline.
-- **Response**: `PagedResponse<StockTakeActivity[]>`.
-- **Frontend usage**: `getHistory(id)`.
-
-### 17.16 `POST /api/stock-takes/{id}/assign`
-- **Purpose**: Assign Counter Dialog.
-- **Request**: `{ assignedTo: string; dueDate?: string }`.
-- **Response**: `PagedResponse<StockTake>`.
-- **Frontend usage**: `assignCounter(id, payload)`.
-
-### 17.17 `GET /api/stock-takes/kpis`
-- **Purpose**: Hero Header quick-stat chips.
-- **Response**: `PagedResponse<StockTakeKpis>`.
-- **Frontend usage**: `getKpis()`.
-
-### 17.18 `GET /api/stock-takes/activities`
-- **Purpose**: Activity Rail recent activities feed.
-- **Response**: `PagedResponse<StockTakeActivity[]>`.
-- **Frontend usage**: `getRecentActivities(limit)`.
-
-### 17.19 `GET /api/warehouses`, `GET /api/departments`, `GET /api/users`
-- **Purpose**: Filter Bar / Create Drawer / Assign Dialog lookups.
-- **Response**: `PagedResponse<Lookup[]>`.
-- **Frontend usage**: `getWarehouses()`, `getDepartments()`, `getUsers()`.
-
-### 17.20 `GET /api/stock-takes/export`
-- **Purpose**: Export Excel.
-- **Request (query)**: same filters as search.
-- **Response**: binary (xlsx) — frontend triggers a download.
-- **Frontend usage**: `exportExcel(filters)`.
-
-### 17.21 `POST /api/stock-takes/{id}/print`
-- **Purpose**: Print Preview / physical print of a session's count sheet or variance report.
-- **Response**: `PagedResponse<PrintRenderResult>` (reuses the existing print-template pipeline).
-- **Frontend usage**: `print(id)`, rendered through the existing `PrintPreviewComponent`.
-
----
-
-## 18. Implementation Notes (frontend, this change)
-
-- New types: `src/app/shared/types/stock-take.types.ts` (kept separate from the legacy
-  `stock.types.ts` `StockItem`/`StockTakeSession`, which nothing else references once this module is
-  rewritten — left in place only because it's still imported by the old page being replaced here).
-- New service: `src/app/services/admin/stock-take.service.ts` (HTTP + mock fallback, `getOr`/`postOr`
-  pattern matching `InventoryManagementService`).
-- New endpoints block: `BASE_API.STOCK_TAKE` in `src/app/shared/api/base.ts`; new
-  `LoadingKeys.STOCK_TAKE` block in `src/app/shared/types/loading.ts`.
-- Rewritten list page at the existing route (`admin/pharmacy/stock-take`, component class
-  `AdminStockTakeComponent` unchanged so routing/breadcrumbs keep working), composed of the panel
-  components listed in §16.
-- New route `admin/pharmacy/stock-take/:id/count` → `AdminStockTakeCountingComponent` (Counting
-  Workspace), registered as a sibling under the existing `pharmacy` route group.
-- Backend is not implemented; all service calls fall back to bundled mock data identical in shape to
-  the proposed API responses, so swapping in the real backend later requires no caller changes.
+Removed: hero header, activity rail, history drawer, complete dialog, floating summary panel, print/activities service methods. Changed files are listed in the change summary of the redesign task; `STOCK_TAKE.ACTIVITIES/PRINT` constants and loading keys were removed with their callers.

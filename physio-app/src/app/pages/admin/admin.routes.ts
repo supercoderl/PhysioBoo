@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { Role } from '../../shared/enums/role';
 import { permissionGuard } from 'src/app/services/auth/permission-guard.guard';
 import { Permissions } from 'src/app/shared/constants/permission.constant';
+import { unsavedChangesGuard } from './pharmacy/stock-take/stock-take-counting.guard';
 
 export const routes: Routes = [
     {
@@ -227,7 +228,8 @@ export const routes: Routes = [
                                 path: ':id/count',
                                 data: { breadcrumb: ['counting'] },
                                 loadComponent: () => import('./pharmacy/stock-take/stock-take-counting.component').then(m => m.AdminStockTakeCountingComponent),
-                                canActivate: [permissionGuard(Permissions.Pharmacy.MedicineInventoryCreate)]
+                                canActivate: [permissionGuard(Permissions.Pharmacy.MedicineInventoryCreate)],
+                                canDeactivate: [unsavedChangesGuard]
                             }
                         ]
                     }

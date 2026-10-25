@@ -1,7 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
-import { AdminBreadcrumbComponent } from "../../../../../components/breadcrumb/admin-breadcrumb.component";
 import { SwitchComponent } from "../../../../../components/switch/switch.component";
 import { UserService } from '../../../../../services/admin/user.service';
 import { PreferenceService } from '../../../../../services/common/preference.service';
@@ -37,7 +36,6 @@ const DEFAULTS: Record<string, boolean> = {
   imports: [
     SharedModule,
     FormsModule,
-    AdminBreadcrumbComponent,
 
     SwitchComponent,
     BooButtonAdminComponent

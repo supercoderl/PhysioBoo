@@ -5,12 +5,12 @@ import { SharedModule } from "../../../../shared/shared-imports";
 @Component({
     selector: 'admin-system-setting',
     standalone: true,
-    imports: [
+    imports: [
         SharedModule
     ],
     template: `
-        <div class="z-10 flex h-full flex-auto flex-col">
-            <div class="flex flex-1 z-[2] min-w-0 h-full bg-[#F6F7F8] absolute inset-0 overflow-hidden">
+        <div class="flex flex-1 min-h-0 flex-col">
+            <div class="flex flex-1 min-h-0 min-w-0 bg-[#F6F7F8] overflow-hidden">
                 <div
                     class="relative mx-0 border-0 w-[320px] max-w-[320px] overflow-hidden bg-transparent flex-0"
                 >
@@ -62,10 +62,10 @@ import { SharedModule } from "../../../../shared/shared-imports";
                         </div>
                     </div>
                 </div>
-                <div class="pt-0.5 pl-0.5 flex flex-col flex-1 min-w-0 w-full z-[9999]">
+                <div class="pt-0.5 pl-0.5 flex flex-col flex-1 min-h-0 min-w-0 w-full z-[9999]">
                     <div 
-                        class="ps bg-surface relative flex flex-col flex-1 min-h-0 overscroll-contain h-screen shadow-card"
-                        style="border-top-left-radius: 12px; scrollbar-width: none; position: relative; overflow-y: auto;"
+                        class="ps bg-surface relative flex flex-col flex-1 min-h-0 overscroll-contain h-full shadow-card boo-scrollbar"
+                        style="border-top-left-radius: 12px; position: relative; overflow-y: auto;"
                     >
                         <div class="flex-1 min-h-0 px-6 py-2 flex flex-col">
                             <router-outlet></router-outlet>

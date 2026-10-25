@@ -315,12 +315,10 @@ export const BASE_API = {
     INSURANCE: (invoiceId: string) => `/api/cashier/invoices/${invoiceId}/insurance`,
     VOID: (invoiceId: string) => `/api/cashier/invoices/${invoiceId}/void`,
     PAYMENT_HISTORY: '/api/cashier/payment-history',
-    PATIENTS_SEARCH: '/api/patients/search',
-    PRINT_INVOICE: '/api/cashier/print-invoice',
   },
   PHARMACY_RETAIL: {
     CATALOG_SEARCH: '/api/pharmacy/retail/catalog/search',
-    CATALOG_BARCODE: (code: string) => `/api/pharmacy/retail/catalog/barcode/${code}`,
+    CATALOG_BARCODE: (code: string) => `/api/pharmacy/retail/catalog/barcode/${encodeURIComponent(code)}`,
     CATALOG_DETAIL: (medicineId: string) => `/api/pharmacy/retail/catalog/${medicineId}`,
     CATALOG_SUGGESTIONS: (mode: string) => `/api/pharmacy/retail/catalog/suggestions?mode=${mode}`,
     INSIGHT: '/api/pharmacy/retail/insight',
@@ -389,9 +387,7 @@ export const BASE_API = {
     SUMMARY: (id: string) => `/api/stock-takes/${id}/summary`,
     HISTORY: (id: string) => `/api/stock-takes/${id}/history`,
     KPIS: '/api/stock-takes/kpis',
-    ACTIVITIES: '/api/stock-takes/activities',
     EXPORT: '/api/stock-takes/export',
-    PRINT: (id: string) => `/api/stock-takes/${id}/print`,
   },
   SURGERY: {
     STATS: '/api/surgery/stats',

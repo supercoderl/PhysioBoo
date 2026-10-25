@@ -1,6 +1,5 @@
-<div class="relative z-10 flex min-h-0 flex-auto flex-col">
-  <div class="container flex shrink-0 flex-col p-4">
-    <admin-breadcrumb></admin-breadcrumb>
+<div class="relative z-10 flex min-h-0 flex-1 flex-col">
+  <div class="flex min-h-0 flex-1 flex-col pb-5">
 
     <!-- Loading -->
     <div
@@ -95,7 +94,7 @@
 
       <!-- Columns -->
       <div
-        class="mt-4 flex items-start gap-4 overflow-x-auto pb-4"
+        class="boo-scrollbar mt-4 flex min-h-0 flex-1 items-start gap-4 overflow-x-auto pb-4"
         cdkDropList
         cdkDropListOrientation="horizontal"
         [cdkDropListData]="b.lists"
@@ -105,7 +104,7 @@
           *ngFor="let list of b.lists; trackBy: trackById"
           cdkDrag
           [cdkDragData]="list"
-          class="flex max-h-[calc(100vh-14rem)] w-72 shrink-0 flex-col rounded-lg bg-[#F6F7F8]"
+          class="flex max-h-full w-72 shrink-0 flex-col rounded-lg bg-[#F6F7F8]"
           [attr.aria-label]="list.title"
         >
           <header

@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
-import { AdminBreadcrumbComponent } from "../../../breadcrumb/admin-breadcrumb.component";
 
 @Component({
   selector: 'admin-content-header',
   standalone: true,
-  imports: [AdminBreadcrumbComponent],
+  imports: [],
   templateUrl: './content-header.component.html',
-  host: { class: 'block h-full min-h-0' }
+  host: { class: 'flex flex-1 flex-col min-h-0 min-w-0' }
 })
 export class AdminContentHeaderComponent {
 

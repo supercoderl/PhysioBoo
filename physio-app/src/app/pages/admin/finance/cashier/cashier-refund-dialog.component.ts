@@ -1,97 +1,148 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
-import { SharedModule } from "../../../../shared/shared-imports";
-import { CashierInvoice, CashierPaymentMethod } from "../../../../shared/types/cashier.types";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
+import { BooButtonComponent, BooInputComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
+import { SharedModule } from "../../../../shared/shared-imports";
+import { CashierInvoice, cashierMethodLabel, CashierRefundablePayment, roundMoney } from "../../../../shared/types/cashier.types";
+import { CashierDialogComponent } from "./cashier-dialog.component";
+
+export type CashierRefundSourceState = 'unavailable' | 'loading' | 'ready' | 'error';
+
+export interface CashierRefundSubmit {
+    payment: CashierRefundablePayment;
+    amount: number;
+    reason: string;
+}
+
+const REASON_MAX_LENGTH = 500;
 
 @Component({
     selector: 'cashier-refund-dialog',
     standalone: true,
-    imports: [SharedModule, BooButtonAdminComponent, BooSelectComponent, BooTextareaComponent],
+    imports: [SharedModule, CashierDialogComponent, BooButtonComponent, BooInputComponent, BooSelectComponent, BooTextareaComponent],
     template: `
-    <div *ngIf="isOpen && invoice" class="fixed inset-0 z-[10000] flex items-center justify-center">
-      <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" (click)="close.emit()" aria-hidden="true"></div>
-
-      <div class="relative bg-surface rounded-2xl shadow-2xl w-full max-w-md mx-4">
-        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-          <div>
-            <h2 class="text-base font-semibold text-slate-900 flex items-center gap-2">
-              <physio-icon name="undo-2" [size]="16" class="text-rose-600"></physio-icon>
-              Refund Payment
-            </h2>
-            <p class="text-xs text-slate-400 mt-0.5">{{ invoice.invoiceNo }} · {{ invoice.patientName }}</p>
-          </div>
-          <button type="button" (click)="close.emit()" class="text-slate-400 hover:text-slate-600" aria-label="Close refund dialog">
-            <physio-icon name="x" [size]="18"></physio-icon>
-          </button>
-        </div>
-
-        <div class="p-5 space-y-4">
-          <div class="bg-rose-50 rounded-lg px-3 py-2 text-xs text-rose-700 flex items-start gap-2">
-            <physio-icon name="triangle-alert" [size]="14" [class]="'mt-0.5 shrink-0'"></physio-icon>
-            Refunds are final and will be recorded in the payment history.
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Refund Amount</label>
-            <input type="number" [(ngModel)]="amount" min="0" [max]="invoice.paidAmount" step="0.01"
-              class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-rose-400/30" />
-            <p class="text-[11px] text-slate-400 mt-1">Paid amount: \${{ invoice.paidAmount.toFixed(2) }}</p>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Refund Method</label>
-            <boo-select [(ngModel)]="method" [options]="methodOptions"></boo-select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Reason</label>
-            <boo-textarea [(ngModel)]="reason" [rows]="3" label="Explain the reason for this refund"></boo-textarea>
-          </div>
-        </div>
-
-        <div class="px-5 py-4 border-t border-slate-100 flex justify-end gap-2">
-          <boo-button-admin (click)="close.emit()" background="transparent" textColor="#71606A" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="600">Cancel</boo-button-admin>
-          <boo-button-admin (click)="confirm()" [disabled]="!canConfirm()" background="#E11D48" textColor="white" padding="8px 20px" [fontSize]="14" [radius]="8" fontWeight="600">
-            Confirm Refund
-          </boo-button-admin>
-        </div>
+    <cashier-dialog
+      [open]="open && !!bill"
+      heading="Refund a payment"
+      [description]="bill ? bill.billNumber + ' · ' + (bill.patientName || 'Unknown patient') : ''"
+      icon="undo-2"
+      [busy]="busy"
+      (dismiss)="close.emit()"
+      (submitForm)="submit()"
+    >
+      <p *ngIf="sourceState === 'loading'" class="m-0 text-sm text-secondary">Loading payments…</p>
+      <p *ngIf="sourceState === 'unavailable'" class="m-0 text-sm text-secondary">Refunds need permission to view payment history, which you don't have.</p>
+      <div *ngIf="sourceState === 'error'" class="space-y-2">
+        <p class="m-0 text-sm text-danger" role="alert">Couldn't load this bill's payments.</p>
+        <button type="button" boo-button variant="secondary" size="sm" (click)="retry.emit()">Try again</button>
       </div>
-    </div>
+      <p *ngIf="sourceState === 'ready' && !payments.length" class="m-0 text-sm text-secondary">
+        No refundable payment was found for this bill in the latest transactions. Older payments cannot be refunded from this screen.
+      </p>
+
+      <ng-container *ngIf="sourceState === 'ready' && payments.length">
+        <fieldset class="m-0 p-0 border-0 space-y-4" [disabled]="busy">
+          <div>
+            <boo-select label="Payment to refund" [options]="paymentOptions" [ngModel]="paymentId" (ngModelChange)="onPaymentChange($event)" required></boo-select>
+            <p *ngIf="touched && !selected" class="mt-1 mb-0 text-xs text-danger" role="alert">Choose the payment to refund.</p>
+          </div>
+
+          <div>
+            <boo-input label="Refund amount" type="number" [(ngModel)]="amount" required></boo-input>
+            <p *ngIf="touched && amountError as msg; else amountHint" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+            <ng-template #amountHint>
+              <p class="mt-1 mb-0 text-xs text-secondary" *ngIf="selected">Up to {{ selected.refundable | currency:'USD':'symbol':'1.2-2' }} can be refunded on this payment.</p>
+            </ng-template>
+          </div>
+
+          <div>
+            <boo-textarea label="Reason" [(ngModel)]="reason" required [rows]="3" [maxlength]="reasonMaxLength"></boo-textarea>
+            <p *ngIf="touched && reasonError as msg" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+          </div>
+        </fieldset>
+      </ng-container>
+
+      <div dialogFooter class="contents">
+        <button type="button" boo-button variant="ghost" (click)="close.emit()" [disabled]="busy">Cancel</button>
+        <button type="submit" boo-button variant="primary" [loading]="busy" [disabled]="sourceState !== 'ready' || !payments.length">Issue refund</button>
+      </div>
+    </cashier-dialog>
   `,
 })
 export class CashierRefundDialogComponent implements OnChanges {
-    @Input() isOpen = false;
-    @Input() invoice: CashierInvoice | null = null;
+    @Input() open = false;
+    @Input() bill: CashierInvoice | null = null;
+    @Input() payments: CashierRefundablePayment[] = [];
+    @Input() sourceState: CashierRefundSourceState = 'loading';
+    @Input() busy = false;
+
     @Output() close = new EventEmitter<void>();
-    @Output() confirmRefund = new EventEmitter<{ amount: number; reason: string; method: CashierPaymentMethod }>();
+    @Output() retry = new EventEmitter<void>();
+    @Output() confirm = new EventEmitter<CashierRefundSubmit>();
 
-    amount = 0;
+    readonly reasonMaxLength = REASON_MAX_LENGTH;
+
+    paymentId: string | null = null;
+    amount = '';
     reason = '';
-    method: CashierPaymentMethod = 'Cash';
-    readonly methodOptions: { label: string; value: CashierPaymentMethod }[] = [
-        { label: 'Cash', value: 'Cash' },
-        { label: 'Credit Card', value: 'CreditCard' },
-        { label: 'Debit Card', value: 'DebitCard' },
-        { label: 'Bank Transfer', value: 'BankTransfer' },
-        { label: 'Insurance', value: 'Insurance' },
-    ];
+    touched = false;
 
-    ngOnChanges(): void {
-        if (this.isOpen && this.invoice) {
-            this.amount = this.invoice.paidAmount;
-            this.reason = '';
-            this.method = 'Cash';
+    get paymentOptions(): { value: string; label: string }[] {
+        return this.payments.map(p => ({
+            value: p.paymentId,
+            label: `${cashierMethodLabel(p.method)} · ${this.money(p.amount)} paid · ${this.money(p.refundable)} refundable`,
+        }));
+    }
+
+    get selected(): CashierRefundablePayment | null {
+        return this.payments.find(p => p.paymentId === this.paymentId) ?? null;
+    }
+
+    get amountError(): string | null {
+        const value = Number(this.amount);
+        if (!this.amount || !(value > 0)) return 'Enter an amount above 0.';
+        if (roundMoney(value) !== value) return 'Use at most 2 decimals.';
+        if (this.selected && value > this.selected.refundable) return `The most you can refund on this payment is ${this.money(this.selected.refundable)}.`;
+        return null;
+    }
+
+    get reasonError(): string | null {
+        return this.reason.trim() ? null : 'Enter the reason for the refund.';
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['open'] && this.open) {
+            this.reset();
+        }
+        // The payment list arrives after the dialog opens: preselect once, never override the user's choice.
+        if (this.open && !this.paymentId && this.payments.length) {
+            this.onPaymentChange(this.payments[0].paymentId);
         }
     }
 
-    canConfirm(): boolean {
-        return !!this.invoice && this.amount > 0 && this.amount <= this.invoice.paidAmount && this.reason.trim().length > 0;
+    onPaymentChange(paymentId: string | null): void {
+        this.paymentId = paymentId;
+        const payment = this.selected;
+        this.amount = payment ? payment.refundable.toFixed(2) : '';
     }
 
-    confirm(): void {
-        if (!this.canConfirm()) return;
-        this.confirmRefund.emit({ amount: Number(this.amount), reason: this.reason.trim(), method: this.method });
+    submit(): void {
+        const payment = this.selected;
+        if (this.busy || this.sourceState !== 'ready') return;
+        this.touched = true;
+        if (!payment || this.amountError || this.reasonError) return;
+
+        this.confirm.emit({ payment, amount: roundMoney(Number(this.amount)), reason: this.reason.trim() });
+    }
+
+    private reset(): void {
+        this.paymentId = null;
+        this.amount = '';
+        this.reason = '';
+        this.touched = false;
+    }
+
+    private money(value: number): string {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
     }
 }

@@ -125,9 +125,6 @@ export const LoadingKeys = {
         INSURANCE: 'cashier-insurance',
         VOID: 'cashier-void',
         PAYMENT_HISTORY: 'cashier-payment-history',
-        PATIENTS_SEARCH: 'cashier-patients-search',
-        EXPORT: 'cashier-export',
-        PRINT_INVOICE: 'cashier-print-invoice'
     },
     RETAIL_POS: {
         CATALOG_SEARCH: 'retail-pos-catalog-search',
@@ -144,7 +141,11 @@ export const LoadingKeys = {
         SUSPEND_CART: 'retail-pos-suspend-cart',
         RESUME_CART: 'retail-pos-resume-cart',
         PATIENTS_SEARCH: 'retail-pos-patients-search',
-        CHECKOUT: 'retail-pos-checkout'
+        CHECKOUT: 'retail-pos-checkout',
+        WARNINGS: 'retail-pos-warnings',
+        RECEIPT_EMAIL: 'retail-pos-receipt-email',
+        RECEIPT_SMS: 'retail-pos-receipt-sms',
+        REFUND: 'retail-pos-refund'
     },
     RADIOLOGY: {
         STATS: 'radiology-stats',
@@ -259,9 +260,7 @@ export const LoadingKeys = {
         SUMMARY: 'stock-take-summary',
         HISTORY: 'stock-take-history',
         KPIS: 'stock-take-kpis',
-        ACTIVITIES: 'stock-take-activities',
         EXPORT: 'stock-take-export',
-        PRINT: 'stock-take-print',
         WAREHOUSES: 'stock-take-warehouses',
         USERS: 'stock-take-users'
     },

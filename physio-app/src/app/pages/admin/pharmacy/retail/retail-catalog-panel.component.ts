@@ -1,195 +1,311 @@
-import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild, signal } from "@angular/core";
-import { BooEmptyStateComponent } from '@physioboo/ui';
+import { Component, DestroyRef, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, inject, signal } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooFilterChip, BooFilterChipsComponent, BooInputComponent, BooPaginationComponent, BooSearchFieldComponent } from '@physioboo/ui';
+import { Observable, Subject, Subscription, debounceTime, distinctUntilChanged, map } from "rxjs";
+import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { RetailPosService } from "../../../../services/admin/retail-pos.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { RetailMedicineCard, RetailQuickCategory, RetailSuggestionMode } from "../../../../shared/types/retail-pos.types";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { RetailCategory, RetailMedicineCard, RetailSuggestionMode } from "../../../../shared/types/retail-pos.types";
+import { formatRetailMoney } from "../../../../shared/utils/retail-pos.utils";
 
-type ResultMode = 'Search' | RetailSuggestionMode;
+type CatalogView = 'Catalog' | RetailSuggestionMode;
+interface CatalogPage { items: RetailMedicineCard[]; totalPages: number; totalCount: number; }
+
+const PAGE_SIZE = 12;
 
 @Component({
   selector: 'retail-catalog-panel',
   standalone: true,
-  imports: [SharedModule,BooEmptyStateComponent, BooButtonAdminComponent],
+  imports: [
+    SharedModule,
+    BooButtonComponent,
+    BooEmptyStateComponent,
+    BooErrorStateComponent,
+    BooFilterChipsComponent,
+    BooInputComponent,
+    BooPaginationComponent,
+    BooSearchFieldComponent,
+    BooSelectComponent,
+  ],
   template: `
-    <div class="bg-surface border border-gray-200 rounded-lg flex flex-col h-full">
-      <!-- Search + barcode -->
-      <div class="p-3 border-b border-gray-200 space-y-2">
-        <div class="flex items-center gap-2">
-          <div class="flex-1 relative">
-            <physio-icon name="search" [size]="16" [class]="'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
-            <input #searchInput type="text" [(ngModel)]="query" (ngModelChange)="onSearchChange()"
-              placeholder="Search medicine by name, generic, or batch..."
-              class="w-full pl-9 pr-3 h-10 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" />
-          </div>
-          <div class="relative">
-            <physio-icon name="scan-barcode" [size]="16" [class]="'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
-            <input #barcodeInput type="text" [(ngModel)]="barcode" (keyup.enter)="scanBarcode()"
-              placeholder="Scan barcode (Ctrl+B)"
-              class="pl-9 pr-3 h-10 w-44 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" />
-          </div>
+    <section class="flex h-full min-h-0 flex-col bg-surface border border-borderGray/60 rounded-2" aria-label="Medicine catalog">
+      <div class="shrink-0 p-4 space-y-3 border-b border-borderGray/60">
+        <boo-search-field label="Search medicines" placeholder="Search by name, generic name or exact barcode (F2)" [busy]="loading() && view() === 'Catalog'"
+          [ngModel]="search" (ngModelChange)="onSearchInput($event)" (clear)="clearSearch()"></boo-search-field>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <boo-select *ngIf="categories().length" label="Category" [options]="categories()" bindLabel="name" bindValue="id"
+            [ngModel]="categoryId" (ngModelChange)="onCategoryChange($event)"></boo-select>
+          <boo-input #barcodeInput label="Scan barcode (Ctrl+B)" [(ngModel)]="barcode" (keydown.enter)="scanBarcode()" [disabled]="scanning()"></boo-input>
         </div>
 
-        <!-- Quick categories -->
-        <div class="flex items-center gap-2 overflow-x-auto pb-1">
-          <button *ngFor="let c of categories()" type="button" (click)="setCategory(c.value)"
-            class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border flex items-center gap-1.5 transition-colors"
-            [ngClass]="activeCategory() === c.value ? 'bg-primary/10 border-primary text-primary' : 'bg-surface border-gray-200 text-gray-600 hover:border-gray-300'">
-            <physio-icon [name]="c.icon" [size]="14"></physio-icon>
-            {{ c.label }}
-          </button>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex flex-wrap gap-1.5" role="group" aria-label="Catalog view">
+            <button *ngFor="let v of views" boo-button size="sm" [variant]="view() === v.key ? 'soft' : 'ghost'" (click)="setView(v.key)"
+              [attr.aria-pressed]="view() === v.key">{{ v.label }}</button>
+          </div>
+          <boo-filter-chips [chips]="activeChips()" (remove)="removeChip($event)"></boo-filter-chips>
         </div>
-
-        <!-- Result mode chips -->
-        <div class="flex items-center gap-2">
-          <button *ngFor="let m of resultModes" type="button" (click)="setMode(m.key)"
-            class="px-3 py-1 rounded-md text-xs font-medium transition-colors"
-            [ngClass]="mode() === m.key ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
-            {{ m.label }}
-          </button>
-        </div>
+        <p *ngIf="view() !== 'Catalog'" class="text-xs text-secondary m-0">{{ viewHint() }}</p>
       </div>
 
-      <!-- Product grid -->
-      <div class="flex-1 overflow-y-auto p-3">
-        <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-          <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <div class="flex min-h-0 flex-1 flex-col" aria-live="polite" [attr.aria-busy]="loading()">
+        <div *ngIf="loading() && !items().length" class="p-4 space-y-2">
+          <div *ngFor="let n of skeleton" class="h-14 rounded-1.5 bg-gray-50 animate-pulse"></div>
         </div>
 
-        <boo-empty-state *ngIf="!isLoading() && !displayedMedicines().length" icon="search-x" title="No medicines match your search">
-          <button (click)="clearFilters()" class="text-primary text-xs font-semibold hover:underline">Clear Filters</button>
+        <boo-error-state *ngIf="!loading() && error()" title="Couldn't load medicines" [description]="error()" (retry)="reload()"></boo-error-state>
+
+        <boo-empty-state *ngIf="!loading() && !error() && !items().length" icon="search-x" [title]="emptyTitle()" [description]="emptyDescription()">
+          <button *ngIf="hasFilters()" boo-button variant="outline" size="sm" (click)="clearFilters()">Clear filters</button>
         </boo-empty-state>
 
-        <div *ngIf="!isLoading() && displayedMedicines().length" class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
-          <div *ngFor="let med of displayedMedicines(); trackBy: trackById"
-            class="relative bg-surface border border-gray-200 rounded-lg p-3 flex flex-col gap-1.5 transition-all hover:shadow-card hover:-translate-y-0.5"
-            [class.opacity-60]="med.stock === 0">
-            <span *ngIf="med.promotionLabel" class="absolute -top-2 -right-2 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">{{ med.promotionLabel }}</span>
-
-            <button type="button" (click)="viewDetail.emit(med.id)" class="absolute top-2 right-2 text-gray-400 hover:text-primary" aria-label="View details">
-              <physio-icon name="info" [size]="14"></physio-icon>
-            </button>
-
-            <div class="pr-5">
-              <p class="text-sm font-semibold text-gray-800 leading-tight">{{ med.name }}</p>
-              <p class="text-xs text-gray-500">{{ med.genericName }} · {{ med.strength }}</p>
-              <p class="text-[11px] text-gray-400">{{ med.packageLabel }}</p>
-            </div>
-
-            <div class="flex items-center justify-between text-xs mt-1">
-              <span [ngClass]="stockClass(med.stock)">{{ med.stock === 0 ? 'Out of stock' : med.stock + ' units' }}</span>
-              <span *ngIf="med.insuranceCovered" class="text-primary font-medium flex items-center gap-0.5">
-                <physio-icon name="shield-check" [size]="12"></physio-icon> Insured
-              </span>
-            </div>
-
-            <div class="flex items-center justify-between mt-1">
-              <span class="text-sm font-bold text-gray-900">\${{ med.price.toFixed(2) }}</span>
-              <boo-button-admin (click)="addToCart.emit(med)" [disabled]="med.stock === 0" textColor="white" [fontSize]="12" [radius]="8" fontWeight="600">
-                Add
-              </boo-button-admin>
-            </div>
-          </div>
+        <div *ngIf="!error() && items().length" class="boo-scrollbar min-h-0 flex-1 overflow-auto transition-opacity" [class.opacity-60]="loading()">
+          <table class="w-full min-w-[520px] text-sm border-collapse">
+            <caption class="sr-only">Medicines available for retail sale</caption>
+            <thead class="sticky top-0 z-10 bg-gray-50">
+              <tr class="text-left text-[11px] uppercase tracking-wide text-secondary bg-gray-50">
+                <th scope="col" class="px-4 py-2.5 font-semibold">Medicine</th>
+                <th scope="col" class="px-3 py-2.5 font-semibold hidden xl:table-cell">Category</th>
+                <th scope="col" class="px-3 py-2.5 font-semibold hidden lg:table-cell">Batch · expiry</th>
+                <th scope="col" class="px-3 py-2.5 font-semibold text-right">Stock</th>
+                <th scope="col" class="px-3 py-2.5 font-semibold text-right">Price</th>
+                <th scope="col" class="px-4 py-2.5 font-semibold text-right"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let med of items(); trackBy: trackById" class="border-t border-borderGray/60 hover:bg-gray-50/70" [class.text-gray-500]="med.stock <= 0">
+                <th scope="row" class="px-4 py-3 text-left font-normal align-top">
+                  <button type="button" (click)="viewDetail.emit(med.id)" class="text-left font-semibold text-regular hover:text-primaryDeep hover:underline break-words bg-transparent p-0 border-0 cursor-pointer">{{ med.name }}</button>
+                  <span class="block text-xs text-secondary break-words">{{ subtitle(med) }}</span>
+                  <span *ngIf="med.barcode" class="block text-[11px] text-gray-500 tabular-nums">{{ med.barcode }}</span>
+                </th>
+                <td class="px-3 py-3 align-top text-xs text-secondary hidden xl:table-cell">{{ med.category }}<span *ngIf="med.manufacturer" class="block text-gray-500">{{ med.manufacturer }}</span></td>
+                <td class="px-3 py-3 align-top text-xs text-secondary hidden lg:table-cell">
+                  <ng-container *ngIf="med.batchNo || med.expiryDate; else noBatch">{{ med.batchNo }}<span *ngIf="med.expiryDate" class="block text-gray-500">{{ med.expiryDate | date:'mediumDate' }}</span></ng-container>
+                  <ng-template #noBatch>—</ng-template>
+                </td>
+                <td class="px-3 py-3 align-top text-right tabular-nums whitespace-nowrap">
+                  <span *ngIf="med.stock > 0" class="text-regular">{{ med.stock }}</span>
+                  <span *ngIf="med.stock <= 0" class="text-xs font-semibold text-danger">Out of stock</span>
+                </td>
+                <td class="px-3 py-3 align-top text-right tabular-nums whitespace-nowrap">
+                  <span class="font-semibold text-regular">{{ money(med.price) }}</span>
+                  <span *ngIf="med.mrp && med.mrp > med.price" class="block text-[11px] text-gray-500 line-through">{{ money(med.mrp) }}</span>
+                </td>
+                <td class="px-4 py-3 align-top text-right">
+                  <button boo-button variant="outline" size="sm" (click)="addToCart.emit(med)" [disabled]="med.stock <= 0 || addDisabled"
+                    [loading]="pendingMedicineId === med.id" [attr.aria-label]="'Add ' + med.name + ' to sale'" [attr.title]="addDisabled ? addDisabledReason : null">Add</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-    </div>
-  `,
-})
+
+      <div *ngIf="items().length" class="shrink-0 px-4 py-3 border-t border-borderGray/60 flex flex-wrap items-center justify-between gap-3">
+        <span class="text-xs text-secondary">{{ view() === 'Catalog' ? totalCount() + ' medicines' : items().length + ' medicines' }}</span>
+        <boo-pagination *ngIf="view() === 'Catalog'" [page]="pageNumber()" [totalPages]="totalPages()" (pageChange)="goToPage($event)"></boo-pagination>
+      </div>
+    </section>
+  `,})
 export class RetailCatalogPanelComponent implements OnInit {
+  /** Disables every Add button, e.g. the cart is on hold or the cashier cannot edit carts. */
+  @Input() addDisabled = false;
+  @Input() addDisabledReason = '';
+  /** Medicine whose add request is in flight; its button shows a spinner. */
+  @Input() pendingMedicineId: string | null = null;
+  /** Categories need pharmacy:medicine-category:read; without it the filter is simply not offered. */
+  @Input() canReadCategories = false;
   @Output() addToCart = new EventEmitter<RetailMedicineCard>();
   @Output() viewDetail = new EventEmitter<string>();
+  /** Fires with every list the panel receives so the page can keep a stock lookup for cart quantity hints. */
+  @Output() medicinesLoaded = new EventEmitter<RetailMedicineCard[]>();
+  @Output() barcodeScanned = new EventEmitter<RetailMedicineCard>();
 
-  @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
-  @ViewChild('barcodeInput') barcodeInputRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('barcodeInput') private barcodeInput?: BooInputComponent;
+  @ViewChild(BooSearchFieldComponent, { read: ElementRef }) private searchField?: ElementRef<HTMLElement>;
 
-  isLoading = signal(true);
-  allMedicines = signal<RetailMedicineCard[]>([]);
-  categories = signal<RetailQuickCategory[]>([]);
-  suggestionResults = signal<RetailMedicineCard[]>([]);
+  private readonly srv = inject(RetailPosService);
+  private readonly toastSrv = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly search$ = new Subject<string>();
+  private loadSub?: Subscription;
 
-  query = '';
-  barcode = '';
-  activeCategory = signal<string>('');
-  mode = signal<ResultMode>('Search');
-
-  readonly resultModes: { key: ResultMode; label: string }[] = [
-    { key: 'Search', label: 'Search Results' },
-    { key: 'Favorites', label: 'Favorites' },
-    { key: 'RecentlySold', label: 'Recently Sold' },
-    { key: 'Recommended', label: 'Recommended' },
+  readonly skeleton = Array.from({ length: 6 });
+  readonly views: { key: CatalogView; label: string }[] = [
+    { key: 'Catalog', label: 'Catalog' },
+    { key: 'RecentlySold', label: 'Recently sold' },
+    { key: 'Recommended', label: 'Best selling' },
   ];
 
-  constructor(private srv: RetailPosService, private toastSrv: ToastService) { }
+  items = signal<RetailMedicineCard[]>([]);
+  categories = signal<RetailCategory[]>([]);
+  loading = signal(true);
+  scanning = signal(false);
+  error = signal<string | null>(null);
+  view = signal<CatalogView>('Catalog');
+  pageNumber = signal(1);
+  totalPages = signal(1);
+  totalCount = signal(0);
+
+  search = '';
+  categoryId: string | null = null;
+  barcode = '';
 
   ngOnInit(): void {
-    this.srv.getQuickCategories().subscribe(res => { if (res.success) this.categories.set(res.data); });
-    this.srv.searchCatalog().subscribe({
-      next: (res) => { if (res.success) this.allMedicines.set(res.data.items); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false),
+    this.search$.pipe(debounceTime(350), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.pageNumber.set(1);
+      this.reload();
     });
+    if (this.canReadCategories) {
+      this.srv.getCategories().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: res => { if (res.success) this.categories.set(res.data.items); },
+        error: () => { /* optional filter: the catalog stays usable without it */ },
+      });
+    }
+    this.reload();
   }
 
   focusSearch(): void {
-    this.searchInputRef?.nativeElement.focus();
+    this.searchField?.nativeElement.querySelector('input')?.focus();
   }
 
   focusBarcode(): void {
-    this.barcodeInputRef?.nativeElement.focus();
+    this.barcodeInput?.focusInput();
   }
 
-  onSearchChange(): void {
-    if (this.query) this.mode.set('Search');
-  }
+  reload(): void {
+    this.loadSub?.unsubscribe();
+    this.loading.set(true);
+    this.error.set(null);
 
-  setCategory(value: string): void {
-    this.activeCategory.set(value);
-  }
+    const view = this.view();
+    const request$: Observable<CatalogPage> = view === 'Catalog'
+      ? this.srv.searchCatalog({ search: this.search, categoryId: this.categoryId, pageNumber: this.pageNumber(), pageSize: PAGE_SIZE }).pipe(
+        map(res => ({ items: res.success ? res.data?.items ?? [] : [], totalPages: res.data?.totalPages ?? 1, totalCount: res.data?.totalCount ?? 0 })))
+      : this.srv.getSuggestions(view).pipe(
+        map(res => ({ items: res.success ? res.data ?? [] : [], totalPages: 1, totalCount: res.data?.length ?? 0 })));
 
-  setMode(key: ResultMode): void {
-    this.mode.set(key);
-    if (key !== 'Search') {
-      this.srv.getSuggestions(key).subscribe(res => { if (res.success) this.suggestionResults.set(res.data); });
-    }
-  }
-
-  clearFilters(): void {
-    this.query = '';
-    this.activeCategory.set('');
-    this.mode.set('Search');
-  }
-
-  scanBarcode(): void {
-    const code = this.barcode.trim();
-    if (!code) return;
-    this.srv.lookupByBarcode(code).subscribe(res => {
-      if (res.success && res.data) {
-        this.addToCart.emit(res.data);
-        this.toastSrv.success(`${res.data.name} added to cart`, 'Scanned');
-      } else {
-        this.toastSrv.error(`No medicine found for barcode ${code}`);
-      }
-      this.barcode = '';
+    this.loadSub = request$.subscribe({
+      next: page => {
+        this.items.set(page.items);
+        this.totalPages.set(Math.max(1, page.totalPages));
+        this.totalCount.set(page.totalCount);
+        this.loading.set(false);
+        this.medicinesLoaded.emit(this.items());
+      },
+      error: () => {
+        this.items.set([]);
+        this.loading.set(false);
+        this.error.set('Check your connection and try again.');
+      },
     });
   }
 
-  displayedMedicines(): RetailMedicineCard[] {
-    if (this.mode() !== 'Search') return this.suggestionResults();
-
-    let list = this.allMedicines();
-    if (this.activeCategory()) list = list.filter(m => m.category === this.activeCategory());
-    if (this.query) {
-      const q = this.query.toLowerCase();
-      list = list.filter(m => m.name.toLowerCase().includes(q) || m.genericName.toLowerCase().includes(q) || m.batchNo.toLowerCase().includes(q));
-    }
-    return list;
+  onSearchInput(value: string): void {
+    this.search = value ?? '';
+    if (this.view() !== 'Catalog') this.view.set('Catalog');
+    this.search$.next(this.search.trim());
   }
 
-  stockClass(stock: number): string {
-    if (stock === 0) return 'text-rose-600 font-semibold';
-    if (stock < 10) return 'text-rose-600 font-semibold';
-    if (stock < 50) return 'text-amber-600';
-    return 'text-emerald-600';
+  clearSearch(): void {
+    this.search = '';
+    this.search$.next('');
+  }
+
+  onCategoryChange(value: string | null): void {
+    this.categoryId = value || null;
+    this.view.set('Catalog');
+    this.pageNumber.set(1);
+    this.reload();
+  }
+
+  setView(key: CatalogView): void {
+    if (this.view() === key) return;
+    this.view.set(key);
+    this.pageNumber.set(1);
+    this.reload();
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages() || page === this.pageNumber()) return;
+    this.pageNumber.set(page);
+    this.reload();
+  }
+
+  clearFilters(): void {
+    this.search = '';
+    this.categoryId = null;
+    this.view.set('Catalog');
+    this.pageNumber.set(1);
+    this.reload();
+  }
+
+  activeChips(): (BooFilterChip & { kind: 'search' | 'category' })[] {
+    const chips: (BooFilterChip & { kind: 'search' | 'category' })[] = [];
+    if (this.view() === 'Catalog' && this.search.trim()) chips.push({ label: `"${this.search.trim()}"`, kind: 'search' });
+    if (this.view() === 'Catalog' && this.categoryId) {
+      chips.push({ label: this.categories().find(c => c.id === this.categoryId)?.name ?? 'Category', kind: 'category' });
+    }
+    return chips;
+  }
+
+  removeChip(chip: BooFilterChip): void {
+    if ((chip as { kind?: string }).kind === 'search') {
+      this.search = '';
+      this.pageNumber.set(1);
+      this.reload();
+    } else {
+      this.onCategoryChange(null);
+    }
+  }
+
+  hasFilters(): boolean {
+    return this.view() !== 'Catalog' || !!this.search.trim() || !!this.categoryId;
+  }
+
+  scanBarcode(): void {
+    const code = (this.barcode ?? '').trim();
+    if (!code || this.scanning()) return;
+    this.scanning.set(true);
+    this.srv.lookupByBarcode(code).subscribe({
+      next: res => {
+        this.scanning.set(false);
+        if (res.success && res.data) {
+          this.barcodeScanned.emit(res.data);
+          this.barcode = '';
+        } else {
+          this.toastSrv.error(`No medicine found for barcode ${code}`);
+        }
+      },
+      error: () => this.scanning.set(false), // barcode kept so the cashier can rescan or correct it
+    });
+  }
+
+  viewHint(): string {
+    return this.view() === 'RecentlySold'
+      ? 'Medicines sold at retail in the last 30 days, most recent first. Search and category filters do not apply here.'
+      : 'Best-selling medicines at retail over the last 30 days, by units sold. Search and category filters do not apply here.';
+  }
+
+  emptyTitle(): string {
+    if (this.view() !== 'Catalog') return 'No retail sales in the last 30 days';
+    return this.hasFilters() ? 'No medicines match your search' : 'No medicines available';
+  }
+
+  emptyDescription(): string {
+    if (this.view() !== 'Catalog') return 'Suggestions appear once medicines have been sold at retail.';
+    return this.hasFilters() ? 'Try a different name, barcode or category.' : 'Active medicines will appear here once they are added to the catalog.';
+  }
+
+  subtitle(med: RetailMedicineCard): string {
+    return [med.genericName, med.strength, med.packageLabel].filter(Boolean).join(' · ');
+  }
+
+  money(amount: number): string {
+    return formatRetailMoney(amount);
   }
 
   trackById(_: number, item: RetailMedicineCard): string {

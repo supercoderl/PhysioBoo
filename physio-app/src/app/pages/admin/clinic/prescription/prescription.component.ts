@@ -12,7 +12,6 @@ import {
     BooInlineErrorComponent,
 } from '@physioboo/ui';
 import { Subscription, combineLatest, filter, finalize, take } from 'rxjs';
-import { AdminBreadcrumbComponent } from '../../../../components/breadcrumb/admin-breadcrumb.component';
 import { PrescriptionService } from '../../../../services/admin/prescription.service';
 import { AuthService } from '../../../../services/auth/auth.service';
 import { DialogService } from '../../../../services/common/dialog.service';
@@ -52,7 +51,6 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     standalone: true,
     imports: [
         NgIf,
-        AdminBreadcrumbComponent,
         BooButtonComponent,
         BooEmptyStateComponent,
         BooErrorStateComponent,

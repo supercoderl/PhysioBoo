@@ -1,42 +1,50 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { BooInlineErrorComponent } from '@physioboo/ui';
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { SharedModule } from "../../../../shared/shared-imports";
+import { StatTone } from "../../../../shared/types/doctor-desk.types";
 import { InventoryKpis } from "../../../../shared/types/inventory-management.types";
 
-interface KpiDef {
-  key: string;
-  label: string;
-  icon: string;
-  tone: 'primary' | 'success' | 'warning' | 'danger' | 'neutral';
-  value: (k: InventoryKpis) => string | number;
+interface KpiCard {
+    label: string;
+    value: string;
+    icon: string;
+    tone: StatTone;
 }
 
+const MONEY = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+const COUNT = new Intl.NumberFormat('en-US');
+
+/**
+ * The server counts low stock, near expiry and expiry per batch, so those cards say "batches".
+ * Purchase orders (always 0 server-side) and out-of-stock (counts empty batches too) are left out on purpose.
+ */
 @Component({
-  selector: 'inventory-kpi-strip',
-  standalone: true,
-  imports: [SharedModule, StatCardComponent],
-  template: `
-    <div class="flex items-center gap-3 overflow-x-auto pb-1">
-      <button type="button" *ngFor="let def of defs" (click)="kpiClick.emit(def.key)" class="shrink-0 text-left">
-        <boo-stat-card [label]="def.label" [value]="kpis ? def.value(kpis) : '—'" [icon]="def.icon" [tone]="def.tone"></boo-stat-card>
-      </button>
-    </div>
+    selector: 'inventory-kpi-strip',
+    standalone: true,
+    imports: [SharedModule, StatCardComponent, BooInlineErrorComponent],
+    template: `
+    <boo-inline-error *ngIf="error" what="the inventory overview" [state]="retrying ? 'retrying' : 'default'" (retry)="retry.emit()"></boo-inline-error>
+
+    <section *ngIf="!error" aria-label="Inventory overview" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
+      <boo-stat-card *ngFor="let card of cards" [label]="card.label" [value]="card.value" [icon]="card.icon" [tone]="card.tone"></boo-stat-card>
+    </section>
   `,
 })
 export class InventoryKpiStripComponent {
-  @Input() kpis: InventoryKpis | null = null;
-  @Output() kpiClick = new EventEmitter<string>();
+    @Input() kpis: InventoryKpis | null = null;
+    @Input() error = false;
+    @Input() retrying = false;
+    @Output() retry = new EventEmitter<void>();
 
-  readonly defs: KpiDef[] = [
-    { key: 'value', label: 'Total Inventory Value', icon: 'dollar-sign', tone: 'primary', value: k => '$' + k.totalInventoryValue.toLocaleString() },
-    { key: 'medicines', label: 'Total Medicines', icon: 'pill', tone: 'neutral', value: k => k.totalMedicines },
-    { key: 'available', label: 'Available Stock', icon: 'package', tone: 'success', value: k => k.availableStock.toLocaleString() },
-    { key: 'reserved', label: 'Reserved Stock', icon: 'package-search', tone: 'neutral', value: k => k.reservedStock.toLocaleString() },
-    { key: 'lowStock', label: 'Low Stock Items', icon: 'trending-down', tone: 'warning', value: k => k.lowStockCount },
-    { key: 'outOfStock', label: 'Out of Stock', icon: 'package-x', tone: 'danger', value: k => k.outOfStockCount },
-    { key: 'nearExpiry', label: 'Near Expiry', icon: 'calendar-clock', tone: 'warning', value: k => k.nearExpiryCount },
-    { key: 'expired', label: 'Expired Items', icon: 'triangle-alert', tone: 'danger', value: k => k.expiredCount },
-    { key: 'movements', label: "Today's Movements", icon: 'activity', tone: 'primary', value: k => k.todayMovementsCount },
-    { key: 'pendingPo', label: 'Pending Purchase Orders', icon: 'clipboard', tone: 'neutral', value: k => k.pendingPurchaseOrders },
-  ];
+    get cards(): KpiCard[] {
+        const k = this.kpis;
+        return [
+            { label: 'Active medicines', value: k ? COUNT.format(k.totalMedicines) : '—', icon: 'pill', tone: 'primary' },
+            { label: 'Stock value (at cost)', value: k ? MONEY.format(k.totalInventoryValue) : '—', icon: 'wallet', tone: 'neutral' },
+            { label: 'Low-stock batches', value: k ? COUNT.format(k.lowStockCount) : '—', icon: 'triangle-alert', tone: k && k.lowStockCount > 0 ? 'warning' : 'neutral' },
+            { label: 'Near-expiry batches', value: k ? COUNT.format(k.nearExpiryCount) : '—', icon: 'clock-alert', tone: k && k.nearExpiryCount > 0 ? 'warning' : 'neutral' },
+            { label: 'Expired batches', value: k ? COUNT.format(k.expiredCount) : '—', icon: 'circle-alert', tone: k && k.expiredCount > 0 ? 'danger' : 'neutral' },
+        ];
+    }
 }

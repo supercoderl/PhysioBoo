@@ -34,7 +34,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     NursingIoTabComponent, NursingTasksTabComponent, NursingNotesTabComponent,
   ],
   template: `
-    <div class="py-5 flex flex-col gap-4 min-w-0" [attr.aria-busy]="isLoading()">
+    <div class="flex flex-1 min-h-0 flex-col gap-4 pb-5" [attr.aria-busy]="isLoading()">
       <!-- First load -->
       <div *ngIf="isLoading()" aria-hidden="true" class="flex flex-col gap-3">
         <div class="rounded-xl border border-borderGray bg-surface p-4 flex items-center gap-3">
@@ -71,7 +71,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
       <ng-container *ngIf="!isLoading() && !loadError() && patient() as p">
         <!-- Patient identity and clinical context: stays in view while the tabs scroll -->
-        <header class="sticky top-0 z-20 bg-surface border border-borderGray rounded-xl shadow-sm">
+        <header class="shrink-0 bg-surface border border-borderGray rounded-xl shadow-sm">
           <div class="px-4 py-3 flex flex-wrap items-start justify-between gap-3">
             <div class="flex items-start gap-3 min-w-0">
               <a boo-button variant="ghost" size="sm" [iconOnly]="true" routerLink="/admin/nursing/dashboard" aria-label="Back to nursing dashboard">
@@ -128,7 +128,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         </header>
 
         <!-- Tabs keep their state (drafts, page) once opened, so switching never loses unsaved input -->
-        <main class="min-w-0">
+        <main class="boo-scrollbar min-h-0 min-w-0 flex-1 overflow-auto">
           <section *ngFor="let t of tabs" [hidden]="activeTab() !== t.key" role="tabpanel" tabindex="0"
             [id]="'nursing-panel-' + t.key" [attr.aria-labelledby]="'nursing-tab-' + t.key">
             <ng-container *ngIf="visited().has(t.key)" [ngSwitch]="t.key">

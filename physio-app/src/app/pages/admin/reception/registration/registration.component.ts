@@ -9,7 +9,6 @@ import { catchError, debounceTime, distinctUntilChanged, finalize, map, of, swit
 import { BooDatepickerComponent } from '../../../../components/date-picker/boo-date-picker.component';
 import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
 import { BooTextareaComponent } from '../../../../components/textarea/boo-textarea/boo-textarea.component';
-import { AdminBreadcrumbComponent } from '../../../../components/breadcrumb/admin-breadcrumb.component';
 import { DoctorService } from '../../../../services/admin/doctor.service';
 import { PatientService } from '../../../../services/admin/patient.service';
 import { AuthService } from '../../../../services/auth/auth.service';
@@ -89,7 +88,6 @@ function validDob(control: AbstractControl<string>): ValidationErrors | null {
         DatePipe,
         ReactiveFormsModule,
         RouterLink,
-        AdminBreadcrumbComponent,
         BooButtonComponent,
         BooIconComponent,
         BooInlineErrorComponent,

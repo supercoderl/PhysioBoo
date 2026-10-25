@@ -1,177 +1,423 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signal } from "@angular/core";
-import { Color, ScaleType } from '@swimlane/ngx-charts';
-import { curveCatmullRom } from 'd3-shape';
+import { Component, EventEmitter, HostListener, inject, Input, OnChanges, Output, signal, SimpleChanges } from "@angular/core";
+import { BooButtonComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { BooEmptyStateComponent } from '@physioboo/ui';
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
+import { AuthService } from "../../../../services/auth/auth.service";
 import { ToastService } from "../../../../services/common/toast.service";
+import { Permissions } from "../../../../shared/constants/permission.constant";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { InventoryHistoryEntry, InventoryMedicineDetail, WarehouseBatch } from "../../../../shared/types/inventory-management.types";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import {
+    BatchActionKind,
+    BatchActionRequest,
+    batchStatusTone,
+    freeQuantity,
+    InventoryBatch,
+    InventoryHistoryEntry,
+    InventoryMedicine,
+    InventoryMedicineDetail,
+    InventoryZone,
+    stockStatusLabel,
+    stockStatusTone,
+} from "../../../../shared/types/inventory-management.types";
+import { InventoryBatchActionDialogComponent } from "./inventory-batch-action-dialog.component";
 
-type DrawerTab = 'Summary' | 'Batches' | 'Trends' | 'Purchase' | 'Dispensing' | 'Supplier' | 'Locations';
+type LoadState = 'idle' | 'loading' | 'ready' | 'error';
+type PanelTab = 'batches' | 'history';
 
 @Component({
     selector: 'inventory-detail-drawer',
     standalone: true,
-    imports: [SharedModule,DrawerComponent, BooEmptyStateComponent, BooButtonAdminComponent],
+    imports: [
+        SharedModule,
+        DrawerComponent,
+        BooButtonComponent,
+        BooEmptyStateComponent,
+        BooInlineErrorComponent,
+        BooStatusBadgeComponent,
+        InventoryBatchActionDialogComponent,
+    ],
     template: `
     <drawer [isOpen]="isOpen" (close)="close.emit()">
-      <div class="flex flex-col h-full" *ngIf="detail">
-        <div class="p-4 border-b border-borderGray/60 flex items-start justify-between">
-          <div>
-            <h3 class="text-base font-semibold text-regular">{{ detail.name }}</h3>
-            <p class="text-xs text-secondary">{{ detail.genericName }} · {{ detail.manufacturer }}</p>
+      <div *ngIf="medicine as med" class="flex flex-col h-screen bg-surface" role="dialog" aria-modal="true" aria-labelledby="inventory-panel-title">
+        <header class="flex-none px-6 py-5 border-b border-gray-100 flex items-start justify-between gap-4">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 id="inventory-panel-title" class="text-xl font-bold text-regular leading-tight m-0 break-words">{{ med.name }}</h2>
+              <boo-status-badge [label]="statusLabel(detail()?.status ?? med.status)" [tone]="statusTone(detail()?.status ?? med.status)" dotted></boo-status-badge>
+            </div>
+            <p class="text-sm text-secondary mt-1 mb-0">
+              {{ detail()?.genericName || med.genericName || 'No generic name' }}
+              <ng-container *ngIf="detail()?.manufacturer"> · {{ detail()?.manufacturer }}</ng-container>
+              <ng-container *ngIf="detail()?.category || med.category"> · {{ detail()?.category || med.category }}</ng-container>
+            </p>
           </div>
-          <button type="button" (click)="close.emit()" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100">
-            <physio-icon name="x" [size]="16"></physio-icon>
+          <button boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="close.emit()" aria-label="Close stock panel">
+            <physio-icon name="x" [size]="20"></physio-icon>
           </button>
-        </div>
+        </header>
 
-        <div class="flex items-center gap-1 px-4 pt-2 border-b border-borderGray/60 overflow-x-auto">
-          <button type="button" *ngFor="let t of tabs" (click)="tab.set(t)"
-            class="px-3 py-2 text-xs font-semibold border-b-2 -mb-px whitespace-nowrap"
-            [ngClass]="tab() === t ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-regular'">
-            {{ t }}
-          </button>
-        </div>
+        <div class="flex-1 min-h-0 overflow-y-auto" custom-scrollbar>
+          <div class="px-6 py-5 space-y-6">
+            <!-- Summary -->
+            <section aria-label="Stock summary">
+              <boo-inline-error *ngIf="detailState() === 'error'" what="the stock summary" (retry)="loadDetail()"></boo-inline-error>
 
-        <div class="flex-1 overflow-y-auto p-4 space-y-4">
-          <section *ngIf="tab() === 'Summary'">
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="rounded-1.5 bg-gray-50 px-3 py-2"><span class="text-secondary">Current Stock</span><p class="font-semibold text-regular">{{ detail.currentStock }} {{ detail.unit }}</p></div>
-              <div class="rounded-1.5 bg-gray-50 px-3 py-2"><span class="text-secondary">Status</span><p class="font-semibold text-regular">{{ detail.status }}</p></div>
-              <div class="rounded-1.5 bg-gray-50 px-3 py-2"><span class="text-secondary">Safety Stock</span><p class="font-semibold text-regular">{{ detail.safetyStock }}</p></div>
-              <div class="rounded-1.5 bg-gray-50 px-3 py-2"><span class="text-secondary">Reorder Level</span><p class="font-semibold text-regular">{{ detail.reorderLevel }}</p></div>
-              <div class="rounded-1.5 bg-gray-50 px-3 py-2"><span class="text-secondary">Avg Unit Cost</span><p class="font-semibold text-regular">{{ '$' + detail.averageUnitCost.toFixed(2) }}</p></div>
-              <div class="rounded-1.5 bg-primary/5 px-3 py-2"><span class="text-secondary">Total Value</span><p class="font-semibold text-primary">{{ '$' + detail.totalValue.toFixed(2) }}</p></div>
-            </div>
-          </section>
+              <dl *ngIf="detailState() !== 'error'" class="grid grid-cols-2 sm:grid-cols-3 gap-3 m-0">
+                <ng-container *ngIf="detail() as d; else summarySkeleton">
+                  <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
+                    <dt class="text-[11px] font-medium text-secondary">On hand</dt>
+                    <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ d.currentStock | number }}<span *ngIf="d.unit" class="ml-1 text-xs font-medium text-secondary">{{ d.unit }}</span></dd>
+                  </div>
+                  <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
+                    <dt class="text-[11px] font-medium text-secondary">Reorder level</dt>
+                    <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ d.reorderLevel | number }}</dd>
+                  </div>
+                  <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
+                    <dt class="text-[11px] font-medium text-secondary">Safety stock</dt>
+                    <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ d.safetyStock | number }}</dd>
+                  </div>
+                  <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
+                    <dt class="text-[11px] font-medium text-secondary">Average unit cost</dt>
+                    <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ d.averageUnitCost | currency:'USD':'symbol':'1.2-2' }}</dd>
+                  </div>
+                  <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
+                    <dt class="text-[11px] font-medium text-secondary">Stock value</dt>
+                    <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ d.totalValue | currency:'USD':'symbol':'1.2-2' }}</dd>
+                  </div>
+                  <div class="rounded-1.5 bg-gray-50 px-3 py-2.5 col-span-2 sm:col-span-1">
+                    <dt class="text-[11px] font-medium text-secondary">Storage</dt>
+                    <dd class="m-0 mt-0.5 text-sm font-semibold text-regular break-words">{{ d.storageLocations.length ? d.storageLocations.join(', ') : 'Not recorded' }}</dd>
+                  </div>
+                </ng-container>
+                <ng-template #summarySkeleton>
+                  <div *ngFor="let s of [1,2,3,4,5,6]" class="rounded-1.5 bg-gray-50 px-3 py-2.5" aria-hidden="true">
+                    <div class="h-2.5 w-16 rounded bg-gray-200 animate-pulse"></div>
+                    <div class="h-4 w-20 rounded bg-gray-200 animate-pulse mt-2"></div>
+                  </div>
+                </ng-template>
+              </dl>
+            </section>
 
-          <section *ngIf="tab() === 'Batches'">
-            <boo-empty-state *ngIf="!batches.length" icon="package-x" title="No batches"></boo-empty-state>
-            <div *ngFor="let b of batches" class="rounded-1.5 border border-borderGray/60 p-2.5 mb-2">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-xs font-semibold text-regular">{{ b.batchNo }}</span>
-                <span class="text-[11px] text-secondary">Exp {{ b.expiryDate | date:'mediumDate' }}</span>
+            <!-- Tabs -->
+            <section>
+              <div role="tablist" aria-label="Batches and history" class="flex items-center gap-1 border-b border-borderGray/60">
+                <button role="tab" type="button" id="inventory-tab-batches" [attr.aria-selected]="tab() === 'batches'" aria-controls="inventory-panel-batches"
+                  (click)="tab.set('batches')"
+                  class="px-3 py-2.5 text-sm font-semibold border-b-2 -mb-px whitespace-nowrap"
+                  [ngClass]="tab() === 'batches' ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-regular'">
+                  Batches<span *ngIf="batchState() === 'ready'" class="ml-1.5 text-xs font-medium text-secondary">{{ batches().length }}</span>
+                </button>
+                <button role="tab" type="button" id="inventory-tab-history" [attr.aria-selected]="tab() === 'history'" aria-controls="inventory-panel-history"
+                  (click)="openHistory()"
+                  class="px-3 py-2.5 text-sm font-semibold border-b-2 -mb-px whitespace-nowrap"
+                  [ngClass]="tab() === 'history' ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-regular'">
+                  History
+                </button>
               </div>
-              <p class="text-[11px] text-secondary">Qty {{ b.quantity }} · Available {{ b.availableQuantity }} · {{ b.storageLocation }}</p>
-            </div>
-          </section>
 
-          <section *ngIf="tab() === 'Trends'" class="space-y-4">
-            <div>
-              <p class="text-[11px] font-semibold text-secondary uppercase mb-1">Inventory Trend</p>
-              <div class="h-[140px]">
-                <ngx-charts-line-chart [results]="inventoryTrendSeries" [scheme]="trendScheme" [curve]="curve"
-                  [xAxis]="true" [yAxis]="true" [legend]="false" [showGridLines]="true" [autoScale]="true" [animations]="true"></ngx-charts-line-chart>
+              <!-- Batches -->
+              <div *ngIf="tab() === 'batches'" id="inventory-panel-batches" role="tabpanel" aria-labelledby="inventory-tab-batches" class="pt-4 space-y-3">
+                <boo-inline-error *ngIf="batchState() === 'error'" what="batches" (retry)="loadBatches()"></boo-inline-error>
+
+                <ng-container *ngIf="batchState() === 'loading'">
+                  <div *ngFor="let s of [1,2]" class="rounded-2 border border-borderGray/60 p-4 space-y-3" aria-hidden="true">
+                    <div class="h-4 w-32 rounded bg-gray-200 animate-pulse"></div>
+                    <div class="h-3 w-full rounded bg-gray-100 animate-pulse"></div>
+                    <div class="h-3 w-2/3 rounded bg-gray-100 animate-pulse"></div>
+                  </div>
+                </ng-container>
+
+                <boo-empty-state *ngIf="batchState() === 'ready' && !batches().length" icon="package-x" title="No batches recorded"
+                  description="This medicine has no stock batches yet."></boo-empty-state>
+
+                <article *ngFor="let b of batches(); trackBy: trackById" class="rounded-2 border border-borderGray/60 p-4">
+                  <div class="flex items-center justify-between gap-2 flex-wrap">
+                    <h3 class="text-sm font-semibold text-regular m-0 break-all">{{ b.batchNo || 'No batch number' }}</h3>
+                    <div class="flex items-center gap-1.5">
+                      <boo-status-badge *ngIf="b.isNearExpiry && !b.isExpired" label="Near expiry" tone="warning"></boo-status-badge>
+                      <boo-status-badge [label]="b.status" [tone]="batchTone(b.status)" dotted></boo-status-badge>
+                    </div>
+                  </div>
+
+                  <dl class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 mt-3 mb-0 text-sm">
+                    <div>
+                      <dt class="text-[11px] text-secondary">Expiry</dt>
+                      <dd class="m-0 font-medium" [ngClass]="b.isExpired ? 'text-rose-600' : b.isNearExpiry ? 'text-amber-700' : 'text-regular'">{{ b.expiryDate ? (b.expiryDate | date:'mediumDate') : '—' }}</dd>
+                    </div>
+                    <div>
+                      <dt class="text-[11px] text-secondary">On hand</dt>
+                      <dd class="m-0 font-medium text-regular tabular-nums">{{ b.quantity | number }}</dd>
+                    </div>
+                    <div>
+                      <dt class="text-[11px] text-secondary">Reserved</dt>
+                      <dd class="m-0 font-medium text-regular tabular-nums">{{ b.reservedQuantity | number }}</dd>
+                    </div>
+                    <div>
+                      <dt class="text-[11px] text-secondary">Free</dt>
+                      <dd class="m-0 font-medium text-regular tabular-nums">{{ free(b) | number }}</dd>
+                    </div>
+                    <div class="col-span-2">
+                      <dt class="text-[11px] text-secondary">Location</dt>
+                      <dd class="m-0 text-regular break-words">{{ b.storageLocation || '—' }}</dd>
+                    </div>
+                    <div>
+                      <dt class="text-[11px] text-secondary">Supplier</dt>
+                      <dd class="m-0 text-regular break-words">{{ b.supplier || '—' }}</dd>
+                    </div>
+                    <div>
+                      <dt class="text-[11px] text-secondary">Unit cost</dt>
+                      <dd class="m-0 text-regular tabular-nums">{{ b.purchasePrice !== null ? (b.purchasePrice | currency:'USD':'symbol':'1.2-2') : '—' }}</dd>
+                    </div>
+                  </dl>
+
+                  <div *ngIf="b.status !== 'Disposed' && hasAnyAction" class="flex flex-wrap gap-2 mt-4 pt-3 border-t border-borderGray/60">
+                    <button *ngIf="canReceive" boo-button variant="secondary" size="sm" (click)="openAction('receive', b)">
+                      <physio-icon name="inbox" [size]="16"></physio-icon>Receive
+                    </button>
+                    <button *ngIf="canUpdate" boo-button variant="secondary" size="sm" (click)="openAction('adjust', b)">
+                      <physio-icon name="pencil" [size]="16"></physio-icon>Adjust
+                    </button>
+                    <button *ngIf="canUpdate && canReadZones" boo-button variant="secondary" size="sm" [disabled]="free(b) <= 0" (click)="openAction('transfer', b)">
+                      <physio-icon name="truck" [size]="16"></physio-icon>Transfer
+                    </button>
+                    <button *ngIf="canDispose" boo-button variant="secondary" size="sm" classname="!text-rose-700 hover:!bg-rose-50" [disabled]="free(b) <= 0" (click)="openAction('dispose', b)">
+                      <physio-icon name="trash" [size]="16"></physio-icon>Dispose
+                    </button>
+                  </div>
+                </article>
               </div>
-            </div>
-            <div>
-              <p class="text-[11px] font-semibold text-secondary uppercase mb-1">Consumption Trend</p>
-              <div class="h-[140px]">
-                <ngx-charts-line-chart [results]="consumptionTrendSeries" [scheme]="consumptionScheme" [curve]="curve"
-                  [xAxis]="true" [yAxis]="true" [legend]="false" [showGridLines]="true" [autoScale]="true" [animations]="true"></ngx-charts-line-chart>
+
+              <!-- History -->
+              <div *ngIf="tab() === 'history'" id="inventory-panel-history" role="tabpanel" aria-labelledby="inventory-tab-history" class="pt-4">
+                <boo-inline-error *ngIf="historyState() === 'error'" what="the movement history" (retry)="loadHistory()"></boo-inline-error>
+
+                <ul *ngIf="historyState() === 'loading'" class="list-none m-0 p-0 space-y-3" aria-hidden="true">
+                  <li *ngFor="let s of [1,2,3,4]" class="space-y-2">
+                    <div class="h-3.5 w-48 rounded bg-gray-200 animate-pulse"></div>
+                    <div class="h-3 w-32 rounded bg-gray-100 animate-pulse"></div>
+                  </li>
+                </ul>
+
+                <boo-empty-state *ngIf="historyState() === 'ready' && !history().length" icon="history" title="No stock movements"
+                  description="Receipts, adjustments, transfers and write-offs will be listed here."></boo-empty-state>
+
+                <ol *ngIf="historyState() === 'ready' && history().length" class="list-none m-0 p-0 divide-y divide-borderGray/60">
+                  <li *ngFor="let h of history()" class="py-3 flex items-start justify-between gap-4">
+                    <div class="min-w-0">
+                      <p class="m-0 text-sm font-semibold text-regular break-words">{{ h.description }}</p>
+                      <p class="m-0 mt-0.5 text-xs text-secondary break-words">
+                        {{ h.date | date:'medium' }}<ng-container *ngIf="h.actor"> · {{ h.actor }}</ng-container><ng-container *ngIf="h.reference"> · Ref {{ h.reference }}</ng-container>
+                      </p>
+                    </div>
+                    <span class="flex-none text-sm font-semibold text-regular tabular-nums">{{ h.quantity | number }}</span>
+                  </li>
+                </ol>
               </div>
-            </div>
-          </section>
-
-          <section *ngIf="tab() === 'Purchase'">
-            <boo-empty-state *ngIf="!purchaseHistory.length" icon="shopping-cart" title="No purchase history"></boo-empty-state>
-            <div *ngFor="let h of purchaseHistory" class="flex items-center justify-between text-xs py-1.5 border-b border-gray-100">
-              <span class="text-secondary">{{ h.date | date:'mediumDate' }} · {{ h.description }}</span>
-              <span class="font-semibold text-regular">{{ h.quantity > 0 ? '+' : '' }}{{ h.quantity }}</span>
-            </div>
-          </section>
-
-          <section *ngIf="tab() === 'Dispensing'">
-            <boo-empty-state *ngIf="!dispensingHistory.length" icon="pill" title="No dispensing history"></boo-empty-state>
-            <div *ngFor="let h of dispensingHistory" class="flex items-center justify-between text-xs py-1.5 border-b border-gray-100">
-              <span class="text-secondary">{{ h.date | date:'mediumDate' }} · {{ h.description }}</span>
-              <span class="font-semibold text-rose-600">{{ h.quantity }}</span>
-            </div>
-          </section>
-
-          <section *ngIf="tab() === 'Supplier'">
-            <boo-empty-state *ngIf="!supplierHistory.length" icon="truck" title="No supplier history"></boo-empty-state>
-            <div *ngFor="let h of supplierHistory" class="flex items-center justify-between text-xs py-1.5 border-b border-gray-100">
-              <span class="text-secondary">{{ h.date | date:'mediumDate' }} · {{ h.description }}</span>
-              <span class="font-semibold text-emerald-600">+{{ h.quantity }}</span>
-            </div>
-          </section>
-
-          <section *ngIf="tab() === 'Locations'">
-            <div class="flex flex-wrap gap-1.5">
-              <span *ngFor="let loc of detail.storageLocations" class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-[11px]">{{ loc }}</span>
-            </div>
-          </section>
-        </div>
-
-        <div class="p-3 border-t border-borderGray/60 grid grid-cols-3 gap-2">
-          <boo-button-admin (click)="receiveStock.emit()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="11" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Receive Stock</boo-button-admin>
-          <boo-button-admin (click)="transferStock.emit()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="11" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Transfer</boo-button-admin>
-          <boo-button-admin (click)="adjustQuantity.emit()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="11" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Adjust Qty</boo-button-admin>
-          <boo-button-admin (click)="reserveStock.emit()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="11" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Reserve Stock</boo-button-admin>
-          <boo-button-admin (click)="disposeBatchAction.emit()" background="transparent" textColor="#E11D48" [border]="{ width: 1, color: '#FECDD3' }" padding="8px 12px" [fontSize]="11" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Dispose Batch</boo-button-admin>
-          <boo-button-admin (click)="printBarcode.emit()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="11" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">Print Barcode</boo-button-admin>
+            </section>
+          </div>
         </div>
       </div>
     </drawer>
+
+    <inventory-batch-action-dialog
+      [isOpen]="actionKind() !== null"
+      [kind]="actionKind()"
+      [batch]="actionBatch()"
+      [medicineName]="medicine?.name ?? ''"
+      [unit]="detail()?.unit ?? null"
+      [zones]="zones()"
+      [zonesState]="zonesState()"
+      [submitting]="submitting()"
+      (close)="closeAction()"
+      (confirm)="onConfirm($event)"
+    ></inventory-batch-action-dialog>
   `,
 })
 export class InventoryDetailDrawerComponent implements OnChanges {
     @Input() isOpen = false;
-    @Input() detail: InventoryMedicineDetail | null = null;
-    @Input() batches: WarehouseBatch[] = [];
-
+    @Input() medicine: InventoryMedicine | null = null;
     @Output() close = new EventEmitter<void>();
-    @Output() receiveStock = new EventEmitter<void>();
-    @Output() transferStock = new EventEmitter<void>();
-    @Output() adjustQuantity = new EventEmitter<void>();
-    @Output() reserveStock = new EventEmitter<void>();
-    @Output() disposeBatchAction = new EventEmitter<void>();
-    @Output() printBarcode = new EventEmitter<void>();
+    /** Stock changed: the list and the overview are out of date. */
+    @Output() changed = new EventEmitter<void>();
 
-    tab = signal<DrawerTab>('Summary');
-    readonly tabs: DrawerTab[] = ['Summary', 'Batches', 'Trends', 'Purchase', 'Dispensing', 'Supplier', 'Locations'];
+    private readonly srv = inject(InventoryManagementService);
+    private readonly toastSrv = inject(ToastService);
+    private readonly authSrv = inject(AuthService);
 
-    purchaseHistory: InventoryHistoryEntry[] = [];
-    dispensingHistory: InventoryHistoryEntry[] = [];
-    supplierHistory: InventoryHistoryEntry[] = [];
+    readonly canReceive = this.authSrv.hasPermission(Permissions.Pharmacy.MedicineInventoryCreate);
+    readonly canUpdate = this.authSrv.hasPermission(Permissions.Pharmacy.MedicineInventoryUpdate);
+    readonly canDispose = this.authSrv.hasPermission(Permissions.Pharmacy.MedicineInventoryDelete);
+    readonly canReadZones = this.authSrv.hasPermission(Permissions.Pharmacy.WarehouseZoneRead);
+    readonly hasAnyAction = this.canReceive || this.canUpdate || this.canDispose;
 
-    curve = curveCatmullRom;
-    inventoryTrendSeries: any[] = [];
-    consumptionTrendSeries: any[] = [];
-    trendScheme: Color = { name: 'inventory', selectable: true, group: ScaleType.Ordinal, domain: ['#FB7185'] };
-    consumptionScheme: Color = { name: 'consumption', selectable: true, group: ScaleType.Ordinal, domain: ['#ef4444'] };
+    tab = signal<PanelTab>('batches');
+    detail = signal<InventoryMedicineDetail | null>(null);
+    detailState = signal<LoadState>('idle');
+    batches = signal<InventoryBatch[]>([]);
+    batchState = signal<LoadState>('idle');
+    history = signal<InventoryHistoryEntry[]>([]);
+    historyState = signal<LoadState>('idle');
+    zones = signal<InventoryZone[]>([]);
+    zonesState = signal<LoadState>('idle');
 
-    constructor(private srv: InventoryManagementService, private toastSrv: ToastService) { }
+    actionKind = signal<BatchActionKind | null>(null);
+    actionBatch = signal<InventoryBatch | null>(null);
+    submitting = signal(false);
+
+    readonly statusLabel = stockStatusLabel;
+    readonly statusTone = stockStatusTone;
+    readonly batchTone = batchStatusTone;
+    readonly free = freeQuantity;
+
+    /** Bumped whenever the panel switches medicine, so a slow response for the previous one is ignored. */
+    private session = 0;
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['detail'] && this.detail) {
-            this.tab.set('Summary');
-            this.loadHistory();
-            this.buildTrends();
+        const opened = changes['isOpen'] && this.isOpen;
+        const switched = changes['medicine'] && this.isOpen;
+        if (!this.medicine || !(opened || switched)) return;
+
+        this.session++;
+        this.tab.set('batches');
+        this.detail.set(null);
+        this.batches.set([]);
+        this.history.set([]);
+        this.historyState.set('idle');
+        this.closeAction();
+        this.loadDetail();
+        this.loadBatches();
+    }
+
+    @HostListener('document:keydown.escape', ['$event'])
+    onEscape(event: Event): void {
+        // An open batch dialog handles Escape itself.
+        if (!this.isOpen || event.defaultPrevented || this.actionKind()) return;
+        this.close.emit();
+    }
+
+    trackById(_: number, batch: InventoryBatch): string {
+        return batch.id;
+    }
+
+    // #region Loading
+    loadDetail(): void {
+        const med = this.medicine;
+        if (!med) return;
+        const session = this.session;
+        this.detailState.set('loading');
+        this.srv.getMedicineDetail(med.id).subscribe({
+            next: res => {
+                if (session !== this.session) return;
+                this.detail.set(res.data ?? null);
+                this.detailState.set(res.success && res.data ? 'ready' : 'error');
+            },
+            error: () => { if (session === this.session) this.detailState.set('error'); },
+        });
+    }
+
+    loadBatches(): void {
+        const med = this.medicine;
+        if (!med) return;
+        const session = this.session;
+        this.batchState.set('loading');
+        this.srv.getBatches(med.id).subscribe({
+            next: res => {
+                if (session !== this.session) return;
+                this.batches.set(res.success ? res.data : []);
+                this.batchState.set(res.success ? 'ready' : 'error');
+            },
+            error: () => { if (session === this.session) this.batchState.set('error'); },
+        });
+    }
+
+    openHistory(): void {
+        this.tab.set('history');
+        if (this.historyState() === 'idle') this.loadHistory();
+    }
+
+    loadHistory(): void {
+        const med = this.medicine;
+        if (!med) return;
+        const session = this.session;
+        this.historyState.set('loading');
+        this.srv.getHistory(med.id).subscribe({
+            next: res => {
+                if (session !== this.session) return;
+                this.history.set(res.success ? res.data ?? [] : []);
+                this.historyState.set(res.success ? 'ready' : 'error');
+            },
+            error: () => { if (session === this.session) this.historyState.set('error'); },
+        });
+    }
+
+    private loadZones(): void {
+        if (this.zonesState() === 'loading' || this.zonesState() === 'ready') return;
+        this.zonesState.set('loading');
+        this.srv.getZones().subscribe({
+            next: res => {
+                this.zones.set(res.success ? (res.data ?? []).map(z => ({ id: z.id, name: z.name })) : []);
+                this.zonesState.set(res.success ? 'ready' : 'error');
+            },
+            error: () => this.zonesState.set('error'),
+        });
+    }
+    // #endregion
+
+    // #region Batch actions
+    openAction(kind: BatchActionKind, batch: InventoryBatch): void {
+        if (kind === 'transfer') this.loadZones();
+        this.actionBatch.set(batch);
+        this.actionKind.set(kind);
+    }
+
+    closeAction(): void {
+        this.actionKind.set(null);
+        this.actionBatch.set(null);
+        this.submitting.set(false);
+    }
+
+    onConfirm(request: BatchActionRequest): void {
+        const batch = this.actionBatch();
+        if (!batch || this.submitting()) return;
+
+        this.submitting.set(true);
+        const call$ = request.kind === 'receive' ? this.srv.receiveStock(batch.id, request.payload)
+            : request.kind === 'adjust' ? this.srv.adjustQuantity(batch.id, request.payload)
+                : request.kind === 'transfer' ? this.srv.transferBatch(batch.id, request.payload)
+                    : this.srv.disposeBatch(batch.id, request.payload);
+
+        const session = this.session;
+        call$.subscribe({
+            next: res => {
+                this.submitting.set(false);
+                if (!res.success) {
+                    // The dialog stays open with its values so the user can correct them.
+                    this.toastSrv.error('The change was not saved. Please check the values and try again.');
+                    return;
+                }
+                this.toastSrv.success(this.successMessage(request, batch));
+                this.closeAction();
+                this.changed.emit();
+                if (session !== this.session) return;
+                this.loadDetail();
+                this.loadBatches();
+                // History is only fetched when it was already opened; otherwise it loads fresh on first view.
+                this.historyState.set('idle');
+                if (this.tab() === 'history') this.loadHistory();
+            },
+            // The global interceptor shows the server's message; keep the dialog open and its values intact.
+            error: () => this.submitting.set(false),
+        });
+    }
+
+    private successMessage(request: BatchActionRequest, batch: InventoryBatch): string {
+        const batchNo = batch.batchNo || 'batch';
+        switch (request.kind) {
+            case 'receive': return `Received ${request.payload.quantity} units into ${batchNo}`;
+            case 'adjust': return `${batchNo} adjusted to ${request.payload.newQuantity} on hand`;
+            case 'transfer': return `Moved ${request.payload.quantity} units from ${batchNo}`;
+            case 'dispose': return `Disposed ${request.payload.quantity} units from ${batchNo}`;
         }
     }
-
-    private loadHistory(): void {
-        if (!this.detail) return;
-        this.srv.getHistory(this.detail.id, 'purchase').subscribe(res => { if (res.success) this.purchaseHistory = res.data.items; });
-        this.srv.getHistory(this.detail.id, 'dispensing').subscribe(res => { if (res.success) this.dispensingHistory = res.data.items; });
-        this.srv.getHistory(this.detail.id, 'supplier').subscribe(res => { if (res.success) this.supplierHistory = res.data.items; });
-    }
-
-    private buildTrends(): void {
-        if (!this.detail) return;
-        const base = this.detail.currentStock;
-        this.inventoryTrendSeries = [{
-            name: 'Stock Level',
-            series: [base * 1.3, base * 1.2, base * 1.05, base * 0.95, base].map((v, i) => ({ name: `Wk ${i + 1}`, value: Math.round(v) })),
-        }];
-        this.consumptionTrendSeries = [{
-            name: 'Consumption',
-            series: [12, 18, 15, 22, 20].map((v, i) => ({ name: `Wk ${i + 1}`, value: v })),
-        }];
-    }
+    // #endregion
 }

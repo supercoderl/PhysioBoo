@@ -1,81 +1,128 @@
-import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angular/core";
+import { Component, DestroyRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject, signal } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { BooButtonComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooInputComponent, BooSearchFieldComponent } from '@physioboo/ui';
+import { EMPTY, Subject, catchError, debounceTime, distinctUntilChanged, map, of, switchMap, tap } from "rxjs";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { BooEmptyStateComponent, BooInputComponent } from '@physioboo/ui';
 import { RetailPosService } from "../../../../services/admin/retail-pos.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailCustomer } from "../../../../shared/types/retail-pos.types";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 
 @Component({
   selector: 'retail-customer-lookup-drawer',
   standalone: true,
-  imports: [SharedModule,DrawerComponent, BooEmptyStateComponent, BooButtonAdminComponent, BooInputComponent],
+  imports: [SharedModule, DrawerComponent, BooButtonComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooInputComponent, BooSearchFieldComponent],
   template: `
-    <drawer [isOpen]="isOpen" (close)="close.emit()">
-      <div class="p-5">
+    <drawer [isOpen]="isOpen" (close)="requestClose()">
+      <div class="p-5" role="dialog" aria-modal="true" aria-labelledby="retail-customer-title" [attr.aria-hidden]="!isOpen">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-base font-semibold text-gray-900">Find Customer</h2>
-          <button type="button" (click)="close.emit()" class="text-gray-400 hover:text-gray-600" aria-label="Close drawer">
+          <h2 id="retail-customer-title" class="text-base font-semibold text-regular m-0">Find customer</h2>
+          <button type="button" (click)="requestClose()" class="w-8 h-8 rounded-1.5 flex items-center justify-center text-gray-500 hover:bg-gray-100" aria-label="Close customer lookup">
             <physio-icon name="x" [size]="18"></physio-icon>
           </button>
         </div>
 
-        <div class="relative mb-4">
-          <physio-icon name="search" [size]="16" [class]="'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
-          <input type="text" [(ngModel)]="query" (ngModelChange)="search()" placeholder="Search by name, phone, or MRN..."
-            class="w-full pl-9 pr-3 h-10 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/30 outline-none" />
+        <boo-search-field label="Search patients" placeholder="Name, phone or MRN" [busy]="searching()" [ngModel]="query" (ngModelChange)="onQueryChange($event)" (clear)="onQueryChange('')"></boo-search-field>
+
+        <div class="mt-4" aria-live="polite">
+          <boo-inline-error *ngIf="searchFailed()" what="patients" [compact]="true" (retry)="retrySearch()"></boo-inline-error>
+
+          <p *ngIf="!searchFailed() && !query.trim()" class="text-sm text-secondary m-0">Type at least part of a patient's name, phone number or MRN to search.</p>
+
+          <boo-empty-state *ngIf="!searchFailed() && query.trim() && !searching() && !results().length" icon="user-search" title="No patients found" description="Try a different name, phone or MRN, or use a walk-in customer below."></boo-empty-state>
+
+          <ul class="list-none m-0 p-0" *ngIf="results().length">
+            <li *ngFor="let p of results()" class="flex items-center justify-between gap-3 py-2.5 border-b border-borderGray/60 last:border-0">
+              <div class="min-w-0">
+                <p class="text-sm font-medium text-regular m-0 break-words">{{ p.fullName }}</p>
+                <p class="text-xs text-secondary m-0">{{ p.mrn }}<span *ngIf="p.phone"> · {{ p.phone }}</span></p>
+                <p *ngIf="p.insuranceProvider" class="text-xs text-primaryDeep m-0">{{ p.insuranceProvider }}</p>
+              </div>
+              <button boo-button variant="outline" size="sm" (click)="useCustomer.emit(p)" [disabled]="submitting" class="shrink-0">Use</button>
+            </li>
+          </ul>
         </div>
 
-        <boo-empty-state *ngIf="!results().length" icon="user-search" title="No patients found" description="Try a different name, phone, or MRN"></boo-empty-state>
-
-        <div *ngFor="let p of results()" class="flex items-center justify-between py-2.5 border-b border-gray-100 last:border-0">
-          <div>
-            <p class="text-sm font-medium text-gray-900">{{ p.fullName }}</p>
-            <p class="text-xs text-gray-500">{{ p.mrn }} · {{ p.phone }}</p>
-          </div>
-          <button type="button" (click)="useCustomer.emit(p)" class="text-xs font-semibold text-primary hover:underline">Use as Customer</button>
-        </div>
-
-        <div class="mt-6 pt-4 border-t border-gray-200">
-          <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Walk-in Customer</p>
-          <div class="flex flex-col gap-2">
-            <boo-input [(ngModel)]="walkInName" label="Name" size="small"></boo-input>
-            <boo-input type="tel" [(ngModel)]="walkInPhone" label="Phone" size="small"></boo-input>
-            <boo-button-admin (click)="useWalkIn()" [disabled]="!walkInName" textColor="white" padding="8px 12px" [fontSize]="14" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">
-              Use Walk-in Customer
-            </boo-button-admin>
-          </div>
-        </div>
+        <form class="mt-6 pt-4 border-t border-borderGray/60 space-y-3" (ngSubmit)="submitWalkIn()" novalidate>
+          <p class="text-xs font-semibold text-secondary uppercase m-0">Walk-in customer</p>
+          <boo-input name="walkInName" label="Name" [required]="true" [(ngModel)]="walkInName" [maxlength]="120" [disabled]="submitting"></boo-input>
+          <boo-input name="walkInPhone" type="tel" label="Phone (optional)" [(ngModel)]="walkInPhone" [maxlength]="30" [disabled]="submitting"></boo-input>
+          <p *ngIf="walkInTouched && !walkInName.trim()" class="text-xs text-danger m-0" role="alert">Enter the customer's name.</p>
+          <button boo-button type="submit" variant="primary" size="sm" [block]="true" [loading]="submitting" [disabled]="submitting">Use walk-in customer</button>
+        </form>
       </div>
     </drawer>
   `,
 })
-export class RetailCustomerLookupDrawerComponent implements OnChanges {
+export class RetailCustomerLookupDrawerComponent implements OnInit, OnChanges {
   @Input() isOpen = false;
+  /** Attaching the customer to the cart is in flight; the drawer stays open if it fails so nothing is retyped. */
+  @Input() submitting = false;
   @Output() close = new EventEmitter<void>();
   @Output() useCustomer = new EventEmitter<RetailCustomer>();
+
+  private readonly srv = inject(RetailPosService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly query$ = new Subject<string>();
 
   query = '';
   walkInName = '';
   walkInPhone = '';
+  walkInTouched = false;
   results = signal<RetailCustomer[]>([]);
+  searching = signal(false);
+  searchFailed = signal(false);
 
-  constructor(private srv: RetailPosService) { }
-
-  ngOnChanges(): void {
-    if (this.isOpen) this.search();
-  }
-
-  search(): void {
-    this.srv.searchPatients(this.query).subscribe(res => {
-      if (res.success) this.results.set(res.data);
+  ngOnInit(): void {
+    this.query$.pipe(
+      map(q => q.trim()),
+      debounceTime(350),
+      distinctUntilChanged(),
+      tap(q => { this.searchFailed.set(false); this.searching.set(!!q); if (!q) this.results.set([]); }),
+      switchMap(q => q
+        ? this.srv.searchPatients(q).pipe(catchError(() => { this.searching.set(false); this.searchFailed.set(true); return EMPTY; }))
+        : of(null)),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(res => {
+      this.searching.set(false);
+      if (res?.success) this.results.set(res.data ?? []);
     });
   }
 
-  useWalkIn(): void {
-    if (!this.walkInName) return;
-    this.useCustomer.emit({ type: 'WalkIn', fullName: this.walkInName, phone: this.walkInPhone });
-    this.walkInName = '';
-    this.walkInPhone = '';
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isOpen'] && this.isOpen) {
+      this.query = '';
+      this.walkInName = '';
+      this.walkInPhone = '';
+      this.walkInTouched = false;
+      this.results.set([]);
+      this.searchFailed.set(false);
+    }
+  }
+
+  onQueryChange(value: string): void {
+    this.query = value ?? '';
+    this.query$.next(this.query);
+  }
+
+  retrySearch(): void {
+    const q = this.query.trim();
+    if (!q) return;
+    this.searchFailed.set(false);
+    this.searching.set(true);
+    this.srv.searchPatients(q).subscribe({
+      next: res => { this.searching.set(false); if (res.success) this.results.set(res.data ?? []); },
+      error: () => { this.searching.set(false); this.searchFailed.set(true); },
+    });
+  }
+
+  submitWalkIn(): void {
+    this.walkInTouched = true;
+    const fullName = this.walkInName.trim();
+    if (!fullName || this.submitting) return;
+    this.useCustomer.emit({ type: 'WalkIn', fullName, phone: this.walkInPhone.trim() });
+  }
+
+  requestClose(): void {
+    if (!this.submitting) this.close.emit();
   }
 }

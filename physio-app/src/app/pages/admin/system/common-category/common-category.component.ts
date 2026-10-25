@@ -7,11 +7,11 @@ import { Category } from "../../../../shared/types/category.types";
   selector: 'admin-common-category',
   standalone: true,
   imports: [
-    SharedModule,
+    SharedModule,
   ],
   template: `
-      <div class="z-10 flex h-full flex-auto flex-col">
-        <div class="flex flex-1 z-[2] min-w-0 h-full bg-body absolute inset-0 overflow-hidden">
+      <div class="flex flex-1 min-h-0 flex-col">
+        <div class="flex flex-1 min-h-0 min-w-0 bg-body overflow-hidden">
           <div class="relative mx-0 border-0 w-[280px] max-w-[280px] shrink-0 overflow-hidden bg-transparent flex-0">
             <div class="w-full relative bg-body text-[#1F232B] min-w-full h-full overflow-y-auto flex flex-col top-0 left-0">
               <div class="relative">
@@ -51,10 +51,10 @@ import { Category } from "../../../../shared/types/category.types";
               </div>
             </div>
           </div>
-          <div class="pt-0.5 pl-0.5 flex flex-col flex-1 min-w-0 w-full z-[9999]">
+          <div class="pt-0.5 pl-0.5 flex flex-col flex-1 min-h-0 min-w-0 w-full z-[9999]">
             <div 
-              class="ps bg-surface relative flex flex-col flex-1 min-h-0 overscroll-contain h-screen shadow-card"
-              style="border-top-left-radius: 12px; scrollbar-width: none; position: relative; overflow-y: auto;"
+              class="ps bg-surface relative flex flex-col flex-1 min-h-0 overscroll-contain h-full shadow-card boo-scrollbar"
+              style="border-top-left-radius: 12px; position: relative; overflow-y: auto;"
             >
               <div class="flex-1 min-h-0 px-6 py-2 flex flex-col">
                 <router-outlet></router-outlet>

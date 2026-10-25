@@ -37,9 +37,124 @@
   outline-offset: 2px;
 }
 
+/* The admin shell is exactly one viewport tall and scrolls #wrapper; the document itself must never scroll. */
+html:has(#admin-layout),
+body:has(#admin-layout) {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   color: rgb(var(--twc-regular));
   -webkit-font-smoothing: antialiased;
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Scrollbars: one treatment for both axes (docs/admin-layout-contract.md).
+   - `.boo-scrollbar`: native bars, thin, for any scroll container.
+   - `[custom-scrollbar]` (CustomScrollbarDirective): draws its own vertical overlay, so the native vertical bar is
+     collapsed here and the native horizontal bar uses the same thumb. The bar keeps its own gutter, so it never covers content.
+   ------------------------------------------------------------------------------------------------ */
+:root {
+  --scrollbar-size: 8px;
+  --scrollbar-thumb: #aaa;
+  --scrollbar-thumb-hover: #888;
+  --scrollbar-fade: 300ms;
+}
+
+:root.dark {
+  --scrollbar-thumb: #6f5d64;
+  --scrollbar-thumb-hover: #8c7a82;
+}
+
+// Every scroll container in the admin shell, whether it opted in or only carries a Tailwind overflow utility.
+$scroll-hosts: '.boo-scrollbar', '[data-scrollbar-overlay]', ':where(#admin-layout) :is(.overflow-x-auto, .overflow-y-auto, .overflow-auto)';
+
+@supports selector(::-webkit-scrollbar) {
+  #{$scroll-hosts} {
+    &::-webkit-scrollbar {
+      width: var(--scrollbar-size);
+      height: var(--scrollbar-size);
+    }
+
+    &::-webkit-scrollbar-track,
+    &::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    /* Idle: the thumb is transparent but keeps its gutter and hit area, so nothing shifts and it can still be grabbed. */
+    &::-webkit-scrollbar-thumb {
+      background-color: transparent;
+      border: 1px solid transparent; /* 6px visible thumb inside the 8px hit area, as wide as the overlay's idle thumb */
+      border-radius: 4px;
+      background-clip: padding-box;
+      transition: background-color var(--scrollbar-fade) ease;
+    }
+
+    /* ScrollbarAutoHideService sets this on hover, scroll, focus and thumb drag, and clears it after the idle delay. */
+    &[data-scrollbar-active]::-webkit-scrollbar-thumb {
+      background-color: var(--scrollbar-thumb);
+    }
+
+    &[data-scrollbar-active]::-webkit-scrollbar-thumb:hover,
+    &::-webkit-scrollbar-thumb:active {
+      background-color: var(--scrollbar-thumb-hover);
+    }
+
+    &::-webkit-scrollbar-button {
+      display: none;
+    }
+  }
+
+  /* The directive's overlay is the vertical bar; only the horizontal one is native. */
+  [data-scrollbar-overlay]::-webkit-scrollbar:vertical {
+    width: 0;
+  }
+}
+
+/* Chromium 121+ ignores the pseudo-elements once scrollbar-width/color is set, so these are for Firefox only. */
+@supports not selector(::-webkit-scrollbar) {
+  #{$scroll-hosts} {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color var(--scrollbar-fade) ease;
+
+    &[data-scrollbar-active] {
+      scrollbar-color: var(--scrollbar-thumb) transparent;
+    }
+  }
+}
+
+/* The overlay thumb of CustomScrollbarDirective follows the same active state (it is drawn by the directive, not the browser). */
+[data-scrollbar-track] {
+  opacity: 0;
+  transition: opacity var(--scrollbar-fade) ease, width 0.2s ease-in-out;
+}
+[data-scrollbar-overlay][data-scrollbar-active] > * > [data-scrollbar-track],
+[data-scrollbar-track][data-scrollbar-pinned] {
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --scrollbar-fade: 0ms;
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Admin workspace (docs/admin-layout-contract.md)
+   The shell (admin-layout) renders the breadcrumb once and gives #wrapper the viewport height that is left.
+   The routed page host is a column of exactly that height. A page that fills the viewport makes its root
+   `flex-1 min-h-0 flex flex-col` and gives its main region `flex-1 min-h-[..]`, which scrolls itself
+   (`min-h-0 overflow-auto`). A page that is a plain stack (the dashboard) simply overflows and #wrapper scrolls.
+   Pages add no horizontal padding or max-width: the shell's px-4 is the only gutter.
+   ------------------------------------------------------------------------------------------------ */
+#wrapper > :not(router-outlet) {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
 }
 
 /* Printed pages carry their own header and footer (see the privacy page); hide the site chrome. */

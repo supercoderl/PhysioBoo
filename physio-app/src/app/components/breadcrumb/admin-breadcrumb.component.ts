@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { filter } from "rxjs";
 import { SharedModule } from "../../shared/shared-imports";
@@ -11,7 +12,7 @@ import { SharedModule } from "../../shared/shared-imports";
     <nav
       *ngIf="breadcrumbs.length"
       [ngClass]="{
-        'flex w-fit rounded-sm border border-solid border-[#EFE3E7] px-2 mb-2 text-[13px] leading-[1.5]': true,
+        'flex w-fit rounded-sm border border-solid border-[#EFE3E7] px-2 mb-3 text-[13px] leading-[1.5]': true,
         'text-[#71606A]': theme === 'light',
         'text-white': theme === 'dark'
       }"
@@ -44,7 +45,7 @@ export class AdminBreadcrumbComponent implements OnInit {
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute) {
     this.router.events
-      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd), takeUntilDestroyed())
       .subscribe(() => {
         this.updateBreadcrumbs();
       });

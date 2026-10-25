@@ -2,10 +2,6 @@ import { NgIf, NgTemplateOutlet } from "@angular/common";
 import { Component, Input } from "@angular/core";
 import { BooIconComponent } from "../icon/icon.component";
 
-/**
- * A request succeeded with nothing to show. `default` is the compact admin block; `panel` is the dashed full-width
- * block of the public listing pages. Actions go in the content slot.
- */
 @Component({
     selector: 'boo-empty-state',
     standalone: true,
@@ -13,7 +9,7 @@ import { BooIconComponent } from "../icon/icon.component";
     template: `
         <ng-template #projected><ng-content></ng-content></ng-template>
 
-        <div *ngIf="appearance === 'default'" class="flex flex-col items-center justify-center text-center py-10 px-6">
+        <div *ngIf="appearance === 'default'" class="h-full flex flex-col items-center justify-center text-center py-10 px-6">
             <div class="flex items-center justify-center w-14 h-14 rounded-2 bg-primary/5 mb-4">
                 <physio-icon [name]="icon" [size]="26" class="text-primary"></physio-icon>
             </div>
@@ -37,6 +33,5 @@ export class BooEmptyStateComponent {
     @Input({ required: true }) title!: string;
     @Input() description?: string | null;
     @Input() appearance: 'default' | 'panel' = 'default';
-    /** Heading level of the title in a panel (2 when the panel replaces a page's results, 3 inside a section). */
     @Input() headingLevel: 2 | 3 = 2;
 }

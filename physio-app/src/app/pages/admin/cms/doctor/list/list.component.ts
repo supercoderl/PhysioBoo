@@ -31,7 +31,7 @@ import { SortOption } from "../../../../../shared/types/sort";
     AdminContentHeaderComponent,
     BooSelectComponent,
     ButtonIconComponent,
-    BooInputComponent,
+    BooInputComponent,
     BooDateAdminComponent,
     BooButtonAdminComponent,
     BooFilterAdminComponent,
@@ -158,6 +158,14 @@ export class CmsDoctorListComponent {
                 totalPages: Math.ceil((currentData.totalCount + 1) / currentData.pageSize)
             }
         })
+    }
+
+    /** Refreshes just the edited row; the drawer stays open. */
+    onAvatarChanged(result: Doctor) {
+        this.tableData.update((currentData) => currentData && {
+            ...currentData,
+            items: currentData.items.map(x => x.id === result.id ? result : x)
+        });
     }
 
     onDelete(id: string | null) {

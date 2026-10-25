@@ -25,7 +25,9 @@ namespace PhysioBoo.Infrastructure.Database.DevData
                 return new DevDataModuleList(false, MaxRows, Array.Empty<DevDataModuleInfo>());
             }
 
+            // Composite modules (the one-click demo facility) come first: they are the entry point.
             List<DevDataModuleInfo> modules = _modules.Values
+                .OrderByDescending(m => m is IDevDataCompositeModule)
                 .Select(m => new DevDataModuleInfo(m.Key, m.Label, m.Description, m.DependsOn))
                 .ToList();
 
@@ -61,10 +63,14 @@ namespace PhysioBoo.Infrastructure.Database.DevData
                 try
                 {
                     DevDataContext context = new DevDataContext(_db, tenantId, Random.Shared);
-                    await GenerateWithDependenciesAsync(module, count, context, new HashSet<string>(), ct);
+                    if (module is IDevDataCompositeModule composite)
+                        await RunCompositeAsync(composite, count, context, ct);
+                    else
+                        await GenerateWithDependenciesAsync(module, count, context, new HashSet<string>(), ct);
+
                     await transaction.CommitAsync(ct);
 
-                    result = new DevDataResult(Guid.NewGuid(), context.Created, context.Warnings);
+                    result = new DevDataResult(Guid.NewGuid(), context.Created, context.Warnings, context.Reused);
                 }
                 catch
                 {
@@ -74,6 +80,24 @@ namespace PhysioBoo.Infrastructure.Database.DevData
             });
 
             return result!;
+        }
+
+        /// <summary>Runs the steps of a composite module in order; a step whose data already exists is reused, not repeated.</summary>
+        private async Task RunCompositeAsync(IDevDataCompositeModule composite, int count, DevDataContext context, CancellationToken ct)
+        {
+            foreach (DevDataStep step in composite.Plan(count))
+            {
+                if (!_modules.TryGetValue(step.ModuleKey, out IDevDataModule? stepModule))
+                    throw new InvalidOperationException($"Composite module '{composite.Key}' lists unknown step '{step.ModuleKey}'.");
+
+                if (await stepModule.HasDataAsync(context, ct))
+                {
+                    context.Reuse(step.ModuleKey);
+                    continue;
+                }
+
+                await GenerateWithDependenciesAsync(stepModule, step.Rows, context, new HashSet<string>(), ct);
+            }
         }
 
         /// <summary>Creates a module's missing parents first (a tenth of the requested rows, at least one), then the module itself.</summary>

@@ -18,7 +18,6 @@ import {
 } from '@physioboo/ui';
 import { Subject, of } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap } from 'rxjs/operators';
-import { AdminBreadcrumbComponent } from '../../../../components/breadcrumb/admin-breadcrumb.component';
 import { BooDatepickerComponent } from '../../../../components/date-picker/boo-date-picker.component';
 import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
 import { AdmissionService } from '../../../../services/admin/admission.service';
@@ -61,7 +60,6 @@ const ALL = null;
         NgFor,
         DatePipe,
         FormsModule,
-        AdminBreadcrumbComponent,
         BooButtonComponent,
         BooDatepickerComponent,
         BooEmptyStateComponent,

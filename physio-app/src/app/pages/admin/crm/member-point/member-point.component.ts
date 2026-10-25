@@ -34,12 +34,12 @@ type ActiveTab = 'members' | 'points' | 'rewards' | 'register';
         BooCheckboxComponent
     ],
     template: `
-    <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-7xl mx-auto">
+    <div class="pb-5">
+      <div>
         <!-- Page Header -->
-        <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900">Members & Loyalty Points</h1>
-          <p class="mt-2 text-gray-600">Manage memberships and track loyalty rewards</p>
+        <div class="mb-4">
+          <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Members & Loyalty Points</h1>
+          <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">Manage memberships and track loyalty rewards</p>
         </div>
 
         <!-- Stats Overview -->

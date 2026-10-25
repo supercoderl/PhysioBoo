@@ -1,85 +1,115 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from "@angular/core";
+import { BooButtonComponent, BooFilterChip, BooFilterChipsComponent, BooInputComponent } from '@physioboo/ui';
+import { debounceTime, Subject, takeUntil } from "rxjs";
 import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
-import { DepartmentService } from "../../../../services/admin/department.service";
-import { StockTakeService } from "../../../../services/admin/stock-take.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { Lookup } from "../../../../shared/types/common";
-import { StockTakeFilter } from "../../../../shared/types/stock-take.types";
-import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
+import { STOCK_TAKE_STATUSES, StockTakeFilter, stockTakeStatusLabel } from "../../../../shared/types/stock-take.types";
+
+type FilterKey = 'search' | 'warehouseId' | 'departmentId' | 'status' | 'dateFrom' | 'dateTo';
+
+interface StockTakeFilterChip extends BooFilterChip {
+    key: FilterKey;
+}
+
+const SEARCH_DEBOUNCE_MS = 350;
 
 @Component({
     selector: 'stock-take-filter-bar',
     standalone: true,
-    imports: [SharedModule,BooSelectComponent, BooDatepickerComponent, ButtonIconComponent],
+    imports: [SharedModule, BooInputComponent, BooSelectComponent, BooDatepickerComponent, BooButtonComponent, BooFilterChipsComponent],
     template: `
-    <div class="bg-surface border border-borderGray/60 rounded-2 p-3.5">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
-        <boo-select label="Warehouse" [(ngModel)]="filter.warehouseId" (ngModelChange)="emitChange()"
-          [options]="warehouses" bindLabel="name" bindValue="id"></boo-select>
+    <section aria-label="Search and filters" class="bg-surface border border-borderGray/60 rounded-2 p-4 space-y-3">
+      <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto] gap-3 items-start">
+        <boo-input
+          label="Search by stock take number"
+          [maxlength]="50"
+          [ngModel]="search"
+          (ngModelChange)="onSearchInput($event)"
+        >
+          <physio-icon endfix name="search" [size]="16" class="text-gray-500"></physio-icon>
+        </boo-input>
 
-        <boo-select label="Department" [(ngModel)]="filter.departmentId" (ngModelChange)="emitChange()"
-          [options]="departments" bindLabel="name" bindValue="id"></boo-select>
-
-        <boo-select label="Status" [(ngModel)]="filter.status" (ngModelChange)="emitChange()"
-          [options]="statusOptions" bindLabel="label" bindValue="value"></boo-select>
-
-        <boo-datepicker label="Scheduled From" [(ngModel)]="filter.dateFrom" (ngModelChange)="emitChange()"></boo-datepicker>
-
-        <boo-datepicker label="Scheduled To" [(ngModel)]="filter.dateTo" (ngModelChange)="emitChange()"></boo-datepicker>
-
-        <div class="flex items-center gap-2">
-          <div class="flex-1 relative">
-            <physio-icon name="search" [size]="14" [class]="'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
-            <input type="text" [(ngModel)]="search" (ngModelChange)="onSearchChange()"
-              placeholder="Search stock take no..."
-              class="w-full pl-8 pr-3 h-8 border border-gray-300 rounded-1.5 text-[13px] focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" />
-          </div>
-          <button-icon [icon]="{ name: 'rotate-ccw', size: 14, class: 'text-gray-500' }" (onClick)="onReset()" title="Reset filters" ariaLabel="Reset filters" buttonClass="!rounded-1.5"></button-icon>
-        </div>
+        <button boo-button variant="ghost" (click)="reset.emit()" [disabled]="!chips.length">
+          <physio-icon name="rotate-ccw" [size]="16"></physio-icon>Reset
+        </button>
       </div>
-    </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
+        <boo-select label="Warehouse" [options]="warehouses" bindLabel="name" bindValue="id"
+          [ngModel]="filter.warehouseId" (ngModelChange)="patch('warehouseId', $event)"></boo-select>
+
+        <boo-select label="Department" [options]="departments" bindLabel="name" bindValue="id"
+          [ngModel]="filter.departmentId" (ngModelChange)="patch('departmentId', $event)"></boo-select>
+
+        <boo-select label="Status" [options]="statuses" bindLabel="label" bindValue="value"
+          [ngModel]="filter.status" (ngModelChange)="patch('status', $event)"></boo-select>
+
+        <boo-datepicker label="Scheduled from" [max]="filter.dateTo"
+          [ngModel]="filter.dateFrom" (ngModelChange)="patch('dateFrom', $event)"></boo-datepicker>
+
+        <boo-datepicker label="Scheduled to" [min]="filter.dateFrom"
+          [ngModel]="filter.dateTo" (ngModelChange)="patch('dateTo', $event)"></boo-datepicker>
+      </div>
+
+      <boo-filter-chips [chips]="chips" (remove)="onRemoveChip($event)"></boo-filter-chips>
+    </section>
   `,
 })
-export class StockTakeFilterBarComponent implements OnInit {
+export class StockTakeFilterBarComponent implements OnInit, OnDestroy {
+    /** Applied values, owned by the page. */
+    @Input() search = '';
     @Input() filter: StockTakeFilter = {};
-    @Output() filterChange = new EventEmitter<StockTakeFilter>();
+    @Input() warehouses: Lookup[] = [];
+    @Input() departments: Lookup[] = [];
+
     @Output() searchChange = new EventEmitter<string>();
+    @Output() filterChange = new EventEmitter<StockTakeFilter>();
     @Output() reset = new EventEmitter<void>();
 
-    search = '';
-    warehouses: Lookup[] = [];
-    departments: Lookup[] = [];
+    readonly statuses = STOCK_TAKE_STATUSES;
 
-    readonly statusOptions = [
-        { label: 'Draft', value: 'Draft' },
-        { label: 'Counting', value: 'Counting' },
-        { label: 'Pending Approval', value: 'PendingApproval' },
-        { label: 'Approved', value: 'Approved' },
-        { label: 'Rejected', value: 'Rejected' },
-        { label: 'Cancelled', value: 'Cancelled' },
-    ];
+    private readonly typed$ = new Subject<string>();
+    private readonly destroy$ = new Subject<void>();
 
-    constructor(private srv: StockTakeService, private departmentSrv: DepartmentService) { }
+    get chips(): StockTakeFilterChip[] {
+        const f = this.filter;
+        const chips: StockTakeFilterChip[] = [];
+        if (this.search.trim()) chips.push({ key: 'search', label: `Number: ${this.search.trim()}` });
+        if (f.warehouseId) chips.push({ key: 'warehouseId', label: `Warehouse: ${this.nameOf(this.warehouses, f.warehouseId)}` });
+        if (f.departmentId) chips.push({ key: 'departmentId', label: `Department: ${this.nameOf(this.departments, f.departmentId)}` });
+        if (f.status) chips.push({ key: 'status', label: `Status: ${stockTakeStatusLabel(f.status)}` });
+        if (f.dateFrom) chips.push({ key: 'dateFrom', label: `From: ${f.dateFrom}` });
+        if (f.dateTo) chips.push({ key: 'dateTo', label: `To: ${f.dateTo}` });
+        return chips;
+    }
 
     ngOnInit(): void {
-        this.srv.getWarehouses().subscribe(res => { if (res.success) this.warehouses = res.data; });
-        this.departmentSrv.search({ pageNumber: 1, pageSize: 100 }).subscribe(res => {
-            if (res.success) this.departments = res.data.items.map(d => ({ id: d.id, name: d.name }));
-        });
+        this.typed$.pipe(debounceTime(SEARCH_DEBOUNCE_MS), takeUntil(this.destroy$)).subscribe(value => this.searchChange.emit(value));
     }
 
-    emitChange(): void {
-        this.filterChange.emit({ ...this.filter });
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
-    onSearchChange(): void {
-        this.searchChange.emit(this.search);
+    onSearchInput(value: string | null): void {
+        this.typed$.next(value ?? '');
     }
 
-    onReset(): void {
-        this.filter = {};
-        this.search = '';
-        this.reset.emit();
+    patch<K extends keyof StockTakeFilter>(key: K, value: StockTakeFilter[K] | undefined): void {
+        const next = { ...this.filter, [key]: value || null };
+        if (next[key] === this.filter[key] || (!next[key] && !this.filter[key])) return;
+        this.filterChange.emit(next);
+    }
+
+    onRemoveChip(chip: StockTakeFilterChip): void {
+        if (chip.key === 'search') this.searchChange.emit('');
+        else this.patch(chip.key, null);
+    }
+
+    private nameOf(list: Lookup[], id: string): string {
+        return list.find(i => i.id === id)?.name ?? 'Selected';
     }
 }

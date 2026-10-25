@@ -1,41 +1,44 @@
+// Mirrors PhysioBoo.Application.ViewModels.Retail. Optional/nullable fields match the API; nothing is derived client-side.
+
 export type RetailCartStatus = 'Active' | 'Held';
 export type RetailCustomerType = 'Patient' | 'WalkIn';
-export type RetailPaymentMethod = 'Cash' | 'Card' | 'QR' | 'Insurance' | 'Mixed';
-export type RetailSuggestionMode = 'Favorites' | 'RecentlySold' | 'Recommended';
+/** Methods accepted by checkout. The API enum also has 'Mixed', which is a UI grouping, never sent as a split method. */
+export type RetailPaymentMethod = 'Cash' | 'Card' | 'QR' | 'Insurance';
+/** 'Recommended' is the API's best-selling-by-volume list over the last 30 days. */
+export type RetailSuggestionMode = 'RecentlySold' | 'Recommended';
 
 export interface RetailMedicineCard {
     id: string;
     name: string;
-    genericName: string;
-    strength: string;
-    packageLabel: string;
-    category: string;
-    manufacturer: string;
-    batchNo: string;
-    expiryDate: string;
-    barcode: string;
+    genericName?: string | null;
+    strength?: string | null;
+    packageLabel?: string | null;
+    category?: string | null;
+    manufacturer?: string | null;
+    batchNo?: string | null;
+    expiryDate?: string | null;
+    barcode?: string | null;
     stock: number;
     price: number;
-    mrp: number;
+    mrp?: number | null;
     insuranceCovered: boolean;
-    promotionLabel?: string | null;
-    isFavorite?: boolean;
-    isRecentlySold?: boolean;
+    isFavorite: boolean;
+    isRecentlySold: boolean;
 }
 
 export interface RetailMedicineAlternative {
     id: string;
     name: string;
-    manufacturer: string;
+    manufacturer?: string | null;
     price: number;
     stock: number;
 }
 
 export interface RetailInventoryMovement {
     date: string;
-    type: 'In' | 'Out';
+    type: string;
     quantity: number;
-    reference: string;
+    reference?: string | null;
 }
 
 export interface RetailMedicineDetail extends RetailMedicineCard {
@@ -48,12 +51,10 @@ export interface RetailCartLineItem {
     id: string;
     medicineId: string;
     name: string;
-    genericName: string;
-    strength: string;
-    packageLabel: string;
+    genericName?: string | null;
+    strength?: string | null;
     unit: string;
     quantity: number;
-    stock: number;
     unitPrice: number;
     discountPercent: number;
     insuranceCoveredAmount: number;
@@ -87,40 +88,62 @@ export interface RetailPaymentSplit {
     amount: number;
 }
 
+export interface RetailTransactionLineItem {
+    id: string;
+    medicineId: string;
+    name: string;
+    quantity: number;
+    unitPrice: number;
+    discountPercent: number;
+    insuranceCoveredAmount: number;
+    total: number;
+}
+
+export type RetailTransactionStatus = 'Completed' | 'Refunded' | 'Suspended';
+
 export interface RetailTransaction {
     id: string;
     transactionNumber: string;
     cashierName: string;
     customer: RetailCustomer | null;
-    items: RetailCartLineItem[];
+    items: RetailTransactionLineItem[];
     subtotal: number;
     discountTotal: number;
     insuranceCoverage: number;
     vat: number;
     grandTotal: number;
-    paymentSplits: RetailPaymentSplit[];
+    paymentSplits: { method: string; amount: number }[];
     amountTendered: number;
     changeDue: number;
     completedAt: string;
-    status: 'Completed' | 'Refunded' | 'Suspended';
-}
-
-export interface RetailBestSeller {
-    name: string;
-    unitsSold: number;
+    status: RetailTransactionStatus;
 }
 
 export interface RetailInventoryInsight {
     lowStockCount: number;
     nearExpiryCount: number;
     outOfStockCount: number;
-    bestSeller: RetailBestSeller | null;
+    bestSellerName?: string | null;
+    bestSellerUnitsSold?: number | null;
     todayRevenue: number;
     todaySalesCount: number;
 }
 
-export interface RetailQuickCategory {
-    label: string;
-    value: string;
-    icon: string;
+/** Subset of MedicineCategoryViewModel used for the catalog category filter. */
+export interface RetailCategory {
+    id: string;
+    name: string;
+}
+
+export interface RetailCatalogQuery {
+    search: string;
+    categoryId: string | null;
+    pageNumber: number;
+    pageSize: number;
+}
+
+export interface RetailCheckoutPayload {
+    hospitalId: string;
+    paymentSplits: RetailPaymentSplit[];
+    amountTendered: number;
 }

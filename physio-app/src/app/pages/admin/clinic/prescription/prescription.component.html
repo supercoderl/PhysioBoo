@@ -1,10 +1,11 @@
-<div class="flex-1 flex flex-col gap-4 min-w-0 pt-3 pb-5">
-  <admin-breadcrumb />
-
-  <!-- No prescription chosen -->
+<div class="flex-1 flex flex-col gap-4 min-w-0 pb-5">
   <ng-container *ngIf="mode === 'empty'">
-    <rx-action-bar title="Prescription" subtitle="Outpatient prescriptions" [showRefresh]="false" />
-    <div class="bg-surface border border-borderGray rounded-xl">
+    <rx-action-bar
+      title="Prescription"
+      subtitle="Outpatient prescriptions"
+      [showRefresh]="false"
+    />
+    <div class="bg-surface border border-borderGray rounded-xl flex-1">
       <boo-empty-state
         icon="file-text"
         title="No prescription selected"
@@ -13,39 +14,95 @@
     </div>
   </ng-container>
 
-  <!-- A patient's prescriptions -->
   <ng-container *ngIf="mode === 'patient'">
-    <rx-action-bar title="Patient prescriptions" subtitle="Choose a prescription to view or edit" [showRefresh]="false" />
+    <rx-action-bar
+      title="Patient prescriptions"
+      subtitle="Choose a prescription to view or edit"
+      [showRefresh]="false"
+    />
 
-    <div *ngIf="loading()" class="h-48 rounded-xl bg-surface border border-borderGray animate-pulse" role="status" aria-busy="true" aria-label="Loading prescriptions"></div>
+    <div
+      *ngIf="loading()"
+      class="h-48 rounded-xl bg-surface border border-borderGray animate-pulse"
+      role="status"
+      aria-busy="true"
+      aria-label="Loading prescriptions"
+    ></div>
 
-    <div *ngIf="!loading() && loadError() as err" class="bg-surface border border-borderGray rounded-xl">
+    <div
+      *ngIf="!loading() && loadError() as err"
+      class="bg-surface border border-borderGray rounded-xl flex-1"
+    >
       <boo-error-state
         icon="triangle-alert"
-        [title]="err === 'forbidden' ? 'No access to prescriptions' : err === 'notFound' ? 'Patient not found' : 'Could not load prescriptions'"
-        [description]="err === 'forbidden' ? 'Your account is not allowed to view prescriptions of this patient.' : err === 'notFound' ? 'The link does not point to a patient.' : 'Something went wrong while loading. Try again.'"
+        [title]="
+          err === 'forbidden'
+            ? 'No access to prescriptions'
+            : err === 'notFound'
+              ? 'Patient not found'
+              : 'Could not load prescriptions'
+        "
+        [description]="
+          err === 'forbidden'
+            ? 'Your account is not allowed to view prescriptions of this patient.'
+            : err === 'notFound'
+              ? 'The link does not point to a patient.'
+              : 'Something went wrong while loading. Try again.'
+        "
         [showRetry]="err === 'failed'"
         (retry)="retry()"
       />
     </div>
 
-    <rx-patient-list *ngIf="!loading() && !loadError()" [rows]="patientRows()" (open)="openPrescription($event)" />
+    <rx-patient-list
+      *ngIf="!loading() && !loadError()"
+      [rows]="patientRows()"
+      (open)="openPrescription($event)"
+    />
   </ng-container>
 
-  <!-- One prescription -->
   <ng-container *ngIf="mode === 'detail'">
-    <div *ngIf="loading() && !prescription()" class="flex flex-col gap-4" role="status" aria-busy="true" aria-label="Loading prescription">
-      <div class="h-8 w-64 rounded-lg bg-surface border border-borderGray animate-pulse"></div>
-      <div class="h-24 rounded-xl bg-surface border border-borderGray animate-pulse"></div>
-      <div class="h-40 rounded-xl bg-surface border border-borderGray animate-pulse"></div>
-      <div class="h-64 rounded-xl bg-surface border border-borderGray animate-pulse"></div>
+    <div
+      *ngIf="loading() && !prescription()"
+      class="flex flex-col gap-4"
+      role="status"
+      aria-busy="true"
+      aria-label="Loading prescription"
+    >
+      <div
+        class="h-8 w-64 rounded-lg bg-surface border border-borderGray animate-pulse"
+      ></div>
+      <div
+        class="h-24 rounded-xl bg-surface border border-borderGray animate-pulse"
+      ></div>
+      <div
+        class="h-40 rounded-xl bg-surface border border-borderGray animate-pulse"
+      ></div>
+      <div
+        class="h-64 rounded-xl bg-surface border border-borderGray animate-pulse"
+      ></div>
     </div>
 
-    <div *ngIf="!loading() && !prescription() && loadError() as err" class="bg-surface border border-borderGray rounded-xl">
+    <div
+      *ngIf="!loading() && !prescription() && loadError() as err"
+      class="bg-surface border border-borderGray rounded-xl flex-1"
+    >
       <boo-error-state
         icon="triangle-alert"
-        [title]="err === 'forbidden' ? 'No access to this prescription' : err === 'notFound' ? 'Prescription not found' : 'Could not load the prescription'"
-        [description]="err === 'forbidden' ? 'Your account is not allowed to view prescriptions.' : err === 'notFound' ? 'It may have been removed, or the link is wrong.' : 'Something went wrong while loading. Try again.'"
+        [title]="
+          err === 'forbidden'
+            ? 'No access to this prescription'
+            : err === 'notFound'
+              ? 'Prescription not found'
+              : 'Could not load the prescription'
+        "
+        [description]="
+          err === 'forbidden'
+            ? 'Your account is not allowed to view prescriptions.'
+            : err === 'notFound'
+              ? 'It may have been removed, or the link is wrong.'
+              : 'Something went wrong while loading. Try again.'
+        "
         [showRetry]="err === 'failed'"
         (retry)="retry()"
       />
@@ -61,15 +118,29 @@
       />
 
       <div *ngIf="canListPatientRx()">
-        <button type="button" boo-button variant="link" size="sm" (click)="backToPatient()">
-          <physio-icon name="arrow-left" [size]="15" aria-hidden="true" />All prescriptions of this patient
+        <button
+          type="button"
+          boo-button
+          variant="link"
+          size="sm"
+          (click)="backToPatient()"
+        >
+          <physio-icon name="arrow-left" [size]="15" aria-hidden="true" />All
+          prescriptions of this patient
         </button>
       </div>
 
-      <!-- A reload failed while the previous copy is still on screen -->
-      <boo-inline-error *ngIf="loadError() && !loading()" what="the latest version of this prescription" (retry)="refresh()" />
+      <boo-inline-error
+        *ngIf="loadError() && !loading()"
+        what="the latest version of this prescription"
+        (retry)="refresh()"
+      />
 
-      <p *ngIf="status() === 'Draft' && !canUpdate()" class="m-0 rounded-lg bg-gray-50 border border-borderGray px-4 py-2.5 text-xs text-secondary" role="status">
+      <p
+        *ngIf="status() === 'Draft' && !canUpdate()"
+        class="m-0 rounded-lg bg-gray-50 border border-borderGray px-4 py-2.5 text-xs text-secondary"
+        role="status"
+      >
         You can view this draft but your account cannot edit it.
       </p>
 

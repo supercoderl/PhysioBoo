@@ -11,6 +11,7 @@ import {
     PLATFORM_ID,
     Renderer2
 } from '@angular/core';
+import { ScrollbarAutoHideService } from './scrollbar-autohide.service';
 
 @Directive({
     selector: '[custom-scrollbar]',
@@ -40,6 +41,7 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
         private el: ElementRef<HTMLElement>,
         private renderer: Renderer2,
         private zone: NgZone,
+        private autoHide: ScrollbarAutoHideService,
         @Inject(PLATFORM_ID) platformId: Object
     ) {
         this.isBrowser = isPlatformBrowser(platformId);
@@ -51,17 +53,16 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
         const container = this.el.nativeElement;
         if (!container) return;
 
-        // Hide default scrollbar
-        this.renderer.setStyle(container, 'scrollbar-width', 'none');
-        this.renderer.setStyle(container, '-ms-overflow-style', 'none');
+        // Engines without ::-webkit-scrollbar (Firefox) cannot hide one axis only, so they keep the native thin bars on both axes.
+        if (!CSS.supports('selector(::-webkit-scrollbar)')) {
+            this.renderer.addClass(container, 'boo-scrollbar');
+            container.style.overflowY = 'auto';
+            return;
+        }
 
-        const style = document.createElement('style');
-        style.textContent = `
-            [custom-scrollbar]::-webkit-scrollbar {
-                display: none;
-            }
-        `;
-        document.head.appendChild(style);
+        // The native vertical bar is replaced by the overlay below. The native horizontal bar stays (styled in styles.scss),
+        // so it keeps its own gutter and never covers the last row or the pagination.
+        this.renderer.setAttribute(container, 'data-scrollbar-overlay', '');
 
         container.style.position = 'relative';
         container.style.overflowY = 'auto';
@@ -82,8 +83,9 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
         this.renderer.setStyle(this.track, 'width', '6px');
         this.renderer.setStyle(this.track, 'transform', 'translateX(-100%)');
         this.renderer.setStyle(this.track, 'background', 'transparent');
-        this.renderer.setStyle(this.track, 'transition', 'background-color 0.2s linear, opacity 0.2s linear, width 0.2s ease-in-out');
-        this.renderer.setStyle(this.track, 'opacity', this.restingOpacity);
+        // Opacity and its fade are owned by styles.scss, driven by ScrollbarAutoHideService's data-scrollbar-active.
+        this.renderer.setAttribute(this.track, 'data-scrollbar-track', '');
+        if (this.alwaysVisible) this.renderer.setAttribute(this.track, 'data-scrollbar-pinned', '');
         this.renderer.setStyle(this.track, 'pointer-events', 'none');
 
         // Thumb
@@ -91,7 +93,7 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
         this.renderer.setStyle(this.thumb, 'position', 'absolute');
         this.renderer.setStyle(this.thumb, 'right', '0');
         this.renderer.setStyle(this.thumb, 'width', '100%');
-        this.renderer.setStyle(this.thumb, 'background', '#aaa');
+        this.renderer.setStyle(this.thumb, 'background', 'var(--scrollbar-thumb, #aaa)');
         this.renderer.setStyle(this.thumb, 'border-radius', '3px');
         this.renderer.setStyle(this.thumb, 'cursor', 'pointer');
         this.renderer.setStyle(this.thumb, 'transition', 'background-color 0.2s linear');
@@ -104,27 +106,19 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
         // Update track position
         this.updateTrackPosition();
 
-        // Hover effects
-        this.renderer.listen(container, 'mouseenter', () => {
-            this.renderer.setStyle(this.track, 'opacity', '0.6');
-        });
+        this.autoHide.attach();
 
-        this.renderer.listen(container, 'mouseleave', () => {
-            if (!this.dragging) {
-                this.renderer.setStyle(this.track, 'opacity', this.restingOpacity);
-                this.renderer.setStyle(this.track, 'width', '6px');
-            }
-        });
+        // Hover effects
 
         this.renderer.listen(this.thumb, 'mouseenter', () => {
             this.renderer.setStyle(this.track, 'width', '10px');
-            this.renderer.setStyle(this.thumb, 'background', '#888');
+            this.renderer.setStyle(this.thumb, 'background', 'var(--scrollbar-thumb-hover, #888)');
         });
 
         this.renderer.listen(this.thumb, 'mouseleave', () => {
             if (!this.dragging) {
                 this.renderer.setStyle(this.track, 'width', '6px');
-                this.renderer.setStyle(this.thumb, 'background', '#aaa');
+                this.renderer.setStyle(this.thumb, 'background', 'var(--scrollbar-thumb, #aaa)');
             }
         });
 
@@ -143,10 +137,7 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
         });
 
         // Handle window resize
-        window.addEventListener('resize', () => {
-            this.updateTrackPosition();
-            this.updateThumb();
-        });
+        window.addEventListener('resize', this.onWindowResize);
 
         this.updateThumb();
 
@@ -155,11 +146,16 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
             this.dragging = true;
             this.dragStartY = e.clientY;
             this.scrollStartTop = container.scrollTop;
-            this.renderer.setStyle(this.thumb, 'background', '#666');
+            this.renderer.setStyle(this.thumb, 'background', 'var(--scrollbar-thumb-hover, #666)');
             e.preventDefault();
             e.stopPropagation();
         });
     }
+
+    private onWindowResize = () => {
+        this.updateTrackPosition();
+        this.updateThumb();
+    };
 
     @HostListener('scroll')
     onScroll() {
@@ -191,14 +187,9 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
     onMouseUp() {
         if (this.dragging) {
             this.dragging = false;
-            this.renderer.setStyle(this.track, 'opacity', this.restingOpacity);
             this.renderer.setStyle(this.track, 'width', '6px');
-            this.renderer.setStyle(this.thumb, 'background', '#aaa');
+            this.renderer.setStyle(this.thumb, 'background', 'var(--scrollbar-thumb, #aaa)');
         }
-    }
-
-    private get restingOpacity() {
-        return this.alwaysVisible ? '0.6' : '0';
     }
 
     private scheduleUpdate() {
@@ -220,7 +211,8 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
 
         this.renderer.setStyle(this.track, 'top', `${rect.top}px`);
         this.renderer.setStyle(this.track, 'left', `${rect.right}px`);
-        this.renderer.setStyle(this.track, 'height', `${rect.height}px`);
+        // clientHeight excludes the native horizontal bar, so the overlay track ends above it.
+        this.renderer.setStyle(this.track, 'height', `${container.clientHeight}px`);
     }
 
     private updateThumb() {
@@ -252,6 +244,7 @@ export class CustomScrollbarDirective implements AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        if (this.isBrowser) window.removeEventListener('resize', this.onWindowResize);
         if (this.isBrowser && this.observer) {
             this.observer.disconnect();
             this.mutationObserver?.disconnect();

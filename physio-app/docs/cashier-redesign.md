@@ -1,174 +1,230 @@
-# Billing / Cashier — Backend Design Doc
+# Cashier — Redesign (`/admin/finance/cashier`)
+
+Route permission: `billing:bill:read`. Last synchronized with the implementation: 2026-10-24.
 
 ## 0. Summary
 
-Unlike other modules covered in this doc series, the Cashier frontend (`/admin/finance/cashier`) is
-**already fully built** — a mature two-pane POS-style workspace (search → invoice table/timeline tabs
-→ sticky detail panel → payment/refund modals), comparable in completeness to the Prescriptions and
-Retail modules once they were redesigned. This doc therefore documents the existing UI **as-is**
-(not a redesign) and focuses the real design work on what's actually missing: the backend. Today only
-3 raw `POST` endpoints exist across Bill/BillItem/Payment (create-only, no reads, no updates, and
-critically — **Bill amount totals are never recalculated after creation**, anywhere in the codebase).
-Every one of the ~11 wired frontend calls under `BASE_API.CASHIER` has zero backend support.
+The previous page was a dark hero with eight KPI tiles, a "Find a bill" panel, a two-tab table and a
+detail panel. It was written against a mock backend, and the real backend (`CashierEndpoints.cs`) now exists
+with a different contract. The page could not work: the service sent no query parameters (the
+`pageNumber`, `pageSize` and `limit` parameters are required by the endpoints), the types used names the API
+never returns (`invoiceNo`, `PartiallyPaid`, `CreditCard`…), and totals were recomputed in the browser.
 
-This doc does not redesign Revenue Reporting (`docs/revenue-report-redesign.md`, separate module) or
-Insurance Claims (`docs/insurance-claims-redesign.md`, separate module) — both are sibling modules
-that read Bill/Payment data but are scoped independently.
+The redesign is a **queue + checkout** workspace:
 
----
+- a plain page header, four *real* summary figures and one toolbar;
+- a compact **bill queue** on the left (what needs attention, sorted by the API by bill date);
+- a **bill panel** on the right that shows the selected bill's charges, totals, payments and every action the
+  user is permitted to take, without leaving the queue;
+- payment, refund, discount and insurance are focused **dialogs** started from the bill panel; the server's
+  response replaces local state, nothing is recomputed in the browser.
 
-## 1. UX Audit — Current State (documented as-is, not redesigned)
+## 1. UX Audit (previous page)
 
-**Files:** `pages/admin/finance/cashier/{cashier.component.ts, cashier-search-panel.component.ts,
-cashier-invoice-table.component.ts, cashier-invoice-detail-panel.component.ts,
-cashier-payment-dialog.component.ts, cashier-refund-dialog.component.ts,
-cashier-transactions-timeline.component.ts}`, service `services/admin/cashier.service.ts`, types
-`shared/types/cashier.types.ts`.
+| Area | Finding |
+|---|---|
+| Hierarchy | Dark hero with 8 equal tiles competes with the work; two of them (`averagePaymentTimeSeconds` is always 0, `cardPayments`/`insuranceClaims` are method splits) carry no decision value. |
+| Search | "Find a bill" panel with barcode input, a dead "Advanced Filters" disclosure (date/department emitted nothing) and a free-text department box. |
+| List | One wide table with 9 columns incl. 4 amounts and a row action menu duplicating the detail panel's actions. |
+| Detail | Edited discount/insurance inline with client-side recomputation of totals and status. |
+| Payment | Free-typed amounts, fictional methods (`CreditCard`, `QRCode`, `Corporate`, `Mixed`) the API rejects. |
+| Trust | Success toasts and local state updates were not driven by the server's returned invoice. |
 
-- Dark hero header with 8 KPI tiles (today's revenue, cash collected, card payments, insurance
-  claims, outstanding bills, refund amount, completed transactions, average payment time).
-- Search panel: global search (patient/MRN/invoice/phone, 250ms debounce), barcode scan input,
-  7-state status filter chips, an "Advanced Filters" disclosure (date-from/date-to/department) that
-  is **currently dead UI** — not wired to any output event.
-- Two-tab left column: Outstanding Invoices table (reuses shared `BooTableAdminComponent` +
-  `ColumnDefDirective` + `BooActionAdminComponent`) / Recent Transactions timeline.
-- Sticky right-side invoice detail panel: patient/visit mini-stats, itemized charge list, inline-edit
-  discount % and insurance coverage amount, summary block, sticky action bar (Receive Payment /
-  Print / Refund / Void).
-- Payment dialog: 8 payment methods incl. a Mixed/split flow with live remaining-balance validation.
-- Refund dialog: capped amount, 5 methods (excludes QRCode/Corporate/Mixed), required reason.
-- The component currently does **client-side recomputation** of totals/status after every action
-  (discount, insurance, payment, refund, void) because the mock endpoints only return narrow deltas,
-  not a full updated invoice — this logic needs to move server-side in the real implementation, with
-  the frontend switched to trust the server's returned invoice instead of recomputing locally.
+## 2. Current Problems (and resolution)
 
-## 2. Current Problems
-
-| # | Problem | Impact |
-|---|---|---|
-| 1 | Zero backend support for any of the 11 wired cashier endpoints | Page cannot function against a real API today |
-| 2 | `Bill.Subtotal`/`TotalAmount`/`PaidAmount`/`OutstandingAmount` never recalculated after creation | `Bill.UpdateAmounts()` exists on the entity but is dead code — no command calls it |
-| 3 | Enum vocabularies diverge: `CashierInvoiceStatus`/`CashierPaymentMethod`/`CashierChargeCategory` (frontend) vs `PaymentStatus`/`PaymentMethod`/`ItemType` (backend) | Needs explicit reconciliation, not blind mapping — see §12.0 |
-| 4 | `Payment` models a refund as fields on the same row (`RefundAmount`/`RefundDate`/`RefundReason`), but frontend treats refund as a distinct transaction-timeline event type | Needs a domain decision — see §12.0 |
-| 5 | No bulk/split-payment support server-side | `CreatePaymentCommand` creates one `Payment` row per call; a Mixed-method payment needs N rows created together |
-| 6 | `BillEndpoints.cs` references a named route `GetBillById` in `CreatedAtRoute` that doesn't exist | Dangling reference — the `Location` header on bill creation is currently broken |
-| 7 | Advanced filter UI (date range, department) collects state but never emits it | Dead code in `cashier-search-panel.component.ts` |
-| 8 | `Bill.AppointmentId` is required (non-nullable) | No support for a walk-in/ad-hoc bill without an appointment — a real cashier workflow often needs this (e.g. retail-adjacent charges, walk-in lab tests) |
+1. API contract mismatch → types, service and enums rewritten from the backend view models.
+2. Filter/paging parameters not sent → service builds `HttpParams` (`pageNumber`, `pageSize`, `search`, `status`, `dateFrom`, `dateTo`).
+3. Totals computed in the browser → removed; the response of every mutation is the updated invoice.
+4. Dead date filter → wired (`dateFrom` / `dateTo`, `DateOnly`).
+5. Permission handling used only the route guard → every mutation is gated by its own permission (§7).
+6. No duplicate-submit protection → each dialog locks while its request is in flight.
+7. Form data lost on failure → dialogs stay open with their values until the server accepts.
 
 ## 3. Information Architecture
 
 ```
-Cashier Workspace
-├── Hero header — 8 KPI tiles (dashboard aggregate query)
-├── Search panel — global search / barcode / status filter / date+department filter
-├── Left column (tabbed)
-│   ├── Outstanding Invoices table (paged, filtered)
-│   └── Recent Transactions timeline (payments/refunds/voids/reprints)
-└── Right panel — selected invoice detail
-    ├── Patient/visit mini-stats
-    ├── Itemized charges (BillItem rows)
-    ├── Discount / Insurance inline editors
-    ├── Totals summary
-    └── Action bar: Receive Payment / Print / Refund / Void
-
-Payment Dialog (modal) — single method or Mixed/split, with live remaining-balance validation
-Refund Dialog (modal) — capped amount, method, required reason
+Cashier
+├── Header ............ title, one-line context, Refresh
+├── Summary strip ..... collected today · outstanding · refunded today · payments today   (GET /dashboard)
+├── Workspace (xl: 2 columns, below xl: queue + drawer)
+│   ├── Queue column
+│   │   ├── Toolbar ... search, status, date from/to, Reset, active filter chips
+│   │   ├── Tabs ...... Bills | Recent payments (needs billing:payment:read)
+│   │   └── Bills list or Recent payments list (paged / latest 100)
+│   └── Bill panel (selected bill)
+│       ├── Header .... bill no, status badge, date, patient, visit/department/doctor
+│       ├── Balance ... total · paid · outstanding
+│       ├── Charges ... line items with category, qty, unit price, line total
+│       ├── Totals .... subtotal, tax, discount, insurance, total
+│       ├── Payments .. payments and refunds recorded on the bill (from payment history)
+│       └── Sticky action bar: Collect payment · Refund · Discount · Insurance · Void
+└── Dialogs: Collect payment · Refund · Discount · Insurance
 ```
 
-## 4. Reused Frontend Infrastructure (already wired, not being changed)
+## 4. User Journey
 
-`BooTableAdminComponent`/`ColumnDefDirective`/`BooActionAdminComponent`, `IconComponent` (physio-icon),
-`ErrorStateComponent`, `DialogService`, `LocalLoadingService`, `ToastService`, `PaginationData`
-helpers, `LoadingKeys.CASHIER.*`. Not currently wired but available: `PrintService` (for
-`printInvoice`/`printReceipt`, currently unimplemented service stubs), `DrawerComponent` (not needed
-— the detail panel is a permanent split-pane, not an overlay).
+1. Cashier opens the page; the queue loads newest bills first, the first bill is selected.
+2. Searches by bill number or patient MRN (the API searches these two fields only), or filters by status/date.
+3. Reviews the selected bill: patient, charges, totals, payments already taken.
+4. **Collect payment** → picks a method per line, amounts default to the outstanding balance, confirms.
+5. The server returns the updated bill; the queue row, panel, summary strip and payment list refresh.
+6. Exceptions: **Refund** (pick the payment, amount ≤ that payment, reason), **Discount** / **Insurance**
+   (separately permissioned), **Void** (only when nothing has been collected).
 
----
+## 5. Layout
 
-## 12. Backend API Contract (proposed — not implemented)
+- Page: `max-w-[1600px]`, `px-4 sm:px-6`, `pt-5 pb-10`, `space-y-5`, same as the redesigned pharmacy pages.
+- Summary strip: `grid-cols-2 lg:grid-cols-4`.
+- Workspace: `xl:grid-cols-[minmax(0,1fr)_minmax(420px,520px)]`; the bill panel is `xl:sticky xl:top-4` with its own scroll.
+- Below `xl` the bill panel opens in the shared `drawer` (640 px, clamped to the viewport).
 
-### 12.0 Required domain model changes (prerequisite)
+### Wireframe (≥ 1280 px)
 
-**Enum reconciliation** — rather than force the frontend's ad-hoc vocabulary onto the backend or vice
-versa, extend the backend enums (source of truth) and have the frontend types converge onto them once
-implementation starts:
+```
+┌ Cashier ───────────────────────────────────────────────────── [Refresh] ┐
+│ Collected today │ Outstanding │ Refunded today │ Payments today          │
+├──────────────────────────────────────────┬───────────────────────────────┤
+│ [search…] [Status ▾] [From] [To] [Reset] │ BILL-0042  ● Partial          │
+│ chips                                    │ Jane Doe · MRN 1001           │
+│ ( Bills | Recent payments )              │ Outstanding   $120.00         │
+│ ┌ BILL-0042  Jane Doe   $120.00  ● ───┐  │ Charges ……………………………………          │
+│ │ BILL-0041  John Roe   $0.00    ● ───┤  │ Totals  ……………………………………          │
+│ │ …                                   │  │ Payments ………………………………          │
+│ └ pagination ─────────────────────────┘  │ [Collect payment] [⋯ actions] │
+└──────────────────────────────────────────┴───────────────────────────────┘
+```
 
-| Backend enum | Change | Reason |
+## 6. Component Hierarchy
+
+```
+AdminCashierComponent                (page state, data loading, mutations)
+├── CashierSummaryStripComponent     (presentational)
+├── CashierFilterBarComponent        (boo-input, boo-select, boo-datepicker, boo-filter-chips)
+├── CashierBillListComponent         (boo-table-admin, boo-status-badge)
+├── CashierPaymentsListComponent     (recent payments)
+├── CashierBillPanelComponent        (selected bill, action bar)  — inline or inside <drawer>
+├── CashierDialogComponent           (modal shell: overlay, focus, Escape, footer slot)
+├── CashierPaymentDialogComponent
+├── CashierRefundDialogComponent
+└── CashierAdjustmentDialogComponent (discount | insurance)
+```
+
+Shared components reused from `@physioboo/ui`: `BooButtonComponent`, `BooInputComponent`, `BooStatusBadgeComponent`,
+`BooFilterChipsComponent`, `BooEmptyStateComponent`, `BooErrorStateComponent`, `BooInlineErrorComponent`,
+`BooIconComponent`. From the app: `BooSelectComponent`, `BooDatepickerComponent`, `BooTextareaComponent`,
+`BooTableAdminComponent` + `ColumnDefDirective`, `StatCardComponent`, `DrawerComponent`, `ToastService`.
+
+## 7. Permissions
+
+| Action | Permission | Notes |
 |---|---|---|
-| `PaymentStatus` | Add nothing — `Partial` (backend) becomes what the frontend calls `PartiallyPaid`; frontend's `InsurancePending` is **not** a bill-level status, it's better modeled as `Bill.InsuranceClaimNumber != null && InsurancePaidAmount == 0` (a derived condition, not a stored state) | Avoids a redundant status value that could drift from the actual insurance fields |
-| `PaymentMethod` | Add `Wallet` already exists; add `Qr` (alias for the frontend's `QRCode`), keep `Card` as the single card method (frontend's `CreditCard`/`DebitCard` split isn't a real backend distinction — collapse to `Card` with an optional `CardBrand` string field on `Payment` if that distinction matters later) | `NetBanking`/`Cheque`/`DemandDraft`/`Upi` (backend) have no frontend equivalent yet — keep them, the cashier UI doesn't need to expose every method immediately |
-| `ItemType` | Frontend's `CashierChargeCategory` maps directly: `Medicine→Medicine`, `Laboratory→LabTest`, `Imaging→Imaging`, `Procedure→Procedure`, `Room→RoomCharge`, `Service→Other` (or a new `Service` value if "service" is a distinct concept from "other" in this domain — decide at implementation time) | No new enum needed, just a frontend-side mapping table when wiring the real service |
+| Open page, list, detail, summary | `billing:bill:read` | route guard |
+| Recent payments, per-bill payment list | `billing:payment:read` | tab hidden, panel shows a note |
+| Collect payment | `billing:payment:create` | |
+| Refund | `billing:payment:refund` (+ `billing:payment:read` to choose the payment) | |
+| Discount | `billing:bill:discount-apply` | |
+| Insurance | `billing:bill:insurance-apply` (+ `admin:insurance-company:read` for the company list) | |
+| Void | `billing:bill:void` | |
 
-**`Bill.AppointmentId` becomes nullable** — walk-in/ad-hoc bills need to exist without an appointment. Add a `BillSource` enum (`Appointment`, `WalkIn`, `PharmacySale`) to distinguish origin without overloading nullability semantics.
+Buttons without the permission are not rendered. The frontend `Permissions.Billing` constant was extended with
+the five missing codes (they already existed on the server).
 
-**Refund modeling decision**: keep refunds as fields on the same `Payment` row (current backend design) rather than introducing a separate `Refund` entity — a full refund sets `RefundAmount = Amount`, a partial refund sets `RefundAmount < Amount`, both leave the original `Payment` row intact for audit purposes. The frontend's `CashierTransactionEvent` (which treats refund as its own timeline event type) is then a **view-layer transformation**: a `Payment` row with `RefundAmount > 0` and `RefundDate` set renders as two timeline entries (the original payment, and a synthetic "Refund" event) rather than two database rows. This avoids the complexity of a new entity for what is fundamentally a state change on an existing payment.
+## 8. UI Specification
 
-**Bill totals must be recalculated on every mutation** — `Bill.UpdateAmounts()` already exists on the entity (dead code today); every command that changes a `Bill`'s items, discount, insurance coverage, or receives/refunds a payment against it must call this method and persist the result. This is the single most important correctness fix in this entire module.
+- Status badge tones (`PaymentStatus`): Pending → warning, Partial → primary, Paid → success, Overdue → danger,
+  Cancelled → neutral, Refunded → danger, Waived → neutral. Always dotted + label (never colour alone).
+- Amounts: `tabular-nums`, `currency:'USD'` pipe (same as the pharmacy pages); outstanding > 0 in `text-rose-700`.
+- Controls: `boo-input` / `boo-select` / `boo-datepicker` at their default (middle) size; buttons `boo-button`.
+- Dialogs: `max-w-lg`, z-index 10001 (above the drawer), `role="dialog"`, `aria-modal`, Escape closes (unless submitting), focus moves into the dialog.
 
-**New entity: none required** — `Bill`/`BillItem`/`Payment` already have all the fields a real implementation needs; the gap is entirely in the Application/Presentation layers (missing queries, missing recalculation logic), not the Domain layer. This is a smaller domain-model lift than Prescriptions or Pharmacy required.
+## 9. Interaction Design
 
-### 12.1 `GET /api/cashier/dashboard`
-- **Purpose**: 8 KPI tiles in the hero header.
-- **Response**: `CashierDashboardStatsViewModel` — `todayRevenue, cashCollected, cardPayments, insuranceClaims, outstandingBills, refundAmount, completedTransactions, averagePaymentTimeSeconds`. Computed by aggregating today's `Payment`/`Bill` rows — `averagePaymentTimeSeconds` has no existing data source (no "bill created → payment received" timestamp delta is tracked anywhere); implement it as `0`/omit initially and flag as a follow-up metric once payment-latency tracking exists.
-- **Frontend usage**: `CashierService.getDashboardStats()`.
+- Search is debounced 350 ms; any filter change resets to page 1. Out-of-order responses are dropped (`switchMap`).
+- Selecting a row selects the bill (keyboard: the bill number is a button). On `< xl` it also opens the drawer.
+- Payment dialog: method rows (method + amount); **Add line** for split tender; the sum must be `> 0` and `≤` outstanding; confirm disabled otherwise and while submitting.
+- Refund dialog: lists the bill's payments that have not been refunded yet, amount capped to the chosen payment, reason required. A payment is refunded once: the server overwrites (does not add to) a payment's refund amount, so a second refund would shrink the first.
+- Void uses the adjustment dialog in its danger tone: a reason is required and the button states what it does. No separate confirm prompt.
+- After any success: toast, close dialog, replace the bill from the response, then reload summary, list and payments.
 
-### 12.2 `GET /api/cashier/invoices`
-- **Purpose**: Paged, filtered invoice list for the Outstanding Invoices table.
-- **Request (query)**: `search?, status?, dateFrom?, dateTo?, departmentId?, pageNumber, pageSize` — matches `CashierInvoiceFilter`, including the currently-dead date/department filters (wire them up as part of this endpoint's implementation, fixing Problem #7).
-- **Response**: `PagedResult<CashierInvoiceViewModel>` — the flattened shape the frontend already expects (patient name/MRN/phone inlined, doctor/department as display strings, `charges` embedded). Build this as a projection over `Bill` + `BillItems` + `Patient`/`Appointment`/`Doctor`/`Department` joins — do not require the frontend to make N+1 calls for display data it already expects inlined.
-- **Frontend usage**: `CashierService.searchInvoices(filter)`.
+## 10. Responsive Behaviour
 
-### 12.3 `GET /api/cashier/invoices/{id}`
-- **Purpose**: Single invoice detail (currently a dead code path in the frontend, but real once wired to a working backend and once mutation endpoints return the server's recalculated invoice instead of the client recomputing locally).
-- **Response**: `CashierInvoiceViewModel` (full detail, same shape as the list row plus nothing extra needed since the list already embeds charges).
-- **Frontend usage**: `CashierService.getInvoiceDetail(invoiceId)`; also the recommended response shape for §12.5–12.9's mutation endpoints (return the fresh invoice, don't make the frontend guess).
+- `≥ xl`: two columns. `lg`: single column, summary 4-up. `< lg`: summary 2-up, filters stack, table scrolls horizontally inside its card (`min-w-[640px]`), drawer fills the viewport.
+- Touch targets ≥ 36 px for row actions; dialog content scrolls inside `max-h-[calc(100vh-2rem)]`.
 
-### 12.4 `POST /api/cashier/invoices`
-- **Purpose**: Create a bill — replaces the disconnected `POST /api/bills` + separate `POST /api/bill-items/create` calls with one transactional create (header + items), same lesson as Prescriptions/Retail's transactional-create requirement. Also fixes the dangling `GetBillById` `CreatedAtRoute` reference (Problem #6) by actually registering that named route.
-- **Request**: `{ patientId, appointmentId?, hospitalId, departmentId, billSource (Appointment|WalkIn|PharmacySale), type (BillType), items: BillItemInput[] }`.
-- **Response**: `CashierInvoiceViewModel` with totals computed via `UpdateAmounts()`.
+## 11. Accessibility
 
-### 12.5 `POST /api/cashier/invoices/{id}/discounts`
-- **Purpose**: Apply a discount percentage to the invoice, recalculate totals via `Bill.UpdateAmounts()`.
-- **Request**: `{ discountPercent }`. **Response**: full `CashierInvoiceViewModel` (not just the delta the mock currently returns — this is what lets the frontend drop its client-side recompute logic, Problem in §1).
-- **Frontend usage**: `CashierService.applyDiscount(invoiceId, discountPercent)`.
+- Landmarks: `main`, `section[aria-label]`; `h1` once; `dl` for balances; live region (`aria-live="polite"`) for the remaining balance in the payment dialog.
+- Dialogs trap initial focus and return to the opener; Escape closes; errors use `role="alert"`.
+- Status is conveyed by text, not colour alone; contrast follows the existing tokens (WCAG AA).
 
-### 12.6 `POST /api/cashier/invoices/{id}/insurance`
-- **Purpose**: Attach/update insurance coverage on the invoice, recalculate totals.
-- **Request**: `{ provider, policyNo, coverageAmount }` — maps to `Bill.InsuranceCompanyId`/`InsuranceClaimNumber`/`InsuranceApprovedAmount` (resolve `provider` string to an `InsuranceCompanyId` FK, or accept the id directly if the frontend is updated to send it).
-- **Response**: full `CashierInvoiceViewModel`.
+## 12. Page States
 
-### 12.7 `POST /api/cashier/payments`
-- **Purpose**: Receive payment — supports the Mixed/split flow by creating multiple `Payment` rows in one call (fixes Problem #5), then recalculates `Bill.PaidAmount`/`OutstandingAmount`/`PaymentStatus` via `UpdateAmounts()`.
-- **Request**: `{ invoiceId, splits: {method, amount}[], amountTendered }`.
-- **Response**: `CashierInvoiceViewModel` (updated) — the frontend's `CashierPaymentResult` becomes redundant once the full invoice comes back.
-- **Note on atomicity**: same infrastructure limitation documented for module 8/9 (`CheckoutCartCommandHandler`) — this codebase's repository layer has no cross-call transaction wrapper; N payment-row inserts + one Bill update happen sequentially, not atomically, until `IUnitOfWork` gains transaction support.
+| Region | Loading | Empty | Error | Disabled |
+|---|---|---|---|---|
+| Summary | skeleton figures | zeros are real zeros | inline error + retry | — |
+| Bills | table loading overlay | "No bills match" (reset filters) / "No bills yet" | `boo-error-state` + retry, filters kept | — |
+| Bill panel | skeleton | "Select a bill" | `boo-inline-error` for payments | actions hidden/disabled by status & permission |
+| Payments | skeleton | "No payments recorded" | inline error + retry | needs `payment:read` |
+| Dialogs | submit button `loading` | — | server message toast; dialog stays open with data | submit disabled until valid |
 
-### 12.8 `POST /api/cashier/refunds`
-- **Purpose**: Refund a payment (full or partial) — sets `RefundAmount`/`RefundDate`/`RefundReason` on the targeted `Payment` row per the §12.0 modeling decision, recalculates `Bill` totals.
-- **Request**: `{ invoiceId, paymentId?, amount, reason, method }` (if `paymentId` is omitted, refund against the most recent completed payment for that invoice — the frontend's current `refundPayment(invoiceId, ...)` signature doesn't pass a specific payment id, so the backend needs a sensible default).
-- **Response**: `CashierInvoiceViewModel`.
+Action availability (derived only from fields the API returns):
 
-### 12.9 `POST /api/cashier/invoices/{id}/void`
-- **Purpose**: Void an invoice (sets `Bill.PaymentStatus = Cancelled`, requires a reason).
-- **Request**: `{ reason }`. **Response**: `CashierInvoiceViewModel`.
+- Collect payment: status not `Cancelled`/`Paid` and `remainingBalance > 0`.
+- Refund: `paidAmount > 0`, and the dialog finds a payment without a refund among the latest 100 transactions.
+- Discount / Insurance: status not `Cancelled`/`Paid`.
+- Void: status not `Cancelled` and `paidAmount === 0` (the server does not enforce this; the UI does, to avoid voiding a bill with money on it).
 
-### 12.10 `GET /api/cashier/payment-history`
-- **Purpose**: Recent Transactions timeline — reads `Payment` rows (with the refund-as-synthetic-event transformation from §12.0 applied server-side, so the frontend keeps receiving `CashierTransactionEvent[]` as-is).
-- **Response**: `List<CashierTransactionEventViewModel>`, paged/limited (e.g. most recent 50).
+## 13. Edge Cases
 
-### 12.11 `GET /api/cashier/invoices/{id}/print` and `GET /api/cashier/payments/{id}/print-receipt`
-- **Purpose**: Printable invoice/receipt — same simplification precedent as Retail/Stock Take (JSON representation for a first pass, reuse the app's `PrintTemplate` infrastructure for real PDF output later rather than building a one-off renderer).
-- **Frontend usage**: `printInvoice`/`printReceipt` — currently unimplemented stubs, wire to `PrintService` once this exists.
+- Double click / Enter on confirm → ignored while a request is pending.
+- Server rejects (validation, 4xx) → global error toast, dialog keeps its values.
+- Bill changes under the user (another cashier) → the server response replaces the row; a bill that leaves the filtered list stays selected in the panel until the user selects another.
+- A payment older than the latest-100 window cannot be refunded from the UI (no per-bill payment endpoint) → the refund dialog explains why.
+- User lacks `payment:read` → payments section and tab are replaced by a note; refund unavailable.
+- Selecting a bill from "Recent payments" that is not on the current page loads it by id.
 
-### 12.12 Explicitly deferred / not part of this pass
-- `GET /api/payment-methods` — declared in `base.ts`, no service method calls it; skip until a real need (dynamic per-hospital payment method configuration) emerges. Hardcode the method list client-side for now.
-- `GET /api/cashier/export` — declared, no service method; export/reporting concerns belong with Revenue Report (`docs/revenue-report-redesign.md`), not duplicated here.
-- Online payment-gateway integration (`InitiatePayment`/`Transaction`/`IPaymentGateway`/webhook/callback in `PaymentEndpoints.cs`) — **on review, this is a separate concern, not a Card/QR path for the cashier terminal.** It's an asynchronous, redirect/webhook-based flow suited to remote/online bill-pay (e.g. a patient paying via a link), whereas a cashier's in-person Card/QR payment is synchronous (swipe-and-confirm, immediately settled). §12.7's `ReceivePayment` correctly treats all in-person methods as immediately `Paid` and does **not** delegate to the gateway subsystem — the two payment paths are architecturally distinct, not a fallback for each other. Module 11 ("Payments") is this gateway subsystem, and it is already fully implemented (`InitiatePayment`, `HandleGatewayNotification`, `GetTransactionStatus` all exist and are wired) — its remaining gap, if any, is a frontend remote-payment page, not backend work.
+## 14. Performance
 
----
+Server paging (page size 12), debounced search, `switchMap` cancellation, `OnPush`-friendly signals, payment
+history fetched once per refresh (limit 100) and shared by the tab and the bill panel.
 
-## 13. Permissions needed (add to `Permissions.Billing`)
+## 15. Scalability
 
-Existing: `BillRead, BillCreate, BillItemRead, BillItemCreate, PaymentRead, PaymentCreate`. Add:
-`BillUpdate, BillVoid, BillDiscountApply, BillInsuranceApply, PaymentRefund`.
+Types mirror the view models one-to-one; adding a payment method means extending one list in the types file.
+The per-bill payments source is isolated in the service (`getPaymentHistory`) so it can switch to a dedicated endpoint (§17) without touching components.
+
+## 16. Backend API Contract (consumed — all exist in `CashierEndpoints.cs`)
+
+All responses are `{ success, data, errors, detailedErrors }`.
+
+| Purpose | Method + URL | Request | Response (`data`) | Permission | Frontend usage |
+|---|---|---|---|---|---|
+| Summary | `GET /api/cashier/dashboard` | — | `{ todayRevenue, cashCollected, cardPayments, insuranceClaims, outstandingBills, refundAmount, completedTransactions, averagePaymentTimeSeconds }` | `bill:read` | summary strip (4 figures) |
+| Bills | `GET /api/cashier/invoices` | query `search, status, dateFrom, dateTo, departmentId, pageNumber, pageSize` | `PagedResult<Invoice>` | `bill:read` | queue |
+| Bill | `GET /api/cashier/invoices/{id}` | — | `Invoice \| null` | `bill:read` | open from a payment |
+| Payments | `GET /api/cashier/payment-history` | query `limit` | `TransactionEvent[]` | `payment:read` | tab, panel, refund picker |
+| Pay | `POST /api/cashier/payments` | `{ invoiceId, splits:[{method, amount}], amountTendered }` | updated `Invoice` | `payment:create` | payment dialog |
+| Refund | `POST /api/cashier/refunds` | `{ invoiceId, paymentId, amount, reason, method }` | updated `Invoice` | `payment:refund` | refund dialog |
+| Discount | `POST /api/cashier/invoices/{id}/discounts` | `{ discountPercent }` | updated `Invoice` | `bill:discount-apply` | adjustment dialog |
+| Insurance | `POST /api/cashier/invoices/{id}/insurance` | `{ insuranceCompanyId, policyNo, coverageAmount }` | updated `Invoice` | `bill:insurance-apply` | adjustment dialog |
+| Void | `POST /api/cashier/invoices/{id}/void` | `{ reason }` | updated `Invoice` | `bill:void` | void dialog |
+| Companies | `POST /api/insurance-companies/search` | `PagedRequest` | `PagedResult<InsuranceCompany>` | `insurance-company:read` | insurance select |
+
+`Invoice` = `{ id, billNumber, billDate, visitType, departmentName, doctorName, patientId, patientName, patientMrn, patientPhone, charges[], subtotal, taxRate, taxAmount, discountPercent, discountAmount, insuranceCoverageAmount, totalAmount, paidAmount, remainingBalance, status }`.
+`status` ∈ `Pending | Partial | Paid | Overdue | Cancelled | Refunded | Waived`; payment `method` ∈ `Cash | Card | Upi | NetBanking | Cheque | DemandDraft | Insurance | Wallet | Qr`.
+
+## 17. Backend limitations (not worked around, not invented)
+
+1. **Search** matches bill number and patient MRN only — not patient name or phone. The placeholder says so.
+2. **No payments-by-bill endpoint.** The panel and refund picker use `payment-history?limit=100` filtered by bill; older payments are not listed.
+3. **Refund** has no server-side cap and *overwrites* `RefundAmount` with the requested value (a second refund on the same payment would reduce the first); it also ignores `method`. The UI offers only payments without a refund, caps the amount to the payment amount and sends the payment's own method.
+4. **Payment** has no server-side check that the splits do not exceed the balance, and records no reference/transaction number. The UI caps the total to the balance and offers no reference field.
+5. **Void** does not check for collected payments; the UI only allows it when `paidAmount === 0`.
+6. **Receipt/print:** `POST /print-invoice` returns the invoice JSON, not a document. No print or receipt action is offered.
+7. **`averagePaymentTimeSeconds`** is always 0 and is not shown. `Refunded`/`Overdue`/`Waived` statuses are never set by cashier flows but exist in the enum and filter.
+8. **Department filter** is supported by the API but there is no cashier department lookup, so it is not exposed.
+9. Recommended follow-ups (backend, out of scope here): `GET /api/cashier/invoices/{id}/payments`, server-side refund/payment caps, void guard, payment reference field.
+
+## 18. Enterprise Recommendations
+
+Audit trail view per bill, shift/cash-drawer reconciliation, receipt PDF, idempotency keys on `POST /payments` and `POST /refunds` (real duplicate protection needs the server), department filter lookup.

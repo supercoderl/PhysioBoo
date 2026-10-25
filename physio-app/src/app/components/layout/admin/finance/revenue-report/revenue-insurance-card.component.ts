@@ -8,7 +8,8 @@ import { InsuranceProviderRevenue } from "../../../../../shared/types/revenue.ty
     imports: [SharedModule],
     template: `
     <div class="bg-surface rounded-2 border border-borderGray/60 p-4 h-full">
-      <h2 class="text-sm font-semibold text-regular mb-3">Insurance Revenue</h2>
+      <h3 class="text-sm font-semibold text-regular mb-0.5">Insurance claims by provider</h3>
+      <p class="text-xs text-secondary mb-3">Claimed, approved and pending amounts for the period</p>
 
       <div *ngIf="loading" class="space-y-3">
         <div *ngFor="let i of [1,2,3]" class="h-14 animate-pulse bg-gray-100 rounded-1.5"></div>

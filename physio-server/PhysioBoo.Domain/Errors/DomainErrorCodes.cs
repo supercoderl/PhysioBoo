@@ -161,6 +161,12 @@
             // Doctor Validation
             public const string EmptyId = "DOCTOR_EMPTY_ID";
             public const string EmptyMedicalLicenseNumber = "DOCTOR_EMPTY_MEDICAL_LICENSE_NUMBER";
+
+            // Doctor Avatar
+            public const string EmptyAvatarFile = "DOCTOR_EMPTY_AVATAR_FILE";
+            public const string AvatarFileTooLarge = "DOCTOR_AVATAR_FILE_TOO_LARGE";
+            public const string UnsupportedAvatarType = "DOCTOR_UNSUPPORTED_AVATAR_TYPE";
+            public const string AvatarUploadFailed = "DOCTOR_AVATAR_UPLOAD_FAILED";
         }
 
         public static class PrintTemplate

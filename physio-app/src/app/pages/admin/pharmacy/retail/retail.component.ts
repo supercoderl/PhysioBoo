@@ -1,402 +1,616 @@
-import { Component, HostListener, OnInit, ViewChild, signal } from "@angular/core";
-import { forkJoin } from "rxjs";
-import { BooErrorStateComponent } from '@physioboo/ui';
-import { StatCardComponent } from "../../../../components/ui/stat-card.component";
-import { RetailPosService, nextLineItemId } from "../../../../services/admin/retail-pos.service";
+import { Component, DestroyRef, HostListener, OnInit, ViewChild, inject, signal } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooInlineErrorComponent } from '@physioboo/ui';
+import { Observable, Subscription, concatMap, from, last } from "rxjs";
+import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
+import { HospitalService } from "../../../../services/admin/hospital.service";
+import { RetailPosService } from "../../../../services/admin/retail-pos.service";
+import { AuthService } from "../../../../services/auth/auth.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
+import { Permissions } from "../../../../shared/constants/permission.constant";
 import { SharedModule } from "../../../../shared/shared-imports";
+import { PagedResponse } from "../../../../shared/types/common";
+import { Hospital } from "../../../../shared/types/support.types";
 import {
   RetailCart,
   RetailCartLineItem,
+  RetailCheckoutPayload,
   RetailCustomer,
   RetailInventoryInsight,
   RetailMedicineCard,
-  RetailPaymentSplit,
+  RetailTransaction,
 } from "../../../../shared/types/retail-pos.types";
+import { formatRetailMoney, retailCartTotals } from "../../../../shared/utils/retail-pos.utils";
 import { RetailCartPanelComponent } from "./retail-cart-panel.component";
 import { RetailCatalogPanelComponent } from "./retail-catalog-panel.component";
 import { RetailCheckoutPanelComponent } from "./retail-checkout-panel.component";
 import { RetailCustomerLookupDrawerComponent } from "./retail-customer-lookup-drawer.component";
 import { RetailPaymentDialogComponent } from "./retail-payment-dialog.component";
 import { RetailProductDetailDrawerComponent } from "./retail-product-detail-drawer.component";
-import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { RetailReceiptDialogComponent } from "./retail-receipt-dialog.component";
+
+const FACILITY_STORAGE_KEY = 'physioboo.retail.hospitalId';
 
 @Component({
   selector: 'admin-retail',
   standalone: true,
   imports: [
     SharedModule,
+    BooButtonComponent,
+    BooEmptyStateComponent,
     BooErrorStateComponent,
-    StatCardComponent,
+    BooInlineErrorComponent,
+    BooSelectComponent,
     RetailCatalogPanelComponent,
     RetailCartPanelComponent,
     RetailCheckoutPanelComponent,
     RetailPaymentDialogComponent,
+    RetailReceiptDialogComponent,
     RetailProductDetailDrawerComponent,
     RetailCustomerLookupDrawerComponent,
-    ButtonIconComponent,
-    BooButtonAdminComponent
   ],
-  host: { class: 'block min-h-screen bg-gray-50' },
   template: `
-    <!-- Sticky POS header -->
-    <div class="sticky top-0 z-20 bg-surface shadow-sm">
-      <div class="px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 class="text-lg font-semibold text-gray-800">Pharmacy Retail</h1>
-          <p class="text-xs text-secondary">Cashier: Current Cashier · Shift started {{ shiftStart | date:'shortTime' }}</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <button-icon [icon]="{ name: 'gauge', size: 14 }" (onClick)="showInsight.set(!showInsight())" buttonClass="!rounded-lg text-xs font-semibold"> {{ showInsight() ? 'Hide' : 'Show' }} Insight </button-icon>
-          <boo-button-admin (click)="newSale()" textColor="white" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" [gap]="6">
-            <physio-icon name="circle-plus" [size]="14"></physio-icon> New Sale
-          </boo-button-admin>
-        </div>
+    <!-- Permission denied: the catalog and insight are all guarded by pharmacy:medicine-inventory:read -->
+    <main *ngIf="!canReadCatalog" class="py-5">
+      <div class="bg-surface border border-borderGray/60 rounded-2 py-8">
+        <boo-empty-state icon="lock" title="You don't have access to Pharmacy Retail"
+          description="Viewing the retail catalog needs the pharmacy inventory read permission. Ask an administrator to grant it."></boo-empty-state>
       </div>
-
-      <!-- Retail queue bar -->
-      <div class="px-4 sm:px-6 border-t border-gray-200 flex items-center gap-1 overflow-x-auto" role="tablist">
-        <button *ngFor="let c of carts()" type="button" (click)="switchCart(c.id)" role="tab" [attr.aria-selected]="activeCartId() === c.id"
-          class="px-4 py-2.5 text-sm font-medium flex items-center gap-2 border-b-2 -mb-px whitespace-nowrap transition-colors"
-          [ngClass]="activeCartId() === c.id ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
-          <span class="w-1.5 h-1.5 rounded-full" [ngClass]="c.status === 'Active' ? 'bg-emerald-500' : 'bg-gray-300'"></span>
-          {{ c.name }}
-          <span class="text-[11px] text-gray-400">({{ c.items.length }})</span>
-        </button>
-        <button type="button" (click)="newCart()" class="px-3 py-2.5 text-xs font-semibold text-primary hover:underline flex items-center gap-1">
-          <physio-icon name="plus" [size]="12"></physio-icon> New Cart
-        </button>
-      </div>
-    </div>
-
-    <main class="px-4 sm:px-6 py-4">
-      <!-- Error state -->
-      <div *ngIf="error()" class="h-[calc(100vh-220px)] min-h-[480px] flex items-center justify-center bg-surface rounded-2 border border-borderGray/60">
-        <boo-error-state title="Couldn't load the POS workspace" [description]="error()" (retry)="retryLoad()"></boo-error-state>
-      </div>
-
-      <ng-container *ngIf="!error()">
-      <!-- Inventory insight strip -->
-      <div *ngIf="showInsight() && insight()" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
-        <boo-stat-card label="Low Stock" [value]="insight()!.lowStockCount" icon="trending-down" tone="warning"></boo-stat-card>
-        <boo-stat-card label="Near Expiry" [value]="insight()!.nearExpiryCount" icon="calendar-clock" tone="warning"></boo-stat-card>
-        <boo-stat-card label="Out of Stock" [value]="insight()!.outOfStockCount" icon="package-x" tone="danger"></boo-stat-card>
-        <boo-stat-card label="Best Seller" [value]="insight()!.bestSeller?.name ?? '—'" icon="trophy" tone="primary"></boo-stat-card>
-        <boo-stat-card label="Today's Revenue" [value]="'$' + insight()!.todayRevenue.toFixed(2)" icon="dollar-sign" tone="success"></boo-stat-card>
-        <boo-stat-card label="Today's Sales" [value]="insight()!.todaySalesCount" icon="receipt" tone="neutral"></boo-stat-card>
-      </div>
-
-      <!-- Three-workspace grid: desktop = 3 panels side by side, tablet = 2-up, mobile = stacked -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1.6fr_1.4fr] gap-4">
-        <div class="h-[calc(100vh-220px)] min-h-[480px]">
-          <retail-catalog-panel #catalogPanel (addToCart)="onAddToCart($event)" (viewDetail)="openProductDrawer($event)"></retail-catalog-panel>
-        </div>
-        <div class="h-[calc(100vh-220px)] min-h-[480px]">
-          <retail-cart-panel [cart]="activeCart()" (quantityChange)="onQuantityChange($event)" (discountChange)="onDiscountChange($event)"
-            (removeItem)="onRemoveItem($event)" (clearAll)="onClearAll()"></retail-cart-panel>
-        </div>
-        <div class="h-[calc(100vh-220px)] min-h-[480px] md:col-span-2 lg:col-span-1">
-          <retail-checkout-panel [cart]="activeCart()" (openCustomerLookup)="customerDrawerOpen.set(true)" (useWalkIn)="customerDrawerOpen.set(true)"
-            (checkout)="openPaymentDialog()" (holdSale)="suspendActiveCart()" (printBill)="printBill()"></retail-checkout-panel>
-        </div>
-      </div>
-      </ng-container>
     </main>
 
-    <!-- Floating quick actions -->
-    <div class="fixed bottom-6 right-6 flex flex-col gap-2 z-30">
-      <button type="button" (click)="newSale()" title="New Sale (F2)" class="w-11 h-11 rounded-full bg-primary text-white shadow-lg flex items-center justify-center hover:opacity-90">
-        <physio-icon name="plus" [size]="18"></physio-icon>
-      </button>
-      <button type="button" (click)="suspendActiveCart()" title="Suspend Sale" class="w-11 h-11 rounded-full bg-surface border border-gray-300 shadow-lg flex items-center justify-center hover:bg-gray-50">
-        <physio-icon name="pause" [size]="18" class="text-gray-700"></physio-icon>
-      </button>
-      <button type="button" (click)="toggleHeldQueue()" title="Hold Queue" class="relative w-11 h-11 rounded-full bg-surface border border-gray-300 shadow-lg flex items-center justify-center hover:bg-gray-50">
-        <physio-icon name="list" [size]="18" class="text-gray-700"></physio-icon>
-        <span *ngIf="heldCarts().length" class="absolute -top-1 -right-1 bg-amber-500 text-white text-[10px] font-bold rounded-full w-4.5 h-4.5 flex items-center justify-center">{{ heldCarts().length }}</span>
-      </button>
-      <button type="button" title="Print Receipt" (click)="printBill()" class="w-11 h-11 rounded-full bg-surface border border-gray-300 shadow-lg flex items-center justify-center hover:bg-gray-50">
-        <physio-icon name="printer" [size]="18" class="text-gray-700"></physio-icon>
-      </button>
-    </div>
+    <main *ngIf="canReadCatalog" class="flex flex-1 flex-col gap-5 pb-24 xl:min-h-0 xl:pb-5">
+      <header class="flex shrink-0 flex-wrap items-end justify-between gap-4">
+        <div class="min-w-0">
+          <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Pharmacy retail</h1>
+          <p class="text-sm text-secondary m-0 mt-1 max-w-2xl">Counter sales of medicine. Find a medicine in the catalog, add it to the open sale, then take payment.</p>
+          <p class="text-xs text-gray-500 m-0 mt-1">Shortcuts: F2 search · F3 customer · F4 checkout · Ctrl+B barcode</p>
+        </div>
+        <div class="flex flex-wrap items-end gap-3">
+          <div *ngIf="hospitals().length > 1" class="w-60">
+            <boo-select label="Facility" [options]="hospitals()" bindLabel="name" bindValue="id" [required]="true" [ngModel]="hospitalId()" (ngModelChange)="selectHospital($event)"></boo-select>
+          </div>
+          <boo-inline-error *ngIf="hospitalsError()" what="facilities" [compact]="true" [state]="hospitalsRetrying() ? 'retrying' : 'default'" (retry)="loadHospitals()"></boo-inline-error>
+          <button *ngIf="canCreateCart" boo-button variant="primary" size="md" (click)="newSale()" [disabled]="!hospitalId() || mutating()" [loading]="creating()"
+            [attr.title]="!hospitalId() ? 'Select a facility first' : null">
+            <physio-icon name="plus" [size]="16"></physio-icon> New sale
+          </button>
+        </div>
+      </header>
 
-    <!-- Held queue popover -->
-    <div *ngIf="showHeldQueue()" class="fixed bottom-24 right-6 w-72 bg-surface border border-gray-200 rounded-lg shadow-2xl z-30 p-3">
-      <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Held Carts</p>
-      <div *ngIf="!heldCarts().length" class="text-xs text-gray-400">No held carts</div>
-      <div *ngFor="let c of heldCarts()" class="flex items-center justify-between py-1.5">
-        <span class="text-sm text-gray-700">{{ c.name }} ({{ c.items.length }})</span>
-        <button type="button" (click)="resumeCart(c.id)" class="text-xs font-semibold text-primary hover:underline">Resume</button>
+      <!-- Today at the counter: sales first, stock alerts after; all values come from the insight endpoint -->
+      <section class="shrink-0" aria-label="Today at the counter">
+        <boo-inline-error *ngIf="insightError()" what="today's summary" [state]="insightRetrying() ? 'retrying' : 'default'" (retry)="loadInsight()"></boo-inline-error>
+        <dl *ngIf="!insightError()" class="m-0 border border-borderGray/60 rounded-2 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-px bg-borderGray/60 overflow-hidden">
+          <ng-container *ngIf="insight() as i; else insightSkeleton">
+            <div class="bg-surface px-4 py-3"><dt class="text-xs text-secondary">Today's revenue</dt><dd class="m-0 mt-1 text-lg font-semibold text-regular tabular-nums">{{ money(i.todayRevenue) }}</dd></div>
+            <div class="bg-surface px-4 py-3"><dt class="text-xs text-secondary">Sales completed</dt><dd class="m-0 mt-1 text-lg font-semibold text-regular tabular-nums">{{ i.todaySalesCount }}</dd></div>
+            <div class="bg-surface px-4 py-3 col-span-2 md:col-span-1 min-w-0"><dt class="text-xs text-secondary">Best seller today</dt>
+              <dd class="m-0 mt-1 text-sm font-semibold text-regular truncate">{{ i.bestSellerName || 'No sales yet' }}<span *ngIf="i.bestSellerName && i.bestSellerUnitsSold" class="font-normal text-secondary"> · {{ i.bestSellerUnitsSold }} sold</span></dd></div>
+            <div class="bg-surface px-4 py-3"><dt class="text-xs text-secondary">Low-stock batches</dt><dd class="m-0 mt-1 text-lg font-semibold tabular-nums" [ngClass]="i.lowStockCount ? 'text-amber-700' : 'text-regular'">{{ i.lowStockCount }}</dd></div>
+            <div class="bg-surface px-4 py-3"><dt class="text-xs text-secondary">Near-expiry batches</dt><dd class="m-0 mt-1 text-lg font-semibold tabular-nums" [ngClass]="i.nearExpiryCount ? 'text-amber-700' : 'text-regular'">{{ i.nearExpiryCount }}</dd></div>
+            <div class="bg-surface px-4 py-3"><dt class="text-xs text-secondary">Out-of-stock batches</dt><dd class="m-0 mt-1 text-lg font-semibold tabular-nums" [ngClass]="i.outOfStockCount ? 'text-danger' : 'text-regular'">{{ i.outOfStockCount }}</dd></div>
+          </ng-container>
+          <ng-template #insightSkeleton>
+            <div *ngFor="let n of [1,2,3,4,5,6]" class="bg-surface px-4 py-3"><div class="h-3 w-20 rounded bg-gray-100 animate-pulse"></div><div class="h-6 w-14 rounded bg-gray-100 animate-pulse mt-2"></div></div>
+          </ng-template>
+        </dl>
+      </section>
+
+      <!-- Cart load failure replaces the workspace -->
+      <div *ngIf="cartsError()" class="min-h-[320px] flex items-center justify-center bg-surface rounded-2 border border-borderGray/60">
+        <boo-error-state title="Couldn't load the sales workspace" [description]="cartsError()" (retry)="loadCarts()"></boo-error-state>
       </div>
+
+      <!-- Catalog (primary) beside the sale (sticky on wide screens, below the catalog otherwise) -->
+      <div *ngIf="!cartsError()" class="grid grid-cols-1 gap-6 xl:min-h-[34rem] xl:flex-1 xl:grid-cols-[minmax(0,1fr)_420px] xl:grid-rows-[minmax(0,1fr)]">
+        <retail-catalog-panel #catalogPanel class="block min-h-0 min-w-0" [canReadCategories]="canReadCategories" [addDisabled]="!canAdd()" [addDisabledReason]="addDisabledReason()"
+          [pendingMedicineId]="pendingMedicineId()" (addToCart)="addMedicine($event)" (barcodeScanned)="onBarcodeScanned($event)"
+          (viewDetail)="openProductDrawer($event)" (medicinesLoaded)="onMedicinesLoaded($event)"></retail-catalog-panel>
+
+        <aside id="retail-sale" class="flex min-h-0 flex-col self-start bg-surface border border-borderGray/60 rounded-2 scroll-mt-4 xl:h-full xl:self-auto xl:overflow-hidden" aria-label="Current sale">
+          <div class="shrink-0 px-4 py-3 border-b border-borderGray/60">
+            <h2 class="text-base font-semibold text-regular m-0">Current sale</h2>
+            <div *ngIf="carts().length" class="mt-2 -mx-1 flex items-center gap-1 overflow-x-auto" role="tablist" aria-label="Open sales">
+              <button *ngFor="let c of carts(); let i = index" type="button" role="tab" [id]="'retail-tab-' + c.id" [attr.aria-selected]="activeCartId() === c.id"
+                [attr.tabindex]="activeCartId() === c.id ? 0 : -1" (click)="switchCart(c.id)" (keydown.arrowright)="moveTab(i, 1)" (keydown.arrowleft)="moveTab(i, -1)"
+                class="px-3 min-h-9 rounded-full text-xs font-medium flex items-center gap-1.5 border whitespace-nowrap transition-colors"
+                [ngClass]="activeCartId() === c.id ? 'bg-primarySoft border-primary text-primaryDeep' : 'bg-surface border-gray-300 text-gray-700 hover:border-gray-400'">
+                <span class="w-1.5 h-1.5 rounded-full" [ngClass]="c.status === 'Active' ? 'bg-emerald-500' : 'bg-amber-500'" aria-hidden="true"></span>
+                {{ c.name }} <span class="text-gray-500">({{ c.items.length }})</span><span *ngIf="c.status === 'Held'" class="text-amber-800">· on hold</span>
+              </button>
+            </div>
+          </div>
+
+          <ng-container *ngIf="canReadCart; else cartDenied">
+            <div *ngIf="cartsLoading()" class="p-4 space-y-3" aria-busy="true">
+              <div *ngFor="let n of [1,2,3]" class="h-16 rounded-1.5 bg-gray-50 animate-pulse"></div>
+            </div>
+
+            <ng-container *ngIf="!cartsLoading()">
+              <retail-cart-panel class="block xl:min-h-0 xl:flex-1" [cart]="activeCart()" [canEdit]="canEditCart()" [canCreate]="canCreateCart && !!hospitalId()" [busy]="mutating()" [warnings]="warnings()"
+                [stockByMedicine]="stockByMedicine()" (quantityChange)="onQuantityChange($event)" (discountChange)="onDiscountChange($event)"
+                (removeItem)="onRemoveItem($event)" (clearAll)="onClearAll()" (resume)="resumeActiveCart()" (newSale)="newSale()"></retail-cart-panel>
+              <retail-checkout-panel class="block shrink-0" [cart]="activeCart()" [canEdit]="canEditCart()" [busy]="mutating()" [holding]="holding()" [canHold]="canHold()"
+                [checkoutBlockedReason]="checkoutBlockedReason()" (openCustomerLookup)="openCustomerDrawer()" (checkout)="openPaymentDialog()" (holdSale)="holdActiveCart()"></retail-checkout-panel>
+            </ng-container>
+          </ng-container>
+
+          <ng-template #cartDenied>
+            <boo-empty-state icon="lock" title="Retail carts are not available to you"
+              description="You can browse medicines, but opening a sale needs the retail cart read permission."></boo-empty-state>
+          </ng-template>
+        </aside>
+      </div>
+    </main>
+
+    <!-- Narrow screens: the sale sits below the catalog, so keep its total and a way to reach it in view -->
+    <div *ngIf="canReadCatalog && canReadCart && activeCart()?.items?.length" class="xl:hidden fixed inset-x-0 bottom-0 z-30 bg-surface border-t border-borderGray shadow-[0_-4px_12px_rgba(0,0,0,0.06)] px-4 py-2.5 flex items-center justify-between gap-3">
+      <div class="leading-tight min-w-0">
+        <p class="m-0 text-xs text-secondary truncate">{{ activeCart()?.name }} · {{ activeCart()?.items?.length }} item(s)</p>
+        <p class="m-0 text-base font-semibold text-primaryDeep tabular-nums">{{ money(grandTotal()) }}</p>
+      </div>
+      <button boo-button variant="primary" size="md" (click)="scrollToSale()">Review sale</button>
     </div>
 
-    <retail-product-detail-drawer [isOpen]="productDrawerOpen()" [medicineId]="productDrawerMedicineId()"
-      (close)="productDrawerOpen.set(false)" (addToCart)="onAddDetailToCart($event)"></retail-product-detail-drawer>
+    <ng-container *ngIf="canReadCatalog">
+      <retail-product-detail-drawer [isOpen]="productDrawerOpen()" [medicineId]="productDrawerMedicineId()" [addDisabled]="!canAdd()" [addDisabledReason]="addDisabledReason()"
+        [adding]="!!pendingMedicineId()" (close)="productDrawerOpen.set(false)" (addToCart)="onAddFromDetail($event)"></retail-product-detail-drawer>
 
-    <retail-customer-lookup-drawer [isOpen]="customerDrawerOpen()" (close)="customerDrawerOpen.set(false)"
-      (useCustomer)="onUseCustomer($event)"></retail-customer-lookup-drawer>
+      <retail-customer-lookup-drawer [isOpen]="customerDrawerOpen()" [submitting]="attaching()" (close)="customerDrawerOpen.set(false)" (useCustomer)="onUseCustomer($event)"></retail-customer-lookup-drawer>
 
-    <retail-payment-dialog [isOpen]="paymentDialogOpen()" [grandTotal]="grandTotal()" [hasInsurance]="!!activeCart()?.customer?.insuranceProvider"
-      (close)="paymentDialogOpen.set(false)" (completeSale)="onCompleteSale($event)"></retail-payment-dialog>
-  `,
-})
+      <retail-payment-dialog [isOpen]="paymentDialogOpen()" [grandTotal]="grandTotal()" [hasInsurance]="!!activeCart()?.customer?.insuranceProvider" [hospitalId]="hospitalId()"
+        [submitting]="checkingOut()" [errorMessage]="checkoutError()" (close)="paymentDialogOpen.set(false)" (completeSale)="onCompleteSale($event)"></retail-payment-dialog>
+
+      <retail-receipt-dialog [transaction]="receipt()" [canSend]="canReadTransaction" [canRefund]="canRefund" (close)="receipt.set(null)" (refunded)="onRefunded($event)"></retail-receipt-dialog>
+    </ng-container>
+  `,})
 export class AdminRetailComponent implements OnInit {
-  @ViewChild('catalogPanel') catalogPanel!: RetailCatalogPanelComponent;
+  @ViewChild('catalogPanel') catalogPanel?: RetailCatalogPanelComponent;
 
-  shiftStart = new Date();
+  private readonly srv = inject(RetailPosService);
+  private readonly hospitalSrv = inject(HospitalService);
+  private readonly authSrv = inject(AuthService);
+  private readonly toastSrv = inject(ToastService);
+  private readonly dialogSrv = inject(DialogService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  // #region Permissions — each action checks its own permission; read access never implies write access
+  readonly canReadCatalog = this.authSrv.hasPermission(Permissions.Pharmacy.MedicineInventoryRead);
+  readonly canReadCategories = this.authSrv.hasPermission(Permissions.Pharmacy.MedicineCategoryRead);
+  readonly canReadCart = this.authSrv.hasPermission(Permissions.Pharmacy.RetailCartRead);
+  readonly canCreateCart = this.authSrv.hasPermission(Permissions.Pharmacy.RetailCartCreate);
+  readonly canUpdateCart = this.authSrv.hasPermission(Permissions.Pharmacy.RetailCartUpdate);
+  readonly canCheckout = this.authSrv.hasPermission(Permissions.Pharmacy.RetailTransactionCreate);
+  readonly canReadTransaction = this.authSrv.hasPermission(Permissions.Pharmacy.RetailTransactionRead);
+  readonly canRefund = this.authSrv.hasPermission(Permissions.Pharmacy.RetailTransactionRefund);
+  // #endregion
 
   carts = signal<RetailCart[]>([]);
   activeCartId = signal<string>('');
+  cartsLoading = signal(true);
+  cartsError = signal<string | null>(null);
+
   insight = signal<RetailInventoryInsight | null>(null);
-  showInsight = signal(true);
-  showHeldQueue = signal(false);
-  error = signal<string | null>(null);
+  insightError = signal(false);
+  insightRetrying = signal(false);
+
+  hospitals = signal<Hospital[]>([]);
+  hospitalId = signal<string | null>(null);
+  hospitalsError = signal(false);
+  hospitalsRetrying = signal(false);
+
+  warnings = signal<string[]>([]);
+  stockByMedicine = signal<Record<string, number>>({});
+
+  /** A cart request is in flight; every cart-editing control locks until it settles. */
+  mutating = signal(false);
+  creating = signal(false);
+  holding = signal(false);
+  attaching = signal(false);
+  pendingMedicineId = signal<string | null>(null);
 
   productDrawerOpen = signal(false);
   productDrawerMedicineId = signal<string | null>(null);
   customerDrawerOpen = signal(false);
   paymentDialogOpen = signal(false);
+  checkingOut = signal(false);
+  checkoutError = signal<string | null>(null);
+  receipt = signal<RetailTransaction | null>(null);
 
-  constructor(
-    private srv: RetailPosService,
-    private toastSrv: ToastService,
-    private dialogSrv: DialogService,
-  ) { }
+  private warningsSub?: Subscription;
 
   ngOnInit(): void {
-    this.loadAll();
+    if (!this.canReadCatalog) return;
+    this.loadInsight();
+    if (this.canReadCart) this.loadCarts();
+    else this.cartsLoading.set(false);
+    if (this.canCreateCart || this.canCheckout) this.loadHospitals();
   }
 
-  retryLoad(): void {
-    this.loadAll();
-  }
-
-  private loadAll(): void {
-    this.error.set(null);
-    forkJoin({
-      carts: this.srv.getCarts(),
-      insight: this.srv.getInsight(),
-    }).subscribe({
-      next: ({ carts, insight }) => {
-        if (carts.success && carts.data.length) {
-          this.carts.set(carts.data);
-          this.activeCartId.set(carts.data[0].id);
-        }
-        if (insight.success) this.insight.set(insight.data);
+  // #region Loading
+  loadCarts(): void {
+    this.cartsError.set(null);
+    this.cartsLoading.set(true);
+    this.srv.getCarts().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: res => {
+        const list = res.success ? res.data ?? [] : [];
+        this.carts.set(list);
+        const current = list.find(c => c.id === this.activeCartId());
+        this.activeCartId.set(current?.id ?? (list.find(c => c.status === 'Active') ?? list[0])?.id ?? '');
+        this.cartsLoading.set(false);
+        this.refreshWarnings();
       },
       error: () => {
-        this.error.set('Failed to load the POS workspace. Please try again.');
+        this.cartsLoading.set(false);
+        this.cartsError.set('Check your connection and try again.');
       },
     });
   }
 
-  @HostListener('window:keydown', ['$event'])
-  onKeydown(event: KeyboardEvent): void {
-    const target = event.target as HTMLElement;
-    const isTypingElsewhere = (target.tagName === 'INPUT' || target.tagName === 'SELECT' || target.tagName === 'TEXTAREA')
-      && !target.classList.contains('allow-shortcut');
-
-    if (event.key === 'Escape') {
-      this.productDrawerOpen.set(false);
-      this.customerDrawerOpen.set(false);
-      this.paymentDialogOpen.set(false);
-      return;
-    }
-    if (isTypingElsewhere) return;
-
-    if (event.key === 'F2') { event.preventDefault(); this.catalogPanel?.focusSearch(); }
-    if (event.key === 'F3') { event.preventDefault(); this.customerDrawerOpen.set(true); }
-    if (event.key === 'F4') { event.preventDefault(); this.openPaymentDialog(); }
-    if (event.key === 'F5') { event.preventDefault(); if (this.paymentDialogOpen()) { /* completion happens inside dialog */ } }
-    if (event.ctrlKey && event.key.toLowerCase() === 'b') { event.preventDefault(); this.catalogPanel?.focusBarcode(); }
+  loadInsight(): void {
+    this.insightRetrying.set(this.insightError());
+    this.srv.getInsight().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: res => {
+        this.insightRetrying.set(false);
+        this.insightError.set(!res.success);
+        if (res.success) this.insight.set(res.data);
+      },
+      error: () => {
+        this.insightRetrying.set(false);
+        this.insightError.set(true);
+      },
+    });
   }
 
+  loadHospitals(): void {
+    this.hospitalsRetrying.set(this.hospitalsError());
+    this.hospitalSrv.lookup().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: list => {
+        this.hospitalsRetrying.set(false);
+        this.hospitalsError.set(false);
+        this.hospitals.set(list);
+        const saved = this.readSavedHospital();
+        this.hospitalId.set(list.find(h => h.id === (this.hospitalId() ?? saved))?.id ?? (list.length === 1 ? list[0].id : null));
+      },
+      error: () => {
+        this.hospitalsRetrying.set(false);
+        this.hospitalsError.set(true);
+      },
+    });
+  }
+
+  selectHospital(id: string | null): void {
+    this.hospitalId.set(id || null);
+    try { if (id) localStorage.setItem(FACILITY_STORAGE_KEY, id); } catch { /* storage unavailable: choice just isn't remembered */ }
+  }
+
+  private readSavedHospital(): string | null {
+    try { return localStorage.getItem(FACILITY_STORAGE_KEY); } catch { return null; }
+  }
+  // #endregion
+
+  // #region Derived state
   activeCart(): RetailCart | null {
     return this.carts().find(c => c.id === this.activeCartId()) ?? null;
   }
 
-  heldCarts() {
-    return this.carts().filter(c => c.status === 'Held');
+  canEditCart(): boolean {
+    return this.canUpdateCart && this.activeCart()?.status === 'Active';
+  }
+
+  /** Adding is possible into an active cart, or into a new one when the cashier may create carts and a facility is set. */
+  canAdd(): boolean {
+    if (this.mutating()) return false;
+    const cart = this.activeCart();
+    if (cart) return this.canEditCart();
+    return this.canCreateCart && this.canUpdateCart && !!this.hospitalId();
+  }
+
+  addDisabledReason(): string {
+    if (!this.canReadCart) return 'You do not have access to retail carts';
+    if (!this.canUpdateCart) return 'You do not have permission to edit carts';
+    const cart = this.activeCart();
+    if (cart && cart.status === 'Held') return 'Resume this held sale before adding items';
+    if (!cart && !this.canCreateCart) return 'There is no open sale and you cannot create one';
+    if (!cart && !this.hospitalId()) return 'Select a facility to start a sale';
+    return '';
+  }
+
+  canHold(): boolean {
+    const cart = this.activeCart();
+    return this.canEditCart() && !!cart && cart.items.length > 0;
   }
 
   grandTotal(): number {
+    return retailCartTotals(this.activeCart()).grandTotal;
+  }
+
+  checkoutBlockedReason(): string | null {
     const cart = this.activeCart();
-    if (!cart) return 0;
-    const subtotal = cart.items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
-    const discount = cart.items.reduce((s, i) => s + (i.unitPrice * i.quantity * i.discountPercent / 100), 0);
-    const insurance = cart.items.reduce((s, i) => s + i.insuranceCoveredAmount, 0);
-    const vat = Math.max(0, subtotal - discount - insurance) * 0.05;
-    return Math.max(0, subtotal - discount - insurance + vat);
+    if (!this.canCheckout) return 'You do not have permission to complete sales.';
+    if (!cart) return 'Open a sale to check out.';
+    if (cart.status === 'Held') return 'Resume this sale to check out.';
+    if (!cart.items.length) return 'Add a medicine to check out.';
+    if (!this.hospitalId()) return 'Select a facility to check out.';
+    if (this.grandTotal() <= 0) return 'The total due must be greater than zero.';
+    return null;
   }
 
-  private updateCart(cartId: string, updater: (cart: RetailCart) => RetailCart): void {
-    this.carts.update(list => list.map(c => c.id === cartId ? updater(c) : c));
+  money(amount: number): string {
+    return formatRetailMoney(amount);
+  }
+  // #endregion
+
+  scrollToSale(): void {
+    document.getElementById('retail-sale')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  private insuranceCoveredAmount(cart: RetailCart, medicine: RetailMedicineCard, quantity: number): number {
-    if (!medicine.insuranceCovered || !cart.customer?.insuranceCoverageAmount) return 0;
-    return (medicine.price * quantity) * (cart.customer.insuranceCoverageAmount / 100);
+  // #region Keyboard
+  @HostListener('window:keydown', ['$event'])
+  onKeydown(event: KeyboardEvent): void {
+    if (!this.canReadCatalog) return;
+    if (event.key === 'Escape') {
+      if (this.productDrawerOpen()) this.productDrawerOpen.set(false);
+      if (this.customerDrawerOpen() && !this.attaching()) this.customerDrawerOpen.set(false);
+      return; // dialogs close themselves on Escape
+    }
+    if (this.paymentDialogOpen() || this.receipt() || this.customerDrawerOpen()) return;
+
+    if (event.key === 'F2') { event.preventDefault(); this.catalogPanel?.focusSearch(); }
+    else if (event.key === 'F3') { event.preventDefault(); this.openCustomerDrawer(); }
+    else if (event.key === 'F4') { event.preventDefault(); this.openPaymentDialog(); }
+    else if (event.ctrlKey && event.key.toLowerCase() === 'b') { event.preventDefault(); this.catalogPanel?.focusBarcode(); }
   }
 
-  onAddToCart(medicine: RetailMedicineCard): void {
-    const cart = this.activeCart();
-    if (!cart) return;
-    this.updateCart(cart.id, c => {
-      const existing = c.items.find(i => i.medicineId === medicine.id);
-      if (existing) {
-        if (existing.quantity >= medicine.stock) {
-          this.toastSrv.error(`Only ${medicine.stock} units of ${medicine.name} in stock`);
-          return c;
+  moveTab(index: number, delta: number): void {
+    const list = this.carts();
+    const next = list[(index + delta + list.length) % list.length];
+    if (!next) return;
+    this.switchCart(next.id);
+    setTimeout(() => document.getElementById('retail-tab-' + next.id)?.focus());
+  }
+  // #endregion
+
+  // #region Cart operations — the API owns the cart; every response replaces the local copy
+  private replaceCart(cart: RetailCart): void {
+    this.carts.update(list => list.some(c => c.id === cart.id) ? list.map(c => c.id === cart.id ? cart : c) : [...list, cart]);
+    if (cart.id === this.activeCartId()) this.refreshWarnings();
+  }
+
+  private removeCartLocally(cartId: string): void {
+    this.carts.update(list => list.filter(c => c.id !== cartId));
+    if (this.activeCartId() === cartId) {
+      const next = this.carts().find(c => c.status === 'Active') ?? this.carts()[0];
+      this.activeCartId.set(next?.id ?? '');
+      this.refreshWarnings();
+    }
+  }
+
+  /** Runs one cart request at a time. `done` runs only on success; on failure local data is left untouched. */
+  private runCartOp(request$: Observable<PagedResponse<RetailCart | null>>, done?: (cart: RetailCart) => void, settled?: () => void): void {
+    if (this.mutating()) return;
+    this.mutating.set(true);
+    request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: res => {
+        this.mutating.set(false);
+        settled?.();
+        if (res.success && res.data) {
+          this.replaceCart(res.data);
+          done?.(res.data);
         }
-        const quantity = existing.quantity + 1;
-        const items = c.items.map(i => i.id === existing.id
-          ? { ...i, quantity, insuranceCoveredAmount: this.insuranceCoveredAmount(c, medicine, quantity), total: this.lineTotal(i.unitPrice, quantity, i.discountPercent) }
-          : i);
-        return { ...c, items };
-      }
-      const line: RetailCartLineItem = {
-        id: nextLineItemId(),
-        medicineId: medicine.id,
-        name: medicine.name,
-        genericName: medicine.genericName,
-        strength: medicine.strength,
-        packageLabel: medicine.packageLabel,
-        unit: medicine.packageLabel,
-        quantity: 1,
-        stock: medicine.stock,
-        unitPrice: medicine.price,
-        discountPercent: 0,
-        insuranceCoveredAmount: this.insuranceCoveredAmount(c, medicine, 1),
-        total: medicine.price,
-      };
-      return { ...c, items: [...c.items, line] };
-    });
-  }
-
-  private lineTotal(unitPrice: number, quantity: number, discountPercent: number): number {
-    const gross = unitPrice * quantity;
-    return gross - (gross * discountPercent / 100);
-  }
-
-  onQuantityChange(payload: { lineItemId: string; quantity: number }): void {
-    const cart = this.activeCart();
-    if (!cart) return;
-    this.updateCart(cart.id, c => ({
-      ...c,
-      items: c.items.map(i => i.id === payload.lineItemId
-        ? { ...i, quantity: payload.quantity, total: this.lineTotal(i.unitPrice, payload.quantity, i.discountPercent) }
-        : i),
-    }));
-  }
-
-  onDiscountChange(payload: { lineItemId: string; discountPercent: number }): void {
-    const cart = this.activeCart();
-    if (!cart) return;
-    this.updateCart(cart.id, c => ({
-      ...c,
-      items: c.items.map(i => i.id === payload.lineItemId
-        ? { ...i, discountPercent: payload.discountPercent, total: this.lineTotal(i.unitPrice, i.quantity, payload.discountPercent) }
-        : i),
-    }));
-  }
-
-  onRemoveItem(lineItemId: string): void {
-    const cart = this.activeCart();
-    if (!cart) return;
-    this.updateCart(cart.id, c => ({ ...c, items: c.items.filter(i => i.id !== lineItemId) }));
-  }
-
-  onClearAll(): void {
-    const cart = this.activeCart();
-    if (!cart) return;
-    this.dialogSrv.confirmDelete(() => {
-      this.updateCart(cart.id, c => ({ ...c, items: [] }));
-    }, 'all items in this cart');
-  }
-
-  newCart(): void {
-    this.srv.createCart().subscribe(res => {
-      if (res.success) {
-        this.carts.update(list => [...list, res.data]);
-        this.activeCartId.set(res.data.id);
-      }
+      },
+      error: () => {
+        this.mutating.set(false);
+        settled?.();
+      },
     });
   }
 
   newSale(): void {
-    this.newCart();
+    const hospitalId = this.hospitalId();
+    if (!this.canCreateCart || !hospitalId || this.mutating()) return;
+    this.creating.set(true);
+    this.runCartOp(this.srv.createCart(hospitalId, `Sale ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`),
+      cart => this.activeCartId.set(cart.id), () => this.creating.set(false));
   }
 
   switchCart(cartId: string): void {
+    if (this.activeCartId() === cartId) return;
     this.activeCartId.set(cartId);
+    this.refreshWarnings();
   }
 
-  suspendActiveCart(): void {
+  addMedicine(medicine: RetailMedicineCard, done?: () => void): void {
+    if (!this.canAdd()) {
+      const reason = this.addDisabledReason();
+      if (reason) this.toastSrv.info(reason);
+      return;
+    }
+    this.stockByMedicine.update(map => ({ ...map, [medicine.id]: medicine.stock }));
+
     const cart = this.activeCart();
-    if (!cart || !cart.items.length) return;
-    this.updateCart(cart.id, c => ({ ...c, status: 'Held' }));
-    const remaining = this.carts().find(c => c.id !== cart.id && c.status === 'Active');
-    if (remaining) this.activeCartId.set(remaining.id);
-    else this.newCart();
-    this.toastSrv.success(`${cart.name} put on hold`);
+    const existing = cart?.items.find(i => i.medicineId === medicine.id);
+    const quantity = (existing?.quantity ?? 0) + 1;
+    if (quantity > medicine.stock) {
+      this.toastSrv.error(`Only ${medicine.stock} units of ${medicine.name} in stock`);
+      return;
+    }
+
+    this.pendingMedicineId.set(medicine.id);
+    const upsert = (cartId: string) => this.srv.upsertCartItem(cartId, medicine.id, quantity, existing?.discountPercent ?? 0);
+
+    if (cart) {
+      this.runCartOp(upsert(cart.id), () => done?.(), () => this.pendingMedicineId.set(null));
+      return;
+    }
+
+    // No open sale yet: create one for this facility, then add the medicine to it.
+    this.mutating.set(true);
+    this.srv.createCart(this.hospitalId()!, `Sale ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: res => {
+        this.mutating.set(false);
+        if (res.success && res.data) {
+          this.replaceCart(res.data);
+          this.activeCartId.set(res.data.id);
+          this.runCartOp(upsert(res.data.id), () => done?.(), () => this.pendingMedicineId.set(null));
+        } else {
+          this.pendingMedicineId.set(null);
+        }
+      },
+      error: () => {
+        this.mutating.set(false);
+        this.pendingMedicineId.set(null);
+      },
+    });
   }
 
-  resumeCart(cartId: string): void {
-    this.updateCart(cartId, c => ({ ...c, status: 'Active' }));
-    this.activeCartId.set(cartId);
-    this.showHeldQueue.set(false);
+  onBarcodeScanned(medicine: RetailMedicineCard): void {
+    this.addMedicine(medicine, () => this.toastSrv.success(`${medicine.name} added to cart`, 'Scanned'));
   }
 
-  toggleHeldQueue(): void {
-    this.showHeldQueue.set(!this.showHeldQueue());
+  onAddFromDetail(medicine: RetailMedicineCard): void {
+    this.addMedicine(medicine, () => this.productDrawerOpen.set(false));
   }
 
-  openProductDrawer(medicineId: string): void {
-    this.productDrawerMedicineId.set(medicineId);
-    this.productDrawerOpen.set(true);
+  onMedicinesLoaded(list: RetailMedicineCard[]): void {
+    this.stockByMedicine.update(map => list.reduce((acc, m) => ({ ...acc, [m.id]: m.stock }), { ...map }));
   }
 
-  onAddDetailToCart(medicine: RetailMedicineCard): void {
-    this.onAddToCart(medicine);
-    this.productDrawerOpen.set(false);
+  onQuantityChange(change: { item: RetailCartLineItem; quantity: number }): void {
+    const cart = this.activeCart();
+    if (!cart || !this.canEditCart()) return;
+    this.runCartOp(this.srv.upsertCartItem(cart.id, change.item.medicineId, change.quantity, change.item.discountPercent));
+  }
+
+  onDiscountChange(change: { item: RetailCartLineItem; discountPercent: number }): void {
+    const cart = this.activeCart();
+    if (!cart || !this.canEditCart()) return;
+    this.runCartOp(this.srv.upsertCartItem(cart.id, change.item.medicineId, change.item.quantity, change.discountPercent));
+  }
+
+  onRemoveItem(item: RetailCartLineItem): void {
+    const cart = this.activeCart();
+    if (!cart || !this.canEditCart()) return;
+    this.runCartOp(this.srv.removeCartItem(cart.id, item.id));
+  }
+
+  /** The API has no "empty cart" endpoint, so the lines are removed one request at a time. */
+  onClearAll(): void {
+    const cart = this.activeCart();
+    if (!cart || !cart.items.length || !this.canEditCart() || this.mutating()) return;
+    this.dialogSrv.confirm(`Remove all ${cart.items.length} item(s) from ${cart.name}?`, () => {
+      this.mutating.set(true);
+      from(cart.items).pipe(
+        concatMap(item => this.srv.removeCartItem(cart.id, item.id)),
+        last(),
+        takeUntilDestroyed(this.destroyRef),
+      ).subscribe({
+        next: res => {
+          this.mutating.set(false);
+          if (res.success && res.data) this.replaceCart(res.data);
+        },
+        error: () => {
+          // Some lines may already be gone; resync from the server rather than guess.
+          this.mutating.set(false);
+          this.loadCarts();
+        },
+      });
+    }, 'Clear cart', 'warning', 'Clear cart');
+  }
+
+  holdActiveCart(): void {
+    const cart = this.activeCart();
+    if (!cart || !this.canHold() || this.mutating()) return;
+    this.holding.set(true);
+    this.runCartOp(this.srv.suspendCart(cart.id), held => {
+      this.toastSrv.success(`${held.name} put on hold`);
+      const other = this.carts().find(c => c.id !== held.id && c.status === 'Active');
+      if (other) this.activeCartId.set(other.id);
+    }, () => this.holding.set(false));
+  }
+
+  resumeActiveCart(): void {
+    const cart = this.activeCart();
+    if (!cart || cart.status !== 'Held' || !this.canUpdateCart) return;
+    this.runCartOp(this.srv.resumeCart(cart.id), resumed => this.toastSrv.success(`${resumed.name} resumed`));
+  }
+  // #endregion
+
+  // #region Customer and clinical warnings
+  openCustomerDrawer(): void {
+    if (!this.canEditCart() || this.mutating()) return;
+    this.customerDrawerOpen.set(true);
   }
 
   onUseCustomer(customer: RetailCustomer): void {
     const cart = this.activeCart();
-    if (!cart) return;
-    this.updateCart(cart.id, c => ({ ...c, customer }));
-    this.customerDrawerOpen.set(false);
-    this.toastSrv.success(`${customer.fullName} attached to ${cart.name}`);
+    if (!cart || !this.canEditCart() || this.attaching() || this.mutating()) return;
+    this.attaching.set(true);
+    this.runCartOp(this.srv.attachCustomer(cart.id, customer), attached => {
+      this.customerDrawerOpen.set(false);
+      this.toastSrv.success(`${attached.customer?.fullName ?? customer.fullName} attached to ${attached.name}`);
+    }, () => this.attaching.set(false));
   }
 
-  openPaymentDialog(): void {
+  private refreshWarnings(): void {
+    this.warningsSub?.unsubscribe();
     const cart = this.activeCart();
-    if (!cart || !cart.items.length) return;
+    const patientId = cart?.customer?.patientId;
+    if (!this.canReadCart || !cart || !patientId || !cart.items.length) {
+      this.warnings.set([]);
+      return;
+    }
+    this.warningsSub = this.srv.checkWarnings(cart.id, patientId, cart.items.map(i => i.medicineId)).subscribe({
+      next: res => this.warnings.set(res.success ? res.data ?? [] : []),
+      error: () => this.warnings.set([]), // advisory only: a failed check never blocks the sale
+    });
+  }
+  // #endregion
+
+  // #region Product detail
+  openProductDrawer(medicineId: string): void {
+    this.productDrawerMedicineId.set(medicineId);
+    this.productDrawerOpen.set(true);
+  }
+  // #endregion
+
+  // #region Checkout
+  openPaymentDialog(): void {
+    if (this.checkoutBlockedReason() || this.mutating()) return;
+    this.checkoutError.set(null);
     this.paymentDialogOpen.set(true);
   }
 
-  onCompleteSale(payload: { paymentSplits: RetailPaymentSplit[]; amountTendered: number }): void {
+  onCompleteSale(payload: RetailCheckoutPayload): void {
     const cart = this.activeCart();
-    if (!cart) return;
-    this.srv.checkout(cart.id, payload.paymentSplits, payload.amountTendered, cart).subscribe(res => {
-      if (res.success) {
-        this.toastSrv.success(`Sale ${res.data.transactionNumber} completed`, 'Sale Complete');
-        this.paymentDialogOpen.set(false);
-        this.updateCart(cart.id, c => ({ ...c, items: [], customer: null }));
-      } else {
-        this.toastSrv.error('Unable to complete sale');
-      }
+    if (!cart || this.checkingOut() || this.checkoutBlockedReason()) return;
+    this.checkingOut.set(true);
+    this.checkoutError.set(null);
+    this.srv.checkout(cart.id, payload).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: res => {
+        this.checkingOut.set(false);
+        if (res.success && res.data) {
+          this.paymentDialogOpen.set(false);
+          this.removeCartLocally(cart.id); // the API closes the cart as part of checkout
+          this.receipt.set(res.data);
+          this.loadInsight();
+          this.catalogPanel?.reload(); // stock changed
+        } else {
+          this.checkoutError.set('The sale could not be completed. Nothing was charged; review the details and try again.');
+        }
+      },
+      error: err => {
+        this.checkingOut.set(false);
+        this.checkoutError.set(err?.error?.errors?.[0] ?? 'The sale could not be completed. Nothing was charged; review the details and try again.');
+      },
     });
   }
 
-  printBill(): void {
-    const cart = this.activeCart();
-    if (!cart || !cart.items.length) {
-      this.toastSrv.info('Cart is empty — nothing to print');
-      return;
-    }
-    this.toastSrv.success('Receipt sent to printer');
+  onRefunded(transaction: RetailTransaction): void {
+    this.receipt.set(transaction);
+    this.loadInsight();
+    this.catalogPanel?.reload();
   }
+  // #endregion
 }

@@ -25,6 +25,16 @@ export class DoctorService {
         return this.http.patch<PagedResponse<string>>(`${BASE_API.DOCTOR.BASE}/${id}`, params);
     }
 
+    uploadAvatar(id: string, file: File) {
+        const form = new FormData();
+        form.append('file', file);
+        return this.http.post<PagedResponse<string | null>>(`${BASE_API.DOCTOR.BASE}/${id}/avatar`, form);
+    }
+
+    removeAvatar(id: string) {
+        return this.http.delete<void>(`${BASE_API.DOCTOR.BASE}/${id}/avatar`);
+    }
+
     delete(id: string) {
         return this.http.delete<PagedResponse<string>>(`${BASE_API.DOCTOR.BASE}/${id}`);
     }

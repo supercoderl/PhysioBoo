@@ -1,176 +1,145 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
+import { BooButtonComponent, BooInputComponent } from '@physioboo/ui';
+import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { CashierInvoice, CashierPaymentMethod, CashierPaymentSplit } from "../../../../shared/types/cashier.types";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { CASHIER_PAYMENT_METHODS, CashierInvoice, CashierPaymentMethod, CashierPaymentSplit, roundMoney } from "../../../../shared/types/cashier.types";
+import { CashierDialogComponent } from "./cashier-dialog.component";
+
+interface PaymentLine {
+    key: number;
+    method: CashierPaymentMethod | null;
+    amount: string;
+}
 
 @Component({
     selector: 'cashier-payment-dialog',
     standalone: true,
-    imports: [SharedModule, BooButtonAdminComponent],
+    imports: [SharedModule, CashierDialogComponent, BooButtonComponent, BooInputComponent, BooSelectComponent],
     template: `
-    <div *ngIf="isOpen && invoice" class="fixed inset-0 z-[10000] flex items-center justify-center">
-      <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" (click)="close.emit()" aria-hidden="true"></div>
-
-      <div class="relative bg-surface rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 rounded-t-2xl">
-          <div>
-            <h2 class="text-base font-semibold text-white">Receive Payment</h2>
-            <p class="text-xs text-slate-400">{{ invoice.invoiceNo }} · {{ invoice.patientName }}</p>
+    <cashier-dialog
+      [open]="open && !!bill"
+      heading="Collect payment"
+      [description]="bill ? bill.billNumber + ' · ' + (bill.patientName || 'Unknown patient') : ''"
+      icon="wallet"
+      [busy]="busy"
+      (dismiss)="close.emit()"
+      (submitForm)="submit()"
+    >
+      <ng-container *ngIf="bill as b">
+        <dl class="grid grid-cols-2 gap-2 m-0">
+          <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
+            <dt class="text-[11px] font-medium text-secondary">Outstanding</dt>
+            <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ b.remainingBalance | currency:'USD':'symbol':'1.2-2' }}</dd>
           </div>
-          <button type="button" (click)="close.emit()" class="text-slate-400 hover:text-white" aria-label="Close payment dialog">
-            <physio-icon name="x" [size]="18"></physio-icon>
+          <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
+            <dt class="text-[11px] font-medium text-secondary">Already paid</dt>
+            <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ b.paidAmount | currency:'USD':'symbol':'1.2-2' }}</dd>
+          </div>
+        </dl>
+
+        <fieldset class="m-0 p-0 border-0 space-y-3" [disabled]="busy">
+          <legend class="text-sm font-semibold text-regular mb-2 p-0">Payment lines</legend>
+
+          <div *ngFor="let line of lines; let i = index; trackBy: trackLine" class="grid grid-cols-[minmax(0,1fr)_minmax(0,9rem)_auto] gap-2 items-start">
+            <boo-select label="Method" [options]="methods" [(ngModel)]="line.method" required></boo-select>
+            <div>
+              <boo-input label="Amount" type="number" [(ngModel)]="line.amount" required></boo-input>
+              <p *ngIf="touched && lineError(line) as msg" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+            </div>
+            <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" class="mt-1" (click)="removeLine(i)" [disabled]="lines.length === 1" [attr.aria-label]="'Remove payment line ' + (i + 1)">
+              <physio-icon name="x" [size]="18"></physio-icon>
+            </button>
+          </div>
+
+          <button type="button" boo-button variant="link" (click)="addLine()">
+            <physio-icon name="plus" [size]="16"></physio-icon>Add payment line
           </button>
-        </div>
+        </fieldset>
 
-        <div class="p-5 grid md:grid-cols-2 gap-5">
-          <!-- Left: method + tender -->
-          <div>
-            <p class="text-xs font-semibold text-slate-500 uppercase mb-2">Payment Method</p>
-            <div class="grid grid-cols-4 gap-2 mb-4">
-              <button *ngFor="let m of methods" type="button" (click)="selectMethod(m.key)"
-                class="px-2 py-2.5 rounded-xl border text-[11px] font-semibold flex flex-col items-center gap-1 transition-colors"
-                [ngClass]="method === m.key ? 'bg-amber-50 border-amber-400 text-amber-800' : 'bg-surface border-slate-200 text-slate-600 hover:border-slate-300'">
-                <physio-icon [name]="m.icon" [size]="16"></physio-icon>
-                {{ m.label }}
-              </button>
-            </div>
+        <dl class="m-0 space-y-1 text-sm" aria-live="polite">
+          <div class="flex justify-between"><dt class="text-secondary">Collecting now</dt><dd class="m-0 font-semibold tabular-nums">{{ total | currency:'USD':'symbol':'1.2-2' }}</dd></div>
+          <div class="flex justify-between"><dt class="text-secondary">Outstanding after payment</dt><dd class="m-0 font-semibold tabular-nums">{{ remainingAfter | currency:'USD':'symbol':'1.2-2' }}</dd></div>
+        </dl>
+        <p *ngIf="touched && totalError as msg" class="m-0 text-xs text-danger" role="alert">{{ msg }}</p>
+      </ng-container>
 
-            <ng-container *ngIf="method !== 'Mixed'">
-              <label class="text-xs font-semibold text-slate-500 uppercase mb-1 block">Amount Tendered</label>
-              <input type="number" [(ngModel)]="tenderedAmount" min="0" step="0.01"
-                class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-400/30 outline-none" />
-            </ng-container>
-
-            <ng-container *ngIf="method === 'Mixed'">
-              <p class="text-xs font-semibold text-slate-500 uppercase mb-1">Split Payment</p>
-              <div *ngFor="let split of splits; let i = index" class="flex items-center gap-2 mb-2">
-                <select [(ngModel)]="split.method" class="px-2 py-1.5 border border-slate-300 rounded-lg text-xs">
-                  <option value="Cash">Cash</option>
-                  <option value="CreditCard">Credit Card</option>
-                  <option value="DebitCard">Debit Card</option>
-                  <option value="BankTransfer">Bank Transfer</option>
-                  <option value="QRCode">QR Code</option>
-                  <option value="Insurance">Insurance</option>
-                  <option value="Corporate">Corporate</option>
-                </select>
-                <input type="number" [(ngModel)]="split.amount" min="0" step="0.01" class="flex-1 px-2 py-1.5 border border-slate-300 rounded-lg text-xs" />
-                <button type="button" (click)="removeSplit(i)" class="text-slate-400 hover:text-rose-600" aria-label="Remove split"><physio-icon name="x" [size]="14"></physio-icon></button>
-              </div>
-              <button type="button" (click)="addSplit()" class="text-xs font-semibold text-amber-700 hover:underline flex items-center gap-1">
-                <physio-icon name="plus" [size]="12"></physio-icon> Add payment line
-              </button>
-              <p class="text-xs mt-2" [ngClass]="remainingSplit() === 0 ? 'text-emerald-600' : 'text-amber-600'" aria-live="polite">
-                Remaining: \${{ remainingSplit().toFixed(2) }}
-              </p>
-            </ng-container>
-          </div>
-
-          <!-- Right: summary -->
-          <div class="bg-slate-50 rounded-xl p-4">
-            <p class="text-xs font-semibold text-slate-500 uppercase mb-2">Summary</p>
-            <div class="flex justify-between text-sm mb-1">
-              <span class="text-slate-500">Remaining Balance</span>
-              <span class="font-bold text-slate-900">\${{ invoice.remainingBalance.toFixed(2) }}</span>
-            </div>
-            <div class="flex justify-between text-sm mb-1" *ngIf="method !== 'Mixed'">
-              <span class="text-slate-500">Tendered</span>
-              <span class="font-medium text-slate-800">\${{ (tenderedAmount || 0).toFixed(2) }}</span>
-            </div>
-            <div class="flex justify-between text-sm" *ngIf="method !== 'Mixed'" aria-live="polite">
-              <span class="text-slate-500">Change</span>
-              <span class="font-semibold text-amber-700">\${{ change().toFixed(2) }}</span>
-            </div>
-
-            <div class="mt-4 pt-3 border-t border-slate-200 flex items-center gap-2 text-[11px] text-slate-500">
-              <physio-icon name="shield-check" [size]="13" class="text-emerald-500"></physio-icon>
-              Receipt will be available for print or reprint after confirmation.
-            </div>
-          </div>
-        </div>
-
-        <div class="px-5 py-4 border-t border-slate-100 flex justify-end gap-2">
-          <boo-button-admin (click)="close.emit()" background="transparent" textColor="#71606A" padding="8px 16px" [fontSize]="14" [radius]="8" fontWeight="600">Cancel</boo-button-admin>
-          <boo-button-admin (click)="complete()" [disabled]="!canComplete()" background="#F59E0B" textColor="#26141A" padding="8px 20px" [fontSize]="14" [radius]="8" fontWeight="600">
-            Confirm Payment
-          </boo-button-admin>
-        </div>
+      <div dialogFooter class="contents">
+        <button type="button" boo-button variant="ghost" (click)="close.emit()" [disabled]="busy">Cancel</button>
+        <button type="submit" boo-button variant="primary" [loading]="busy">Record payment</button>
       </div>
-    </div>
+    </cashier-dialog>
   `,
 })
 export class CashierPaymentDialogComponent implements OnChanges {
-    @Input() isOpen = false;
-    @Input() invoice: CashierInvoice | null = null;
+    @Input() open = false;
+    @Input() bill: CashierInvoice | null = null;
+    @Input() busy = false;
+
     @Output() close = new EventEmitter<void>();
-    @Output() completePayment = new EventEmitter<{ splits: CashierPaymentSplit[]; amountTendered: number }>();
+    @Output() confirm = new EventEmitter<{ splits: CashierPaymentSplit[]; amountTendered: number }>();
 
-    readonly methods: { key: CashierPaymentMethod; label: string; icon: string }[] = [
-        { key: 'Cash', label: 'Cash', icon: 'banknote' },
-        { key: 'CreditCard', label: 'Credit Card', icon: 'credit-card' },
-        { key: 'DebitCard', label: 'Debit Card', icon: 'credit-card' },
-        { key: 'BankTransfer', label: 'Bank Transfer', icon: 'landmark' },
-        { key: 'QRCode', label: 'QR Code', icon: 'qr-code' },
-        { key: 'Insurance', label: 'Insurance', icon: 'shield-check' },
-        { key: 'Corporate', label: 'Corporate', icon: 'building-2' },
-        { key: 'Mixed', label: 'Split', icon: 'split' },
-    ];
+    readonly methods = CASHIER_PAYMENT_METHODS;
 
-    method: CashierPaymentMethod = 'Cash';
-    tenderedAmount = 0;
-    splits: CashierPaymentSplit[] = [];
+    lines: PaymentLine[] = [];
+    touched = false;
 
-    ngOnChanges(): void {
-        if (this.isOpen && this.invoice) {
-            this.method = 'Cash';
-            this.tenderedAmount = this.invoice.remainingBalance;
-            this.splits = [{ method: 'Cash', amount: this.invoice.remainingBalance }];
+    private nextKey = 0;
+
+    ngOnChanges(changes: SimpleChanges): void {
+        // Only a fresh open resets the form: a failed request leaves the dialog open with the user's entries.
+        if (changes['open'] && this.open && this.bill) {
+            this.touched = false;
+            this.lines = [this.newLine(this.bill.remainingBalance.toFixed(2))];
         }
     }
 
-    selectMethod(key: CashierPaymentMethod): void {
-        this.method = key;
-        this.tenderedAmount = this.invoice?.remainingBalance ?? 0;
-        if (key === 'Mixed' && !this.splits.length) {
-            this.splits = [{ method: 'Cash', amount: this.invoice?.remainingBalance ?? 0 }];
-        }
+    get total(): number {
+        return roundMoney(this.lines.reduce((sum, l) => sum + (Number(l.amount) || 0), 0));
     }
 
-    addSplit(): void {
-        this.splits.push({ method: 'Cash', amount: 0 });
+    get remainingAfter(): number {
+        return roundMoney((this.bill?.remainingBalance ?? 0) - this.total);
     }
 
-    removeSplit(index: number): void {
-        this.splits.splice(index, 1);
+    get totalError(): string | null {
+        if (this.total <= 0) return 'Enter an amount to collect.';
+        if (this.remainingAfter < 0) return 'The payment is more than the outstanding balance.';
+        return null;
     }
 
-    splitTotal(): number {
-        return this.splits.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+    lineError(line: PaymentLine): string | null {
+        const amount = Number(line.amount);
+        if (!line.method) return 'Choose a method.';
+        if (!line.amount || !(amount > 0)) return 'Enter an amount above 0.';
+        if (roundMoney(amount) !== amount) return 'Use at most 2 decimals.';
+        return null;
     }
 
-    remainingSplit(): number {
-        const target = this.invoice?.remainingBalance ?? 0;
-        return Math.round((target - this.splitTotal()) * 100) / 100;
+    addLine(): void {
+        const remaining = Math.max(0, this.remainingAfter);
+        this.lines = [...this.lines, this.newLine(remaining > 0 ? remaining.toFixed(2) : '')];
     }
 
-    change(): number {
-        const target = this.invoice?.remainingBalance ?? 0;
-        return Math.max(0, (this.tenderedAmount || 0) - target);
+    removeLine(index: number): void {
+        if (this.lines.length > 1) this.lines = this.lines.filter((_, i) => i !== index);
     }
 
-    canComplete(): boolean {
-        const target = this.invoice?.remainingBalance ?? 0;
-        if (target <= 0) return false;
-        if (this.method === 'Mixed') return this.remainingSplit() === 0;
-        return (this.tenderedAmount || 0) >= target;
+    trackLine(_: number, line: PaymentLine): number {
+        return line.key;
     }
 
-    complete(): void {
-        if (!this.canComplete()) return;
-        if (this.method === 'Mixed') {
-            this.completePayment.emit({ splits: this.splits, amountTendered: this.splitTotal() });
-        } else {
-            const target = this.invoice?.remainingBalance ?? 0;
-            this.completePayment.emit({ splits: [{ method: this.method, amount: target }], amountTendered: this.tenderedAmount });
-        }
+    submit(): void {
+        if (this.busy || !this.bill) return;
+        this.touched = true;
+        if (this.totalError || this.lines.some(l => this.lineError(l))) return;
+
+        this.confirm.emit({
+            splits: this.lines.map(l => ({ method: l.method as CashierPaymentMethod, amount: roundMoney(Number(l.amount)) })),
+            amountTendered: this.total,
+        });
+    }
+
+    private newLine(amount: string): PaymentLine {
+        return { key: this.nextKey++, method: 'Cash', amount };
     }
 }

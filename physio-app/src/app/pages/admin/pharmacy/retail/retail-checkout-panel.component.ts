@@ -1,118 +1,99 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { BooButtonComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailCart } from "../../../../shared/types/retail-pos.types";
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-
-const VAT_RATE = 0.05;
+import { formatRetailMoney, retailCartTotals } from "../../../../shared/utils/retail-pos.utils";
 
 @Component({
   selector: 'retail-checkout-panel',
   standalone: true,
-  imports: [SharedModule, BooButtonAdminComponent],
+  imports: [SharedModule, BooButtonComponent],
   template: `
-    <div class="bg-surface border border-gray-200 rounded-lg flex flex-col h-full">
-      <!-- Customer card -->
-      <div class="p-3 border-b border-gray-200">
-        <h2 class="text-sm font-semibold text-gray-800 mb-2">Customer</h2>
+    <section class="flex flex-col border-t border-borderGray/60" aria-label="Customer and checkout">
+      <div class="p-3 border-b border-borderGray/60">
+        <h2 class="text-sm font-semibold text-regular m-0 mb-2">Customer</h2>
 
-        <div *ngIf="!cart?.customer" class="flex gap-2">
-          <boo-button-admin (click)="openCustomerLookup.emit()" background="transparent" textColor="#71606A" [border]="{ width: 1, style: 'dashed', color: '#E3D5DA' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" [gap]="6" buttonClass="w-full" class="flex-1">
-            <physio-icon name="search" [size]="14"></physio-icon> Search Patient
-          </boo-button-admin>
-          <span class="text-xs text-gray-400 self-center">or</span>
-          <boo-button-admin (click)="useWalkIn.emit()" background="transparent" textColor="#71606A" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" buttonClass="w-full" class="flex-1">
-            Walk-in Customer
-          </boo-button-admin>
+        <div *ngIf="!cart" class="text-xs text-secondary">Open a sale to attach a customer.</div>
+
+        <div *ngIf="cart && !cart.customer" class="flex flex-wrap gap-2">
+          <button boo-button variant="secondary" size="sm" (click)="openCustomerLookup.emit()" [disabled]="!canEdit || busy" class="flex-1">
+            <physio-icon name="search" [size]="14"></physio-icon> Patient or walk-in (F3)
+          </button>
         </div>
 
-        <div *ngIf="cart?.customer" class="bg-gray-50 rounded-lg p-3">
-          <div class="flex items-start justify-between">
-            <div>
-              <p class="text-sm font-semibold text-gray-900">{{ cart!.customer!.fullName }}</p>
-              <p class="text-xs text-gray-500" *ngIf="cart!.customer!.mrn">MRN {{ cart!.customer!.mrn }}</p>
-              <p class="text-xs text-gray-500">{{ cart!.customer!.phone }}</p>
+        <div *ngIf="cart?.customer as customer" class="bg-gray-50 rounded-1.5 p-3">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-regular m-0 break-words">{{ customer.fullName }}</p>
+              <p class="text-xs text-secondary m-0" *ngIf="customer.type === 'WalkIn'">Walk-in customer</p>
+              <p class="text-xs text-secondary m-0" *ngIf="customer.mrn">MRN {{ customer.mrn }}</p>
+              <p class="text-xs text-secondary m-0" *ngIf="customer.phone">{{ customer.phone }}</p>
             </div>
-            <button type="button" (click)="openCustomerLookup.emit()" class="text-xs font-semibold text-primary hover:underline">Change</button>
+            <button *ngIf="canEdit" boo-button variant="link" size="sm" (click)="openCustomerLookup.emit()" [disabled]="busy">Change</button>
           </div>
 
           <div class="flex flex-wrap gap-1.5 mt-2">
-            <span *ngIf="cart!.customer!.insuranceProvider" class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-medium">{{ cart!.customer!.insuranceProvider }}</span>
-            <span *ngIf="cart!.customer!.loyaltyPoints" class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[11px] font-medium">{{ cart!.customer!.loyaltyPoints }} pts</span>
-            <span *ngIf="cart!.customer!.prescriptionReference" class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-[11px] font-medium">Rx {{ cart!.customer!.prescriptionReference }}</span>
-            <span *ngIf="cart!.customer!.allergyInformation" class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 text-[11px] font-medium flex items-center gap-1">
-              <physio-icon name="triangle-alert" [size]="11"></physio-icon> {{ cart!.customer!.allergyInformation }}
+            <span *ngIf="customer.insuranceProvider" class="px-2 py-0.5 rounded-full bg-primarySoft text-primaryDeep text-[11px] font-medium">{{ customer.insuranceProvider }}</span>
+            <span *ngIf="customer.loyaltyPoints" class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[11px] font-medium">{{ customer.loyaltyPoints }} pts</span>
+            <span *ngIf="customer.prescriptionReference" class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 text-[11px] font-medium">Rx {{ customer.prescriptionReference }}</span>
+            <span *ngIf="customer.allergyInformation" class="px-2 py-0.5 rounded-full bg-dangerSoft text-gray-900 text-[11px] font-medium inline-flex items-center gap-1">
+              <physio-icon name="triangle-alert" [size]="11" class="text-danger"></physio-icon> Allergy: {{ customer.allergyInformation }}
             </span>
           </div>
         </div>
       </div>
 
-      <!-- Payment summary -->
-      <div class="p-3 flex-1 flex flex-col justify-end">
-        <div class="space-y-1.5 mb-4">
+      <div class="p-3 bg-gray-50/60 rounded-b-2">
+        <dl class="space-y-1.5 mb-4 m-0">
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Subtotal</span>
-            <span class="font-medium text-gray-800">\${{ subtotal().toFixed(2) }}</span>
-          </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Discount</span>
-            <span class="font-medium text-emerald-600">-\${{ discountTotal().toFixed(2) }}</span>
+            <dt class="text-secondary">Subtotal ({{ totals().itemCount }} {{ totals().itemCount === 1 ? 'unit' : 'units' }})</dt>
+            <dd class="m-0 font-medium text-regular">{{ money(totals().subtotal) }}</dd>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Insurance Coverage</span>
-            <span class="font-medium text-primary">-\${{ insuranceCoverage().toFixed(2) }}</span>
+            <dt class="text-secondary">Discount</dt>
+            <dd class="m-0 font-medium text-emerald-700">−{{ money(totals().discountTotal) }}</dd>
           </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-500">VAT (5%)</span>
-            <span class="font-medium text-gray-800">\${{ vat().toFixed(2) }}</span>
+          <div class="flex justify-between text-sm" *ngIf="totals().insuranceCoverage > 0">
+            <dt class="text-secondary">Insurance coverage</dt>
+            <dd class="m-0 font-medium text-primaryDeep">−{{ money(totals().insuranceCoverage) }}</dd>
           </div>
-          <div class="pt-2 border-t border-gray-200 flex justify-between items-baseline">
-            <span class="text-sm font-semibold text-gray-900">Grand Total</span>
-            <span class="text-xl font-bold text-primary">\${{ grandTotal().toFixed(2) }}</span>
+          <div class="pt-2 border-t border-borderGray/60 flex justify-between items-baseline">
+            <dt class="text-sm font-semibold text-regular">Total due</dt>
+            <dd class="m-0 text-xl font-bold text-primaryDeep">{{ money(totals().grandTotal) }}</dd>
           </div>
-        </div>
+        </dl>
+
+        <p *ngIf="checkoutBlockedReason" class="text-xs text-secondary m-0 mb-2" role="status">{{ checkoutBlockedReason }}</p>
 
         <div class="space-y-2">
-          <boo-button-admin (click)="checkout.emit()" [disabled]="!cart || !cart.items.length" textColor="white" padding="12px 12px" [fontSize]="14" [radius]="8" fontWeight="600" buttonClass="w-full" class="w-full">
-            Checkout
-          </boo-button-admin>
-          <div class="flex gap-2">
-            <boo-button-admin (click)="holdSale.emit()" [disabled]="!cart || !cart.items.length" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" buttonClass="w-full" class="flex-1">
-              Hold Sale
-            </boo-button-admin>
-            <boo-button-admin (click)="printBill.emit()" [disabled]="!cart || !cart.items.length" background="transparent" textColor="#55434B" [border]="{ width: 1, color: '#E3D5DA' }" padding="8px 12px" [fontSize]="12" [radius]="8" fontWeight="600" buttonClass="w-full" class="flex-1">
-              Print Bill
-            </boo-button-admin>
-          </div>
+          <button boo-button variant="primary" size="md" [block]="true" (click)="checkout.emit()" [disabled]="!!checkoutBlockedReason || busy">
+            Checkout (F4)
+          </button>
+          <button boo-button variant="secondary" size="sm" [block]="true" (click)="holdSale.emit()" [disabled]="!canHold || busy" [loading]="holding">
+            Put sale on hold
+          </button>
         </div>
       </div>
-    </div>
+    </section>
   `,
 })
 export class RetailCheckoutPanelComponent {
   @Input() cart: RetailCart | null = null;
+  @Input() canEdit = false;
+  @Input() busy = false;
+  @Input() holding = false;
+  @Input() canHold = false;
+  /** Why checkout cannot run right now (empty cart, missing permission, no facility); null when it can. */
+  @Input() checkoutBlockedReason: string | null = null;
   @Output() openCustomerLookup = new EventEmitter<void>();
-  @Output() useWalkIn = new EventEmitter<void>();
   @Output() checkout = new EventEmitter<void>();
   @Output() holdSale = new EventEmitter<void>();
-  @Output() printBill = new EventEmitter<void>();
 
-  subtotal(): number {
-    return (this.cart?.items ?? []).reduce((s, i) => s + i.unitPrice * i.quantity, 0);
+  totals() {
+    return retailCartTotals(this.cart);
   }
 
-  discountTotal(): number {
-    return (this.cart?.items ?? []).reduce((s, i) => s + (i.unitPrice * i.quantity * i.discountPercent / 100), 0);
-  }
-
-  insuranceCoverage(): number {
-    return (this.cart?.items ?? []).reduce((s, i) => s + i.insuranceCoveredAmount, 0);
-  }
-
-  vat(): number {
-    return Math.max(0, this.subtotal() - this.discountTotal() - this.insuranceCoverage()) * VAT_RATE;
-  }
-
-  grandTotal(): number {
-    return Math.max(0, this.subtotal() - this.discountTotal() - this.insuranceCoverage() + this.vat());
+  money(amount: number): string {
+    return formatRetailMoney(amount);
   }
 }

@@ -105,12 +105,9 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
                         <ng-template #patientSearchTpl>
                             <label for="bf-patient" class="block mb-1 text-[13px] font-medium text-regular">Find patient <span class="text-danger" aria-hidden="true">*</span></label>
                             <div class="relative">
-                                <physio-icon
-                                    [name]="patientSearching ? 'loader-circle' : 'search'"
-                                    [size]="16"
-                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-placeholder pointer-events-none"
-                                    [class.animate-spin]="patientSearching"
-                                />
+                                <span class="absolute inset-y-0 left-3 flex items-center text-placeholder pointer-events-none" aria-hidden="true">
+                                    <physio-icon [name]="patientSearching ? 'loader-circle' : 'search'" [size]="16" [class.animate-spin]="patientSearching" />
+                                </span>
                                 <input
                                     #patientInput
                                     id="bf-patient"

@@ -2,50 +2,46 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { StockTakeCategoryNode } from "../../../../shared/types/stock-take.types";
 
+/** Medicine categories of the session with their saved count progress; selecting one narrows the items table. */
 @Component({
     selector: 'stock-take-category-tree',
     standalone: true,
     imports: [SharedModule],
+    host: { class: 'block min-h-0 lg:h-full' },
     template: `
-    <div class="h-full flex flex-col bg-surface border border-borderGray/60 rounded-2 overflow-hidden">
-      <div class="p-3 border-b border-borderGray/60">
-        <div class="relative">
-          <physio-icon name="search" [size]="14" [class]="'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
-          <input type="text" [(ngModel)]="query" (ngModelChange)="queryChange.emit(query)"
-            placeholder="Search categories or items..."
-            class="w-full pl-8 pr-3 h-9 border border-gray-300 rounded-1.5 text-[13px] focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" />
-        </div>
-      </div>
-
-      <div class="flex-1 overflow-y-auto p-2 space-y-1">
-        <button type="button" (click)="select.emit(null)"
-          class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-1.5 text-left transition-colors"
-          [ngClass]="!activeId ? 'bg-primary/10 text-primary' : 'hover:bg-gray-50 text-regular'">
-          <span class="flex items-center gap-2 text-sm font-semibold">
-            <physio-icon name="layout-grid" [size]="15"></physio-icon> All Items
-          </span>
-        </button>
-
-        <button *ngFor="let node of categories" type="button" (click)="select.emit(node)"
-          class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-1.5 text-left transition-colors"
-          [ngClass]="activeId === node.id ? 'bg-primary/10 text-primary' : 'hover:bg-gray-50 text-regular'">
-          <span class="flex items-center gap-2 text-sm font-medium min-w-0">
-            <physio-icon [name]="node.icon" [size]="15" [class]="'shrink-0'"></physio-icon>
+    <nav aria-label="Categories" class="bg-surface border border-borderGray/60 rounded-2 p-2 lg:flex lg:h-full lg:min-h-0 lg:flex-col">
+      <h2 class="text-xs font-bold text-secondary uppercase tracking-wider px-2 pt-1.5 pb-2 m-0">Categories</h2>
+      <ul class="list-none m-0 p-0 space-y-0.5 max-h-[16rem] overflow-y-auto lg:min-h-0 lg:max-h-none lg:flex-1" custom-scrollbar>
+        <li>
+          <button type="button" (click)="select.emit(null)" [attr.aria-current]="activeId ? null : 'true'"
+            class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-1.5 text-left text-sm transition-colors"
+            [ngClass]="!activeId ? 'bg-primarySoft text-primaryDeep font-semibold' : 'hover:bg-gray-50 text-regular'">
+            <span>All items</span>
+            <span class="text-[11px] tabular-nums text-secondary">{{ countedTotal }}/{{ total }}</span>
+          </button>
+        </li>
+        <li *ngFor="let node of categories; trackBy: trackById">
+          <button type="button" (click)="select.emit(node)" [attr.aria-current]="activeId === node.id ? 'true' : null"
+            class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-1.5 text-left text-sm transition-colors"
+            [ngClass]="activeId === node.id ? 'bg-primarySoft text-primaryDeep font-semibold' : 'hover:bg-gray-50 text-regular'">
             <span class="truncate">{{ node.name }}</span>
-          </span>
-          <span class="text-[11px] font-semibold shrink-0" [ngClass]="activeId === node.id ? 'text-primary' : 'text-gray-400'">
-            {{ node.countedCount }}/{{ node.itemCount }}
-          </span>
-        </button>
-      </div>
-    </div>
+            <span class="flex-none text-[11px] tabular-nums" [ngClass]="node.countedCount === node.itemCount ? 'text-emerald-600 font-semibold' : 'text-secondary'">
+              {{ node.countedCount }}/{{ node.itemCount }}
+            </span>
+          </button>
+        </li>
+      </ul>
+    </nav>
   `,
 })
 export class StockTakeCategoryTreeComponent {
     @Input() categories: StockTakeCategoryNode[] = [];
     @Input() activeId: string | null = null;
+    @Input() total = 0;
+    @Input() countedTotal = 0;
     @Output() select = new EventEmitter<StockTakeCategoryNode | null>();
-    @Output() queryChange = new EventEmitter<string>();
 
-    query = '';
+    trackById(_: number, node: StockTakeCategoryNode): string {
+        return node.id;
+    }
 }

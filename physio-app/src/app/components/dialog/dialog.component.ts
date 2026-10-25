@@ -1,10 +1,10 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, HostListener, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { booMotionState } from '@physioboo/ui';
 import { DialogService } from '../../services/common/dialog.service';
 import { SharedModule } from '../../shared/shared-imports'; // Nơi chứa CommonModule, Icons...
 import { DialogType } from '../../shared/types/dialog.types';
-import { booMotionState } from '@physioboo/ui';
 import { isPublicUrl } from '../../shared/utils/motion.utils';
 import { BooButtonAdminComponent } from '../button/boo-button-admin/boo-button-admin.component';
 
@@ -13,7 +13,6 @@ import { BooButtonAdminComponent } from '../button/boo-button-admin/boo-button-a
   standalone: true,
   imports: [SharedModule, BooButtonAdminComponent],
   animations: [
-    // 'admin' is the original behaviour of this shared component; 'full' / 'reduced' are the public-site motion.
     trigger('backdrop', [
       transition('void => admin', [
         style({ opacity: 0 }),
@@ -63,7 +62,7 @@ import { BooButtonAdminComponent } from '../button/boo-button-admin/boo-button-a
   ],
   template: `
     @if (dialogService.dialogState(); as data) {
-      <div class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+      <div class="fixed inset-0 z-[10001] flex items-center justify-center p-4">
         
         <div 
           [@backdrop]="mode"
@@ -117,7 +116,6 @@ export class DialogComponent {
   private readonly router = inject(Router);
   private readonly motion = booMotionState();
 
-  /** Public pages get the public motion (and no backdrop blur); every other area keeps the original behaviour. */
   get mode(): 'admin' | 'full' | 'reduced' {
     return isPublicUrl(this.router.url) ? this.motion : 'admin';
   }

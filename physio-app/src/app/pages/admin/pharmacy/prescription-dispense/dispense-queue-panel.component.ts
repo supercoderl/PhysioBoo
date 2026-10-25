@@ -1,94 +1,121 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooFilterChip, BooFilterChipsComponent, BooSearchFieldComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
+import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DispenseQueueItem, DispenseQueueStatus } from "../../../../shared/types/dispensing.types";
+import { DISPENSE_STATUS_OPTIONS, dispenseStatusLabel, dispenseStatusTone, priorityTone } from "../../../../shared/utils/dispensing.utils";
+
+export type DispenseFilterKey = 'search' | 'status' | 'date';
+
+interface DispenseFilterChip extends BooFilterChip {
+  key: DispenseFilterKey;
+}
 
 @Component({
   selector: 'dispense-queue-panel',
   standalone: true,
-  imports: [SharedModule, BooStatusBadgeComponent, BooEmptyStateComponent],
+  imports: [SharedModule, BooButtonComponent, BooSearchFieldComponent, BooSelectComponent, BooDatepickerComponent, BooFilterChipsComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent],
   template: `
-    <div class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden">
-      <div class="p-3 border-b border-borderGray/60 flex flex-col gap-2">
+    <section class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden" aria-labelledby="dispense-queue-title">
+      <div class="p-4 border-b border-borderGray/60 space-y-3">
         <div class="flex items-center justify-between">
-          <h2 class="text-sm font-semibold text-regular">Prescription Queue</h2>
-          <button type="button" (click)="autoRefreshChange.emit(!autoRefresh)" [title]="autoRefresh ? 'Auto-refresh on' : 'Auto-refresh off'"
-            class="w-7 h-7 rounded-1.5 flex items-center justify-center" [ngClass]="autoRefresh ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-400'">
-            <physio-icon name="refresh" [size]="14"></physio-icon>
-          </button>
+          <h2 id="dispense-queue-title" class="text-base font-semibold text-regular m-0">Prescriptions</h2>
+          <span class="text-xs text-secondary" aria-live="polite">{{ loading ? 'Loading…' : items.length + (items.length === 1 ? ' result' : ' results') }}</span>
         </div>
-        <div class="relative">
-          <physio-icon name="search" [size]="14" [class]="'absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400'"></physio-icon>
-          <input type="text" [ngModel]="search" (ngModelChange)="searchChange.emit($event)" placeholder="Search patient, MRN, RX number..."
-            class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+
+        <boo-search-field label="Search prescriptions" placeholder="Patient, MRN or Rx number"
+          [ngModel]="search" (ngModelChange)="searchChange.emit($event)" (clear)="searchChange.emit('')" [busy]="searching"></boo-search-field>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <boo-select label="Status" [options]="statusOptions" bindLabel="label" bindValue="value"
+            [ngModel]="status" (ngModelChange)="statusChange.emit($event)"></boo-select>
+          <boo-datepicker label="Issued on" [ngModel]="date" (ngModelChange)="dateChange.emit($event)"></boo-datepicker>
         </div>
-        <div class="flex items-center gap-1 overflow-x-auto" role="tablist">
-          <button type="button" *ngFor="let f of filters" (click)="statusFilterChange.emit(f.value)" role="tab"
-            [attr.aria-selected]="statusFilter === f.value"
-            class="px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap"
-            [ngClass]="statusFilter === f.value ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
-            {{ f.label }}
-          </button>
-        </div>
+
+        <boo-filter-chips [chips]="chips" (remove)="clearFilter.emit($event.key)"></boo-filter-chips>
       </div>
 
-      <div class="flex-1 overflow-y-auto p-2 space-y-2">
-        <boo-empty-state *ngIf="!items.length" icon="inbox" title="No prescriptions waiting" description="New prescriptions will appear here as they arrive."></boo-empty-state>
+      <div class="flex-1 min-h-0 overflow-y-auto">
+        <div *ngIf="loading" class="p-3 space-y-3" aria-busy="true" aria-label="Loading prescriptions">
+          <div *ngFor="let i of skeletonRows" class="rounded-2 border border-borderGray/60 p-3 space-y-2 animate-pulse">
+            <div class="h-3 w-1/3 bg-gray-200 rounded"></div>
+            <div class="h-4 w-2/3 bg-gray-200 rounded"></div>
+            <div class="h-3 w-1/2 bg-gray-100 rounded"></div>
+          </div>
+        </div>
 
-        <button type="button" *ngFor="let item of items" (click)="select.emit(item)"
-          class="w-full text-left p-3 rounded-1.5 border transition-colors"
-          [ngClass]="item.queueId === selectedQueueId ? 'border-primary bg-primary/5' : 'border-borderGray/60 hover:border-primary/40 hover:bg-gray-50'">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-semibold text-gray-500">#{{ item.queueNumber }} · {{ item.prescriptionNumber }}</span>
-            <span class="w-1.5 h-1.5 rounded-full shrink-0" [ngClass]="priorityDotClass(item.priority)" [title]="item.priority + ' priority'"></span>
-          </div>
-          <p class="text-sm font-semibold text-regular leading-tight">{{ item.patientName }}</p>
-          <p class="text-[11px] text-secondary mb-1.5">{{ item.mrn }} · {{ item.wardOrClinic }}</p>
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] text-secondary">{{ item.prescribingDoctor }} · {{ item.medicationCount }} meds</span>
-            <boo-status-badge [label]="item.status" [tone]="statusTone(item.status)" dotted></boo-status-badge>
-          </div>
-        </button>
+        <boo-error-state *ngIf="!loading && error" icon="triangle-alert" title="Couldn't load prescriptions" [description]="error" (retry)="retry.emit()"></boo-error-state>
+
+        <boo-empty-state *ngIf="!loading && !error && !items.length"
+          [icon]="hasFilters ? 'search' : 'inbox'"
+          [title]="hasFilters ? 'No prescriptions match' : 'No prescriptions to dispense'"
+          [description]="hasFilters ? 'Try a different search or clear the filters.' : 'Issued prescriptions will appear here.'">
+          <button *ngIf="hasFilters" boo-button variant="secondary" size="sm" (click)="clearAll.emit()">Clear filters</button>
+        </boo-empty-state>
+
+        <ul *ngIf="!loading && !error && items.length" class="list-none m-0 p-3 space-y-2">
+          <li *ngFor="let item of items; trackBy: trackById">
+            <button type="button" (click)="select.emit(item)" [attr.aria-current]="item.queueId === selectedId ? 'true' : null"
+              class="w-full text-left rounded-2 border p-3 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+              [ngClass]="item.queueId === selectedId ? 'border-primary bg-primarySoft' : 'border-borderGray/60 bg-surface hover:border-primary/40 hover:bg-gray-50'">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs font-semibold text-secondary truncate">#{{ item.queueNumber }} · {{ item.prescriptionNumber }}</span>
+                <boo-status-badge [label]="statusLabel(item.status)" [tone]="statusTone(item.status)" dotted></boo-status-badge>
+              </div>
+              <div class="flex items-center gap-2 mt-1.5">
+                <span class="text-sm font-semibold text-regular truncate">{{ item.patientName }}</span>
+                <boo-status-badge *ngIf="item.priority !== 'Normal'" [label]="item.priority + ' priority'" [tone]="priorityTone(item.priority)"></boo-status-badge>
+              </div>
+              <p class="text-xs text-secondary mt-0.5 mb-0 truncate">{{ item.mrn }}<ng-container *ngIf="item.wardOrClinic"> · {{ item.wardOrClinic }}</ng-container></p>
+              <p class="text-xs text-secondary mt-1.5 mb-0 flex items-center justify-between gap-2">
+                <span class="truncate">Dr. {{ item.prescribingDoctor }} · {{ item.medicationCount }} {{ item.medicationCount === 1 ? 'medicine' : 'medicines' }}</span>
+                <span class="shrink-0">{{ item.createdAt | date:'dd MMM, HH:mm' }}</span>
+              </p>
+            </button>
+          </li>
+        </ul>
       </div>
-    </div>
+    </section>
   `,
 })
 export class DispenseQueuePanelComponent {
   @Input() items: DispenseQueueItem[] = [];
-  @Input() selectedQueueId: string | null = null;
+  @Input() selectedId: string | null = null;
+  @Input() loading = false;
+  @Input() searching = false;
+  @Input() error: string | null = null;
   @Input() search = '';
-  @Input() statusFilter: DispenseQueueStatus | null = null;
-  @Input() autoRefresh = true;
+  @Input() status: DispenseQueueStatus | null = null;
+  @Input() date: string | null = null;
 
   @Output() select = new EventEmitter<DispenseQueueItem>();
   @Output() searchChange = new EventEmitter<string>();
-  @Output() statusFilterChange = new EventEmitter<DispenseQueueStatus | null>();
-  @Output() autoRefreshChange = new EventEmitter<boolean>();
+  @Output() statusChange = new EventEmitter<DispenseQueueStatus | null>();
+  @Output() dateChange = new EventEmitter<string | null>();
+  @Output() clearFilter = new EventEmitter<DispenseFilterKey>();
+  @Output() clearAll = new EventEmitter<void>();
+  @Output() retry = new EventEmitter<void>();
 
-  readonly filters: { label: string; value: DispenseQueueStatus | null }[] = [
-    { label: 'All', value: null },
-    { label: 'Waiting', value: 'Waiting' },
-    { label: 'Verifying', value: 'Verifying' },
-    { label: 'On Hold', value: 'OnHold' },
-    { label: 'Completed', value: 'Completed' },
-  ];
+  readonly statusOptions = DISPENSE_STATUS_OPTIONS;
+  readonly skeletonRows = [1, 2, 3, 4];
+  readonly statusLabel = dispenseStatusLabel;
+  readonly statusTone = dispenseStatusTone;
+  readonly priorityTone = priorityTone;
 
-  priorityDotClass(priority: string): string {
-    if (priority === 'Critical') return 'bg-rose-500';
-    if (priority === 'High') return 'bg-amber-500';
-    return 'bg-gray-300';
+  get hasFilters(): boolean {
+    return !!(this.search.trim() || this.status || this.date);
   }
 
-  statusTone(status: DispenseQueueStatus): BooBadgeTone {
-    switch (status) {
-      case 'Waiting': return 'neutral';
-      case 'Verifying': return 'primary';
-      case 'Preparing':
-      case 'Dispensing': return 'warning';
-      case 'Completed': return 'success';
-      case 'Cancelled': return 'danger';
-      case 'OnHold': return 'warning';
-      default: return 'neutral';
-    }
+  get chips(): DispenseFilterChip[] {
+    const chips: DispenseFilterChip[] = [];
+    if (this.search.trim()) chips.push({ key: 'search', label: `Search: ${this.search.trim()}` });
+    if (this.status) chips.push({ key: 'status', label: `Status: ${dispenseStatusLabel(this.status)}` });
+    if (this.date) chips.push({ key: 'date', label: `Issued: ${this.date}` });
+    return chips;
+  }
+
+  trackById(_: number, item: DispenseQueueItem): string {
+    return item.queueId;
   }
 }

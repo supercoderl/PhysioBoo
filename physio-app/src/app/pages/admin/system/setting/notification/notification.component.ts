@@ -1,6 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { finalize } from 'rxjs';
-import { AdminBreadcrumbComponent } from "../../../../../components/breadcrumb/admin-breadcrumb.component";
 import { SwitchComponent } from "../../../../../components/switch/switch.component";
 import { PreferenceService } from '../../../../../services/common/preference.service';
 import { ToastService } from '../../../../../services/common/toast.service';
@@ -43,7 +42,6 @@ const DEFAULTS: Record<string, boolean> = {
   standalone: true,
   imports: [
     SharedModule,
-    AdminBreadcrumbComponent,
     SwitchComponent,
     BooButtonAdminComponent
   ],

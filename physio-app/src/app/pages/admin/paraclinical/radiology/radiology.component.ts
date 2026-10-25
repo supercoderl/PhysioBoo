@@ -41,7 +41,6 @@ const LOADING_KEY = 'radiology';
     RadiologyPatientStudyDrawerComponent,
     BooButtonAdminComponent
   ],
-  host: { class: 'block min-h-screen bg-gray-50' },
   template: `
     <!-- Loading -->
     <div *ngIf="loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3">
@@ -50,14 +49,14 @@ const LOADING_KEY = 'radiology';
     </div>
 
     <!-- Error -->
-    <div *ngIf="error() && !loadingSrv.isLoading(LOADING_KEY)" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div *ngIf="error() && !loadingSrv.isLoading(LOADING_KEY)" class="pt-4">
       <boo-error-state title="Couldn't load radiology workspace" [description]="error()" (retry)="retryLoad()"></boo-error-state>
     </div>
 
     <ng-container *ngIf="!error() && hasLoadedOnce">
       <!-- Sticky module header -->
-      <div class="sticky top-0 z-20 bg-surface shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="mb-4 shrink-0 rounded-2 border border-borderGray/60 bg-surface">
+        <div class="px-4 py-4 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 class="text-lg font-semibold text-gray-800">Radiology</h1>
             <p class="text-xs text-secondary">Radiology Information System — orders, scheduling, imaging, and reporting</p>
@@ -68,7 +67,7 @@ const LOADING_KEY = 'radiology';
         </div>
 
         <!-- Tab nav -->
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-gray-200 flex items-center gap-1 overflow-x-auto" role="tablist">
+        <nav class="px-4 border-t border-gray-200 flex items-center gap-1 overflow-x-auto" role="tablist">
           <button *ngFor="let t of tabs" type="button" (click)="setTab(t.key)" [attr.aria-selected]="activeTab() === t.key" role="tab"
             class="px-4 py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 -mb-px whitespace-nowrap"
             [ngClass]="activeTab() === t.key ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
@@ -78,7 +77,7 @@ const LOADING_KEY = 'radiology';
         </nav>
       </div>
 
-      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main class="boo-scrollbar min-h-0 min-w-0 flex-1 overflow-auto pb-5">
         <!-- Critical findings alerts banner -->
         <div *ngIf="alerts().length > 0" class="mb-6 flex gap-3 overflow-x-auto pb-1" aria-live="polite">
           <div *ngFor="let a of alertsBySeverity()" class="shrink-0 min-w-[280px] bg-surface border rounded-lg p-3 flex items-start gap-2"

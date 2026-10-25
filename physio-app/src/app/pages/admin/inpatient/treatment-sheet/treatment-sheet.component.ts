@@ -54,10 +54,9 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     BooButtonAdminComponent,
     ButtonIconComponent
   ],
-  host: { class: 'block min-h-screen bg-gray-50' },
   template: `
     <!-- No patient selected -->
-    <div *ngIf="!patientId" class="max-w-xl mx-auto px-4 sm:px-6 pt-12">
+    <div *ngIf="!patientId" class="mx-auto max-w-xl pt-8">
       <boo-error-state *ngIf="patientsError()" title="Couldn't load admitted patients" [description]="patientsError()" (retry)="loadAdmittedPatients()"></boo-error-state>
       <ng-container *ngIf="!patientsError()">
         <boo-empty-state icon="clipboard-list" title="Select an inpatient" description="Choose a currently admitted patient to open their treatment sheet."></boo-empty-state>
@@ -74,7 +73,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     </div>
 
     <!-- Error -->
-    <div *ngIf="patientId && error() && !loadingSrv.isLoading(LOADING_KEY)" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div *ngIf="patientId && error() && !loadingSrv.isLoading(LOADING_KEY)" class="pt-4">
       <boo-empty-state *ngIf="noActiveStay()" icon="bed" title="No active inpatient stay" [description]="error()"></boo-empty-state>
       <boo-error-state *ngIf="!noActiveStay()" title="Couldn't load the treatment sheet" [description]="error()" (retry)="retryLoad()"></boo-error-state>
       <div class="mt-4 flex justify-center">
@@ -84,8 +83,8 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
     <ng-container *ngIf="patientId && !error() && hasLoadedOnce">
       <!-- Sticky patient summary header -->
-      <div class="sticky top-0 z-20 bg-surface shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-start justify-between gap-4">
+      <div class="mb-4 shrink-0 rounded-2 border border-borderGray/60 bg-surface">
+        <div class="px-4 py-4 flex flex-wrap items-start justify-between gap-4">
           <div class="flex items-start gap-3 min-w-0">
             <div class="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
               {{ initials(summary()?.fullName ?? '') }}
@@ -113,7 +112,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         </div>
 
         <!-- Tab nav -->
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-gray-200 flex items-center gap-1 overflow-x-auto" role="tablist">
+        <nav class="px-4 border-t border-gray-200 flex items-center gap-1 overflow-x-auto" role="tablist">
           <button *ngFor="let t of tabs" type="button" (click)="setTab(t.key)" [attr.aria-selected]="activeTab() === t.key" role="tab"
             class="px-4 py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 -mb-px whitespace-nowrap"
             [ngClass]="activeTab() === t.key ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
@@ -123,7 +122,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         </nav>
       </div>
 
-      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main class="boo-scrollbar min-h-0 min-w-0 flex-1 overflow-auto pb-5">
         <!-- Clinical alerts banner -->
         <div *ngIf="alerts().length > 0" class="mb-6 flex gap-3 overflow-x-auto pb-1" aria-live="polite">
           <div *ngFor="let a of alertsBySeverity()" class="shrink-0 min-w-[280px] bg-surface border rounded-lg p-3 flex items-start gap-2"

@@ -1,16 +1,14 @@
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
 import { BASE_API } from "../../shared/api/base";
 import { createHttpContext } from "../../shared/contexts/option.context";
 import {
     CashierDashboardStats,
+    CashierInsuranceRequest,
     CashierInvoice,
     CashierInvoiceFilter,
-    CashierPatientMatch,
-    CashierPaymentMethod,
-    CashierPaymentResult,
-    CashierPaymentSplit,
-    CashierRefundResult,
+    CashierPaymentRequest,
+    CashierRefundRequest,
     CashierTransactionEvent,
 } from "../../shared/types/cashier.types";
 import { PagedResponse, PaginationData } from "../../shared/types/common";
@@ -24,48 +22,49 @@ export class CashierService {
 
     // #region Methods
     getDashboardStats() {
-        return this.http.get<PagedResponse<CashierDashboardStats>>(BASE_API.CASHIER.DASHBOARD, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.DASHBOARD }) });
+        return this.http.get<PagedResponse<CashierDashboardStats>>(BASE_API.CASHIER.DASHBOARD, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.DASHBOARD, skipErrorToast: true }) });
     }
 
     searchInvoices(filter: CashierInvoiceFilter) {
-        return this.http.get<PagedResponse<PaginationData<CashierInvoice>>>(BASE_API.CASHIER.INVOICES, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.INVOICES_SEARCH }) });
+        let params = new HttpParams()
+            .set('pageNumber', filter.pageNumber)
+            .set('pageSize', filter.pageSize);
+        if (filter.search.trim()) params = params.set('search', filter.search.trim());
+        if (filter.status) params = params.set('status', filter.status);
+        if (filter.dateFrom) params = params.set('dateFrom', filter.dateFrom);
+        if (filter.dateTo) params = params.set('dateTo', filter.dateTo);
+
+        return this.http.get<PagedResponse<PaginationData<CashierInvoice>>>(BASE_API.CASHIER.INVOICES, { params, context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.INVOICES_SEARCH, skipErrorToast: true }) });
     }
 
     getInvoiceDetail(invoiceId: string) {
-        return this.http.get<PagedResponse<CashierInvoice>>(BASE_API.CASHIER.INVOICE_DETAIL(invoiceId), { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.INVOICE_DETAIL }) });
+        return this.http.get<PagedResponse<CashierInvoice | null>>(BASE_API.CASHIER.INVOICE_DETAIL(invoiceId), { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.INVOICE_DETAIL }) });
     }
 
-    searchPatients(query: string) {
-        return this.http.get<PagedResponse<CashierPatientMatch[]>>(`${BASE_API.CASHIER.PATIENTS_SEARCH}?q=${encodeURIComponent(query)}`, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.PATIENTS_SEARCH }) });
+    getPaymentHistory(limit: number) {
+        const params = new HttpParams().set('limit', limit);
+        return this.http.get<PagedResponse<CashierTransactionEvent[]>>(BASE_API.CASHIER.PAYMENT_HISTORY, { params, context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.PAYMENT_HISTORY, skipErrorToast: true }) });
     }
 
-    receivePayment(invoiceId: string, splits: CashierPaymentSplit[], amountTendered: number) {
-        return this.http.post<PagedResponse<CashierPaymentResult>>(BASE_API.CASHIER.PAYMENTS, { invoiceId, splits, amountTendered }, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.PAYMENT }) });
+    /** Every mutation answers with the refreshed invoice, which callers use instead of recomputing totals. */
+    receivePayment(request: CashierPaymentRequest) {
+        return this.http.post<PagedResponse<CashierInvoice | null>>(BASE_API.CASHIER.PAYMENTS, request, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.PAYMENT }) });
     }
 
-    refundPayment(invoiceId: string, amount: number, reason: string, method: CashierPaymentMethod) {
-        return this.http.post<PagedResponse<CashierRefundResult>>(BASE_API.CASHIER.REFUNDS, { invoiceId, amount, reason, method }, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.REFUND }) });
+    refundPayment(request: CashierRefundRequest) {
+        return this.http.post<PagedResponse<CashierInvoice | null>>(BASE_API.CASHIER.REFUNDS, request, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.REFUND }) });
     }
 
     applyDiscount(invoiceId: string, discountPercent: number) {
-        return this.http.post<PagedResponse<{ invoiceId: string; discountPercent: number }>>(BASE_API.CASHIER.DISCOUNTS(invoiceId), { discountPercent }, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.DISCOUNT }) });
+        return this.http.post<PagedResponse<CashierInvoice | null>>(BASE_API.CASHIER.DISCOUNTS(invoiceId), { discountPercent }, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.DISCOUNT }) });
     }
 
-    applyInsurance(invoiceId: string, provider: string, policyNo: string, coverageAmount: number) {
-        return this.http.post<PagedResponse<{ invoiceId: string; coverageAmount: number }>>(BASE_API.CASHIER.INSURANCE(invoiceId), { provider, policyNo, coverageAmount }, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.INSURANCE }) });
+    applyInsurance(invoiceId: string, request: CashierInsuranceRequest) {
+        return this.http.post<PagedResponse<CashierInvoice | null>>(BASE_API.CASHIER.INSURANCE(invoiceId), request, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.INSURANCE }) });
     }
 
     voidInvoice(invoiceId: string, reason: string) {
-        return this.http.post<PagedResponse<{ invoiceId: string }>>(BASE_API.CASHIER.VOID(invoiceId), { reason }, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.VOID }) });
+        return this.http.post<PagedResponse<CashierInvoice | null>>(BASE_API.CASHIER.VOID(invoiceId), { reason }, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.VOID }) });
     }
-
-    getPaymentHistory() {
-        return this.http.get<PagedResponse<CashierTransactionEvent[]>>(BASE_API.CASHIER.PAYMENT_HISTORY, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.PAYMENT_HISTORY }) });
-    }
-
-    printInvoice(invoiceId: string) {
-        return this.http.post<PagedResponse<{ printed: boolean }>>(BASE_API.CASHIER.PRINT_INVOICE, { invoiceId }, { context: createHttpContext({ loadingKey: LoadingKeys.CASHIER.PRINT_INVOICE }) });
-    }
-
     // #endregion
 }

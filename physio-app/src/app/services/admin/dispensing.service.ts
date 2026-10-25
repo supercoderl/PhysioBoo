@@ -27,15 +27,15 @@ export class DispensingService {
     const params: Record<string, string> = {};
     if (search) params['search'] = search;
     if (status) params['status'] = status;
-    return this.http.get<PagedResponse<PaginationData<DispenseQueueItem>>>(BASE_API.DISPENSING.QUEUE, { params, context: createHttpContext({ loadingKey: LoadingKeys.DISPENSING.QUEUE }) });
+    return this.http.get<PagedResponse<PaginationData<DispenseQueueItem>>>(BASE_API.DISPENSING.QUEUE, { params, context: createHttpContext({ loadingKey: LoadingKeys.DISPENSING.QUEUE, skipErrorToast: true }) });
   }
 
   getStats() {
-    return this.http.get<PagedResponse<DispenseQueueStats>>(BASE_API.DISPENSING.STATS, { context: createHttpContext({ loadingKey: LoadingKeys.DISPENSING.STATS }) });
+    return this.http.get<PagedResponse<DispenseQueueStats>>(BASE_API.DISPENSING.STATS, { context: createHttpContext({ loadingKey: LoadingKeys.DISPENSING.STATS, skipErrorToast: true }) });
   }
 
   getWorkspace(queueId: string) {
-    return this.http.get<PagedResponse<DispenseWorkspace>>(BASE_API.DISPENSING.WORKSPACE(queueId), { context: createHttpContext({ loadingKey: LoadingKeys.DISPENSING.WORKSPACE }) });
+    return this.http.get<PagedResponse<DispenseWorkspace>>(BASE_API.DISPENSING.WORKSPACE(queueId), { context: createHttpContext({ loadingKey: LoadingKeys.DISPENSING.WORKSPACE, skipErrorToast: true }) });
   }
 
   acknowledgeAlert(workspaceId: string, alertId: string, note?: string) {
@@ -63,7 +63,7 @@ export class DispensingService {
   }
 
   getMedicineDetail(medicineId: string) {
-    return this.http.get<PagedResponse<DispenseMedicineDetail>>(BASE_API.DISPENSING.MEDICINE_DETAIL(medicineId), { context: createHttpContext({ loadingKey: LoadingKeys.DISPENSING.MEDICINE_DETAIL }) });
+    return this.http.get<PagedResponse<DispenseMedicineDetail>>(BASE_API.DISPENSING.MEDICINE_DETAIL(medicineId), { context: createHttpContext({ loadingKey: LoadingKeys.DISPENSING.MEDICINE_DETAIL, skipErrorToast: true }) });
   }
 
   holdPrescription(workspaceId: string, reason: string) {

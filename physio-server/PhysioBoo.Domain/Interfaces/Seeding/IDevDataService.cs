@@ -17,7 +17,9 @@ namespace PhysioBoo.Domain.Interfaces.Seeding
 
     public sealed record DevDataModuleList(bool Enabled, int MaxRows, IReadOnlyList<DevDataModuleInfo> Modules);
 
-    public sealed record DevDataResult(Guid BatchId, IReadOnlyDictionary<string, int> Created, IReadOnlyList<string> Warnings);
+    /// <param name="Created">Rows written, keyed by table.</param>
+    /// <param name="Reused">Keys of the modules whose data already existed and was linked to instead of generated again.</param>
+    public sealed record DevDataResult(Guid BatchId, IReadOnlyDictionary<string, int> Created, IReadOnlyList<string> Warnings, IReadOnlyList<string> Reused);
 
     /// <summary>A request the generator cannot serve; the endpoint reports it as a 400 (never 403/404, which the app redirects on).</summary>
     public sealed class DevDataException : Exception

@@ -11,6 +11,7 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
     template: `
     <div class="bg-surface rounded-2 border border-borderGray/60 h-full overflow-hidden">
       <boo-table-admin
+        minTableWidth="560px"
         title="Doctor Performance"
         [data]="data ?? []"
         tdClass="px-4 py-3"

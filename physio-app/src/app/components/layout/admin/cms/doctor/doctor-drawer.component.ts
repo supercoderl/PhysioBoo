@@ -1,8 +1,10 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { BooInputComponent } from '@physioboo/ui';
 import { firstValueFrom } from "rxjs";
-import { MedicalSpecialtyService } from "../../../../../services/admin/medical-specialty.service";
 import { DoctorService } from "../../../../../services/admin/doctor.service";
+import { MedicalSpecialtyService } from "../../../../../services/admin/medical-specialty.service";
+import { DialogService } from "../../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../shared/constants/error.constant";
@@ -16,7 +18,6 @@ import { Doctor } from "../../../../../shared/types/medical-staff.types";
 import { convertEnumToSelection } from "../../../../../shared/utils/common";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooInputComponent } from '@physioboo/ui';
 import { BooJsonInputComponent } from "../../../../input/boo-json-input/boo-json-input.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
@@ -95,7 +96,44 @@ interface StepConfig {
                 </div>
                 <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar>
                     <boo-json-editor [targetForms]="[userForm, profileForm, doctorForm]"></boo-json-editor>
-                    
+
+                    <section *ngIf="isEdit" class="px-6 pt-6 flex items-center gap-4" aria-label="Doctor avatar">
+                        <div class="relative flex-none">
+                            <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-solid border-[#c3c3c3] bg-primarySoft flex items-center justify-center text-primary text-xl font-bold select-none">
+                                <img *ngIf="displayedAvatar; else initialsTpl"
+                                    [src]="displayedAvatar"
+                                    alt="Doctor avatar"
+                                    class="w-full h-full object-cover"
+                                    (error)="avatarLoadFailed = true" />
+                                <ng-template #initialsTpl>{{ initials }}</ng-template>
+                            </div>
+                            <button type="button"
+                                class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-sm hover:bg-primaryHover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                                [disabled]="isAvatarBusy"
+                                [attr.aria-label]="avatarUrl ? 'Change avatar' : 'Upload avatar'"
+                                (click)="avatarInput.click()">
+                                <physio-icon name="upload" [size]="14"></physio-icon>
+                            </button>
+                            <input #avatarInput type="file" class="hidden"
+                                accept="image/jpeg,image/png,image/webp"
+                                (change)="onAvatarSelected($event)" />
+                        </div>
+
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-semibold text-primary m-0">{{ pendingAvatarFile ? 'Preview' : 'Profile photo' }}</p>
+                            <p class="text-xs text-secondary m-0 mb-2">JPEG, PNG or WebP, up to 5 MB.</p>
+                            <div class="flex flex-wrap gap-2" aria-live="polite">
+                                <ng-container *ngIf="pendingAvatarFile; else idleActions">
+                                    <boo-button-admin textColor="white" [loading]="isAvatarBusy" [disabled]="isAvatarBusy" (click)="saveAvatar()">Save photo</boo-button-admin>
+                                    <boo-button-admin background="transparent" [disabled]="isAvatarBusy" (click)="cancelAvatar()">Cancel</boo-button-admin>
+                                </ng-container>
+                                <ng-template #idleActions>
+                                    <boo-button-admin *ngIf="avatarUrl" background="transparent" [disabled]="isAvatarBusy" (click)="confirmRemoveAvatar()">Remove photo</boo-button-admin>
+                                </ng-template>
+                            </div>
+                        </div>
+                    </section>
+
                     <div *ngIf="currentStep === 1" [formGroup]="userForm" class="p-6 space-y-6 animate-fadeIn">
                         <div>
                             <div class="flex items-center gap-2 mb-1">
@@ -253,8 +291,10 @@ interface StepConfig {
                         </div>
  
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-6">
-                            <boo-select label="Employment Status" formControlName="employmentStatus" [options]="employmentStatusOptions"></boo-select>
-                            <boo-json-input label="Bank Account Details" formControlName="bankAccountDetails"></boo-json-input>
+                            <div class="flex flex-col gap-4 md:col-span-2">
+                                <boo-select label="Employment Status" formControlName="employmentStatus" [options]="employmentStatusOptions"></boo-select>
+                                <boo-json-input label="Bank Account Details" formControlName="bankAccountDetails"></boo-json-input>
+                            </div>
                             <boo-input label="PAN Number" formControlName="panNumber"></boo-input>
                             <boo-input label="GSTIN" formControlName="gstin"></boo-input>
                         </div>
@@ -316,10 +356,10 @@ interface StepConfig {
 export class CmsDoctorDrawerComponent implements OnChanges {
     // #region Inputs, Outputs, Properties
     @Input() isOpen = false;
-    /** When set, the drawer edits that doctor instead of registering a new one. */
     @Input() doctorId: string | null = null;
     @Output() close = new EventEmitter<void>();
     @Output() saveSuccess = new EventEmitter<Doctor>();
+    @Output() avatarChanged = new EventEmitter<Doctor>();
     @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
     currentStep = 1;
@@ -335,7 +375,6 @@ export class CmsDoctorDrawerComponent implements OnChanges {
         { id: 3, label: 'Doctor', description: 'Medical profile', icon: 'stethoscope', formGroupName: 'doctorForm' },
     ];
 
-    /** Account and profile are not updatable through the update endpoint, so editing only shows the doctor step. */
     get steps(): StepConfig[] {
         return this.isEdit ? this.allSteps.filter(x => x.id === 3) : this.allSteps;
     }
@@ -350,6 +389,25 @@ export class CmsDoctorDrawerComponent implements OnChanges {
     isSaving = false;
     isLoadingDoctor = false;
     private loadedDoctor: Doctor | null = null;
+
+    // Avatar
+    private static readonly AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    private static readonly AVATAR_MAX_BYTES = 5 * 1024 * 1024;
+    avatarUrl: string | null = null;
+    avatarLoadFailed = false;
+    isAvatarBusy = false;
+    pendingAvatarFile: File | null = null;
+    private pendingAvatarPreview: string | null = null;
+
+    get displayedAvatar(): string | null {
+        return this.pendingAvatarPreview ?? (this.avatarLoadFailed ? null : this.avatarUrl);
+    }
+
+    get initials(): string {
+        const parts = (this.loadedDoctor?.fullName ?? '').trim().split(/\s+/).filter(Boolean);
+        if (!parts.length) return '?';
+        return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+    }
 
     employmentStatusOptions = convertEnumToSelection(EmploymentStatus);
     genderOptions = convertEnumToSelection(Gender);
@@ -367,6 +425,7 @@ export class CmsDoctorDrawerComponent implements OnChanges {
     constructor(
         private fb: FormBuilder,
         private toastSrv: ToastService,
+        private dialogSrv: DialogService,
         private doctorSrv: DoctorService,
         private specialtySrv: MedicalSpecialtyService,
         protected loadingSrv: LocalLoadingService
@@ -395,6 +454,7 @@ export class CmsDoctorDrawerComponent implements OnChanges {
             }
             const d = res.data;
             this.loadedDoctor = d;
+            this.setAvatar(d.avatar);
             // Not changeable through the update endpoint.
             for (const name of this.readOnlyWhenEditing) this.doctorForm.get(name)?.disable();
             this.doctorForm.patchValue({
@@ -488,6 +548,8 @@ export class CmsDoctorDrawerComponent implements OnChanges {
 
     private resetAll() {
         this.loadedDoctor = null;
+        this.discardPendingAvatar();
+        this.setAvatar(null);
         this.doctorForm.enable();
         this.currentStep = this.isEdit ? 3 : 1;
         this.completedSteps.clear();
@@ -501,7 +563,6 @@ export class CmsDoctorDrawerComponent implements OnChanges {
     }
 
     goToStep(stepId: number) {
-        // Allow free navigation to any visited/completed step, or back
         if (stepId < this.currentStep || this.completedSteps.has(stepId)) {
             this.currentStep = stepId;
             this.scrollToTop();
@@ -551,6 +612,9 @@ export class CmsDoctorDrawerComponent implements OnChanges {
             return;
         }
 
+        // A chosen but unsaved photo is part of "Save changes"; stop here if it fails so nothing is silently dropped.
+        if (this.pendingAvatarFile && !(await this.saveAvatar())) return;
+
         this.isSaving = true;
         try {
             const targetId = this.isEdit ? await this.update() : await this.create();
@@ -573,11 +637,9 @@ export class CmsDoctorDrawerComponent implements OnChanges {
         const doctor = this.doctorForm.getRawValue();
 
         const created = await firstValueFrom(this.doctorSrv.create({
-            // User
             email: user.email,
             phone: user.phone,
             password: user.password,
-            // Profile
             firstName: profile.firstName,
             lastName: profile.lastName,
             middleName: profile.middleName,
@@ -593,7 +655,6 @@ export class CmsDoctorDrawerComponent implements OnChanges {
             emergencyContactPhone: profile.emergencyContactPhone,
             emergencyContactRelationship: profile.emergencyContactRelationship,
             preferredCommunication: profile.preferredCommunication,
-            // Doctor
             bio: doctor.bio,
             about: doctor.about,
             languagesSpoken: this.parseLanguages(doctor.languagesSpoken),
@@ -616,7 +677,6 @@ export class CmsDoctorDrawerComponent implements OnChanges {
         return created.data;
     }
 
-    /** The update contract also carries fees and availability; those are re-sent unchanged from the loaded record. */
     private async update(): Promise<string> {
         const id = this.doctorId!;
         const current = this.loadedDoctor;
@@ -654,7 +714,103 @@ export class CmsDoctorDrawerComponent implements OnChanges {
         return id;
     }
 
+    // #region Avatar
+    private setAvatar(url: string | null) {
+        this.avatarUrl = url;
+        this.avatarLoadFailed = false;
+    }
+
+    private discardPendingAvatar() {
+        if (this.pendingAvatarPreview) URL.revokeObjectURL(this.pendingAvatarPreview);
+        this.pendingAvatarPreview = null;
+        this.pendingAvatarFile = null;
+    }
+
+    onAvatarSelected(event: Event) {
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0];
+        input.value = '';
+        if (!file || this.isAvatarBusy) return;
+
+        if (!CmsDoctorDrawerComponent.AVATAR_TYPES.includes(file.type)) {
+            this.toastSrv.error('Avatar must be a JPEG, PNG or WebP image.');
+            return;
+        }
+        if (file.size > CmsDoctorDrawerComponent.AVATAR_MAX_BYTES) {
+            this.toastSrv.error('Avatar may not exceed 5 MB.');
+            return;
+        }
+
+        this.discardPendingAvatar();
+        this.pendingAvatarFile = file;
+        this.pendingAvatarPreview = URL.createObjectURL(file);
+    }
+
+    cancelAvatar() {
+        if (this.isAvatarBusy) return;
+        this.discardPendingAvatar();
+    }
+
+    async saveAvatar(): Promise<boolean> {
+        if (!this.pendingAvatarFile || !this.doctorId || this.isAvatarBusy) return false;
+
+        this.isAvatarBusy = true;
+        try {
+            const res = await firstValueFrom(this.doctorSrv.uploadAvatar(this.doctorId, this.pendingAvatarFile));
+            if (!res.success || !res.data) throw new Error('Avatar was not saved');
+            this.discardPendingAvatar();
+            this.setAvatar(res.data);
+            this.toastSrv.success('Avatar updated');
+            await this.notifyAvatarChanged();
+            return true;
+        } catch {
+            this.toastSrv.error('Could not upload the avatar. Please try again.');
+            return false;
+        } finally {
+            this.isAvatarBusy = false;
+        }
+    }
+
+    confirmRemoveAvatar() {
+        if (this.isAvatarBusy) return;
+        this.dialogSrv.confirm(
+            'The doctor will show initials instead of a photo.',
+            () => void this.removeAvatar(),
+            'Remove avatar?',
+            'warning',
+            'Remove'
+        );
+    }
+
+    private async removeAvatar() {
+        if (!this.doctorId || this.isAvatarBusy) return;
+
+        this.isAvatarBusy = true;
+        try {
+            await firstValueFrom(this.doctorSrv.removeAvatar(this.doctorId));
+            this.setAvatar(null);
+            this.toastSrv.success('Avatar removed');
+            await this.notifyAvatarChanged();
+        } catch {
+            this.toastSrv.error('Could not remove the avatar. Please try again.');
+        } finally {
+            this.isAvatarBusy = false;
+        }
+    }
+
+    private async notifyAvatarChanged() {
+        try {
+            const res = await firstValueFrom(this.doctorSrv.search_by_id(this.doctorId!));
+            if (res.success && res.data) {
+                this.loadedDoctor = res.data;
+                this.avatarChanged.emit(res.data);
+            }
+        } catch { /* the avatar change itself is already saved */ }
+    }
+    // #endregion
+
     onClose() {
+        this.discardPendingAvatar();
         this.close.emit();
     }
-}
+}

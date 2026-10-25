@@ -1,5 +1,4 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { AdminBreadcrumbComponent } from "../../../../../components/breadcrumb/admin-breadcrumb.component";
 import { finalize } from 'rxjs';
 import { BillingService } from '../../../../../services/admin/billing.service';
 import { ToastService } from '../../../../../services/common/toast.service';
@@ -31,7 +30,6 @@ interface Invoice {
   standalone: true,
   imports: [
     SharedModule,
-    AdminBreadcrumbComponent,
   ],
   templateUrl: './billing.component.html'
 })

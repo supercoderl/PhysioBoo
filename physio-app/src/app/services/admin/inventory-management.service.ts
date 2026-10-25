@@ -1,21 +1,27 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
+import { map } from "rxjs";
 import { BASE_API } from "../../shared/api/base";
 import { createHttpContext } from "../../shared/contexts/option.context";
 import { PagedResponse, PaginationData } from "../../shared/types/common";
 import {
-  InventoryAlert,
+  AdjustStockPayload,
+  DisposeStockPayload,
+  InventoryBatch,
   InventoryHistoryEntry,
   InventoryKpis,
-  InventoryMedicineCard,
+  InventoryMedicine,
   InventoryMedicineDetail,
-  InventoryQuickCategory,
-  StockInsight,
-  StockMovementEvent,
-  WarehouseBatch,
-  WarehouseZone,
+  InventorySearchQuery,
+  InventoryZone,
+  normalizeBatchStatus,
+  ReceiveStockPayload,
+  TransferStockPayload,
 } from "../../shared/types/inventory-management.types";
 import { LoadingKeys } from "../../shared/types/loading";
+
+/** A batch as the API sends it: the lifecycle status is the enum's number. */
+type RawBatch = Omit<InventoryBatch, 'status'> & { status: number | string };
 
 @Injectable({ providedIn: 'root' })
 export class InventoryManagementService {
@@ -23,82 +29,61 @@ export class InventoryManagementService {
   private readonly http = inject(HttpClient);
   // #endregion
 
-  // Methods
+  // #region Reads
   getKpis() {
     return this.http.get<PagedResponse<InventoryKpis>>(BASE_API.INVENTORY.KPIS, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.KPIS }) });
   }
 
-  getQuickCategories() {
-    return this.http.get<PagedResponse<InventoryQuickCategory[]>>('/api/medicine-categories/search', { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.QUICK_CATEGORIES }) });
-  }
+  /** The API requires both paging parameters; `search` and `categoryId` are only sent when set. */
+  searchMedicines(query: InventorySearchQuery) {
+    let params = new HttpParams().set('pageNumber', query.pageNumber).set('pageSize', query.pageSize);
+    if (query.search.trim()) params = params.set('search', query.search.trim());
+    if (query.categoryId) params = params.set('categoryId', query.categoryId);
 
-  searchMedicines() {
-    return this.http.get<PagedResponse<PaginationData<InventoryMedicineCard>>>(BASE_API.INVENTORY.MEDICINES_SEARCH, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.MEDICINES_SEARCH }) });
-  }
-
-  lookupByBarcode(code: string) {
-    return this.http.get<PagedResponse<InventoryMedicineCard | null>>(BASE_API.INVENTORY.MEDICINE_BARCODE(code), { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.MEDICINE_BARCODE }) });
+    return this.http.get<PagedResponse<PaginationData<InventoryMedicine>>>(BASE_API.INVENTORY.MEDICINES_SEARCH, {
+      params,
+      context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.MEDICINES_SEARCH }),
+    });
   }
 
   getMedicineDetail(medicineId: string) {
-    return this.http.get<PagedResponse<InventoryMedicineDetail>>(BASE_API.INVENTORY.MEDICINE_DETAIL(medicineId), { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.MEDICINE_DETAIL }) });
+    return this.http.get<PagedResponse<InventoryMedicineDetail | null>>(BASE_API.INVENTORY.MEDICINE_DETAIL(medicineId), { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.MEDICINE_DETAIL }) });
   }
 
-  getBatches(medicineId: string, sort: 'FEFO' | 'FIFO' = 'FEFO') {
-    return this.http.get<PagedResponse<WarehouseBatch[]>>(BASE_API.INVENTORY.MEDICINE_BATCHES(medicineId), { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.MEDICINE_BATCHES }) });
+  /** Earliest expiry first (FEFO), as the API orders them. */
+  getBatches(medicineId: string) {
+    return this.http.get<PagedResponse<RawBatch[]>>(BASE_API.INVENTORY.MEDICINE_BATCHES(medicineId), { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.MEDICINE_BATCHES }) })
+      .pipe(map(res => ({ ...res, data: (res.data ?? []).map(toBatch) })));
   }
 
-  receiveStock(batchId: string, payload: { quantity: number; purchasePrice?: number; supplierId?: string; manufacturingDate?: string; expiryDate?: string }) {
-    return this.http.post<PagedResponse<WarehouseBatch | null>>(BASE_API.INVENTORY.BATCH_RECEIVE(batchId), payload, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.BATCH_RECEIVE }) });
+  getHistory(medicineId: string) {
+    return this.http.get<PagedResponse<InventoryHistoryEntry[]>>(BASE_API.INVENTORY.MEDICINE_HISTORY(medicineId), { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.MEDICINE_HISTORY }) });
   }
 
-  transferBatch(batchId: string, payload: { toZoneId: string; quantity: number }) {
-    return this.http.post<PagedResponse<WarehouseBatch | null>>(BASE_API.INVENTORY.BATCH_TRANSFER(batchId), payload, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.BATCH_TRANSFER }) });
+  getZones() {
+    return this.http.get<PagedResponse<InventoryZone[]>>(BASE_API.INVENTORY.WAREHOUSE_ZONES, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.WAREHOUSE_ZONES }) });
   }
-
-  adjustQuantity(batchId: string, payload: { newQuantity: number; reason: string }) {
-    return this.http.post<PagedResponse<WarehouseBatch | null>>(BASE_API.INVENTORY.BATCH_ADJUST(batchId), payload, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.BATCH_ADJUST }) });
-  }
-
-  reserveBatch(batchId: string, payload: { quantity: number; reference: string }) {
-    return this.http.post<PagedResponse<WarehouseBatch | null>>(BASE_API.INVENTORY.BATCH_RESERVE(batchId), payload, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.BATCH_RESERVE }) });
-  }
-
-  lockBatch(batchId: string, reason: string) {
-    return this.http.post<PagedResponse<WarehouseBatch | null>>(BASE_API.INVENTORY.BATCH_LOCK(batchId), { reason }, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.BATCH_LOCK }) });
-  }
-
-  disposeBatch(batchId: string, payload: { reason: string; quantity: number }) {
-    return this.http.post<PagedResponse<WarehouseBatch | null>>(BASE_API.INVENTORY.BATCH_DISPOSE(batchId), payload, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.BATCH_DISPOSE }) });
-  }
-
-  printBarcode(batchId: string) {
-    return this.http.get<PagedResponse<{ barcodeImageUrl: string }>>(BASE_API.INVENTORY.BATCH_BARCODE(batchId), { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.BATCH_BARCODE }) });
-  }
-
-  getWarehouseZones() {
-    return this.http.get<PagedResponse<WarehouseZone[]>>(BASE_API.INVENTORY.WAREHOUSE_ZONES, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.WAREHOUSE_ZONES }) });
-  }
-
-  getInsights(medicineId?: string) {
-    return this.http.get<PagedResponse<StockInsight[]>>(`${BASE_API.INVENTORY.INTELLIGENCE}${medicineId ? '?medicineId=' + medicineId : ''}`, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.INTELLIGENCE }) });
-  }
-
-  getMovements() {
-    return this.http.get<PagedResponse<PaginationData<StockMovementEvent>>>(BASE_API.INVENTORY.MOVEMENTS, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.MOVEMENTS }) });
-  }
-
-  getAlerts(medicineId?: string) {
-    return this.http.get<PagedResponse<InventoryAlert[]>>(BASE_API.INVENTORY.ALERTS, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.ALERTS }) });
-  }
-
-  acknowledgeAlert(alertId: string, note?: string) {
-    return this.http.post<PagedResponse<{ alertId: string }>>(BASE_API.INVENTORY.ALERT_ACKNOWLEDGE(alertId), { note }, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.ALERT_ACKNOWLEDGE }) });
-  }
-
-  getHistory(medicineId: string, type: 'purchase' | 'dispensing' | 'supplier') {
-    return this.http.get<PagedResponse<PaginationData<InventoryHistoryEntry>>>(`${BASE_API.INVENTORY.MEDICINE_HISTORY(medicineId)}?type=${type}`, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.MEDICINE_HISTORY }) });
-  }
-
   // #endregion
+
+  // #region Batch operations
+  receiveStock(batchId: string, payload: ReceiveStockPayload) {
+    return this.http.post<PagedResponse<RawBatch | null>>(BASE_API.INVENTORY.BATCH_RECEIVE(batchId), payload, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.BATCH_RECEIVE }) });
+  }
+
+  adjustQuantity(batchId: string, payload: AdjustStockPayload) {
+    return this.http.post<PagedResponse<RawBatch | null>>(BASE_API.INVENTORY.BATCH_ADJUST(batchId), payload, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.BATCH_ADJUST }) });
+  }
+
+  transferBatch(batchId: string, payload: TransferStockPayload) {
+    return this.http.post<PagedResponse<RawBatch | null>>(BASE_API.INVENTORY.BATCH_TRANSFER(batchId), payload, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.BATCH_TRANSFER }) });
+  }
+
+  disposeBatch(batchId: string, payload: DisposeStockPayload) {
+    return this.http.post<PagedResponse<RawBatch | null>>(BASE_API.INVENTORY.BATCH_DISPOSE(batchId), payload, { context: createHttpContext({ loadingKey: LoadingKeys.INVENTORY.BATCH_DISPOSE }) });
+  }
+  // #endregion
+}
+
+function toBatch(raw: RawBatch): InventoryBatch {
+  return { ...raw, status: normalizeBatchStatus(raw.status) };
 }

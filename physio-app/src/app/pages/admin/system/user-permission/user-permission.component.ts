@@ -8,10 +8,12 @@ import { UserPermissionUserDrawerComponent } from "../../../../components/layout
 import { PermissionService } from "../../../../services/admin/permission.service";
 import { RoleService } from "../../../../services/admin/role.service";
 import { UserService } from "../../../../services/admin/user.service";
+import { AuthService } from "../../../../services/auth/auth.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING } from "../../../../shared/constants/error.constant";
+import { Permissions } from "../../../../shared/constants/permission.constant";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { PagedRequest, PaginationData } from "../../../../shared/types/common";
 import { User } from "../../../../shared/types/core.types";
@@ -53,6 +55,11 @@ interface TabDef {
     host: { class: 'block h-full min-h-0' }
 })
 export class AdminUserPermissionComponent implements OnInit {
+    /** Blocks a second submit while a save (which may be several requests) is still running. */
+    isSaving = signal(false);
+    readonly canCreateRole: boolean;
+    readonly canCreatePermission: boolean;
+
     // #region Tab & shared state
     readonly tabs: TabDef[] = [
         { key: 'users', label: 'Users', icon: 'users', hint: 'Accounts that can sign in' },
@@ -109,7 +116,7 @@ export class AdminUserPermissionComponent implements OnInit {
     permissionsData = signal<PaginationData<Permission> | null>(null);
     permParams = {
         pageNumber: 1,
-        pageSize: 200,
+        pageSize: 500,
         search: '',
         sort: '+category',
         filter: { start: '', end: '', category: null as string | null, isActive: null as boolean | null }
@@ -145,9 +152,8 @@ export class AdminUserPermissionComponent implements OnInit {
         return Array.from(set).sort();
     });
 
-    permsByCategory(category: string): Permission[] {
-        return (this.permissionsData()?.items ?? []).filter(p => p.category === category);
-    }
+    permsByCategory = (category: string): Permission[] =>
+        (this.permissionsData()?.items ?? []).filter(p => p.category === category);
     // #endregion
 
     constructor(
@@ -157,8 +163,11 @@ export class AdminUserPermissionComponent implements OnInit {
         private permSrv: PermissionService,
         private toastSrv: ToastService,
         private dialogSrv: DialogService,
-        protected loadingSrv: LocalLoadingService
+        protected loadingSrv: LocalLoadingService,
+        authSrv: AuthService
     ) {
+        this.canCreateRole = authSrv.hasPermission(Permissions.Iam.RoleCreate);
+        this.canCreatePermission = authSrv.hasPermission(Permissions.Iam.PermissionCreate);
         this.userForm = this.fb.group({
             email: ['', [Validators.required, Validators.email]],
             phone: [''],
@@ -240,9 +249,8 @@ export class AdminUserPermissionComponent implements OnInit {
         this.userRolesDraft.set(next);
     }
 
-    isUserRoleSelected(roleId: string): boolean {
-        return this.userRolesDraft().has(roleId);
-    }
+    /** Passed to the drawer as an input, so it must not depend on the caller's `this`. */
+    isUserRoleSelected = (roleId: string): boolean => this.userRolesDraft().has(roleId);
 
     async saveUser(): Promise<void> {
         if (this.userForm.invalid) {
@@ -250,6 +258,8 @@ export class AdminUserPermissionComponent implements OnInit {
             this.toastSrv.error('Please complete required fields');
             return;
         }
+        if (this.isSaving()) return;
+        this.isSaving.set(true);
         const v = this.userForm.getRawValue();
         try {
             let userId: string;
@@ -278,9 +288,14 @@ export class AdminUserPermissionComponent implements OnInit {
             ]);
 
             this.toastSrv.success(this.selectedUserId() ? 'User updated' : 'User created');
+            this.closeUserDrawer();
             this.loadUsers();
         } catch {
             this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+            // Role changes may have been applied before the failure; show what the server now has.
+            this.loadUsers();
+        } finally {
+            this.isSaving.set(false);
         }
     }
 
@@ -366,9 +381,7 @@ export class AdminUserPermissionComponent implements OnInit {
         this.rolePermissionsDraft.set(next);
     }
 
-    isPermSelected(permId: string): boolean {
-        return this.rolePermissionsDraft().has(permId);
-    }
+    isPermSelected = (permId: string): boolean => this.rolePermissionsDraft().has(permId);
 
     toggleCategoryAll(category: string, on: boolean): void {
         const next = new Set(this.rolePermissionsDraft());
@@ -380,12 +393,12 @@ export class AdminUserPermissionComponent implements OnInit {
         this.rolePermissionsDraft.set(next);
     }
 
-    categoryAllSelected(category: string): boolean {
-        const items = (this.permissionsData()?.items ?? []).filter(p => p.category === category);
+    categoryAllSelected = (category: string): boolean => {
+        const items = this.permsByCategory(category);
         if (!items.length) return false;
         const draft = this.rolePermissionsDraft();
         return items.every(p => draft.has(p.id));
-    }
+    };
 
     async saveRole(): Promise<void> {
         if (this.roleForm.invalid) {
@@ -393,6 +406,8 @@ export class AdminUserPermissionComponent implements OnInit {
             this.toastSrv.error('Please complete required fields');
             return;
         }
+        if (this.isSaving()) return;
+        this.isSaving.set(true);
         const v = this.roleForm.getRawValue();
         try {
             let roleId = this.selectedRoleId();
@@ -425,6 +440,8 @@ export class AdminUserPermissionComponent implements OnInit {
             this.loadRoles();
         } catch {
             this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+        } finally {
+            this.isSaving.set(false);
         }
     }
 
@@ -451,7 +468,7 @@ export class AdminUserPermissionComponent implements OnInit {
         }
         this.dialogSrv.confirmDelete(() => {
             this.roleSrv.delete(role.id).subscribe({
-                next: () => { this.toastSrv.success('Role deleted'); this.loadRoles(); },
+                next: () => { this.toastSrv.success('Role deleted'); this.closeRoleDrawer(); this.loadRoles(); },
                 error: () => this.toastSrv.error('Failed to delete role'),
             });
         });
@@ -503,6 +520,8 @@ export class AdminUserPermissionComponent implements OnInit {
             this.toastSrv.error('Please complete required fields');
             return;
         }
+        if (this.isSaving()) return;
+        this.isSaving.set(true);
         const v = this.permForm.getRawValue();
         try {
             if (this.selectedPermissionId()) {
@@ -515,6 +534,8 @@ export class AdminUserPermissionComponent implements OnInit {
             this.loadPermissions();
         } catch {
             this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
+        } finally {
+            this.isSaving.set(false);
         }
     }
 

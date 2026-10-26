@@ -19,6 +19,7 @@ import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo
   template: `
     <div class="bg-surface rounded-[6px] border border-gray-200 h-full overflow-hidden">
       <boo-table-admin
+        [availableTools]="['filter', 'sort']"
         [data]="data?.items ?? []"
         tdClass="px-4 py-3"
         [showFooter]="true"

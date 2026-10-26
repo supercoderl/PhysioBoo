@@ -2,10 +2,11 @@ import { Component, ElementRef, OnInit, ViewChild, computed, inject, signal } fr
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, of } from 'rxjs';
+import { catchError, forkJoin, Observable, of } from 'rxjs';
 import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
 import { PrintTemplateService } from '../../../../services/admin/print-template.service';
 import { PrintService } from '../../../../services/common/print.service';
+import { DialogService } from '../../../../services/common/dialog.service';
 import { ToastService } from '../../../../services/common/toast.service';
 import { Orientation } from '../../../../shared/enums/print-orientation';
 import { PaperSize } from '../../../../shared/enums/print-paper-size';
@@ -43,13 +44,9 @@ type EditField = 'header' | 'body' | 'footer' | 'css';
               <input type="text" formControlName="code" placeholder="template-code"
                 class="bg-transparent outline-none border-0 w-32 truncate" />
               <span>·</span>
-              <select formControlName="module" class="bg-transparent outline-none border-0 text-xs">
-                <option *ngFor="let m of modules" [value]="m">{{ m }}</option>
-              </select>
+              <boo-select formControlName="module" size="small" [options]="moduleOptions" />
               <span>·</span>
-              <select formControlName="documentType" class="bg-transparent outline-none border-0 text-xs">
-                <option *ngFor="let d of docTypes" [value]="d">{{ d }}</option>
-              </select>
+              <boo-select formControlName="documentType" size="small" [options]="docTypeOptions" />
             </div>
           </div>
         </div>
@@ -64,7 +61,7 @@ type EditField = 'header' | 'body' | 'footer' | 'css';
             <physio-icon name="printer" class="w-3.5 h-3.5" />
             Test print
           </boo-button-admin>
-          <button type="submit" [disabled]="!form.dirty || form.invalid"
+          <button type="submit" [disabled]="!form.dirty || form.invalid || isSaving() || isLoading()"
             class="inline-flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-white bg-primary hover:bg-primary/90 rounded disabled:opacity-50 whitespace-nowrap shrink-0">
             <span>Save</span>
           </button>
@@ -145,6 +142,7 @@ export class AdminPrintTemplateDesignerComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private toastSrv = inject(ToastService);
+  private dialogSrv = inject(DialogService);
 
   paperOptions = convertEnumToSelection(PaperSize);
   orientationOptions = convertEnumToSelection(Orientation);
@@ -176,8 +174,13 @@ export class AdminPrintTemplateDesignerComponent implements OnInit {
   useSampleData = signal(true);
   palette = signal<PlaceholderGroup[]>([]);
 
-  modules = ['clinical', 'billing', 'reception', 'lab', 'pharmacy', 'system'];
-  docTypes = ['prescription', 'lab-report', 'discharge-summary', 'appointment', 'invoice', 'receipt'];
+  isLoading = signal(false);
+  isSaving = signal(false);
+  /** Flags the API requires on every metadata update but the designer does not edit. */
+  private flags = { isActive: true, isSystemDefault: false };
+
+  moduleOptions = ['clinical', 'billing', 'reception', 'lab', 'pharmacy', 'system'].map(v => ({ label: v, value: v }));
+  docTypeOptions = ['prescription', 'lab-report', 'discharge-summary', 'appointment', 'invoice', 'receipt'].map(v => ({ label: v, value: v }));
   editTabs: { id: EditField; label: string }[] = [
     { id: 'header', label: 'Header' },
     { id: 'body',   label: 'Body' },
@@ -236,20 +239,31 @@ export class AdminPrintTemplateDesignerComponent implements OnInit {
   // #region Lifecycle
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
+    const sourceId = this.route.snapshot.queryParamMap.get('from');
     if (id && id !== 'new') {
       this.templateId.set(id);
       this.loadTemplate(id);
+    } else if (sourceId) {
+      this.loadTemplate(sourceId, true);
     }
     this.loadPlaceholders();
   }
   // #endregion
 
   // #region IO
-  loadTemplate(id: string): void {
+  /** `asCopy` fills the form from an existing template as the start of a new one. */
+  loadTemplate(id: string, asCopy = false): void {
+    this.isLoading.set(true);
     this.templateSrv.getById(id)
-      .pipe(catchError(_ => { this.toastSrv.error('Failed to load template'); return of(null); }))
+      .pipe(catchError(_ => of(null)))
       .subscribe(res => {
-        if (res?.success && res.data) this.hydrate(res.data);
+        this.isLoading.set(false);
+        if (!res?.success || !res.data) {
+          this.toastSrv.error('Template not found');
+          this.router.navigate(['/admin/system/print-templates'], { replaceUrl: true });
+          return;
+        }
+        this.hydrate(res.data, asCopy);
       });
   }
 
@@ -262,11 +276,12 @@ export class AdminPrintTemplateDesignerComponent implements OnInit {
       });
   }
 
-  private hydrate(t: PrintTemplateDetail): void {
+  private hydrate(t: PrintTemplateDetail, asCopy: boolean): void {
     const v = t.currentVersion;
+    if (!asCopy) this.flags = { isActive: t.isActive, isSystemDefault: t.isSystemDefault };
     this.form.patchValue({
-      name: t.name,
-      code: t.code,
+      name: asCopy ? `${t.name} (copy)` : t.name,
+      code: asCopy ? '' : t.code,
       module: t.module,
       documentType: t.documentType,
       version: v ? {
@@ -278,7 +293,9 @@ export class AdminPrintTemplateDesignerComponent implements OnInit {
         customCss: v.customCss || '',
       } : undefined
     });
-    this.form.markAsPristine();
+    // A copy is unsaved by definition, so Save must be available straight away.
+    if (asCopy) this.form.markAsDirty();
+    else this.form.markAsPristine();
   }
   // #endregion
 
@@ -318,16 +335,28 @@ export class AdminPrintTemplateDesignerComponent implements OnInit {
       this.toastSrv.error('Name and code are required');
       return;
     }
+    if (this.isSaving()) return;
+
     const value = this.form.getRawValue();
     const version: Partial<PrintTemplateVersion> = value.version;
 
     const id = this.templateId();
     if (id) {
-      this.templateSrv.saveVersion(id, version)
-        .pipe(catchError(_ => { this.toastSrv.error('Failed to save'); return of(null); }))
-        .subscribe(res => {
-          if (res?.success) { this.form.markAsPristine(); this.toastSrv.success('Template saved'); }
-        });
+      const { name, code, module, documentType } = this.form.controls;
+      const calls: Observable<unknown>[] = [];
+      if ([name, code, module, documentType].some(c => c.dirty)) {
+        calls.push(this.templateSrv.update(id, {
+          name: value.name, code: value.code, module: value.module, documentType: value.documentType, ...this.flags
+        }));
+      }
+      if (this.form.controls.version.dirty) calls.push(this.templateSrv.saveVersion(id, version));
+      if (!calls.length) return;
+
+      this.isSaving.set(true);
+      forkJoin(calls).subscribe({
+        next: () => { this.isSaving.set(false); this.form.markAsPristine(); this.toastSrv.success('Template saved'); },
+        error: () => { this.isSaving.set(false); this.toastSrv.error('Failed to save'); }
+      });
     } else {
       const payload = {
         name: value.name,
@@ -336,9 +365,11 @@ export class AdminPrintTemplateDesignerComponent implements OnInit {
         documentType: value.documentType,
         version
       };
+      this.isSaving.set(true);
       this.templateSrv.create(payload)
         .pipe(catchError(_ => { this.toastSrv.error('Failed to create template'); return of(null); }))
         .subscribe(res => {
+          this.isSaving.set(false);
           if (res?.success && res.data) {
             this.templateId.set(res.data);
             this.form.markAsPristine();
@@ -361,8 +392,9 @@ export class AdminPrintTemplateDesignerComponent implements OnInit {
   }
 
   goBack(): void {
-    if (this.form.dirty && !confirm('Discard unsaved changes?')) return;
-    this.router.navigate(['/admin/system/print-templates']);
+    const leave = () => this.router.navigate(['/admin/system/print-templates']);
+    if (this.form.dirty) this.dialogSrv.confirmUnsavedChanges(leave);
+    else leave();
   }
   // #endregion
 

@@ -1,15 +1,16 @@
-import { Component, EventEmitter, Input, Output, WritableSignal, computed } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild, WritableSignal, computed } from "@angular/core";
 import { catchError, forkJoin, of } from "rxjs";
 import { UserPermissionUserTableCardComponent } from "../../../../components/layout/admin/system/user-permission/user-table-card.component";
 import { UserService } from "../../../../services/admin/user.service";
 import { DialogService } from "../../../../services/common/dialog.service";
+import { TablePageSizeService } from "../../../../services/common/table-page-size.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { PagedRequest, PaginationData } from "../../../../shared/types/common";
 import { User } from "../../../../shared/types/core.types";
 import { FilterConfig, UserFilter } from "../../../../shared/types/filter.types";
 import { SortOption } from "../../../../shared/types/sort";
-import { BulkAction, SavedView, TableComment } from "../../../../shared/types/table.types";
+import { BulkAction } from "../../../../shared/types/table.types";
 
 @Component({
     selector: 'admin-user-permission-user-tab',
@@ -26,35 +27,27 @@ import { BulkAction, SavedView, TableComment } from "../../../../shared/types/ta
                 [currentSort]="params().sort"
                 [filterConfigs]="filter_configs"
                 [currentFilter]="params().filter"
-                [savedViews]="savedViews"
-                [currentViewId]="currentViewId"
-                [currentGroupBy]="currentGroupBy"
-                [comments]="comments"
                 (pageChange)="onPageChanged($event)"
-                (editClick)="onOpenDrawer($event)"
+                (editClick)="onEdit($event)"
                 (deleteClick)="onDelete($event)"
                 (searchChange)="onSearch($event)"
                 (reloadClick)="onReloadClick()"
                 (bulkAction)="onBulkAction($event)"
                 (sortApply)="onSortChange($event)"
                 (filterApply)="onSingleFilterChange($event)"
-                (viewSelect)="onViewSelect($event)"
-                (viewSaveAsNew)="onViewSaveAsNew()"
-                (viewDelete)="onViewDelete($event)"
-                (groupApply)="onGroupApply($event)"
-                (commentAdd)="onCommentAdd($event)"
-                (commentDelete)="onCommentDelete($event)"
-                (resetView)="onResetView()"
                 [filter]="paginationFilter()"
             />
         </div>
     `
 })
-export class AdminUserPermissionUserTabComponent {
+export class AdminUserPermissionUserTabComponent implements AfterViewInit {
+    @ViewChild('tableHost', { static: false }) tableHost?: ElementRef<HTMLElement>;
+
     // #region Inputs, Outputs, Properties
     @Input({ required: true }) tableData!: WritableSignal<PaginationData<User> | null>;
     @Input({ required: true }) params!: WritableSignal<PagedRequest<UserFilter>>;
     @Output() reloadClick = new EventEmitter<void>();
+    @Output() editClick = new EventEmitter<User>();
 
     paginationFilter = computed(() => ({
         pageNumber: this.params().pageNumber ?? 1,
@@ -68,9 +61,6 @@ export class AdminUserPermissionUserTabComponent {
         { label: 'Email (Z-A)', value: '-email' },
     ];
 
-    isDrawerOpen: boolean = false;
-    selectedId: string | null = null;
-
     filter_configs: FilterConfig[] = [
         {
             key: 'isActive',
@@ -82,21 +72,35 @@ export class AdminUserPermissionUserTabComponent {
         }
     ];
 
-    savedViews: SavedView[] = [
-        { id: 'all', name: 'All accounts', isDefault: true, icon: 'rows-4' },
-        { id: 'recent', name: 'Recent', icon: 'clock' },
-    ];
-    currentViewId: string | null = 'all';
-    currentGroupBy: string | null = null;
-    comments: TableComment[] = [];
     // #endregion
 
     // #region Init (Lifecycle + Setup)
     constructor(
         private dialogSrv: DialogService,
         private toastSrv: ToastService,
-        private userSrv: UserService
+        private userSrv: UserService,
+        private pageSizeSrv: TablePageSizeService
     ) { }
+
+    /** Fit as many rows as the remaining screen height allows. */
+    ngAfterViewInit(): void {
+        this.pageSizeSrv
+            .watch({
+                hostElement: this.tableHost,
+                rowHeight: 64,
+                toolbarHeight: 48,
+                headerHeight: 48,
+                footerHeight: 44,
+                extraOffset: 16,
+                min: 5,
+                max: 50
+            })
+            .subscribe(size => {
+                if (size === this.params().pageSize) return;
+                this.params.update(p => ({ ...p, pageSize: size, pageNumber: 1 }));
+                this.onReloadClick();
+            });
+    }
     // #endregion
 
     // #region Methods
@@ -105,100 +109,35 @@ export class AdminUserPermissionUserTabComponent {
         this.onReloadClick();
     }
 
-    onOpenDrawer(id: string | null) {
-        this.selectedId = id;
-        this.isDrawerOpen = true;
-    }
 
-    onCloseDrawer() {
-        this.isDrawerOpen = false;
-        this.selectedId = null;
+
+    onEdit(id: string) {
+        const user = this.tableData()?.items.find(u => u.id === id);
+        if (user) this.editClick.emit(user);
     }
 
     onReloadClick() {
         this.reloadClick.emit();
     }
 
-    onSaveSuccess(result: User) {
-        this.onCloseDrawer();
-        this.tableData.update(currentData => {
-            if (!currentData) {
-                return {
-                    items: [result],
-                    totalCount: 1,
-                    pageNumber: 1,
-                    pageSize: this.params().pageSize ?? 10,
-                    totalPages: 1,
-                    hasNext: false,
-                    hasPrevious: false
-                };
-            }
 
-            const existingIndex = currentData.items.findIndex(x => x.id === result.id);
-            if (existingIndex > -1) {
-                const updatedItems = [...currentData.items];
-                updatedItems[existingIndex] = result;
-                return { ...currentData, items: updatedItems };
-            }
-
-            return {
-                ...currentData,
-                totalCount: currentData.totalCount + 1,
-                items: [result, ...currentData.items],
-                totalPages: Math.ceil((currentData.totalCount + 1) / currentData.pageSize)
-            };
-        });
-    }
 
     onDelete(id: string | null) {
         if (!id) return;
 
         this.dialogSrv.confirmDelete(() => {
-            const currentData = this.tableData();
-            if (!currentData) return;
+            const data = this.tableData();
+            const wasLastOnPage = !!data && data.items.length === 1 && data.pageNumber > 1;
 
-            const isLastItemOnPage = currentData.items.length === 1;
-            const isNotFirstPage = currentData.pageNumber > 1;
-
-            if (isLastItemOnPage && isNotFirstPage) {
-                this.toastSrv.success("Deleted 1 item.");
-                this.userSrv.delete(id).subscribe({
-                    next: () => {
-                        this.params.update(p => ({ ...p, pageNumber: currentData.pageNumber - 1 }));
-                        this.onReloadClick();
-                    },
-                    error: () => this.toastSrv.error("System error occurred.")
-                });
-                if (this.isDrawerOpen) this.onCloseDrawer();
-                return;
-            }
-
-            const backupItems = [...currentData.items];
-            const backupCount = currentData.totalCount;
-
-            this.tableData.update(data => {
-                if (!data) return null;
-                return {
-                    ...data,
-                    items: data.items.filter(item => item.id !== id),
-                    totalCount: data.totalCount - 1
-                };
+            this.userSrv.delete(id).subscribe({
+                next: () => {
+                    this.toastSrv.success('Deleted 1 item.');
+                    if (wasLastOnPage) this.params.update(p => ({ ...p, pageNumber: (p.pageNumber ?? 1) - 1 }));
+                    this.onReloadClick();
+                },
+                error: () => this.toastSrv.error('The user could not be deleted.')
             });
-
-            this.toastSrv.success("Deleted 1 item.");
-            this.userSrv.delete(id)
-                .pipe(
-                    catchError(_ => {
-                        this.toastSrv.error("System error occurred. Rolling back data...");
-                        this.tableData.update(data => {
-                            if (!data) return null;
-                            return { ...data, items: backupItems, totalCount: backupCount };
-                        });
-                        return of(null);
-                    })
-                )
-                .subscribe({ next: _ => { if (this.isDrawerOpen) this.onCloseDrawer(); } });
-        });
+        }, 'this user');
     }
 
     onSearch(val: string) {
@@ -211,14 +150,6 @@ export class AdminUserPermissionUserTabComponent {
         this.onReloadClick();
     }
 
-    onFilterApply(event: any) {
-        this.params.update(p => ({
-            ...p,
-            pageNumber: 1,
-            filter: { ...p.filter, ...event }
-        }));
-        this.onReloadClick();
-    }
 
     onSingleFilterChange(event: { key: string; value: any }) {
         this.params.update(p => ({
@@ -229,69 +160,12 @@ export class AdminUserPermissionUserTabComponent {
         this.onReloadClick();
     }
 
-    onViewSelect(v: SavedView) {
-        this.currentViewId = v.id;
-        switch (v.id) {
-            case 'all':
-                this.params.update(p => ({
-                    ...p,
-                    pageNumber: 1,
-                    filter: { isActive: null },
-                    sort: '-createdAt'
-                }));
-                break;
-            case 'recent':
-                this.params.update(p => ({ ...p, pageNumber: 1, sort: '-createdAt' }));
-                break;
-        }
-        this.onReloadClick();
-    }
 
-    onViewSaveAsNew() {
-        const name = prompt('Name for this view?');
-        if (!name) return;
-        const newView: SavedView = { id: `view_${Date.now()}`, name, icon: 'bookmark' };
-        this.savedViews = [...this.savedViews, newView];
-        this.currentViewId = newView.id;
-    }
 
-    onViewDelete(v: SavedView) {
-        this.savedViews = this.savedViews.filter(x => x.id !== v.id);
-        if (this.currentViewId === v.id) this.currentViewId = 'all';
-    }
 
-    onGroupApply(key: string | null) {
-        this.currentGroupBy = key;
-    }
 
-    onCommentAdd(text: string) {
-        this.comments = [
-            ...this.comments,
-            {
-                id: `c_${Date.now()}`,
-                author: 'You',
-                text,
-                createdAt: new Date().toLocaleString()
-            }
-        ];
-    }
 
-    onCommentDelete(c: TableComment) {
-        this.comments = this.comments.filter(x => x.id !== c.id);
-    }
 
-    onResetView() {
-        this.params.update(p => ({
-            pageNumber: 1,
-            pageSize: p.pageSize,
-            search: '',
-            sort: '-createdAt',
-            filter: { isActive: null }
-        }));
-        this.currentGroupBy = null;
-        this.currentViewId = 'all';
-        this.onReloadClick();
-    }
 
     onBulkAction(event: { action: BulkAction; ids: (number | string)[]; selectAllPages: boolean }) {
         const { action, ids } = event;
@@ -313,10 +187,6 @@ export class AdminUserPermissionUserTabComponent {
             return;
         }
 
-        if (action.key === 'export') {
-            this.toastSrv.success(`Exporting ${ids.length} item(s)...`);
-            return;
-        }
     }
 
     // #endregion

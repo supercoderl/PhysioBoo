@@ -90,6 +90,13 @@ export class AdminHospitalTableCardComponent {
   @Input() filter!: { pageNumber: number, pageSize: number };
   @Input() sortOptions: SortOption[] = [];
   @Input() currentSort = '';
+  /** Hides the Delete action for users without the delete permission. */
+  @Input() set canDelete(value: boolean) {
+    this.tableActions = [
+      { label: 'Edit', onClick: (item: any) => this.editClick.emit(item.id) },
+      ...(value ? [{ label: 'Delete', isDanger: true, onClick: (item: any) => this.deleteClick.emit(item.id) }] : [])
+    ];
+  }
   @Output() pageChange = new EventEmitter<number>();
   @Output() searchChange = new EventEmitter<string>();
   @Output() reloadClick = new EventEmitter<void>();
@@ -99,17 +106,7 @@ export class AdminHospitalTableCardComponent {
 
   readonly typeLabel = hospitalTypeLabel;
 
-  readonly tableActions: ActionItem[] = [
-    {
-      label: 'Edit',
-      onClick: (item: any) => this.editClick.emit(item.id)
-    },
-    {
-      label: 'Delete',
-      isDanger: true,
-      onClick: (item: any) => this.deleteClick.emit(item.id)
-    }
-  ];
+  tableActions: ActionItem[] = [];
   // #endregion
 
   // #region Init (Lifecycle + Setup)

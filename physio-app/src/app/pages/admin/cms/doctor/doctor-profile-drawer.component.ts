@@ -41,7 +41,7 @@ const WHOLE = [Validators.required, Validators.min(0), Validators.pattern(/^\d+$
                 [formGroup]="form"
                 (ngSubmit)="submit()"
                 novalidate
-                [attr.aria-busy]="submitting || photoBusy"
+                [attr.aria-busy]="submitting || !!photoBusy"
             >
                 <header class="flex-none px-6 py-4 border-b border-rowDivider flex items-start justify-between gap-3">
                     <div class="min-w-0">
@@ -65,10 +65,10 @@ const WHOLE = [Validators.required, Validators.min(0), Validators.pattern(/^\d+$
                             </span>
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <button type="button" boo-button variant="secondary" size="sm" [disabled]="photoBusy || submitting" [loading]="photoBusy === 'upload'" (click)="photoInput.click()">
+                                    <button type="button" boo-button variant="secondary" size="sm" [disabled]="!!photoBusy || submitting" [loading]="photoBusy === 'upload'" (click)="photoInput.click()">
                                         <physio-icon *ngIf="photoBusy !== 'upload'" name="upload" [size]="15" aria-hidden="true" />{{ photoUrl ? 'Replace photo' : 'Upload photo' }}
                                     </button>
-                                    <button *ngIf="photoUrl" type="button" boo-button variant="ghost" size="sm" class="!text-danger" [disabled]="photoBusy || submitting" [loading]="photoBusy === 'remove'" (click)="confirmRemovePhoto()">Remove</button>
+                                    <button *ngIf="photoUrl" type="button" boo-button variant="ghost" size="sm" class="!text-danger" [disabled]="!!photoBusy || submitting" [loading]="photoBusy === 'remove'" (click)="confirmRemovePhoto()">Remove</button>
                                 </div>
                                 <p class="m-0 mt-1.5 text-xs text-secondary">JPEG, PNG or WebP, up to 5 MB. Photo changes are saved right away.</p>
                                 <input #photoInput type="file" class="hidden" accept="image/jpeg,image/png,image/webp" tabindex="-1" aria-hidden="true" (change)="onPhotoPicked($event)" />

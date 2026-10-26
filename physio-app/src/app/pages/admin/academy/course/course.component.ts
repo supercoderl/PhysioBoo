@@ -1,222 +1,283 @@
-import { Component, HostListener, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { BooCheckboxComponent, BooEmptyStateComponent, BooInputComponent } from '@physioboo/ui';
+import { NgClass, NgFor, NgIf } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import {
+  BooButtonComponent,
+  BooEmptyStateComponent,
+  BooErrorStateComponent,
+  BooIconComponent,
+  BooInlineErrorComponent,
+  BooInlineErrorState,
+  BooStatusBadgeComponent,
+} from '@physioboo/ui';
+import { finalize } from 'rxjs/operators';
 import { AcademyService } from '../../../../services/admin/academy.service';
 import { AuthService } from '../../../../services/auth/auth.service';
 import { DialogService } from '../../../../services/common/dialog.service';
 import { ToastService } from '../../../../services/common/toast.service';
 import { Permissions } from '../../../../shared/constants/permission.constant';
-import { SharedModule } from '../../../../shared/shared-imports';
 import { Course, Lesson } from '../../../../shared/types/academy.types';
-import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
+import { AcademyCourseFormDrawerComponent } from '../list/course-form-drawer.component';
+import { AcademyLessonFormDrawerComponent } from './lesson-form-drawer.component';
 
-interface CourseDraft { title: string; category: string; description: string; isPublished: boolean; }
-interface LessonDraft { id: string | null; title: string; content: string; durationMinutes: number; }
+type LoadError = 'notFound' | 'forbidden' | 'failed';
 
+const LIST_ROUTE = '/admin/academy/list';
+
+/**
+ * Academy course workspace (GET /api/academy/courses/{id}, or .../manage for managers, which also opens drafts).
+ * Learners read lessons and tick them off; managers also edit the course, publish it and add, edit or delete lessons.
+ * Course and lesson forms live in drawers that guard their own unsaved changes.
+ */
 @Component({
   selector: 'app-academy-course',
   standalone: true,
   imports: [
-    SharedModule,
+    NgClass,
+    NgIf,
+    NgFor,
+    RouterLink,
+    BooButtonComponent,
+    BooIconComponent,
+    BooStatusBadgeComponent,
     BooEmptyStateComponent,
-    BooButtonAdminComponent,
-    BooInputComponent,
-    BooTextareaComponent,
-    BooCheckboxComponent
+    BooErrorStateComponent,
+    BooInlineErrorComponent,
+    AcademyCourseFormDrawerComponent,
+    AcademyLessonFormDrawerComponent,
   ],
-  templateUrl: './course.component.html'
+  templateUrl: './course.component.html',
+  host: { class: 'flex flex-col min-h-full' },
 })
 export class CourseAcademyComponent implements OnInit {
-  course = signal<Course | null>(null);
-  selectedId = signal<string | null>(null);
-  isLoading = signal(true);
-  isSaving = signal(false);
-  canManage = false;
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly academySrv = inject(AcademyService);
+  private readonly authSrv = inject(AuthService);
+  private readonly dialogSrv = inject(DialogService);
+  private readonly toastSrv = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  courseDraft = signal<CourseDraft | null>(null);
-  lessonDraft = signal<LessonDraft | null>(null);
+  readonly listRoute = LIST_ROUTE;
+  readonly skeletonRows = Array.from({ length: 5 });
+
+  course: Course | null = null;
+  selectedId: string | null = null;
+  canManage = false;
+  loading = true;
+  loadError: LoadError | null = null;
+  /** State of the banner shown when a reload fails while the previous course is still on screen. */
+  refreshErrorState: BooInlineErrorState = 'default';
+
+  /** A course-level change (publish, delete) is in flight. */
+  courseBusy = false;
+  /** Lessons with a completion toggle or delete in flight. */
+  readonly busyLessonIds = new Set<string>();
+
+  courseFormOpen = false;
+  lessonFormOpen = false;
+  editingLesson: Lesson | null = null;
 
   private courseId = '';
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private academySrv: AcademyService,
-    private authSrv: AuthService,
-    private toastSrv: ToastService,
-    private dialogSrv: DialogService
-  ) { }
-
   // #region Lifecycle
   ngOnInit(): void {
-    this.courseId = this.route.snapshot.paramMap.get('id') ?? '';
+    this.courseId = this.route.snapshot.paramMap.get('id')?.trim() ?? '';
     this.canManage = this.authSrv.hasPermission(Permissions.Academy.CourseManage);
-    this.loadCourse();
+    this.load();
   }
 
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    if (this.isSaving()) return;
-    this.courseDraft.set(null);
-    this.lessonDraft.set(null);
+  /** Loads the course. Content already on screen stays visible while a reload runs. */
+  load(selectLessonId?: string): void {
+    if (!this.courseId) {
+      this.loading = false;
+      this.loadError = 'notFound';
+      return;
+    }
+
+    this.loading = true;
+    this.academySrv.getCourse(this.courseId, this.canManage)
+      .pipe(finalize(() => this.loading = false), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: res => {
+          if (!res.success || !res.data) {
+            this.fail(this.course ? 'failed' : 'notFound');
+            return;
+          }
+
+          this.loadError = null;
+          this.refreshErrorState = 'default';
+          this.course = res.data;
+          this.selectedId = this.pickLesson(res.data, selectLessonId ?? this.selectedId);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.fail(err.status === 404 ? 'notFound' : err.status === 403 ? 'forbidden' : 'failed');
+        },
+      });
   }
 
-  loadCourse(selectLessonId?: string): void {
-    // Managers load through the manage endpoint so a draft course opens for them.
-    this.academySrv.getCourse(this.courseId, this.canManage).subscribe({
-      next: res => {
-        const course = res.success ? res.data : null;
-        this.course.set(course);
-
-        // Keep the lesson that is open; otherwise the first one the user has not finished.
-        const keep = selectLessonId ?? this.selectedId();
-        const fallback = course?.lessons.find(l => !l.isCompleted) ?? course?.lessons[0];
-        this.selectedId.set(course?.lessons.some(l => l.id === keep) ? keep! : fallback?.id ?? null);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.course.set(null);
-        this.isLoading.set(false);
-      }
-    });
+  /** Retry from the error panel or the refresh banner. */
+  retry(): void {
+    if (this.course) this.refreshErrorState = 'retrying';
+    this.load();
   }
 
-  selectedLesson(): Lesson | null {
-    return this.course()?.lessons.find(l => l.id === this.selectedId()) ?? null;
+  private fail(error: LoadError): void {
+    // A course that disappeared or became off limits is no longer shown; a plain failure keeps the last good copy.
+    if (error !== 'failed') this.course = null;
+    this.refreshErrorState = this.course && this.refreshErrorState === 'retrying' ? 'failed' : 'default';
+    this.loadError = error;
   }
 
-  progress(): number {
-    const course = this.course();
-    return course?.lessonCount ? Math.round(course.completedLessons * 100 / course.lessonCount) : 0;
+  /** Keeps the lesson that is open; otherwise the first one the user has not finished. */
+  private pickLesson(course: Course, keep: string | null): string | null {
+    if (keep && course.lessons.some(l => l.id === keep)) return keep;
+    return (course.lessons.find(l => !l.isCompleted) ?? course.lessons[0])?.id ?? null;
+  }
+  // #endregion
+
+  // #region View state
+  get selectedLesson(): Lesson | null {
+    return this.course?.lessons.find(l => l.id === this.selectedId) ?? null;
+  }
+
+  get selectedIndex(): number {
+    return this.course?.lessons.findIndex(l => l.id === this.selectedId) ?? -1;
+  }
+
+  get previousLesson(): Lesson | null {
+    return this.selectedIndex > 0 ? this.course!.lessons[this.selectedIndex - 1] : null;
+  }
+
+  get nextLesson(): Lesson | null {
+    return this.selectedIndex >= 0 ? this.course?.lessons[this.selectedIndex + 1] ?? null : null;
+  }
+
+  get progress(): number {
+    return this.course?.lessonCount ? Math.round(this.course.completedLessons * 100 / this.course.lessonCount) : 0;
+  }
+
+  get hours(): string {
+    const minutes = this.course?.totalMinutes ?? 0;
+    return minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
   }
   // #endregion
 
   // #region Learning
   toggleCompleted(lesson: Lesson): void {
+    if (this.busyLessonIds.has(lesson.id)) return;
+
     const completed = !lesson.isCompleted;
+    this.busyLessonIds.add(lesson.id);
+    this.academySrv.setLessonCompleted(lesson.id, completed)
+      .pipe(finalize(() => this.busyLessonIds.delete(lesson.id)), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: res => {
+          const course = this.course;
+          if (!res.success || !course) return;
 
-    this.academySrv.setLessonCompleted(lesson.id, completed).subscribe(res => {
-      if (!res.success) return;
-
-      const course = this.course();
-      if (!course) return;
-
-      lesson.isCompleted = completed;
-      course.completedLessons += completed ? 1 : -1;
-      this.course.set({ ...course });
-
-      if (completed) this.goToNext(lesson);
-    });
-  }
-
-  private goToNext(lesson: Lesson): void {
-    const lessons = this.course()?.lessons ?? [];
-    const next = lessons[lessons.findIndex(l => l.id === lesson.id) + 1];
-    if (next) this.selectedId.set(next.id);
+          this.course = {
+            ...course,
+            completedLessons: course.completedLessons + (completed ? 1 : -1),
+            lessons: course.lessons.map(l => l.id === lesson.id ? { ...l, isCompleted: completed } : l),
+          };
+          if (completed && this.nextLesson) this.selectedId = this.nextLesson.id;
+        },
+        // The global HTTP error toast reports the failure; the lesson keeps its previous state.
+        error: () => undefined,
+      });
   }
   // #endregion
 
-  // #region Course editing
-  openCourseEditor(): void {
-    const course = this.course();
-    if (!course) return;
+  // #region Course actions
+  openCourseForm(): void {
+    this.courseFormOpen = true;
+  }
 
-    this.courseDraft.set({
+  closeCourseForm(): void {
+    this.courseFormOpen = false;
+  }
+
+  onCourseSaved(): void {
+    this.courseFormOpen = false;
+    this.load();
+  }
+
+  togglePublished(): void {
+    const course = this.course;
+    if (!course || this.courseBusy) return;
+
+    const publish = !course.isPublished;
+    this.courseBusy = true;
+    this.academySrv.updateCourse(course.id, {
       title: course.title,
       category: course.category,
-      description: course.description ?? '',
-      isPublished: course.isPublished
-    });
+      description: course.description,
+      isPublished: publish,
+    })
+      .pipe(finalize(() => this.courseBusy = false), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: res => {
+          if (!res.success) return;
+          this.toastSrv.success(course.title, publish ? 'Course published' : 'Course unpublished');
+          this.load();
+        },
+        error: () => undefined,
+      });
   }
 
-  canSaveCourse(): boolean {
-    const draft = this.courseDraft();
-    return !!draft && !!draft.title.trim() && !!draft.category.trim() && !this.isSaving();
-  }
-
-  saveCourse(): void {
-    const draft = this.courseDraft();
-    if (!draft || !this.canSaveCourse()) return;
-
-    this.isSaving.set(true);
-    this.academySrv.updateCourse(this.courseId, {
-      title: draft.title.trim(),
-      category: draft.category.trim(),
-      description: draft.description.trim() || null,
-      isPublished: draft.isPublished
-    }).subscribe({
-      next: res => {
-        this.isSaving.set(false);
-        if (!res.success) return;
-
-        this.toastSrv.success('Course updated');
-        this.courseDraft.set(null);
-        this.loadCourse();
-      },
-      error: () => this.isSaving.set(false)
-    });
-  }
-
-  deleteCourse(): void {
-    const course = this.course();
-    if (!course) return;
+  confirmDeleteCourse(): void {
+    const course = this.course;
+    if (!course || this.courseBusy) return;
 
     this.dialogSrv.confirmDelete(() => {
-      this.academySrv.deleteCourse(course.id).subscribe(res => {
-        if (!res.success) return;
-
-        this.toastSrv.success('Course deleted');
-        this.router.navigate(['/admin/academy/list']);
-      });
+      this.courseBusy = true;
+      this.academySrv.deleteCourse(course.id)
+        .pipe(finalize(() => this.courseBusy = false), takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: res => {
+            if (!res.success) return;
+            this.toastSrv.success(course.title, 'Course deleted');
+            this.router.navigate([LIST_ROUTE]);
+          },
+          error: () => undefined,
+        });
     }, `the course "${course.title}"`);
   }
   // #endregion
 
-  // #region Lesson editing
-  openLessonEditor(lesson?: Lesson): void {
-    this.lessonDraft.set(lesson
-      ? { id: lesson.id, title: lesson.title, content: lesson.content, durationMinutes: lesson.durationMinutes }
-      : { id: null, title: '', content: '', durationMinutes: 10 });
+  // #region Lesson actions
+  openLessonForm(lesson: Lesson | null = null): void {
+    this.editingLesson = lesson;
+    this.lessonFormOpen = true;
   }
 
-  canSaveLesson(): boolean {
-    const draft = this.lessonDraft();
-    return !!draft && !!draft.title.trim() && !!draft.content.trim()
-      && draft.durationMinutes >= 1 && draft.durationMinutes <= 600 && !this.isSaving();
+  closeLessonForm(): void {
+    this.lessonFormOpen = false;
   }
 
-  saveLesson(): void {
-    const draft = this.lessonDraft();
-    if (!draft || !this.canSaveLesson()) return;
-
-    const payload = { title: draft.title.trim(), content: draft.content.trim(), durationMinutes: draft.durationMinutes };
-    const request = draft.id
-      ? this.academySrv.updateLesson(draft.id, payload)
-      : this.academySrv.createLesson(this.courseId, payload);
-
-    this.isSaving.set(true);
-    request.subscribe({
-      next: res => {
-        this.isSaving.set(false);
-        if (!res.success) return;
-
-        this.toastSrv.success(draft.id ? 'Lesson updated' : 'Lesson added');
-        this.lessonDraft.set(null);
-        this.loadCourse(res.data.id);
-      },
-      error: () => this.isSaving.set(false)
-    });
+  onLessonSaved(lesson: Lesson): void {
+    this.lessonFormOpen = false;
+    this.load(lesson.id);
   }
 
-  deleteLesson(lesson: Lesson): void {
+  confirmDeleteLesson(lesson: Lesson): void {
+    if (this.busyLessonIds.has(lesson.id)) return;
+
     this.dialogSrv.confirmDelete(() => {
-      this.academySrv.deleteLesson(lesson.id).subscribe(res => {
-        if (!res.success) return;
-
-        this.toastSrv.success('Lesson deleted');
-        this.loadCourse();
-      });
+      this.busyLessonIds.add(lesson.id);
+      this.academySrv.deleteLesson(lesson.id)
+        .pipe(finalize(() => this.busyLessonIds.delete(lesson.id)), takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: res => {
+            if (!res.success) return;
+            this.toastSrv.success(lesson.title, 'Lesson deleted');
+            this.load();
+          },
+          error: () => undefined,
+        });
     }, `the lesson "${lesson.title}"`);
   }
   // #endregion

@@ -16,7 +16,7 @@ import { PaginationData } from "../../../../../shared/types/common";
 import { DateRange } from "../../../../../shared/types/date.types";
 import { FilterConfig } from "../../../../../shared/types/filter.types";
 import { SortOption } from "../../../../../shared/types/sort";
-import { BulkAction, SavedView, TableComment } from "../../../../../shared/types/table.types";
+import { BulkAction } from "../../../../../shared/types/table.types";
 
 @Component({
     selector: 'common-category-medicine-category-list',
@@ -41,7 +41,7 @@ export class CommonCategoryMedicineCategoryListComponent implements OnInit {
         pageNumber: 1,
         pageSize: 5,
         search: '',
-        sort: 'createdAt:desc',
+        sort: '-createdAt',
         filter: {
             start: null as Date | null,
             end: null as Date | null
@@ -50,12 +50,6 @@ export class CommonCategoryMedicineCategoryListComponent implements OnInit {
     isDrawerOpen: boolean = false;
     selectedId: string | null = null;
 
-    savedViews: SavedView[] = [
-        { id: 'all', name: 'All Types', isDefault: true, icon: 'rows-4' },
-    ];
-    currentViewId: string | null = 'all';
-    currentGroupBy: string | null = null;
-    comments: TableComment[] = [];
     sort_options: SortOption[] = [
         { label: 'Recent', value: '-createdAt' },
         { label: 'Oldest', value: '+createdAt' },
@@ -138,89 +132,29 @@ export class CommonCategoryMedicineCategoryListComponent implements OnInit {
         this.selectedId = null;
     }
 
-    onSaveSuccess(result: MedicineCategory) {
+    /** A new row sorts by name, code or date on the server, so reload instead of guessing where it belongs. */
+    onSaveSuccess() {
         this.onCloseDrawer();
-        this.tableData.update((currentData) => {
-            if (!currentData) {
-                return {
-                    items: [result],
-                    totalCount: 1,
-                    pageNumber: 1,
-                    pageSize: this.params.pageSize,
-                    totalPages: 1,
-                    hasNext: false,
-                    hasPrevious: false
-                }
-            }
-
-            const existingIndex = currentData.items.findIndex(x => x.id === result.id);
-            if (existingIndex > -1) {
-                const updatedItems = [...currentData.items];
-                updatedItems[existingIndex] = result;
-                return {
-                    ...currentData,
-                    items: updatedItems
-                };
-            }
-
-            return {
-                ...currentData,
-                totalCount: currentData.totalCount + 1,
-                items: [result, ...currentData.items],
-                totalPages: Math.ceil((currentData.totalCount + 1) / currentData.pageSize)
-            }
-        })
+        this.loadMedicineCategories();
     }
 
     onDelete(id: string | null) {
         if (!id) return;
 
         this.dialogSrv.confirmDelete(() => {
-            const currentData = this.tableData();
-            if (!currentData) return;
+            const data = this.tableData();
+            const wasLastOnPage = !!data && data.items.length === 1 && data.pageNumber > 1;
 
-            const isLastItemOnPage = currentData.items.length === 1;
-            const isNotFirstPage = currentData.pageNumber > 1;
-
-            if (isLastItemOnPage && isNotFirstPage) {
-                this.toastSrv.success("Deleted 1 item.");
-                this.medicineCategorySrv.delete(id).subscribe({
-                    next: () => {
-                        this.params.pageNumber = currentData.pageNumber - 1;
-                        this.loadMedicineCategories();
-                    },
-                    error: () => this.toastSrv.error("System error occurred.")
-                });
-                this.isDrawerOpen && this.onCloseDrawer();
-                return;
-            }
-
-            const backupItems = [...currentData.items];
-            const backupCount = currentData.totalCount;
-
-            this.tableData.update(data => {
-                if (!data) return null;
-                return {
-                    ...data,
-                    items: data.items.filter(item => item.id !== id),
-                    totalCount: data.totalCount - 1
-                };
+            this.medicineCategorySrv.delete(id).subscribe({
+                next: () => {
+                    this.toastSrv.success("Deleted 1 item.");
+                    if (wasLastOnPage) this.params.pageNumber -= 1;
+                    if (this.isDrawerOpen) this.onCloseDrawer();
+                    this.loadMedicineCategories();
+                },
+                error: () => this.toastSrv.error("The item could not be deleted. It may still be in use.")
             });
-
-            this.toastSrv.success("Deleted 1 item.")
-            this.medicineCategorySrv.delete(id)
-                .pipe(
-                    catchError(_ => {
-                        this.toastSrv.error("System error occurred. Rolling back data...");
-                        this.tableData.update(data => {
-                            if (!data) return null;
-                            return { ...data, items: backupItems, totalCount: backupCount };
-                        });
-                        return of(null);
-                    })
-                )
-                .subscribe({ next: _ => this.isDrawerOpen && this.onCloseDrawer() });
-        })
+        });
     }
 
     onSearch(val: string) {
@@ -234,7 +168,6 @@ export class CommonCategoryMedicineCategoryListComponent implements OnInit {
     }
 
     onFilterApply(event: any) {
-        console.log(event);
         this.params = {
             ...this.params,
             pageNumber: 1,
@@ -256,75 +189,6 @@ export class CommonCategoryMedicineCategoryListComponent implements OnInit {
         this.loadMedicineCategories();
     }
 
-    onViewSelect(v: SavedView) {
-        this.currentViewId = v.id;
-        switch (v.id) {
-            case 'all':
-                this.params = {
-                    ...this.params, pageNumber: 1, filter: {
-                        start: null,
-                        end: null,
-                    }, sort: '-createdAt'
-                };
-                break;
-            case 'surgical':
-                this.params = { ...this.params, pageNumber: 1, filter: { ...this.params.filter } };
-                break;
-            case 'recent':
-                this.params = { ...this.params, pageNumber: 1, sort: '-createdAt' };
-                break;
-        }
-        this.loadMedicineCategories();
-    }
-
-    onViewSaveAsNew() {
-        const name = prompt('Name for this view?');
-        if (!name) return;
-        const newView: SavedView = { id: `view_${Date.now()}`, name, icon: 'bookmark' };
-        this.savedViews = [...this.savedViews, newView];
-        this.currentViewId = newView.id;
-    }
-
-    onViewDelete(v: SavedView) {
-        this.savedViews = this.savedViews.filter(x => x.id !== v.id);
-        if (this.currentViewId === v.id) this.currentViewId = 'all';
-    }
-
-    onGroupApply(key: string | null) {
-        this.currentGroupBy = key;
-    }
-
-    onCommentAdd(text: string) {
-        this.comments = [
-            ...this.comments,
-            {
-                id: `c_${Date.now()}`,
-                author: 'You',
-                text,
-                createdAt: new Date().toLocaleString()
-            }
-        ];
-    }
-
-    onCommentDelete(c: TableComment) {
-        this.comments = this.comments.filter(x => x.id !== c.id);
-    }
-
-    onResetView() {
-        this.params = {
-            pageNumber: 1,
-            pageSize: this.params.pageSize,
-            search: '',
-            sort: '-createdAt',
-            filter: {
-                start: null,
-                end: null,
-            }
-        };
-        this.currentGroupBy = null;
-        this.currentViewId = 'all';
-        this.loadMedicineCategories();
-    }
 
     onBulkAction(event: { action: BulkAction; ids: (number | string)[]; selectAllPages: boolean }) {
         const { action, ids } = event;
@@ -346,10 +210,6 @@ export class CommonCategoryMedicineCategoryListComponent implements OnInit {
             return;
         }
 
-        if (action.key === 'export') {
-            this.toastSrv.success(`Exporting ${ids.length} item(s)...`);
-            return;
-        }
     }
 
     onDateChange(range: DateRange) {

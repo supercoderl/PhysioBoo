@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
-import { ProfileTimelineComponent } from "./timeline.component";
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { BooButtonComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { filter, switchMap, take } from 'rxjs';
 import { AuthService } from '../../../../services/auth/auth.service';
 import { SharedModule } from '../../../../shared/shared-imports';
 
@@ -8,147 +8,131 @@ import { SharedModule } from '../../../../shared/shared-imports';
   selector: 'app-profile',
   standalone: true,
   imports: [
-    ProfileTimelineComponent,
-    ButtonIconComponent,
-    SharedModule
+    SharedModule,
+    BooButtonComponent,
+    BooErrorStateComponent,
+    BooStatusBadgeComponent
   ],
   template: `
-    <div class="z-10 flex flex-auto flex-col">
-      <div class="flex flex-1 z-[2] min-w-0 bg-[#F6F7F8]">
-        <div class="flex flex-col w-full z-[9999]">
-          <div class="bg-surface border-b border-solid border-[#EFE3E7] flex flex-0 bg-cover">
-            <div class="container">
-              <div class="flex w-full flex-col">
-                <img
-                  class="h-40 w-full object-cover lg:h-80"
-                  alt="Profile Cover"
-                  src="https://fuse-react-vitejs-demo.fusetheme.com/assets/images/pages/profile/cover.jpg"
-                />
+    <div class="flex flex-auto flex-col min-h-0 overflow-y-auto bg-[#F6F7F8]" custom-scrollbar>
+      <ng-container *ngIf="(userInfo$ | async) as user; else noUser">
+        <div class="bg-surface border-b border-solid border-[#EFE3E7]">
+          <div class="container">
+            <div class="flex w-full flex-col">
+              <div
+                class="h-40 w-full lg:h-60"
+                style="background: linear-gradient(90.08deg, #E11D48 0.09%, #06aed4 70.28%)"
+                aria-hidden="true"
+              ></div>
+              <div class="mx-auto flex w-full max-w-7xl shrink-0 flex-col items-center gap-4 px-8 pb-6 lg:flex-row lg:items-end">
                 <div
-                  class="mx-auto flex w-full max-w-7xl shrink-0 flex-col items-center px-8 lg:h-18 lg:flex-row"
+                  class="-mt-16 border-4 border-solid w-32 h-32 shrink-0 relative overflow-hidden rounded-full border-[#c4c4c4] bg-surface"
                 >
-                  <div class="-mt-24 rounded-full lg:-mt-22">
-                    <div style="transform: none">
-                      <div
-                        class="border-4 border-solid w-32 h-32 relative flex-center-center leading-none rounded-full overflow-hidden text-[13px] border-[#c4c4c4]"
-                      >
-                        
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="mt-4 flex flex-col items-center lg:mt-0 lg:ml-8 lg:items-start"
-                  >
-                    <p
-                      class="font-bold leading-none text-[14px] m-0"
-                    >
-                      asdasdasd
-                    </p>
-                    <p
-                      class="m-0 text-[13px] leading-[1.5] text-[#71606A]"
-                    >
-                      London, UK
-                    </p>
-                  </div>
-                  <div class="mx-8 hidden h-8 border-l-2 lg:flex"></div>
-                  <div class="mt-3 flex items-center gap-6 lg:mt-0">
-                    <div class="flex flex-col items-center">
-                      <p
-                        class="font-bold m-0 leading-[1.5] text-[13px]"
-                      >
-                        DR-001
-                      </p>
-                      <p
-                        class="font-medium m-0 text-[11px] text-[#71606A]"
-                      >
-                        EMP ID
-                      </p>
-                    </div>
-                    <div class="flex flex-col items-center">
-                      <p
-                        class="font-bold m-0 leading-[1.5] text-[13px]"
-                      >
-                        10 years
-                      </p>
-                      <p
-                        class="font-medium m-0 text-[11px] text-[#71606A]"
-                      >
-                        EXP
-                      </p>
-                    </div>
-                    <div class="flex flex-col items-center">
-                      <p
-                        class="font-bold m-0 leading-[1.5] text-[13px]"
-                      >
-                        4.8 ⭐
-                      </p>
-                      <p
-                        class="font-medium m-0 text-[11px] text-[#71606A]"
-                      >
-                        Rating
-                      </p>
-                    </div>
-                  </div>
-                  <div class="my-4 flex flex-1 justify-end lg:my-0">
-                    <div class="overflow-hidden flex p-1 rounded-[8px] bg-[#0000000f] w-fit">
-                      <div
-                        class="overflow-hidden mb-0 relative inline-block flex-1 whitespace-nowrap w-full"
-                      >
-                        <div
-                          role="tablist"
-                          class="flex"
-                        >
-                          <button-icon
-                            class="z-[1]"
-                            buttonClass="text-[13px] !border-0"
-                          >
-                            Schedule
-                          </button-icon>
-                          <button-icon
-                            class="z-[1]"
-                            buttonClass="text-[13px] !border-0"
-                          >
-                            Qualifications
-                          </button-icon>
-                          <button-icon
-                            class="z-[1]"
-                            buttonClass="text-[13px] !border-0"
-                          >
-                            My Patients
-                          </button-icon>
-                        </div>
-                        <span
-                          class="absolute h-0.5 min-h-full bottom-0 top-0 bg-surface rounded-[6px] border border-solid border-[#EFE3E7] z-0"
-                          style="left: 0px; width: 76.2625px"
-                        ></span>
-                      </div>
-                    </div>
+                  <img
+                    class="w-full h-full object-cover"
+                    [alt]="displayName(user)"
+                    [appSrc]="user.avatarUrl"
+                  />
+                </div>
+                <div class="flex flex-col items-center lg:items-start lg:flex-1 min-w-0">
+                  <h1 class="font-bold leading-tight text-[20px] m-0 truncate max-w-full">
+                    {{ displayName(user) }}
+                  </h1>
+                  <p class="m-0 text-[13px] leading-[1.5] text-[#71606A] truncate max-w-full">{{ user.email }}</p>
+                  <div class="mt-2 flex flex-wrap items-center gap-2">
+                    <boo-status-badge
+                      [label]="user.isVerified ? 'Verified' : 'Unverified'"
+                      [tone]="user.isVerified ? 'success' : 'warning'"
+                      dotted
+                    ></boo-status-badge>
+                    <boo-status-badge
+                      *ngFor="let role of roles$ | async"
+                      [label]="role"
+                      tone="primary"
+                    ></boo-status-badge>
                   </div>
                 </div>
+                <a boo-button variant="primary" size="sm" routerLink="/admin/system/settings/account">
+                  Edit account
+                </a>
               </div>
             </div>
           </div>
-          <div id="up_content" class="flex flex-col flex-1 min-h-0">
-            <div class="container">
-                <div class="mx-auto flex w-full max-w-7xl flex-auto justify-center p-4 sm:p-8">
-                    <div class="w-full">
-                        <profile-timeline></profile-timeline>
-                    </div>
+        </div>
+
+        <div class="container">
+          <div class="mx-auto w-full max-w-7xl p-4 sm:p-8">
+            <section class="bg-surface rounded-[12px] shadow-xs p-6" aria-labelledby="profile-contact-heading">
+              <h2 id="profile-contact-heading" class="font-semibold text-lg m-0 mb-4">Contact</h2>
+              <dl class="grid gap-4 sm:grid-cols-2 m-0">
+                <div>
+                  <dt class="text-xs font-medium text-[#71606A]">Email</dt>
+                  <dd class="m-0 mt-1 text-[14px] break-all">{{ user.email }}</dd>
                 </div>
-            </div>
+                <div>
+                  <dt class="text-xs font-medium text-[#71606A]">Phone</dt>
+                  <dd class="m-0 mt-1 text-[14px]">{{ user.phone || '—' }}</dd>
+                </div>
+              </dl>
+              <p class="m-0 mt-4 text-[13px] text-[#71606A]">
+                Names, date of birth, emergency contacts and other personal details are managed in your account settings.
+              </p>
+            </section>
           </div>
-      </div>
+        </div>
+      </ng-container>
+
+      <ng-template #noUser>
+        <div class="container">
+          <div class="mx-auto w-full max-w-7xl p-4 sm:p-8">
+            <boo-error-state
+              *ngIf="loadFailed(); else loading"
+              title="Couldn't load your profile"
+              description="Check your connection and try again."
+              (retry)="load()"
+            ></boo-error-state>
+            <ng-template #loading>
+              <div class="animate-pulse flex flex-col gap-4" role="status" aria-label="Loading your profile">
+                <div class="h-40 rounded-[12px] bg-[#EFE3E7]"></div>
+                <div class="h-24 rounded-[12px] bg-[#EFE3E7]"></div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </ng-template>
     </div>
   `
 })
-export class ProfileComponent {
+export class ProfileComponent implements OnInit {
   // #region Inputs, Outputs, Properties
+  private authSrv = inject(AuthService);
+
   userInfo$ = this.authSrv.userInfo$;
+  roles$ = this.authSrv.role$;
+  loadFailed = signal(false);
   // #endregion
 
   // #region Init (Lifecycle + Setup)
-  constructor(
-    private authSrv: AuthService
-  ) { }
+  ngOnInit(): void {
+    this.load();
+  }
+  // #endregion
+
+  // #region Actions
+  /** The shell normally has the user already; this covers a direct page load or a failed earlier fetch. */
+  load(): void {
+    this.loadFailed.set(false);
+    this.userInfo$.pipe(
+      take(1),
+      filter(user => !user),
+      switchMap(() => this.authSrv.getProfile())
+    ).subscribe({
+      error: () => this.loadFailed.set(true)
+    });
+  }
+
+  displayName(user: { firstName: string; lastName: string; email: string }): string {
+    return `${user.firstName} ${user.lastName}`.trim() || user.email;
+  }
   // #endregion
 }

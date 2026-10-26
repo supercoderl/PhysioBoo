@@ -5,6 +5,7 @@ import { AdminContentHeaderComponent } from '../../../../components/layout/admin
 import { BooActionAdminComponent } from '../../../../components/table/boo-table-admin/boo-action-admin.component';
 import { BooTableAdminComponent } from '../../../../components/table/boo-table-admin/boo-table-admin.component';
 import { PrintTemplateService } from '../../../../services/admin/print-template.service';
+import { DialogService } from '../../../../services/common/dialog.service';
 import { LocalLoadingService } from '../../../../services/common/local-loading.service';
 import { PrintService } from '../../../../services/common/print.service';
 import { ToastService } from '../../../../services/common/toast.service';
@@ -111,6 +112,7 @@ export class AdminPrintTemplateListComponent implements OnInit {
   private toastSrv = inject(ToastService);
   private router = inject(Router);
   private printSrv = inject(PrintService);
+  private dialogSrv = inject(DialogService);
   loadingSrv = inject(LocalLoadingService);
 
   data = signal<PaginationData<PrintTemplate> | null>(null);
@@ -176,14 +178,20 @@ export class AdminPrintTemplateListComponent implements OnInit {
       this.toastSrv.error('System default templates cannot be deleted');
       return;
     }
-    if (!confirm(`Delete template "${row.name}"?`)) return;
-    this.templateSrv.delete(row.id)
-      .pipe(catchError(_ => { this.toastSrv.error('Failed to delete'); return of(null); }))
-      .subscribe(res => {
-        if (res?.success) {
-          this.toastSrv.success('Template deleted');
-          this.load();
-        }
-      });
+    this.dialogSrv.confirmDelete(() => {
+      const data = this.data();
+      const wasLastOnPage = !!data && data.items.length === 1 && data.pageNumber > 1;
+
+      this.templateSrv.delete(row.id)
+        .subscribe({
+          // The API answers 204 No Content, so there is no body to inspect.
+          next: () => {
+            this.toastSrv.success('Template deleted');
+            if (wasLastOnPage) this.params.pageNumber -= 1;
+            this.load();
+          },
+          error: () => this.toastSrv.error('Failed to delete')
+        });
+    }, `the template "${row.name}"`);
   }
 }

@@ -3,10 +3,12 @@ import { ButtonIconComponent } from "../../../../components/button/button-icon/b
 import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
 import { AdminHospitalDrawerComponent } from "../../../../components/layout/admin/system/hospital/hospital-drawer.component";
 import { AdminHospitalTableCardComponent } from "../../../../components/layout/admin/system/hospital/hospital-table-card.component";
+import { AuthService } from "../../../../services/auth/auth.service";
 import { HospitalService } from "../../../../services/admin/hospital.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { TablePageSizeService } from "../../../../services/common/table-page-size.service";
 import { ToastService } from "../../../../services/common/toast.service";
+import { Permissions } from "../../../../shared/constants/permission.constant";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { PaginationData } from "../../../../shared/types/common";
 import { SortOption } from "../../../../shared/types/sort";
@@ -32,7 +34,7 @@ import { Hospital } from "../../../../shared/types/support.types";
                     <p class="text-sm text-secondary m-0">Branches of your hospital group</p>
                 </div>
                 <div class="text-right flex">
-                    <button-icon buttonClass="!bg-primary ms-2 text-white" (onClick)="onOpenDrawer(null)">
+                    <button-icon *ngIf="canCreate" buttonClass="!bg-primary ms-2 text-white" (onClick)="onOpenDrawer(null)">
                         New branch
                     </button-icon>
                 </div>
@@ -44,6 +46,7 @@ import { Hospital } from "../../../../shared/types/support.types";
                     [filter]="params"
                     [sortOptions]="sortOptions"
                     [currentSort]="params.sort"
+                    [canDelete]="canDelete"
                     (pageChange)="onPageChanged($event)"
                     (searchChange)="onSearch($event)"
                     (reloadClick)="loadHospitals()"
@@ -76,6 +79,8 @@ export class AdminHospitalListComponent implements AfterViewInit {
     };
     isDrawerOpen = false;
     selectedId: string | null = null;
+    readonly canCreate: boolean;
+    readonly canDelete: boolean;
 
     /** The API sorts by name, code and creation date only. */
     readonly sortOptions: SortOption[] = [
@@ -93,8 +98,12 @@ export class AdminHospitalListComponent implements AfterViewInit {
         private hospitalSrv: HospitalService,
         private dialogSrv: DialogService,
         private toastSrv: ToastService,
-        private pageSizeSrv: TablePageSizeService
-    ) { }
+        private pageSizeSrv: TablePageSizeService,
+        private authSrv: AuthService
+    ) {
+        this.canCreate = this.authSrv.hasPermission(Permissions.Admin.HospitalCreate);
+        this.canDelete = this.authSrv.hasPermission(Permissions.Admin.HospitalDelete);
+    }
 
     ngAfterViewInit(): void {
         this.pageSizeSrv

@@ -45,13 +45,13 @@ export const routes: Routes = [
             },
             {
                 path: 'sequence-tracker',
-                data: { breadcrumb: ['sequence tracker'] },
+                data: { breadcrumb: ['sequence tracker'], permission: Permissions.Admin.SequenceTrackerRead },
                 loadComponent: () => import('./sequence-tracker/list.component').then(m => m.SettingSequenceTrackerListComponent),
                 canActivate: [permissionGuard(Permissions.Admin.SequenceTrackerRead)]
             },
             {
                 path: 'admin-menu',
-                data: { breadcrumb: ['admin menu'] },
+                data: { breadcrumb: ['admin menu'], permission: Permissions.Admin.AdminMenuRead },
                 loadComponent: () => import('./admin-menu/admin-menu.component').then(m => m.SettingAdminMenuComponent),
                 canActivate: [permissionGuard(Permissions.Admin.AdminMenuRead)]
             }

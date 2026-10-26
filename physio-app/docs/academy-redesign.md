@@ -19,7 +19,7 @@ Course (title, description, category, published/draft) → Lessons (title, conte
 - **Manager:** Academy → Manage (shows drafts, enables "New course") → create a course as a draft → open it → add lessons → Edit course → publish.
 
 ## 5. Layout
-List: breadcrumb, title and search, Manage toggle, category chips, responsive tile grid. Course: header with progress bar, then a lesson list (left) and a reader (right); on phones they stack.
+List: breadcrumb, title and search, Manage toggle, category chips, responsive tile grid. Course workspace: back link, category and Published/Draft badges, title, description and (managers) Edit / Publish / Delete; an overview row (lessons, learning time, my progress); then a lesson list (left, 20rem) and a reader (right) with Previous / Mark complete / Next; below `lg` they stack.
 
 ## 6. Wireframe
 ```
@@ -41,7 +41,7 @@ Hand hygiene [Edit course] [Delete]      ▓▓▓░░ 2/4
 ```
 
 ## 7. Component Hierarchy
-`ListAcademyComponent` (tiles, filters, new-course dialog) and `CourseAcademyComponent` (header, lesson list, reader, course and lesson dialogs), using `AdminBreadcrumbComponent`, `IconComponent` (physio-icon), `EmptyStateComponent`.
+`ListAcademyComponent` (tiles, filters, new-course dialog) and `CourseAcademyComponent` (header, overview, lesson list, reader) with `AcademyCourseFormDrawerComponent` (shared with the list) and `AcademyLessonFormDrawerComponent` (drawers with unsaved-change guard), using `AdminBreadcrumbComponent`, `IconComponent` (physio-icon), `EmptyStateComponent`.
 
 ## 8. UI Specification
 Tiles are white cards with a category pill, a "Draft" pill for unpublished courses and a progress bar (`role="progressbar"`). The open lesson is highlighted; finished lessons show a ticked circle in the primary colour.
@@ -52,7 +52,7 @@ Tiles are white cards with a category pill, a "Draft" pill for unpublished cours
 - Deleting a course or lesson asks for confirmation.
 
 ## 10. Responsive Behaviour
-Tiles 3 → 2 → 1 columns; the course page switches from two columns to a stack below `md`; the lesson dialog is a bottom sheet on phones.
+Tiles 3 → 2 → 1 columns; the course page switches from two columns to a stack below `md`; course and lesson forms are right-hand drawers.
 
 ## 11. Accessibility
 The lesson list is a `nav` with `aria-current` on the open lesson; progress bars carry `aria-valuenow`; icon-only buttons have `aria-label`; dialogs are `role="dialog" aria-modal`; loading skeletons set `aria-busy`.

@@ -1,310 +1,225 @@
-<div class="relative z-10 flex min-h-0 flex-auto flex-col">
-  <div class="flex shrink-0 grow flex-col pb-5">
+<div class="flex flex-1 min-h-0 flex-col gap-4 pb-5">
 
-    <!-- Loading -->
-    <div
-      *ngIf="isLoading()"
-      class="mt-4 grid gap-4 md:grid-cols-[18rem_1fr]"
-      aria-busy="true"
-    >
-      <div class="h-64 animate-pulse rounded-lg bg-gray-100"></div>
-      <div class="h-64 animate-pulse rounded-lg bg-gray-100"></div>
+  <!-- First load -->
+  <div *ngIf="loading && !course && !loadError" class="flex flex-col gap-4" aria-hidden="true">
+    <div class="h-16 w-full max-w-xl rounded-xl bg-rowDivider animate-pulse"></div>
+    <div class="grid grid-cols-2 gap-3 lg:grid-cols-3">
+      <div *ngFor="let _ of [1, 2, 3]" class="h-20 rounded-xl bg-rowDivider animate-pulse"></div>
     </div>
+    <div class="grid items-start gap-4 lg:grid-cols-[20rem_1fr]">
+      <div class="h-72 rounded-xl bg-rowDivider animate-pulse"></div>
+      <div class="h-72 rounded-xl bg-rowDivider animate-pulse"></div>
+    </div>
+  </div>
+  <span *ngIf="loading && !course && !loadError" class="sr-only" role="status">Loading course…</span>
 
-    <!-- Not found -->
-    <div *ngIf="!isLoading() && !course()" class="mt-6">
+  <!-- No course to show: missing id, deleted, unpublished, no access or failure -->
+  <ng-container *ngIf="!course && loadError">
+    <div>
+      <a boo-button variant="ghost" size="sm" [routerLink]="listRoute"><physio-icon name="arrow-left" [size]="15" aria-hidden="true" />All courses</a>
+    </div>
+    <section class="flex-1 min-h-[320px] flex items-center justify-center bg-surface border border-borderGray rounded-xl px-4 py-8">
       <boo-empty-state
+        *ngIf="loadError === 'notFound'"
         icon="graduation-cap"
         title="Course not found"
-        description="It may be unpublished or deleted."
-      ></boo-empty-state>
-      <div class="mt-3 text-center">
-        <a
-          routerLink="/admin/academy/list"
-          class="text-primary text-[13px] font-medium"
-          >Back to courses</a
-        >
-      </div>
-    </div>
+        description="It may be unpublished or deleted, or the link may be wrong."
+      >
+        <a boo-button variant="secondary" size="sm" [routerLink]="listRoute">Back to courses</a>
+      </boo-empty-state>
+      <boo-empty-state
+        *ngIf="loadError === 'forbidden'"
+        icon="lock"
+        title="You don't have access to this course"
+        description="Ask an administrator for permission to view Academy courses."
+      >
+        <a boo-button variant="secondary" size="sm" [routerLink]="listRoute">Back to courses</a>
+      </boo-empty-state>
+      <boo-error-state
+        *ngIf="loadError === 'failed'"
+        icon="cloud-off"
+        title="We couldn't load this course"
+        description="Check your connection and try again."
+        retryLabel="Try again"
+        (retry)="retry()"
+      />
+    </section>
+  </ng-container>
 
-    <ng-container *ngIf="course() as c">
-      <!-- Header -->
-      <div class="mt-2 flex flex-wrap items-start justify-between gap-3">
-        <div class="min-w-0 flex-auto">
-          <div class="flex flex-wrap items-center gap-2">
+  <ng-container *ngIf="course as c">
+
+    <!-- Page header -->
+    <header class="flex flex-wrap items-start justify-between gap-3">
+      <div class="min-w-0 flex-1 basis-80">
+        <a boo-button variant="ghost" size="sm" class="-ml-3.5" [routerLink]="listRoute"><physio-icon name="arrow-left" [size]="15" aria-hidden="true" />All courses</a>
+        <div class="mt-1 flex flex-wrap items-center gap-2">
+          <boo-status-badge tone="primary" [label]="c.category" />
+          <boo-status-badge dotted [label]="c.isPublished ? 'Published' : 'Draft'" [tone]="c.isPublished ? 'success' : 'warning'" />
+        </div>
+        <h1 class="m-0 mt-2 text-xl leading-7 font-semibold tracking-tight text-regular break-words">{{ c.title }}</h1>
+        <p *ngIf="c.description" class="m-0 mt-1 max-w-3xl text-sm leading-6 text-secondary break-words whitespace-pre-line">{{ c.description }}</p>
+      </div>
+
+      <div *ngIf="canManage" class="flex flex-wrap items-center gap-2" role="group" aria-label="Course actions">
+        <button type="button" boo-button variant="secondary" size="sm" aria-haspopup="dialog" [disabled]="courseBusy" (click)="openCourseForm()">
+          <physio-icon name="pencil" [size]="15" aria-hidden="true" />Edit course
+        </button>
+        <button type="button" boo-button [variant]="c.isPublished ? 'secondary' : 'primary'" size="sm" [loading]="courseBusy" [disabled]="courseBusy" (click)="togglePublished()">
+          {{ c.isPublished ? 'Unpublish' : 'Publish' }}
+        </button>
+        <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" class="!text-danger" [disabled]="courseBusy" aria-label="Delete course" title="Delete course" (click)="confirmDeleteCourse()">
+          <physio-icon name="trash" [size]="16" />
+        </button>
+      </div>
+    </header>
+
+    <!-- A reload failed while the previous copy is still on screen -->
+    <boo-inline-error *ngIf="loadError === 'failed'" what="the latest course data" [state]="refreshErrorState" (retry)="retry()" />
+
+    <!-- Overview -->
+    <dl class="m-0 grid grid-cols-2 gap-3 lg:grid-cols-3" aria-label="Course overview">
+      <div class="bg-surface border border-borderGray rounded-xl px-4 py-3">
+        <dt class="text-xs font-medium text-secondary">Lessons</dt>
+        <dd class="m-0 mt-1 text-2xl font-semibold leading-8 text-regular tabular-nums">{{ c.lessonCount }}</dd>
+      </div>
+      <div class="bg-surface border border-borderGray rounded-xl px-4 py-3">
+        <dt class="text-xs font-medium text-secondary">Learning time</dt>
+        <dd class="m-0 mt-1 text-2xl font-semibold leading-8 text-regular tabular-nums">{{ hours }}</dd>
+      </div>
+      <div class="col-span-2 lg:col-span-1 bg-surface border border-borderGray rounded-xl px-4 py-3">
+        <dt class="text-xs font-medium text-secondary">My progress</dt>
+        <dd class="m-0 mt-1 flex items-center gap-3">
+          <span class="text-2xl font-semibold leading-8 text-regular tabular-nums">{{ progress }}%</span>
+          <span class="flex-auto">
             <span
-              class="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary"
-              >{{ c.category }}</span
-            >
-            <span
-              *ngIf="!c.isPublished"
-              class="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700"
-              >Draft</span
-            >
-          </div>
-          <h1
-            class="m-0 mt-1 text-[22px] font-extrabold leading-tight tracking-tight"
-          >
-            {{ c.title }}
-          </h1>
-          <p
-            *ngIf="c.description"
-            class="m-0 mt-1 text-[13px] leading-[1.5] text-[#71606A]"
-          >
-            {{ c.description }}
-          </p>
-          <div class="mt-3 flex max-w-sm items-center gap-2">
-            <div
-              class="h-2 flex-auto overflow-hidden rounded-full bg-gray-200"
+              class="block h-1.5 overflow-hidden rounded-full bg-rowDivider"
               role="progressbar"
-              [attr.aria-valuenow]="progress()"
+              [attr.aria-valuenow]="progress"
               aria-valuemin="0"
               aria-valuemax="100"
-              aria-label="Course progress"
-            >
-              <div
-                class="h-full rounded-full bg-primary"
-                [style.width.%]="progress()"
-              ></div>
-            </div>
-            <span class="text-[12px] font-medium"
-              >{{ c.completedLessons }}/{{ c.lessonCount }} ·
-              {{ progress() }}%</span
-            >
-          </div>
-        </div>
-
-        <div *ngIf="canManage" class="flex items-center gap-2">
-          <boo-button-admin (click)="openCourseEditor()" background="transparent" textColor="inherit" [border]="{ width: 1, color: '#EFE3E7' }" padding="10px 12px" [radius]="8" fontWeight="500" [gap]="6">
-            <physio-icon name="pencil" [size]="16"></physio-icon> Edit course
-          </boo-button-admin>
-          <boo-button-admin (click)="deleteCourse()" background="transparent" textColor="#DC2626" padding="10px 12px" [radius]="8" fontWeight="500" [gap]="6">
-            <physio-icon name="trash" [size]="16"></physio-icon> Delete
-          </boo-button-admin>
-        </div>
+              aria-label="Your progress in this course"
+            ><span class="block h-full rounded-full bg-primary" [style.width.%]="progress"></span></span>
+            <span class="mt-1 block text-xs text-secondary tabular-nums">{{ c.completedLessons }} of {{ c.lessonCount }} done</span>
+          </span>
+        </dd>
       </div>
+    </dl>
 
-      <div class="mt-4 grid items-start gap-4 md:grid-cols-[18rem_1fr]">
-        <!-- Lessons -->
-        <nav class="rounded-lg bg-surface p-2 shadow-sm" aria-label="Lessons">
-          <ul class="m-0 list-none p-0">
-            <li
-              *ngFor="
-                let lesson of c.lessons;
-                let i = index;
-                trackBy: trackById
-              "
-            >
+    <!-- Content -->
+    <div class="grid flex-1 min-h-0 items-start gap-4 lg:grid-cols-[20rem_1fr]" [class.opacity-60]="loading" [attr.aria-busy]="loading">
+
+      <!-- Lessons -->
+      <section class="min-w-0 bg-surface border border-borderGray rounded-xl" aria-labelledby="lessons-title">
+        <div class="flex items-center justify-between gap-2 px-4 py-3 border-b border-rowDivider">
+          <h2 id="lessons-title" class="m-0 text-sm font-semibold text-regular">Lessons</h2>
+          <button *ngIf="canManage" type="button" boo-button variant="soft" size="sm" aria-haspopup="dialog" (click)="openLessonForm()">
+            <physio-icon name="plus" [size]="15" aria-hidden="true" />Add lesson
+          </button>
+        </div>
+
+        <nav *ngIf="c.lessons.length; else noLessonsTpl" aria-label="Lessons" class="p-2 lg:max-h-[60vh] lg:overflow-y-auto">
+          <ol class="m-0 list-none p-0 flex flex-col gap-0.5">
+            <li *ngFor="let lesson of c.lessons; let i = index; trackBy: trackById">
               <button
                 type="button"
-                (click)="selectedId.set(lesson.id)"
-                [attr.aria-current]="selectedId() === lesson.id ? 'true' : null"
-                class="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-[13px] hover:bg-gray-50"
-                [ngClass]="
-                  selectedId() === lesson.id
-                    ? 'bg-primary/10 font-semibold'
-                    : ''
-                "
+                (click)="selectedId = lesson.id"
+                [attr.aria-current]="selectedId === lesson.id ? 'true' : null"
+                class="flex w-full min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                [ngClass]="selectedId === lesson.id ? 'bg-primarySoft font-semibold text-regular' : 'text-regular'"
               >
                 <physio-icon
                   [name]="lesson.isCompleted ? 'circle-check' : 'circle'"
                   [size]="16"
-                  [ngClass]="
-                    lesson.isCompleted ? 'text-primary' : 'text-gray-400'
-                  "
-                ></physio-icon>
-                <span class="min-w-0 flex-auto truncate"
-                  >{{ i + 1 }}. {{ lesson.title }}</span
-                >
-                <span class="shrink-0 text-[11px] text-[#71606A]"
-                  >{{ lesson.durationMinutes }} min</span
-                >
+                  class="flex-none"
+                  [ngClass]="lesson.isCompleted ? 'text-primary' : 'text-gray-400'"
+                  aria-hidden="true"
+                />
+                <span class="min-w-0 flex-auto truncate"><span class="tabular-nums">{{ i + 1 }}.</span> {{ lesson.title }}</span>
+                <span class="flex-none text-xs font-normal text-secondary tabular-nums">{{ lesson.durationMinutes }} min</span>
+                <span *ngIf="lesson.isCompleted" class="sr-only">Completed</span>
               </button>
             </li>
-          </ul>
-          <p
-            *ngIf="!c.lessons.length"
-            class="m-0 px-2 py-3 text-[13px] text-[#71606A]"
-          >
-            No lessons yet.
-          </p>
-          <boo-button-admin *ngIf="canManage" (click)="openLessonEditor()" background="transparent" textColor="rgb(var(--twc-primary))" padding="8px 8px" [radius]="8" [gap]="6" buttonClass="w-full" class="mt-1 w-full">
-            <physio-icon name="plus" [size]="14"></physio-icon> Add lesson
-          </boo-button-admin>
+          </ol>
         </nav>
+        <ng-template #noLessonsTpl>
+          <p class="m-0 px-4 py-6 text-center text-sm text-secondary">No lessons yet.</p>
+        </ng-template>
+      </section>
 
-        <!-- Reader -->
-        <article class="min-h-64 rounded-lg bg-surface p-5 shadow-sm">
-          <ng-container *ngIf="selectedLesson() as l; else noLesson">
-            <div class="flex flex-wrap items-start justify-between gap-2">
-              <h2 class="m-0 text-[18px] font-semibold leading-tight">
-                {{ l.title }}
-              </h2>
-              <div *ngIf="canManage" class="flex items-center gap-1">
-                <button
-                  type="button"
-                  (click)="openLessonEditor(l)"
-                  aria-label="Edit lesson"
-                  class="rounded p-1.5 text-gray-500 hover:bg-gray-100"
-                >
-                  <physio-icon name="pencil" [size]="16"></physio-icon>
-                </button>
-                <button
-                  type="button"
-                  (click)="deleteLesson(l)"
-                  aria-label="Delete lesson"
-                  class="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-red-600"
-                >
-                  <physio-icon name="trash" [size]="16"></physio-icon>
-                </button>
-              </div>
+      <!-- Reader -->
+      <article class="min-w-0 min-h-[320px] bg-surface border border-borderGray rounded-xl" aria-live="polite">
+        <ng-container *ngIf="selectedLesson as l; else noLessonTpl">
+          <header class="flex flex-wrap items-start justify-between gap-3 px-5 py-4 border-b border-rowDivider">
+            <div class="min-w-0">
+              <p class="m-0 text-xs text-secondary tabular-nums">Lesson {{ selectedIndex + 1 }} of {{ c.lessons.length }} · {{ l.durationMinutes }} min</p>
+              <h2 class="m-0 mt-0.5 text-lg font-semibold leading-tight text-regular break-words">{{ l.title }}</h2>
             </div>
-            <p class="m-0 mt-1 text-[12px] text-[#71606A]">
-              {{ l.durationMinutes }} min read
-            </p>
-            <div
-              class="mt-4 whitespace-pre-line break-words text-[14px] leading-[1.7]"
-            >
-              {{ l.content }}
+            <div *ngIf="canManage" class="flex items-center gap-1" role="group" aria-label="Lesson actions">
+              <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" aria-haspopup="dialog" aria-label="Edit lesson" title="Edit lesson" [disabled]="busyLessonIds.has(l.id)" (click)="openLessonForm(l)">
+                <physio-icon name="pencil" [size]="16" />
+              </button>
+              <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" class="!text-danger" aria-label="Delete lesson" title="Delete lesson" [disabled]="busyLessonIds.has(l.id)" (click)="confirmDeleteLesson(l)">
+                <physio-icon name="trash" [size]="16" />
+              </button>
             </div>
+          </header>
 
+          <div class="px-5 py-5 max-w-3xl whitespace-pre-line break-words text-sm leading-7 text-regular">{{ l.content }}</div>
+
+          <footer class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-t border-rowDivider">
+            <button type="button" boo-button variant="ghost" size="sm" [disabled]="!previousLesson" (click)="selectedId = previousLesson!.id">
+              <physio-icon name="arrow-left" [size]="15" aria-hidden="true" />Previous
+            </button>
             <button
               type="button"
+              boo-button
+              [variant]="l.isCompleted ? 'secondary' : 'primary'"
+              size="sm"
+              [loading]="busyLessonIds.has(l.id)"
+              [disabled]="busyLessonIds.has(l.id)"
+              [attr.aria-pressed]="l.isCompleted"
               (click)="toggleCompleted(l)"
-              class="mt-6 flex items-center gap-2 rounded-lg px-4 min-h-10 text-[13px] font-medium"
-              [ngClass]="
-                l.isCompleted
-                  ? 'border border-[#EFE3E7] bg-surface text-[#71606A] hover:bg-gray-50'
-                  : 'bg-primary text-white'
-              "
             >
-              <physio-icon
-                [name]="l.isCompleted ? 'circle-check' : 'circle'"
-                [size]="16"
-              ></physio-icon>
-              {{
-                l.isCompleted
-                  ? "Completed — mark as not done"
-                  : "Mark as complete"
-              }}
+              <physio-icon *ngIf="!busyLessonIds.has(l.id)" [name]="l.isCompleted ? 'circle-check' : 'circle'" [size]="15" aria-hidden="true" />
+              {{ l.isCompleted ? 'Completed · mark as not done' : 'Mark as complete' }}
             </button>
-          </ng-container>
-          <ng-template #noLesson>
+            <button type="button" boo-button variant="ghost" size="sm" [disabled]="!nextLesson" (click)="selectedId = nextLesson!.id">
+              Next<physio-icon name="chevron-right" [size]="15" aria-hidden="true" />
+            </button>
+          </footer>
+        </ng-container>
+
+        <ng-template #noLessonTpl>
+          <div class="flex min-h-[320px] items-center justify-center px-4 py-8">
             <boo-empty-state
               icon="graduation-cap"
               title="Nothing to read yet"
-              [description]="
-                canManage
-                  ? 'Add the first lesson to this course.'
-                  : 'Lessons will appear here.'
-              "
-            ></boo-empty-state>
-          </ng-template>
-        </article>
-      </div>
-    </ng-container>
-  </div>
+              [description]="canManage ? 'Add the first lesson to this course.' : 'Lessons will appear here once they are added.'"
+            >
+              <button *ngIf="canManage" type="button" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openLessonForm()">
+                <physio-icon name="plus" [size]="15" aria-hidden="true" />Add lesson
+              </button>
+            </boo-empty-state>
+          </div>
+        </ng-template>
+      </article>
+    </div>
+  </ng-container>
 </div>
 
-<!-- Course dialog -->
-<div
-  *ngIf="courseDraft() as d"
-  class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4"
-  (click)="courseDraft.set(null)"
->
-  <div
-    role="dialog"
-    aria-modal="true"
-    aria-label="Edit course"
-    class="w-full max-w-md rounded-xl bg-surface shadow-xl"
-    (click)="$event.stopPropagation()"
-  >
-    <div class="border-b border-[#EFE3E7] px-4 py-3">
-      <h2 class="m-0 text-[16px] font-semibold">Edit course</h2>
-    </div>
-    <div class="space-y-3 px-4 py-3">
-      <div class="block">
-        <label for="course-title" class="mb-1 block text-[12px] font-semibold text-[#71606A]">Title</label>
-        <boo-input [id]="'course-title'" [(ngModel)]="d.title" [maxlength]="200"></boo-input>
-      </div>
-      <div class="block">
-        <label for="course-category" class="mb-1 block text-[12px] font-semibold text-[#71606A]">Category</label>
-        <boo-input [id]="'course-category'" [(ngModel)]="d.category" [maxlength]="60"></boo-input>
-      </div>
-      <div class="block">
-        <label for="course-description" class="mb-1 block text-[12px] font-semibold text-[#71606A]">Description</label>
-        <boo-textarea [id]="'course-description'" [(ngModel)]="d.description" [maxlength]="2000" [rows]="3"></boo-textarea>
-      </div>
-      <boo-checkbox [(ngModel)]="d.isPublished">
-        <span class="text-[13px]">Published (visible to everyone)</span>
-      </boo-checkbox>
-    </div>
-    <div class="flex justify-end gap-2 border-t border-[#EFE3E7] px-4 py-3">
-      <boo-button-admin (click)="courseDraft.set(null)" background="transparent" textColor="#71606A" padding="10px 12px" [radius]="8" fontWeight="500">
-        Cancel
-      </boo-button-admin>
-      <boo-button-admin (click)="saveCourse()" [disabled]="!canSaveCourse()" textColor="white" padding="10px 16px" [radius]="8" fontWeight="500">
-        {{ isSaving() ? "Saving..." : "Save" }}
-      </boo-button-admin>
-    </div>
-  </div>
-</div>
+<academy-course-form-drawer
+  *ngIf="canManage"
+  [open]="courseFormOpen"
+  [course]="course"
+  (close)="closeCourseForm()"
+  (saved)="onCourseSaved()"
+/>
 
-<!-- Lesson dialog -->
-<div
-  *ngIf="lessonDraft() as d"
-  class="fixed inset-0 z-40 flex items-end sm:items-center justify-center bg-black/40 p-0 sm:p-4"
-  (click)="lessonDraft.set(null)"
->
-  <div
-    role="dialog"
-    aria-modal="true"
-    [attr.aria-label]="d.id ? 'Edit lesson' : 'New lesson'"
-    class="flex max-h-[90vh] w-full sm:max-w-xl flex-col rounded-t-xl sm:rounded-xl bg-surface shadow-xl"
-    (click)="$event.stopPropagation()"
-  >
-    <div class="border-b border-[#EFE3E7] px-4 py-3">
-      <h2 class="m-0 text-[16px] font-semibold">
-        {{ d.id ? "Edit lesson" : "New lesson" }}
-      </h2>
-    </div>
-    <div class="flex-1 space-y-3 overflow-y-auto px-4 py-3">
-      <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]"
-          >Title</span
-        >
-        <input
-          type="text"
-          [(ngModel)]="d.title"
-          maxlength="200"
-          autofocus
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
-        />
-      </label>
-      <div class="block">
-        <label for="course-content" class="mb-1 block text-[12px] font-semibold text-[#71606A]">Content</label>
-        <boo-textarea [id]="'course-content'" [(ngModel)]="d.content" [maxlength]="20000" [rows]="10"></boo-textarea>
-      </div>
-      <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]"
-          >Duration (minutes)</span
-        >
-        <input
-          type="number"
-          [(ngModel)]="d.durationMinutes"
-          min="1"
-          max="600"
-          class="w-32 rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
-        />
-      </label>
-    </div>
-    <div class="flex justify-end gap-2 border-t border-[#EFE3E7] px-4 py-3">
-      <boo-button-admin (click)="lessonDraft.set(null)" background="transparent" textColor="#71606A" padding="10px 12px" [radius]="8" fontWeight="500">
-        Cancel
-      </boo-button-admin>
-      <boo-button-admin (click)="saveLesson()" [disabled]="!canSaveLesson()" textColor="white" padding="10px 16px" [radius]="8" fontWeight="500">
-        {{ isSaving() ? "Saving..." : "Save" }}
-      </boo-button-admin>
-    </div>
-  </div>
-</div>
+<academy-lesson-form-drawer
+  *ngIf="canManage && course"
+  [open]="lessonFormOpen"
+  [courseId]="course.id"
+  [lesson]="editingLesson"
+  (close)="closeLessonForm()"
+  (saved)="onLessonSaved($event)"
+/>

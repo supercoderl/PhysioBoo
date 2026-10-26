@@ -16,7 +16,10 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
             <div
                 *ngFor="let r of tableData()?.items"
                 class="group bg-surface rounded-lg border border-gray-200 p-5 hover:shadow-md hover:border-primary/40 transition-all cursor-pointer"
+                role="button"
+                tabindex="0"
                 (click)="onEditClick(r)"
+                (keydown.enter)="onEditClick(r)"
             >
                 <div class="flex items-start justify-between mb-3">
                     <div class="flex items-center gap-3">

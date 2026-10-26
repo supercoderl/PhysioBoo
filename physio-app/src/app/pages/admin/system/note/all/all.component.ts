@@ -51,6 +51,7 @@ export class AllNoteComponent implements OnInit, OnDestroy {
 
   private readonly search$ = new Subject<string>();
   private searchSub?: Subscription;
+  private notesSub?: Subscription;
 
   constructor(
     private noteSrv: NoteService,
@@ -70,6 +71,7 @@ export class AllNoteComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.searchSub?.unsubscribe();
+    this.notesSub?.unsubscribe();
   }
 
   @HostListener('document:keydown.escape')
@@ -80,8 +82,10 @@ export class AllNoteComponent implements OnInit, OnDestroy {
 
   // #region Loading
   loadNotes(): void {
+    // A newer search or filter replaces the one still in flight, so a slow earlier answer cannot overwrite it.
+    this.notesSub?.unsubscribe();
     this.isLoading.set(true);
-    this.noteSrv.getNotes({ search: this.search.trim(), label: this.activeLabel, archived: this.showArchived }).subscribe({
+    this.notesSub = this.noteSrv.getNotes({ search: this.search.trim(), label: this.activeLabel, archived: this.showArchived }).subscribe({
       next: res => {
         if (res.success) this.notes.set(res.data);
         this.isLoading.set(false);

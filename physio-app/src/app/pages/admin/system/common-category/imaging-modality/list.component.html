@@ -24,10 +24,6 @@
       [currentSort]="params.sort"
       [filterConfigs]="filter_configs"
       [currentFilter]="params.filter"
-      [savedViews]="savedViews"
-      [currentViewId]="currentViewId"
-      [currentGroupBy]="currentGroupBy"
-      [comments]="comments"
       (pageChange)="onPageChanged($event)"
       (editClick)="onOpenDrawer($event)"
       (deleteClick)="onDelete($event)"
@@ -36,13 +32,6 @@
       (bulkAction)="onBulkAction($event)"
       (sortApply)="onSortChange($event)"
       (filterApply)="onSingleFilterChange($event)"
-      (viewSelect)="onViewSelect($event)"
-      (viewSaveAsNew)="onViewSaveAsNew()"
-      (viewDelete)="onViewDelete($event)"
-      (groupApply)="onGroupApply($event)"
-      (commentAdd)="onCommentAdd($event)"
-      (commentDelete)="onCommentDelete($event)"
-      (resetView)="onResetView()"
       [filter]="params"
     />
   </div>
@@ -51,7 +40,7 @@
     [isOpen]="isDrawerOpen"
     [currentId]="selectedId"
     (close)="onCloseDrawer()"
-    (saveSuccess)="onSaveSuccess($event)"
+    (saveSuccess)="onSaveSuccess()"
     (delete)="onDelete($event)"
   />
 </admin-content-header>

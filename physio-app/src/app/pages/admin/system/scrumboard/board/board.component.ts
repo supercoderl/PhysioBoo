@@ -138,12 +138,16 @@ export class BoardScrumboardComponent implements OnInit {
     const title = this.newListTitle.trim();
     if (!board || !title) return;
 
-    this.scrumSrv.createList(board.id, title).subscribe(res => {
-      if (!res.success) return;
+    // Clear first so a second Enter cannot add the same list twice; put the text back if the server refuses.
+    this.newListTitle = '';
+    this.scrumSrv.createList(board.id, title).subscribe({
+      next: res => {
+        if (!res.success) { this.newListTitle = title; return; }
 
-      board.lists.push({ ...res.data, cards: [] });
-      this.board.set({ ...board });
-      this.newListTitle = '';
+        board.lists.push({ ...res.data, cards: [] });
+        this.board.set({ ...board });
+      },
+      error: () => this.newListTitle = title
     });
   }
 
@@ -188,11 +192,14 @@ export class BoardScrumboardComponent implements OnInit {
     const title = this.newCardTitle.trim();
     if (!title) return;
 
-    this.scrumSrv.createCard(list.id, { title, description: null, dueDate: null }).subscribe(res => {
-      if (!res.success) return;
+    this.newCardTitle = '';
+    this.scrumSrv.createCard(list.id, { title, description: null, dueDate: null }).subscribe({
+      next: res => {
+        if (!res.success) { this.newCardTitle = title; return; }
 
-      list.cards.push(res.data);
-      this.newCardTitle = '';
+        list.cards.push(res.data);
+      },
+      error: () => this.newCardTitle = title
     });
   }
 

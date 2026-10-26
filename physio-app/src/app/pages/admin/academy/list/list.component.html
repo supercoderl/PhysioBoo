@@ -1,142 +1,266 @@
-<div class="relative z-10 flex min-h-0 flex-auto flex-col">
-  <div class="flex shrink-0 grow flex-col pb-5">
+<div class="flex flex-1 min-h-0 flex-col gap-4 pb-5">
 
-    <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h1 class="m-0 text-[22px] font-extrabold leading-none tracking-tight">Academy</h1>
-        <p class="m-0 mt-1 text-[13px] leading-[1.5] text-[#71606A]">Training courses for the team</p>
-      </div>
-
-      <div class="flex flex-wrap items-center gap-2">
-        <label class="flex items-center gap-2 rounded-lg border border-[#EFE3E7] bg-surface px-3 min-h-10">
-          <physio-icon name="search" [size]="16" class="text-gray-400"></physio-icon>
-          <input
-            type="search"
-            [(ngModel)]="search"
-            (ngModelChange)="onSearchChange($event)"
-            placeholder="Search courses"
-            aria-label="Search courses"
-            class="bg-transparent text-[14px] outline-none"
-          />
-        </label>
-        <button
-          *ngIf="canManage"
-          type="button"
-          (click)="toggleManage()"
-          [attr.aria-pressed]="manageMode"
-          class="flex items-center gap-1.5 rounded-lg border px-3 min-h-10 text-[13px] font-medium transition-colors"
-          [ngClass]="manageMode ? 'bg-primary text-white border-primary' : 'bg-surface text-[#71606A] border-[#EFE3E7] hover:bg-gray-50'"
-        >
-          <physio-icon name="settings-2" [size]="16"></physio-icon>
-          Manage
-        </button>
-        <boo-button-admin *ngIf="canManage && manageMode" (click)="openDialog()" textColor="white" padding="10px 12px" [radius]="8" fontWeight="500" [gap]="6">
-          <physio-icon name="plus" [size]="16"></physio-icon>
-          New course
-        </boo-button-admin>
-      </div>
+  <!-- Page header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div class="min-w-0">
+      <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Academy</h1>
+      <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">
+        Training courses for the team
+        <ng-container *ngIf="loaded">
+          <span aria-hidden="true"> · </span>{{ courses.length }} {{ courses.length === 1 ? 'course' : 'courses' }}{{ hasFilters ? ' match' : '' }}
+        </ng-container>
+      </p>
     </div>
-
-    <!-- Categories -->
-    <div *ngIf="categories().length" class="mt-4 flex flex-wrap gap-2" role="group" aria-label="Filter by category">
+    <div class="flex flex-wrap items-center gap-2">
+      <button boo-button variant="secondary" size="sm" [loading]="loading" (click)="load()">
+        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      </button>
       <button
-        *ngFor="let c of categories()"
+        *ngIf="canManage"
         type="button"
-        (click)="selectCategory(c)"
-        [attr.aria-pressed]="category === c"
-        class="rounded-full border px-3 py-1 text-[12px] font-medium transition-colors"
-        [ngClass]="category === c ? 'bg-primary text-white border-primary' : 'bg-surface text-[#1F232B] border-[#EFE3E7] hover:bg-gray-50'"
-      >{{ c }}</button>
+        boo-button
+        [variant]="manageMode ? 'soft' : 'secondary'"
+        size="sm"
+        [attr.aria-pressed]="manageMode"
+        (click)="toggleManage()"
+      ><physio-icon name="settings-2" [size]="15" aria-hidden="true" />Manage</button>
+      <button *ngIf="canEdit" type="button" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
+        <physio-icon name="plus" [size]="15" aria-hidden="true" />New course
+      </button>
+    </div>
+  </header>
+
+  <!-- Overview: derived from the loaded catalog, so it is hidden while a filter narrows the list -->
+  <dl *ngIf="overview && !hasFilters" class="m-0 grid grid-cols-2 gap-3" [ngClass]="canEdit ? 'lg:grid-cols-4' : 'lg:grid-cols-3'" aria-label="Catalog overview">
+    <div class="bg-surface border border-borderGray rounded-xl px-4 py-3">
+      <dt class="text-xs font-medium text-secondary">{{ canEdit ? 'Courses' : 'Published courses' }}</dt>
+      <dd class="m-0 mt-1 text-2xl font-semibold leading-8 text-regular tabular-nums">{{ overview.courses }}</dd>
+    </div>
+    <div *ngIf="canEdit" class="bg-surface border border-borderGray rounded-xl px-4 py-3">
+      <dt class="text-xs font-medium text-secondary">Published · Drafts</dt>
+      <dd class="m-0 mt-1 text-2xl font-semibold leading-8 text-regular tabular-nums">{{ overview.published }}<span class="text-secondary font-normal"> · {{ overview.drafts }}</span></dd>
+    </div>
+    <div class="bg-surface border border-borderGray rounded-xl px-4 py-3">
+      <dt class="text-xs font-medium text-secondary">Lessons</dt>
+      <dd class="m-0 mt-1 text-2xl font-semibold leading-8 text-regular tabular-nums">{{ overview.lessons }}</dd>
+    </div>
+    <div class="bg-surface border border-borderGray rounded-xl px-4 py-3">
+      <dt class="text-xs font-medium text-secondary">Total learning time</dt>
+      <dd class="m-0 mt-1 text-2xl font-semibold leading-8 text-regular tabular-nums">{{ hours }}</dd>
+    </div>
+  </dl>
+
+  <!-- A refresh failed while the previous results are still on screen -->
+  <boo-inline-error
+    *ngIf="loaded && loadError === 'failed'"
+    what="the latest courses"
+    [state]="refreshErrorState"
+    (retry)="load()"
+  />
+
+  <section class="flex-1 min-h-[360px] flex flex-col min-w-0 bg-surface border border-borderGray rounded-xl" aria-labelledby="course-list-title">
+    <h2 id="course-list-title" class="sr-only">Course list</h2>
+
+    <!-- Search and filter -->
+    <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
+      <boo-search-field
+        class="flex-1 basis-64 min-w-0"
+        label="Search courses"
+        placeholder="Search by title or description"
+        [maxlength]="100"
+        [(ngModel)]="query"
+        (ngModelChange)="onQueryChange()"
+        [busy]="searchPending || (loading && !!searchTerm)"
+        (clear)="clearSearch()"
+      />
+      <label class="flex flex-col min-w-0 w-full sm:w-52">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Category</span>
+        <boo-select size="small" [height]="36" label="Category" required [options]="categoryOptions" [(ngModel)]="category" (ngModelChange)="onCategoryChange()" />
+      </label>
     </div>
 
-    <!-- Loading skeleton -->
-    <div *ngIf="isLoading()" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
-      <div *ngFor="let i of [1, 2, 3]" class="h-48 animate-pulse rounded-lg bg-surface p-5 shadow-sm">
-        <div class="h-4 w-1/3 rounded bg-gray-200"></div>
-        <div class="mt-4 h-4 w-2/3 rounded bg-gray-200"></div>
-        <div class="mt-3 h-3 w-full rounded bg-gray-100"></div>
-      </div>
+    <!-- Active filters -->
+    <div *ngIf="chips.length" class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2 border-b border-rowDivider bg-body/60 min-h-[44px]">
+      <boo-filter-chips [chips]="chips" (remove)="removeChip($event)" />
+      <button *ngIf="chips.length > 1" type="button" boo-button variant="link" size="sm" (click)="clearFilters()">Clear all</button>
     </div>
 
-    <!-- Empty -->
-    <div *ngIf="!isLoading() && !courses().length" class="mt-6">
-      <boo-empty-state
-        icon="graduation-cap"
-        [title]="search || category ? 'No courses match your search' : 'No courses yet'"
-        [description]="search || category ? 'Try a different search or category.' : (canManage ? 'Switch to Manage to add the first course.' : 'Courses will appear here when they are published.')"
-      ></boo-empty-state>
-    </div>
-
-    <!-- Courses -->
-    <div *ngIf="!isLoading() && courses().length" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <a
-        *ngFor="let course of courses(); trackBy: trackById"
-        [routerLink]="['/admin/academy/course', course.id]"
-        class="flex flex-col rounded-lg bg-surface p-5 text-[#1F232B] no-underline shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary"
-      >
-        <div class="flex items-center justify-between gap-2">
-          <span class="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">{{ course.category }}</span>
-          <span *ngIf="!course.isPublished" class="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700">Draft</span>
-        </div>
-        <p class="m-0 mt-3 text-[15px] font-semibold leading-[1.4]">{{ course.title }}</p>
-        <p *ngIf="course.description" class="line-clamp-2 m-0 mt-1 text-[13px] leading-[1.5] text-[#71606A]">{{ course.description }}</p>
-
-        <div class="mt-auto pt-4">
-          <p class="m-0 text-[12px] text-[#71606A]">
-            {{ course.lessonCount }} {{ course.lessonCount === 1 ? 'lesson' : 'lessons' }} · {{ course.totalMinutes }} min
-          </p>
-          <div class="mt-2 flex items-center gap-2">
-            <div
-              class="h-2 flex-auto overflow-hidden rounded-full bg-gray-200"
-              role="progressbar"
-              [attr.aria-valuenow]="progress(course)"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              [attr.aria-label]="'Progress in ' + course.title"
+    <!-- Results -->
+    <div class="flex-1 flex flex-col min-w-0 min-h-0" [attr.aria-busy]="loading">
+      <div *ngIf="courses.length; else noRowsTpl" class="overflow-x-auto" [class.opacity-60]="loading">
+        <table class="w-full border-collapse text-sm">
+          <caption class="sr-only">Academy courses</caption>
+          <thead>
+            <tr class="text-left text-xs font-medium text-secondary border-b border-rowDivider">
+              <th scope="col" class="px-4 py-2.5 font-medium">Course</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden md:table-cell">Category</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden sm:table-cell whitespace-nowrap">Content</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden lg:table-cell whitespace-nowrap">My progress</th>
+              <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">Status</th>
+              <th scope="col" class="px-4 py-2.5 font-medium text-right"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let c of courses; trackBy: trackById"
+              class="border-b border-rowDivider last:border-b-0 hover:bg-body transition-colors"
+              [class.opacity-50]="busyIds.has(c.id)"
             >
-              <div class="h-full rounded-full bg-primary" [style.width.%]="progress(course)"></div>
+              <td class="px-4 py-3 align-top min-w-0 max-w-[420px]">
+                <a
+                  [routerLink]="['/admin/academy/course', c.id]"
+                  class="block max-w-full font-semibold text-regular no-underline truncate hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                >{{ c.title }}</a>
+                <p *ngIf="c.description" class="m-0 mt-0.5 text-xs leading-5 text-secondary line-clamp-2">{{ c.description }}</p>
+                <p class="m-0 mt-1 text-xs text-secondary md:hidden">{{ c.category }}</p>
+              </td>
+
+              <td class="px-4 py-3 align-top hidden md:table-cell">
+                <boo-status-badge tone="primary" [label]="c.category" />
+              </td>
+
+              <td class="px-4 py-3 align-top hidden sm:table-cell whitespace-nowrap">
+                <div class="text-regular tabular-nums">{{ c.lessonCount }} {{ c.lessonCount === 1 ? 'lesson' : 'lessons' }}</div>
+                <div class="mt-0.5 text-xs text-secondary tabular-nums">{{ c.totalMinutes }} min</div>
+              </td>
+
+              <td class="px-4 py-3 align-top hidden lg:table-cell w-48">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="h-1.5 flex-auto overflow-hidden rounded-full bg-rowDivider"
+                    role="progressbar"
+                    [attr.aria-valuenow]="progress(c)"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    [attr.aria-label]="'Your progress in ' + c.title"
+                  >
+                    <div class="h-full rounded-full bg-primary" [style.width.%]="progress(c)"></div>
+                  </div>
+                  <span class="text-xs font-medium text-regular tabular-nums">{{ progress(c) }}%</span>
+                </div>
+              </td>
+
+              <td class="px-4 py-3 align-top">
+                <boo-status-badge dotted [label]="c.isPublished ? 'Published' : 'Draft'" [tone]="c.isPublished ? 'success' : 'warning'" />
+              </td>
+
+              <td class="px-3 py-2 align-middle text-right whitespace-nowrap">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <a
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [routerLink]="['/admin/academy/course', c.id]"
+                    [attr.aria-label]="'Open ' + c.title"
+                    title="Open course"
+                  ><physio-icon name="chevron-right" [size]="16" /></a>
+                  <ng-container *ngIf="canEdit">
+                    <button
+                      type="button"
+                      boo-button
+                      variant="ghost"
+                      size="sm"
+                      [iconOnly]="true"
+                      [disabled]="busyIds.has(c.id)"
+                      [attr.aria-label]="'Edit ' + c.title"
+                      aria-haspopup="dialog"
+                      title="Edit course"
+                      (click)="openEdit(c)"
+                    ><physio-icon name="pencil" [size]="16" /></button>
+                    <button
+                      type="button"
+                      boo-button
+                      variant="ghost"
+                      size="sm"
+                      class="hidden sm:inline-flex"
+                      [disabled]="busyIds.has(c.id)"
+                      [attr.aria-label]="(c.isPublished ? 'Unpublish ' : 'Publish ') + c.title"
+                      (click)="togglePublished(c)"
+                    >{{ c.isPublished ? 'Unpublish' : 'Publish' }}</button>
+                    <button
+                      type="button"
+                      boo-button
+                      variant="ghost"
+                      size="sm"
+                      [iconOnly]="true"
+                      class="!text-danger"
+                      [disabled]="busyIds.has(c.id)"
+                      [attr.aria-label]="'Delete ' + c.title"
+                      title="Delete course"
+                      (click)="confirmDelete(c)"
+                    ><physio-icon name="trash" [size]="16" /></button>
+                  </ng-container>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No rows: first load, access denied, failure or no matches — all inside the list area -->
+      <ng-template #noRowsTpl>
+        <div *ngIf="loading && !loaded; else stateTpl" class="flex flex-col" aria-hidden="true">
+          <div *ngFor="let _ of skeletonRows" class="flex items-center gap-6 px-4 py-3.5 border-b border-rowDivider">
+            <div class="flex-1 min-w-0">
+              <div class="h-3.5 w-56 max-w-full rounded bg-rowDivider animate-pulse"></div>
+              <div class="mt-2 h-3 w-80 max-w-full rounded bg-rowDivider animate-pulse"></div>
             </div>
-            <span class="text-[12px] font-medium">{{ progress(course) }}%</span>
+            <div class="hidden md:block w-24 h-5 rounded-full bg-rowDivider animate-pulse"></div>
+            <div class="hidden sm:block w-20 h-3.5 rounded bg-rowDivider animate-pulse"></div>
+            <div class="w-20 h-5 rounded-full bg-rowDivider animate-pulse"></div>
           </div>
         </div>
-      </a>
+        <span *ngIf="loading && !loaded" class="sr-only" role="status">Loading courses…</span>
+        <ng-template #stateTpl>
+          <div class="flex-1 flex items-center justify-center px-4 py-8">
+            <boo-empty-state
+              *ngIf="loadError === 'forbidden'"
+              icon="lock"
+              title="You don't have access to this catalog"
+              description="Ask an administrator for permission to view Academy courses."
+            />
+            <boo-error-state
+              *ngIf="loadError === 'failed' && !loaded"
+              icon="cloud-off"
+              title="We couldn't load courses"
+              description="Check your connection and try again."
+              retryLabel="Try again"
+              (retry)="load()"
+            />
+            <ng-container *ngIf="!loadError || (loadError === 'failed' && loaded)">
+              <boo-empty-state
+                *ngIf="hasFilters; else noCoursesTpl"
+                icon="search"
+                title="No courses match"
+                description="Try a different search, or pick another category."
+              >
+                <button boo-button variant="secondary" size="sm" (click)="clearFilters()">Clear filters</button>
+              </boo-empty-state>
+              <ng-template #noCoursesTpl>
+                <boo-empty-state
+                  icon="graduation-cap"
+                  title="No courses yet"
+                  [description]="canEdit ? 'Create the first course to start building the catalog.' : 'Courses will appear here when they are published.'"
+                >
+                  <button *ngIf="canEdit" type="button" boo-button variant="primary" size="sm" (click)="openCreate()">
+                    <physio-icon name="plus" [size]="15" aria-hidden="true" />New course
+                  </button>
+                </boo-empty-state>
+              </ng-template>
+            </ng-container>
+          </div>
+        </ng-template>
+      </ng-template>
     </div>
-  </div>
+  </section>
 </div>
 
-<!-- New course dialog -->
-<div *ngIf="draft() as d" class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4" (click)="closeDialog()">
-  <div role="dialog" aria-modal="true" aria-label="New course" class="w-full max-w-md rounded-xl bg-surface shadow-xl" (click)="$event.stopPropagation()">
-    <div class="border-b border-[#EFE3E7] px-4 py-3">
-      <h2 class="m-0 text-[16px] font-semibold">New course</h2>
-    </div>
-    <div class="space-y-3 px-4 py-3">
-      <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]">Title</span>
-        <input type="text" [(ngModel)]="d.title" maxlength="200" autofocus
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
-      </label>
-      <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]">Category</span>
-        <input type="text" [(ngModel)]="d.category" maxlength="60" list="academy-categories"
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary" />
-        <datalist id="academy-categories">
-          <option *ngFor="let c of categories()" [value]="c"></option>
-        </datalist>
-      </label>
-      <div class="block">
-        <label for="new-course-description" class="mb-1 block text-[12px] font-semibold text-[#71606A]">Description</label>
-        <boo-textarea [id]="'new-course-description'" [(ngModel)]="d.description" [maxlength]="2000" [rows]="3"></boo-textarea>
-      </div>
-      <boo-checkbox [(ngModel)]="d.isPublished">
-        <span class="text-[13px]">Publish now (otherwise it stays a draft)</span>
-      </boo-checkbox>
-    </div>
-    <div class="flex justify-end gap-2 border-t border-[#EFE3E7] px-4 py-3">
-      <boo-button-admin (click)="closeDialog()" background="transparent" textColor="#71606A" padding="10px 12px" [radius]="8" fontWeight="500">Cancel</boo-button-admin>
-      <boo-button-admin (click)="createCourse()" [disabled]="!canCreate()" textColor="white" padding="10px 16px" [radius]="8" fontWeight="500">
-        {{ isSaving() ? 'Creating...' : 'Create' }}
-      </boo-button-admin>
-    </div>
-  </div>
-</div>
+<academy-course-form-drawer
+  [open]="formOpen"
+  [course]="editing"
+  [categories]="categories"
+  [defaultCategory]="category"
+  (close)="closeForm()"
+  (saved)="onSaved()"
+/>

@@ -1,7 +1,9 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { AuthService } from "../../../../services/auth/auth.service";
 import { CATEGORIES_MANAGEMENT } from "../../../../shared/data/dummy";
 import { SharedModule } from "../../../../shared/shared-imports";
-import { Category } from "../../../../shared/types/category.types";
+import { canOpenNavLink, childRoutePermissions } from "../../../../shared/utils/route-permission.utils";
 
 @Component({
   selector: 'admin-common-category',
@@ -68,58 +70,13 @@ import { Category } from "../../../../shared/types/category.types";
 
 export class AdminCommonCategoryComponent {
   // #region Inputs, Outputs, Properties
-  viewMode: 'grid' | 'table' = 'grid';
-  selectedType = 'all';
-  searchTerm = '';
-  filterStatus = '';
-  showModal = false;
-  isEditMode = false;
-  openMenuId: number | null = null;
+  private readonly requiredPermissions = childRoutePermissions(inject(ActivatedRoute));
+  private readonly authSrv = inject(AuthService);
 
-  categories = CATEGORIES_MANAGEMENT;
-
-  formData: any = {
-    name: '',
-    code: '',
-    description: '',
-    type: '',
-    status: 'active',
-    icon: '📋',
-    color: '#FB7185',
-  };
-  // #endregion
-
-  // #region Methods
-  toggleMenu(id: number): void {
-    this.openMenuId = this.openMenuId === id ? null : id;
-    console.log(this.openMenuId);
-  }
-
-  openAddModal(): void {
-    this.isEditMode = false;
-    this.formData = {
-      name: '',
-      code: '',
-      description: '',
-      type: this.selectedType !== 'all' ? this.selectedType : '',
-      status: 'active',
-      icon: '📋',
-      color: '#FB7185',
-    };
-    this.showModal = true;
-  }
-
-  editCategory(category: Category): void {
-    this.isEditMode = true;
-    this.formData = { ...category };
-    this.showModal = true;
-    this.openMenuId = null;
-  }
-
-  closeModal(): void {
-    this.showModal = false;
-    this.isEditMode = false;
-    this.openMenuId = null;
+  /** Only the categories the signed-in user is allowed to open. */
+  get categories() {
+    return CATEGORIES_MANAGEMENT.filter(c =>
+      canOpenNavLink(c.route, this.requiredPermissions, code => this.authSrv.hasPermission(code)));
   }
   // #endregion
 }

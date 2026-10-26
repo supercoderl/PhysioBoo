@@ -216,8 +216,8 @@ export class UserPermissionUserDrawerComponent {
     }
 
     onSave() {
+        // The page closes the drawer once the save succeeds, so a failed save keeps the form.
         this.save.emit();
-        this.onClose();
     }
 
     onToggle(roleId: string) {

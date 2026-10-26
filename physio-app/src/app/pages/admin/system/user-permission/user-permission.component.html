@@ -70,7 +70,7 @@
   <!-- ============================================================== -->
   <!-- Users tab                                                      -->
   <!-- ============================================================== -->
-  <div *ngIf="activeTab() === 'users'" class="space-y-4">
+  <div *ngIf="activeTab() === 'users'" class="flex flex-1 min-h-0 flex-col gap-4">
     <div
       class="p-3 flex justify-between md:items-center"
     >
@@ -84,6 +84,7 @@
       [tableData]="usersData"
       [params]="userParams"
       (reloadClick)="loadUsers()"
+      (editClick)="openEditUser($event)"
     />
   </div>
 
@@ -94,7 +95,7 @@
     <div
       class="p-3 flex justify-between md:items-center"
     >
-      <boo-button-admin (click)="openNewRole()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
+      <boo-button-admin *ngIf="canCreateRole" (click)="openNewRole()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
         <physio-icon name="plus" class="w-4 h-4"></physio-icon>
         New Role
       </boo-button-admin>
@@ -115,7 +116,7 @@
     <div
       class="p-3 flex justify-between md:items-center"
     >
-      <boo-button-admin (click)="openNewPermission()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
+      <boo-button-admin *ngIf="canCreatePermission" (click)="openNewPermission()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
         <physio-icon name="plus" class="w-4 h-4"></physio-icon>
         New Permission
       </boo-button-admin>
@@ -134,7 +135,8 @@
   <user-permission-user-drawer
     [isOpen]="isUserDrawerOpen()"
     (close)="closeUserDrawer()"
-    (save)="saveUser()" 
+    (save)="saveUser()"
+    (toggle)="toggleUserRole($event)"
     [form]="userForm" 
     [rolesData]="rolesData" 
     [selectedUserId]="selectedUserId" 
@@ -150,6 +152,10 @@
     (close)="closeRoleDrawer()"
     (saveRole)="saveRole()"
     (deleteRole)="deleteRole($event)"
+    (selectRoleColor)="selectRoleColor($event)"
+    (selectRoleIcon)="selectRoleIcon($event)"
+    (togglePermission)="togglePermission($event)"
+    (toggleCategoryAll)="toggleCategoryAll($event.category, $event.on)"
     [form]="roleForm"
     [selectedRoleId]="selectedRoleId"
     [selectedRole]="selectedRole" 

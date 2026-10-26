@@ -1,6 +1,9 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { AuthService } from "../../../../services/auth/auth.service";
 import { SETTINGS_MANAGEMENT } from "../../../../shared/data/dummy";
 import { SharedModule } from "../../../../shared/shared-imports";
+import { canOpenNavLink, childRoutePermissions } from "../../../../shared/utils/route-permission.utils";
 
 @Component({
     selector: 'admin-system-setting',
@@ -79,10 +82,13 @@ import { SharedModule } from "../../../../shared/shared-imports";
 
 export class AdminSystemSettingComponent {
     // #region Inputs, Outputs, Properties
-    settings = SETTINGS_MANAGEMENT;
-    // #endregion
+    private readonly requiredPermissions = childRoutePermissions(inject(ActivatedRoute));
+    private readonly authSrv = inject(AuthService);
 
-    // #region Methods
-
+    /** Only the settings the signed-in user is allowed to open. */
+    get settings() {
+        return SETTINGS_MANAGEMENT.filter(s =>
+            canOpenNavLink(s.route, this.requiredPermissions, code => this.authSrv.hasPermission(code)));
+    }
     // #endregion
 }

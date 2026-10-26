@@ -6,7 +6,7 @@ import { ActionItem, PaginationData } from "../../../../../../shared/types/commo
 import { FilterConfig } from "../../../../../../shared/types/filter.types";
 import { MedicalSpecialty } from "../../../../../../shared/types/medical-staff.types";
 import { SortOption } from "../../../../../../shared/types/sort";
-import { BulkAction, GroupableColumn, SavedView, TableComment } from "../../../../../../shared/types/table.types";
+import { BulkAction, GroupableColumn } from "../../../../../../shared/types/table.types";
 import { ColorUtils } from "../../../../../../shared/utils/color.utils";
 import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo-table-admin.component";
@@ -30,29 +30,21 @@ import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo
         [currentPage]="data?.pageNumber ?? filter.pageNumber"
         [pageSize]="data?.pageSize ?? filter.pageSize"
         [totalItems]="data?.totalCount ?? 0"
+        [availableTools]="['filter', 'sort', 'group']"
         [bulkActions]="bulkActions"
         [sortOptions]="sortOptions"
         [currentSort]="currentSort"
         [filterConfigs]="filterConfigs"
         [currentFilter]="currentFilter"
-        [savedViews]="savedViews"
-        [currentViewId]="currentViewId"
         [groupableColumns]="groupableColumns"
         [currentGroupBy]="currentGroupBy"
-        [comments]="comments"
         (pageChange)="onPageClick($event)"
         (searchChange)="onSearchChange($event)"
         (reload)="onReloadClick()"
         (bulkAction)="bulkAction.emit($event)"
         (sortApply)="sortApply.emit($event)"
         (filterApply)="filterApply.emit($event)"
-        (viewSelect)="viewSelect.emit($event)"
-        (viewSaveAsNew)="viewSaveAsNew.emit()"
-        (viewDelete)="viewDelete.emit($event)"
         (groupApply)="groupApply.emit($event)"
-        (commentAdd)="commentAdd.emit($event)"
-        (commentDelete)="commentDelete.emit($event)"
-        (resetView)="resetView.emit()"
         [loading]="loadingSrv.isLoading('search')"
       >
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
@@ -117,10 +109,7 @@ export class CommonCategoryMedicalSpecialtyTableCardComponent {
   @Input() currentSort: string = '';
   @Input() filterConfigs: FilterConfig[] = [];
   @Input() currentFilter: Record<string, any> = {};
-  @Input() savedViews: SavedView[] = [];
-  @Input() currentViewId: string | null = null;
   @Input() currentGroupBy: string | null = null;
-  @Input() comments: TableComment[] = [];
   @Output() pageChange = new EventEmitter<number>();
   @Output() searchChange = new EventEmitter<string>();
   @Output() editClick = new EventEmitter<string>();
@@ -129,13 +118,7 @@ export class CommonCategoryMedicalSpecialtyTableCardComponent {
   @Output() bulkAction = new EventEmitter<{ action: BulkAction; ids: (number | string)[]; selectAllPages: boolean }>();
   @Output() sortApply = new EventEmitter<SortOption>();
   @Output() filterApply = new EventEmitter<{ key: string; value: any }>();
-  @Output() viewSelect = new EventEmitter<SavedView>();
-  @Output() viewSaveAsNew = new EventEmitter<void>();
-  @Output() viewDelete = new EventEmitter<SavedView>();
   @Output() groupApply = new EventEmitter<string | null>();
-  @Output() commentAdd = new EventEmitter<string>();
-  @Output() commentDelete = new EventEmitter<TableComment>();
-  @Output() resetView = new EventEmitter<void>();
 
   readonly groupableColumns: GroupableColumn[] = [
     { key: 'category', label: 'Category' },
@@ -144,7 +127,6 @@ export class CommonCategoryMedicalSpecialtyTableCardComponent {
   ColorUtils = ColorUtils;
 
   readonly bulkActions: BulkAction[] = [
-    { key: 'export', label: 'Export', icon: 'download', variant: 'default' },
     { key: 'delete', label: 'Delete', icon: 'trash', variant: 'danger', requireConfirm: true },
   ];
 

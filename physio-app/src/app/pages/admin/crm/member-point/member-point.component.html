@@ -1,0 +1,367 @@
+<div class="flex flex-1 min-h-0 flex-col gap-4 pb-5">
+
+  <!-- Page header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div class="min-w-0">
+      <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Members &amp; points</h1>
+      <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">
+        Loyalty members, their point balances and history
+        <ng-container *ngIf="data">
+          <span aria-hidden="true"> · </span>{{ data.totalCount | number }} {{ data.totalCount === 1 ? 'member' : 'members' }}{{ hasFilters || statusFilter ? ' match' : '' }}
+          <span aria-hidden="true"> · </span>{{ sortLabel }}
+        </ng-container>
+      </p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <button boo-button variant="secondary" size="sm" [loading]="loading" (click)="refresh()">
+        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      </button>
+      <button *ngIf="canReadRewards" boo-button variant="secondary" size="sm" aria-haspopup="dialog" (click)="openRewards()">
+        <physio-icon name="gift" [size]="15" aria-hidden="true" />Rewards
+      </button>
+      <button *ngIf="canEnroll" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openEnroll()">
+        <physio-icon name="user-plus" [size]="15" aria-hidden="true" />Enroll member
+      </button>
+    </div>
+  </header>
+
+  <!-- Programme figures: whole programme, not the filtered list. Hidden quietly if they can't be loaded. -->
+  <section *ngIf="!statsFailed" aria-labelledby="member-stats-title">
+    <h2 id="member-stats-title" class="sr-only">Programme figures</h2>
+    <dl class="m-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-px overflow-hidden rounded-xl border border-borderGray bg-rowDivider" [attr.aria-busy]="!stats">
+      <div class="bg-surface px-4 py-3 min-w-0">
+        <dt class="text-xs text-secondary truncate">Members</dt>
+        <dd class="m-0 mt-0.5 text-lg leading-6 font-semibold text-regular tabular-nums">{{ stats ? (stats.totalMembers | number) : '–' }}</dd>
+      </div>
+      <div class="bg-surface px-4 py-3 min-w-0">
+        <dt class="text-xs text-secondary truncate">Active</dt>
+        <dd class="m-0 mt-0.5 text-lg leading-6 font-semibold text-regular tabular-nums">
+          {{ stats ? (stats.activeMembers | number) : '–' }}<span *ngIf="activeRate !== null" class="ml-1.5 text-xs font-medium text-secondary">{{ activeRate }}%</span>
+        </dd>
+      </div>
+      <div class="bg-surface px-4 py-3 min-w-0">
+        <dt class="text-xs text-secondary truncate">Joined this month</dt>
+        <dd class="m-0 mt-0.5 text-lg leading-6 font-semibold text-regular tabular-nums">{{ stats ? (stats.newMembersThisMonth | number) : '–' }}</dd>
+      </div>
+      <div class="bg-surface px-4 py-3 min-w-0">
+        <dt class="text-xs text-secondary truncate">Points added this month</dt>
+        <dd class="m-0 mt-0.5 text-lg leading-6 font-semibold text-regular tabular-nums">{{ stats ? (stats.pointsDistributedThisMonth | number) : '–' }}</dd>
+      </div>
+      <div class="bg-surface px-4 py-3 min-w-0 col-span-2 sm:col-span-1">
+        <dt class="text-xs text-secondary truncate">Rewards redeemed this month</dt>
+        <dd class="m-0 mt-0.5 text-lg leading-6 font-semibold text-regular tabular-nums">{{ stats ? (stats.rewardsRedeemedThisMonth | number) : '–' }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- A refresh failed while the previous results are still on screen -->
+  <boo-inline-error
+    *ngIf="data && loadError === 'failed'"
+    what="the latest members"
+    [state]="refreshErrorState"
+    (retry)="load()"
+  />
+
+  <section class="flex-1 min-h-[360px] flex flex-col min-w-0 bg-surface border border-borderGray rounded-xl" aria-labelledby="member-list-title">
+    <h2 id="member-list-title" class="sr-only">Member list</h2>
+
+    <!-- Status: one tab per membership status, with how many members are in it under the current search and tier -->
+    <div class="boo-scrollbar overflow-x-auto border-b border-rowDivider">
+      <div class="flex min-w-max items-stretch px-2" role="tablist" aria-label="Membership status">
+        <ng-container *ngFor="let tab of statusTabs; let i = index">
+          <span *ngIf="i === 1" class="self-center w-px h-8 mx-1.5 bg-rowDivider" aria-hidden="true"></span>
+          <button
+            type="button"
+            role="tab"
+            [id]="'member-tab-' + i"
+            aria-controls="member-results"
+            [attr.aria-selected]="tab.value === statusFilter"
+            [attr.tabindex]="tab.value === statusFilter ? 0 : -1"
+            class="relative -mb-px flex flex-col items-start gap-0.5 px-3 py-2.5 min-w-[92px] bg-transparent border-0 border-b-2 text-left cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary rounded-t"
+            [ngClass]="tab.value === statusFilter ? 'border-primary' : 'border-transparent hover:bg-body'"
+            (click)="selectStatus(tab.value)"
+            (keydown)="onTabKey($event, i)"
+          >
+            <span class="flex items-center gap-1.5 text-xs whitespace-nowrap"
+              [class.font-semibold]="tab.value === statusFilter"
+              [class.text-primaryDeep]="tab.value === statusFilter"
+              [class.font-medium]="tab.value !== statusFilter"
+              [class.text-secondary]="tab.value !== statusFilter"
+            >
+              <span *ngIf="tab.dot" class="w-1.5 h-1.5 rounded-full flex-none" [ngClass]="tab.dot" aria-hidden="true"></span>{{ tab.label }}
+            </span>
+            <span class="text-lg leading-6 font-semibold tabular-nums" [class.text-regular]="countOf(tab) !== null" [class.text-placeholder]="countOf(tab) === null">
+              <ng-container *ngIf="countOf(tab) !== null; else noCountTpl">{{ countOf(tab) | number }}</ng-container>
+              <ng-template #noCountTpl><span aria-hidden="true">–</span></ng-template>
+            </span>
+            <span *ngIf="countOf(tab) !== null" class="sr-only">{{ countOf(tab) === 1 ? 'member' : 'members' }}</span>
+          </button>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Search, tier and sort. Field labels (20px) over 36px controls line up with the 56px search field. -->
+    <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
+      <boo-search-field
+        class="flex-1 basis-64 min-w-0"
+        label="Search members by name, member number, phone or email"
+        placeholder="Search by name, member no., phone or email"
+        [maxlength]="100"
+        [(ngModel)]="query"
+        (ngModelChange)="onQueryChange()"
+        [busy]="searchPending || (loading && !!searchTerm)"
+        (clear)="clearSearch()"
+      />
+
+      <label class="flex flex-col min-w-0 w-[calc(50%-6px)] sm:w-40">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Tier</span>
+        <boo-select size="small" [height]="36" label="All tiers" [options]="tierOptions" [(ngModel)]="tier" (ngModelChange)="onTierChange()" />
+      </label>
+
+      <label class="flex flex-col min-w-0 w-[calc(50%-6px)] sm:w-44">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Sort by</span>
+        <boo-select size="small" [height]="36" label="Sort by" required [options]="sortOptions" [(ngModel)]="sort" (ngModelChange)="onSortChange()" />
+      </label>
+    </div>
+
+    <!-- Active filters -->
+    <div *ngIf="chips.length" class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2 border-b border-rowDivider bg-body/60">
+      <boo-filter-chips [chips]="chips" (remove)="removeChip($event)" />
+      <button *ngIf="chips.length > 1" type="button" boo-button variant="link" size="sm" (click)="clearFilters()">Clear all</button>
+    </div>
+
+    <!-- Results -->
+    <div id="member-results" role="tabpanel" class="flex-1 flex flex-col min-w-0 min-h-0 relative" [attr.aria-busy]="loading">
+      <div *ngIf="items.length; else noRowsTpl" class="boo-scrollbar min-h-0 flex-1 overflow-auto" [class.opacity-60]="loading">
+        <table class="w-full border-collapse text-sm">
+          <caption class="sr-only">Members, page {{ page }} of {{ totalPages }}</caption>
+          <thead class="sticky top-0 z-10 bg-surface">
+            <tr class="text-left text-xs font-medium text-secondary border-b border-rowDivider">
+              <th scope="col" class="px-4 py-2.5 font-medium">Member</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden md:table-cell">Contact</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden sm:table-cell">Membership</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden lg:table-cell whitespace-nowrap">Last visit</th>
+              <th scope="col" class="px-4 py-2.5 font-medium text-right whitespace-nowrap">Balance</th>
+              <th scope="col" class="px-4 py-2.5 font-medium text-right"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let m of items; trackBy: trackById"
+              class="border-b border-rowDivider last:border-b-0 hover:bg-body cursor-pointer transition-colors"
+              [class.bg-primarySoft]="selected?.id === m.id"
+              [class.opacity-50]="busyIds.has(m.id)"
+              (click)="openMember(m)"
+            >
+              <!-- Identity -->
+              <td class="px-4 py-3 align-top min-w-0 max-w-[300px]">
+                <div class="flex items-start gap-3 min-w-0">
+                  <span class="flex-none w-8 h-8 rounded-full bg-primarySoft text-primaryDeep text-[11px] font-semibold flex items-center justify-center" aria-hidden="true">{{ initials(m) }}</span>
+                  <div class="min-w-0">
+                    <button
+                      type="button"
+                      class="block max-w-full p-0 bg-transparent border-0 text-left font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                      [attr.aria-label]="'Open points of ' + name(m)"
+                      aria-haspopup="dialog"
+                      (click)="$event.stopPropagation(); openMember(m)"
+                    >{{ name(m) }}</button>
+                    <div class="mt-0.5 text-xs text-secondary tabular-nums truncate">{{ m.memberNumber }}</div>
+                    <div class="mt-1 sm:hidden"><boo-status-badge dotted [label]="status(m).label" [tone]="status(m).tone" /></div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Contact -->
+              <td class="px-4 py-3 align-top hidden md:table-cell max-w-[240px]">
+                <div class="text-regular tabular-nums truncate">{{ m.phone || '—' }}</div>
+                <div *ngIf="m.email" class="mt-0.5 text-xs text-secondary truncate" [title]="m.email">{{ m.email }}</div>
+              </td>
+
+              <!-- Membership -->
+              <td class="px-4 py-3 align-top hidden sm:table-cell whitespace-nowrap">
+                <div class="flex items-center gap-1.5">
+                  <boo-status-badge [label]="m.membershipType" [tone]="tierTone(m)" />
+                  <boo-status-badge *ngIf="m.status !== 'active'" dotted [label]="status(m).label" [tone]="status(m).tone" />
+                </div>
+                <div class="mt-1 text-xs text-secondary">Joined {{ m.joinDate | date: 'd MMM y' }}</div>
+              </td>
+
+              <!-- Visits -->
+              <td class="px-4 py-3 align-top hidden lg:table-cell whitespace-nowrap">
+                <span [class.text-regular]="m.lastVisit" [class.text-placeholder]="!m.lastVisit">{{ (m.lastVisit | date: 'd MMM y') || 'No visits yet' }}</span>
+              </td>
+
+              <!-- Balance -->
+              <td class="px-4 py-3 align-top text-right whitespace-nowrap">
+                <span class="text-[15px] leading-5 font-semibold tabular-nums" [class.text-regular]="m.points > 0" [class.text-placeholder]="m.points <= 0">{{ m.points | number }}</span>
+                <span class="ml-1 text-xs text-secondary">pts</span>
+              </td>
+
+              <!-- Actions -->
+              <td class="px-3 py-2 align-middle text-right whitespace-nowrap" (click)="$event.stopPropagation()">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <button
+                    *ngIf="canAdd"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    class="hidden sm:inline-flex"
+                    [disabled]="m.status !== 'active' || busyIds.has(m.id)"
+                    [attr.aria-label]="addPointsLabel(m)"
+                    aria-haspopup="dialog"
+                    [title]="m.status === 'active' ? 'Add points' : 'Only active members can earn points'"
+                    (click)="openPoints(m, 'add')"
+                  ><physio-icon name="circle-plus" [size]="16" /></button>
+                  <button
+                    *ngIf="canUpdate"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    class="hidden sm:inline-flex"
+                    [disabled]="busyIds.has(m.id)"
+                    [attr.aria-label]="'Edit membership of ' + name(m)"
+                    aria-haspopup="dialog"
+                    title="Edit membership"
+                    (click)="openEdit(m)"
+                  ><physio-icon name="pencil" [size]="16" /></button>
+                  <button
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [attr.aria-label]="'Open points of ' + name(m)"
+                    aria-haspopup="dialog"
+                    title="Balance and history"
+                    (click)="openMember(m)"
+                  ><physio-icon name="chevron-right" [size]="16" /></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No rows: first load, access denied, failure or no matches — all inside the list area -->
+      <ng-template #noRowsTpl>
+        <div *ngIf="loading && !data; else stateTpl" class="flex flex-col" aria-hidden="true">
+          <div *ngFor="let _ of skeletonRows" class="flex items-center gap-6 px-4 py-3.5 border-b border-rowDivider">
+            <div class="flex-1 min-w-0 flex items-center gap-3">
+              <div class="flex-none w-8 h-8 rounded-full bg-rowDivider animate-pulse"></div>
+              <div class="min-w-0"><div class="h-3.5 w-40 max-w-full rounded bg-rowDivider animate-pulse"></div><div class="mt-2 h-3 w-24 rounded bg-rowDivider animate-pulse"></div></div>
+            </div>
+            <div class="hidden md:block w-36 h-3.5 rounded bg-rowDivider animate-pulse"></div>
+            <div class="hidden sm:block w-16 h-5 rounded-full bg-rowDivider animate-pulse"></div>
+            <div class="w-16 h-3.5 rounded bg-rowDivider animate-pulse"></div>
+          </div>
+          <span class="sr-only" role="status">Loading members…</span>
+        </div>
+        <ng-template #stateTpl>
+          <div class="flex-1 flex items-center justify-center px-4 py-8">
+            <boo-empty-state
+              *ngIf="loadError === 'forbidden'"
+              icon="lock"
+              title="You don't have access to loyalty members"
+              description="Ask an administrator for permission to view members and points."
+            />
+            <boo-error-state
+              *ngIf="loadError === 'failed' && !data"
+              icon="cloud-off"
+              title="We couldn't load members"
+              description="Check your connection and try again."
+              retryLabel="Try again"
+              (retry)="load()"
+            />
+            <ng-container *ngIf="!loadError || (loadError === 'failed' && data)">
+              <boo-empty-state
+                *ngIf="hasFilters; else noFilterTpl"
+                icon="search"
+                [title]="'No ' + emptyStatusLabel + 'members match'"
+                description="Check the spelling, or search by member number, phone or email instead."
+              >
+                <button boo-button variant="secondary" size="sm" (click)="clearFilters()">Clear filters</button>
+              </boo-empty-state>
+              <ng-template #noFilterTpl>
+                <boo-empty-state
+                  *ngIf="statusFilter; else noMembersTpl"
+                  icon="users"
+                  [title]="'No ' + emptyStatusLabel + 'members'"
+                  description="Members with this status will be listed here."
+                >
+                  <button boo-button variant="secondary" size="sm" (click)="selectStatus(null)">Show all members</button>
+                </boo-empty-state>
+              </ng-template>
+              <ng-template #noMembersTpl>
+                <boo-empty-state
+                  icon="users"
+                  title="No members yet"
+                  description="Enroll existing patients in the loyalty programme to start tracking their points."
+                >
+                  <button *ngIf="canEnroll" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openEnroll()">
+                    <physio-icon name="user-plus" [size]="15" aria-hidden="true" />Enroll member
+                  </button>
+                </boo-empty-state>
+              </ng-template>
+            </ng-container>
+          </div>
+        </ng-template>
+      </ng-template>
+    </div>
+
+    <!-- Paging -->
+    <footer *ngIf="data && data.totalCount > 0" class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-rowDivider">
+      <p class="m-0 text-xs text-secondary tabular-nums" aria-live="polite">Showing {{ firstShown }}–{{ lastShown }} of {{ data.totalCount | number }}</p>
+      <boo-pagination *ngIf="totalPages > 1" [page]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)" />
+    </footer>
+  </section>
+</div>
+
+<crm-member-detail-drawer
+  [member]="selected"
+  [ledgerVersion]="ledgerVersion"
+  [canAdd]="canAdd"
+  [canRedeem]="canRedeem"
+  [canUpdate]="canUpdate"
+  [canDelete]="canDelete"
+  [busy]="!!selected && busyIds.has(selected.id)"
+  (close)="selected = null"
+  (addPoints)="openPoints($event, 'add', true)"
+  (redeem)="openPoints($event, 'redeem', true)"
+  (edit)="openEdit($event, true)"
+  (remove)="confirmRemove($event)"
+/>
+
+<crm-member-points-drawer
+  [member]="pointsTarget"
+  [mode]="pointsMode"
+  [rewards]="rewards"
+  [rewardsState]="rewardsState === 'idle' ? 'loading' : rewardsState"
+  (close)="closePoints()"
+  (retryRewards)="retryRewards()"
+  (done)="onPointsDone($event)"
+/>
+
+<crm-member-edit-drawer
+  [member]="editing"
+  (close)="closeEdit()"
+  (saved)="onSaved($event)"
+/>
+
+<crm-member-enroll-drawer
+  [open]="enrolling"
+  (close)="enrolling = false"
+  (enrolled)="onEnrolled($event)"
+/>
+
+<crm-rewards-catalog-drawer
+  [open]="rewardsOpen"
+  [rewards]="rewards"
+  [total]="rewardsTotal"
+  [state]="rewardsState === 'idle' ? 'loading' : rewardsState"
+  (close)="rewardsOpen = false"
+  (retry)="retryRewards()"
+/>

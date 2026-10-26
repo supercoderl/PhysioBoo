@@ -1,0 +1,307 @@
+<div class="flex flex-1 min-h-0 flex-col gap-4 pb-5">
+
+  <!-- Page header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div class="min-w-0">
+      <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Patients</h1>
+      <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">
+        Patient directory
+        <ng-container *ngIf="data">
+          <span aria-hidden="true"> · </span>{{ data.totalCount }} {{ data.totalCount === 1 ? 'patient' : 'patients' }}{{ hasFilters ? ' match' : '' }}
+          <span aria-hidden="true"> · </span>{{ sortLabel }}
+        </ng-container>
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button boo-button variant="secondary" size="sm" [loading]="loading" [disabled]="rangeInvalid" (click)="load()">
+        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      </button>
+      <a *ngIf="registerLink" boo-button variant="primary" size="sm" [routerLink]="registerLink">
+        <physio-icon name="user-plus" [size]="15" aria-hidden="true" />Register patient
+      </a>
+    </div>
+  </header>
+
+  <!-- A refresh failed while the previous results are still on screen -->
+  <boo-inline-error
+    *ngIf="data && loadError === 'failed'"
+    what="the latest patients"
+    [state]="refreshErrorState"
+    (retry)="load()"
+  />
+
+  <section class="flex-1 min-h-[360px] flex flex-col min-w-0 bg-surface border border-borderGray rounded-xl" aria-labelledby="patient-list-title">
+    <h2 id="patient-list-title" class="sr-only">Patient list</h2>
+
+    <!-- Search, filter and sort. Field labels (20px) over 36px controls line up with the 56px search field. -->
+    <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
+      <boo-search-field
+        class="flex-1 basis-64 min-w-0"
+        label="Search patients by patient number"
+        placeholder="Search by patient number"
+        [maxlength]="50"
+        [(ngModel)]="query"
+        (ngModelChange)="onQueryChange()"
+        [busy]="searchPending || (loading && !!searchTerm)"
+        (clear)="clearSearch()"
+        aria-describedby="patient-filter-msg"
+      />
+
+      <fieldset class="m-0 p-0 border-0 min-w-0 flex items-center gap-x-2 flex-wrap">
+        <legend class="float-left w-full mb-1 text-xs leading-4 font-medium text-secondary">Registered between</legend>
+        <div class="w-36">
+          <boo-datepicker size="small" [height]="36" label="From" [max]="to || today" [(ngModel)]="from" (ngModelChange)="onRangeChange()" />
+        </div>
+        <span class="text-secondary text-sm" aria-hidden="true">–</span>
+        <div class="w-36">
+          <boo-datepicker size="small" [height]="36" label="To" [min]="from" [max]="today" [(ngModel)]="to" (ngModelChange)="onRangeChange()" />
+        </div>
+      </fieldset>
+
+      <label class="flex flex-col min-w-0 w-full sm:w-44">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Sort by</span>
+        <boo-select size="small" [height]="36" label="Sort by" required [options]="sortOptions" [(ngModel)]="sort" (ngModelChange)="onSortChange()" />
+      </label>
+    </div>
+
+    <!-- Active filters, and what the search covers -->
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2 border-b border-rowDivider bg-body/60 min-h-[44px]">
+      <boo-filter-chips [chips]="chips" (remove)="removeChip($event)" />
+      <button *ngIf="chips.length > 1" type="button" boo-button variant="link" size="sm" (click)="clearFilters()">Clear all</button>
+      <p
+        id="patient-filter-msg"
+        class="m-0 text-xs"
+        [class.text-danger]="rangeInvalid"
+        [class.text-secondary]="!rangeInvalid"
+        aria-live="polite"
+      >
+        <ng-container *ngIf="rangeInvalid; else hintTpl">The start date must be on or before the end date.</ng-container>
+        <ng-template #hintTpl>
+          <ng-container *ngIf="rangePartial; else defaultHintTpl">Pick both dates to filter by registration date.</ng-container>
+          <ng-template #defaultHintTpl>
+            <ng-container *ngIf="!chips.length">Search matches the start of a patient number, e.g. “PAT-”.</ng-container>
+          </ng-template>
+        </ng-template>
+      </p>
+    </div>
+
+    <!-- Results -->
+    <div class="flex-1 flex flex-col min-w-0 min-h-0 relative" [attr.aria-busy]="loading">
+      <div *ngIf="items.length; else noRowsTpl" class="boo-scrollbar min-h-0 flex-1 overflow-auto" [class.opacity-60]="loading">
+        <table class="w-full border-collapse text-sm">
+          <caption class="sr-only">Patients, page {{ page }} of {{ totalPages }}</caption>
+          <thead class="sticky top-0 z-10 bg-surface">
+            <tr class="text-left text-xs font-medium text-secondary border-b border-rowDivider">
+              <th scope="col" class="px-4 py-2.5 font-medium">Patient</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden md:table-cell">Contact</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden xl:table-cell whitespace-nowrap">Age · sex</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden sm:table-cell">Care</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden lg:table-cell whitespace-nowrap">Last visit</th>
+              <th scope="col" class="px-4 py-2.5 font-medium text-right"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let p of items; trackBy: trackById"
+              class="border-b border-rowDivider last:border-b-0 hover:bg-body cursor-pointer transition-colors"
+              [class.bg-primarySoft]="selected?.id === p.id"
+              [class.opacity-50]="busyIds.has(p.id)"
+              (click)="openProfile(p)"
+            >
+              <!-- Identity -->
+              <td class="px-4 py-3 align-top min-w-0 max-w-[300px]">
+                <div class="flex items-start gap-3 min-w-0">
+                  <span class="flex-none w-8 h-8 rounded-full bg-primarySoft text-primaryDeep text-[11px] font-semibold flex items-center justify-center" aria-hidden="true">{{ initials(p) }}</span>
+                  <div class="min-w-0">
+                    <button
+                      type="button"
+                      class="block max-w-full p-0 bg-transparent border-0 text-left font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                      [attr.aria-label]="'Open profile of ' + name(p)"
+                      aria-haspopup="dialog"
+                      (click)="$event.stopPropagation(); openProfile(p)"
+                    >{{ name(p) }}</button>
+                    <div class="mt-0.5 text-xs text-secondary tabular-nums truncate">
+                      {{ p.patientNumber }}<span *ngIf="p.phone" class="md:hidden"> · {{ p.phone }}</span>
+                    </div>
+                    <div class="mt-1 sm:hidden"><boo-status-badge dotted [label]="risk(p).label" [tone]="risk(p).tone" /></div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Contact -->
+              <td class="px-4 py-3 align-top hidden md:table-cell max-w-[240px]">
+                <div class="text-regular tabular-nums truncate">{{ p.phone || '—' }}</div>
+                <div *ngIf="p.email" class="mt-0.5 text-xs text-secondary truncate" [title]="p.email">{{ p.email }}</div>
+              </td>
+
+              <!-- Demographics -->
+              <td class="px-4 py-3 align-top hidden xl:table-cell whitespace-nowrap">
+                <ng-container *ngIf="age(p) !== null; else dashTpl">
+                  <span class="text-regular tabular-nums">{{ age(p) }}</span>
+                  <span *ngIf="gender(p)" class="text-secondary"> · {{ gender(p) }}</span>
+                </ng-container>
+              </td>
+
+              <!-- Care -->
+              <td class="px-4 py-3 align-top hidden sm:table-cell">
+                <boo-status-badge dotted [label]="risk(p).label" [tone]="risk(p).tone" />
+                <div class="mt-1 text-xs text-secondary whitespace-nowrap">
+                  {{ type(p) }}<ng-container *ngFor="let f of flags(p)"><span aria-hidden="true"> · </span><span [class.font-semibold]="f === 'VIP'" [class.text-primaryDeep]="f === 'VIP'">{{ f }}</span></ng-container>
+                </div>
+              </td>
+
+              <!-- Visits -->
+              <td class="px-4 py-3 align-top hidden lg:table-cell whitespace-nowrap">
+                <div class="text-regular" [class.text-placeholder]="!lastVisit(p)">{{ (lastVisit(p) | date: 'd MMM y') || 'No visits yet' }}</div>
+                <div class="mt-0.5 text-xs text-secondary tabular-nums">
+                  {{ p.totalVisits }} {{ p.totalVisits === 1 ? 'visit' : 'visits' }}<ng-container *ngIf="followUp(p) as f"><span aria-hidden="true"> · </span>follow-up {{ f | date: 'd MMM' }}</ng-container>
+                </div>
+              </td>
+
+              <!-- Actions -->
+              <td class="px-3 py-2 align-middle text-right whitespace-nowrap" (click)="$event.stopPropagation()">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <button
+                    *ngIf="canUpdate"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [disabled]="busyIds.has(p.id)"
+                    [attr.aria-label]="'Edit ' + name(p)"
+                    aria-haspopup="dialog"
+                    title="Edit patient"
+                    (click)="openEdit(p)"
+                  ><physio-icon name="pencil" [size]="16" /></button>
+                  <a
+                    *ngIf="recordLink"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    class="hidden sm:inline-flex"
+                    [routerLink]="recordLink"
+                    [queryParams]="{ patientId: p.id }"
+                    [attr.aria-label]="'Open medical record of ' + name(p)"
+                    title="Medical record"
+                  ><physio-icon name="file-text" [size]="16" /></a>
+                  <button
+                    *ngIf="canDelete"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    class="!text-danger hidden sm:inline-flex"
+                    [disabled]="busyIds.has(p.id)"
+                    [attr.aria-label]="'Delete ' + name(p)"
+                    title="Delete patient"
+                    (click)="confirmDelete(p)"
+                  ><physio-icon name="trash" [size]="16" /></button>
+                  <button
+                    *ngIf="!canUpdate && !recordLink && !canDelete"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [attr.aria-label]="'Open profile of ' + name(p)"
+                    aria-haspopup="dialog"
+                    title="View profile"
+                    (click)="openProfile(p)"
+                  ><physio-icon name="chevron-right" [size]="16" /></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No rows: first load, access denied, failure or no matches — all inside the list area -->
+      <ng-template #noRowsTpl>
+        <div *ngIf="loading && !data; else stateTpl" class="flex flex-col" aria-hidden="true">
+          <div *ngFor="let _ of skeletonRows" class="flex items-center gap-6 px-4 py-3.5 border-b border-rowDivider">
+            <div class="flex-1 min-w-0 flex items-center gap-3">
+              <div class="flex-none w-8 h-8 rounded-full bg-rowDivider animate-pulse"></div>
+              <div class="min-w-0"><div class="h-3.5 w-40 max-w-full rounded bg-rowDivider animate-pulse"></div><div class="mt-2 h-3 w-24 rounded bg-rowDivider animate-pulse"></div></div>
+            </div>
+            <div class="hidden md:block w-36 h-3.5 rounded bg-rowDivider animate-pulse"></div>
+            <div class="hidden sm:block w-20 h-5 rounded-full bg-rowDivider animate-pulse"></div>
+            <div class="hidden lg:block w-24 h-3.5 rounded bg-rowDivider animate-pulse"></div>
+          </div>
+          <span class="sr-only" role="status">Loading patients…</span>
+        </div>
+        <ng-template #stateTpl>
+          <div class="flex-1 flex items-center justify-center px-4 py-8">
+            <boo-empty-state
+              *ngIf="loadError === 'forbidden'"
+              icon="lock"
+              title="You don't have access to patient records"
+              description="Ask an administrator for permission to view patients."
+            />
+            <boo-error-state
+              *ngIf="loadError === 'failed' && !data"
+              icon="cloud-off"
+              title="We couldn't load patients"
+              description="Check your connection and try again."
+              retryLabel="Try again"
+              (retry)="load()"
+            />
+            <ng-container *ngIf="!loadError || (loadError === 'failed' && data)">
+              <boo-empty-state
+                *ngIf="hasFilters; else noPatientsTpl"
+                icon="search"
+                title="No patients match"
+                description="Check the patient number, or widen the registration dates."
+              >
+                <button boo-button variant="secondary" size="sm" (click)="clearFilters()">Clear filters</button>
+              </boo-empty-state>
+              <ng-template #noPatientsTpl>
+                <boo-empty-state
+                  icon="users"
+                  title="No patients yet"
+                  description="Patients appear here once they're registered at reception."
+                >
+                  <a *ngIf="registerLink" boo-button variant="primary" size="sm" [routerLink]="registerLink">
+                    <physio-icon name="user-plus" [size]="15" aria-hidden="true" />Register patient
+                  </a>
+                </boo-empty-state>
+              </ng-template>
+            </ng-container>
+          </div>
+        </ng-template>
+      </ng-template>
+    </div>
+
+    <!-- Paging -->
+    <footer *ngIf="data && data.totalCount > 0" class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-rowDivider">
+      <p class="m-0 text-xs text-secondary tabular-nums" aria-live="polite">Showing {{ firstShown }}–{{ lastShown }} of {{ data.totalCount }}</p>
+      <boo-pagination *ngIf="totalPages > 1" [page]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)" />
+    </footer>
+  </section>
+</div>
+
+<ng-template #dashTpl><span class="text-placeholder">—</span></ng-template>
+
+<crm-patient-detail-drawer
+  [patient]="selected"
+  [canUpdate]="canUpdate"
+  [canDelete]="canDelete"
+  [recordLink]="recordLink"
+  [busy]="!!selected && busyIds.has(selected.id)"
+  [doctorNames]="doctorNames"
+  [hospitalNames]="hospitalNames"
+  (close)="selected = null"
+  (edit)="openEdit($event, true)"
+  (remove)="confirmDelete($event)"
+/>
+
+<crm-patient-edit-drawer
+  [patient]="editing"
+  [doctors]="doctors"
+  [hospitals]="hospitals"
+  [lookupError]="lookupError"
+  (close)="closeEdit()"
+  (saved)="onSaved($event)"
+/>

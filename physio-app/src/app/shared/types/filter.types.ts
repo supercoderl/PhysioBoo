@@ -1,3 +1,5 @@
+import { LeadPriority, LeadStatus } from "../enums/lead";
+
 export type FilterType = 'select' | 'range-number' | 'boolean' | 'color';
 
 export interface FilterOption {
@@ -96,13 +98,14 @@ export interface ServiceFilter {
     hospitalId?: string | null;
 }
 
+/** The server filters patients only by the date the record was created (both dates needed); it ignores the rest. */
 export interface PatientFilter {
     start: string,
     end: string,
-    patientType: number | null,
-    riskLevel: number | null,
-    isVip: boolean | null,
-    isChronicPatient: boolean | null,
+    patientType?: number | null,
+    riskLevel?: number | null,
+    isVip?: boolean | null,
+    isChronicPatient?: boolean | null,
 }
 
 export interface HospitalGroupFilter {
@@ -171,8 +174,10 @@ export interface BedFilter {
 }
 
 export interface CampaignFilter {
-    start: string,
-    end: string,
+    /** YYYY-MM-DD; campaigns still running on or after this day. */
+    start: string | null,
+    /** YYYY-MM-DD; campaigns starting on or before this day. */
+    end: string | null,
     type: number | null,
     status: number | null,
 }
@@ -200,10 +205,12 @@ export interface RewardFilter {
 }
 
 export interface LeadFilter {
+    /** YYYY-MM-DD; leads received on or after this day. */
     start: string | null;
+    /** YYYY-MM-DD; leads received on or before this day. */
     end: string | null;
-    status: number | null;
-    priority: number | null;
+    status: LeadStatus | null;
+    priority: LeadPriority | null;
 }
 
 export interface ComplaintFilter {

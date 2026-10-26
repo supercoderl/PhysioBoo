@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
 import { FeatureFilter } from "../../shared/types/filter.types";
-import { Feature } from "../../shared/types/feature.types";
+import { Feature, SaveFeatureRequest } from "../../shared/types/feature.types";
 
 @Injectable({ providedIn: 'root' })
 export class HomeFeatureService {
@@ -17,11 +17,11 @@ export class HomeFeatureService {
         return this.http.get<PagedResponse<Feature | null>>(`${BASE_API.HOME_FEATURE.BASE}/${id}`);
     }
 
-    create(params: any) {
+    create(params: SaveFeatureRequest) {
         return this.http.post<PagedResponse<string>>(BASE_API.HOME_FEATURE.BASE, params);
     }
 
-    update(id: string, params: any) {
+    update(id: string, params: SaveFeatureRequest) {
         return this.http.patch<PagedResponse<string>>(`${BASE_API.HOME_FEATURE.BASE}/${id}`, params);
     }
 

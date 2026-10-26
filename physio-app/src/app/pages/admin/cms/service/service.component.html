@@ -1,119 +1,384 @@
-<admin-content-header>
-  <!-- ──────────────────────────────────────────────────────────── -->
-  <!-- Page header                                                  -->
-  <!-- ──────────────────────────────────────────────────────────── -->
-  <div class="flex items-start justify-between pb-4 mb-4 border-b border-gray-200 gap-4">
+<div class="flex flex-1 min-h-0 flex-col gap-4 pb-5">
+
+  <!-- Page header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
     <div class="min-w-0">
-      <h4 class="text-[22px] text-primary font-semibold mb-1">Medical Services</h4>
-      <p class="text-sm text-secondary m-0">
-        Manage hospital services and pricing
-        <span *ngIf="data() as d" class="text-gray-400">·</span>
-        <span *ngIf="data() as d">{{ d.totalCount }} services</span>
+      <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Medical services</h1>
+      <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">
+        The services patients can book, with their price, duration and the team that delivers them
+        <ng-container *ngIf="stats as st">
+          <span aria-hidden="true"> · </span><span class="font-medium text-regular tabular-nums">{{ st.activeServices | number }}</span> of {{ st.totalServices | number }} live on the website
+        </ng-container>
       </p>
     </div>
-    <div class="flex items-center gap-2 shrink-0">
-      <boo-button-admin (click)="bulkExport()" background="transparent" textColor="rgb(var(--twc-primary))" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 12px" [fontSize]="14" fontWeight="500" [gap]="8">
-        <physio-icon name="download" class="w-4 h-4"></physio-icon>
-        Export
-      </boo-button-admin>
-      <boo-button-admin (click)="openNewForm()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
-        <physio-icon name="plus" class="w-4 h-4"></physio-icon>
-        New Service
-      </boo-button-admin>
+    <div class="flex items-center gap-2">
+      <button boo-button variant="secondary" size="sm" [loading]="exporting" [disabled]="!data?.totalCount" (click)="exportCsv()">
+        <physio-icon *ngIf="!exporting" name="download" [size]="15" aria-hidden="true" />Export CSV
+      </button>
+      <button boo-button variant="secondary" size="sm" [iconOnly]="true" [loading]="loading" aria-label="Refresh services" title="Refresh" (click)="load()">
+        <physio-icon *ngIf="!loading" name="refresh" [size]="15" />
+      </button>
+      <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
+        <physio-icon name="plus" [size]="15" aria-hidden="true" />New service
+      </button>
     </div>
-  </div>
+  </header>
 
-  <!-- ──────────────────────────────────────────────────────────── -->
-  <!-- KPI strip                                                    -->
-  <!-- ──────────────────────────────────────────────────────────── -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-    <div class="bg-surface rounded-lg border border-gray-200 p-4">
-      <div class="text-xs text-secondary uppercase tracking-wider mb-1">Total services</div>
-      <div class="text-2xl font-semibold text-primary">{{ stats()?.totalServices ?? data()?.totalCount ?? '—' }}</div>
-    </div>
-    <div class="bg-surface rounded-lg border border-gray-200 p-4">
-      <div class="text-xs text-secondary uppercase tracking-wider mb-1">Active</div>
-      <div class="text-2xl font-semibold text-emerald-600">{{ stats()?.activeServices ?? '—' }}</div>
-    </div>
-    <div class="bg-surface rounded-lg border border-gray-200 p-4">
-      <div class="text-xs text-secondary uppercase tracking-wider mb-1">Average price</div>
-      <div class="text-2xl font-semibold text-primary">
-        {{ stats() ? formatMoney(stats()!.averagePrice, stats()!.averagePriceCurrency) : '—' }}
-      </div>
-    </div>
-    <div class="bg-surface rounded-lg border border-gray-200 p-4">
-      <div class="text-xs text-secondary uppercase tracking-wider mb-1">Most used dept.</div>
-      <div class="text-base font-semibold text-primary truncate" [title]="stats()?.mostUsedDepartment?.name">
-        {{ stats()?.mostUsedDepartment?.name ?? '—' }}
-      </div>
-      <div class="text-xs text-secondary">
-        <ng-container *ngIf="stats()?.mostUsedDepartment as d">{{ d.serviceCount }} services</ng-container>
-      </div>
-    </div>
-  </div>
-
-  <!-- ──────────────────────────────────────────────────────────── -->
-  <!-- Load error banner (never fake success data on API failure)  -->
-  <!-- ──────────────────────────────────────────────────────────── -->
-  <div *ngIf="loadError()" class="mb-3 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-    <div class="flex items-center gap-2 text-sm text-red-700">
-      <physio-icon name="triangle-alert" [size]="16" [class]="'shrink-0'"></physio-icon>
-      Couldn't load services. What you see below may be out of date.
-    </div>
-    <boo-button-admin (click)="load()" background="transparent" textColor="#B91C1C" [border]="{ width: 1, color: '#FCA5A5' }" [fontSize]="14" fontWeight="500" class="shrink-0">
-      Retry
-    </boo-button-admin>
-  </div>
-
-  <!-- ──────────────────────────────────────────────────────────── -->
-  <!-- Table                                                        -->
-  <!-- ──────────────────────────────────────────────────────────── -->
-  <div class="flex-1 min-h-0">
-    <cms-service-table-card
-      [data]="data()"
-      [filter]="{ pageNumber: params.pageNumber, pageSize: params.pageSize }"
-      [sortOptions]="sortOptions"
-      [currentSort]="params.sort"
-      [filterConfigs]="filterConfigs"
-      [currentFilter]="currentFilter"
-      (pageChange)="onPageChange($event)"
-      (searchChange)="onSearchChange($event)"
-      (sortApply)="onSortApply($event)"
-      (filterApply)="onFilterApply($event)"
-      (resetView)="onResetView()"
-      (reloadClick)="load()"
-      (bulkAction)="onBulkAction($event)"
-      (viewClick)="openDetail($event)"
-      (editClick)="openEditForm($event)"
-      (duplicateClick)="duplicate($event)"
-      (archiveClick)="archive($event)"
-      (deleteClick)="deleteOne($event)"
-    />
-  </div>
-
-  <!-- ──────────────────────────────────────────────────────────── -->
-  <!-- Detail drawer                                                -->
-  <!-- ──────────────────────────────────────────────────────────── -->
-  <cms-service-detail-drawer
-    [isOpen]="isDetailOpen()"
-    [serviceId]="detailId()"
-    (close)="closeDetail()"
-    (editClick)="openEditForm($event); closeDetail()"
-    (duplicateClick)="duplicate($event)"
-    (archiveClick)="archive($event)"
-    (publishClick)="publish($event)"
-    (deleteClick)="deleteOne($event)"
+  <!-- A refresh failed while the previous results are still on screen -->
+  <boo-inline-error
+    *ngIf="data && loadError === 'failed'"
+    what="the latest services"
+    [state]="refreshErrorState"
+    (retry)="load()"
   />
 
-  <!-- ──────────────────────────────────────────────────────────── -->
-  <!-- Create / edit form drawer                                    -->
-  <!-- ──────────────────────────────────────────────────────────── -->
-  <cms-service-drawer
-    [isOpen]="isFormOpen()"
-    [currentId]="editingId()"
-    [departmentOptions]="departmentOptions()"
-    [doctorOptions]="doctorOptions()"
-    (close)="closeForm()"
-    (saveSuccess)="onSaveSuccess()"
-  />
-</admin-content-header>
+  <section class="flex-1 min-h-[360px] flex flex-col min-w-0 bg-surface border border-borderGray rounded-xl" aria-labelledby="service-list-title">
+    <h2 id="service-list-title" class="sr-only">Service catalog</h2>
+
+    <!-- Lifecycle: one status at a time, as the server filters -->
+    <div class="boo-scrollbar overflow-x-auto border-b border-rowDivider">
+      <div class="flex min-w-max gap-1 px-4" role="tablist" aria-label="Service status">
+        <button
+          *ngFor="let tab of statusTabs; let i = index"
+          type="button"
+          role="tab"
+          [id]="'service-tab-' + i"
+          aria-controls="service-results"
+          [attr.aria-selected]="tab.value === statusFilter"
+          [attr.tabindex]="tab.value === statusFilter ? 0 : -1"
+          class="relative -mb-px px-3 py-3 bg-transparent border-0 border-b-2 text-sm whitespace-nowrap cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary rounded-t aria-[selected=false]:hover:text-regular"
+          [class.border-primary]="tab.value === statusFilter"
+          [class.text-primaryDeep]="tab.value === statusFilter"
+          [class.font-semibold]="tab.value === statusFilter"
+          [class.border-transparent]="tab.value !== statusFilter"
+          [class.text-secondary]="tab.value !== statusFilter"
+          [class.font-medium]="tab.value !== statusFilter"
+          (click)="selectStatus(tab.value)"
+          (keydown)="onTabKey($event, i)"
+        >{{ tab.label }}</button>
+      </div>
+    </div>
+
+    <!-- Search, who delivers it, availability and sort. Field labels (20px) over 36px controls line up with the 56px search field. -->
+    <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
+      <boo-search-field
+        class="flex-1 basis-64 min-w-0"
+        label="Search services by name, code or short name"
+        placeholder="Search name, code or short name"
+        [maxlength]="100"
+        [(ngModel)]="query"
+        (ngModelChange)="onQueryChange()"
+        [busy]="searchPending || (loading && !!searchTerm)"
+        (clear)="clearSearch()"
+      />
+
+      <label class="flex flex-col min-w-0 w-full sm:w-44">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Department</span>
+        <boo-select size="small" [height]="36" label="All departments" [options]="departmentOptions" [(ngModel)]="departmentFilter" (ngModelChange)="onFilterChange()" />
+      </label>
+
+      <label class="flex flex-col min-w-0 w-full sm:w-44">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Doctor</span>
+        <boo-select size="small" [height]="36" label="All doctors" [options]="doctorOptions" [(ngModel)]="doctorFilter" (ngModelChange)="onFilterChange()" />
+      </label>
+
+      <label class="flex flex-col min-w-0 w-full sm:w-40">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Availability</span>
+        <boo-select size="small" [height]="36" label="Any availability" [options]="availabilityOptions" [(ngModel)]="availabilityFilter" (ngModelChange)="onFilterChange()" />
+      </label>
+
+      <label class="flex flex-col min-w-0 w-full sm:w-48">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Sort by</span>
+        <boo-select size="small" [height]="36" label="Sort by" required [options]="sortOptions" [(ngModel)]="sort" (ngModelChange)="onFilterChange()" />
+      </label>
+    </div>
+
+    <!-- Ticked rows take over this strip with their bulk actions; otherwise it shows active filters and the count -->
+    <div
+      *ngIf="picked.size; else scopeTpl"
+      class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2 border-b border-rowDivider bg-primarySoft/60 min-h-[44px]"
+      role="region"
+      aria-label="Bulk actions"
+    >
+      <p class="m-0 text-sm font-medium text-primaryDeep tabular-nums" aria-live="polite">{{ picked.size }} selected</p>
+      <div class="flex flex-wrap items-center gap-2">
+        <button *ngIf="canUpdate && statusFilter !== 'Archived'" type="button" boo-button variant="secondary" size="sm" [disabled]="!!bulkBusy" [loading]="bulkBusy === 'archive'" (click)="bulkArchive()">
+          <physio-icon *ngIf="bulkBusy !== 'archive'" name="archive" [size]="15" aria-hidden="true" />Archive
+        </button>
+        <button *ngIf="canDelete" type="button" boo-button variant="secondary" size="sm" class="!text-danger" [disabled]="!!bulkBusy" [loading]="bulkBusy === 'delete'" (click)="bulkDelete()">
+          <physio-icon *ngIf="bulkBusy !== 'delete'" name="trash" [size]="15" aria-hidden="true" />Delete
+        </button>
+      </div>
+      <button type="button" boo-button variant="link" size="sm" class="ml-auto" [disabled]="!!bulkBusy" (click)="clearPicked()">Clear selection</button>
+    </div>
+    <ng-template #scopeTpl>
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2 border-b border-rowDivider bg-body/60 min-h-[44px]">
+        <boo-filter-chips [chips]="chips" (remove)="removeChip($event)" />
+        <button *ngIf="chips.length > 1" type="button" boo-button variant="link" size="sm" (click)="clearFilters()">Clear all</button>
+        <p class="m-0 text-xs text-secondary" aria-live="polite">
+          <ng-container *ngIf="data">{{ data.totalCount | number }} {{ countNoun }}<span aria-hidden="true"> · </span>{{ sortLabel }}</ng-container>
+        </p>
+      </div>
+    </ng-template>
+
+    <!-- Results -->
+    <div
+      id="service-results"
+      role="tabpanel"
+      [attr.aria-labelledby]="'service-tab-' + tabIndex(activeTab)"
+      class="flex-1 flex flex-col min-w-0 min-h-0 relative"
+      [attr.aria-busy]="loading"
+    >
+      <div *ngIf="items.length; else noRowsTpl" class="boo-scrollbar min-h-0 flex-1 overflow-auto" [class.opacity-60]="loading">
+        <table class="w-full border-collapse text-sm">
+          <caption class="sr-only">{{ activeTab.label }}, page {{ page }} of {{ totalPages }}</caption>
+          <thead class="sticky top-0 z-10 bg-surface">
+            <tr class="text-left text-xs font-medium text-secondary border-b border-rowDivider">
+              <th *ngIf="canSelect" scope="col" class="w-10 pl-4 pr-0 py-2.5 font-medium">
+                <boo-checkbox [ngModel]="allPicked" (ngModelChange)="togglePickAll($event)" [disabled]="!!bulkBusy">
+                  <span class="sr-only">Select all services on this page</span>
+                </boo-checkbox>
+              </th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Service</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden lg:table-cell">Department and doctor</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden md:table-cell text-right">Price and time</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden md:table-cell">Status</th>
+              <th scope="col" class="px-4 py-2.5 font-medium text-right"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let s of items; trackBy: trackById"
+              class="border-b border-rowDivider last:border-b-0 hover:bg-body cursor-pointer transition-colors"
+              [class.bg-primarySoft]="selected?.id === s.id || picked.has(s.id)"
+              [class.opacity-50]="busy.get(s.id) === 'delete'"
+              (click)="openDetail(s)"
+            >
+              <td *ngIf="canSelect" class="w-10 pl-4 pr-0 py-3 align-top" (click)="$event.stopPropagation()">
+                <div class="pt-0.5">
+                  <boo-checkbox [ngModel]="picked.has(s.id)" (ngModelChange)="togglePick(s, $event)" [disabled]="!!bulkBusy">
+                    <span class="sr-only">Select {{ s.name }}</span>
+                  </boo-checkbox>
+                </div>
+              </td>
+
+              <!-- Identity: name first, then code and how it is booked -->
+              <td class="px-4 py-3 align-top min-w-0">
+                <div class="min-w-0 max-w-[520px]">
+                  <button
+                    type="button"
+                    class="block max-w-full p-0 bg-transparent border-0 text-left text-[15px] leading-5 font-semibold text-regular line-clamp-2 break-words cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                    [attr.aria-label]="'View ' + s.name"
+                    aria-haspopup="dialog"
+                    [title]="s.name"
+                    (click)="$event.stopPropagation(); openDetail(s)"
+                  >{{ s.name }}</button>
+                  <p *ngIf="s.shortName || s.description" class="m-0 mt-0.5 text-xs leading-5 text-secondary line-clamp-1 break-words">{{ s.shortName || s.description }}</p>
+                  <p class="m-0 mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-secondary">
+                    <span class="font-mono font-medium text-primaryDeep">{{ s.code }}</span>
+                    <span aria-hidden="true">·</span><span>{{ bookingRule(s) }}</span>
+                    <span class="lg:hidden min-w-0 truncate max-w-[220px]" *ngIf="s.primaryDepartmentName"><span aria-hidden="true">· </span>{{ s.primaryDepartmentName }}</span>
+                  </p>
+                  <!-- Narrow screens: price, time and status move under the name -->
+                  <div class="mt-2 md:hidden flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <boo-status-badge dotted [label]="status(s).label" [tone]="status(s).tone" />
+                    <span class="text-xs font-medium text-regular tabular-nums">{{ money(s.basePrice, s.currency) }}</span>
+                    <span class="text-xs text-secondary tabular-nums">{{ duration(s.durationMinutes) }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Who delivers it -->
+              <td class="px-4 py-3 align-top hidden lg:table-cell max-w-[240px]">
+                <div class="flex items-center gap-1.5 min-w-0">
+                  <span *ngIf="s.primaryDepartmentName; else noDeptTpl" class="truncate text-regular" [title]="s.primaryDepartmentName">{{ s.primaryDepartmentName }}</span>
+                  <ng-template #noDeptTpl><span class="text-placeholder">No department</span></ng-template>
+                  <span *ngIf="moreDepartments(s)" class="flex-none text-xs text-secondary">+{{ moreDepartments(s) }}</span>
+                </div>
+                <div class="mt-1 flex items-center gap-1.5 min-w-0 text-xs text-secondary">
+                  <physio-icon name="stethoscope" [size]="13" class="flex-none" aria-hidden="true" />
+                  <span *ngIf="s.primaryDoctorName; else noDocTpl" class="truncate" [title]="s.primaryDoctorName">{{ s.primaryDoctorName }}</span>
+                  <ng-template #noDocTpl><span class="text-placeholder">No doctor assigned</span></ng-template>
+                  <span *ngIf="doctorCount(s) > 1" class="flex-none">+{{ doctorCount(s) - 1 }}</span>
+                </div>
+              </td>
+
+              <!-- Price and duration, right-aligned so amounts line up -->
+              <td class="px-4 py-3 align-top hidden md:table-cell text-right whitespace-nowrap">
+                <div class="font-semibold text-regular tabular-nums">{{ money(s.basePrice, s.currency) }}</div>
+                <div class="mt-1 text-xs text-secondary tabular-nums">
+                  {{ duration(s.durationMinutes) }}<ng-container *ngIf="s.vatIncluded"><span aria-hidden="true"> · </span>VAT incl.</ng-container>
+                </div>
+              </td>
+
+              <!-- Lifecycle, then day-to-day availability -->
+              <td class="px-4 py-3 align-top hidden md:table-cell whitespace-nowrap">
+                <boo-status-badge dotted [label]="status(s).label" [tone]="status(s).tone" />
+                <div class="mt-1.5 flex items-center gap-1.5 text-xs" [ngClass]="availability(s).text">
+                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="availability(s).dot" aria-hidden="true"></span>{{ availability(s).label }}
+                </div>
+              </td>
+
+              <!-- Actions: the next lifecycle step, then edit and delete -->
+              <td class="px-3 py-2.5 align-top text-right whitespace-nowrap" (click)="$event.stopPropagation()">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <ng-container *ngIf="canUpdate && rowMove(s) as t">
+                    <button
+                      type="button"
+                      boo-button
+                      variant="secondary"
+                      size="sm"
+                      class="hidden md:inline-flex"
+                      [disabled]="busy.has(s.id)"
+                      [loading]="busy.get(s.id) === t.kind"
+                      [attr.aria-label]="t.label + ' ' + s.name"
+                      (click)="move(s, t)"
+                    ><physio-icon *ngIf="busy.get(s.id) !== t.kind" [name]="t.icon" [size]="14" aria-hidden="true" />{{ t.label }}</button>
+                  </ng-container>
+                  <button
+                    *ngIf="canUpdate"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [disabled]="busy.has(s.id)"
+                    [attr.aria-label]="'Edit ' + s.name"
+                    aria-haspopup="dialog"
+                    title="Edit service"
+                    (click)="openEdit(s)"
+                  ><physio-icon name="pencil" [size]="16" /></button>
+                  <button
+                    *ngIf="canDelete"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    class="!text-danger hidden sm:inline-flex"
+                    [disabled]="busy.has(s.id)"
+                    [attr.aria-label]="'Delete ' + s.name"
+                    title="Delete service"
+                    (click)="confirmDelete(s)"
+                  ><physio-icon name="trash" [size]="16" /></button>
+                  <button
+                    *ngIf="!canUpdate && !canDelete"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [attr.aria-label]="'View ' + s.name"
+                    aria-haspopup="dialog"
+                    title="View details"
+                    (click)="openDetail(s)"
+                  ><physio-icon name="chevron-right" [size]="16" /></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No rows: first load, access denied, failure or nothing found — all inside the list area -->
+      <ng-template #noRowsTpl>
+        <div *ngIf="loading && !data; else stateTpl" class="flex flex-col" aria-hidden="true">
+          <div *ngFor="let _ of skeletonRows" class="flex items-start gap-4 px-4 py-3.5 border-b border-rowDivider">
+            <div class="flex-1 min-w-0 pt-0.5">
+              <div class="h-4 w-72 max-w-full rounded bg-rowDivider animate-pulse"></div>
+              <div class="mt-2 h-3 w-96 max-w-full rounded bg-rowDivider animate-pulse"></div>
+              <div class="mt-2.5 h-3 w-40 rounded bg-rowDivider animate-pulse"></div>
+            </div>
+            <div class="hidden lg:block w-36 h-3.5 mt-1 rounded bg-rowDivider animate-pulse"></div>
+            <div class="hidden md:block w-24 h-4 mt-0.5 rounded bg-rowDivider animate-pulse"></div>
+            <div class="hidden md:block w-20 h-5 rounded-full bg-rowDivider animate-pulse"></div>
+          </div>
+          <span class="sr-only" role="status">Loading services…</span>
+        </div>
+        <ng-template #stateTpl>
+          <div class="flex-1 flex items-center justify-center px-4 py-8">
+            <boo-empty-state
+              *ngIf="loadError === 'forbidden'"
+              icon="lock"
+              title="You don't have access to services"
+              description="Ask an administrator for permission to manage the service catalog."
+            />
+            <boo-error-state
+              *ngIf="loadError === 'failed' && !data"
+              icon="cloud-off"
+              title="We couldn't load services"
+              description="Check your connection and try again."
+              retryLabel="Try again"
+              (retry)="load()"
+            />
+            <ng-container *ngIf="!loadError || (loadError === 'failed' && data)">
+              <!-- Filters narrowed it down to nothing -->
+              <boo-empty-state
+                *ngIf="hasFilters; else noStatusTpl"
+                icon="search"
+                title="No services match"
+                description="Try other words, or another department, doctor or availability."
+              >
+                <button boo-button variant="secondary" size="sm" (click)="clearFilters()">Clear filters</button>
+              </boo-empty-state>
+              <!-- Only the status tab is narrowing the list -->
+              <ng-template #noStatusTpl>
+                <boo-empty-state
+                  *ngIf="statusFilter !== null; else noServicesTpl"
+                  icon="stethoscope"
+                  [title]="'No ' + activeTab.label.toLowerCase() + ' services'"
+                  [description]="statusFilter === 'Archived' ? 'Services you archive are kept here, out of the catalog and off the website.' : 'Services show up here when they reach this status.'"
+                >
+                  <button boo-button variant="secondary" size="sm" (click)="showAll()">View all services</button>
+                </boo-empty-state>
+              </ng-template>
+              <!-- Nothing at all yet -->
+              <ng-template #noServicesTpl>
+                <boo-empty-state
+                  icon="stethoscope"
+                  title="No services yet"
+                  [description]="canCreate ? 'Add your first service. It stays a draft until you publish it to the website.' : 'Services appear here once someone on your team adds one.'"
+                >
+                  <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
+                    <physio-icon name="plus" [size]="15" aria-hidden="true" />New service
+                  </button>
+                </boo-empty-state>
+              </ng-template>
+            </ng-container>
+          </div>
+        </ng-template>
+      </ng-template>
+    </div>
+
+    <!-- Paging -->
+    <footer *ngIf="data && data.totalCount > 0" class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-rowDivider">
+      <p class="m-0 text-xs text-secondary tabular-nums" aria-live="polite">Showing {{ firstShown }}–{{ lastShown }} of {{ data.totalCount }}</p>
+      <boo-pagination *ngIf="totalPages > 1" [page]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)" />
+    </footer>
+  </section>
+</div>
+
+<cms-service-detail-drawer
+  [service]="selected"
+  [departmentOptions]="departmentOptions"
+  [doctorOptions]="doctorOptions"
+  [canCreate]="canCreate"
+  [canUpdate]="canUpdate"
+  [canDelete]="canDelete"
+  [busy]="busySelected"
+  [pending]="pendingSelected"
+  (close)="selected = null"
+  (edit)="openEdit($event, true)"
+  (remove)="confirmDelete($event)"
+  (duplicate)="duplicate($event)"
+  (transition)="selected && move(selected, $event)"
+/>
+
+<cms-service-edit-drawer
+  [open]="editorOpen"
+  [service]="editing"
+  [departmentOptions]="departmentOptions"
+  [doctorOptions]="doctorOptions"
+  (close)="closeEditor()"
+  (saved)="onSaved($event)"
+/>

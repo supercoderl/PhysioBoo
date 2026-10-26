@@ -1,0 +1,400 @@
+<div class="flex flex-1 min-h-0 flex-col gap-4 pb-5">
+
+  <!-- Page header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div class="min-w-0">
+      <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Support &amp; complaints</h1>
+      <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">
+        Patient complaints, triaged and followed through to resolution
+        <ng-container *ngIf="counts && !hasFilters">
+          <span aria-hidden="true"> · </span><span class="font-medium text-regular">{{ openCount }} open</span>
+          <ng-container *ngIf="pendingCount"><span aria-hidden="true"> · </span><span class="font-medium text-amber-700">{{ pendingCount }} not picked up</span></ng-container>
+        </ng-container>
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button boo-button variant="secondary" size="sm" [loading]="loading" [disabled]="rangeInvalid" (click)="refresh()">
+        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      </button>
+      <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
+        <physio-icon name="plus" [size]="15" aria-hidden="true" />Log complaint
+      </button>
+    </div>
+  </header>
+
+  <!-- A refresh failed while the previous results are still on screen -->
+  <boo-inline-error
+    *ngIf="data && loadError === 'failed'"
+    what="the latest complaints"
+    [state]="refreshErrorState"
+    (retry)="refresh()"
+  />
+
+  <section class="flex-1 min-h-[360px] flex flex-col min-w-0 bg-surface border border-borderGray rounded-xl" aria-labelledby="complaint-list-title">
+    <h2 id="complaint-list-title" class="sr-only">Complaint queue</h2>
+
+    <!-- Status: one tab per step of a ticket's life, with how many tickets are in it under the current filters -->
+    <div class="boo-scrollbar overflow-x-auto border-b border-rowDivider">
+      <div class="flex min-w-max items-stretch px-2" role="tablist" aria-label="Ticket status">
+        <ng-container *ngFor="let tab of statusTabs; let i = index">
+          <!-- Separators: the open queue reads as one flow, the finished tickets stand apart -->
+          <span *ngIf="i === 1" class="self-center w-px h-8 mx-1.5 bg-rowDivider" aria-hidden="true"></span>
+          <physio-icon *ngIf="i === 2 || i === 4" name="chevron-right" [size]="14" class="self-center flex-none text-placeholder" aria-hidden="true" />
+          <span *ngIf="i === 3" class="self-center w-px h-8 mx-1.5 bg-rowDivider" aria-hidden="true"></span>
+          <button
+            type="button"
+            role="tab"
+            [id]="'complaint-tab-' + i"
+            aria-controls="complaint-results"
+            [attr.aria-selected]="tab.value === statusFilter"
+            [attr.tabindex]="tab.value === statusFilter ? 0 : -1"
+            class="relative -mb-px flex flex-col items-start gap-0.5 px-3 py-2.5 min-w-[92px] bg-transparent border-0 border-b-2 text-left cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary rounded-t"
+            [ngClass]="tab.value === statusFilter ? 'border-primary' : 'border-transparent hover:bg-body'"
+            (click)="selectStatus(tab.value)"
+            (keydown)="onTabKey($event, i)"
+          >
+            <span class="flex items-center gap-1.5 text-xs whitespace-nowrap"
+              [class.font-semibold]="tab.value === statusFilter"
+              [class.text-primaryDeep]="tab.value === statusFilter"
+              [class.font-medium]="tab.value !== statusFilter"
+              [class.text-secondary]="tab.value !== statusFilter"
+            >
+              <span *ngIf="tab.dot" class="w-1.5 h-1.5 rounded-full flex-none" [ngClass]="tab.dot" aria-hidden="true"></span>{{ tab.label }}
+            </span>
+            <span class="text-lg leading-6 font-semibold tabular-nums" [class.text-regular]="countOf(tab) !== null" [class.text-placeholder]="countOf(tab) === null">
+              <ng-container *ngIf="countOf(tab) !== null; else noCountTpl">{{ countOf(tab) }}</ng-container>
+              <ng-template #noCountTpl><span aria-hidden="true">–</span></ng-template>
+            </span>
+            <span *ngIf="countOf(tab) !== null" class="sr-only">{{ countOf(tab) === 1 ? 'ticket' : 'tickets' }}</span>
+          </button>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Search, priority, category, dates and sort. Field labels (20px) over 36px controls line up with the 56px search field. -->
+    <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
+      <boo-search-field
+        class="flex-1 basis-64 min-w-0"
+        label="Search complaints by ticket, subject, name, phone or email"
+        placeholder="Ticket, subject, name, phone or email"
+        [maxlength]="100"
+        [(ngModel)]="query"
+        (ngModelChange)="onQueryChange()"
+        [busy]="searchPending || (loading && !!searchTerm)"
+        (clear)="clearSearch()"
+        aria-describedby="complaint-filter-msg"
+      />
+
+      <label class="flex flex-col min-w-0 w-[calc(50%-6px)] sm:w-36">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Priority</span>
+        <boo-select size="small" [height]="36" label="Any priority" [searchable]="false" [options]="priorityOptions" [(ngModel)]="priorityFilter" (ngModelChange)="onFilterChange()" />
+      </label>
+
+      <label class="flex flex-col min-w-0 w-[calc(50%-6px)] sm:w-44">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Category</span>
+        <boo-select size="small" [height]="36" label="Any category" [searchable]="false" [options]="categoryOptions" [(ngModel)]="categoryFilter" (ngModelChange)="onFilterChange()" />
+      </label>
+
+      <fieldset class="m-0 p-0 border-0 min-w-0 flex items-center gap-x-2 flex-wrap">
+        <legend class="float-left w-full mb-1 text-xs leading-4 font-medium text-secondary">Logged between</legend>
+        <div class="w-36">
+          <boo-datepicker size="small" [height]="36" label="From" [max]="to || today" [(ngModel)]="from" (ngModelChange)="onFilterChange()" />
+        </div>
+        <span class="text-secondary text-sm" aria-hidden="true">–</span>
+        <div class="w-36">
+          <boo-datepicker size="small" [height]="36" label="To" [min]="from" [max]="today" [(ngModel)]="to" (ngModelChange)="onFilterChange()" />
+        </div>
+      </fieldset>
+
+      <label class="flex flex-col min-w-0 w-full sm:w-44">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Sort by</span>
+        <boo-select size="small" [height]="36" label="Sort by" required [searchable]="false" [options]="sortOptions" [(ngModel)]="sort" (ngModelChange)="onSortChange()" />
+      </label>
+    </div>
+
+    <!-- Active filters, and what the current status asks for -->
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2 border-b border-rowDivider bg-body/60 min-h-[44px]">
+      <boo-filter-chips [chips]="chips" (remove)="removeChip($event)" />
+      <button *ngIf="chips.length > 1" type="button" boo-button variant="link" size="sm" (click)="clearFilters()">Clear all</button>
+      <p
+        id="complaint-filter-msg"
+        class="m-0 text-xs"
+        [class.text-danger]="rangeInvalid"
+        [class.text-secondary]="!rangeInvalid"
+        aria-live="polite"
+      >
+        <ng-container *ngIf="rangeInvalid; else hintTpl">The start date must be on or before the end date.</ng-container>
+        <ng-template #hintTpl>
+          <ng-container *ngIf="data">
+            <ng-container *ngIf="statusFilter !== null; else allHintTpl">{{ statusHint }}</ng-container>
+            <ng-template #allHintTpl>{{ data.totalCount }} {{ data.totalCount === 1 ? 'ticket' : 'tickets' }}</ng-template>
+            <span aria-hidden="true"> · </span>{{ sortLabel }}<ng-container *ngIf="hasFilters"><span aria-hidden="true"> · </span>status counts follow your filters</ng-container>
+          </ng-container>
+        </ng-template>
+      </p>
+    </div>
+
+    <!-- Results -->
+    <div
+      id="complaint-results"
+      role="tabpanel"
+      [attr.aria-labelledby]="'complaint-tab-' + tabIndex(activeTab)"
+      class="flex-1 flex flex-col min-w-0 min-h-0 relative"
+      [attr.aria-busy]="loading"
+    >
+      <div *ngIf="items.length; else noRowsTpl" class="boo-scrollbar min-h-0 flex-1 overflow-auto" [class.opacity-60]="loading">
+        <table class="w-full border-collapse text-sm">
+          <caption class="sr-only">{{ activeTab.label }}, page {{ page }} of {{ totalPages }}</caption>
+          <thead class="sticky top-0 z-10 bg-surface">
+            <tr class="text-left text-xs font-medium text-secondary border-b border-rowDivider">
+              <th scope="col" class="px-4 py-2.5 font-medium">Complaint</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden md:table-cell">Raised by</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden sm:table-cell">Status</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden lg:table-cell">Owner</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden xl:table-cell whitespace-nowrap">Logged</th>
+              <th scope="col" class="px-4 py-2.5 font-medium text-right"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let c of items; trackBy: trackById"
+              class="border-b border-rowDivider last:border-b-0 hover:bg-body cursor-pointer transition-colors"
+              [class.bg-primarySoft]="selected?.id === c.id"
+              [class.opacity-50]="busy.get(c.id) === 'delete'"
+              (click)="openDetail(c)"
+            >
+              <!-- Subject first; ticket number and category under it -->
+              <td class="px-4 py-3 align-top min-w-0 max-w-[360px]">
+                <div class="flex items-start gap-2 min-w-0">
+                  <span
+                    class="flex-none mt-[7px] w-1.5 h-1.5 rounded-full"
+                    [ngClass]="c.priority === Urgent ? 'bg-danger' : raised(c) ? 'bg-amber-500' : 'bg-transparent'"
+                    aria-hidden="true"
+                  ></span>
+                  <div class="min-w-0">
+                    <button
+                      type="button"
+                      class="block max-w-full p-0 bg-transparent border-0 text-left font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                      [attr.aria-label]="'Open ' + ticket(c) + ': ' + subject(c)"
+                      aria-haspopup="dialog"
+                      [title]="subject(c)"
+                      (click)="$event.stopPropagation(); openDetail(c)"
+                    >{{ subject(c) }}</button>
+                    <div class="mt-0.5 text-xs text-secondary truncate">
+                      <span class="font-mono tabular-nums">{{ ticket(c) }}</span><span aria-hidden="true"> · </span>{{ category(c) }}<span class="md:hidden"><span aria-hidden="true"> · </span>{{ c.patientName }}</span>
+                    </div>
+                    <div class="mt-1 flex flex-wrap gap-1 sm:hidden">
+                      <boo-status-badge dotted [label]="status(c).label" [tone]="status(c).tone" />
+                      <boo-status-badge *ngIf="raised(c)" [label]="priority(c).label" [tone]="priority(c).tone" />
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Who raised it. Contact details stay in the ticket. -->
+              <td class="px-4 py-3 align-top hidden md:table-cell max-w-[220px]">
+                <div class="text-regular truncate" [title]="c.patientName">{{ c.patientName || '—' }}</div>
+                <div class="mt-0.5 text-xs text-secondary truncate">{{ c.patientId ? 'Patient record linked' : 'No patient record' }}</div>
+              </td>
+
+              <!-- Status and priority -->
+              <td class="px-4 py-3 align-top hidden sm:table-cell whitespace-nowrap">
+                <boo-status-badge dotted [label]="status(c).label" [tone]="status(c).tone" />
+                <div class="mt-1 text-xs"
+                  [class.text-danger]="c.priority === Urgent"
+                  [class.text-amber-700]="raised(c) && c.priority !== Urgent"
+                  [class.font-medium]="raised(c)"
+                  [class.text-secondary]="!raised(c)"
+                >{{ priority(c).label }} priority</div>
+              </td>
+
+              <!-- Owner -->
+              <td class="px-4 py-3 align-top hidden lg:table-cell max-w-[200px]">
+                <div *ngIf="c.assignedTo; else unassignedTpl" class="text-regular truncate" [title]="c.assignedTo">{{ c.assignedTo }}</div>
+                <ng-template #unassignedTpl>
+                  <div class="text-placeholder">Unassigned</div>
+                  <button
+                    *ngIf="canUpdate && me && open(c)"
+                    type="button"
+                    boo-button
+                    variant="link"
+                    size="sm"
+                    classname="!h-auto !px-0 text-xs"
+                    [disabled]="busy.has(c.id)"
+                    [loading]="busy.get(c.id) === 'assign'"
+                    [attr.aria-label]="'Assign ' + ticket(c) + ' to me'"
+                    (click)="$event.stopPropagation(); assign(c, me)"
+                  >Assign to me</button>
+                </ng-template>
+              </td>
+
+              <!-- When it was logged, and when it was resolved -->
+              <td class="px-4 py-3 align-top hidden xl:table-cell whitespace-nowrap">
+                <div class="text-regular">{{ c.createdAt | date: 'd MMM y' }}</div>
+                <div class="mt-0.5 text-xs text-secondary">
+                  <ng-container *ngIf="c.resolvedAt; else ageTpl">Resolved {{ c.resolvedAt | date: 'd MMM' }}</ng-container>
+                  <ng-template #ageTpl>{{ age(c) }}</ng-template>
+                </div>
+              </td>
+
+              <!-- Actions: the usual next step, then edit and delete -->
+              <td class="px-3 py-2 align-middle text-right whitespace-nowrap" (click)="$event.stopPropagation()">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <ng-container *ngIf="canUpdate && nextMove(c) as m">
+                    <button
+                      type="button"
+                      boo-button
+                      variant="secondary"
+                      size="sm"
+                      class="hidden md:inline-flex"
+                      [disabled]="busy.has(c.id)"
+                      [loading]="busy.get(c.id) === m.to"
+                      [attr.aria-label]="m.label + ': ' + ticket(c)"
+                      (click)="move(c, m)"
+                    ><physio-icon *ngIf="busy.get(c.id) !== m.to" [name]="m.icon" [size]="14" aria-hidden="true" />{{ m.label }}</button>
+                  </ng-container>
+                  <button
+                    *ngIf="canUpdate"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [disabled]="busy.has(c.id)"
+                    [attr.aria-label]="'Edit ' + ticket(c)"
+                    aria-haspopup="dialog"
+                    title="Edit complaint"
+                    (click)="openEdit(c)"
+                  ><physio-icon name="pencil" [size]="16" /></button>
+                  <button
+                    *ngIf="canDelete"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    class="!text-danger hidden sm:inline-flex"
+                    [disabled]="busy.has(c.id)"
+                    [attr.aria-label]="'Delete ' + ticket(c)"
+                    title="Delete complaint"
+                    (click)="confirmDelete(c)"
+                  ><physio-icon name="trash" [size]="16" /></button>
+                  <button
+                    *ngIf="!canUpdate && !canDelete"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [attr.aria-label]="'Open ' + ticket(c)"
+                    aria-haspopup="dialog"
+                    title="View details"
+                    (click)="openDetail(c)"
+                  ><physio-icon name="chevron-right" [size]="16" /></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No rows: first load, access denied, failure or nothing found — all inside the list area -->
+      <ng-template #noRowsTpl>
+        <div *ngIf="loading && !data; else stateTpl" class="flex flex-col" aria-hidden="true">
+          <div *ngFor="let _ of skeletonRows" class="flex items-center gap-6 px-4 py-3.5 border-b border-rowDivider">
+            <div class="flex-1 min-w-0">
+              <div class="h-3.5 w-56 max-w-full rounded bg-rowDivider animate-pulse"></div>
+              <div class="mt-2 h-3 w-32 rounded bg-rowDivider animate-pulse"></div>
+            </div>
+            <div class="hidden md:block w-32 h-3.5 rounded bg-rowDivider animate-pulse"></div>
+            <div class="hidden sm:block w-20 h-5 rounded-full bg-rowDivider animate-pulse"></div>
+            <div class="hidden lg:block w-24 h-3.5 rounded bg-rowDivider animate-pulse"></div>
+          </div>
+          <span class="sr-only" role="status">Loading complaints…</span>
+        </div>
+        <ng-template #stateTpl>
+          <div class="flex-1 flex items-center justify-center px-4 py-8">
+            <boo-empty-state
+              *ngIf="loadError === 'forbidden'"
+              icon="lock"
+              title="You don't have access to complaints"
+              description="Ask an administrator for permission to view support tickets."
+            />
+            <boo-error-state
+              *ngIf="loadError === 'failed' && !data"
+              icon="cloud-off"
+              title="We couldn't load complaints"
+              description="Check your connection and try again."
+              retryLabel="Try again"
+              (retry)="refresh()"
+            />
+            <ng-container *ngIf="!loadError || (loadError === 'failed' && data)">
+              <!-- Filters narrowed it down to nothing -->
+              <boo-empty-state
+                *ngIf="hasFilters; else noStatusTpl"
+                icon="search"
+                title="No complaints match"
+                description="Try another ticket number, name or subject, another priority or category, or wider dates."
+              >
+                <button boo-button variant="secondary" size="sm" (click)="clearFilters()">Clear filters</button>
+              </boo-empty-state>
+              <!-- Only the status tab is narrowing the list -->
+              <ng-template #noStatusTpl>
+                <boo-empty-state
+                  *ngIf="statusFilter !== null; else noComplaintsTpl"
+                  icon="inbox"
+                  [title]="'No ' + activeTab.label.toLowerCase() + ' tickets'"
+                  [description]="emptyStatusText"
+                >
+                  <button boo-button variant="secondary" size="sm" (click)="showAll()">View all tickets</button>
+                </boo-empty-state>
+              </ng-template>
+              <!-- Nothing at all yet -->
+              <ng-template #noComplaintsTpl>
+                <boo-empty-state
+                  icon="headset"
+                  title="No complaints logged"
+                  [description]="canCreate ? 'When a patient raises a concern by phone, email or at the desk, log it here so it gets an owner and a follow-up.' : 'Complaints your team logs appear here.'"
+                >
+                  <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
+                    <physio-icon name="plus" [size]="15" aria-hidden="true" />Log complaint
+                  </button>
+                </boo-empty-state>
+              </ng-template>
+            </ng-container>
+          </div>
+        </ng-template>
+      </ng-template>
+    </div>
+
+    <!-- Paging -->
+    <footer *ngIf="data && data.totalCount > 0" class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-rowDivider">
+      <p class="m-0 text-xs text-secondary tabular-nums" aria-live="polite">Showing {{ firstShown }}–{{ lastShown }} of {{ data.totalCount }}</p>
+      <boo-pagination *ngIf="totalPages > 1" [page]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)" />
+    </footer>
+  </section>
+</div>
+
+<crm-complaint-detail-drawer
+  [complaint]="selected"
+  [canUpdate]="canUpdate"
+  [canDelete]="canDelete"
+  [busy]="busySelected"
+  [pendingOwner]="pendingSelectedOwner"
+  [me]="me"
+  [assignSaved]="assignSaved"
+  (close)="selected = null"
+  (edit)="openEdit($event, true)"
+  (remove)="confirmDelete($event)"
+  (move)="selected && move(selected, $event)"
+  (assign)="selected && assign(selected, $event)"
+  (setPriority)="selected && setPriority(selected, $event)"
+/>
+
+<crm-complaint-edit-drawer
+  [open]="editorOpen"
+  [complaint]="editing"
+  [me]="me"
+  (close)="closeEditor()"
+  (saved)="onSaved($event)"
+/>

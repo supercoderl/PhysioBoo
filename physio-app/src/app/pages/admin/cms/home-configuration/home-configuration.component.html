@@ -1,0 +1,522 @@
+<div class="flex flex-1 min-h-0 flex-col gap-4 pb-5">
+
+  <!-- Page header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div class="min-w-0">
+      <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Home page</h1>
+      <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">
+        Site details, hero banners, features and testimonials for the home page.
+        Site details save with the Save button; list changes save as you make them.
+      </p>
+    </div>
+    <button
+      type="button"
+      boo-button
+      variant="secondary"
+      size="sm"
+      [iconOnly]="true"
+      aria-label="Reload home page setup"
+      title="Reload"
+      (click)="refreshAll()"
+    ><physio-icon name="refresh" [size]="15" /></button>
+  </header>
+
+  <p class="sr-only" aria-live="polite">{{ announcement }}</p>
+
+  <p *ngIf="!canUpdate" class="m-0 flex items-start gap-2 px-4 py-3 rounded-xl border border-borderGray bg-body text-sm text-regular">
+    <physio-icon name="lock" [size]="16" class="mt-0.5 flex-none text-secondary" aria-hidden="true" />
+    <span>You can view the home page setup. Changing it needs edit access to home page settings.</span>
+  </p>
+
+  <div class="grid grid-cols-1 lg:grid-cols-[200px_minmax(0,1fr)] gap-6 items-start">
+
+    <!-- Section navigation (wide screens) -->
+    <nav class="hidden lg:block sticky top-4" aria-label="Home page sections">
+      <p class="m-0 mb-1.5 px-3 text-xs font-medium text-secondary">On this page</p>
+      <ul class="m-0 p-0 list-none flex flex-col gap-0.5">
+        <li *ngFor="let item of nav; trackBy: trackById">
+          <button
+            type="button"
+            class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-transparent border-0 text-left text-sm font-medium text-regular cursor-pointer hover:bg-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            (click)="goTo(item.id)"
+          >
+            <span class="truncate">{{ item.label }}</span>
+            <span
+              *ngIf="item.meta"
+              class="flex-none text-xs tabular-nums"
+              [class.text-amber-700]="item.attention"
+              [class.text-secondary]="!item.attention"
+            >{{ item.meta }}</span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="flex flex-col gap-6 min-w-0 max-w-[1040px]">
+
+      <!-- ───────────── Site details ───────────── -->
+      <section id="hc-site" tabindex="-1" class="scroll-mt-4 bg-surface border border-borderGray rounded-xl min-w-0 focus:outline-none" aria-labelledby="hc-site-title">
+        <header class="flex flex-wrap items-start justify-between gap-3 px-5 py-4 border-b border-rowDivider">
+          <div class="min-w-0 flex-1 basis-64">
+            <div class="flex flex-wrap items-center gap-2">
+              <h2 id="hc-site-title" class="m-0 text-base leading-6 font-semibold text-regular">Site details</h2>
+              <boo-status-badge *ngIf="settingsState === 'ready' && !configured" dotted label="Not set up" tone="warning" />
+            </div>
+            <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">The hospital name, welcome text and contact details. These are saved together.</p>
+          </div>
+        </header>
+
+        <!-- First load -->
+        <div *ngIf="settingsState === 'loading'" class="px-5 py-5 flex flex-col gap-6" aria-hidden="true">
+          <div *ngFor="let _ of [1, 2, 3]" class="grid grid-cols-1 md:grid-cols-[200px_minmax(0,1fr)] gap-3 md:gap-8">
+            <div>
+              <div class="h-3.5 w-28 rounded bg-rowDivider animate-pulse"></div>
+              <div class="mt-2 h-3 w-40 rounded bg-rowDivider animate-pulse"></div>
+            </div>
+            <div class="flex flex-col gap-3">
+              <div class="h-11 w-full rounded-md bg-rowDivider animate-pulse"></div>
+              <div class="h-11 w-full rounded-md bg-rowDivider animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+        <span *ngIf="settingsState === 'loading'" class="sr-only" role="status">Loading site details…</span>
+
+        <div *ngIf="settingsState === 'forbidden'" class="px-5 py-8">
+          <boo-empty-state icon="lock" appearance="panel" [headingLevel]="3" title="You can’t view site details" description="Ask an administrator for access to home page settings." />
+        </div>
+
+        <!-- Without the saved values there is nothing safe to edit: saving a blank form would overwrite them. -->
+        <div *ngIf="settingsState === 'failed'" class="px-5 py-8">
+          <boo-error-state icon="cloud-off" appearance="panel" [headingLevel]="3" title="We couldn’t load site details" description="Check your connection and try again. Nothing has been changed." retryLabel="Try again" (retry)="loadSettings()" />
+        </div>
+
+        <form *ngIf="settingsState === 'ready'" [formGroup]="form" (ngSubmit)="saveSettings()" novalidate [attr.aria-busy]="saving">
+          <div class="px-5 divide-y divide-rowDivider">
+
+            <!-- Identity -->
+            <div class="py-5 grid grid-cols-1 md:grid-cols-[200px_minmax(0,1fr)] gap-3 md:gap-8" role="group" aria-labelledby="hc-g-identity">
+              <div>
+                <h3 id="hc-g-identity" class="m-0 text-sm font-semibold text-regular">Identity</h3>
+                <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">How the hospital is named on the home page.</p>
+              </div>
+              <div class="flex flex-col gap-4 min-w-0">
+                <div>
+                  <label for="hc-name" class="block mb-1 text-[13px] font-medium text-regular">Hospital name <span class="text-danger" aria-hidden="true">*</span></label>
+                  <boo-input id="hc-name" name="hc-name" formControlName="hospitalName" label="Hospital name" [maxlength]="max.hospitalName" />
+                </div>
+                <div>
+                  <div class="flex items-baseline justify-between gap-3 mb-1">
+                    <label for="hc-tagline" class="text-[13px] font-medium text-regular">Tagline</label>
+                    <span class="text-xs text-secondary tabular-nums">{{ form.controls.tagLine.value.length }} / {{ max.tagLine }}</span>
+                  </div>
+                  <boo-input id="hc-tagline" name="hc-tagline" formControlName="tagLine" label="A short line under the name" [maxlength]="max.tagLine" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Welcome -->
+            <div class="py-5 grid grid-cols-1 md:grid-cols-[200px_minmax(0,1fr)] gap-3 md:gap-8" role="group" aria-labelledby="hc-g-welcome">
+              <div>
+                <h3 id="hc-g-welcome" class="m-0 text-sm font-semibold text-regular">Welcome message</h3>
+                <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">A few sentences that introduce the hospital.</p>
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-baseline justify-between gap-3 mb-1">
+                  <label for="hc-welcome" class="text-[13px] font-medium text-regular">Message</label>
+                  <span class="text-xs text-secondary tabular-nums">{{ form.controls.welcomeMessage.value.length }} / {{ max.welcomeMessage }}</span>
+                </div>
+                <boo-textarea id="hc-welcome" formControlName="welcomeMessage" label="Welcome visitors and say what you offer" [rows]="4" [maxlength]="max.welcomeMessage" />
+              </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="py-5 grid grid-cols-1 md:grid-cols-[200px_minmax(0,1fr)] gap-3 md:gap-8" role="group" aria-labelledby="hc-g-contact">
+              <div>
+                <h3 id="hc-g-contact" class="m-0 text-sm font-semibold text-regular">Contact details</h3>
+                <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">How patients reach the hospital. All optional.</p>
+              </div>
+              <div class="flex flex-col gap-4 min-w-0">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="hc-phone" class="block mb-1 text-[13px] font-medium text-regular">Phone</label>
+                    <boo-input id="hc-phone" name="hc-phone" type="tel" formControlName="contactPhone" label="Phone number" [maxlength]="max.contactPhone" />
+                  </div>
+                  <div>
+                    <label for="hc-email" class="block mb-1 text-[13px] font-medium text-regular">Email</label>
+                    <boo-input id="hc-email" name="hc-email" type="email" formControlName="contactEmail" label="Email address" [maxlength]="max.contactEmail" />
+                  </div>
+                </div>
+                <div>
+                  <div class="flex items-baseline justify-between gap-3 mb-1">
+                    <label for="hc-address" class="text-[13px] font-medium text-regular">Address</label>
+                    <span class="text-xs text-secondary tabular-nums">{{ form.controls.address.value.length }} / {{ max.address }}</span>
+                  </div>
+                  <boo-textarea id="hc-address" formControlName="address" label="Street, district, city" [rows]="2" [maxlength]="max.address" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Emergency banner -->
+            <div class="py-5 grid grid-cols-1 md:grid-cols-[200px_minmax(0,1fr)] gap-3 md:gap-8" role="group" aria-labelledby="hc-g-emergency">
+              <div>
+                <h3 id="hc-g-emergency" class="m-0 text-sm font-semibold text-regular">Emergency banner</h3>
+                <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">An emergency contact notice on the home page.</p>
+              </div>
+              <div class="min-w-0 md:pt-0.5">
+                <boo-checkbox name="hc-emergency" formControlName="showEmergencyBanner" label="Show the emergency contact banner" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Save bar: stays in view while the form is on screen -->
+          <footer
+            *ngIf="canUpdate"
+            class="sticky bottom-0 z-[1] flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-3 border-t border-rowDivider bg-surface rounded-b-xl"
+          >
+            <p class="m-0 flex items-center gap-1.5 text-xs min-h-5" role="status" aria-live="polite">
+              <ng-container *ngIf="saving">
+                <physio-icon name="loader-circle" [size]="14" class="animate-spin text-secondary" aria-hidden="true" />
+                <span class="text-secondary">Saving…</span>
+              </ng-container>
+              <ng-container *ngIf="!saving && dirty && saveState === 'failed'">
+                <physio-icon name="circle-alert" [size]="14" class="text-danger" aria-hidden="true" />
+                <span class="text-danger">Couldn’t save. Your changes are still here.</span>
+              </ng-container>
+              <ng-container *ngIf="!saving && dirty && saveState !== 'failed'">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
+                <span class="text-amber-700">Unsaved changes</span>
+              </ng-container>
+              <ng-container *ngIf="!saving && !dirty && saveState === 'saved' && savedAt">
+                <physio-icon name="check" [size]="14" class="text-emerald-600" aria-hidden="true" />
+                <span class="text-secondary">Saved at {{ savedAt | date: 'shortTime' }}</span>
+              </ng-container>
+              <ng-container *ngIf="!saving && !dirty && saveState !== 'saved'">
+                <span class="text-secondary">{{ configured ? 'No unsaved changes' : 'Not set up yet. Add the hospital name, then save.' }}</span>
+              </ng-container>
+            </p>
+            <div class="flex items-center gap-2 ml-auto">
+              <button type="button" boo-button variant="ghost" size="sm" [disabled]="!dirty || saving" (click)="discardSettings()">Discard changes</button>
+              <button type="submit" boo-button variant="primary" size="sm" [loading]="saving" [disabled]="!dirty" title="Save (Ctrl+S)">
+                {{ configured ? 'Save site details' : 'Save and set up' }}
+              </button>
+            </div>
+          </footer>
+        </form>
+      </section>
+
+      <!-- ───────────── Hero banners ───────────── -->
+      <home-config-section
+        sectionId="hc-banners"
+        heading="Hero banners"
+        what="hero banners"
+        description="Large slides at the top of the home page, each with a headline, image and optional button."
+        [summary]="bannerSummary"
+        [state]="banners.state"
+        [hasItems]="banners.items.length > 0"
+        [refreshFailed]="banners.refreshFailed"
+        [refreshState]="banners.refreshState"
+        [canAdd]="canUpdate"
+        addLabel="Add banner"
+        emptyIcon="image"
+        emptyTitle="No hero banners yet"
+        emptyDescription="Add a banner with a headline and image to open the home page."
+        [note]="banners.truncated ? 'Showing the first ' + banners.items.length + ' of ' + banners.total + '. Reordering is off until fewer banners exist.' : 'Listed in display order, first at the top.'"
+        (add)="openBanner(null)"
+        (retry)="banners.load()"
+      >
+        <ol class="m-0 p-0 list-none" aria-label="Hero banners in display order">
+          <li
+            *ngFor="let b of banners.items; let i = index; let first = first; let last = last; trackBy: trackById"
+            class="flex flex-wrap sm:flex-nowrap items-center gap-x-3 gap-y-2 px-5 py-3 border-b border-rowDivider last:border-b-0 transition-opacity"
+            [class.opacity-50]="banners.busy.get(b.id) === 'delete'"
+          >
+            <span class="flex-none w-5 text-center text-xs font-semibold tabular-nums text-secondary" aria-hidden="true">{{ i + 1 }}</span>
+            <div class="flex-none w-20 h-12 sm:w-24 sm:h-[54px] rounded-md overflow-hidden bg-body border border-rowDivider flex items-center justify-center" [class.opacity-60]="!b.active">
+              <img *ngIf="b.imageUrl; else noImageTpl" [src]="b.imageUrl" alt="" class="w-full h-full object-cover" loading="lazy" />
+              <ng-template #noImageTpl><physio-icon name="image" [size]="18" class="text-placeholder" aria-hidden="true" /></ng-template>
+            </div>
+            <div class="flex-1 min-w-[150px]">
+              <span class="sr-only">Position {{ i + 1 }}: </span>
+              <button
+                *ngIf="canUpdate; else bannerTitleTpl"
+                type="button"
+                class="block max-w-full p-0 bg-transparent border-0 text-left text-sm leading-5 font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                [attr.aria-label]="'Edit banner ' + b.title"
+                aria-haspopup="dialog"
+                [title]="b.title"
+                (click)="openBanner(b)"
+              >{{ b.title }}</button>
+              <ng-template #bannerTitleTpl><p class="m-0 text-sm leading-5 font-semibold text-regular truncate" [title]="b.title">{{ b.title }}</p></ng-template>
+              <p *ngIf="b.subtitle" class="m-0 mt-0.5 text-xs leading-5 text-secondary truncate" [title]="b.subtitle">{{ b.subtitle }}</p>
+              <p class="m-0 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-secondary">
+                <boo-status-badge class="sm:hidden" dotted [label]="b.active ? 'Active' : 'Inactive'" [tone]="b.active ? 'success' : 'neutral'" />
+                <ng-container *ngIf="b.buttonText || b.buttonLink; else noButtonTpl">
+                  <span class="inline-flex items-center gap-1 min-w-0 max-w-full">
+                    <physio-icon name="link" [size]="12" class="flex-none" aria-hidden="true" />
+                    <span class="font-medium text-regular truncate">{{ b.buttonText || 'No button text' }}</span>
+                    <span *ngIf="b.buttonLink" class="truncate" [title]="b.buttonLink"><span aria-hidden="true">→ </span>{{ linkLabel(b.buttonLink) }}</span>
+                  </span>
+                </ng-container>
+                <ng-template #noButtonTpl><span class="text-placeholder">No button</span></ng-template>
+              </p>
+            </div>
+            <boo-status-badge class="hidden sm:inline-flex flex-none" dotted [label]="b.active ? 'Active' : 'Inactive'" [tone]="b.active ? 'success' : 'neutral'" />
+
+            <div *ngIf="canUpdate" class="flex-none ml-auto inline-flex items-center gap-0.5">
+              <ng-container *ngIf="banners.canReorder">
+                <button
+                  type="button" boo-button variant="ghost" size="sm" [iconOnly]="true"
+                  [id]="'hc-banner-' + b.id + '-up'"
+                  [disabled]="first || banners.isBusy(b) || banners.busy.size > 0"
+                  [attr.aria-label]="'Move ' + b.title + ' up'"
+                  title="Move up"
+                  (click)="moveBanner(b, -1)"
+                ><physio-icon name="arrow-up" [size]="16" /></button>
+                <button
+                  type="button" boo-button variant="ghost" size="sm" [iconOnly]="true"
+                  [id]="'hc-banner-' + b.id + '-down'"
+                  [disabled]="last || banners.isBusy(b) || banners.busy.size > 0"
+                  [attr.aria-label]="'Move ' + b.title + ' down'"
+                  title="Move down"
+                  (click)="moveBanner(b, 1)"
+                ><physio-icon name="arrow-down" [size]="16" /></button>
+              </ng-container>
+              <button
+                type="button" boo-button variant="ghost" size="sm" [iconOnly]="true"
+                [disabled]="banners.isBusy(b)"
+                [loading]="banners.busy.get(b.id) === 'toggle'"
+                [attr.aria-label]="(b.active ? 'Deactivate ' : 'Activate ') + b.title"
+                [title]="b.active ? 'Deactivate' : 'Activate'"
+                (click)="toggleBanner(b)"
+              ><physio-icon *ngIf="banners.busy.get(b.id) !== 'toggle'" [name]="b.active ? 'eye-crossed' : 'eye'" [size]="16" /></button>
+              <button
+                type="button" boo-button variant="ghost" size="sm" [iconOnly]="true"
+                class="hidden sm:inline-flex"
+                [disabled]="banners.isBusy(b)"
+                [attr.aria-label]="'Edit banner ' + b.title"
+                aria-haspopup="dialog"
+                title="Edit"
+                (click)="openBanner(b)"
+              ><physio-icon name="pencil" [size]="16" /></button>
+              <button
+                type="button" boo-button variant="ghost" size="sm" [iconOnly]="true"
+                class="!text-danger"
+                [disabled]="banners.isBusy(b)"
+                [attr.aria-label]="'Delete banner ' + b.title"
+                title="Delete"
+                (click)="confirmDeleteBanner(b)"
+              ><physio-icon name="trash" [size]="16" /></button>
+            </div>
+          </li>
+        </ol>
+      </home-config-section>
+
+      <!-- ───────────── Features ───────────── -->
+      <home-config-section
+        sectionId="hc-features"
+        heading="Features"
+        what="features"
+        description="Short highlights with an icon, such as services or facilities you want to point out."
+        [summary]="featureSummary"
+        [state]="features.state"
+        [hasItems]="features.items.length > 0"
+        [refreshFailed]="features.refreshFailed"
+        [refreshState]="features.refreshState"
+        [canAdd]="canUpdate"
+        addLabel="Add feature"
+        emptyIcon="layout-grid"
+        emptyTitle="No features yet"
+        emptyDescription="Add a feature with an icon, a title and a sentence about it."
+        [note]="features.truncated ? 'Showing the first ' + features.items.length + ' of ' + features.total + '. Reordering is off until fewer features exist.' : 'Listed in display order, first at the top.'"
+        (add)="openFeature(null)"
+        (retry)="features.load()"
+      >
+        <ol class="m-0 p-0 list-none" aria-label="Features in display order">
+          <li
+            *ngFor="let f of features.items; let i = index; let first = first; let last = last; trackBy: trackById"
+            class="flex flex-wrap sm:flex-nowrap items-center gap-x-3 gap-y-2 px-5 py-3 border-b border-rowDivider last:border-b-0 transition-opacity"
+            [class.opacity-50]="features.busy.get(f.id) === 'delete'"
+          >
+            <span class="flex-none w-5 text-center text-xs font-semibold tabular-nums text-secondary" aria-hidden="true">{{ i + 1 }}</span>
+            <span class="flex-none w-10 h-10 rounded-lg bg-primarySoft text-primary flex items-center justify-center" [class.opacity-60]="!f.active" aria-hidden="true">
+              <physio-icon [name]="f.icon || 'circle'" [size]="20" />
+            </span>
+            <div class="flex-1 min-w-[150px]">
+              <span class="sr-only">Position {{ i + 1 }}: </span>
+              <button
+                *ngIf="canUpdate; else featureTitleTpl"
+                type="button"
+                class="block max-w-full p-0 bg-transparent border-0 text-left text-sm leading-5 font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                [attr.aria-label]="'Edit feature ' + f.title"
+                aria-haspopup="dialog"
+                [title]="f.title"
+                (click)="openFeature(f)"
+              >{{ f.title }}</button>
+              <ng-template #featureTitleTpl><p class="m-0 text-sm leading-5 font-semibold text-regular truncate" [title]="f.title">{{ f.title }}</p></ng-template>
+              <p class="m-0 mt-0.5 text-xs leading-5 line-clamp-1 break-words" [class.text-secondary]="f.description" [class.text-placeholder]="!f.description">{{ f.description || 'No description' }}</p>
+              <boo-status-badge class="sm:hidden mt-1" dotted [label]="f.active ? 'Active' : 'Inactive'" [tone]="f.active ? 'success' : 'neutral'" />
+            </div>
+            <boo-status-badge class="hidden sm:inline-flex flex-none" dotted [label]="f.active ? 'Active' : 'Inactive'" [tone]="f.active ? 'success' : 'neutral'" />
+
+            <div *ngIf="canUpdate" class="flex-none ml-auto inline-flex items-center gap-0.5">
+              <ng-container *ngIf="features.canReorder">
+                <button
+                  type="button" boo-button variant="ghost" size="sm" [iconOnly]="true"
+                  [id]="'hc-feature-' + f.id + '-up'"
+                  [disabled]="first || features.isBusy(f) || features.busy.size > 0"
+                  [attr.aria-label]="'Move ' + f.title + ' up'"
+                  title="Move up"
+                  (click)="moveFeature(f, -1)"
+                ><physio-icon name="arrow-up" [size]="16" /></button>
+                <button
+                  type="button" boo-button variant="ghost" size="sm" [iconOnly]="true"
+                  [id]="'hc-feature-' + f.id + '-down'"
+                  [disabled]="last || features.isBusy(f) || features.busy.size > 0"
+                  [attr.aria-label]="'Move ' + f.title + ' down'"
+                  title="Move down"
+                  (click)="moveFeature(f, 1)"
+                ><physio-icon name="arrow-down" [size]="16" /></button>
+              </ng-container>
+              <button
+                type="button" boo-button variant="ghost" size="sm" [iconOnly]="true"
+                [disabled]="features.isBusy(f)"
+                [loading]="features.busy.get(f.id) === 'toggle'"
+                [attr.aria-label]="(f.active ? 'Deactivate ' : 'Activate ') + f.title"
+                [title]="f.active ? 'Deactivate' : 'Activate'"
+                (click)="toggleFeature(f)"
+              ><physio-icon *ngIf="features.busy.get(f.id) !== 'toggle'" [name]="f.active ? 'eye-crossed' : 'eye'" [size]="16" /></button>
+              <button
+                type="button" boo-button variant="ghost" size="sm" [iconOnly]="true"
+                class="hidden sm:inline-flex"
+                [disabled]="features.isBusy(f)"
+                [attr.aria-label]="'Edit feature ' + f.title"
+                aria-haspopup="dialog"
+                title="Edit"
+                (click)="openFeature(f)"
+              ><physio-icon name="pencil" [size]="16" /></button>
+              <button
+                type="button" boo-button variant="ghost" size="sm" [iconOnly]="true"
+                class="!text-danger"
+                [disabled]="features.isBusy(f)"
+                [attr.aria-label]="'Delete feature ' + f.title"
+                title="Delete"
+                (click)="confirmDeleteFeature(f)"
+              ><physio-icon name="trash" [size]="16" /></button>
+            </div>
+          </li>
+        </ol>
+      </home-config-section>
+
+      <!-- ───────────── Testimonials ───────────── -->
+      <home-config-section
+        sectionId="hc-testimonials"
+        heading="Testimonials"
+        what="testimonials"
+        description="What patients say about their care, with a star rating."
+        [summary]="testimonialSummary"
+        [state]="testimonials.state"
+        [hasItems]="testimonials.items.length > 0"
+        [refreshFailed]="testimonials.refreshFailed"
+        [refreshState]="testimonials.refreshState"
+        [canAdd]="canUpdate"
+        addLabel="Add testimonial"
+        emptyIcon="message-square-text"
+        emptyTitle="No testimonials yet"
+        emptyDescription="Add a patient’s words and rating, with their permission."
+        [note]="testimonials.truncated ? 'Showing the newest ' + testimonials.items.length + ' of ' + testimonials.total + '.' : 'Newest first, by testimonial date (or when it was added, if it has none).'"
+        (add)="openTestimonial(null)"
+        (retry)="testimonials.load()"
+      >
+        <ul class="m-0 p-0 list-none" aria-label="Testimonials, newest first">
+          <li
+            *ngFor="let t of testimonials.items; trackBy: trackById"
+            class="flex flex-wrap sm:flex-nowrap items-start gap-x-3 gap-y-2 px-5 py-3.5 border-b border-rowDivider last:border-b-0 transition-opacity"
+            [class.opacity-50]="testimonials.busy.get(t.id) === 'delete'"
+          >
+            <span class="flex-none w-10 h-10 rounded-full bg-primarySoft text-primaryDeep text-xs font-semibold flex items-center justify-center" [class.opacity-60]="!t.active" aria-hidden="true">{{ initials(t.patientName) }}</span>
+            <div class="flex-1 min-w-[150px]">
+              <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                <button
+                  *ngIf="canUpdate; else testimonialNameTpl"
+                  type="button"
+                  class="max-w-full p-0 bg-transparent border-0 text-left text-sm leading-5 font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                  [attr.aria-label]="'Edit testimonial from ' + t.patientName"
+                  aria-haspopup="dialog"
+                  (click)="openTestimonial(t)"
+                >{{ t.patientName }}</button>
+                <ng-template #testimonialNameTpl><span class="text-sm leading-5 font-semibold text-regular truncate">{{ t.patientName }}</span></ng-template>
+                <span class="inline-flex items-center gap-0.5" role="img" [attr.aria-label]="t.rating + ' out of 5 stars'">
+                  <physio-icon *ngFor="let s of stars" name="star" [size]="13" [class]="s <= t.rating ? 'text-amber-400' : 'text-rowDivider'" />
+                </span>
+                <span class="text-xs text-secondary tabular-nums">{{ t.date ? (t.date | date: 'mediumDate') : 'No date' }}</span>
+              </div>
+              <p class="m-0 mt-1 text-xs leading-5 line-clamp-2 break-words" [class.text-regular]="t.comment" [class.text-placeholder]="!t.comment">
+                <ng-container *ngIf="t.comment; else noCommentTpl">“{{ t.comment }}”</ng-container>
+                <ng-template #noCommentTpl>No comment</ng-template>
+              </p>
+              <boo-status-badge class="sm:hidden mt-1.5" dotted [label]="t.active ? 'Active' : 'Inactive'" [tone]="t.active ? 'success' : 'neutral'" />
+            </div>
+            <boo-status-badge class="hidden sm:inline-flex flex-none mt-0.5" dotted [label]="t.active ? 'Active' : 'Inactive'" [tone]="t.active ? 'success' : 'neutral'" />
+
+            <div *ngIf="canUpdate" class="flex-none ml-auto inline-flex items-center gap-0.5 sm:-mt-1.5">
+              <button
+                type="button" boo-button variant="ghost" size="sm" [iconOnly]="true"
+                [disabled]="testimonials.isBusy(t)"
+                [loading]="testimonials.busy.get(t.id) === 'toggle'"
+                [attr.aria-label]="(t.active ? 'Deactivate testimonial from ' : 'Activate testimonial from ') + t.patientName"
+                [title]="t.active ? 'Deactivate' : 'Activate'"
+                (click)="toggleTestimonial(t)"
+              ><physio-icon *ngIf="testimonials.busy.get(t.id) !== 'toggle'" [name]="t.active ? 'eye-crossed' : 'eye'" [size]="16" /></button>
+              <button
+                type="button" boo-button variant="ghost" size="sm" [iconOnly]="true"
+                class="hidden sm:inline-flex"
+                [disabled]="testimonials.isBusy(t)"
+                [attr.aria-label]="'Edit testimonial from ' + t.patientName"
+                aria-haspopup="dialog"
+                title="Edit"
+                (click)="openTestimonial(t)"
+              ><physio-icon name="pencil" [size]="16" /></button>
+              <button
+                type="button" boo-button variant="ghost" size="sm" [iconOnly]="true"
+                class="!text-danger"
+                [disabled]="testimonials.isBusy(t)"
+                [attr.aria-label]="'Delete testimonial from ' + t.patientName"
+                title="Delete"
+                (click)="confirmDeleteTestimonial(t)"
+              ><physio-icon name="trash" [size]="16" /></button>
+            </div>
+          </li>
+        </ul>
+      </home-config-section>
+    </div>
+  </div>
+</div>
+
+<home-banner-edit-drawer
+  [open]="bannerOpen"
+  [banner]="editingBanner"
+  [nextOrder]="banners.nextOrder"
+  [canDelete]="canUpdate"
+  (close)="closeBanner()"
+  (saved)="onBannerSaved($event)"
+  (remove)="confirmDeleteBanner($event)"
+/>
+
+<home-feature-edit-drawer
+  [open]="featureOpen"
+  [feature]="editingFeature"
+  [nextOrder]="features.nextOrder"
+  [canDelete]="canUpdate"
+  (close)="closeFeature()"
+  (saved)="onFeatureSaved($event)"
+  (remove)="confirmDeleteFeature($event)"
+/>
+
+<home-testimonial-edit-drawer
+  [open]="testimonialOpen"
+  [testimonial]="editingTestimonial"
+  [canDelete]="canUpdate"
+  (close)="closeTestimonial()"
+  (saved)="onTestimonialSaved($event)"
+  (remove)="confirmDeleteTestimonial($event)"
+/>

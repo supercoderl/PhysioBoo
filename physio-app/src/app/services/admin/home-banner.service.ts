@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { BASE_API } from "../../shared/api/base";
 import { PagedRequest, PagedResponse, PaginationData } from "../../shared/types/common";
 import { BannerFilter } from "../../shared/types/filter.types";
-import { Banner } from "../../shared/types/banner.types";
+import { Banner, SaveBannerRequest } from "../../shared/types/banner.types";
 
 @Injectable({ providedIn: 'root' })
 export class HomeBannerService {
@@ -17,11 +17,11 @@ export class HomeBannerService {
         return this.http.get<PagedResponse<Banner | null>>(`${BASE_API.HOME_BANNER.BASE}/${id}`);
     }
 
-    create(params: any) {
+    create(params: SaveBannerRequest) {
         return this.http.post<PagedResponse<string>>(BASE_API.HOME_BANNER.BASE, params);
     }
 
-    update(id: string, params: any) {
+    update(id: string, params: SaveBannerRequest) {
         return this.http.patch<PagedResponse<string>>(`${BASE_API.HOME_BANNER.BASE}/${id}`, params);
     }
 

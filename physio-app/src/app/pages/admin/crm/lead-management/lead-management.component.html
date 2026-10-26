@@ -1,0 +1,388 @@
+<div class="flex flex-1 min-h-0 flex-col gap-4 pb-5">
+
+  <!-- Page header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div class="min-w-0">
+      <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Leads</h1>
+      <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">
+        Enquiries from the website, phone and walk-ins, followed up until they become patients
+        <ng-container *ngIf="counts && !hasFilters">
+          <span aria-hidden="true"> · </span><span class="font-medium text-regular">{{ openCount }} open</span>
+          <ng-container *ngIf="newCount"><span aria-hidden="true"> · </span><span class="font-medium text-amber-700">{{ newCount }} new</span></ng-container>
+        </ng-container>
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button boo-button variant="secondary" size="sm" [loading]="loading" [disabled]="rangeInvalid" (click)="refresh()">
+        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      </button>
+      <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
+        <physio-icon name="plus" [size]="15" aria-hidden="true" />New lead
+      </button>
+    </div>
+  </header>
+
+  <!-- A refresh failed while the previous results are still on screen -->
+  <boo-inline-error
+    *ngIf="data && loadError === 'failed'"
+    what="the latest leads"
+    [state]="refreshErrorState"
+    (retry)="load()"
+  />
+
+  <section class="flex-1 min-h-[360px] flex flex-col min-w-0 bg-surface border border-borderGray rounded-xl" aria-labelledby="lead-list-title">
+    <h2 id="lead-list-title" class="sr-only">Lead queue</h2>
+
+    <!-- Pipeline: one tab per stage, with how many leads are in it under the current filters -->
+    <div class="boo-scrollbar overflow-x-auto border-b border-rowDivider">
+      <div class="flex min-w-max items-stretch px-2" role="tablist" aria-label="Lead stage">
+        <ng-container *ngFor="let tab of stageTabs; let i = index">
+          <!-- Separators: the forward path reads as one flow, the outcomes and "all" stand apart -->
+          <span *ngIf="i === 1 || i === stageTabs.length - 1" class="self-center w-px h-8 mx-1.5 bg-rowDivider" aria-hidden="true"></span>
+          <physio-icon *ngIf="i > 1 && i < stageTabs.length - 1" name="chevron-right" [size]="14" class="self-center flex-none text-placeholder" aria-hidden="true" />
+          <button
+            type="button"
+            role="tab"
+            [id]="'lead-tab-' + i"
+            aria-controls="lead-results"
+            [attr.aria-selected]="tab.value === stageFilter"
+            [attr.tabindex]="tab.value === stageFilter ? 0 : -1"
+            class="relative -mb-px flex flex-col items-start gap-0.5 px-3 py-2.5 min-w-[92px] bg-transparent border-0 border-b-2 text-left cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary rounded-t"
+            [ngClass]="tab.value === stageFilter ? 'border-primary' : 'border-transparent hover:bg-body'"
+            (click)="selectStage(tab.value)"
+            (keydown)="onTabKey($event, i)"
+          >
+            <span class="flex items-center gap-1.5 text-xs whitespace-nowrap"
+              [class.font-semibold]="tab.value === stageFilter"
+              [class.text-primaryDeep]="tab.value === stageFilter"
+              [class.font-medium]="tab.value !== stageFilter"
+              [class.text-secondary]="tab.value !== stageFilter"
+            >
+              <span *ngIf="tab.dot" class="w-1.5 h-1.5 rounded-full flex-none" [ngClass]="tab.dot" aria-hidden="true"></span>{{ tab.label }}
+            </span>
+            <span class="text-lg leading-6 font-semibold tabular-nums" [class.text-regular]="countOf(tab) !== null" [class.text-placeholder]="countOf(tab) === null">
+              <ng-container *ngIf="countOf(tab) !== null; else noCountTpl">{{ countOf(tab) }}</ng-container>
+              <ng-template #noCountTpl><span aria-hidden="true">–</span></ng-template>
+            </span>
+            <span *ngIf="countOf(tab) !== null" class="sr-only">{{ countOf(tab) === 1 ? 'lead' : 'leads' }}</span>
+          </button>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Search, priority, dates and sort. Field labels (20px) over 36px controls line up with the 56px search field. -->
+    <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
+      <boo-search-field
+        class="flex-1 basis-64 min-w-0"
+        label="Search leads by name, phone or email"
+        placeholder="Search by name, phone or email"
+        [maxlength]="100"
+        [(ngModel)]="query"
+        (ngModelChange)="onQueryChange()"
+        [busy]="searchPending || (loading && !!searchTerm)"
+        (clear)="clearSearch()"
+        aria-describedby="lead-filter-msg"
+      />
+
+      <label class="flex flex-col min-w-0 w-full sm:w-40">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Priority</span>
+        <boo-select size="small" [height]="36" label="Any priority" [options]="priorityOptions" [(ngModel)]="priorityFilter" (ngModelChange)="onFilterChange()" />
+      </label>
+
+      <fieldset class="m-0 p-0 border-0 min-w-0 flex items-center gap-x-2 flex-wrap">
+        <legend class="float-left w-full mb-1 text-xs leading-4 font-medium text-secondary">Received between</legend>
+        <div class="w-36">
+          <boo-datepicker size="small" [height]="36" label="From" [max]="to || today" [(ngModel)]="from" (ngModelChange)="onFilterChange()" />
+        </div>
+        <span class="text-secondary text-sm" aria-hidden="true">–</span>
+        <div class="w-36">
+          <boo-datepicker size="small" [height]="36" label="To" [min]="from" [max]="today" [(ngModel)]="to" (ngModelChange)="onFilterChange()" />
+        </div>
+      </fieldset>
+
+      <label class="flex flex-col min-w-0 w-full sm:w-44">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Sort by</span>
+        <boo-select size="small" [height]="36" label="Sort by" required [options]="sortOptions" [(ngModel)]="sort" (ngModelChange)="onSortChange()" />
+      </label>
+    </div>
+
+    <!-- Active filters, and what the current stage asks for -->
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2 border-b border-rowDivider bg-body/60 min-h-[44px]">
+      <boo-filter-chips [chips]="chips" (remove)="removeChip($event)" />
+      <button *ngIf="chips.length > 1" type="button" boo-button variant="link" size="sm" (click)="clearFilters()">Clear all</button>
+      <p
+        id="lead-filter-msg"
+        class="m-0 text-xs"
+        [class.text-danger]="rangeInvalid"
+        [class.text-secondary]="!rangeInvalid"
+        aria-live="polite"
+      >
+        <ng-container *ngIf="rangeInvalid; else hintTpl">The start date must be on or before the end date.</ng-container>
+        <ng-template #hintTpl>
+          <ng-container *ngIf="data">
+            <ng-container *ngIf="stageFilter; else allHintTpl">{{ stageHint }}</ng-container>
+            <ng-template #allHintTpl>{{ data.totalCount }} {{ data.totalCount === 1 ? 'lead' : 'leads' }}</ng-template>
+            <span aria-hidden="true"> · </span>{{ sortLabel }}<ng-container *ngIf="hasFilters"><span aria-hidden="true"> · </span>stage counts follow your filters</ng-container>
+          </ng-container>
+        </ng-template>
+      </p>
+    </div>
+
+    <!-- Results -->
+    <div
+      id="lead-results"
+      role="tabpanel"
+      [attr.aria-labelledby]="'lead-tab-' + tabIndex(activeTab)"
+      class="flex-1 flex flex-col min-w-0 min-h-0 relative"
+      [attr.aria-busy]="loading"
+    >
+      <div *ngIf="items.length; else noRowsTpl" class="boo-scrollbar min-h-0 flex-1 overflow-auto" [class.opacity-60]="loading">
+        <table class="w-full border-collapse text-sm">
+          <caption class="sr-only">{{ activeTab.label }}, page {{ page }} of {{ totalPages }}</caption>
+          <thead class="sticky top-0 z-10 bg-surface">
+            <tr class="text-left text-xs font-medium text-secondary border-b border-rowDivider">
+              <th scope="col" class="px-4 py-2.5 font-medium">Lead</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden md:table-cell">Contact</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden xl:table-cell">Enquiry</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden sm:table-cell">Stage</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden lg:table-cell">Owner</th>
+              <th scope="col" class="px-4 py-2.5 font-medium text-right"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let l of items; trackBy: trackById"
+              class="border-b border-rowDivider last:border-b-0 hover:bg-body cursor-pointer transition-colors"
+              [class.bg-primarySoft]="selected?.id === l.id"
+              [class.opacity-50]="busy.get(l.id) === 'delete'"
+              (click)="openDetail(l)"
+            >
+              <!-- Identity, and how long they have been waiting -->
+              <td class="px-4 py-3 align-top min-w-0 max-w-[300px]">
+                <div class="flex items-start gap-3 min-w-0">
+                  <span class="flex-none w-8 h-8 rounded-full bg-primarySoft text-primaryDeep text-[11px] font-semibold flex items-center justify-center" aria-hidden="true">{{ initials(l) }}</span>
+                  <div class="min-w-0">
+                    <button
+                      type="button"
+                      class="block max-w-full p-0 bg-transparent border-0 text-left font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                      [attr.aria-label]="'Open details of ' + name(l)"
+                      aria-haspopup="dialog"
+                      [title]="name(l)"
+                      (click)="$event.stopPropagation(); openDetail(l)"
+                    >{{ name(l) }}</button>
+                    <div class="mt-0.5 text-xs truncate" [class.text-amber-700]="waiting(l)" [class.font-medium]="waiting(l)" [class.text-secondary]="!waiting(l)">
+                      <ng-container *ngIf="waiting(l); else receivedTpl">{{ wait(l) }}</ng-container>
+                      <ng-template #receivedTpl>Received {{ age(l).toLowerCase() }}</ng-template>
+                      <span *ngIf="l.phone" class="md:hidden text-secondary font-normal tabular-nums"> · {{ l.phone }}</span>
+                    </div>
+                    <div class="mt-1 flex flex-wrap gap-1 sm:hidden">
+                      <boo-status-badge dotted [label]="stage(l).label" [tone]="stage(l).tone" />
+                      <boo-status-badge *ngIf="l.priority === High" label="High" tone="danger" />
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Contact -->
+              <td class="px-4 py-3 align-top hidden md:table-cell max-w-[240px]">
+                <div class="text-regular tabular-nums truncate">{{ l.phone || '—' }}</div>
+                <div class="mt-0.5 text-xs truncate" [class.text-secondary]="l.email" [class.text-placeholder]="!l.email" [title]="l.email || ''">{{ l.email || 'No email' }}</div>
+              </td>
+
+              <!-- What they asked about, and where from -->
+              <td class="px-4 py-3 align-top hidden xl:table-cell max-w-[240px]">
+                <div class="text-regular truncate" [title]="l.service">{{ l.service || '—' }}</div>
+                <div class="mt-0.5 text-xs text-secondary truncate">{{ l.source || 'Unknown source' }}</div>
+              </td>
+
+              <!-- Stage and priority -->
+              <td class="px-4 py-3 align-top hidden sm:table-cell whitespace-nowrap">
+                <boo-status-badge dotted [label]="stage(l).label" [tone]="stage(l).tone" />
+                <div class="mt-1 text-xs" [class.text-danger]="l.priority === High" [class.font-medium]="l.priority === High" [class.text-secondary]="l.priority !== High">
+                  {{ priority(l).label }} priority
+                </div>
+              </td>
+
+              <!-- Owner -->
+              <td class="px-4 py-3 align-top hidden lg:table-cell max-w-[200px]">
+                <div *ngIf="l.assignedTo; else unassignedTpl" class="text-regular truncate" [title]="l.assignedTo">{{ l.assignedTo }}</div>
+                <ng-template #unassignedTpl>
+                  <div class="text-placeholder">Unassigned</div>
+                  <button
+                    *ngIf="canUpdate && me && savable(l)"
+                    type="button"
+                    boo-button
+                    variant="link"
+                    size="sm"
+                    classname="!h-auto !px-0 text-xs"
+                    [disabled]="busy.has(l.id)"
+                    [loading]="busy.get(l.id) === 'assign'"
+                    [attr.aria-label]="'Assign ' + name(l) + ' to me'"
+                    (click)="$event.stopPropagation(); assign(l, me)"
+                  >Assign to me</button>
+                </ng-template>
+              </td>
+
+              <!-- Actions: the usual next step, then edit and delete -->
+              <td class="px-3 py-2 align-middle text-right whitespace-nowrap" (click)="$event.stopPropagation()">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <ng-container *ngIf="canUpdate && nextMove(l) as m">
+                    <button
+                      type="button"
+                      boo-button
+                      variant="secondary"
+                      size="sm"
+                      class="hidden md:inline-flex"
+                      [disabled]="busy.has(l.id) || !savable(l)"
+                      [loading]="busy.get(l.id) === m.to"
+                      [attr.aria-label]="m.label + ': ' + name(l)"
+                      [title]="savable(l) ? '' : needsEmail"
+                      (click)="move(l, m)"
+                    ><physio-icon *ngIf="busy.get(l.id) !== m.to" [name]="m.icon" [size]="14" aria-hidden="true" />{{ m.label }}</button>
+                  </ng-container>
+                  <button
+                    *ngIf="canUpdate"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [disabled]="busy.has(l.id)"
+                    [attr.aria-label]="'Edit ' + name(l)"
+                    aria-haspopup="dialog"
+                    title="Edit lead"
+                    (click)="openEdit(l)"
+                  ><physio-icon name="pencil" [size]="16" /></button>
+                  <button
+                    *ngIf="canDelete"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    class="!text-danger hidden sm:inline-flex"
+                    [disabled]="busy.has(l.id)"
+                    [attr.aria-label]="'Delete ' + name(l)"
+                    title="Delete lead"
+                    (click)="confirmDelete(l)"
+                  ><physio-icon name="trash" [size]="16" /></button>
+                  <button
+                    *ngIf="!canUpdate && !canDelete"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [attr.aria-label]="'Open details of ' + name(l)"
+                    aria-haspopup="dialog"
+                    title="View details"
+                    (click)="openDetail(l)"
+                  ><physio-icon name="chevron-right" [size]="16" /></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No rows: first load, access denied, failure or nothing found — all inside the list area -->
+      <ng-template #noRowsTpl>
+        <div *ngIf="loading && !data; else stateTpl" class="flex flex-col" aria-hidden="true">
+          <div *ngFor="let _ of skeletonRows" class="flex items-center gap-6 px-4 py-3.5 border-b border-rowDivider">
+            <div class="flex-1 min-w-0 flex items-center gap-3">
+              <div class="flex-none w-8 h-8 rounded-full bg-rowDivider animate-pulse"></div>
+              <div class="min-w-0"><div class="h-3.5 w-44 max-w-full rounded bg-rowDivider animate-pulse"></div><div class="mt-2 h-3 w-24 rounded bg-rowDivider animate-pulse"></div></div>
+            </div>
+            <div class="hidden md:block w-32 h-3.5 rounded bg-rowDivider animate-pulse"></div>
+            <div class="hidden sm:block w-20 h-5 rounded-full bg-rowDivider animate-pulse"></div>
+            <div class="hidden lg:block w-24 h-3.5 rounded bg-rowDivider animate-pulse"></div>
+          </div>
+          <span class="sr-only" role="status">Loading leads…</span>
+        </div>
+        <ng-template #stateTpl>
+          <div class="flex-1 flex items-center justify-center px-4 py-8">
+            <boo-empty-state
+              *ngIf="loadError === 'forbidden'"
+              icon="lock"
+              title="You don't have access to leads"
+              description="Ask an administrator for permission to view leads."
+            />
+            <boo-error-state
+              *ngIf="loadError === 'failed' && !data"
+              icon="cloud-off"
+              title="We couldn't load leads"
+              description="Check your connection and try again."
+              retryLabel="Try again"
+              (retry)="refresh()"
+            />
+            <ng-container *ngIf="!loadError || (loadError === 'failed' && data)">
+              <!-- Filters narrowed it down to nothing -->
+              <boo-empty-state
+                *ngIf="hasFilters; else noStageTpl"
+                icon="search"
+                title="No leads match"
+                description="Try another name, phone or email, another priority, or wider dates."
+              >
+                <button boo-button variant="secondary" size="sm" (click)="clearFilters()">Clear filters</button>
+              </boo-empty-state>
+              <!-- Only the stage tab is narrowing the list -->
+              <ng-template #noStageTpl>
+                <boo-empty-state
+                  *ngIf="stageFilter !== null; else noLeadsTpl"
+                  icon="inbox"
+                  [title]="'No ' + activeTab.label.toLowerCase() + ' leads'"
+                  [description]="emptyStageText"
+                >
+                  <button boo-button variant="secondary" size="sm" (click)="showAll()">View all leads</button>
+                </boo-empty-state>
+              </ng-template>
+              <!-- Nothing at all yet -->
+              <ng-template #noLeadsTpl>
+                <boo-empty-state
+                  icon="inbox"
+                  title="No leads yet"
+                  [description]="canCreate ? 'Requests from the public website appear here on their own. Add people who call or walk in yourself.' : 'Requests from the public website and enquiries your team records appear here.'"
+                >
+                  <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
+                    <physio-icon name="plus" [size]="15" aria-hidden="true" />New lead
+                  </button>
+                </boo-empty-state>
+              </ng-template>
+            </ng-container>
+          </div>
+        </ng-template>
+      </ng-template>
+    </div>
+
+    <!-- Paging -->
+    <footer *ngIf="data && data.totalCount > 0" class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-rowDivider">
+      <p class="m-0 text-xs text-secondary tabular-nums" aria-live="polite">Showing {{ firstShown }}–{{ lastShown }} of {{ data.totalCount }}</p>
+      <boo-pagination *ngIf="totalPages > 1" [page]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)" />
+    </footer>
+  </section>
+</div>
+
+<crm-lead-detail-drawer
+  [lead]="selected"
+  [canUpdate]="canUpdate"
+  [canDelete]="canDelete"
+  [busy]="busySelected"
+  [pendingOwner]="pendingSelectedOwner"
+  [me]="me"
+  [registerLink]="registerLink"
+  [noteSaved]="noteSaved"
+  (close)="selected = null"
+  (edit)="openEdit($event, true)"
+  (remove)="confirmDelete($event)"
+  (move)="selected && move(selected, $event)"
+  (assign)="selected && assign(selected, $event)"
+  (addNote)="selected && addNote(selected, $event)"
+/>
+
+<crm-lead-edit-drawer
+  [open]="editorOpen"
+  [lead]="editing"
+  [me]="me"
+  (close)="closeEditor()"
+  (saved)="onSaved($event)"
+/>

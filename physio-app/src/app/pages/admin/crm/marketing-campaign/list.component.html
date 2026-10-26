@@ -1,0 +1,365 @@
+<div class="flex flex-1 min-h-0 flex-col gap-4 pb-5">
+
+  <!-- Page header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div class="min-w-0">
+      <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Marketing campaigns</h1>
+      <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">
+        Plan, launch and follow outreach to patients and leads
+        <ng-container *ngIf="stats">
+          <span aria-hidden="true"> · </span>{{ stats.totalCampaigns | number }} {{ stats.totalCampaigns === 1 ? 'campaign' : 'campaigns' }}
+          <span aria-hidden="true"> · </span><span class="font-medium" [class.text-emerald-700]="stats.activeCampaigns > 0">{{ stats.activeCampaigns | number }} active</span>
+        </ng-container>
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button boo-button variant="secondary" size="sm" [loading]="loading" (click)="refresh()">
+        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      </button>
+      <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
+        <physio-icon name="plus" [size]="15" aria-hidden="true" />New campaign
+      </button>
+    </div>
+  </header>
+
+  <!-- A refresh failed while the previous results are still on screen -->
+  <boo-inline-error
+    *ngIf="data && loadError === 'failed'"
+    what="the latest campaigns"
+    [state]="refreshErrorState"
+    (retry)="load()"
+  />
+
+  <section class="flex-1 min-h-[360px] flex flex-col min-w-0 bg-surface border border-borderGray rounded-xl" aria-labelledby="campaign-list-title">
+    <h2 id="campaign-list-title" class="sr-only">Campaign list</h2>
+
+    <!-- Lifecycle lens: one status at a time, as the server filters -->
+    <div class="boo-scrollbar overflow-x-auto border-b border-rowDivider">
+      <div class="flex min-w-max gap-1 px-4" role="tablist" aria-label="Campaign status">
+        <button
+          *ngFor="let tab of statusTabs; let i = index"
+          type="button"
+          role="tab"
+          [id]="'campaign-tab-' + i"
+          aria-controls="campaign-results"
+          [attr.aria-selected]="tab.value === statusFilter"
+          [attr.tabindex]="tab.value === statusFilter ? 0 : -1"
+          class="relative -mb-px px-3 py-3 bg-transparent border-0 border-b-2 text-sm whitespace-nowrap cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary rounded-t aria-[selected=false]:hover:text-regular"
+          [class.border-primary]="tab.value === statusFilter"
+          [class.text-primaryDeep]="tab.value === statusFilter"
+          [class.font-semibold]="tab.value === statusFilter"
+          [class.border-transparent]="tab.value !== statusFilter"
+          [class.text-secondary]="tab.value !== statusFilter"
+          [class.font-medium]="tab.value !== statusFilter"
+          (click)="selectStatus(tab.value)"
+          (keydown)="onTabKey($event, i)"
+        >{{ tab.label }}</button>
+      </div>
+    </div>
+
+    <!-- Search, channel, dates and sort. Field labels (20px) over 36px controls line up with the 56px search field. -->
+    <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
+      <boo-search-field
+        class="flex-1 basis-64 min-w-0"
+        label="Search campaigns by name or code"
+        placeholder="Search by name or code"
+        [maxlength]="100"
+        [(ngModel)]="query"
+        (ngModelChange)="onQueryChange()"
+        [busy]="searchPending || (loading && !!searchTerm)"
+        (clear)="clearSearch()"
+        aria-describedby="campaign-filter-msg"
+      />
+
+      <label class="flex flex-col min-w-0 w-full sm:w-44">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Channel</span>
+        <boo-select size="small" [height]="36" label="All channels" [options]="channelOptions" [(ngModel)]="channelFilter" (ngModelChange)="onFilterChange()" />
+      </label>
+
+      <fieldset class="m-0 p-0 border-0 min-w-0 flex items-center gap-x-2 flex-wrap">
+        <legend class="float-left w-full mb-1 text-xs leading-4 font-medium text-secondary">Running between</legend>
+        <div class="w-36">
+          <boo-datepicker size="small" [height]="36" label="From" [max]="to" [(ngModel)]="from" (ngModelChange)="onFilterChange()" />
+        </div>
+        <span class="text-secondary text-sm" aria-hidden="true">–</span>
+        <div class="w-36">
+          <boo-datepicker size="small" [height]="36" label="To" [min]="from" [(ngModel)]="to" (ngModelChange)="onFilterChange()" />
+        </div>
+      </fieldset>
+
+      <label class="flex flex-col min-w-0 w-full sm:w-48">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Sort by</span>
+        <boo-select size="small" [height]="36" label="Sort by" required [options]="sortOptions" [(ngModel)]="sort" (ngModelChange)="onFilterChange()" />
+      </label>
+    </div>
+
+    <!-- Active filters, and how the list is scoped -->
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2 border-b border-rowDivider bg-body/60 min-h-[44px]">
+      <boo-filter-chips [chips]="chips" (remove)="removeChip($event)" />
+      <button *ngIf="chips.length > 1" type="button" boo-button variant="link" size="sm" (click)="clearFilters()">Clear all</button>
+      <p
+        id="campaign-filter-msg"
+        class="m-0 text-xs"
+        [class.text-danger]="rangeInvalid"
+        [class.text-secondary]="!rangeInvalid"
+        aria-live="polite"
+      >
+        <ng-container *ngIf="rangeInvalid; else hintTpl">The start date must be on or before the end date.</ng-container>
+        <ng-template #hintTpl>
+          <ng-container *ngIf="data">
+            {{ data.totalCount | number }} {{ data.totalCount === 1 ? 'campaign' : 'campaigns' }}<ng-container *ngIf="statusFilter === null"> (cancelled ones are under Cancelled)</ng-container>
+            <span aria-hidden="true"> · </span>{{ sortLabel }}
+          </ng-container>
+        </ng-template>
+      </p>
+    </div>
+
+    <!-- Results -->
+    <div
+      id="campaign-results"
+      role="tabpanel"
+      [attr.aria-labelledby]="'campaign-tab-' + tabIndex(activeTab)"
+      class="flex-1 flex flex-col min-w-0 min-h-0 relative"
+      [attr.aria-busy]="loading"
+    >
+      <div *ngIf="items.length; else noRowsTpl" class="boo-scrollbar min-h-0 flex-1 overflow-auto" [class.opacity-60]="loading">
+        <table class="w-full border-collapse text-sm">
+          <caption class="sr-only">{{ activeTab.label }} campaigns, page {{ page }} of {{ totalPages }}</caption>
+          <thead class="sticky top-0 z-10 bg-surface">
+            <tr class="text-left text-xs font-medium text-secondary border-b border-rowDivider">
+              <th scope="col" class="px-4 py-2.5 font-medium">Campaign</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden sm:table-cell">Status</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden md:table-cell">Schedule</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden xl:table-cell">Audience</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden lg:table-cell text-right">Spent / budget</th>
+              <th scope="col" class="px-4 py-2.5 font-medium text-right"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let c of items; trackBy: trackById"
+              class="border-b border-rowDivider last:border-b-0 hover:bg-body cursor-pointer transition-colors"
+              [class.bg-primarySoft]="selected?.id === c.id"
+              [class.opacity-50]="busy.get(c.id) === 'delete'"
+              (click)="openDetail(c)"
+            >
+              <!-- Identity: name first, then code and channel -->
+              <td class="px-4 py-3 align-top min-w-0 max-w-[340px]">
+                <div class="flex items-start gap-3 min-w-0">
+                  <span class="flex-none w-8 h-8 rounded-lg bg-primarySoft text-primaryDeep flex items-center justify-center" aria-hidden="true">
+                    <physio-icon [name]="channel(c).icon" [size]="16" />
+                  </span>
+                  <div class="min-w-0">
+                    <button
+                      type="button"
+                      class="block max-w-full p-0 bg-transparent border-0 text-left font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                      [attr.aria-label]="'Open details of ' + c.name"
+                      aria-haspopup="dialog"
+                      [title]="c.name"
+                      (click)="$event.stopPropagation(); openDetail(c)"
+                    >{{ c.name }}</button>
+                    <div class="mt-0.5 text-xs text-secondary truncate">
+                      <span class="tabular-nums">{{ c.code }}</span><span aria-hidden="true"> · </span>{{ channel(c).label }}
+                    </div>
+                    <div *ngIf="c.goal" class="mt-0.5 text-xs text-secondary truncate hidden 2xl:block" [title]="c.goal">{{ c.goal }}</div>
+                    <div class="mt-1 sm:hidden"><boo-status-badge dotted [label]="status(c).label" [tone]="status(c).tone" /></div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Lifecycle -->
+              <td class="px-4 py-3 align-top hidden sm:table-cell whitespace-nowrap">
+                <boo-status-badge dotted [label]="status(c).label" [tone]="status(c).tone" />
+              </td>
+
+              <!-- Schedule, with where today falls in it -->
+              <td class="px-4 py-3 align-top hidden md:table-cell whitespace-nowrap">
+                <ng-container *ngIf="c.startDate || c.endDate; else unscheduledTpl">
+                  <div class="text-regular tabular-nums">
+                    <ng-container *ngIf="c.startDate && c.endDate">{{ date(c.startDate) | date: 'd MMM' }} – {{ date(c.endDate) | date: 'd MMM y' }}</ng-container>
+                    <ng-container *ngIf="c.startDate && !c.endDate">From {{ date(c.startDate) | date: 'd MMM y' }}</ng-container>
+                    <ng-container *ngIf="!c.startDate && c.endDate">Until {{ date(c.endDate) | date: 'd MMM y' }}</ng-container>
+                  </div>
+                </ng-container>
+                <ng-template #unscheduledTpl><div class="text-placeholder">No dates set</div></ng-template>
+                <div *ngIf="timing(c) as t" class="mt-0.5 text-xs" [class.text-danger]="t.overdue" [class.text-secondary]="!t.overdue">{{ t.text }}</div>
+              </td>
+
+              <!-- Audience -->
+              <td class="px-4 py-3 align-top hidden xl:table-cell max-w-[200px]">
+                <div class="truncate" [class.text-regular]="c.audienceSegmentName" [class.text-placeholder]="!c.audienceSegmentName" [title]="c.audienceSegmentName || ''">
+                  {{ c.audienceSegmentName || 'No specific audience' }}
+                </div>
+              </td>
+
+              <!-- Budget -->
+              <td class="px-4 py-3 align-top hidden lg:table-cell whitespace-nowrap text-right">
+                <div class="tabular-nums">
+                  <span class="text-regular font-medium">{{ c.spent | number: '1.0-0' }}</span>
+                  <span class="text-secondary"> / {{ c.budget | number: '1.0-0' }}</span>
+                </div>
+                <div *ngIf="use(c) !== null; else noBudgetTpl" class="mt-1.5 ml-auto w-28 h-1 rounded-full bg-rowDivider overflow-hidden" aria-hidden="true">
+                  <div class="h-full rounded-full" [class.bg-primary]="use(c)! <= 100" [class.bg-danger]="use(c)! > 100" [style.width.%]="min(use(c)!, 100)"></div>
+                </div>
+                <ng-template #noBudgetTpl><div class="mt-0.5 text-xs text-placeholder">No budget set</div></ng-template>
+              </td>
+
+              <!-- Actions: the usual next step, then edit and delete -->
+              <td class="px-3 py-2 align-middle text-right whitespace-nowrap" (click)="$event.stopPropagation()">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <ng-container *ngIf="canUpdate && nextMove(c) as t">
+                    <button
+                      type="button"
+                      boo-button
+                      variant="secondary"
+                      size="sm"
+                      class="hidden md:inline-flex"
+                      [disabled]="busy.has(c.id)"
+                      [loading]="busy.get(c.id) === t.to"
+                      [attr.aria-label]="t.label + ' ' + c.name"
+                      (click)="move(c, t)"
+                    ><physio-icon *ngIf="busy.get(c.id) !== t.to" [name]="t.icon" [size]="14" aria-hidden="true" />{{ t.label }}</button>
+                  </ng-container>
+                  <button
+                    *ngIf="canUpdate"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [disabled]="busy.has(c.id)"
+                    [attr.aria-label]="'Edit ' + c.name"
+                    aria-haspopup="dialog"
+                    title="Edit campaign"
+                    (click)="openEdit(c)"
+                  ><physio-icon name="pencil" [size]="16" /></button>
+                  <button
+                    *ngIf="canDelete"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    class="!text-danger hidden sm:inline-flex"
+                    [disabled]="busy.has(c.id)"
+                    [attr.aria-label]="'Delete ' + c.name"
+                    title="Delete campaign"
+                    (click)="confirmDelete(c)"
+                  ><physio-icon name="trash" [size]="16" /></button>
+                  <button
+                    *ngIf="!canUpdate && !canDelete"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [attr.aria-label]="'Open details of ' + c.name"
+                    aria-haspopup="dialog"
+                    title="View details"
+                    (click)="openDetail(c)"
+                  ><physio-icon name="chevron-right" [size]="16" /></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No rows: first load, access denied, failure or nothing found — all inside the list area -->
+      <ng-template #noRowsTpl>
+        <div *ngIf="loading && !data; else stateTpl" class="flex flex-col" aria-hidden="true">
+          <div *ngFor="let _ of skeletonRows" class="flex items-center gap-6 px-4 py-3.5 border-b border-rowDivider">
+            <div class="flex-1 min-w-0 flex items-center gap-3">
+              <div class="flex-none w-8 h-8 rounded-lg bg-rowDivider animate-pulse"></div>
+              <div class="min-w-0"><div class="h-3.5 w-48 max-w-full rounded bg-rowDivider animate-pulse"></div><div class="mt-2 h-3 w-28 rounded bg-rowDivider animate-pulse"></div></div>
+            </div>
+            <div class="hidden sm:block w-20 h-5 rounded-full bg-rowDivider animate-pulse"></div>
+            <div class="hidden md:block w-32 h-3.5 rounded bg-rowDivider animate-pulse"></div>
+            <div class="hidden lg:block w-24 h-3.5 rounded bg-rowDivider animate-pulse"></div>
+          </div>
+          <span class="sr-only" role="status">Loading campaigns…</span>
+        </div>
+        <ng-template #stateTpl>
+          <div class="flex-1 flex items-center justify-center px-4 py-8">
+            <boo-empty-state
+              *ngIf="loadError === 'forbidden'"
+              icon="lock"
+              title="You don't have access to campaigns"
+              description="Ask an administrator for permission to view marketing campaigns."
+            />
+            <boo-error-state
+              *ngIf="loadError === 'failed' && !data"
+              icon="cloud-off"
+              title="We couldn't load campaigns"
+              description="Check your connection and try again."
+              retryLabel="Try again"
+              (retry)="load()"
+            />
+            <ng-container *ngIf="!loadError || (loadError === 'failed' && data)">
+              <!-- Filters narrowed it down to nothing -->
+              <boo-empty-state
+                *ngIf="hasFilters; else noStatusTpl"
+                icon="search"
+                title="No campaigns match"
+                description="Try another name or code, another channel, or wider dates."
+              >
+                <button boo-button variant="secondary" size="sm" (click)="clearFilters()">Clear filters</button>
+              </boo-empty-state>
+              <!-- Only the status tab is narrowing the list -->
+              <ng-template #noStatusTpl>
+                <boo-empty-state
+                  *ngIf="statusFilter !== null; else noCampaignsTpl"
+                  icon="megaphone"
+                  [title]="'No ' + activeTab.label.toLowerCase() + ' campaigns'"
+                  description="Campaigns show up here when they reach this status."
+                >
+                  <button boo-button variant="secondary" size="sm" (click)="showAll()">View all campaigns</button>
+                </boo-empty-state>
+              </ng-template>
+              <!-- Nothing at all yet -->
+              <ng-template #noCampaignsTpl>
+                <boo-empty-state
+                  icon="megaphone"
+                  title="No campaigns yet"
+                  [description]="canCreate ? 'Plan your first campaign as a draft, then launch it when it is ready.' : 'Campaigns appear here once someone on your team plans one.'"
+                >
+                  <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
+                    <physio-icon name="plus" [size]="15" aria-hidden="true" />New campaign
+                  </button>
+                </boo-empty-state>
+              </ng-template>
+            </ng-container>
+          </div>
+        </ng-template>
+      </ng-template>
+    </div>
+
+    <!-- Paging -->
+    <footer *ngIf="data && data.totalCount > 0" class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-rowDivider">
+      <p class="m-0 text-xs text-secondary tabular-nums" aria-live="polite">Showing {{ firstShown }}–{{ lastShown }} of {{ data.totalCount }}</p>
+      <boo-pagination *ngIf="totalPages > 1" [page]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)" />
+    </footer>
+  </section>
+</div>
+
+<crm-campaign-detail-drawer
+  [campaign]="selected"
+  [canUpdate]="canUpdate"
+  [canDelete]="canDelete"
+  [busy]="busySelected"
+  [pendingStatus]="pendingSelectedStatus"
+  [segmentCriteria]="selectedCriteria"
+  (close)="selected = null"
+  (edit)="openEdit($event, true)"
+  (remove)="confirmDelete($event)"
+  (transition)="selected && move(selected, $event)"
+/>
+
+<crm-campaign-edit-drawer
+  [open]="editorOpen"
+  [campaign]="editing"
+  [segments]="segments"
+  [segmentError]="segmentError"
+  (close)="closeEditor()"
+  (saved)="onSaved($event)"
+/>

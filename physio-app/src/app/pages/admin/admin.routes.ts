@@ -301,6 +301,7 @@ export const routes: Routes = [
                         path: 'member-point',
                         data: { breadcrumb: ['member-point'] },
                         loadComponent: () => import('./crm/member-point/member-point.component').then(m => m.AdminMemberPointComponent),
+                        canActivate: [permissionGuard(Permissions.Crm.MemberRead)],
                     }
                 ]
             },
@@ -330,6 +331,7 @@ export const routes: Routes = [
                         data: { breadcrumb: ['home-configuration'] },
                         loadComponent: () => import('./cms/home-configuration/home-configuration.component').then(m => m.AdminHomeConfigurationComponent),
                         canActivate: [permissionGuard(Permissions.Cms.HomeSettingsRead)],
+                        canDeactivate: [unsavedChangesGuard],
                     },
                     {
                         path: 'doctor',

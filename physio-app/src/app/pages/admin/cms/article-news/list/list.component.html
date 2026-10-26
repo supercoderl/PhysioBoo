@@ -1,90 +1,354 @@
-<admin-content-header>
-  <div
-    class="flex items-center md:flex-column gap-2 pb-3 mb-2 border-1 border-bottom"
-  >
-    <div class="flex-1">
-      <h4 class="text-[22px] text-primary font-semibold mb-0">
-        Article & News
-      </h4>
-    </div>
-    <div class="text-right flex">
-      <button-icon
-        buttonClass="!bg-primary ms-2 text-white"
-        (onClick)="onOpenDrawer(null)"
-      >
-        New Item
-      </button-icon>
-    </div>
-  </div>
+<div class="flex flex-1 min-h-0 flex-col gap-4 pb-5">
 
-  <div class="flex items-center justify-between flex-wrap">
+  <!-- Page header -->
+  <header class="flex flex-wrap items-end justify-between gap-3">
+    <div class="min-w-0">
+      <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Articles &amp; news</h1>
+      <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">Write, publish and archive stories for the public blog</p>
+    </div>
     <div class="flex items-center gap-2">
-      <div>
-        <div class="flex items-center flex-wrap gap-2">
-          <div class="table-search flex items-center mb-0">
-            <div class="search-input">
-              <boo-input
-                label="Search..."
-                size="small"
-                (search)="onSearch($event)"
-              >
-                <physio-icon
-                  [class.animate-spin]="loadingSrv.isLoading('search')"
-                  [name]="
-                    loadingSrv.isLoading('search') ? 'loader-circle' : 'search'
-                  "
-                  endfix
-                class="text-[#85757D]"
-                />
-              </boo-input>
-            </div>
-          </div>
+      <button boo-button variant="secondary" size="sm" [loading]="loading" (click)="load()">
+        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      </button>
+      <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
+        <physio-icon name="plus" [size]="15" aria-hidden="true" />New article
+      </button>
+    </div>
+  </header>
+
+  <!-- A refresh failed while the previous results are still on screen -->
+  <boo-inline-error
+    *ngIf="data && loadError === 'failed'"
+    what="the latest articles"
+    [state]="refreshErrorState"
+    (retry)="load()"
+  />
+
+  <section class="flex-1 min-h-[360px] flex flex-col min-w-0 bg-surface border border-borderGray rounded-xl" aria-labelledby="article-list-title">
+    <h2 id="article-list-title" class="sr-only">Article list</h2>
+
+    <!-- Publishing state: one at a time, as the server filters -->
+    <div class="boo-scrollbar overflow-x-auto border-b border-rowDivider">
+      <div class="flex min-w-max gap-1 px-4" role="tablist" aria-label="Publishing status">
+        <button
+          *ngFor="let tab of statusTabs; let i = index"
+          type="button"
+          role="tab"
+          [id]="'article-tab-' + i"
+          aria-controls="article-results"
+          [attr.aria-selected]="tab.value === statusFilter"
+          [attr.tabindex]="tab.value === statusFilter ? 0 : -1"
+          class="relative -mb-px px-3 py-3 bg-transparent border-0 border-b-2 text-sm whitespace-nowrap cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary rounded-t aria-[selected=false]:hover:text-regular"
+          [class.border-primary]="tab.value === statusFilter"
+          [class.text-primaryDeep]="tab.value === statusFilter"
+          [class.font-semibold]="tab.value === statusFilter"
+          [class.border-transparent]="tab.value !== statusFilter"
+          [class.text-secondary]="tab.value !== statusFilter"
+          [class.font-medium]="tab.value !== statusFilter"
+          (click)="selectStatus(tab.value)"
+          (keydown)="onTabKey($event, i)"
+        >{{ tab.label }}</button>
+      </div>
+    </div>
+
+    <!-- Search, category, creation dates and sort. Field labels (20px) over 36px controls line up with the 56px search field. -->
+    <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
+      <boo-search-field
+        class="flex-1 basis-64 min-w-0"
+        label="Search articles by title, excerpt or tag"
+        placeholder="Search title, excerpt or tag"
+        [maxlength]="100"
+        [(ngModel)]="query"
+        (ngModelChange)="onQueryChange()"
+        [busy]="searchPending || (loading && !!searchTerm)"
+        (clear)="clearSearch()"
+        aria-describedby="article-filter-msg"
+      />
+
+      <label class="flex flex-col min-w-0 w-full sm:w-44">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Category</span>
+        <boo-select size="small" [height]="36" label="All categories" [options]="categoryOptions" [(ngModel)]="categoryFilter" (ngModelChange)="onFilterChange()" />
+      </label>
+
+      <fieldset class="m-0 p-0 border-0 min-w-0 flex items-center gap-x-2 flex-wrap">
+        <legend class="float-left w-full mb-1 text-xs leading-4 font-medium text-secondary">Created between</legend>
+        <div class="w-36">
+          <boo-datepicker size="small" [height]="36" label="From" [max]="to" [(ngModel)]="from" (ngModelChange)="onFilterChange()" />
         </div>
+        <span class="text-secondary text-sm" aria-hidden="true">–</span>
+        <div class="w-36">
+          <boo-datepicker size="small" [height]="36" label="To" [min]="from" [(ngModel)]="to" (ngModelChange)="onFilterChange()" />
+        </div>
+      </fieldset>
+
+      <label class="flex flex-col min-w-0 w-full sm:w-48">
+        <span class="mb-1 text-xs leading-4 font-medium text-secondary">Sort by</span>
+        <boo-select size="small" [height]="36" label="Sort by" required [options]="sortOptions" [(ngModel)]="sort" (ngModelChange)="onFilterChange()" />
+      </label>
+    </div>
+
+    <!-- Active filters, and how the list is scoped -->
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2 border-b border-rowDivider bg-body/60 min-h-[44px]">
+      <boo-filter-chips [chips]="chips" (remove)="removeChip($event)" />
+      <button *ngIf="chips.length > 1" type="button" boo-button variant="link" size="sm" (click)="clearFilters()">Clear all</button>
+      <p
+        id="article-filter-msg"
+        class="m-0 text-xs"
+        [class.text-danger]="rangeInvalid"
+        [class.text-secondary]="!rangeInvalid"
+        aria-live="polite"
+      >
+        <ng-container *ngIf="rangeInvalid">The start date must be on or before the end date.</ng-container>
+        <ng-container *ngIf="!rangeInvalid && rangeIncomplete">Pick both dates to filter by creation date.</ng-container>
+        <ng-container *ngIf="!rangeInvalid && !rangeIncomplete && data">
+          {{ data.totalCount | number }} {{ countNoun }}<span aria-hidden="true"> · </span>{{ sortLabel }}
+        </ng-container>
+      </p>
+    </div>
+
+    <!-- Results -->
+    <div
+      id="article-results"
+      role="tabpanel"
+      [attr.aria-labelledby]="'article-tab-' + tabIndex(activeTab)"
+      class="flex-1 flex flex-col min-w-0 min-h-0 relative"
+      [attr.aria-busy]="loading"
+    >
+      <div *ngIf="items.length; else noRowsTpl" class="boo-scrollbar min-h-0 flex-1 overflow-auto" [class.opacity-60]="loading">
+        <table class="w-full border-collapse text-sm">
+          <caption class="sr-only">{{ activeTab.label }}, page {{ page }} of {{ totalPages }}</caption>
+          <thead class="sticky top-0 z-10 bg-surface">
+            <tr class="text-left text-xs font-medium text-secondary border-b border-rowDivider">
+              <th scope="col" class="px-4 py-2.5 font-medium">Article</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden md:table-cell">Status</th>
+              <th scope="col" class="px-4 py-2.5 font-medium hidden lg:table-cell">Author</th>
+              <th scope="col" class="px-4 py-2.5 font-medium text-right"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let a of items; trackBy: trackById"
+              class="border-b border-rowDivider last:border-b-0 hover:bg-body cursor-pointer transition-colors"
+              [class.bg-primarySoft]="selected?.id === a.id"
+              [class.opacity-50]="busy.get(a.id) === 'delete'"
+              (click)="openDetail(a)"
+            >
+              <!-- The story: cover, headline, standfirst, then quiet metadata -->
+              <td class="px-4 py-3 align-top min-w-0">
+                <div class="flex items-start gap-4 min-w-0">
+                  <div class="flex-none w-24 aspect-[16/10] rounded-lg overflow-hidden bg-body border border-rowDivider flex items-center justify-center" aria-hidden="true">
+                    <img
+                      *ngIf="a.coverImageUrl && !brokenCovers.has(a.id); else noCoverTpl"
+                      [src]="a.coverImageUrl"
+                      alt=""
+                      loading="lazy"
+                      class="w-full h-full object-cover"
+                      (error)="onCoverError(a)"
+                    />
+                    <ng-template #noCoverTpl><physio-icon name="image" [size]="18" class="text-placeholder" /></ng-template>
+                  </div>
+                  <div class="min-w-0 flex-1 max-w-[560px]">
+                    <button
+                      type="button"
+                      class="block max-w-full p-0 bg-transparent border-0 text-left text-[15px] leading-5 font-semibold text-regular line-clamp-2 break-words cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                      [attr.aria-label]="'Preview ' + a.title"
+                      aria-haspopup="dialog"
+                      [title]="a.title"
+                      (click)="$event.stopPropagation(); openDetail(a)"
+                    >{{ a.title }}</button>
+                    <p *ngIf="a.excerpt" class="m-0 mt-1 text-xs leading-5 text-secondary line-clamp-1 break-words">{{ a.excerpt }}</p>
+                    <p class="m-0 mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-secondary">
+                      <span class="font-medium text-primaryDeep">{{ category(a) }}</span>
+                      <ng-container *ngIf="a.readTime"><span aria-hidden="true">·</span><span>{{ a.readTime }}</span></ng-container>
+                      <ng-container *ngIf="tags(a).length"><span aria-hidden="true">·</span><span class="truncate max-w-[240px]" [title]="a.tags">{{ tags(a).join(', ') }}</span></ng-container>
+                      <span class="lg:hidden"><span aria-hidden="true">· </span>{{ a.author }}</span>
+                    </p>
+                    <div class="mt-2 md:hidden flex flex-wrap items-center gap-2">
+                      <boo-status-badge dotted [label]="status(a).label" [tone]="status(a).tone" />
+                      <span *ngIf="dateLine(a) as d" class="text-xs text-secondary">{{ d.label }} {{ d.date | date: 'd MMM y' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Publishing state and its date -->
+              <td class="px-4 py-3 align-top hidden md:table-cell whitespace-nowrap">
+                <boo-status-badge dotted [label]="status(a).label" [tone]="status(a).tone" />
+                <div *ngIf="dateLine(a) as d" class="mt-1.5 text-xs text-secondary tabular-nums">{{ d.label }} {{ d.date | date: 'd MMM y' }}</div>
+              </td>
+
+              <!-- Byline -->
+              <td class="px-4 py-3 align-top hidden lg:table-cell max-w-[200px]">
+                <div class="truncate text-regular" [title]="a.author">{{ a.author }}</div>
+              </td>
+
+              <!-- Actions: publish a draft, view a live one, then edit and delete -->
+              <td class="px-3 py-2.5 align-top text-right whitespace-nowrap" (click)="$event.stopPropagation()">
+                <div class="inline-flex items-center justify-end gap-1">
+                  <ng-container *ngIf="canUpdate && rowMove(a) as t">
+                    <button
+                      type="button"
+                      boo-button
+                      variant="secondary"
+                      size="sm"
+                      class="hidden md:inline-flex"
+                      [disabled]="busy.has(a.id)"
+                      [loading]="busy.get(a.id) === t.to"
+                      [attr.aria-label]="t.label + ' ' + a.title"
+                      (click)="move(a, t)"
+                    ><physio-icon *ngIf="busy.get(a.id) !== t.to" [name]="t.icon" [size]="14" aria-hidden="true" />{{ t.label }}</button>
+                  </ng-container>
+                  <a
+                    *ngIf="a.status === ArticleStatus.Published"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    class="hidden sm:inline-flex"
+                    [href]="publicUrl(a)"
+                    target="_blank"
+                    rel="noopener"
+                    [attr.aria-label]="'View ' + a.title + ' on the site (opens in a new tab)'"
+                    title="View on site"
+                  ><physio-icon name="external-link" [size]="16" /></a>
+                  <button
+                    *ngIf="canUpdate"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [disabled]="busy.has(a.id)"
+                    [attr.aria-label]="'Edit ' + a.title"
+                    aria-haspopup="dialog"
+                    title="Edit article"
+                    (click)="openEdit(a)"
+                  ><physio-icon name="pencil" [size]="16" /></button>
+                  <button
+                    *ngIf="canDelete"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    class="!text-danger hidden sm:inline-flex"
+                    [disabled]="busy.has(a.id)"
+                    [attr.aria-label]="'Delete ' + a.title"
+                    title="Delete article"
+                    (click)="confirmDelete(a)"
+                  ><physio-icon name="trash" [size]="16" /></button>
+                  <button
+                    *ngIf="!canUpdate && !canDelete"
+                    type="button"
+                    boo-button
+                    variant="ghost"
+                    size="sm"
+                    [iconOnly]="true"
+                    [attr.aria-label]="'Preview ' + a.title"
+                    aria-haspopup="dialog"
+                    title="Preview"
+                    (click)="openDetail(a)"
+                  ><physio-icon name="chevron-right" [size]="16" /></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <boo-date-admin
-        [startDate]="params.filter.start"
-        [endDate]="params.filter.end"
-        (rangeChange)="onDateChange($event)"
-      />
+      <!-- No rows: first load, access denied, failure or nothing found — all inside the list area -->
+      <ng-template #noRowsTpl>
+        <div *ngIf="loading && !data; else stateTpl" class="flex flex-col" aria-hidden="true">
+          <div *ngFor="let _ of skeletonRows" class="flex items-start gap-4 px-4 py-3.5 border-b border-rowDivider">
+            <div class="flex-none w-24 aspect-[16/10] rounded-lg bg-rowDivider animate-pulse"></div>
+            <div class="flex-1 min-w-0 pt-0.5">
+              <div class="h-4 w-72 max-w-full rounded bg-rowDivider animate-pulse"></div>
+              <div class="mt-2 h-3 w-96 max-w-full rounded bg-rowDivider animate-pulse"></div>
+              <div class="mt-2.5 h-3 w-40 rounded bg-rowDivider animate-pulse"></div>
+            </div>
+            <div class="hidden md:block w-20 h-5 rounded-full bg-rowDivider animate-pulse"></div>
+            <div class="hidden lg:block w-28 h-3.5 mt-1 rounded bg-rowDivider animate-pulse"></div>
+          </div>
+          <span class="sr-only" role="status">Loading articles…</span>
+        </div>
+        <ng-template #stateTpl>
+          <div class="flex-1 flex items-center justify-center px-4 py-8">
+            <boo-empty-state
+              *ngIf="loadError === 'forbidden'"
+              icon="lock"
+              title="You don't have access to articles"
+              description="Ask an administrator for permission to manage articles and news."
+            />
+            <boo-error-state
+              *ngIf="loadError === 'failed' && !data"
+              icon="cloud-off"
+              title="We couldn't load articles"
+              description="Check your connection and try again."
+              retryLabel="Try again"
+              (retry)="load()"
+            />
+            <ng-container *ngIf="!loadError || (loadError === 'failed' && data)">
+              <!-- Filters narrowed it down to nothing -->
+              <boo-empty-state
+                *ngIf="hasFilters; else noStatusTpl"
+                icon="search"
+                title="No articles match"
+                description="Try other words, another category, or wider dates."
+              >
+                <button boo-button variant="secondary" size="sm" (click)="clearFilters()">Clear filters</button>
+              </boo-empty-state>
+              <!-- Only the status tab is narrowing the list -->
+              <ng-template #noStatusTpl>
+                <boo-empty-state
+                  *ngIf="statusFilter !== null; else noArticlesTpl"
+                  icon="newspaper"
+                  [title]="'No ' + activeTab.label.toLowerCase() + ' yet'"
+                  [description]="statusFilter === ArticleStatus.Archived ? 'Articles you archive are kept here, off the public blog.' : 'Articles show up here when they reach this status.'"
+                >
+                  <button boo-button variant="secondary" size="sm" (click)="showAll()">View all articles</button>
+                </boo-empty-state>
+              </ng-template>
+              <!-- Nothing at all yet -->
+              <ng-template #noArticlesTpl>
+                <boo-empty-state
+                  icon="newspaper"
+                  title="No articles yet"
+                  [description]="canCreate ? 'Write your first article. It stays a draft until you publish it.' : 'Articles appear here once someone on your team writes one.'"
+                >
+                  <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
+                    <physio-icon name="plus" [size]="15" aria-hidden="true" />New article
+                  </button>
+                </boo-empty-state>
+              </ng-template>
+            </ng-container>
+          </div>
+        </ng-template>
+      </ng-template>
     </div>
 
-    <div class="flex table-dropdown right-content items-center flex-wrap gap-3">
-      <boo-button-admin
-        [icon]="{ name: 'refresh', size: 14 }"
-        buttonClass="!bg-surface h-full text-secondary"
-        [border]="{ width: 1, color: '#EFE3E7' }"
-        (click)="loadArticles()"
-      >
-        <span class="text-placeholder">Reload</span>
-      </boo-button-admin>
-      <boo-filter-admin
-        [filters]="filter_configs"
-        (apply)="onFilterApply($event)"
-      />
-      <boo-sort-admin
-        [(value)]="params.sort"
-        (change)="onSortChange($event)"
-        [options]="sort_options"
-      />
-    </div>
-  </div>
+    <!-- Paging -->
+    <footer *ngIf="data && data.totalCount > 0" class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-rowDivider">
+      <p class="m-0 text-xs text-secondary tabular-nums" aria-live="polite">Showing {{ firstShown }}–{{ lastShown }} of {{ data.totalCount }}</p>
+      <boo-pagination *ngIf="totalPages > 1" [page]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)" />
+    </footer>
+  </section>
+</div>
 
-  <div class="mt-2">
-    <cms-article-news-table-card
-      [data]="tableData()"
-      (pageChange)="onPageChanged($event)"
-      (editClick)="onOpenDrawer($event)"
-      (deleteClick)="onDelete($event)"
-      [filter]="params"
-    />
-  </div>
+<cms-article-detail-drawer
+  [article]="selected"
+  [canUpdate]="canUpdate"
+  [canDelete]="canDelete"
+  [busy]="busySelected"
+  [pendingStatus]="pendingSelectedStatus"
+  (close)="selected = null"
+  (edit)="openEdit($event, true)"
+  (remove)="confirmDelete($event)"
+  (transition)="selected && move(selected, $event)"
+/>
 
-  <cms-article-news-drawer
-    [isOpen]="isDrawerOpen"
-    [currentId]="selectedId"
-    (close)="onCloseDrawer()"
-    (saveSuccess)="onSaveSuccess($event)"
-    (delete)="onDelete($event)"
-  />
-</admin-content-header>
+<cms-article-edit-drawer
+  [open]="editorOpen"
+  [article]="editing"
+  (close)="closeEditor()"
+  (saved)="onSaved($event)"
+/>

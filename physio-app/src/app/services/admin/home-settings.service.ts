@@ -9,10 +9,10 @@ export class HomeSettingsService {
     constructor(private http: HttpClient) { }
 
     get() {
-        return this.http.get<PagedResponse<HomeSettings>>(BASE_API.HOME_SETTINGS.BASE);
+        return this.http.get<PagedResponse<HomeSettings | null>>(BASE_API.HOME_SETTINGS.BASE);
     }
 
     update(params: HomeSettings) {
-        return this.http.put<PagedResponse<HomeSettings>>(BASE_API.HOME_SETTINGS.BASE, params);
+        return this.http.put<PagedResponse<HomeSettings | null>>(BASE_API.HOME_SETTINGS.BASE, params);
     }
 }

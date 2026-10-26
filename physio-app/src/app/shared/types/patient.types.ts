@@ -11,6 +11,12 @@ export interface Patient {
   id: string;
   patientNumber: string;
   fullName: string;
+  firstName: string;
+  lastName: string;
+  /** YYYY-MM-DD. A placeholder date when the patient has no personal profile. */
+  dateOfBirth: string;
+  /** Gender enum name, e.g. "Female"; empty when the patient has no personal profile. */
+  gender: string;
   email: string;
   phone: string;
 

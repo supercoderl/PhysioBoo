@@ -1,14 +1,29 @@
 <!-- Hero -->
-<section class="bg-gray-50">
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-8 pb-9 lg:pt-[72px] lg:pb-20 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] gap-9 lg:gap-16 items-center">
-    <div class="min-w-0">
-      <p class="font-mono font-medium text-xs lg:text-[13px] text-primaryDeep tracking-[.04em] uppercase mb-3.5 lg:mb-5">{{ tenant.name }}</p>
-      <h1 class="text-[34px] leading-10 lg:text-[56px] lg:leading-[64px] font-semibold tracking-[-.02em] text-balance mb-3.5 lg:mb-5">
+<section class="relative isolate overflow-hidden bg-gray-50">
+  <!-- Photo fills the right side; the mask fades its left and bottom edges into the page background. -->
+  <div
+    class="absolute inset-y-0 right-0 -z-10 w-full lg:w-[60%] bg-cover bg-[position:75%_center] bg-no-repeat opacity-30 lg:opacity-100 bg-[url('/assets/images/background/hero-hospital.png')] [mask-image:linear-gradient(to_right,transparent,#000_40%),linear-gradient(to_bottom,#000_55%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,#000_40%),linear-gradient(to_bottom,#000_55%,transparent)] [mask-composite:intersect] [-webkit-mask-composite:source-in]"
+    aria-hidden="true"
+  ></div>
+  <div
+    class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-8 pb-9 lg:pt-14 lg:pb-12"
+  >
+    <div class="min-w-0 max-w-[600px]">
+      <p
+        class="font-mono font-medium text-xs lg:text-[13px] text-primaryDeep tracking-[.04em] uppercase mb-3.5 lg:mb-5"
+      >
+        {{ tenant.name }}
+      </p>
+      <h1
+        class="text-[34px] leading-10 lg:text-[56px] lg:leading-[64px] font-semibold tracking-[-.02em] text-balance mb-3.5 lg:mb-5"
+      >
         Find the right doctor and request an appointment
       </h1>
-      <p class="text-base leading-6 lg:text-lg lg:leading-7 text-gray-700 max-w-[540px] mb-6 lg:mb-9 text-pretty">
-        Search doctors, clinics, services and health articles. Send a request from a doctor’s profile and the clinic
-        will call you to arrange a time.
+      <p
+        class="text-base leading-6 lg:text-lg lg:leading-7 text-gray-700 max-w-[540px] mb-6 lg:mb-9 text-pretty"
+      >
+        Search doctors, clinics, services and health articles. Send a request
+        from a doctor’s profile and the clinic will call you to arrange a time.
       </p>
 
       <!-- The keyword goes to /search, which covers doctors, services, clinics and articles. -->
@@ -18,8 +33,14 @@
         aria-label="Search the site"
         class="bg-surface border border-gray-300 rounded-2xl p-1.5 lg:p-2 flex flex-col sm:flex-row gap-1.5 focus-within:border-primary lg:shadow-[0_8px_24px_rgba(38,20,26,.06)]"
       >
-        <label class="flex-1 min-w-0 flex gap-3 items-center px-3.5 py-3 lg:px-3 lg:py-2">
-          <physio-icon name="search" [size]="18" class="text-gray-600 flex-none" />
+        <label
+          class="flex-1 min-w-0 flex gap-3 items-center px-3.5 py-3 lg:px-3 lg:py-2"
+        >
+          <physio-icon
+            name="search"
+            [size]="18"
+            class="text-gray-600 flex-none"
+          />
           <span class="sr-only">Doctor, specialty, clinic or service</span>
           <input
             #searchInput
@@ -34,40 +55,76 @@
             class="w-full border-0 outline-none p-0 bg-transparent text-base lg:text-[15px] text-gray-900 placeholder:text-gray-500 [&::-webkit-search-cancel-button]:hidden"
           />
         </label>
-        <button boo-button type="submit" variant="primary" size="lg" class="w-full sm:w-auto">
+        <button
+          boo-button
+          type="submit"
+          variant="primary"
+          size="lg"
+          class="w-full sm:w-auto"
+        >
           <physio-icon name="search" [size]="16" />Search
         </button>
       </form>
-      <p *ngIf="emptySubmit" id="hero-search-hint" role="status" class="text-sm text-gray-700 mt-2.5 mb-0">
+      <p
+        *ngIf="emptySubmit"
+        id="hero-search-hint"
+        role="status"
+        class="text-sm text-gray-700 mt-2.5 mb-0"
+      >
         Type a doctor’s name, a specialty, a clinic or a service to search.
       </p>
 
-      <div *ngIf="popular.length" class="flex gap-2 items-center mt-4 lg:mt-5 -mx-5 px-5 lg:mx-0 lg:px-0 overflow-x-auto lg:overflow-visible lg:flex-wrap no-scrollbar">
-        <span class="hidden lg:inline text-sm text-gray-600 mr-1">Popular:</span>
+      <div
+        *ngIf="popular.length"
+        class="flex gap-2 items-center mt-4 lg:mt-5 -mx-5 px-5 lg:mx-0 lg:px-0 overflow-x-auto lg:overflow-visible lg:flex-wrap no-scrollbar"
+      >
+        <span class="hidden lg:inline text-sm text-gray-600 mr-1"
+          >Popular:</span
+        >
         <button
           *ngFor="let p of popular"
           type="button"
           (click)="searchFor(p)"
           class="flex-none h-[38px] lg:h-[34px] px-3.5 rounded-full border border-gray-300 bg-surface text-sm text-gray-900 whitespace-nowrap hover:border-primary hover:text-primaryDeep cursor-pointer motion-chip"
-        >{{ p }}</button>
+        >
+          {{ p }}
+        </button>
       </div>
     </div>
-
-    <div class="h-[200px] lg:h-[520px] rounded-[20px] lg:rounded-3xl ph-stripes border border-gray-200" aria-hidden="true"></div>
   </div>
 </section>
 
-<!-- Specialties (hidden when the network lists none) -->
-<section *ngIf="specialties.state !== 'empty'" appReveal id="specialties" class="scroll-mt-24 pt-12 pb-6 lg:pt-24 lg:pb-12">
+<section
+  *ngIf="specialties.state !== 'empty'"
+  appReveal
+  id="specialties"
+  class="scroll-mt-24 pt-12 pb-6 lg:pt-24 lg:pb-12"
+>
   <div class="max-w-[1200px] mx-auto px-5 xl:px-0">
-    <div class="flex justify-between items-baseline lg:items-end gap-4 mb-[18px] lg:mb-8">
+    <div
+      class="flex justify-between items-baseline lg:items-end gap-4 mb-[18px] lg:mb-8"
+    >
       <div>
-        <h2 class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em]">Browse by specialty</h2>
-        <p class="hidden lg:block text-base text-gray-700 mt-2">Start with the type of care you need.</p>
+        <h2
+          class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em]"
+        >
+          Browse by specialty
+        </h2>
+        <p class="hidden lg:block text-base text-gray-700 mt-2">
+          Start with the type of care you need.
+        </p>
       </div>
-      <a routerLink="/doctor" class="flex-none whitespace-nowrap text-sm lg:text-[15px] font-semibold text-primary hover:text-primaryHover flex gap-1.5 items-center motion-arrow">
-        <span class="lg:hidden">All</span><span class="hidden lg:inline">All doctors</span>
-        <physio-icon name="arrow-right" [size]="16" class="hidden lg:inline-block" />
+      <a
+        routerLink="/doctor"
+        class="flex-none whitespace-nowrap text-sm lg:text-[15px] font-semibold text-primary hover:text-primaryHover flex gap-1.5 items-center motion-arrow"
+      >
+        <span class="lg:hidden">All</span
+        ><span class="hidden lg:inline">All doctors</span>
+        <physio-icon
+          name="arrow-right"
+          [size]="16"
+          class="hidden lg:inline-block"
+        />
       </a>
     </div>
 
@@ -78,7 +135,12 @@
       (retry)="retry('specialties')"
     />
 
-    <div *ngIf="specialties.state === 'loading'" aria-busy="true" aria-label="Loading specialties" class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 lg:gap-4">
+    <div
+      *ngIf="specialties.state === 'loading'"
+      aria-busy="true"
+      aria-label="Loading specialties"
+      class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 lg:gap-4"
+    >
       <span
         *ngFor="let s of specialtySkeletons; let i = index"
         class="h-[104px] lg:h-[88px] rounded-[14px] lg:rounded-2xl bg-[#F4ECEF] animate-pulse motion-reduce:animate-none"
@@ -86,7 +148,10 @@
       ></span>
     </div>
 
-    <div *ngIf="specialties.state === 'results'" class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 lg:gap-4">
+    <div
+      *ngIf="specialties.state === 'results'"
+      class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 lg:gap-4"
+    >
       <a
         *ngFor="let s of specialties.items; let i = index; trackBy: trackById"
         routerLink="/doctor"
@@ -94,11 +159,19 @@
         class="min-w-0 flex-col lg:flex-row gap-3 lg:gap-4 lg:items-center p-4 lg:p-5 border border-gray-200 rounded-[14px] lg:rounded-2xl bg-surface text-gray-900 hover:text-gray-900 motion-card motion-card-lift motion-card-accent motion-arrow"
         [ngClass]="i >= 6 ? 'hidden lg:flex' : 'flex'"
       >
-        <span class="w-10 h-10 lg:w-12 lg:h-12 rounded-[10px] lg:rounded-xl bg-primarySoft text-primaryDeep flex items-center justify-center flex-none">
+        <span
+          class="w-10 h-10 lg:w-12 lg:h-12 rounded-[10px] lg:rounded-xl bg-primarySoft text-primaryDeep flex items-center justify-center flex-none"
+        >
           <physio-icon [name]="s.icon" [size]="22" />
         </span>
-        <span class="text-[15px] lg:text-base font-semibold break-words">{{ s.name }}</span>
-        <physio-icon name="chevron-right" [size]="16" class="hidden lg:inline-block ml-auto text-gray-400 flex-none" />
+        <span class="text-[15px] lg:text-base font-semibold break-words">{{
+          s.name
+        }}</span>
+        <physio-icon
+          name="chevron-right"
+          [size]="16"
+          class="hidden lg:inline-block ml-auto text-gray-400 flex-none"
+        />
       </a>
     </div>
   </div>
@@ -107,18 +180,39 @@
 <!-- Doctors -->
 <section appReveal class="pt-8 pb-12 lg:pt-12 lg:pb-24">
   <div class="max-w-[1200px] mx-auto px-5 xl:px-0">
-    <div class="flex justify-between items-baseline lg:items-end gap-4 mb-[18px] lg:mb-8">
+    <div
+      class="flex justify-between items-baseline lg:items-end gap-4 mb-[18px] lg:mb-8"
+    >
       <div>
-        <h2 class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em]">Doctors in our network</h2>
-        <p class="hidden lg:block text-base text-gray-700 mt-2">View a profile or send an appointment request.</p>
+        <h2
+          class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em]"
+        >
+          Doctors in our network
+        </h2>
+        <p class="hidden lg:block text-base text-gray-700 mt-2">
+          View a profile or send an appointment request.
+        </p>
       </div>
-      <a routerLink="/doctor" class="flex-none whitespace-nowrap text-sm lg:text-[15px] font-semibold text-primary hover:text-primaryHover flex gap-1.5 items-center motion-arrow">
-        <span class="lg:hidden">All</span><span class="hidden lg:inline">View all doctors</span>
-        <physio-icon name="arrow-right" [size]="16" class="hidden lg:inline-block" />
+      <a
+        routerLink="/doctor"
+        class="flex-none whitespace-nowrap text-sm lg:text-[15px] font-semibold text-primary hover:text-primaryHover flex gap-1.5 items-center motion-arrow"
+      >
+        <span class="lg:hidden">All</span
+        ><span class="hidden lg:inline">View all doctors</span>
+        <physio-icon
+          name="arrow-right"
+          [size]="16"
+          class="hidden lg:inline-block"
+        />
       </a>
     </div>
 
-    <boo-inline-error *ngIf="doctors.state === 'error'" what="doctors" [state]="doctors.retry" (retry)="retry('doctors')" />
+    <boo-inline-error
+      *ngIf="doctors.state === 'error'"
+      what="doctors"
+      [state]="doctors.retry"
+      (retry)="retry('doctors')"
+    />
 
     <boo-empty-state
       *ngIf="doctors.state === 'empty'"
@@ -140,25 +234,55 @@
     class="list-none m-0 max-w-[1200px] mx-auto px-5 xl:px-0 flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 overflow-x-auto md:overflow-visible snap-x snap-mandatory no-scrollbar"
   >
     <ng-container *ngIf="doctors.state === 'loading'">
-      <li *ngFor="let s of doctorSkeletons" class="flex-[0_0_290px] md:flex-auto snap-start"><doctor-card [skeleton]="true" /></li>
+      <li
+        *ngFor="let s of doctorSkeletons"
+        class="flex-[0_0_290px] md:flex-auto snap-start"
+      >
+        <doctor-card [skeleton]="true" />
+      </li>
     </ng-container>
-    <li *ngFor="let d of doctors.items; trackBy: trackById" class="flex-[0_0_290px] md:flex-auto snap-start"><doctor-card [doctor]="d" /></li>
+    <li
+      *ngFor="let d of doctors.items; trackBy: trackById"
+      class="flex-[0_0_290px] md:flex-auto snap-start"
+    >
+      <doctor-card [doctor]="d" />
+    </li>
   </ul>
 </section>
 
 <!-- How appointment requests work -->
 <section class="bg-gray-50 border-y border-gray-200">
-  <div appReveal class="max-w-[1200px] mx-auto px-5 xl:px-0 py-12 lg:py-24 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16">
+  <div
+    appReveal
+    class="max-w-[1200px] mx-auto px-5 xl:px-0 py-12 lg:py-24 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16"
+  >
     <div>
-      <h2 class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em] mb-5 lg:mb-3">How appointment requests work</h2>
-      <p class="hidden lg:block text-base leading-[26px] text-gray-700 mb-7">Three steps from search to a call back from the clinic.</p>
-      <a boo-button variant="primary" size="lg" routerLink="/doctor" class="!hidden lg:!inline-flex">Find a doctor</a>
+      <h2
+        class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em] mb-5 lg:mb-3"
+      >
+        How appointment requests work
+      </h2>
+      <p class="hidden lg:block text-base leading-[26px] text-gray-700 mb-7">
+        Three steps from search to a call back from the clinic.
+      </p>
+      <a
+        boo-button
+        variant="primary"
+        size="lg"
+        routerLink="/doctor"
+        class="!hidden lg:!inline-flex"
+        >Find a doctor</a
+      >
     </div>
 
     <!-- Mobile list -->
     <ol class="list-none m-0 p-0 lg:hidden flex flex-col gap-5">
       <li *ngFor="let s of steps; let i = index" class="flex gap-4">
-        <span class="w-8 h-8 rounded-full bg-primary text-white font-mono font-semibold text-[13px] flex items-center justify-center flex-none" aria-hidden="true">{{ i + 1 }}</span>
+        <span
+          class="w-8 h-8 rounded-full bg-primary text-white font-mono font-semibold text-[13px] flex items-center justify-center flex-none"
+          aria-hidden="true"
+          >{{ i + 1 }}</span
+        >
         <div>
           <h3 class="text-base font-semibold mb-1">{{ s.t }}</h3>
           <p class="text-[15px] leading-[22px] text-gray-700">{{ s.d }}</p>
@@ -168,8 +292,15 @@
 
     <!-- Desktop cards -->
     <ol class="list-none m-0 p-0 hidden lg:grid grid-cols-3 gap-5">
-      <li *ngFor="let s of steps" class="bg-surface border border-gray-200 rounded-2xl p-6">
-        <span class="font-mono font-semibold text-sm text-primary" aria-hidden="true">{{ s.n }}</span>
+      <li
+        *ngFor="let s of steps"
+        class="bg-surface border border-gray-200 rounded-2xl p-6"
+      >
+        <span
+          class="font-mono font-semibold text-sm text-primary"
+          aria-hidden="true"
+          >{{ s.n }}</span
+        >
         <h3 class="text-lg font-semibold mt-3.5 mb-2">{{ s.t }}</h3>
         <p class="text-[15px] leading-6 text-gray-700">{{ s.d }}</p>
       </li>
@@ -180,18 +311,39 @@
 <!-- Hospitals and clinics -->
 <section appReveal class="py-12 lg:py-24">
   <div class="max-w-[1200px] mx-auto px-5 xl:px-0">
-    <div class="flex justify-between items-baseline lg:items-end gap-4 mb-[18px] lg:mb-8">
+    <div
+      class="flex justify-between items-baseline lg:items-end gap-4 mb-[18px] lg:mb-8"
+    >
       <div>
-        <h2 class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em]">Hospitals and clinics</h2>
-        <p class="hidden lg:block text-base text-gray-700 mt-2">Facilities in the {{ tenant.name }} network.</p>
+        <h2
+          class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em]"
+        >
+          Hospitals and clinics
+        </h2>
+        <p class="hidden lg:block text-base text-gray-700 mt-2">
+          Facilities in the {{ tenant.name }} network.
+        </p>
       </div>
-      <a routerLink="/hospitals" class="flex-none whitespace-nowrap text-sm lg:text-[15px] font-semibold text-primary hover:text-primaryHover flex gap-1.5 items-center motion-arrow">
-        <span class="lg:hidden">All</span><span class="hidden lg:inline">View all</span>
-        <physio-icon name="arrow-right" [size]="16" class="hidden lg:inline-block" />
+      <a
+        routerLink="/hospitals"
+        class="flex-none whitespace-nowrap text-sm lg:text-[15px] font-semibold text-primary hover:text-primaryHover flex gap-1.5 items-center motion-arrow"
+      >
+        <span class="lg:hidden">All</span
+        ><span class="hidden lg:inline">View all</span>
+        <physio-icon
+          name="arrow-right"
+          [size]="16"
+          class="hidden lg:inline-block"
+        />
       </a>
     </div>
 
-    <boo-inline-error *ngIf="clinics.state === 'error'" what="clinics" [state]="clinics.retry" (retry)="retry('clinics')" />
+    <boo-inline-error
+      *ngIf="clinics.state === 'error'"
+      what="clinics"
+      [state]="clinics.retry"
+      (retry)="retry('clinics')"
+    />
 
     <boo-empty-state
       *ngIf="clinics.state === 'empty'"
@@ -209,9 +361,17 @@
       class="list-none m-0 p-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
     >
       <ng-container *ngIf="clinics.state === 'loading'">
-        <li *ngFor="let s of clinicSkeletons; let i = index" [class.hidden]="i >= 1" class="md:!block"><clinic-card [skeleton]="true" /></li>
+        <li
+          *ngFor="let s of clinicSkeletons; let i = index"
+          [class.hidden]="i >= 1"
+          class="md:!block"
+        >
+          <clinic-card [skeleton]="true" />
+        </li>
       </ng-container>
-      <li *ngFor="let h of clinics.items; trackBy: trackById"><clinic-card [hospital]="h" /></li>
+      <li *ngFor="let h of clinics.items; trackBy: trackById">
+        <clinic-card [hospital]="h" />
+      </li>
     </ul>
   </div>
 </section>
@@ -219,16 +379,28 @@
 <!-- Why choose us -->
 <section appReveal class="pb-12 lg:pb-24">
   <div class="max-w-[1200px] mx-auto px-5 xl:px-0">
-    <div class="lg:border-t border-gray-200 lg:pt-[72px] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16">
-      <h2 class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em] mb-5 lg:mb-0">Why choose {{ tenant.name }}</h2>
+    <div
+      class="lg:border-t border-gray-200 lg:pt-[72px] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16"
+    >
+      <h2
+        class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em] mb-5 lg:mb-0"
+      >
+        Why choose {{ tenant.name }}
+      </h2>
       <div class="flex flex-col gap-[22px] lg:grid lg:grid-cols-3 lg:gap-8">
         <div *ngFor="let r of reasons" class="flex lg:block gap-3.5">
-          <span class="w-10 h-10 lg:w-11 lg:h-11 rounded-[10px] lg:rounded-xl bg-primarySoft text-primaryDeep flex items-center justify-center flex-none lg:mb-4">
+          <span
+            class="w-10 h-10 lg:w-11 lg:h-11 rounded-[10px] lg:rounded-xl bg-primarySoft text-primaryDeep flex items-center justify-center flex-none lg:mb-4"
+          >
             <physio-icon [name]="r.icon" [size]="20" />
           </span>
           <div>
-            <h3 class="text-base lg:text-lg font-semibold mb-1 lg:mb-2">{{ r.t }}</h3>
-            <p class="text-[15px] leading-[22px] lg:leading-6 text-gray-700">{{ r.d }}</p>
+            <h3 class="text-base lg:text-lg font-semibold mb-1 lg:mb-2">
+              {{ r.t }}
+            </h3>
+            <p class="text-[15px] leading-[22px] lg:leading-6 text-gray-700">
+              {{ r.d }}
+            </p>
           </div>
         </div>
       </div>
@@ -237,12 +409,24 @@
 </section>
 
 <!-- Testimonials (only when the tenant has published some) -->
-<section *ngIf="testimonials.length" class="bg-gray-50 border-y border-gray-200">
+<section
+  *ngIf="testimonials.length"
+  class="bg-gray-50 border-y border-gray-200"
+>
   <div appReveal class="max-w-[1200px] mx-auto px-5 xl:px-0 py-12 lg:py-24">
-    <h2 class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em] mb-6 lg:mb-8">What patients say</h2>
+    <h2
+      class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em] mb-6 lg:mb-8"
+    >
+      What patients say
+    </h2>
     <div class="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-3 gap-5">
-      <figure *ngFor="let t of testimonials" class="m-0 bg-surface border border-gray-200 rounded-2xl p-7 flex flex-col gap-5">
-        <blockquote class="m-0 text-base leading-[26px] text-gray-800">{{ t.text }}</blockquote>
+      <figure
+        *ngFor="let t of testimonials"
+        class="m-0 bg-surface border border-gray-200 rounded-2xl p-7 flex flex-col gap-5"
+      >
+        <blockquote class="m-0 text-base leading-[26px] text-gray-800">
+          {{ t.text }}
+        </blockquote>
         <figcaption class="flex gap-3 items-center">
           <span class="w-10 h-10 rounded-full bg-gray-200 flex-none"></span>
           <span class="text-sm">
@@ -257,15 +441,29 @@
 
 <!-- FAQ -->
 <section appReveal class="pb-12 lg:py-24">
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16">
+  <div
+    class="max-w-[1200px] mx-auto px-5 xl:px-0 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16"
+  >
     <div>
-      <h2 class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em] mb-2 lg:mb-3">Questions about appointments</h2>
+      <h2
+        class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em] mb-2 lg:mb-3"
+      >
+        Questions about appointments
+      </h2>
       <p class="hidden lg:block text-base text-gray-700">
-        Can't find an answer? <a routerLink="/contact" class="text-primary hover:text-primaryHover font-semibold">Contact us</a>
+        Can't find an answer?
+        <a
+          routerLink="/contact"
+          class="text-primary hover:text-primaryHover font-semibold"
+          >Contact us</a
+        >
       </p>
     </div>
     <div class="border-t border-gray-200 mt-3 lg:mt-0">
-      <div *ngFor="let f of faqs; let i = index" class="border-b border-gray-200">
+      <div
+        *ngFor="let f of faqs; let i = index"
+        class="border-b border-gray-200"
+      >
         <h3 class="m-0">
           <button
             type="button"
@@ -275,12 +473,26 @@
             class="w-full min-h-14 py-4 lg:py-[22px] border-0 bg-transparent flex justify-between items-center gap-4 lg:gap-6 text-left text-base lg:text-[17px] font-semibold text-gray-900 hover:text-primaryDeep cursor-pointer"
           >
             {{ f.q }}
-            <physio-icon [name]="openFaq === i ? 'minus' : 'plus'" [size]="20" class="text-primary flex-none" />
+            <physio-icon
+              [name]="openFaq === i ? 'minus' : 'plus'"
+              [size]="20"
+              class="text-primary flex-none"
+            />
           </button>
         </h3>
         <!-- Always rendered so it can animate; the collapsed answer is visibility:hidden (out of the tab order and the accessibility tree). -->
-        <div [id]="'faq-' + i" class="motion-collapse" [class.is-open]="openFaq === i">
-          <div><p class="text-[15px] leading-[22px] lg:leading-6 text-gray-700 pb-4 lg:pb-[22px] lg:pr-12">{{ f.a }}</p></div>
+        <div
+          [id]="'faq-' + i"
+          class="motion-collapse"
+          [class.is-open]="openFaq === i"
+        >
+          <div>
+            <p
+              class="text-[15px] leading-[22px] lg:leading-6 text-gray-700 pb-4 lg:pb-[22px] lg:pr-12"
+            >
+              {{ f.a }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -290,48 +502,98 @@
 <!-- Articles (hidden when nothing is published) -->
 <section appReveal *ngIf="articles.state !== 'empty'" class="pb-12 lg:pb-24">
   <div class="max-w-[1200px] mx-auto px-5 xl:px-0">
-    <div class="flex justify-between items-baseline lg:items-end gap-4 mb-[18px] lg:mb-8">
-      <h2 class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em]">Health articles</h2>
-      <a routerLink="/blog" class="flex-none whitespace-nowrap text-sm lg:text-[15px] font-semibold text-primary hover:text-primaryHover flex gap-1.5 items-center motion-arrow">
-        <span class="lg:hidden">All</span><span class="hidden lg:inline">All articles</span>
-        <physio-icon name="arrow-right" [size]="16" class="hidden lg:inline-block" />
+    <div
+      class="flex justify-between items-baseline lg:items-end gap-4 mb-[18px] lg:mb-8"
+    >
+      <h2
+        class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em]"
+      >
+        Health articles
+      </h2>
+      <a
+        routerLink="/blog"
+        class="flex-none whitespace-nowrap text-sm lg:text-[15px] font-semibold text-primary hover:text-primaryHover flex gap-1.5 items-center motion-arrow"
+      >
+        <span class="lg:hidden">All</span
+        ><span class="hidden lg:inline">All articles</span>
+        <physio-icon
+          name="arrow-right"
+          [size]="16"
+          class="hidden lg:inline-block"
+        />
       </a>
     </div>
 
-    <boo-inline-error *ngIf="articles.state === 'error'" what="articles" [state]="articles.retry" (retry)="retry('articles')" />
+    <boo-inline-error
+      *ngIf="articles.state === 'error'"
+      what="articles"
+      [state]="articles.retry"
+      (retry)="retry('articles')"
+    />
 
     <ul
       *ngIf="articles.state === 'loading' || articles.state === 'results'"
       [attr.aria-busy]="articles.state === 'loading' ? true : null"
-      [attr.aria-label]="articles.state === 'loading' ? 'Loading articles' : null"
+      [attr.aria-label]="
+        articles.state === 'loading' ? 'Loading articles' : null
+      "
       class="list-none m-0 p-0 grid grid-cols-[minmax(0,1fr)] md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5"
     >
       <ng-container *ngIf="articles.state === 'loading'">
-        <li *ngFor="let s of articleSkeletons; let i = index" [class.hidden]="i >= 1" class="md:!block"><article-card [skeleton]="true" /></li>
+        <li
+          *ngFor="let s of articleSkeletons; let i = index"
+          [class.hidden]="i >= 1"
+          class="md:!block"
+        >
+          <article-card [skeleton]="true" />
+        </li>
       </ng-container>
-      <li *ngFor="let a of articles.items; trackBy: trackById"><article-card [article]="a" /></li>
+      <li *ngFor="let a of articles.items; trackBy: trackById">
+        <article-card [article]="a" />
+      </li>
     </ul>
   </div>
 </section>
 
 <!-- Final CTA -->
 <section class="px-5 xl:px-0 pb-12 lg:pb-24">
-  <div class="max-w-[1200px] mx-auto bg-primarySoft rounded-[20px] lg:rounded-3xl px-[22px] py-7 lg:px-16 lg:py-14 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-5 lg:gap-10">
+  <div
+    class="max-w-[1200px] mx-auto bg-primarySoft rounded-[20px] lg:rounded-3xl px-[22px] py-7 lg:px-16 lg:py-14 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-5 lg:gap-10"
+  >
     <div>
-      <h2 class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em] mb-2 lg:mb-2.5 text-gray-900">Ready to see a doctor?</h2>
+      <h2
+        class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em] mb-2 lg:mb-2.5 text-gray-900"
+      >
+        Ready to see a doctor?
+      </h2>
       <p class="text-[15px] leading-[22px] lg:text-base text-gray-800">
         <ng-container *ngIf="tenant.phone || tenant.email; else contactLink">
           Questions first?
-          <ng-container *ngIf="tenant.phone">Call <b class="font-semibold">{{ tenant.phone }}</b></ng-container>
+          <ng-container *ngIf="tenant.phone"
+            >Call <b class="font-semibold">{{ tenant.phone }}</b></ng-container
+          >
           <ng-container *ngIf="tenant.phone && tenant.email"> or </ng-container>
-          <ng-container *ngIf="tenant.email">email <b class="font-semibold">{{ tenant.email }}</b></ng-container>.
+          <ng-container *ngIf="tenant.email"
+            >email <b class="font-semibold">{{ tenant.email }}</b></ng-container
+          >.
         </ng-container>
         <ng-template #contactLink>
-          Questions first? <a routerLink="/contact" class="font-semibold text-primaryDeep underline underline-offset-2">Send us a message</a>.
+          Questions first?
+          <a
+            routerLink="/contact"
+            class="font-semibold text-primaryDeep underline underline-offset-2"
+            >Send us a message</a
+          >.
         </ng-template>
       </p>
     </div>
-    <a boo-button variant="primary" size="lg" routerLink="/doctor" class="flex-none">
+    <a
+      boo-button
+      variant="primary"
+      size="lg"
+      routerLink="/doctor"
+      class="flex-none"
+    >
       <physio-icon name="search" [size]="18" />Find a doctor
     </a>
   </div>

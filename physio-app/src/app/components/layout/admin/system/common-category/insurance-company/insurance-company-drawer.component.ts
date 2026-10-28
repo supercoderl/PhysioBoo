@@ -1,362 +1,177 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize, firstValueFrom } from "rxjs";
+import { Component, inject } from "@angular/core";
+import { FormBuilder, Validators } from "@angular/forms";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { InsuranceCompanyService } from "../../../../../../services/admin/insurance-company.service";
-import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../../../services/common/toast.service";
-import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { InsuranceType } from "../../../../../../shared/enums/insurance-type";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { InsuranceCompany } from "../../../../../../shared/types/support.types";
 import { convertEnumToSelection } from "../../../../../../shared/utils/common";
-import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
-import { DrawerComponent } from "../../../../../drawer/drawer.component";
-import { BooJsonInputComponent } from "../../../../../input/boo-json-input/boo-json-input.component";
 import { BooSelectComponent } from "../../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";
-import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-input.component";
+import { CategoryDrawerBase } from "../shared/category-drawer.base";
+import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-shell.component";
 
+/** Create / edit an insurance company (POST /insurance-companies, PATCH /insurance-companies/{id}). */
 @Component({
     selector: 'common-category-insurance-company-drawer',
     standalone: true,
     imports: [
         SharedModule,
-        DrawerComponent,
+        CommonCategoryDrawerShellComponent,
         BooInputComponent,
-
         BooTextareaComponent,
-        BooButtonAdminComponent,
-        BooSelectComponent,
         BooCheckboxComponent,
-        BooJsonInputComponent,
-        BooDevJsonFillerComponent
+        BooSelectComponent
     ],
     template: `
-        <drawer
+        <common-category-drawer-shell
+            [form]="form"
             [isOpen]="isOpen"
-            [isShowDialog]="true"
-            (close)="onClose()"
+            [title]="isEdit ? 'Edit insurance company' : 'New insurance company'"
+            subtitle="Who the insurer is and how claims are made and settled."
+            [isEdit]="isEdit"
+            [canDelete]="canDelete"
+            [loading]="loading"
+            [loadFailed]="loadFailed"
+            [saving]="saving"
+            (save)="save()"
+            (cancel)="requestClose()"
+            (discard)="discard()"
+            (delete)="onDelete()"
+            (retry)="loadDetail()"
         >
-            <div class="flex flex-col h-full bg-surface relative">
-                <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
-                    <div>
-                        <h2 class="text-xl font-bold text-primary leading-none mb-1">
-                            {{ currentId ? 'Edit Insurance Company' : 'New Insurance Company' }}
-                        </h2>
-                        <p class="text-sm text-secondary m-0">Configure company details and policies</p>
+            <ng-container [formGroup]="form">
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Company</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-[1fr_12rem] gap-4">
+                        <boo-input label="Company name" [required]="true" formControlName="name" [maxlength]="200" placeholder="e.g. Bao Viet Insurance" />
+                        <boo-select label="Type" formControlName="type" [options]="insuranceTypeOptions" [required]="true" />
                     </div>
-                    <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <physio-icon name="x" [size]="20"></physio-icon>
-                    </button>
-                </div>
+                </section>
 
-                <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
-                    <boo-json-editor [targetForms]="form"></boo-json-editor>
-                    
-                    <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Contact</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <boo-input label="Contact person" formControlName="contactPerson" [maxlength]="100" />
+                        <boo-input label="Phone" formControlName="phone" [maxlength]="20" placeholder="+84…" />
+                        <boo-input type="email" label="Email" formControlName="email" [maxlength]="150" placeholder="claims@insurer.com" />
+                        <boo-input label="Website" formControlName="website" [maxlength]="200" placeholder="https://…" />
                     </div>
-                    
-                    <div class="p-6">
-                        <div class="flex gap-5">
-                            <div class="flex-1 space-y-4">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <boo-input label="Company Name" [required]="true" formControlName="name" placeholder="Ex: Bao Viet Insurance"></boo-input>
-                                    <div>
-                                        <boo-select 
-                                            label="Select Type"
-                                            formControlName="type"
-                                            [options]="insuranceTypeOptions"
-                                        ></boo-select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="mt-4">
+                        <boo-textarea label="Address" formControlName="address" />
                     </div>
-                    
-                    <div class="h-px bg-gray-100 mx-6"></div>
-                    
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Contact Information</h3>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <boo-input label="Contact Person" formControlName="contactPerson" placeholder="John Doe"></boo-input>
-                            <boo-input label="Phone Number" formControlName="phone" placeholder="+84..."></boo-input>
-                        </div>
-                        <div class="space-y-4">
-                            <boo-input type="email" label="Email Address" formControlName="email" placeholder="contact@insurance.com"></boo-input>
-                            <boo-input label="Website" formControlName="website" placeholder="https://www..."></boo-input>
-                            <boo-textarea label="Address" formControlName="address" placeholder="123 Main St..."></boo-textarea>
-                        </div>
-                    </div>
+                </section>
 
-                    <div class="h-px bg-gray-100 mx-6"></div>
-                    
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Facilities & Metrics</h3>
-                        <div class="grid grid-cols-2 gap-4 mb-6">
-                            <div 
-                                class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('cashlessFacility')?.value, 'border-gray-200': !form.get('cashlessFacility')?.value}"
-                                (click)="toggleCheck('cashlessFacility')"
-                            >
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center shrink-0">
-                                        <physio-icon name="credit-card" [size]="18" class="text-green-600"></physio-icon>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Cashless</span>
-                                </div>
-                                <boo-checkbox formControlName="cashlessFacility"></boo-checkbox>
-                            </div>
-                            <div 
-                                class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('reimbursementFacility')?.value, 'border-gray-200': !form.get('reimbursementFacility')?.value}"
-                                (click)="toggleCheck('reimbursementFacility')"
-                            >
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-primarySoft flex items-center justify-center shrink-0">
-                                        <physio-icon name="refresh" [size]="18" class="text-primary"></physio-icon>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Reimbursement</span>
-                                </div>
-                                <boo-checkbox formControlName="reimbursementFacility"></boo-checkbox>
-                            </div>
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Claims</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="cashlessFacility" label="Cashless claims" />
                         </div>
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="reimbursementFacility" label="Reimbursement claims" />
+                        </div>
+                    </div>
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <boo-input type="number" label="Maximum coverage" formControlName="maximumCoverageAmount" placeholder="0.00" />
+                        <boo-input type="number" label="Settlement ratio (%)" formControlName="claimSettlementRatio" placeholder="95.5" />
+                        <boo-input type="number" label="Avg. settlement (days)" formControlName="averageClaimSettlementTime" placeholder="7" />
+                    </div>
+                    <p *ngIf="form.controls['claimSettlementRatio'].touched && form.controls['claimSettlementRatio'].invalid" class="m-0 mt-1 text-xs text-danger" role="alert">The settlement ratio is a percentage between 0 and 100.</p>
+                </section>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <boo-input type="number" label="Max Coverage Amount" formControlName="maximumCoverageAmount" placeholder="0.00"></boo-input>
-                            <boo-input type="number" label="Claim Settlement Ratio (%)" formControlName="claimSettlementRatio" placeholder="95.5"></boo-input>
+                <section class="px-6 py-5">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Terms</h3>
+                    <div class="flex flex-col gap-4">
+                        <div>
+                            <boo-textarea label="Required documents" formControlName="requiredDocuments" placeholder="ID card, Invoice, Medical records" />
+                            <p class="m-0 mt-1 text-xs text-secondary">Separate documents with commas or new lines.</p>
                         </div>
-                        <div class="mt-4">
-                            <boo-input type="number" label="Avg Claim Settlement Time (Days)" formControlName="averageClaimSettlementTime" placeholder="7"></boo-input>
-                        </div>
+                        <boo-textarea label="Network hospitals" formControlName="networkHospitals" placeholder="Hospitals in the insurer’s network" />
+                        <boo-textarea label="Terms and conditions" formControlName="termAndConditions" />
                     </div>
-
-                    <div class="h-px bg-gray-100 mx-6"></div>
-                    
-                    <div class="p-6 pb-10">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Additional Info</h3>    
-                        <div class="space-y-4">
-                            <boo-json-input 
-                                formControlName="NetworkHospitals" 
-                                label="Network Hospitals (JSON or Text)" 
-                                [required]="true"
-                                placeholder="List of hospitals..."
-                                [minHeight]="250"
-                            >
-                            </boo-json-input>
-                            <boo-textarea label="Required Documents" formControlName="requiredDocuments" placeholder="ID, Invoices, Medical Records (comma separated)..."></boo-textarea>
-                            <boo-textarea label="Terms & Conditions" formControlName="termAndConditions" placeholder="Enter terms and conditions..."></boo-textarea>
-                        </div>
+                    <div *ngIf="isEdit" class="mt-4 rounded-xl border border-borderGray px-3 py-2.5">
+                        <boo-checkbox formControlName="isActive" label="Active" />
+                        <p class="m-0 mt-1 text-xs text-secondary">Clear to mark this insurer inactive.</p>
                     </div>
-                </div>
-                
-                <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0 shadow-top-md">
-                    <div>
-                        <boo-button-admin *ngIf="currentId" (click)="onDelete()" background="transparent" textColor="#EF4444" padding="6px 8px" [fontSize]="14" fontWeight="500" [gap]="6" buttonClass="group">
-                            <physio-icon 
-                                name="trash" 
-                                [size]="16"
-                            [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
-                            ></physio-icon> 
-                            <span>Delete</span>
-                        </boo-button-admin>
-                    </div>
-                    <div class="flex gap-3">
-                        <boo-button-admin
-                            buttonClass="hover:!bg-gray-200"
-                            background="transparent"
-                            (click)="onClose()"
-                            [disabled]="loadingSrv.isLoading('search-by-id')"
-                        >
-                            Cancel
-                        </boo-button-admin>
-                        <boo-button-admin
-                            textColor="white"
-                            (click)="onSave()"
-                            [disabled]="loadingSrv.isLoading('search-by-id') || loadingSrv.isLoading('create') || loadingSrv.isLoading('update')"
-                            [loading]="loadingSrv.isLoading('update')"
-                        >
-                            Save Changes
-                        </boo-button-admin>
-                    </div>
-                </div>
-            </div>
-        </drawer>
+                </section>
+            </ng-container>
+        </common-category-drawer-shell>
     `
 })
+export class CommonCategoryInsuranceCompanyDrawerComponent extends CategoryDrawerBase<InsuranceCompany> {
+    protected override readonly noun = 'insurance company';
+    protected override readonly service = inject(InsuranceCompanyService);
 
-export class CommonCategoryInsuranceCompanyDrawerComponent implements OnChanges {
-    // #region Inputs, Outputs, Properties
-    @Input() isOpen = false;
-    @Input() currentId: string | null = null;
-    @Output() close = new EventEmitter<void>();
-    @Output() saveSuccess = new EventEmitter<InsuranceCompany>();
-    @Output() delete = new EventEmitter<string>();
-    @ViewChild('scrollContainer') scrollContainer!: ElementRef;
-    form: FormGroup;
-    insuranceTypeOptions = convertEnumToSelection(InsuranceType);
-    // #endregion
+    readonly insuranceTypeOptions = convertEnumToSelection(InsuranceType);
 
-    // #region Init (Lifecycle + Setup)
-    constructor(
-        private fb: FormBuilder,
-        private toastSrv: ToastService,
-        private insuranceCompanySrv: InsuranceCompanyService,
-        protected loadingSrv: LocalLoadingService
-    ) {
-        this.form = this.initForm();
+    override readonly form = inject(FormBuilder).group({
+        name: ['', [Validators.required, Validators.maxLength(200), Validators.pattern(/\S/)]],
+        type: [InsuranceType.Health as InsuranceType | null, [Validators.required]],
+        contactPerson: [null as string | null],
+        phone: [null as string | null],
+        email: [null as string | null, [Validators.email]],
+        address: [null as string | null],
+        website: [null as string | null],
+        cashlessFacility: [false],
+        reimbursementFacility: [false],
+        networkHospitals: [null as string | null],
+        maximumCoverageAmount: [null as number | string | null, [Validators.min(0)]],
+        claimSettlementRatio: [null as number | string | null, [Validators.min(0), Validators.max(100)]],
+        averageClaimSettlementTime: [0 as number | string, [Validators.min(0)]],
+        requiredDocuments: [''],
+        termAndConditions: [null as string | null],
+        isActive: [true]
+    });
+
+    protected override defaults() {
+        return {
+            name: '', type: InsuranceType.Health, contactPerson: null, phone: null, email: null, address: null, website: null,
+            cashlessFacility: false, reimbursementFacility: false, networkHospitals: null, maximumCoverageAmount: null,
+            claimSettlementRatio: null, averageClaimSettlementTime: 0, requiredDocuments: '', termAndConditions: null, isActive: true
+        };
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (!this.isOpen) return;
-
-        if (changes['currentId'] && this.currentId) {
-            this.loadDetail(this.currentId);
-        } else if (!this.currentId) {
-            this.resetForm();
-        }
-    }
-    // #endregion
-
-    // #region Methods
-    private initForm(): FormGroup {
-        return this.fb.group({
-            name: ['', [Validators.required]],
-            type: [InsuranceType.Health],
-            contactPerson: [''],
-            phone: [''],
-            email: [''],
-            address: [''],
-            website: [''],
-            cashlessFacility: [false],
-            reimbursementFacility: [false],
-            networkHospitals: [''],
-            maximumCoverageAmount: [null],
-            claimSettlementRatio: [null],
-            averageClaimSettlementTime: [0],
-            requiredDocuments: [''],
-            termAndConditions: ['']
-        });
+    protected override toFormValue(item: InsuranceCompany) {
+        return {
+            name: item.name,
+            type: item.type,
+            contactPerson: item.contactPerson,
+            phone: item.phone,
+            email: item.email,
+            address: item.address,
+            website: item.website,
+            cashlessFacility: !!item.cashlessFacility,
+            reimbursementFacility: !!item.reimbursementFacility,
+            networkHospitals: item.networkHospitals,
+            maximumCoverageAmount: item.maximumCoverageAmount,
+            claimSettlementRatio: item.claimSettlementRatio,
+            averageClaimSettlementTime: item.averageClaimSettlementTime ?? 0,
+            requiredDocuments: (item.requiredDocuments ?? []).join(', '),
+            termAndConditions: item.termAndConditions,
+            isActive: item.isActive
+        };
     }
 
-    loadDetail(id: string) {
-        this.form.disable();
-
-        this.insuranceCompanySrv.search_by_id(id)
-            .pipe(
-                finalize(() => this.form.enable())
-            )
-            .subscribe(_res => {
-                if (_res.success) {
-                    this.form.patchValue({
-                        name: _res.data?.name,
-                        type: _res.data?.type,
-                        contactPerson: _res.data?.contactPerson,
-                        phone: _res.data?.phone,
-                        email: _res.data?.email,
-                        address: _res.data?.address,
-                        website: _res.data?.website,
-                        cashlessFacility: _res.data?.cashlessFacility,
-                        reimbursementFacility: _res.data?.reimbursementFacility,
-                        networkHospitals: _res.data?.networkHospitals,
-                        maximumCoverageAmount: _res.data?.maximumCoverageAmount,
-                        claimSettlementRatio: _res.data?.claimSettlementRatio,
-                        averageClaimSettlementTime: _res.data?.averageClaimSettlementTime,
-                        requiredDocuments: Array.isArray(_res.data?.requiredDocuments) ? _res.data?.requiredDocuments.join(', ') : _res.data?.requiredDocuments,
-                        termAndConditions: _res.data?.termAndConditions
-                    })
-                }
-            })
-    }
-
-    toggleCheck(controlName: string) {
-        const currentValue = this.form.get(controlName)?.value;
-
-        this.form.patchValue({
-            [controlName]: !currentValue
-        });
-        this.form.markAsDirty();
-    }
-
-    async onSave() {
-        if (this.form.invalid) {
-            this.toastSrv.error('Please check required fields');
-            this.form.markAllAsTouched();
-            return;
-        }
-
-        const formValues = this.form.getRawValue();
-
-        let parsedDocuments: string[] = [];
-        const rawDocs = formValues.requiredDocuments;
-
-        if (rawDocs) {
-            if (typeof rawDocs === 'string' && rawDocs.trim() !== '') {
-                try {
-                    const parsed = JSON.parse(rawDocs);
-                    if (Array.isArray(parsed))
-                        parsedDocuments = parsed;
-                    else parsedDocuments = [rawDocs];
-                }
-                catch (e) {
-                    parsedDocuments = rawDocs.split(',').map((item: string) => item.trim()).filter((item: string) => item.length > 0);
-                }
-            } else if (Array.isArray(rawDocs))
-                parsedDocuments = rawDocs;
-        }
-
-        const payload = {
-            ...formValues,
-            type: Number(formValues.type ?? InsuranceType.Health),
-            averageClaimSettlementTime: Number(formValues.averageClaimSettlementTime) || 0,
-            maximumCoverageAmount: formValues.maximumCoverageAmount ? Number(formValues.maximumCoverageAmount) : null,
-            claimSettlementRatio: formValues.claimSettlementRatio ? Number(formValues.claimSettlementRatio) : null,
-            requiredDocuments: parsedDocuments
-        }
-
-        try {
-            let id: string;
-            if (this.currentId) {
-                await firstValueFrom(this.insuranceCompanySrv.update(this.currentId, payload));
-                id = this.currentId;
-            } else {
-                const createRes = await firstValueFrom(this.insuranceCompanySrv.create(payload));
-                if (!createRes.success || !createRes.data) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
-                id = createRes.data;
-            }
-
-            const response = await firstValueFrom(this.insuranceCompanySrv.search_by_id(id));
-            if (response.success && response.data) {
-                this.saveSuccess.emit(response.data);
-            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (err) {
-            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            console.error(err);
-        }
-    }
-
-    resetForm() {
-        this.form.reset({
-            category: 'Clinical',
-            averageConsultationDuration: 0,
-            isDiagnostic: false,
-            isSurgical: false
-        });
-    }
-
-    onClose() {
-        if (this.scrollContainer) {
-            this.scrollContainer.nativeElement.scrollTop = 0;
-        }
-
-        this.close.emit();
-    }
-
-    onDelete() {
-        if (this.currentId) this.delete.emit(this.currentId);
+    protected override toPayload(raw: Record<string, any>) {
+        return {
+            name: this.text(raw['name']),
+            type: Number(raw['type'] ?? InsuranceType.Health),
+            contactPerson: this.text(raw['contactPerson']),
+            phone: this.text(raw['phone']),
+            email: this.text(raw['email']),
+            address: this.text(raw['address']),
+            website: this.text(raw['website']),
+            cashlessFacility: !!raw['cashlessFacility'],
+            reimbursementFacility: !!raw['reimbursementFacility'],
+            networkHospitals: this.text(raw['networkHospitals']),
+            maximumCoverageAmount: this.num(raw['maximumCoverageAmount'], null),
+            claimSettlementRatio: this.num(raw['claimSettlementRatio'], null),
+            averageClaimSettlementTime: this.num(raw['averageClaimSettlementTime']),
+            requiredDocuments: String(raw['requiredDocuments'] ?? '').split(/[,\n]/).map(d => d.trim()).filter(Boolean),
+            termAndConditions: this.text(raw['termAndConditions']),
+            // Update requires it (create ignores it); omitting it used to deactivate the insurer on every edit.
+            isActive: !!raw['isActive']
+        };
     }
 }

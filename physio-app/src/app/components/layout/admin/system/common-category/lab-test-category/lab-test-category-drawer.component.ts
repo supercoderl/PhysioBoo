@@ -1,229 +1,82 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize, firstValueFrom } from "rxjs";
+import { Component, inject } from "@angular/core";
+import { FormBuilder, Validators } from "@angular/forms";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { LabTestCategoryService } from "../../../../../../services/admin/lab-test-category.service";
-import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../../../services/common/toast.service";
-import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { LabTestCategory } from "../../../../../../shared/types/laboratory-imaging.types";
-import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
-import { DrawerComponent } from "../../../../../drawer/drawer.component";
-import { BooInputComponent } from '@physioboo/ui';
 import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";
+import { CategoryDrawerBase } from "../shared/category-drawer.base";
+import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-shell.component";
 
+/** Create / edit a lab test category (POST /lab-test-categories, PATCH /lab-test-categories/{id}). */
 @Component({
     selector: 'common-category-lab-test-category-drawer',
     standalone: true,
     imports: [
         SharedModule,
-        DrawerComponent,
+        CommonCategoryDrawerShellComponent,
         BooInputComponent,
-
         BooTextareaComponent,
-        BooButtonAdminComponent
+        BooCheckboxComponent
     ],
     template: `
-        <drawer
+        <common-category-drawer-shell
+            [form]="form"
             [isOpen]="isOpen"
-            [isShowDialog]="true"
-            (close)="onClose()"
+            [title]="isEdit ? 'Edit lab test category' : 'New lab test category'"
+            subtitle="Groups lab tests in the catalog and on order forms."
+            [isEdit]="isEdit"
+            [canDelete]="canDelete"
+            [loading]="loading"
+            [loadFailed]="loadFailed"
+            [saving]="saving"
+            (save)="save()"
+            (cancel)="requestClose()"
+            (discard)="discard()"
+            (delete)="onDelete()"
+            (retry)="loadDetail()"
         >
-            <div class="flex flex-col h-full bg-surface relative">
-                <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
-                    <div>
-                        <h2 class="text-xl font-bold text-primary leading-none mb-1">
-                            {{ currentId ? 'Edit Record' : 'New Record' }}
-                        </h2>
-                        <p class="text-sm text-secondary m-0">Configure basic details and department</p>
-                    </div>
-                    <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <physio-icon name="x" [size]="20"></physio-icon>
-                    </button>
+            <section class="px-6 py-5" [formGroup]="form">
+                <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Category</h3>
+                <div class="flex flex-col gap-4">
+                    <boo-input label="Name" [required]="true" formControlName="name" [maxlength]="150" placeholder="e.g. Haematology" />
+                    <boo-input label="Lab section" formControlName="department" [maxlength]="150" placeholder="e.g. Clinical pathology" />
+                    <boo-textarea label="Description" formControlName="description" placeholder="Which tests belong here" />
                 </div>
-
-                <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
-                    <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
-                    </div>
-                    
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Basic Information</h3>
-                        <div class="space-y-4">
-                            <boo-input 
-                                label="Name" 
-                                [required]="true" 
-                                formControlName="name" 
-                                placeholder="Ex: Cardiology"
-                            ></boo-input>
-                            
-                            <boo-input 
-                                label="Department" 
-                                formControlName="department" 
-                                placeholder="Ex: Internal Medicine"
-                            ></boo-input>
-                        </div>
-                    </div>
-                    
-                    <div class="h-px bg-gray-100 mx-6"></div>
-                    
-                    <div class="p-6 pb-10">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Additional Info</h3>    
-                        <div class="space-y-4">
-                            <boo-textarea 
-                                label="Description" 
-                                formControlName="description" 
-                                placeholder="Enter description..."
-                            ></boo-textarea>
-                        </div>
-                    </div>
+                <div *ngIf="isEdit" class="mt-4 rounded-xl border border-borderGray px-3 py-2.5">
+                    <boo-checkbox formControlName="isActive" label="Active" />
+                    <p class="m-0 mt-1 text-xs text-secondary">Clear to mark this category inactive.</p>
                 </div>
-
-                <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0 shadow-top-md">
-                    <div>
-                        <boo-button-admin *ngIf="currentId" (click)="onDelete()" background="transparent" textColor="#EF4444" padding="6px 8px" [fontSize]="14" fontWeight="500" [gap]="6" buttonClass="group">
-                            <physio-icon 
-                                name="trash" 
-                                [size]="16"
-                                [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
-                            ></physio-icon> 
-                            <span>Delete</span>
-                        </boo-button-admin>
-                    </div>
-                    <div class="flex gap-3">
-                        <boo-button-admin
-                            buttonClass="hover:!bg-gray-200"
-                            background="transparent"
-                            (click)="onClose()"
-                            [disabled]="loadingSrv.isLoading('search-by-id')"
-                        >
-                            Cancel
-                        </boo-button-admin>
-                        <boo-button-admin
-                            textColor="white"
-                            (click)="onSave()"
-                            [disabled]="loadingSrv.isLoading('search-by-id') || loadingSrv.isLoading('create') || loadingSrv.isLoading('update')"
-                            [loading]="loadingSrv.isLoading('update')"
-                        >
-                            Save Changes
-                        </boo-button-admin>
-                    </div>
-                </div>
-            </div>
-        </drawer>
+            </section>
+        </common-category-drawer-shell>
     `
 })
+export class CommonCategoryLabTestCategoryDrawerComponent extends CategoryDrawerBase<LabTestCategory> {
+    protected override readonly noun = 'lab test category';
+    protected override readonly service = inject(LabTestCategoryService);
 
-export class CommonCategoryLabTestCategoryDrawerComponent implements OnChanges {
-    // #region Inputs, Outputs, Properties
-    @Input() isOpen = false;
-    @Input() currentId: string | null = null;
-    @Output() close = new EventEmitter<void>();
-    @Output() saveSuccess = new EventEmitter<LabTestCategory>();
-    @Output() delete = new EventEmitter<string>();
-    @ViewChild('scrollContainer') scrollContainer!: ElementRef;
-    form: FormGroup;
-    // #endregion
+    override readonly form = inject(FormBuilder).group({
+        name: ['', [Validators.required, Validators.maxLength(150), Validators.pattern(/\S/)]],
+        description: [null as string | null],
+        department: [null as string | null],
+        isActive: [true]
+    });
 
-    // #region Init (Lifecycle + Setup)
-    constructor(
-        private fb: FormBuilder,
-        private toastSrv: ToastService,
-        private labTestCategorySrv: LabTestCategoryService,
-        protected loadingSrv: LocalLoadingService
-    ) {
-        this.form = this.initForm();
+    protected override defaults() {
+        return { name: '', description: null, department: null, isActive: true };
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (!this.isOpen) return;
-
-        if (changes['currentId'] && this.currentId) {
-            this.loadDetail(this.currentId);
-        } else if (!this.currentId) {
-            this.resetForm();
-        }
-    }
-    // #endregion
-
-    // #region Methods
-    private initForm(): FormGroup {
-        return this.fb.group({
-            name: ['', [Validators.required]],
-            description: [null],
-            department: [null]
-        });
+    protected override toFormValue(item: LabTestCategory) {
+        return { name: item.name, description: item.description, department: item.department, isActive: item.isActive };
     }
 
-    loadDetail(id: string) {
-        this.form.disable();
-
-        this.labTestCategorySrv.search_by_id(id)
-            .pipe(
-                finalize(() => this.form.enable())
-            )
-            .subscribe(_res => {
-                if (_res.success) {
-                    this.form.patchValue({
-                        name: _res.data?.name,
-                        description: _res.data?.description,
-                        department: _res.data?.department
-                    })
-                }
-            })
-    }
-
-    async onSave() {
-        if (this.form.invalid) {
-            this.toastSrv.error('Please check required fields');
-            this.form.markAllAsTouched();
-            return;
-        }
-
-        const formData = { ...this.form.getRawValue() }
-
-        try {
-            let id: string;
-            if (this.currentId) {
-                // The endpoint answers 204 No Content: a failure surfaces as an HTTP error, not as `success: false`.
-                await firstValueFrom(this.labTestCategorySrv.update(this.currentId, formData));
-                id = this.currentId;
-            } else {
-                const createRes = await firstValueFrom(this.labTestCategorySrv.create(formData));
-                if (!createRes.success || !createRes.data) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
-                id = createRes.data;
-            }
-
-            const response = await firstValueFrom(this.labTestCategorySrv.search_by_id(id));
-            if (response.success && response.data) {
-                this.saveSuccess.emit(response.data);
-            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (err) {
-            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            console.error(err);
-        }
-    }
-
-    resetForm() {
-        this.form.reset({
-            name: '',
-            description: null,
-            department: null
-        });
-    }
-
-    onClose() {
-        if (this.scrollContainer) {
-            this.scrollContainer.nativeElement.scrollTop = 0;
-        }
-
-        this.close.emit();
-    }
-
-    onDelete() {
-        if (this.currentId) this.delete.emit(this.currentId);
+    protected override toPayload(raw: Record<string, any>) {
+        return {
+            name: this.text(raw['name']),
+            description: this.text(raw['description']),
+            department: this.text(raw['department']),
+            // Update requires it (create ignores it); omitting it used to deactivate the category on every edit.
+            isActive: !!raw['isActive']
+        };
     }
 }

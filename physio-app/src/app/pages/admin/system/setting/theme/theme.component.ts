@@ -1,150 +1,124 @@
-import { Component, OnInit, inject, signal } from "@angular/core";
+import { Component, OnDestroy, OnInit, computed, inject, signal } from "@angular/core";
+import { BooButtonComponent } from "@physioboo/ui";
 import { finalize } from "rxjs";
+import { SettingPageComponent } from "../../../../../components/layout/admin/setting/shared/setting-page.component";
+import { SettingSectionComponent } from "../../../../../components/layout/admin/setting/shared/setting-section.component";
+import { DialogService } from "../../../../../services/common/dialog.service";
 import { PreferenceService } from "../../../../../services/common/preference.service";
-import { AccentColor, FontSize, ThemeConfig, ThemeConfigService, ThemeMode } from "../../../../../services/common/theme-config.service";
+import { FontSize, ThemeConfig, ThemeConfigService, ThemeMode } from "../../../../../services/common/theme-config.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
-interface ThemeOption { value: ThemeMode; label: string; icon: string; }
+interface ThemeOption { value: ThemeMode; label: string; icon: string; hint: string; }
 interface FontSizeOption { value: FontSize; label: string; size: string; }
-interface AccentOption { value: AccentColor; color: string; name: string; }
 
+const OPTION = 'relative flex items-center gap-3 p-3.5 rounded-xl border text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
+
+/**
+ * Settings > Theme: colour mode and base text size from ThemeConfigService, saved as user preferences
+ * (group `theme`). Picking an option previews it across the app at once; leaving the page without saving puts the
+ * saved appearance back, so a preview never outlives the page. The product has a single accent colour, so there is
+ * nothing to pick there.
+ */
 @Component({
   selector: 'admin-system-setting-theme',
   standalone: true,
-  imports: [SharedModule, BooButtonAdminComponent],
-  host: { class: 'block h-full min-h-0 overflow-y-auto' },
+  imports: [SharedModule, SettingPageComponent, SettingSectionComponent, BooButtonComponent],
   template: `
-    <main class="flex-1 py-4">
-      <div class="max-w-4xl mx-auto">
-        <header class="flex items-start justify-between mb-2">
-          <div>
-            <h1 class="text-2xl font-semibold text-gray-900">Appearance</h1>
-            <p class="text-sm text-gray-500 mt-1">Personalize how PhysioBoo looks for your account.</p>
-          </div>
-          <boo-button-admin (click)="onReset()" [disabled]="loading() || saving()" background="transparent" textColor="#85757D" [fontSize]="14">
-            Reset to defaults
-          </boo-button-admin>
-        </header>
+    <setting-page
+      heading="Theme"
+      description="Personalize how PhysioBoo looks for your account. Changes preview instantly; save to keep them."
+      saveLabel="Save appearance"
+      dirtyLabel="You are previewing unsaved appearance changes."
+      [loading]="loading()"
+      [dirty]="isDirty()"
+      [saving]="saving()"
+      (save)="onSave()"
+      (discard)="onDiscard()"
+    >
+      <button pageActions type="button" boo-button variant="ghost" size="sm" [disabled]="saving() || isDefault()" (click)="onReset()">
+        <physio-icon name="rotate-ccw" [size]="15" aria-hidden="true" />Reset to defaults
+      </button>
 
-        <section class="bg-surface rounded-lg border border-gray-200 mb-6">
-          <div class="p-6 pb-3 border-b border-gray-100">
-            <h2 class="text-base font-semibold text-gray-900 mb-1">Theme</h2>
-            <p class="text-sm text-gray-500 m-0">Choose how the interface looks. Auto follows your operating system.</p>
-          </div>
-          <div class="p-6 pt-3 grid grid-cols-3 gap-3">
-            <button *ngFor="let opt of themes" type="button"
-              (click)="pickMode(opt.value)"
-              [class.border-primary]="config().mode === opt.value"
-              [class.bg-primary]="config().mode === opt.value"
-              [class.text-white]="config().mode === opt.value"
-              [class.border-gray-200]="config().mode !== opt.value"
-              [class.text-gray-700]="config().mode !== opt.value"
-              class="relative flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover:border-gray-300">
-              <physio-icon [name]="opt.icon" [size]="24" [class]="config().mode === opt.value ? 'text-white' : 'text-black'" />
-              <span class="text-sm font-medium">{{ opt.label }}</span>
-              <span *ngIf="config().mode === opt.value"
-                class="absolute top-2 right-2 w-2 h-2 bg-white rounded-full"></span>
-            </button>
-          </div>
-        </section>
+      <setting-section heading="Color mode" description="Auto follows your device’s light or dark setting.">
+        <div class="grid gap-3 sm:grid-cols-3" role="radiogroup" aria-label="Color mode">
+          <button
+            *ngFor="let opt of themes"
+            type="button"
+            role="radio"
+            [attr.aria-checked]="config().mode === opt.value"
+            [class]="optionClass(config().mode === opt.value)"
+            [disabled]="saving()"
+            (click)="pickMode(opt.value)"
+          >
+            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+              [class.bg-primary]="config().mode === opt.value" [class.text-white]="config().mode === opt.value"
+              [class.bg-gray-100]="config().mode !== opt.value" [class.text-regular]="config().mode !== opt.value" aria-hidden="true">
+              <physio-icon [name]="opt.icon" [size]="18" />
+            </span>
+            <span class="min-w-0">
+              <span class="block text-sm font-medium text-regular">{{ opt.label }}</span>
+              <span class="block text-xs text-secondary">{{ opt.hint }}</span>
+            </span>
+            <physio-icon *ngIf="config().mode === opt.value" name="check" [size]="16" class="absolute top-3 right-3 text-primary" aria-hidden="true" />
+          </button>
+        </div>
+      </setting-section>
 
-        <section class="bg-surface rounded-lg border border-gray-200 mb-6">
-          <div class="p-6 pb-3 border-b border-gray-100">
-            <h2 class="text-base font-semibold text-gray-900 mb-1">Accent color</h2>
-            <p class="text-sm text-gray-500 m-0">Highlights, buttons, and links use this color.</p>
-          </div>
-          <div class="p-6 pt-3 grid grid-cols-6 gap-3">
-            <button *ngFor="let c of accentColors" type="button"
-              (click)="pickAccent(c.value)"
-              [style.background-color]="hexFor(c.value)"
-              [class.ring-2]="config().accentColor === c.value"
-              [class.ring-offset-2]="config().accentColor === c.value"
-              [class.ring-gray-900]="config().accentColor === c.value"
-              class="relative aspect-square rounded-lg transition-transform hover:scale-105"
-              [title]="c.name">
-              <span *ngIf="config().accentColor === c.value"
-                class="absolute inset-0 flex items-center justify-center">
-                <span class="w-3 h-3 bg-surface rounded-full"></span>
-              </span>
-            </button>
-          </div>
-        </section>
-
-        <section class="bg-surface rounded-lg border border-gray-200">
-          <div class="p-6 pb-3 border-b border-gray-100">
-            <h2 class="text-base font-semibold text-gray-900 mb-1">Font size</h2>
-            <p class="text-sm text-gray-500 m-0">Adjust the base font size used across the app.</p>
-          </div>
-          <div class="p-6 pt-3 space-y-2">
-            <label *ngFor="let f of fontSizes"
-              [class.border-primary]="config().fontSize === f.value"
-              [class.bg-primary]="config().fontSize === f.value"
-              [class.text-white]="config().fontSize === f.value"
-              [class.border-gray-200]="config().fontSize !== f.value"
-              class="flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all hover:border-gray-300">
-              <span class="flex items-center gap-3">
-                <input type="radio" name="fontSize" [value]="f.value"
-                  [checked]="config().fontSize === f.value"
-                  (change)="pickFont(f.value)"
-                  class="w-4 h-4 accent-primary" />
-                <span>
-                  <span class="block font-medium"
-                    [class.text-white]="config().fontSize === f.value"
-                    [class.text-gray-900]="config().fontSize !== f.value">{{ f.label }}</span>
-                  <span class="block text-sm"
-                    [class.text-white]="config().fontSize === f.value"
-                    [class.text-gray-500]="config().fontSize !== f.value">{{ f.size }}</span>
-                </span>
-              </span>
-              <span [style.fontSize]="f.size"
-                [class.text-white]="config().fontSize === f.value"
-                [class.text-gray-600]="config().fontSize !== f.value">Aa</span>
-            </label>
-          </div>
-        </section>
-
-        <footer class="mt-6 flex justify-end gap-2">
-          <boo-button-admin (click)="onCancel()" [disabled]="saving() || !isDirty()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 16px" [fontSize]="14" fontWeight="500">
-            Discard changes
-          </boo-button-admin>
-          <boo-button-admin (click)="onSave()" [disabled]="saving() || !isDirty()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
-            <physio-icon *ngIf="saving()" name="loader-circle" [class]="'w-4 h-4 animate-spin'" />
-            <span>{{ saving() ? 'Saving…' : 'Save preferences' }}</span>
-          </boo-button-admin>
-        </footer>
-      </div>
-    </main>
-    `
+      <setting-section heading="Text size" description="Scales text and spacing across the app.">
+        <div class="grid gap-3 sm:grid-cols-3" role="radiogroup" aria-label="Text size">
+          <button
+            *ngFor="let f of fontSizes"
+            type="button"
+            role="radio"
+            [attr.aria-checked]="config().fontSize === f.value"
+            [class]="optionClass(config().fontSize === f.value) + ' justify-between'"
+            [disabled]="saving()"
+            (click)="pickFont(f.value)"
+          >
+            <span class="min-w-0">
+              <span class="block text-sm font-medium text-regular">{{ f.label }}</span>
+              <span class="block text-xs text-secondary">{{ f.size }} base</span>
+            </span>
+            <span class="font-semibold text-regular leading-none pr-6" [style.font-size]="f.size" aria-hidden="true">Aa</span>
+            <physio-icon *ngIf="config().fontSize === f.value" name="check" [size]="16" class="absolute top-3 right-3 text-primary" aria-hidden="true" />
+          </button>
+        </div>
+      </setting-section>
+    </setting-page>
+  `
 })
-export class AdminSystemSettingThemeComponent implements OnInit {
+export class AdminSystemSettingThemeComponent implements OnInit, OnDestroy {
   private themeSrv = inject(ThemeConfigService);
   private prefSrv = inject(PreferenceService);
+  private dialogSrv = inject(DialogService);
   private toastSrv = inject(ToastService);
 
-  loading = signal(false);
-  saving = signal(false);
+  readonly loading = signal(true);
+  readonly saving = signal(false);
 
-  private original = signal<ThemeConfig>({ mode: 'light', fontSize: 'medium', accentColor: 'rose' });
-  config = this.themeSrv.config;
+  /** The appearance as last saved; what leaving the page or Discard returns to. */
+  private readonly original = signal<ThemeConfig>({ ...this.themeSrv.config() });
+  readonly config = this.themeSrv.config;
 
-  themes: ThemeOption[] = [
-    { value: 'light', label: 'Light', icon: 'sun' },
-    { value: 'dark', label: 'Dark', icon: 'moon' },
-    { value: 'auto', label: 'Auto', icon: 'monitor' },
+  readonly isDirty = computed(() => {
+    const a = this.original(), b = this.config();
+    return a.mode !== b.mode || a.fontSize !== b.fontSize || a.accentColor !== b.accentColor;
+  });
+  readonly isDefault = computed(() => this.config().mode === 'light' && this.config().fontSize === 'medium');
+
+  readonly themes: ThemeOption[] = [
+    { value: 'light', label: 'Light', icon: 'sun', hint: 'Bright background' },
+    { value: 'dark', label: 'Dark', icon: 'moon', hint: 'Easier on the eyes at night' },
+    { value: 'auto', label: 'Auto', icon: 'monitor', hint: 'Match this device' },
   ];
-  fontSizes: FontSizeOption[] = [
+  readonly fontSizes: FontSizeOption[] = [
     { value: 'small', label: 'Small', size: '14px' },
     { value: 'medium', label: 'Medium', size: '16px' },
     { value: 'large', label: 'Large', size: '18px' },
   ];
-  accentColors: AccentOption[] = [
-    { value: 'rose', color: '#E11D48', name: 'Rose' },
-  ];
 
   ngOnInit(): void {
-    this.loading.set(true);
     this.prefSrv.loadAll()
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
@@ -152,52 +126,60 @@ export class AdminSystemSettingThemeComponent implements OnInit {
           this.themeSrv.hydrateFromCache();
           this.original.set({ ...this.themeSrv.config() });
         },
-        error: () => this.toastSrv.error('Failed to load preferences')
+        // Keep the appearance already applied at sign-in as the saved state.
+        error: () => this.original.set({ ...this.themeSrv.config() })
       });
   }
 
-  pickMode(mode: ThemeMode) { this.themeSrv.preview({ mode }); }
-  pickFont(fontSize: FontSize) { this.themeSrv.preview({ fontSize }); }
-  pickAccent(accentColor: AccentColor) { this.themeSrv.preview({ accentColor }); }
-
-  isDirty(): boolean {
-    const a = this.original(), b = this.config();
-    return a.mode !== b.mode || a.fontSize !== b.fontSize || a.accentColor !== b.accentColor;
+  ngOnDestroy(): void {
+    if (this.isDirty()) this.themeSrv.preview(this.original());
   }
 
-  onCancel(): void {
+  optionClass(selected: boolean): string {
+    return `${OPTION} ${selected ? 'border-primary bg-primary/5' : 'border-borderGray hover:bg-black/[0.02]'}`;
+  }
+
+  pickMode(mode: ThemeMode): void { this.themeSrv.preview({ mode }); }
+  pickFont(fontSize: FontSize): void { this.themeSrv.preview({ fontSize }); }
+
+  onDiscard(): void {
     this.themeSrv.preview(this.original());
   }
 
   onSave(): void {
-    if (this.saving()) return;
+    if (this.saving() || !this.isDirty()) return;
+    const next = { ...this.config() };
     this.saving.set(true);
-    this.themeSrv.save(this.config())
+    this.themeSrv.save(next)
       .pipe(finalize(() => this.saving.set(false)))
       .subscribe({
         next: () => {
-          this.original.set({ ...this.config() });
-          this.toastSrv.success('Preferences saved');
+          this.original.set(next);
+          this.toastSrv.success('Appearance saved');
         },
-        error: () => this.toastSrv.error('Failed to save preferences')
+        // The preview stays on screen so the save can be retried; the interceptor reports the failure.
+        error: () => undefined
       });
   }
 
   onReset(): void {
-    if (!confirm('Reset appearance to defaults?')) return;
-    this.saving.set(true);
-    this.themeSrv.reset()
-      .pipe(finalize(() => this.saving.set(false)))
-      .subscribe({
-        next: () => {
-          this.original.set({ ...this.config() });
-          this.toastSrv.success('Preferences reset to defaults');
-        },
-        error: () => this.toastSrv.error('Failed to reset preferences')
-      });
-  }
-
-  hexFor(c: AccentColor): string {
-    return this.accentColors.find(x => x.value === c)?.color ?? '#E11D48';
+    this.dialogSrv.confirm(
+      'Light mode and medium text will be applied and saved for your account.',
+      () => {
+        this.saving.set(true);
+        this.themeSrv.reset()
+          .pipe(finalize(() => this.saving.set(false)))
+          .subscribe({
+            next: () => {
+              this.original.set({ ...this.config() });
+              this.toastSrv.success('Appearance reset to defaults');
+            },
+            error: () => undefined
+          });
+      },
+      'Reset appearance?',
+      'warning',
+      'Reset'
+    );
   }
 }

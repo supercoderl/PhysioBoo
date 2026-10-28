@@ -1,192 +1,121 @@
-<div class="py-4 flex flex-col flex-1 min-h-0 overflow-y-auto"
-  style="border-top-left-radius: 12px"
-  custom-scrollbar>
-  <div class="container">
-    <div class="flex-auto w-full">
-
-      <header class="flex flex-col mb-6">
-        <div class="flex items-start justify-between mt-2">
-          <div>
-            <p class="tracking-tight font-bold leading-none text-[22px] m-0">Security</p>
-            <p class="text-sm text-gray-500 mt-1">Manage your password, two-factor authentication, and active sessions.</p>
-          </div>
-        </div>
-      </header>
-
-      <section class="bg-surface rounded-lg border border-gray-200 mb-6">
-        <div class="p-5 border-b border-gray-100">
-          <h2 class="text-base font-semibold text-gray-900 mb-1">Change password</h2>
-          <p class="text-sm text-gray-500">You can change your password twice within 24 hours.</p>
-        </div>
-        <form class="p-5 flex flex-col gap-4" (submit)="$event.preventDefault(); onChangePassword()">
-          <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-medium text-gray-600">Current password</span>
-            <div class="inline-flex items-center gap-2 h-10 px-3 border border-gray-200 rounded-md bg-surface focus-within:border-primary transition-colors">
-              <physio-icon name="lock" class="w-4 h-4 text-gray-400" />
-              <input [type]="showCurrent() ? 'text' : 'password'"
-                placeholder="Enter your current password"
-                class="flex-1 min-w-0 text-sm bg-transparent outline-none border-0"
-                [ngModel]="currentPassword()"
-                (ngModelChange)="currentPassword.set($event)"
-                name="currentPassword"
-                autocomplete="current-password" />
-              <button type="button" (click)="showCurrent.set(!showCurrent())"
-                class="text-gray-400 hover:text-gray-600 p-0.5">
-                <physio-icon [name]="showCurrent() ? 'eye-crossed' : 'eye'" class="w-4 h-4" />
-              </button>
-            </div>
-          </label>
-
-          <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-medium text-gray-600">New password</span>
-            <div class="inline-flex items-center gap-2 h-10 px-3 border border-gray-200 rounded-md bg-surface focus-within:border-primary transition-colors">
-              <physio-icon name="key" class="w-4 h-4 text-gray-400" />
-              <input [type]="showNew() ? 'text' : 'password'"
-                placeholder="At least 8 characters"
-                class="flex-1 min-w-0 text-sm bg-transparent outline-none border-0"
-                [ngModel]="newPassword()"
-                (ngModelChange)="newPassword.set($event)"
-                name="newPassword"
-                autocomplete="new-password" />
-              <button type="button" (click)="showNew.set(!showNew())"
-                class="text-gray-400 hover:text-gray-600 p-0.5">
-                <physio-icon [name]="showNew() ? 'eye-crossed' : 'eye'" class="w-4 h-4" />
-              </button>
-            </div>
-            <div *ngIf="newPassword()" class="flex items-center gap-2 mt-1">
-              <div class="flex-1 h-1.5 rounded-full bg-gray-100 overflow-hidden">
-                <div class="h-full transition-all" [class]="strengthColorClass()"
-                  [style.width.%]="(passwordStrength() / 4) * 100"></div>
-              </div>
-              <span class="text-[11px] font-medium text-gray-600 min-w-[60px] text-right">{{ strengthLabel() }}</span>
-            </div>
-          </label>
-
-          <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-medium text-gray-600">Confirm new password</span>
-            <div class="inline-flex items-center gap-2 h-10 px-3 border rounded-md bg-surface focus-within:border-primary transition-colors"
-              [class.border-red-300]="!passwordsMatch()"
-              [class.border-gray-200]="passwordsMatch()">
-              <physio-icon name="key" class="w-4 h-4 text-gray-400" />
-              <input [type]="showConfirm() ? 'text' : 'password'"
-                placeholder="Re-enter your new password"
-                class="flex-1 min-w-0 text-sm bg-transparent outline-none border-0"
-                [ngModel]="confirmPassword()"
-                (ngModelChange)="confirmPassword.set($event)"
-                name="confirmPassword"
-                autocomplete="new-password" />
-              <button type="button" (click)="showConfirm.set(!showConfirm())"
-                class="text-gray-400 hover:text-gray-600 p-0.5">
-                <physio-icon [name]="showConfirm() ? 'eye-crossed' : 'eye'" class="w-4 h-4" />
-              </button>
-            </div>
-            <span *ngIf="!passwordsMatch()" class="text-[11px] text-red-500">Passwords don't match.</span>
-          </label>
-
-          <div class="flex justify-end">
-            <button type="submit"
-              [disabled]="!canSavePassword() || savingPassword()"
-              class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              <physio-icon *ngIf="savingPassword()" name="loader-circle" [class]="'w-4 h-4 animate-spin'" />
-              <span>{{ savingPassword() ? 'Updating…' : 'Update password' }}</span>
-            </button>
-          </div>
-        </form>
-      </section>
-
-      <section class="bg-surface rounded-lg border border-gray-200 mb-6">
-        <div class="p-5 border-b border-gray-100">
-          <h2 class="text-base font-semibold text-gray-900 mb-1">Security preferences</h2>
-          <p class="text-sm text-gray-500">Extra protections for your account.</p>
-        </div>
-        <div class="divide-y divide-gray-100">
-          <label class="flex items-start justify-between gap-4 px-5 py-4 cursor-pointer hover:bg-gray-50/60 transition-colors">
-            <div class="flex-1 min-w-0">
-              <div class="text-sm font-medium text-gray-900">Two-factor authentication</div>
-              <div class="text-xs text-gray-500 mt-0.5">Require a one-time code from your authenticator app or SMS on every login.</div>
-            </div>
-            <div class="shrink-0 pt-0.5">
-              <switch [isOpen]="isPrefOn(KEYS.TWO_FACTOR)" (change)="togglePref(KEYS.TWO_FACTOR)"></switch>
-            </div>
-          </label>
-          <label class="flex items-start justify-between gap-4 px-5 py-4 cursor-pointer hover:bg-gray-50/60 transition-colors">
-            <div class="flex-1 min-w-0">
-              <div class="text-sm font-medium text-gray-900">Rotate password every 6 months</div>
-              <div class="text-xs text-gray-500 mt-0.5">We'll prompt you to set a new password regularly. Helps mitigate breach risk.</div>
-            </div>
-            <div class="shrink-0 pt-0.5">
-              <switch [isOpen]="isPrefOn(KEYS.ROTATE_PASSWORD)" (change)="togglePref(KEYS.ROTATE_PASSWORD)"></switch>
-            </div>
-          </label>
-          <label class="flex items-start justify-between gap-4 px-5 py-4 cursor-pointer hover:bg-gray-50/60 transition-colors">
-            <div class="flex-1 min-w-0">
-              <div class="text-sm font-medium text-gray-900">Email me on new device sign-in</div>
-              <div class="text-xs text-gray-500 mt-0.5">Get notified whenever someone (you, hopefully) signs in from an unrecognized device.</div>
-            </div>
-            <div class="shrink-0 pt-0.5">
-              <switch [isOpen]="isPrefOn(KEYS.EMAIL_NEW_LOGIN)" (change)="togglePref(KEYS.EMAIL_NEW_LOGIN)"></switch>
-            </div>
-          </label>
-        </div>
-
-        <div class="p-5 border-t border-gray-100 flex justify-end gap-2">
-          <boo-button-admin (click)="onCancelPrefs()" [disabled]="savingPrefs() || !isPrefsDirty()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 16px" [fontSize]="14" fontWeight="500">
-            Discard
-          </boo-button-admin>
-          <boo-button-admin (click)="onSavePrefs()" [disabled]="savingPrefs() || !isPrefsDirty()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
-            <physio-icon *ngIf="savingPrefs()" name="loader-circle" [class]="'w-4 h-4 animate-spin'" />
-            <span>{{ savingPrefs() ? 'Saving…' : 'Save preferences' }}</span>
-          </boo-button-admin>
-        </div>
-      </section>
-
-      <section class="bg-surface rounded-lg border border-gray-200">
-        <div class="p-5 border-b border-gray-100 flex items-center justify-between gap-4">
-          <div>
-            <h2 class="text-base font-semibold text-gray-900 mb-1">Active sessions</h2>
-            <p class="text-sm text-gray-500">Devices currently signed in to your account.</p>
-          </div>
-          <button type="button"
-            *ngIf="sessions().length > 1"
-            (click)="revokeAllOtherSessions()"
-            class="text-sm text-red-600 hover:text-red-700 hover:underline transition-colors">
-            Sign out all other devices
+<setting-page heading="Security" description="Your password and the devices signed in to your account.">
+  <setting-section heading="Change password" description="After the change you are signed out everywhere, including here, and sign in again with the new password.">
+    <form class="flex flex-col gap-4 max-w-[560px]" [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" novalidate>
+      <div class="flex flex-col gap-1.5">
+        <label for="sec-current" class="text-xs font-medium text-regular">Current password <span class="text-danger" aria-hidden="true">*</span></label>
+        <boo-input id="sec-current" size="small" label="Current password" [type]="showCurrent() ? 'text' : 'password'" formControlName="currentPassword" [maxlength]="50" required>
+          <button endfix type="button" class="p-1 rounded text-secondary hover:text-regular focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            [attr.aria-label]="showCurrent() ? 'Hide password' : 'Show password'" [attr.aria-pressed]="showCurrent()" (click)="showCurrent.set(!showCurrent())">
+            <physio-icon [name]="showCurrent() ? 'eye-crossed' : 'eye'" [size]="15" />
           </button>
-        </div>
-        <div class="divide-y divide-gray-100">
-          <div *ngIf="!sessions().length" class="p-10 text-center text-sm text-gray-400">
-            No active sessions.
-          </div>
-          <div *ngFor="let s of sessions()"
-            class="flex items-center gap-4 px-5 py-3 hover:bg-gray-50/60 transition-colors">
-            <div class="w-9 h-9 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center shrink-0">
-              <physio-icon
-                [name]="s.device.toLowerCase().includes('iphone') || s.device.toLowerCase().includes('android') ? 'smartphone' : 'monitor'"
-                class="w-4 h-4" />
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-medium text-gray-900 truncate">{{ s.device }} · {{ s.browser }}</span>
-                <span *ngIf="s.current"
-                  class="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
-                  This device
-                </span>
-              </div>
-              <div class="text-xs text-gray-500 mt-0.5">
-                <ng-container *ngIf="s.location">{{ s.location }} · </ng-container>{{ s.ip || 'Unknown IP' }} · {{ s.lastActiveAt }}
-              </div>
-            </div>
-            <button type="button"
-              [disabled]="s.current"
-              (click)="revokeSession(s)"
-              class="text-xs text-gray-500 hover:text-red-600 hover:underline disabled:opacity-30 disabled:no-underline disabled:cursor-not-allowed transition-colors"
-              [title]="s.current ? 'You can\'t sign out from your current device' : 'Sign out'">
-              Sign out
-            </button>
-          </div>
-        </div>
-      </section>
+        </boo-input>
+      </div>
 
+      <div class="flex flex-col gap-1.5">
+        <label for="sec-new" class="text-xs font-medium text-regular">New password <span class="text-danger" aria-hidden="true">*</span></label>
+        <boo-input id="sec-new" size="small" label="New password" [type]="showNew() ? 'text' : 'password'" formControlName="newPassword" [maxlength]="50" required>
+          <button endfix type="button" class="p-1 rounded text-secondary hover:text-regular focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            [attr.aria-label]="showNew() ? 'Hide password' : 'Show password'" [attr.aria-pressed]="showNew()" (click)="showNew.set(!showNew())">
+            <physio-icon [name]="showNew() ? 'eye-crossed' : 'eye'" [size]="15" />
+          </button>
+        </boo-input>
+        <ul id="sec-rules" class="m-0 mt-1 p-0 list-none grid gap-x-4 gap-y-1 sm:grid-cols-2" aria-label="Password requirements">
+          <li *ngFor="let rule of rules" class="flex items-center gap-1.5 text-xs" [class.text-emerald-700]="ruleState()[rule.key]" [class.text-secondary]="!ruleState()[rule.key]">
+            <physio-icon [name]="ruleState()[rule.key] ? 'check' : 'circle'" [size]="12" aria-hidden="true" />
+            <span>{{ rule.label }}</span>
+            <span class="sr-only">{{ ruleState()[rule.key] ? '(met)' : '(not met)' }}</span>
+          </li>
+        </ul>
+        <p *ngIf="sameAsCurrent" class="m-0 text-xs text-danger" role="alert">Choose a password different from your current one.</p>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="sec-confirm" class="text-xs font-medium text-regular">Confirm new password <span class="text-danger" aria-hidden="true">*</span></label>
+        <boo-input id="sec-confirm" size="small" label="Re-enter the new password" [type]="showConfirm() ? 'text' : 'password'" formControlName="confirmPassword" [maxlength]="50" required>
+          <button endfix type="button" class="p-1 rounded text-secondary hover:text-regular focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            [attr.aria-label]="showConfirm() ? 'Hide password' : 'Show password'" [attr.aria-pressed]="showConfirm()" (click)="showConfirm.set(!showConfirm())">
+            <physio-icon [name]="showConfirm() ? 'eye-crossed' : 'eye'" [size]="15" />
+          </button>
+        </boo-input>
+        <p *ngIf="confirmError" class="m-0 text-xs text-danger" role="alert">{{ confirmError }}</p>
+      </div>
+
+      <div class="flex justify-end">
+        <button type="submit" boo-button variant="primary" size="sm" [loading]="savingPassword()" [disabled]="passwordForm.invalid">
+          {{ savingPassword() ? 'Changing…' : 'Change password' }}
+        </button>
+      </div>
+    </form>
+  </setting-section>
+
+  <setting-section heading="Signed-in devices" description="Browsers and devices with an active session on your account." [flush]="true">
+    <button
+      sectionActions
+      *ngIf="hasOtherSessions()"
+      type="button"
+      boo-button
+      variant="ghost"
+      size="sm"
+      classname="!text-danger !h-8"
+      [loading]="revoking() === 'others'"
+      [disabled]="!!revoking()"
+      (click)="revokeAllOtherSessions()"
+    >Sign out all other devices</button>
+
+    <div *ngIf="loadingSessions()" class="divide-y divide-rowDivider" aria-busy="true">
+      <div *ngFor="let _ of [1, 2]" class="flex items-center gap-4 px-5 py-3.5">
+        <div class="w-9 h-9 rounded-full bg-gray-100 animate-pulse motion-reduce:animate-none"></div>
+        <div class="flex-1 space-y-2">
+          <div class="h-3 w-48 max-w-full rounded bg-gray-100 animate-pulse motion-reduce:animate-none"></div>
+          <div class="h-3 w-32 max-w-full rounded bg-gray-100 animate-pulse motion-reduce:animate-none"></div>
+        </div>
+      </div>
+      <span class="sr-only" role="status">Loading devices…</span>
     </div>
-  </div>
-</div>
+
+    <boo-error-state
+      *ngIf="!loadingSessions() && sessionsFailed()"
+      title="We couldn’t load your devices"
+      description="Check your connection and try again."
+      [headingLevel]="3"
+      (retry)="loadSessions()"
+    />
+
+    <boo-empty-state
+      *ngIf="!loadingSessions() && !sessionsFailed() && !sessions().length"
+      icon="monitor"
+      title="No active sessions"
+      description="Devices appear here after they sign in."
+      [headingLevel]="3"
+    />
+
+    <ul *ngIf="!loadingSessions() && !sessionsFailed() && sessions().length" class="m-0 p-0 list-none divide-y divide-rowDivider">
+      <li *ngFor="let s of sessions()" class="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3">
+        <div class="w-9 h-9 rounded-full bg-gray-100 text-secondary flex items-center justify-center shrink-0" aria-hidden="true">
+          <physio-icon [name]="deviceIcon(s)" [size]="16" />
+        </div>
+        <div class="flex-1 min-w-[12rem]">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-sm font-medium text-regular truncate">{{ s.device || 'Unknown device' }} · {{ s.browser || 'Unknown browser' }}</span>
+            <boo-status-badge *ngIf="s.current" dotted label="This device" tone="success" />
+          </div>
+          <div class="text-xs text-secondary mt-0.5">
+            <ng-container *ngIf="s.location">{{ s.location }} · </ng-container>{{ s.ip || 'Unknown IP' }} · {{ lastActive(s) }}
+          </div>
+        </div>
+        <button
+          *ngIf="!s.current"
+          type="button"
+          boo-button
+          variant="secondary"
+          size="sm"
+          classname="!h-8"
+          [loading]="revoking() === s.id"
+          [disabled]="!!revoking()"
+          [attr.aria-label]="'Sign out ' + s.device + ' ' + s.browser"
+          (click)="revokeSession(s)"
+        >Sign out</button>
+      </li>
+    </ul>
+  </setting-section>
+</setting-page>

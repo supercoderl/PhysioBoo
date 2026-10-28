@@ -454,7 +454,7 @@ export class BooDatepickerComponent implements ControlValueAccessor, AfterViewIn
   get labelClasses(): string {
     const base = 'absolute left-0 z-[1] flex items-center transition-all duration-200 cursor-text truncate pointer-events-none';
     switch (this.size) {
-      case 'small': return `${base} px-3 text-xs h-8 leading-8`;
+      case 'small': return `${base} px-3 text-xs h-8.5 leading-[34px]`;
       case 'large': return `${base} px-5 text-base h-12 leading-[3rem]`;
       default: return `${base} px-4 text-sm h-11 leading-[2.75rem]`;
     }
@@ -463,7 +463,7 @@ export class BooDatepickerComponent implements ControlValueAccessor, AfterViewIn
     const base = 'w-full inline-flex items-center text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary border bg-surface';
     let sizeClass = '';
     switch (this.size) {
-      case 'small': sizeClass = 'px-3 h-8 text-xs'; break;
+      case 'small': sizeClass = 'px-3 h-8.5 text-xs'; break;
       case 'large': sizeClass = 'px-5 h-12 text-base'; break;
       default: sizeClass = 'px-4 h-11 text-sm'; break;
     }

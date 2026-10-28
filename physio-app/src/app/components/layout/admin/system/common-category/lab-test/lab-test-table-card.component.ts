@@ -1,15 +1,13 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
+import { Component, Input } from "@angular/core";
+import { BooStatusBadgeComponent } from "@physioboo/ui";
 import { ColumnDefDirective } from "../../../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../../../shared/shared-imports";
-import { ActionItem, PaginationData } from "../../../../../../shared/types/common";
 import { LabTest } from "../../../../../../shared/types/laboratory-imaging.types";
-import { SortOption } from "../../../../../../shared/types/sort";
-import { BulkAction, GroupableColumn } from "../../../../../../shared/types/table.types";
-import { ColorUtils } from "../../../../../../shared/utils/color.utils";
 import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/boo-action-admin.component";
-import { BooTableAdminComponent, FilterConfig } from "../../../../../table/boo-table-admin/boo-table-admin.component";
+import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo-table-admin.component";
+import { CategoryTableCardBase } from "../shared/category-table-card.base";
 
+/** Lab tests: test identity and category, specimen, turnaround, price, ordering options and status. */
 @Component({
   selector: 'common-category-lab-test-table-card',
   standalone: true,
@@ -17,136 +15,88 @@ import { BooTableAdminComponent, FilterConfig } from "../../../../../table/boo-t
     SharedModule,
     BooTableAdminComponent,
     ColumnDefDirective,
-    BooActionAdminComponent
+    BooActionAdminComponent,
+    BooStatusBadgeComponent
   ],
-  host: { class: 'block h-full min-h-0' },
   template: `
-    <div class="bg-surface rounded-[6px] border border-gray-200 h-full overflow-hidden">
-      <boo-table-admin 
-        [data]="data?.items ?? []" 
-        tdClass="px-4 py-3"
-        [showFooter]="true" 
-        [currentPage]="data?.pageNumber ?? filter.pageNumber"
-        [pageSize]="data?.pageSize ?? filter.pageSize"
-        [totalItems]="data?.totalCount ?? 0"
-        [availableTools]="['sort']"
-        [bulkActions]="bulkActions"
-        [sortOptions]="sortOptions"
-        [currentSort]="currentSort"
-        [filterConfigs]="filterConfigs"
-        [currentFilter]="currentFilter"
-        [groupableColumns]="groupableColumns"
-        (pageChange)="onPageClick($event)"
-        (searchChange)="onSearchChange($event)"
-        (reload)="onReloadClick()"
-        (bulkAction)="bulkAction.emit($event)"
-        (sortApply)="sortApply.emit($event)"
-        (filterApply)="filterApply.emit($event)"
-        [loading]="loadingSrv.isLoading('search')"
-      >  
-              <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
+    <boo-table-admin
+      class="flex-1 min-h-0 rounded-[6px] overflow-hidden"
+      [data]="data?.items ?? []"
+      [currentPage]="data?.pageNumber ?? filter.pageNumber"
+      [pageSize]="data?.pageSize ?? filter.pageSize"
+      [totalItems]="data?.totalCount ?? 0"
+      [loading]="loading"
+      [availableTools]="tools"
+      [bulkActions]="bulkActions"
+      [sortOptions]="sortOptions"
+      [currentSort]="currentSort"
+      [filterConfigs]="filterConfigs"
+      [currentFilter]="currentFilter"
+      minTableWidth="1080px"
+      (pageChange)="pageChange.emit($event)"
+      (searchChange)="searchChange.emit($event)"
+      (reload)="reloadClick.emit()"
+      (sortApply)="sortApply.emit($event)"
+      (filterApply)="filterApply.emit($event)"
+      (bulkAction)="onBulkAction($event)"
+    >
+      <ng-container *ngIf="canDelete">
+        <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
+      </ng-container>
 
-        <ng-template appColumnDef="name" headerLabel="Name" headerClass="text-left" let-item>
-          <div class="flex items-center gap-3 overflow-hidden" (click)="onEditClick(item.id)">
-            <div class="min-w-0 flex-1">
-              <div class="truncate text-sm font-semibold text-danger cursor-pointer" [title]="item.name">
-                {{ item.testName }}
-              </div>
-            </div>
+      <ng-template appColumnDef="name" headerLabel="Test" headerClass="text-left" let-item>
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="min-w-0">
+            <button
+              *ngIf="canUpdate; else plainName"
+              type="button"
+              class="block max-w-full truncate p-0 bg-transparent border-0 text-left text-sm leading-4 font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm"
+              [title]="item.testName"
+              (click)="onRowOpen(item)"
+            >{{ item.testName }}</button>
+            <ng-template #plainName><span class="block truncate text-sm leading-4 font-semibold text-regular" [title]="item.testName">{{ item.testName }}</span></ng-template>
+            <div class="truncate text-xs leading-4 text-secondary">{{ item.testCode || empty }}</div>
           </div>
+        </div>
+      </ng-template>
+      <ng-template appColumnDef="category" headerLabel="Category" headerClass="text-left" width="170px" let-item>
+        <div class="truncate text-sm">{{ categoryNames[item.categoryId] || empty }}</div>
+      </ng-template>
+      <ng-template appColumnDef="sample" headerLabel="Specimen" headerClass="text-left" width="150px" let-item>
+        <div class="min-w-0">
+          <div class="truncate text-sm leading-4 text-regular">{{ item.sampleType || empty }}</div>
+          <div class="truncate text-xs leading-4 text-secondary">{{ item.sampleVolume || item.unitOfMeasurement || empty }}</div>
+        </div>
+      </ng-template>
+      <ng-template appColumnDef="reportingTimeHours" headerLabel="Turnaround" headerClass="text-left" width="130px" let-item>
+        <div class="min-w-0">
+          <div class="truncate text-sm leading-4 text-regular">{{ item.reportingTimeHours ? item.reportingTimeHours + ' h' : empty }}</div>
+          <div class="truncate text-xs leading-4 text-secondary">{{ item.isUrgentAvailable && item.urgentReportingTimeHours ? 'Urgent ' + item.urgentReportingTimeHours + ' h' : 'Routine only' }}</div>
+        </div>
+      </ng-template>
+      <ng-template appColumnDef="cost" headerLabel="Price" headerClass="text-right" cellClass="text-right" width="120px" let-item>
+        <span class="text-sm tabular-nums">{{ item.cost | currency:'USD':'symbol':'1.2-2' }}</span>
+      </ng-template>
+      <ng-template appColumnDef="options" headerLabel="Options" headerClass="text-left" width="230px" let-item>
+        <div class="flex flex-wrap gap-1 overflow-hidden">
+          <boo-status-badge *ngIf="item.fastingRequired" [label]="'Fasting'" tone="warning" />
+          <boo-status-badge *ngIf="item.isHomeCollectionAvailable" [label]="'Home collection'" tone="primary" />
+          <boo-status-badge *ngIf="item.isProfile" [label]="'Panel'" tone="neutral" />
+          <span *ngIf="!(item.fastingRequired) && !(item.isHomeCollectionAvailable) && !(item.isProfile)" class="text-sm text-secondary">{{ empty }}</span>
+        </div>
+      </ng-template>
+      <ng-template appColumnDef="isActive" headerLabel="Status" headerClass="text-left" width="120px" let-item>
+        <boo-status-badge dotted [label]="item.isActive ? 'Active' : 'Inactive'" [tone]="item.isActive ? 'success' : 'neutral'" />
+      </ng-template>
+      <ng-container *ngIf="tableActions.length">
+        <ng-template appColumnDef="actions" headerLabel="" width="64px" headerClass="text-center" cellClass="flex justify-center" let-item>
+          <boo-action-admin [items]="tableActions" [data]="item" />
         </ng-template>
-
-        <ng-template appColumnDef="code" headerLabel="Code" headerClass="text-left" let-item>
-          <div class="text-sm">{{ item.testCode }}</div>
-        </ng-template>
-
-        <ng-template appColumnDef="description" headerLabel="Description" headerClass="text-left" let-item>
-          <div class="text-sm">{{ item.description }}</div>
-        </ng-template>
-
-        <ng-template appColumnDef="cost" headerLabel="Cost" headerClass="text-right" cellClass="text-right" let-item>
-          <div class="text-sm">{{ item.cost }}</div>
-        </ng-template>
-
-        <ng-template appColumnDef="actions" headerLabel="Actions" let-item headerClass="text-center" cellClass="text-center">
-          <div class="relative">
-            <boo-action-admin
-              [items]="tableActions"
-              [data]="item"
-            />
-          </div>
-        </ng-template>
-      </boo-table-admin>
-    </div>
-  `,
-  styles: [`
-    :host ::ng-deep {
-      .pi {
-        font-size: 0.875rem;
-      }
-    }
-  `]
+      </ng-container>
+    </boo-table-admin>
+  `
 })
-export class CommonCategoryLabTestTableCardComponent {
-  // #region Inputs, Outputs, Properties
-  @Input() data: PaginationData<LabTest> | null = null;
-  @Input() filter!: { pageNumber: number, pageSize: number };
-  @Input() sortOptions: SortOption[] = [];
-  @Input() currentSort: string = '';
-  @Input() filterConfigs: FilterConfig[] = [];
-  @Input() currentFilter: Record<string, any> = {};
-  @Output() pageChange = new EventEmitter<number>();
-  @Output() searchChange = new EventEmitter<string>();
-  @Output() editClick = new EventEmitter<string>();
-  @Output() deleteClick = new EventEmitter<string>();
-  @Output() reloadClick = new EventEmitter<void>();
-  @Output() bulkAction = new EventEmitter<{ action: BulkAction; ids: (number | string)[]; selectAllPages: boolean }>();
-  @Output() sortApply = new EventEmitter<SortOption>();
-  @Output() filterApply = new EventEmitter<{ key: string; value: any }>();
-
-  readonly groupableColumns: GroupableColumn[] = [
-
-  ];
-  ColorUtils = ColorUtils;
-
-  readonly bulkActions: BulkAction[] = [
-    { key: 'delete', label: 'Delete', icon: 'trash', variant: 'danger', requireConfirm: true },
-  ];
-
-  readonly tableActions: ActionItem[] = [
-    {
-      label: 'Delete',
-      isDanger: true,
-      onClick: (item: any) => this.onDeleteClick(item.id)
-    }
-  ];
-  // #endregion
-
-  // #region Init (Lifecycle + Setup)
-  constructor(
-    protected loadingSrv: LocalLoadingService
-  ) { }
-  // #endregion
-
-  // #region Methods
-  onPageClick(page: number) {
-    this.pageChange.emit(page);
-  }
-
-  onEditClick(id: string) {
-    this.editClick.emit(id);
-  }
-
-  onDeleteClick(id: string) {
-    this.deleteClick.emit(id);
-  }
-
-  onSearchChange(val: string) {
-    this.searchChange.emit(val);
-  }
-
-  onReloadClick() {
-    this.reloadClick.emit();
-  }
-  // #endregion
+export class CommonCategoryLabTestTableCardComponent extends CategoryTableCardBase<LabTest> {
+  /** Category names by id (the lab test category lookup). */
+  @Input() categoryNames: Record<string, string> = {};
 }

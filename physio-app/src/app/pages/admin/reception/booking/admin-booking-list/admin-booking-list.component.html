@@ -34,11 +34,11 @@
       <fieldset class="m-0 p-0 border-0 min-w-0 flex flex-wrap items-end gap-2">
         <legend class="float-left w-full mb-1 text-xs font-medium text-secondary">Booked between</legend>
         <div class="w-40">
-          <boo-datepicker size="small" label="From" [max]="to || today" [(ngModel)]="from" (ngModelChange)="onRangeChange()" />
+          <boo-datepicker size="small" [height]="36" label="From" [max]="to || today" [(ngModel)]="from" (ngModelChange)="onRangeChange()" />
         </div>
         <span class="h-9 flex items-center text-secondary text-sm" aria-hidden="true">–</span>
         <div class="w-40">
-          <boo-datepicker size="small" label="To" [min]="from" [(ngModel)]="to" (ngModelChange)="onRangeChange()" />
+          <boo-datepicker size="small" [height]="36" label="To" [min]="from" [(ngModel)]="to" (ngModelChange)="onRangeChange()" />
         </div>
         <div class="flex items-center gap-1 p-0.5 rounded-lg bg-body border border-borderGray" role="group" aria-label="Quick ranges">
           <button

@@ -1,242 +1,189 @@
-<div
-  class="py-4 flex flex-col flex-1 min-h-0 overflow-y-auto"
-  style="border-top-left-radius: 12px"
-  custom-scrollbar
+<common-category-page
+  heading="Team"
+  description="People with access to your clinic’s workspace"
+  plural="members"
+  createLabel="Invite member"
+  [countLabel]="countLabel"
+  [canCreate]="canCreate"
+  [chips]="chips"
+  [loading]="loading()"
+  [loadFailed]="loadFailed()"
+  [hasData]="!!tableData()"
+  (create)="openInvite()"
+  (removeChip)="removeChip($event)"
+  (clearFilters)="clearFilters()"
+  (retry)="load()"
 >
-  <div class="container">
-    <div class="flex-auto w-full">
-      <header class="flex flex-col mb-6">
-        <div class="flex items-start justify-between mt-2">
-          <div>
-            <p class="tracking-tight font-bold leading-none text-[22px] m-0">
-              Team
-            </p>
-            <p class="text-sm text-gray-500 mt-1">
-              {{ members().length }}
-              {{ members().length === 1 ? "member" : "members" }}
-              <ng-container *ngIf="pendingInvites().length">
-                · {{ pendingInvites().length }} pending invite{{
-                  pendingInvites().length === 1 ? "" : "s"
-                }}
-              </ng-container>
-            </p>
-          </div>
-        </div>
-      </header>
+  <div class="flex flex-1 min-h-0 min-w-0 flex-col gap-3">
+    <!-- One fixed-height line, so the table below keeps the height it was paged for. -->
+    <div *ngIf="canReadInvites" class="shrink-0 h-11 px-4 flex items-center justify-between gap-3 bg-surface border border-borderGray rounded-xl">
+      <p class="m-0 flex items-center gap-2 min-w-0 text-sm text-regular">
+        <physio-icon name="send" [size]="15" class="shrink-0 text-secondary" aria-hidden="true" />
+        <span class="truncate" *ngIf="invitesLoading()">Loading invitations…</span>
+        <span class="truncate" *ngIf="!invitesLoading() && invitesFailed()">Pending invitations couldn’t be loaded.</span>
+        <span class="truncate" *ngIf="!invitesLoading() && !invitesFailed()">
+          <ng-container *ngIf="invites().length; else noInvites">
+            <span class="font-medium tabular-nums">{{ invites().length }}</span> pending invitation{{ invites().length === 1 ? '' : 's' }}
+          </ng-container>
+          <ng-template #noInvites><span class="text-secondary">No pending invitations</span></ng-template>
+        </span>
+      </p>
+      <button *ngIf="invitesFailed() && !invitesLoading()" type="button" boo-button variant="link" size="sm" (click)="loadInvites()">Retry</button>
+      <button *ngIf="!invitesFailed() && invites().length" type="button" boo-button variant="link" size="sm" aria-haspopup="dialog" (click)="invitesOpen.set(true)">View</button>
+    </div>
 
-      <section class="bg-surface rounded-lg border border-gray-200 mb-6">
-        <div class="p-5 border-b border-gray-100">
-          <h2 class="text-base font-semibold text-gray-900 mb-1">
-            Add team member
-          </h2>
-          <p class="text-sm text-gray-500">
-            Enter an email and pick the role they should have.
-          </p>
-        </div>
-        <form
-          class="p-5 flex flex-col sm:flex-row gap-2"
-          (submit)="$event.preventDefault(); onInvite()"
-        >
-          <div
-            class="flex-1 min-w-0 inline-flex items-center gap-2 h-10 px-3 border border-gray-200 rounded-md bg-surface focus-within:border-primary transition-colors"
-          >
-            <physio-icon name="email" class="w-4 h-4 text-gray-400" />
-            <input
-              type="email"
-              placeholder="email@example.com"
-              class="flex-1 min-w-0 text-sm bg-transparent outline-none border-0"
-              [ngModel]="inviteEmail()"
-              (ngModelChange)="inviteEmail.set($event)"
-              name="inviteEmail"
-            />
-          </div>
-          <boo-select
-            class="sm:w-48"
-            label="Select role"
-            required
-            [height]="40"
-            [options]="invitableRoles()"
-            bindLabel="name"
-            bindValue="id"
-            [ngModel]="inviteRoleId()"
-            (ngModelChange)="inviteRoleId.set($event)"
-            name="inviteRole"
-          ></boo-select>
-          <button
-            type="submit"
-            [disabled]="inviting() || !inviteEmail() || !inviteRoleId()"
-            class="inline-flex items-center justify-center gap-1.5 h-10 px-4 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <physio-icon
-              [name]="inviting() ? 'loader-circle' : 'plus'"
-              [class]="inviting() ? 'w-4 h-4 animate-spin' : 'w-4 h-4'"
-            />
-            <span>{{ inviting() ? "Adding…" : "Add" }}</span>
-          </button>
-        </form>
-      </section>
-
-      <section class="bg-surface rounded-lg border border-gray-200">
-        <div
-          class="p-5 border-b border-gray-100 flex items-center justify-between gap-4"
-        >
-          <div>
-            <h2 class="text-base font-semibold text-gray-900 mb-1">Members</h2>
-            <p class="text-sm text-gray-500">
-              People with access to this workspace.
-            </p>
-          </div>
-          <div
-            class="inline-flex items-center gap-2 h-9 px-3 border border-gray-200 rounded-md bg-surface focus-within:border-primary w-56"
-          >
-            <physio-icon name="search" class="w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search members"
-              class="flex-1 min-w-0 text-sm bg-transparent outline-none border-0"
-              [ngModel]="search()"
-              (ngModelChange)="search.set($event)"
-              name="search"
-            />
-          </div>
-        </div>
-
-        <div class="divide-y divide-gray-100">
-          <div
-            *ngIf="loading()"
-            class="p-8 flex items-center justify-center text-sm text-gray-400"
-          >
-            <physio-icon
-              name="loader-circle"
-              [class]="'w-5 h-5 mr-2 animate-spin'"
-            />
-            Loading members…
-          </div>
-
-          <div
-            *ngIf="!loading() && filteredMembers().length === 0"
-            class="p-10 flex flex-col items-center text-center"
-          >
-            <div
-              class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3"
-            >
-              <physio-icon name="users" class="w-6 h-6 text-gray-400" />
-            </div>
-            <p class="text-sm font-medium text-gray-700 mb-1">No members yet</p>
-            <p class="text-xs text-gray-500">
-              Invite teammates to collaborate in this workspace.
-            </p>
-          </div>
-
-          <div
-            *ngFor="let m of filteredMembers()"
-            class="flex items-center gap-4 px-5 py-3 hover:bg-gray-50/60 transition-colors"
-          >
-            <div
-              class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold shrink-0 overflow-hidden"
-            >
-              <img
-                *ngIf="m.profilePicture"
-                [src]="m.profilePicture"
-                [alt]="m.email"
-                class="w-full h-full object-cover"
-              />
-              <span *ngIf="!m.profilePicture">{{ initialsFor(m) }}</span>
-            </div>
-
-            <div class="flex-1 min-w-0">
-              <div class="text-sm font-medium text-gray-900 truncate">
-                {{ displayNameFor(m) }}
-              </div>
-              <div class="text-xs text-gray-500 truncate">{{ m.email }}</div>
-            </div>
-
-            <span
-              *ngIf="m.id === currentUserId"
-              class="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded"
-            >
-              You
-            </span>
-
-            <select
-              class="h-8 px-2 text-xs border border-gray-200 rounded bg-surface focus:outline-none focus:border-primary disabled:bg-gray-50 disabled:text-gray-500"
-              [value]="roleIdFor(m)"
-              [disabled]="m.id === currentUserId || changingRoleFor() === m.id"
-              (change)="onChangeRole(m, $any($event.target).value)"
-            >
-              <option value="" disabled>No role</option>
-              <option *ngFor="let r of roles()" [value]="r.id">
-                {{ r.name }}
-              </option>
-            </select>
-
-            <button
-              type="button"
-              class="p-1.5 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
-              [disabled]="m.id === currentUserId || removing() === m.id"
-              (click)="onRemove(m)"
-              [title]="
-                m.id === currentUserId
-                  ? 'You cannot remove yourself'
-                  : 'Remove member'
-              "
-            >
-              <physio-icon
-                [name]="removing() === m.id ? 'loader-circle' : 'trash'"
-                [class]="
-                  removing() === m.id ? 'w-4 h-4 animate-spin' : 'w-4 h-4'
-                "
-              />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section
-        *ngIf="pendingInvites().length"
-        class="bg-surface rounded-lg border border-gray-200 mt-6"
+    <div #tableHost class="flex flex-1 min-h-0 min-w-0 flex-col">
+      <boo-table-admin
+        class="flex-1 min-h-0 rounded-[6px] overflow-hidden"
+        [data]="tableData()?.items ?? []"
+        [currentPage]="tableData()?.pageNumber ?? params.pageNumber"
+        [pageSize]="tableData()?.pageSize ?? params.pageSize"
+        [totalItems]="tableData()?.totalCount ?? 0"
+        [loading]="loading()"
+        [availableTools]="['filter', 'sort']"
+        [sortOptions]="sortOptions"
+        [currentSort]="params.sort"
+        [filterConfigs]="filterConfigs"
+        [currentFilter]="params.filter"
+        minTableWidth="880px"
+        (pageChange)="onPageChanged($event)"
+        (searchChange)="onSearch($event)"
+        (reload)="load()"
+        (sortApply)="onSortChange($event)"
+        (filterApply)="onFilterChange($event)"
       >
-        <div class="p-5 border-b border-gray-100">
-          <h2 class="text-base font-semibold text-gray-900 mb-1">
-            Pending invitations
-          </h2>
-          <p class="text-sm text-gray-500">
-            These people haven't accepted yet.
-          </p>
-        </div>
-        <div class="divide-y divide-gray-100">
-          <div
-            *ngFor="let inv of pendingInvites()"
-            class="flex items-center gap-4 px-5 py-3 hover:bg-gray-50/60"
-          >
-            <div
-              class="w-9 h-9 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shrink-0"
-            >
-              <physio-icon name="email" class="w-4 h-4" />
+        <ng-template appColumnDef="member" headerLabel="Member" headerClass="text-left" let-item>
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold shrink-0 overflow-hidden" aria-hidden="true">
+              <img *ngIf="item.profilePicture; else initialsTpl" [src]="item.profilePicture" alt="" class="w-full h-full object-cover" />
+              <ng-template #initialsTpl>{{ initials(item) }}</ng-template>
             </div>
-            <div class="flex-1 min-w-0">
-              <div class="text-sm font-medium text-gray-900 truncate">
-                {{ inv.email }}
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="truncate text-sm leading-4 font-semibold text-regular" [title]="displayName(item)">{{ displayName(item) }}</span>
+                <boo-status-badge *ngIf="item.id === currentUserId()" label="You" tone="primary" />
               </div>
-              <div class="text-xs text-gray-500">
-                {{ roleNameFor(inv.roleCode) }} · invited {{ inv.invitedAt }} ·
-                expires {{ inv.expiresAt }}
-              </div>
+              <div class="truncate text-xs leading-4 text-secondary" [title]="item.email">{{ item.email }}</div>
             </div>
-            <span
-              class="text-xs px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200"
-              >Pending</span
-            >
-            <button
-              type="button"
-              class="text-xs text-gray-500 hover:text-red-600"
-              (click)="onRevokeInvite(inv)"
-            >
-              Revoke
-            </button>
           </div>
-        </div>
-      </section>
+        </ng-template>
+        <ng-template appColumnDef="roles" headerLabel="Role" headerClass="text-left" width="220px" let-item>
+          <div class="flex flex-wrap gap-1 overflow-hidden">
+            <boo-status-badge *ngFor="let name of roleNames(item)" [label]="name" tone="neutral" />
+            <span *ngIf="!roleNames(item).length" class="text-sm text-secondary">No role</span>
+          </div>
+        </ng-template>
+        <ng-template appColumnDef="isActive" headerLabel="Status" headerClass="text-left" width="150px" let-item>
+          <div class="flex flex-wrap gap-1">
+            <boo-status-badge dotted [label]="item.isActive ? 'Active' : 'Inactive'" [tone]="item.isActive ? 'success' : 'neutral'" />
+            <boo-status-badge *ngIf="!item.isVerified" label="Unverified" tone="warning" />
+          </div>
+        </ng-template>
+        <ng-template appColumnDef="lastLoginAt" headerLabel="Last sign-in" headerClass="text-left" width="140px" let-item>
+          <span class="text-sm text-regular">{{ item.lastLoginAt ? (item.lastLoginAt | date:'mediumDate') : 'Never' }}</span>
+        </ng-template>
+        <ng-template appColumnDef="createdAt" headerLabel="Joined" headerClass="text-left" width="130px" let-item>
+          <span class="text-sm text-regular">{{ item.createdAt ? (item.createdAt | date:'mediumDate') : empty }}</span>
+        </ng-template>
+        <ng-container *ngIf="canUpdate || canDelete">
+          <ng-template appColumnDef="actions" headerLabel="" width="64px" headerClass="text-center" cellClass="flex justify-center" let-item>
+            <boo-action-admin *ngIf="rowActions().get(item.id)?.length" [items]="rowActions().get(item.id)!" [data]="item" />
+          </ng-template>
+        </ng-container>
+      </boo-table-admin>
     </div>
   </div>
-</div>
+</common-category-page>
+
+<!-- Invite -->
+<common-category-drawer-shell
+  [form]="inviteForm"
+  [isOpen]="isInviteOpen"
+  title="Invite a team member"
+  subtitle="They get an email with a link to join, valid for 7 days."
+  submitLabel="Send invite"
+  [saving]="inviting"
+  (save)="onInvite()"
+  (cancel)="requestCloseInvite()"
+  (discard)="isInviteOpen = false"
+>
+  <div class="px-6 py-5 flex flex-col gap-4" [formGroup]="inviteForm">
+    <div class="flex flex-col gap-1.5">
+      <label for="invite-email" class="text-xs font-medium text-regular">Email <span class="text-danger" aria-hidden="true">*</span></label>
+      <boo-input id="invite-email" type="email" size="small" label="name@example.com" formControlName="email" [maxlength]="256" required />
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <span class="text-xs font-medium text-regular">Role <span class="text-danger" aria-hidden="true">*</span></span>
+      <boo-select size="small" label="Role" formControlName="roleId" [options]="invitableRoles()" required />
+      <p class="m-0 text-xs text-secondary">Invitations use a built-in role. Custom roles can be given after they join, with Change role.</p>
+    </div>
+  </div>
+</common-category-drawer-shell>
+
+<!-- Change role -->
+<common-category-drawer-shell
+  [form]="roleForm"
+  [isOpen]="!!roleMember"
+  title="Change role"
+  [subtitle]="roleMember ? displayName(roleMember) + ' · ' + roleMember.email + '.' : ''"
+  [isEdit]="true"
+  [saving]="savingRole"
+  (save)="onSaveRole()"
+  (cancel)="requestCloseRole()"
+  (discard)="roleMember = null"
+>
+  <div class="px-6 py-5 flex flex-col gap-4" [formGroup]="roleForm">
+    <div class="flex flex-col gap-1.5">
+      <span class="text-xs font-medium text-regular">Role <span class="text-danger" aria-hidden="true">*</span></span>
+      <boo-select size="small" label="Role" formControlName="roleId" [options]="roleOptions()" required />
+    </div>
+    <p *ngIf="roleMember && roleNames(roleMember).length > 1" class="m-0 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900" role="note">
+      <physio-icon name="triangle-alert" [size]="14" class="shrink-0 mt-px" aria-hidden="true" />
+      This member has {{ roleNames(roleMember).length }} roles ({{ roleNames(roleMember).join(', ') }}). Saving replaces all of them with the role above.
+    </p>
+    <p class="m-0 text-xs text-secondary">The role decides which pages and actions the member can use. It applies the next time they sign in or refresh.</p>
+  </div>
+</common-category-drawer-shell>
+
+<!-- Pending invitations -->
+<drawer [isOpen]="invitesOpen()" (close)="invitesOpen.set(false)">
+  <div *ngIf="invitesOpen()" class="flex flex-col h-svh bg-surface" role="dialog" aria-modal="true" aria-labelledby="invites-title">
+    <header class="flex-none px-6 py-4 border-b border-rowDivider flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        <h2 id="invites-title" class="m-0 text-lg font-semibold leading-tight text-regular">Pending invitations</h2>
+        <p class="m-0 mt-0.5 text-xs text-secondary">People who haven’t accepted yet. Links expire after 7 days.</p>
+      </div>
+      <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Close pending invitations" (click)="invitesOpen.set(false)">
+        <physio-icon name="x" [size]="18" />
+      </button>
+    </header>
+    <div class="flex-1 min-h-0 overflow-y-auto boo-scrollbar">
+      <boo-empty-state *ngIf="!invites().length" icon="send" title="No pending invitations" [headingLevel]="3" />
+      <ul class="m-0 p-0 list-none divide-y divide-rowDivider">
+        <li *ngFor="let inv of invites()" class="flex items-center gap-3 px-6 py-3">
+          <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center shrink-0" aria-hidden="true">
+            <physio-icon name="hourglass" [size]="15" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-medium text-regular truncate">{{ inv.email || 'No email' }}</div>
+            <div class="text-xs text-secondary">
+              {{ roleNameForCode(inv.intendedRole) }} · sent {{ inv.invitedAt | date:'mediumDate' }} · expires {{ inv.expiresAt | date:'mediumDate' }}
+            </div>
+          </div>
+          <button
+            *ngIf="canRevokeInvites"
+            type="button"
+            boo-button
+            variant="ghost"
+            size="sm"
+            classname="!text-danger !h-8"
+            [loading]="revokingInvite() === inv.id"
+            [disabled]="!!revokingInvite()"
+            [attr.aria-label]="'Revoke invitation for ' + (inv.email || 'this address')"
+            (click)="onRevokeInvite(inv)"
+          >Revoke</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</drawer>

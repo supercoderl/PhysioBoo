@@ -1,13 +1,18 @@
-<span class="relative inline-flex items-center w-10 h-5 m-2 cursor-pointer">
+<span class="relative inline-flex items-center w-10 h-5 m-2 cursor-pointer" [class.opacity-50]="disabled" [class.cursor-not-allowed]="disabled">
+  <!-- The native change event is stopped here: it would otherwise bubble to the host and fire `(change)` a second time. -->
   <input
     type="checkbox"
-    class="absolute w-full h-full opacity-0 cursor-pointer peer z-10"
-    (change)="handleSwitch()"
+    role="switch"
+    class="absolute w-full h-full opacity-0 cursor-pointer peer z-10 disabled:cursor-not-allowed"
+    (change)="$event.stopPropagation(); handleSwitch()"
     [checked]="isOpen"
+    [disabled]="disabled"
+    [attr.aria-checked]="!!isOpen"
+    [attr.aria-label]="ariaLabel || null"
   />
 
   <span
-    class="absolute inset-0 bg-gray-600 rounded-full transition-colors duration-300 ease-in-out peer-checked:bg-primary"
+    class="absolute inset-0 bg-gray-600 rounded-full transition-colors duration-300 ease-in-out peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40 peer-focus-visible:ring-offset-2"
   ></span>
 
   <span

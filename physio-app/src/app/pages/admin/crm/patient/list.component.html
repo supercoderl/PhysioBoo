@@ -33,9 +33,11 @@
   <section class="flex-1 min-h-[360px] flex flex-col min-w-0 bg-surface border border-borderGray rounded-xl" aria-labelledby="patient-list-title">
     <h2 id="patient-list-title" class="sr-only">Patient list</h2>
 
-    <!-- Search, filter and sort. Field labels (20px) over 36px controls line up with the 56px search field. -->
+    <!-- Search, filter and sort. Every control is 36px high and the row aligns on its bottom edge, under the field labels. -->
     <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
       <boo-search-field
+        size="small"
+        [height]="36"
         class="flex-1 basis-64 min-w-0"
         label="Search patients by patient number"
         placeholder="Search by patient number"

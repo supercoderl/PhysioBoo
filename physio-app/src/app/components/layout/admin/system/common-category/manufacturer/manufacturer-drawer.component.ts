@@ -1,315 +1,157 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize, firstValueFrom } from "rxjs";
+import { Component, inject } from "@angular/core";
+import { FormBuilder, Validators } from "@angular/forms";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { ManufacturerService } from "../../../../../../services/admin/manufacturer.service";
-import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../../../services/common/toast.service";
-import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { Manufacturer } from "../../../../../../shared/types/support.types";
-import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
-import { DrawerComponent } from "../../../../../drawer/drawer.component";
-import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-input.component";
+import { CategoryDrawerBase } from "../shared/category-drawer.base";
+import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-shell.component";
 
+/** Create / edit a manufacturer (POST /manufacturers, PATCH /manufacturers/{id}). The company code is assigned by the server. */
 @Component({
     selector: 'common-category-manufacturer-drawer',
     standalone: true,
     imports: [
         SharedModule,
-        DrawerComponent,
+        CommonCategoryDrawerShellComponent,
         BooInputComponent,
-
-        BooButtonAdminComponent,
-        BooCheckboxComponent,
-        BooDevJsonFillerComponent
+        BooCheckboxComponent
     ],
     template: `
-        <drawer
+        <common-category-drawer-shell
+            [form]="form"
             [isOpen]="isOpen"
-            [isShowDialog]="true"
-            (close)="onClose()"
+            [title]="isEdit ? 'Edit manufacturer' : 'New manufacturer'"
+            subtitle="Company identity, contact and regulatory standing."
+            [isEdit]="isEdit"
+            [canDelete]="canDelete"
+            [loading]="loading"
+            [loadFailed]="loadFailed"
+            [saving]="saving"
+            (save)="save()"
+            (cancel)="requestClose()"
+            (discard)="discard()"
+            (delete)="onDelete()"
+            (retry)="loadDetail()"
         >
-            <div class="flex flex-col h-full bg-surface relative">
-                <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
-                    <div>
-                        <h2 class="text-xl font-bold text-primary leading-none mb-1">
-                            {{ currentId ? 'Edit Manufacturer' : 'New Manufacturer' }}
-                        </h2>
-                        <p class="text-sm text-secondary m-0">Configure company details and certifications</p>
+            <ng-container [formGroup]="form">
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Company</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-[1fr_10rem] gap-4">
+                        <boo-input label="Company name" [required]="true" formControlName="name" [maxlength]="200" placeholder="e.g. MedTech Inc." />
+                        <boo-input type="number" label="Established" formControlName="establishedYear" placeholder="e.g. 1990" />
                     </div>
-                    <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <physio-icon name="x" [size]="20"></physio-icon>
-                    </button>
-                </div>
+                    <p *ngIf="form.controls['establishedYear'].touched && form.controls['establishedYear'].invalid" class="m-0 mt-1 text-xs text-danger" role="alert">Enter a year between 1800 and {{ thisYear }}.</p>
+                </section>
 
-                <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
-                    <boo-json-editor [targetForms]="form"></boo-json-editor>
-                    
-                    <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Contact and location</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <boo-input type="email" label="Email" formControlName="email" [maxlength]="150" placeholder="contact@company.com" />
+                        <boo-input label="Phone" formControlName="phone" [maxlength]="20" />
+                        <boo-input class="sm:col-span-2" label="Website" formControlName="website" [maxlength]="200" placeholder="https://…" />
+                        <boo-input class="sm:col-span-2" label="Address" formControlName="address" [maxlength]="300" />
+                        <boo-input label="City" formControlName="city" [maxlength]="100" />
+                        <boo-input label="State / province" formControlName="state" [maxlength]="100" />
+                        <boo-input label="Country" formControlName="country" [maxlength]="100" />
+                        <boo-input label="Postal code" formControlName="postalCode" [maxlength]="20" />
                     </div>
-                    
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Basic Information</h3>
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-2 gap-4">
-                                <boo-input label="Company Name" [required]="true" formControlName="name" placeholder="Ex: MedTech Inc."></boo-input>
-                                <boo-input type="number" label="Established Year" formControlName="establishedYear" placeholder="Ex: 1990"></boo-input>
-                            </div>
-                        </div>
-                    </div>
+                </section>
 
-                    <div class="h-px bg-gray-100 mx-6"></div>
-
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Contact & Location</h3>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <boo-input type="email" label="Email Address" formControlName="email" placeholder="contact@company.com"></boo-input>
-                            <boo-input label="Phone Number" formControlName="phone" placeholder="+1..."></boo-input>
+                <section class="px-6 py-5">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Regulatory</h3>
+                    <boo-input label="License number" formControlName="licenseNumber" [maxlength]="100" />
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="gmpCertified" label="GMP certified" />
                         </div>
-                        <div class="mb-4">
-                            <boo-input label="Website" formControlName="website" placeholder="https://www..."></boo-input>
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="isoCertified" label="ISO certified" />
                         </div>
-                        <div class="mb-4">
-                            <boo-input label="Address" formControlName="address" placeholder="123 Main St"></boo-input>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <boo-input label="City" formControlName="city" placeholder="Ex: New York"></boo-input>
-                            <boo-input label="State / Province" formControlName="state" placeholder="Ex: NY"></boo-input>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <boo-input label="Country" formControlName="country" placeholder="Ex: USA"></boo-input>
-                            <boo-input label="Postal Code" formControlName="postalCode" placeholder="Ex: 10001"></boo-input>
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="fdaApproved" label="FDA approved" />
                         </div>
                     </div>
-
-                    <div class="h-px bg-gray-100 mx-6"></div>
-
-                    <div class="p-6 pb-10">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Legal & Certifications</h3>
-                        <div class="mb-5">
-                            <boo-input label="License Number" formControlName="licenseNumber" placeholder="Enter license code..."></boo-input>
-                        </div>
-                        
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Quality & Compliance</label>
-                        <div class="grid grid-cols-3 gap-4">
-                            <div 
-                                class="border rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm gap-2"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('gmpCertified')?.value, 'border-gray-200': !form.get('gmpCertified')?.value}"
-                                (click)="toggleCheck('gmpCertified')"
-                            >
-                                <span class="text-sm font-bold" [ngClass]="form.get('gmpCertified')?.value ? 'text-primary' : 'text-gray-500'">GMP</span>
-                                <boo-checkbox formControlName="gmpCertified"></boo-checkbox>
-                            </div>
-
-                            <div 
-                                class="border rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm gap-2"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('isoCertified')?.value, 'border-gray-200': !form.get('isoCertified')?.value}"
-                                (click)="toggleCheck('isoCertified')"
-                            >
-                                <span class="text-sm font-bold" [ngClass]="form.get('isoCertified')?.value ? 'text-primary' : 'text-gray-500'">ISO</span>
-                                <boo-checkbox formControlName="isoCertified"></boo-checkbox>
-                            </div>
-
-                            <div 
-                                class="border rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm gap-2"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('fdaApproved')?.value, 'border-gray-200': !form.get('fdaApproved')?.value}"
-                                (click)="toggleCheck('fdaApproved')"
-                            >
-                                <span class="text-sm font-bold" [ngClass]="form.get('fdaApproved')?.value ? 'text-primary' : 'text-gray-500'">FDA</span>
-                                <boo-checkbox formControlName="fdaApproved"></boo-checkbox>
-                            </div>
-                        </div>
+                    <div *ngIf="isEdit" class="mt-4 rounded-xl border border-borderGray px-3 py-2.5">
+                        <boo-checkbox formControlName="isActive" label="Active" />
+                        <p class="m-0 mt-1 text-xs text-secondary">Clear to mark this manufacturer inactive.</p>
                     </div>
-                </div>
-
-                <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0 shadow-top-md">
-                    <div>
-                        <boo-button-admin *ngIf="currentId" (click)="onDelete()" background="transparent" textColor="#EF4444" padding="6px 8px" [fontSize]="14" fontWeight="500" [gap]="6" buttonClass="group">
-                            <physio-icon 
-                                name="trash" 
-                                [size]="16"
-                                [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
-                            ></physio-icon> 
-                            <span>Delete</span>
-                        </boo-button-admin>
-                    </div>
-                    <div class="flex gap-3">
-                        <boo-button-admin
-                            buttonClass="hover:!bg-gray-200"
-                            background="transparent"
-                            (click)="onClose()"
-                            [disabled]="loadingSrv.isLoading('search-by-id')"
-                        >
-                            Cancel
-                        </boo-button-admin>
-                        <boo-button-admin
-                            textColor="white"
-                            (click)="onSave()"
-                            [disabled]="loadingSrv.isLoading('search-by-id') || loadingSrv.isLoading('create') || loadingSrv.isLoading('update')"
-                            [loading]="loadingSrv.isLoading('update')"
-                        >
-                            Save Changes
-                        </boo-button-admin>
-                    </div>
-                </div>
-            </div>
-        </drawer>
+                </section>
+            </ng-container>
+        </common-category-drawer-shell>
     `
 })
+export class CommonCategoryManufacturerDrawerComponent extends CategoryDrawerBase<Manufacturer> {
+    protected override readonly noun = 'manufacturer';
+    protected override readonly service = inject(ManufacturerService);
 
-export class CommonCategoryManufacturerDrawerComponent implements OnChanges {
-    // #region Inputs, Outputs, Properties
-    @Input() isOpen = false;
-    @Input() currentId: string | null = null;
-    @Output() close = new EventEmitter<void>();
-    @Output() saveSuccess = new EventEmitter<Manufacturer>();
-    @Output() delete = new EventEmitter<string>();
-    @ViewChild('scrollContainer') scrollContainer!: ElementRef;
-    form: FormGroup;
-    // #endregion
+    readonly thisYear = new Date().getFullYear();
 
-    // #region Init (Lifecycle + Setup)
-    constructor(
-        private fb: FormBuilder,
-        private toastSrv: ToastService,
-        private manufacturerSrv: ManufacturerService,
-        protected loadingSrv: LocalLoadingService
-    ) {
-        this.form = this.initForm();
+    override readonly form = inject(FormBuilder).group({
+        name: ['', [Validators.required, Validators.maxLength(200), Validators.pattern(/\S/)]],
+        address: [null as string | null],
+        city: [null as string | null],
+        state: [null as string | null],
+        country: [null as string | null],
+        postalCode: [null as string | null],
+        phone: [null as string | null],
+        email: [null as string | null, [Validators.email]],
+        website: [null as string | null],
+        licenseNumber: [null as string | null],
+        gmpCertified: [false],
+        isoCertified: [false],
+        fdaApproved: [false],
+        // The API stores 0 when the year is unknown.
+        establishedYear: [null as number | string | null, [Validators.min(1800), Validators.max(this.thisYear)]],
+        isActive: [true]
+    });
+
+    protected override defaults() {
+        return {
+            name: '', address: null, city: null, state: null, country: null, postalCode: null, phone: null, email: null,
+            website: null, licenseNumber: null, gmpCertified: false, isoCertified: false, fdaApproved: false,
+            establishedYear: null, isActive: true
+        };
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (!this.isOpen) return;
-
-        if (changes['currentId'] && this.currentId) {
-            this.loadDetail(this.currentId);
-        } else if (!this.currentId) {
-            this.resetForm();
-        }
-    }
-    // #endregion
-
-    // #region Methods
-    private initForm(): FormGroup {
-        return this.fb.group({
-            name: ['', [Validators.required]],
-            address: [null],
-            city: [null],
-            state: [null],
-            country: [null],
-            postalCode: [null],
-            phone: [null],
-            email: [null],
-            website: [null],
-            licenseNumber: [null],
-            gmpCertified: [false],
-            isoCertified: [false],
-            fdaApproved: [false],
-            establishedYear: [0]
-        });
+    protected override toFormValue(item: Manufacturer) {
+        return {
+            name: item.name,
+            address: item.address,
+            city: item.city,
+            state: item.state,
+            country: item.country,
+            postalCode: item.postalCode,
+            phone: item.phone,
+            email: item.email,
+            website: item.website,
+            licenseNumber: item.licenseNumber,
+            gmpCertified: !!item.gmpCertified,
+            isoCertified: !!item.isoCertified,
+            fdaApproved: !!item.fdaApproved,
+            establishedYear: item.establishedYear || null,
+            isActive: item.isActive
+        };
     }
 
-    loadDetail(id: string) {
-        this.form.disable();
-
-        this.manufacturerSrv.search_by_id(id)
-            .pipe(
-                finalize(() => this.form.enable())
-            )
-            .subscribe(_res => {
-                if (_res.success) {
-                    this.form.patchValue({
-                        name: _res.data?.name,
-                        address: _res.data?.address,
-                        city: _res.data?.city,
-                        state: _res.data?.state,
-                        country: _res.data?.country,
-                        postalCode: _res.data?.postalCode,
-                        phone: _res.data?.phone,
-                        email: _res.data?.email,
-                        website: _res.data?.website,
-                        licenseNumber: _res.data?.licenseNumber,
-                        gmpCertified: _res.data?.gmpCertified ?? false,
-                        isoCertified: _res.data?.isoCertified ?? false,
-                        fdaApproved: _res.data?.fdaApproved ?? false,
-                        establishedYear: _res.data?.establishedYear ?? 0,
-                    })
-                }
-            })
-    }
-
-    toggleCheck(controlName: string) {
-        const currentValue = this.form.get(controlName)?.value;
-
-        this.form.patchValue({
-            [controlName]: !currentValue
-        });
-        this.form.markAsDirty();
-    }
-
-    async onSave() {
-        if (this.form.invalid) {
-            this.toastSrv.error('Please check required fields');
-            this.form.markAllAsTouched();
-            return;
-        }
-
-        const formData = { ...this.form.getRawValue() }
-
-        try {
-            let id: string;
-            if (this.currentId) {
-                await firstValueFrom(this.manufacturerSrv.update(this.currentId, formData));
-                id = this.currentId;
-            } else {
-                const createRes = await firstValueFrom(this.manufacturerSrv.create(formData));
-                if (!createRes.success || !createRes.data) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
-                id = createRes.data;
-            }
-
-            const response = await firstValueFrom(this.manufacturerSrv.search_by_id(id));
-            if (response.success && response.data) {
-                this.saveSuccess.emit(response.data);
-            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (err) {
-            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            console.error(err);
-        }
-    }
-
-    resetForm() {
-        this.form.reset({
-            name: '',
-            address: null,
-            city: null,
-            state: null,
-            country: null,
-            postalCode: null,
-            phone: null,
-            email: null,
-            website: null,
-            licenseNumber: null,
-            gmpCertified: false,
-            isoCertified: false,
-            fdaApproved: false,
-            establishedYear: 0
-        });
-    }
-
-    onClose() {
-        if (this.scrollContainer) {
-            this.scrollContainer.nativeElement.scrollTop = 0;
-        }
-
-        this.close.emit();
-    }
-
-    onDelete() {
-        if (this.currentId) this.delete.emit(this.currentId);
+    protected override toPayload(raw: Record<string, any>) {
+        return {
+            name: this.text(raw['name']),
+            address: this.text(raw['address']),
+            city: this.text(raw['city']),
+            state: this.text(raw['state']),
+            country: this.text(raw['country']),
+            postalCode: this.text(raw['postalCode']),
+            phone: this.text(raw['phone']),
+            email: this.text(raw['email']),
+            website: this.text(raw['website']),
+            licenseNumber: this.text(raw['licenseNumber']),
+            gmpCertified: !!raw['gmpCertified'],
+            isoCertified: !!raw['isoCertified'],
+            fdaApproved: !!raw['fdaApproved'],
+            establishedYear: this.num(raw['establishedYear']),
+            // Update requires it (create ignores it); omitting it used to deactivate the manufacturer on every edit.
+            isActive: !!raw['isActive']
+        };
     }
 }

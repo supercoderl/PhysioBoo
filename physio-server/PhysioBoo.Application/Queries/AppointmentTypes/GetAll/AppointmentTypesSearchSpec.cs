@@ -45,19 +45,23 @@ namespace PhysioBoo.Application.Queries.AppointmentTypes.GetAll
 
                 if (q.Request.Filter.IsEmergency.HasValue)
                 {
-                    Query.Where(x => q.Request.Filter.IsEmergency.Value);
+                    bool isEmergency = q.Request.Filter.IsEmergency.Value;
+                    Query.Where(x => x.IsEmergency == isEmergency);
                 }
                 if (q.Request.Filter.RequiresPreparation.HasValue)
                 {
-                    Query.Where(x => q.Request.Filter.RequiresPreparation.Value);
+                    bool requiresPreparation = q.Request.Filter.RequiresPreparation.Value;
+                    Query.Where(x => x.RequiresPreparation == requiresPreparation);
                 }
                 if (q.Request.Filter.IsFollowUp.HasValue)
                 {
-                    Query.Where(x => q.Request.Filter.IsFollowUp.Value);
+                    bool isFollowUp = q.Request.Filter.IsFollowUp.Value;
+                    Query.Where(x => x.IsFollowUp == isFollowUp);
                 }
                 if (q.Request.Filter.IsActive.HasValue)
                 {
-                    Query.Where(x => q.Request.Filter.IsActive.Value);
+                    bool isActive = q.Request.Filter.IsActive.Value;
+                    Query.Where(x => x.IsActive == isActive);
                 }
             }
 

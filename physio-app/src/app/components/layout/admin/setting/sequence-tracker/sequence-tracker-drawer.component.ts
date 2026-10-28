@@ -1,284 +1,203 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize, firstValueFrom } from "rxjs";
+import { Component, inject } from "@angular/core";
+import { FormBuilder, Validators } from "@angular/forms";
+import { BooInputComponent } from '@physioboo/ui';
+import { map } from "rxjs";
 import { SequenceTrackerService } from "../../../../../services/admin/sequence-tracker.service";
-import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../../services/common/toast.service";
-import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { SequenceTracker } from "../../../../../shared/types/system.types";
-import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
-import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooInputComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
+import { CategoryDrawerBase } from "../../system/common-category/shared/category-drawer.base";
+import { CommonCategoryDrawerShellComponent } from "../../system/common-category/shared/category-drawer-shell.component";
+import { SEQUENCE_DATE_FORMATS, SEQUENCE_ENTITY_TYPES, buildSequenceCode, dateFormatRepeatsCodes } from "./sequence-tracker.utils";
 
+const WHOLE_NUMBER = /^\d+$/;
+
+/**
+ * Create / edit a numbering rule (POST /sequence-trackers, PATCH /sequence-trackers/{id}). The server issues codes
+ * as prefix + date + "-" + zero-padded (last number + 1) + suffix for the rule whose record type matches exactly, so
+ * the drawer offers the record types the server uses, refuses a second rule for the same type, and warns before a
+ * change that would issue codes again.
+ */
 @Component({
     selector: 'setting-sequence-tracker-drawer',
     standalone: true,
     imports: [
         SharedModule,
-        DrawerComponent,
+        CommonCategoryDrawerShellComponent,
         BooInputComponent,
-
-        BooButtonAdminComponent,
         BooSelectComponent,
     ],
     template: `
-        <drawer
+        <common-category-drawer-shell
+            [form]="form"
             [isOpen]="isOpen"
-            [isShowDialog]="true" 
-            (close)="onClose()"
+            [title]="isEdit ? 'Edit numbering rule' : 'New numbering rule'"
+            subtitle="How codes are generated for one type of record."
+            [isEdit]="isEdit"
+            [canDelete]="canDelete"
+            [loading]="loading"
+            [loadFailed]="loadFailed"
+            [saving]="saving || checking"
+            (save)="save()"
+            (cancel)="requestClose()"
+            (discard)="discard()"
+            (delete)="onDelete()"
+            (retry)="loadDetail()"
         >
-            <div class="flex flex-col h-full bg-surface relative">
-                <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
-                    <div>
-                        <h2 class="text-xl font-bold text-primary leading-none mb-1">
-                            {{ currentId ? 'Edit Numbering Rule' : 'New Numbering Rule' }}
-                        </h2>
-                        <p class="text-sm text-secondary m-0">Configure auto-generated codes for system entities</p>
-                    </div>
-                    <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <physio-icon name="x" [size]="20"></physio-icon>
-                    </button>
-                </div>
+            <ng-container [formGroup]="form">
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Record type</h3>
+                    <boo-select label="Record type" [required]="true" formControlName="entityType" [options]="entityTypeOptions" />
+                    <p *ngIf="duplicateType" class="m-0 mt-1 text-xs text-danger" role="alert">A rule for {{ duplicateType }} already exists. Edit that rule instead.</p>
+                    <p *ngIf="isEdit && typeChanged" class="m-0 mt-2 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900" role="note">
+                        <physio-icon name="triangle-alert" [size]="14" class="shrink-0 mt-px" aria-hidden="true" />
+                        {{ loaded?.entityType }} records will have no numbering rule after this change, and creating them will fail until one is added.
+                    </p>
+                </section>
 
-                <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
-                    <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
-                    </div>
-
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Rule Identification</h3>
-                        <div class="space-y-4">
-                            <boo-input 
-                                label="Entity Type" 
-                                [required]="true" 
-                                formControlName="entityType" 
-                                placeholder="Ex: Patient, LabTest, Invoice...">
-                            </boo-input>
-
-                            <div class="grid grid-cols-2 gap-4">
-                                <boo-input 
-                                    label="Prefix" 
-                                    [required]="true" 
-                                    formControlName="prefix" 
-                                    placeholder="Ex: BN-, TEST-">
-                                </boo-input>
-                                
-                                <boo-input 
-                                    label="Suffix (Optional)" 
-                                    formControlName="suffix" 
-                                    placeholder="Ex: -HCM">
-                                </boo-input>
-                            </div>
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Code format</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <boo-input label="Prefix" [required]="true" formControlName="prefix" [maxlength]="20" />
+                        <boo-input label="Suffix (optional)" formControlName="suffix" [maxlength]="20" />
+                        <boo-select class="sm:col-span-2" label="Date part" formControlName="useDateFormating" [options]="dateFormats" />
+                        <div>
+                            <boo-input type="number" label="Number of digits" [required]="true" formControlName="sequenceLength" />
+                            <p *ngIf="form.controls.sequenceLength.touched && form.controls.sequenceLength.invalid" class="m-0 mt-1 text-xs text-danger" role="alert">Enter a whole number from 1 to 18.</p>
+                        </div>
+                        <div>
+                            <boo-input type="number" label="Last issued number" [required]="true" formControlName="currentSequence" />
+                            <p *ngIf="form.controls.currentSequence.touched && form.controls.currentSequence.invalid; else counterHint" class="m-0 mt-1 text-xs text-danger" role="alert">Enter a whole number, 0 or more.</p>
+                            <ng-template #counterHint><p class="m-0 mt-1 text-xs text-secondary">The next code uses this number + 1.</p></ng-template>
                         </div>
                     </div>
 
-                    <div class="h-px bg-gray-100 mx-6"></div>
+                    <p *ngIf="repeatsCodes" class="m-0 mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900" role="note">
+                        <physio-icon name="triangle-alert" [size]="14" class="shrink-0 mt-px" aria-hidden="true" />
+                        The counter restarts at 1 every day. A year or month date part stays the same across days, so codes will repeat. Use the full date, or no date.
+                    </p>
+                    <p *ngIf="isEdit && counterLowered" class="m-0 mt-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800" role="note">
+                        <physio-icon name="triangle-alert" [size]="14" class="shrink-0 mt-px" aria-hidden="true" />
+                        Lowering the number from {{ loaded?.currentSequence }} re-issues codes that may already belong to existing records.
+                    </p>
+                </section>
 
-                    <div class="p-6 pb-10">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Sequence Configuration</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Date Formatting (Optional)</label>
-                                <boo-select 
-                                    formControlName="useDateFormating"
-                                    [options]="[
-                                        { label: 'None', value: null },
-                                        { label: 'Year (yyyy) - Ex: 2026', value: 'yyyy' },
-                                        { label: 'Year & Month (yyMM) - Ex: 2603', value: 'yyMM' },
-                                        { label: 'Full Date (yyyyMMdd) - Ex: 20260307', value: 'yyyyMMdd' }
-                                    ]"
-                                ></boo-select>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4">
-                                <boo-input 
-                                    type="number" 
-                                    label="Sequence Length" 
-                                    [required]="true" 
-                                    formControlName="sequenceLength" 
-                                    placeholder="Ex: 4 (0001)">
-                                </boo-input>
-                                
-                                <boo-input 
-                                    type="number" 
-                                    label="Current Sequence" 
-                                    [required]="true" 
-                                    formControlName="currentSequence" 
-                                    placeholder="Ex: 0">
-                                </boo-input>
-                            </div>
-
-                            <div class="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-xl">
-                                <p class="text-xs text-primary font-semibold mb-1 uppercase tracking-wider">Format Preview</p>
-                                <p class="text-lg font-mono text-gray-800">
-                                    {{ form.get('prefix')?.value || 'PREFIX-' }}<span class="text-gray-400">{{ form.get('useDateFormating')?.value ? 'DATE-' : '' }}</span><span class="text-primary">{{ previewSequence }}</span>{{ form.get('suffix')?.value || '' }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>             
-                </div>
-
-                <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0 shadow-top-md">
-                    <div>
-                        <boo-button-admin *ngIf="currentId" (click)="onDelete()" background="transparent" textColor="#EF4444" padding="6px 8px" [fontSize]="14" fontWeight="500" [gap]="6" buttonClass="group">
-                            <physio-icon 
-                                name="trash" 
-                                [size]="16"
-                                [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
-                            ></physio-icon> 
-                            <span>Delete</span>
-                        </boo-button-admin>
+                <section class="px-6 py-5">
+                    <h3 class="m-0 mb-3 text-xs font-semibold uppercase tracking-wider text-secondary">Next code</h3>
+                    <div class="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
+                        <p class="m-0 text-lg font-mono text-regular break-all">{{ preview }}</p>
+                        <p class="m-0 mt-1 text-xs text-secondary">The code the next {{ form.controls.entityType.value || 'record' }} would get if created today, once this rule is saved.</p>
                     </div>
-                    <div class="flex gap-3">
-                        <boo-button-admin
-                            buttonClass="hover:!bg-gray-200"
-                            background="transparent"
-                            (click)="onClose()"
-                            [disabled]="loadingSrv.isLoading('search-by-id')"
-                        >
-                            Cancel
-                        </boo-button-admin>
-                        <boo-button-admin
-                            textColor="white"
-                            (click)="onSave()"
-                            [disabled]="loadingSrv.isLoading('search-by-id') || loadingSrv.isLoading('create') || loadingSrv.isLoading('update')"
-                            [loading]="loadingSrv.isLoading('update')"
-                        >
-                            Save Changes
-                        </boo-button-admin>
-                    </div>
-                </div>
-            </div>
-        </drawer>
+                </section>
+            </ng-container>
+        </common-category-drawer-shell>
     `
 })
+export class SettingSequenceTrackerDrawerComponent extends CategoryDrawerBase<SequenceTracker> {
+    protected override readonly noun = 'numbering rule';
+    protected override readonly service = inject(SequenceTrackerService);
 
-export class SettingSequenceTrackerDrawerComponent implements OnChanges {
-    // #region Inputs, Outputs, Properties
-    @Input() isOpen = false;
-    @Input() currentId: string | null = null;
-    @Output() close = new EventEmitter<void>();
-    @Output() saveSuccess = new EventEmitter<SequenceTracker>();
-    @Output() delete = new EventEmitter<string>();
-    @ViewChild('scrollContainer') scrollContainer!: ElementRef;
-    form: FormGroup;
-    // #endregion
+    readonly dateFormats = SEQUENCE_DATE_FORMATS;
+    /** The record as loaded, to warn about changes that affect codes already issued. */
+    loaded: SequenceTracker | null = null;
+    checking = false;
+    duplicateType: string | null = null;
 
-    // #region Init (Lifecycle + Setup)
-    constructor(
-        private fb: FormBuilder,
-        private toastSrv: ToastService,
-        private sequenceTrackerSrv: SequenceTrackerService,
-        protected loadingSrv: LocalLoadingService
-    ) {
-        this.form = this.initForm();
+    override readonly form = inject(FormBuilder).group({
+        entityType: ['', [Validators.required]],
+        prefix: ['', [Validators.required, Validators.maxLength(20)]],
+        suffix: ['' as string | null, [Validators.maxLength(20)]],
+        useDateFormating: [null as string | null],
+        sequenceLength: [6 as number | string, [Validators.required, Validators.min(1), Validators.max(18), Validators.pattern(WHOLE_NUMBER)]],
+        currentSequence: [0 as number | string, [Validators.required, Validators.min(0), Validators.pattern(WHOLE_NUMBER)]],
+    });
+
+    /** Known record types, plus the loaded one if it isn't (so an old rule still shows its own type). */
+    get entityTypeOptions(): { label: string; value: string }[] {
+        const types = [...SEQUENCE_ENTITY_TYPES];
+        const current = this.loaded?.entityType;
+        if (current && !types.includes(current)) types.unshift(current);
+        return types.map(t => ({ label: t === current && !SEQUENCE_ENTITY_TYPES.includes(t) ? `${t} (not used)` : t, value: t }));
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (!this.isOpen) return;
-
-        if (changes['currentId'] && this.currentId) {
-            this.loadDetail(this.currentId);
-        } else if (!this.currentId) {
-            this.resetForm();
-        }
-    }
-    // #endregion
-
-    // #region Methods
-    private initForm(): FormGroup {
-        return this.fb.group({
-            entityType: ['', [Validators.required]],
-            prefix: ['', [Validators.required]],
-            useDateFormating: [null],
-            sequenceLength: [4],
-            currentSequence: [0],
-            suffix: [null],
-        });
+    get preview(): string {
+        const v = this.form.getRawValue();
+        return buildSequenceCode({
+            prefix: (v.prefix ?? '').trim() || 'PREFIX',
+            suffix: (v.suffix ?? '').trim() || null,
+            useDateFormating: v.useDateFormating,
+            sequenceLength: this.num(v.sequenceLength, 1) ?? 1,
+        }, (this.num(v.currentSequence, 0) ?? 0) + 1);
     }
 
-    get previewSequence(): string {
-        const length = this.form.get('sequenceLength')?.value || 4;
-        const current = this.form.get('currentSequence')?.value || 1;
-        return current.toString().padStart(length, '0');
+    get repeatsCodes(): boolean {
+        return dateFormatRepeatsCodes(this.form.controls.useDateFormating.value);
     }
 
-    loadDetail(id: string) {
-        this.form.disable();
-
-        this.sequenceTrackerSrv.search_by_id(id)
-            .pipe(
-                finalize(() => this.form.enable())
-            )
-            .subscribe(_res => {
-                if (_res.success) {
-                    this.form.patchValue({
-                        entityType: _res.data?.entityType,
-                        prefix: _res.data?.prefix,
-                        useDateFormating: _res.data?.useDateFormating,
-                        sequenceLength: _res.data?.sequenceLength,
-                        currentSequence: _res.data?.currentSequence,
-                        suffix: _res.data?.suffix
-                    })
-                }
-            })
+    get typeChanged(): boolean {
+        return !!this.loaded && this.form.controls.entityType.value !== this.loaded.entityType;
     }
 
-    async onSave() {
-        if (this.form.invalid) {
-            this.toastSrv.error('Please check required fields');
-            this.form.markAllAsTouched();
+    get counterLowered(): boolean {
+        const value = this.num(this.form.controls.currentSequence.value, null);
+        return !!this.loaded && value !== null && value < this.loaded.currentSequence;
+    }
+
+    protected override defaults() {
+        this.loaded = null;
+        this.duplicateType = null;
+        return { entityType: '', prefix: '', suffix: '', useDateFormating: null, sequenceLength: 6, currentSequence: 0 };
+    }
+
+    protected override toFormValue(item: SequenceTracker) {
+        this.loaded = item;
+        return {
+            entityType: item.entityType,
+            prefix: item.prefix,
+            suffix: item.suffix ?? '',
+            useDateFormating: item.useDateFormating ?? null,
+            sequenceLength: item.sequenceLength,
+            currentSequence: item.currentSequence,
+        };
+    }
+
+    protected override toPayload(raw: Record<string, any>) {
+        return {
+            entityType: String(raw['entityType'] ?? '').trim(),
+            prefix: String(raw['prefix'] ?? '').trim(),
+            suffix: this.text(raw['suffix']),
+            useDateFormating: raw['useDateFormating'] || null,
+            sequenceLength: this.num(raw['sequenceLength'], 1),
+            currentSequence: this.num(raw['currentSequence'], 0),
+        };
+    }
+
+    /**
+     * The server keeps no uniqueness on the record type and uses the first matching rule, so a second rule for the
+     * same type would make numbering unpredictable. Check before saving a new type.
+     */
+    override save(): void {
+        if (this.saving || this.checking || this.loading || this.loadFailed) return;
+        const entityType = String(this.form.controls.entityType.value ?? '').trim();
+        this.duplicateType = null;
+        if (this.form.invalid || !entityType || (this.isEdit && !this.typeChanged)) {
+            super.save();
             return;
         }
 
-        const formData = { ...this.form.getRawValue() }
-
-        try {
-            let id: string;
-            if (this.currentId) {
-                await firstValueFrom(this.sequenceTrackerSrv.update(this.currentId, formData));
-                id = this.currentId;
-            } else {
-                const createRes = await firstValueFrom(this.sequenceTrackerSrv.create(formData));
-                if (!createRes.success || !createRes.data) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
-                id = createRes.data;
-            }
-
-            const response = await firstValueFrom(this.sequenceTrackerSrv.search_by_id(id));
-            if (response.success && response.data) {
-                this.saveSuccess.emit(response.data);
-            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (err) {
-            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            return;
-        }
-    }
-
-    resetForm() {
-        this.form.reset({
-            entityType: '',
-            prefix: '',
-            useDateFormating: null,
-            sequenceLength: 4,
-            currentSequence: 0,
-            suffix: null,
-        });
-    }
-
-    onClose() {
-        if (this.scrollContainer) {
-            this.scrollContainer.nativeElement.scrollTop = 0;
-        }
-
-        this.close.emit();
-    }
-
-    onDelete() {
-        if (this.currentId) this.delete.emit(this.currentId);
+        this.checking = true;
+        this.service.search({ pageNumber: 1, pageSize: 50, search: entityType, sort: '+entityType', filter: { start: '', end: '' } })
+            .pipe(map(res => (res.data?.items ?? []).some(r => r.entityType === entityType && r.id !== this.currentId)))
+            .subscribe({
+                next: exists => {
+                    this.checking = false;
+                    if (exists) {
+                        this.duplicateType = entityType;
+                        return;
+                    }
+                    super.save();
+                },
+                error: () => this.checking = false
+            });
     }
 }

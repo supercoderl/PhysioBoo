@@ -1,115 +1,166 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
-import { SwitchComponent } from "../../../../../components/switch/switch.component";
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AbstractControl, FormBuilder, ValidationErrors, Validators } from '@angular/forms';
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { finalize, map, startWith } from 'rxjs';
+import { SettingPageComponent } from '../../../../../components/layout/admin/setting/shared/setting-page.component';
+import { SettingSectionComponent } from '../../../../../components/layout/admin/setting/shared/setting-section.component';
 import { UserService } from '../../../../../services/admin/user.service';
-import { PreferenceService } from '../../../../../services/common/preference.service';
+import { AuthService } from '../../../../../services/auth/auth.service';
+import { DialogService } from '../../../../../services/common/dialog.service';
 import { ToastService } from '../../../../../services/common/toast.service';
 import { SharedModule } from '../../../../../shared/shared-imports';
-import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { UserSession } from '../../../../../shared/types/session.types';
 
-interface ActiveSession {
-  id: string;
-  device: string;
-  browser: string;
-  ip: string;
-  location: string;
-  lastActiveAt: string;
-  current: boolean;
+/** The server's password rule (ValidationExtensions.Password): 8–50 characters with all four character kinds. */
+const PASSWORD_RULES: { key: string; label: string; test: (pw: string) => boolean }[] = [
+  { key: 'length', label: '8 to 50 characters', test: pw => pw.length >= 8 && pw.length <= 50 },
+  { key: 'upper', label: 'An uppercase letter', test: pw => /[A-Z]/.test(pw) },
+  { key: 'lower', label: 'A lowercase letter', test: pw => /[a-z]/.test(pw) },
+  { key: 'digit', label: 'A number', test: pw => /[0-9]/.test(pw) },
+  { key: 'symbol', label: 'A symbol, e.g. ! @ # $', test: pw => /[^a-zA-Z0-9]/.test(pw) },
+];
+
+function passwordPolicy(control: AbstractControl): ValidationErrors | null {
+  const value = String(control.value ?? '');
+  if (!value) return null;
+  return PASSWORD_RULES.every(r => r.test(value)) ? null : { passwordPolicy: true };
 }
 
-const KEYS = {
-  TWO_FACTOR: 'security.twoFactor',
-  ROTATE_PASSWORD: 'security.rotatePassword',
-  EMAIL_NEW_LOGIN: 'security.emailOnNewLogin',
-} as const;
+function passwordsMatch(group: AbstractControl): ValidationErrors | null {
+  const next = group.get('newPassword')?.value;
+  const confirm = group.get('confirmPassword')?.value;
+  return confirm && next !== confirm ? { mismatch: true } : null;
+}
 
-const DEFAULTS: Record<string, boolean> = {
-  [KEYS.TWO_FACTOR]: false,
-  [KEYS.ROTATE_PASSWORD]: false,
-  [KEYS.EMAIL_NEW_LOGIN]: true,
-};
+function differsFromCurrent(group: AbstractControl): ValidationErrors | null {
+  const current = group.get('currentPassword')?.value;
+  const next = group.get('newPassword')?.value;
+  return current && next && current === next ? { sameAsCurrent: true } : null;
+}
 
+/**
+ * Settings > Security: change the password (PATCH /api/users/change-password) and manage signed-in devices
+ * (GET/DELETE /api/users/me/sessions). Changing the password revokes every refresh token on the server, so the
+ * page signs out right after a successful change instead of leaving a session that will fail on its next refresh.
+ */
 @Component({
   selector: 'setting-security',
   standalone: true,
   imports: [
     SharedModule,
-    FormsModule,
-
-    SwitchComponent,
-    BooButtonAdminComponent
+    SettingPageComponent,
+    SettingSectionComponent,
+    BooInputComponent,
+    BooButtonComponent,
+    BooStatusBadgeComponent,
+    BooEmptyStateComponent,
+    BooErrorStateComponent
   ],
   templateUrl: './security.component.html'
 })
 export class SecurityComponent implements OnInit {
-  private prefSrv = inject(PreferenceService);
-  private toastSrv = inject(ToastService);
+  private fb = inject(FormBuilder);
+  private authSrv = inject(AuthService);
   private userSrv = inject(UserService);
+  private dialogSrv = inject(DialogService);
+  private toastSrv = inject(ToastService);
 
-  loading = signal(false);
-  loadingSessions = signal(false);
-  savingPassword = signal(false);
-  savingPrefs = signal(false);
+  readonly rules = PASSWORD_RULES;
 
-  // password fields
-  currentPassword = signal('');
-  newPassword = signal('');
-  confirmPassword = signal('');
-  showCurrent = signal(false);
-  showNew = signal(false);
-  showConfirm = signal(false);
+  readonly passwordForm = this.fb.nonNullable.group({
+    currentPassword: ['', Validators.required],
+    newPassword: ['', [Validators.required, passwordPolicy]],
+    confirmPassword: ['', Validators.required],
+  }, { validators: [passwordsMatch, differsFromCurrent] });
 
-  // preferences
-  prefs = signal<Record<string, boolean>>({ ...DEFAULTS });
-  private originalPrefs = signal<Record<string, boolean>>({ ...DEFAULTS });
+  readonly savingPassword = signal(false);
+  readonly showCurrent = signal(false);
+  readonly showNew = signal(false);
+  readonly showConfirm = signal(false);
 
-  sessions = signal<ActiveSession[]>([]);
-
-  passwordStrength = computed(() => this.scorePassword(this.newPassword()));
-  passwordsMatch = computed(() =>
-    !this.confirmPassword() || this.newPassword() === this.confirmPassword()
+  private readonly newPassword = toSignal(
+    this.passwordForm.controls.newPassword.valueChanges.pipe(startWith(''), map(v => v ?? '')),
+    { initialValue: '' }
   );
-  canSavePassword = computed(() =>
-    !!this.currentPassword() &&
-    this.passwordStrength() >= 3 &&
-    this.passwordsMatch() &&
-    this.newPassword() !== this.currentPassword()
-  );
-
-  isPrefsDirty = computed(() => {
-    const a = this.originalPrefs(), b = this.prefs();
-    return Object.keys(a).some(k => a[k] !== b[k]);
+  /** Which of the server's rules the new password meets, for the live checklist. */
+  readonly ruleState = computed(() => {
+    const pw = this.newPassword();
+    return Object.fromEntries(PASSWORD_RULES.map(r => [r.key, r.test(pw)])) as Record<string, boolean>;
   });
 
-  KEYS = KEYS;
+  readonly sessions = signal<UserSession[]>([]);
+  readonly loadingSessions = signal(true);
+  readonly sessionsFailed = signal(false);
+  readonly revoking = signal<string | null>(null);
+  readonly hasOtherSessions = computed(() => this.sessions().some(s => !s.current));
 
   ngOnInit(): void {
-    this.loading.set(true);
-    this.prefSrv.loadAll()
-      .pipe(finalize(() => this.loading.set(false)))
-      .subscribe({
-        next: () => this.hydrate(),
-        error: () => { this.hydrate(); this.toastSrv.error('Failed to load security settings'); }
-      });
     this.loadSessions();
   }
 
+  // #region Password
+  get confirmError(): string | null {
+    const c = this.passwordForm.controls.confirmPassword;
+    if (!(c.touched || c.dirty) || !c.value) return null;
+    return this.passwordForm.hasError('mismatch') ? 'The passwords don’t match.' : null;
+  }
+
+  get sameAsCurrent(): boolean {
+    return this.passwordForm.hasError('sameAsCurrent') && this.passwordForm.controls.newPassword.dirty;
+  }
+
+  onChangePassword(): void {
+    if (this.savingPassword()) return;
+    if (this.passwordForm.invalid) {
+      this.passwordForm.markAllAsTouched();
+      return;
+    }
+
+    const { currentPassword, newPassword } = this.passwordForm.getRawValue();
+    this.savingPassword.set(true);
+    this.userSrv.changePassword(currentPassword, newPassword)
+      .pipe(finalize(() => this.savingPassword.set(false)))
+      .subscribe({
+        next: () => {
+          this.passwordForm.reset();
+          this.toastSrv.success('Password changed. Sign in again with your new password.');
+          // The server has revoked every session of this account, including this one.
+          this.authSrv.signOut();
+        },
+        // The interceptor shows the server's reason (for example, a wrong current password); the fields stay filled.
+        error: () => undefined
+      });
+  }
+  // #endregion
+
+  // #region Sessions
   loadSessions(): void {
     this.loadingSessions.set(true);
+    this.sessionsFailed.set(false);
     this.userSrv.getSessions()
       .pipe(finalize(() => this.loadingSessions.set(false)))
       .subscribe({
         next: res => {
-          if (!res.success) return;
-          this.sessions.set(res.data.map(s => ({ ...s, lastActiveAt: s.current ? 'Active now' : this.relativeTime(s.lastActiveAt) })));
+          if (!res.success) { this.sessionsFailed.set(true); return; }
+          // This device first, then the most recently active.
+          this.sessions.set([...(res.data ?? [])].sort((a, b) =>
+            Number(b.current) - Number(a.current) || new Date(b.lastActiveAt).getTime() - new Date(a.lastActiveAt).getTime()));
         },
-        error: () => this.toastSrv.error('Failed to load active sessions')
+        error: () => this.sessionsFailed.set(true)
       });
   }
 
-  private relativeTime(iso: string): string {
-    const minutes = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  deviceIcon(s: UserSession): string {
+    const device = (s.device ?? '').toLowerCase();
+    return /iphone|android|mobile|ipad|tablet/.test(device) ? 'smartphone' : 'monitor';
+  }
+
+  lastActive(s: UserSession): string {
+    if (s.current) return 'Active now';
+    const time = new Date(s.lastActiveAt).getTime();
+    if (isNaN(time)) return 'Unknown';
+    const minutes = Math.round((Date.now() - time) / 60000);
     if (minutes < 1) return 'Just now';
     if (minutes < 60) return `${minutes} min ago`;
     const hours = Math.round(minutes / 60);
@@ -118,107 +169,51 @@ export class SecurityComponent implements OnInit {
     return days === 1 ? 'Yesterday' : `${days} days ago`;
   }
 
-  private hydrate(): void {
-    const next: Record<string, boolean> = {};
-    for (const k of Object.keys(DEFAULTS)) {
-      next[k] = this.prefSrv.get<boolean>(k, DEFAULTS[k]);
-    }
-    this.prefs.set(next);
-    this.originalPrefs.set({ ...next });
-  }
-
-  togglePref(key: string): void {
-    this.prefs.update(s => ({ ...s, [key]: !s[key] }));
-  }
-
-  isPrefOn(key: string): boolean {
-    return !!this.prefs()[key];
-  }
-
-  onChangePassword(): void {
-    if (!this.canSavePassword() || this.savingPassword()) return;
-    this.savingPassword.set(true);
-    this.userSrv.changePassword(this.currentPassword(), this.newPassword())
-      .pipe(finalize(() => this.savingPassword.set(false)))
-      .subscribe({
-        next: () => {
-          this.currentPassword.set('');
-          this.newPassword.set('');
-          this.confirmPassword.set('');
-          this.toastSrv.success('Password updated');
-        },
-        error: err => this.toastSrv.error(err?.error?.errors?.[0] ?? err?.error?.detailedErrors?.[0] ?? 'Unable to change password. Check your current password.')
-      });
-  }
-
-  onSavePrefs(): void {
-    if (!this.isPrefsDirty() || this.savingPrefs()) return;
-    this.savingPrefs.set(true);
-    const a = this.originalPrefs();
-    const b = this.prefs();
-    const changed = Object.keys(b)
-      .filter(k => a[k] !== b[k])
-      .map(k => ({ key: k, value: b[k], group: 'security' }));
-
-    this.prefSrv.setMany(changed)
-      .pipe(finalize(() => this.savingPrefs.set(false)))
-      .subscribe({
-        next: () => {
-          this.originalPrefs.set({ ...b });
-          this.toastSrv.success('Security preferences saved');
-        },
-        error: () => this.toastSrv.error('Failed to save preferences')
-      });
-  }
-
-  onCancelPrefs(): void {
-    this.prefs.set({ ...this.originalPrefs() });
-  }
-
-  revokeSession(s: ActiveSession): void {
-    if (s.current) return;
-    if (!confirm(`Sign out from ${s.device}?`)) return;
-    this.userSrv.revokeSession(s.id).subscribe({
-      next: res => {
-        if (!res.success) { this.toastSrv.error('Unable to sign out that device'); return; }
-        this.sessions.update(list => list.filter(x => x.id !== s.id));
-        this.toastSrv.success(`Signed out ${s.device}`);
+  revokeSession(s: UserSession): void {
+    if (s.current || this.revoking()) return;
+    this.dialogSrv.confirm(
+      `${s.device} · ${s.browser} will be signed out and must sign in again to use your account.`,
+      () => {
+        this.revoking.set(s.id);
+        this.userSrv.revokeSession(s.id)
+          .pipe(finalize(() => this.revoking.set(null)))
+          .subscribe({
+            next: res => {
+              if (!res.success) { this.toastSrv.error('Unable to sign out that device'); return; }
+              this.sessions.update(list => list.filter(x => x.id !== s.id));
+              this.toastSrv.success(`Signed out ${s.device}`);
+            },
+            error: () => undefined
+          });
       },
-      error: () => this.toastSrv.error('Unable to sign out that device')
-    });
+      'Sign out this device?',
+      'warning',
+      'Sign out'
+    );
   }
 
   revokeAllOtherSessions(): void {
-    if (!confirm('Sign out from all other devices?')) return;
-    this.userSrv.revokeOtherSessions().subscribe({
-      next: res => {
-        if (!res.success) { this.toastSrv.error('Unable to sign out other devices'); return; }
-        this.sessions.update(list => list.filter(x => x.current));
-        this.toastSrv.success('Signed out from all other devices');
+    if (this.revoking()) return;
+    const others = this.sessions().filter(s => !s.current).length;
+    this.dialogSrv.confirm(
+      `${others} other device${others === 1 ? '' : 's'} will be signed out. This device stays signed in.`,
+      () => {
+        this.revoking.set('others');
+        this.userSrv.revokeOtherSessions()
+          .pipe(finalize(() => this.revoking.set(null)))
+          .subscribe({
+            next: res => {
+              if (!res.success) { this.toastSrv.error('Unable to sign out other devices'); return; }
+              this.sessions.update(list => list.filter(x => x.current));
+              this.toastSrv.success('Signed out all other devices');
+            },
+            error: () => undefined
+          });
       },
-      error: () => this.toastSrv.error('Unable to sign out other devices')
-    });
+      'Sign out all other devices?',
+      'warning',
+      'Sign out others'
+    );
   }
-
-  private scorePassword(pw: string): number {
-    if (!pw) return 0;
-    let score = 0;
-    if (pw.length >= 8) score++;
-    if (pw.length >= 12) score++;
-    if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
-    if (/\d/.test(pw)) score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
-    return Math.min(score, 4);
-  }
-
-  strengthLabel(): string {
-    const s = this.passwordStrength();
-    if (!this.newPassword()) return '';
-    return ['Too weak', 'Weak', 'Fair', 'Good', 'Strong'][s];
-  }
-
-  strengthColorClass(): string {
-    const s = this.passwordStrength();
-    return ['bg-red-500', 'bg-red-500', 'bg-amber-500', 'bg-emerald-500', 'bg-emerald-600'][s];
-  }
+  // #endregion
 }

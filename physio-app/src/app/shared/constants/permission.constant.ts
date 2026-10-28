@@ -187,6 +187,9 @@ export const Permissions = {
         SequenceTrackerCreate: "admin:sequence-tracker:create",
         SequenceTrackerUpdate: "admin:sequence-tracker:update",
         SequenceTrackerDelete: "admin:sequence-tracker:delete",
+        InviteCreate: "admin:invite:create",
+        InviteRead: "admin:invite:read",
+        InviteRevoke: "admin:invite:revoke",
     },
     Iam: {
         UserRead: "iam:user:read",
@@ -281,6 +284,11 @@ export const Permissions = {
         InsuranceClaimCreate: "finance:insurance-claim:create",
         InsuranceClaimUpdate: "finance:insurance-claim:update",
         InsuranceClaimProcess: "finance:insurance-claim:process",
+    },
+    Subscription: {
+        /** A tenant administrator viewing and changing the tenant's own plan (Settings > Billing). */
+        OwnRead: "subscription:own:read",
+        OwnManage: "subscription:own:manage",
     },
     Portal: {
         ReviewRead: "portal:review:read",

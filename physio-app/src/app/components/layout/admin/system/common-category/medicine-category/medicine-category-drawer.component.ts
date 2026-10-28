@@ -1,289 +1,126 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize, firstValueFrom } from "rxjs";
+import { Component, Input, OnChanges, SimpleChanges, inject } from "@angular/core";
+import { FormBuilder, Validators } from "@angular/forms";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { MedicineCategoryService } from "../../../../../../services/admin/medicine-category.service";
-import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../../../services/common/toast.service";
-import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { MedicineCategory } from "../../../../../../shared/types/clinical.types";
-import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
-import { DrawerComponent } from "../../../../../drawer/drawer.component";
 import { BooSelectComponent } from "../../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";
+import { CategoryDrawerBase } from "../shared/category-drawer.base";
+import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-shell.component";
 
+/** Create / edit a medicine category (POST /medicine-categories, PATCH /medicine-categories/{id}). The code is assigned by the server. */
 @Component({
     selector: 'common-category-medicine-category-drawer',
     standalone: true,
     imports: [
         SharedModule,
-        DrawerComponent,
+        CommonCategoryDrawerShellComponent,
         BooInputComponent,
-
         BooTextareaComponent,
-        BooButtonAdminComponent,
-        BooSelectComponent,
-        BooCheckboxComponent
+        BooCheckboxComponent,
+        BooSelectComponent
     ],
     template: `
-        <drawer
+        <common-category-drawer-shell
+            [form]="form"
             [isOpen]="isOpen"
-            [isShowDialog]="true"
-            (close)="onClose()"
+            [title]="isEdit ? 'Edit medicine category' : 'New medicine category'"
+            subtitle="Where the category sits in the formulary and how its medicines are dispensed."
+            [isEdit]="isEdit"
+            [canDelete]="canDelete"
+            [loading]="loading"
+            [loadFailed]="loadFailed"
+            [saving]="saving"
+            (save)="save()"
+            (cancel)="requestClose()"
+            (discard)="discard()"
+            (delete)="onDelete()"
+            (retry)="loadDetail()"
         >
-            <div class="flex flex-col h-full bg-surface relative">
-                <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
-                    <div>
-                        <h2 class="text-xl font-bold text-primary leading-none mb-1">
-                            {{ currentId ? 'Edit Category' : 'New Category' }}
-                        </h2>
-                        <p class="text-sm text-secondary m-0">Configure category details and regulations</p>
+            <ng-container [formGroup]="form">
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Category</h3>
+                    <div class="flex flex-col gap-4">
+                        <boo-input label="Category name" [required]="true" formControlName="name" [maxlength]="150" placeholder="e.g. Antibiotics" />
+                        <boo-select label="Parent category" formControlName="parentCategoryId" [options]="parentChoices" />
                     </div>
-                    <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <physio-icon name="x" [size]="20"></physio-icon>
-                    </button>
-                </div>
+                </section>
 
-                <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
-                    <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
-                    </div>
-                    
-                    <div class="p-6">
-                        <div class="space-y-4">
-                            <boo-input label="Category Name" [required]="true" formControlName="name" placeholder="Ex: Antibiotics"></boo-input>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Parent Category</label>
-                                <boo-select 
-                                    label="Select Parent (Optional)"
-                                    formControlName="parentCategoryId"
-                                    [options]="[
-                                        { label: 'Root Level', value: null }
-                                        ]"
-                                ></boo-select>
-                            </div>
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Dispensing rules</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="requiresPrescription" label="Prescription required" />
+                        </div>
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="isControlled" label="Controlled substance" />
                         </div>
                     </div>
+                </section>
 
-                    <div class="h-px bg-gray-100 mx-6"></div>
-
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Regulations</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div 
-                                class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('isControlled')?.value, 'border-gray-200': !form.get('isControlled')?.value}"
-                                (click)="toggleCheck('isControlled')"
-                            >
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center shrink-0">
-                                        <physio-icon name="triangle-alert" [size]="18" class="text-red-600"></physio-icon>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Controlled</span>
-                                </div>
-                                <boo-checkbox formControlName="isControlled"></boo-checkbox>
-                            </div>
-
-                            <div 
-                                class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('requiresPrescription')?.value, 'border-gray-200': !form.get('requiresPrescription')?.value}"
-                                (click)="toggleCheck('requiresPrescription')"
-                            >
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-primarySoft flex items-center justify-center shrink-0">
-                                        <physio-icon name="file-text" [size]="18" class="text-primary"></physio-icon>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Rx Required</span>
-                                </div>
-                                <boo-checkbox formControlName="requiresPrescription"></boo-checkbox>
-                            </div>
-                        </div>
+                <section class="px-6 py-5">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Details</h3>
+                    <div class="flex flex-col gap-4">
+                        <boo-textarea label="Storage conditions" formControlName="storageConditions" placeholder="e.g. Store below 25°C, away from direct sunlight" />
+                        <boo-textarea label="Description" formControlName="description" />
                     </div>
-
-                    <div class="h-px bg-gray-100 mx-6"></div>
-
-                    <div class="p-6 pb-10">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Additional Info</h3>    
-                        <div class="space-y-4">
-                            <boo-textarea label="Storage Conditions" formControlName="storageConditions" placeholder="Ex: Store below 25°C, protect from direct sunlight..."></boo-textarea>
-                            <boo-textarea label="Description" formControlName="description" placeholder="Enter category description..."></boo-textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0 shadow-top-md">
-                    <div>
-                        <boo-button-admin *ngIf="currentId" (click)="onDelete()" background="transparent" textColor="#EF4444" padding="6px 8px" [fontSize]="14" fontWeight="500" [gap]="6" buttonClass="group">
-                            <physio-icon 
-                                name="trash" 
-                                [size]="16"
-                                [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
-                            ></physio-icon> 
-                            <span>Delete</span>
-                        </boo-button-admin>
-                    </div>
-                    <div class="flex gap-3">
-                        <boo-button-admin
-                            buttonClass="hover:!bg-gray-200"
-                            background="transparent"
-                            (click)="onClose()"
-                            [disabled]="loadingSrv.isLoading('search-by-id')"
-                        >
-                            Cancel
-                        </boo-button-admin>
-                        <boo-button-admin
-                            textColor="white"
-                            (click)="onSave()"
-                            [disabled]="loadingSrv.isLoading('search-by-id') || loadingSrv.isLoading('create') || loadingSrv.isLoading('update')"
-                            [loading]="loadingSrv.isLoading('update')"
-                        >
-                            Save Changes
-                        </boo-button-admin>
-                    </div>
-                </div>
-            </div>
-        </drawer>
+                </section>
+            </ng-container>
+        </common-category-drawer-shell>
     `
 })
+export class CommonCategoryMedicineCategoryDrawerComponent extends CategoryDrawerBase<MedicineCategory> implements OnChanges {
+    /** Every category, from the list page; the one being edited is left out. */
+    @Input() parentOptions: { label: string; value: string }[] = [];
 
-export class CommonCategoryMedicineCategoryDrawerComponent implements OnChanges {
-    // #region Inputs, Outputs, Properties
-    @Input() isOpen = false;
-    @Input() currentId: string | null = null;
-    @Output() close = new EventEmitter<void>();
-    @Output() saveSuccess = new EventEmitter<MedicineCategory>();
-    @Output() delete = new EventEmitter<string>();
-    @ViewChild('scrollContainer') scrollContainer!: ElementRef;
-    form: FormGroup;
-    // #endregion
+    protected override readonly noun = 'medicine category';
+    protected override readonly service = inject(MedicineCategoryService);
 
-    // #region Init (Lifecycle + Setup)
-    constructor(
-        private fb: FormBuilder,
-        private toastSrv: ToastService,
-        private medicineCategorySrv: MedicineCategoryService,
-        protected loadingSrv: LocalLoadingService
-    ) {
-        this.form = this.initForm();
-    }
+    parentChoices: { label: string; value: string | null }[] = [{ label: 'None (top level)', value: null }];
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (!this.isOpen) return;
+    override readonly form = inject(FormBuilder).group({
+        name: ['', [Validators.required, Validators.maxLength(150), Validators.pattern(/\S/)]],
+        description: [null as string | null],
+        parentCategoryId: [null as string | null],
+        isControlled: [false],
+        requiresPrescription: [false],
+        storageConditions: [null as string | null]
+    });
 
-        if (changes['currentId'] && this.currentId) {
-            this.loadDetail(this.currentId);
-        } else if (!this.currentId) {
-            this.resetForm();
-        }
-    }
-    // #endregion
-
-    // #region Methods
-    private initForm(): FormGroup {
-        return this.fb.group({
-            name: ['', [Validators.required]],
-            description: [null],
-            parentCategoryId: [null],
-            isControlled: [false],
-            requiresPrescription: [false],
-            storageConditions: [null]
-        });
-    }
-
-    loadDetail(id: string) {
-        this.form.disable();
-
-        this.medicineCategorySrv.search_by_id(id)
-            .pipe(
-                finalize(() => this.form.enable())
-            )
-            .subscribe(_res => {
-                if (_res.success) {
-                    this.form.patchValue({
-                        name: _res.data?.name,
-                        description: _res.data?.description,
-                        parentCategoryId: _res.data?.parentCategoryId,
-                        isControlled: _res.data?.isControlled ?? false,
-                        requiresPrescription: _res.data?.requiresPrescription ?? false,
-                        storageConditions: _res.data?.storageConditions
-                    })
-                }
-            })
-    }
-
-    toggleCheck(controlName: string) {
-        const currentValue = this.form.get(controlName)?.value;
-
-        this.form.patchValue({
-            [controlName]: !currentValue
-        });
-        this.form.markAsDirty();
-    }
-
-    onIconUploaded(data: { url: string; publicId: string }) {
-        this.form.patchValue({
-            iconUrl: data.url,
-            iconPublicId: data.publicId
-        });
-        this.form.markAsDirty();
-    }
-
-    async onSave() {
-        if (this.form.invalid) {
-            this.toastSrv.error('Please check required fields');
-            this.form.markAllAsTouched();
-            return;
-        }
-
-        const formData = { ...this.form.getRawValue() }
-
-        try {
-            let id: string;
-
-            if (this.currentId) {
-                await firstValueFrom(this.medicineCategorySrv.update(this.currentId, formData));
-                id = this.currentId;
-            } else {
-                const createRes = await firstValueFrom(this.medicineCategorySrv.create(formData));
-                if (!createRes.success || !createRes.data) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
-                id = createRes.data;
-            }
-
-            const response = await firstValueFrom(this.medicineCategorySrv.search_by_id(id));
-            if (response.success && response.data) {
-                this.saveSuccess.emit(response.data);
-            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (err) {
-            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            console.error(err);
+    override ngOnChanges(changes: SimpleChanges): void {
+        super.ngOnChanges(changes);
+        if (changes['parentOptions'] || changes['currentId']) {
+            this.parentChoices = [
+                { label: 'None (top level)', value: null },
+                ...this.parentOptions.filter(o => o.value !== this.currentId)
+            ];
         }
     }
 
-    resetForm() {
-        this.form.reset({
-            name: '',
-            description: null,
-            parentCategoryId: null,
-            isControlled: false,
-            requiresPrescription: false,
-            storageConditions: null
-        });
+    protected override defaults() {
+        return { name: '', description: null, parentCategoryId: null, isControlled: false, requiresPrescription: false, storageConditions: null };
     }
 
-    onClose() {
-        if (this.scrollContainer) {
-            this.scrollContainer.nativeElement.scrollTop = 0;
-        }
-
-        this.close.emit();
+    protected override toFormValue(item: MedicineCategory) {
+        return {
+            name: item.name,
+            description: item.description,
+            parentCategoryId: item.parentCategoryId ?? null,
+            isControlled: !!item.isControlled,
+            requiresPrescription: !!item.requiresPrescription,
+            storageConditions: item.storageConditions
+        };
     }
 
-    onDelete() {
-        if (this.currentId) this.delete.emit(this.currentId);
+    protected override toPayload(raw: Record<string, any>) {
+        return {
+            name: this.text(raw['name']),
+            description: this.text(raw['description']),
+            parentCategoryId: raw['parentCategoryId'] || null,
+            isControlled: !!raw['isControlled'],
+            requiresPrescription: !!raw['requiresPrescription'],
+            storageConditions: this.text(raw['storageConditions'])
+        };
     }
 }

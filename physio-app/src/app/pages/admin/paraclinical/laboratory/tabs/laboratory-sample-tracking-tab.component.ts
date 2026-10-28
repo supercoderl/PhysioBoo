@@ -45,7 +45,7 @@ type ActionKind = 'collect' | 'recollect' | 'reject' | 'result';
 
     <ng-container *ngIf="!isLoading() && !error()">
       <div class="flex flex-wrap items-end gap-3 mb-4">
-        <boo-search-field class="w-full md:w-80" label="Search specimens" placeholder="Barcode, test, patient or order #"
+        <boo-search-field size="middle" class="w-full md:w-80" label="Search specimens" placeholder="Barcode, test, patient or order #"
           [(ngModel)]="search" (ngModelChange)="applyFilters()" (clear)="search = ''; applyFilters()" />
         <boo-select class="w-52" label="Collection" [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()" [options]="statusOptions" />
         <button *ngIf="hasFilters()" boo-button variant="ghost" size="sm" type="button" (click)="clearFilters()">Clear filters</button>

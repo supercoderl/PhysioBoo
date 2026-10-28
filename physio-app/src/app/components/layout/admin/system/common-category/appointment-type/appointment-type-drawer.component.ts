@@ -1,346 +1,148 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize, firstValueFrom } from "rxjs";
+import { Component, inject } from "@angular/core";
+import { FormBuilder, Validators } from "@angular/forms";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { AppointmentTypeService } from "../../../../../../services/admin/appointment-type.service";
-import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../../../services/common/toast.service";
-import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { AppointmentType } from "../../../../../../shared/types/operation.types";
-import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
-import { DrawerComponent } from "../../../../../drawer/drawer.component";
 import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";
-import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-input.component";
+import { CategoryDrawerBase } from "../shared/category-drawer.base";
+import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-shell.component";
 
+/** Create / edit an appointment type (POST /appointment-types, PATCH /appointment-types/{id}). */
 @Component({
     selector: 'common-category-appointment-type-drawer',
     standalone: true,
     imports: [
         SharedModule,
-        DrawerComponent,
+        CommonCategoryDrawerShellComponent,
         BooInputComponent,
-
         BooTextareaComponent,
-        BooButtonAdminComponent,
-        BooCheckboxComponent,
-        BooDevJsonFillerComponent
+        BooCheckboxComponent
     ],
     template: `
-        <drawer
+        <common-category-drawer-shell
+            [form]="form"
             [isOpen]="isOpen"
-            [isShowDialog]="true"
-            (close)="onClose()"
+            [title]="isEdit ? 'Edit appointment type' : 'New appointment type'"
+            subtitle="The slot the scheduler books and what it costs."
+            [isEdit]="isEdit"
+            [canDelete]="canDelete"
+            [loading]="loading"
+            [loadFailed]="loadFailed"
+            [saving]="saving"
+            (save)="save()"
+            (cancel)="requestClose()"
+            (discard)="discard()"
+            (delete)="onDelete()"
+            (retry)="loadDetail()"
         >
-            <div class="flex flex-col h-full bg-surface relative">
-                <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
-                    <div>
-                        <h2 class="text-xl font-bold text-primary leading-none mb-1">
-                            {{ currentId ? 'Edit Appointment Type' : 'New Appointment Type' }}
-                        </h2>
-                        <p class="text-sm text-secondary m-0">Configure appointment type details and settings</p>
-                    </div>
-                    <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <physio-icon name="x" [size]="20"></physio-icon>
-                    </button>
-                </div>
-
-                <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
-                    <boo-json-editor [targetForms]="form"></boo-json-editor>
-                    
-                    <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
-                    </div>
-                    
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Basic Information</h3>
-                        <div class="space-y-4">
-                            <div class="flex gap-4">
-                                <div class="flex-1">
-                                    <boo-input label="Type Name" [required]="true" formControlName="name" placeholder="Ex: General Consultation"></boo-input>
-                                </div>
-                                <div class="flex-1">
-                                    <boo-input label="Color Code" formControlName="colorCode" placeholder="Ex: #FF5733"></boo-input>
-                                </div>
-                            </div>
+            <ng-container [formGroup]="form">
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Basic information</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-[1fr_10rem] gap-4">
+                        <boo-input label="Name" [required]="true" formControlName="name" [maxlength]="100" placeholder="e.g. General consultation" />
+                        <div class="flex items-center gap-2">
+                            <span class="flex-none w-9 h-9 rounded-lg border border-borderGray" [style.background-color]="form.value.colorCode || 'transparent'" aria-hidden="true"></span>
+                            <boo-input class="flex-1 min-w-0" label="Calendar color" formControlName="colorCode" [maxlength]="9" placeholder="#FB7185" />
                         </div>
                     </div>
+                    <p *ngIf="form.controls['colorCode'].touched && form.controls['colorCode'].hasError('pattern')" class="m-0 mt-1 text-xs text-danger" role="alert">Use a hex color such as #FB7185.</p>
+                </section>
 
-                    <div class="h-px bg-gray-100 mx-6"></div>
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Scheduling and fee</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <boo-input type="number" label="Slot length (min)" [required]="true" formControlName="defaultDuration" placeholder="30" />
+                        <boo-input type="number" label="Buffer after (min)" formControlName="bufferTime" placeholder="0" />
+                        <boo-input type="number" label="Consultation fee (USD)" formControlName="consultationFee" placeholder="0.00" />
+                    </div>
+                </section>
 
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Time & Pricing</h3>
-                        <div class="space-y-4">
-                            <div class="flex gap-4">
-                                <div class="flex-1">
-                                    <boo-input type="number" label="Duration (Mins)" [required]="true" formControlName="defaultDuration" placeholder="30"></boo-input>
-                                </div>
-                                <div class="flex-1">
-                                    <boo-input type="number" label="Buffer Time (Mins)" formControlName="bufferTime" placeholder="15"></boo-input>
-                                </div>
-                            </div>
-                            <div>
-                                <boo-input type="number" label="Consultation Fee ($)" formControlName="consultationFee" placeholder="150.00"></boo-input>
-                            </div>
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Booking rules</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="isEmergency" label="Emergency" />
+                        </div>
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="isFollowUp" label="Follow-up visit" />
+                        </div>
+                        <div class="sm:col-span-2 rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="requiresPreparation" label="Patient preparation required" />
                         </div>
                     </div>
-
-                    <div class="h-px bg-gray-100 mx-6"></div>
-
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Settings</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            
-                            <div 
-                                class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-red-400 hover:shadow-sm"
-                                [ngClass]="{'border-red-500 bg-red-50/50': form.get('isEmergency')?.value, 'border-gray-200': !form.get('isEmergency')?.value}"
-                                (click)="toggleCheck('isEmergency')"
-                            >
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                                        <physio-icon name="triangle-alert" [size]="16" class="text-[#ef4444]"></physio-icon>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Emergency</span>
-                                </div>
-                                <boo-checkbox formControlName="isEmergency"></boo-checkbox>
-                            </div>
-
-                            <div 
-                                class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('isFollowUp')?.value, 'border-gray-200': !form.get('isFollowUp')?.value}"
-                                (click)="toggleCheck('isFollowUp')"
-                            >
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-primarySoft flex items-center justify-center shrink-0">
-                                        <physio-icon name="refresh" [size]="16" class="text-primary"></physio-icon>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Follow Up</span>
-                                </div>
-                                <boo-checkbox formControlName="isFollowUp"></boo-checkbox>
-                            </div>
-
-                            <div 
-                                class="col-span-2 border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-orange-400 hover:shadow-sm"
-                                [ngClass]="{'border-orange-500 bg-orange-50/50': form.get('requiresPreparation')?.value, 'border-gray-200': !form.get('requiresPreparation')?.value}"
-                                (click)="toggleCheck('requiresPreparation')"
-                            >
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
-                                        <physio-icon name="clipboard" [size]="16" class="text-[#f97316]"></physio-icon>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Requires Preparation before Appointment</span>
-                                </div>
-                                <boo-checkbox formControlName="requiresPreparation"></boo-checkbox>
-                            </div>
-                        </div>
+                    <div *ngIf="form.value.requiresPreparation" class="mt-4">
+                        <boo-textarea label="Preparation instructions" formControlName="preparationInstructions" placeholder="e.g. Fast for 8 hours before the visit" />
                     </div>
+                </section>
 
-                    <div class="h-px bg-gray-100 mx-6"></div>
-
-                    <div class="p-6 pb-10">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Details & Instructions</h3>    
-                        <div class="space-y-4">
-                            <div *ngIf="form.get('requiresPreparation')?.value" class="animate-fade-in-up">
-                                <boo-textarea 
-                                    label="Preparation Instructions" 
-                                    formControlName="preparationInstructions" 
-                                    placeholder="Ex: Fasting for 8 hours, drink plenty of water...">
-                                </boo-textarea>
-                            </div>
-                            <boo-textarea 
-                                label="Description" 
-                                formControlName="description" 
-                                placeholder="Enter general description about this appointment type...">
-                            </boo-textarea>
-                        </div>
+                <section class="px-6 py-5">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Details</h3>
+                    <boo-textarea label="Description" formControlName="description" placeholder="What this visit is for" />
+                    <div *ngIf="isEdit" class="mt-4 rounded-xl border border-borderGray px-3 py-2.5">
+                        <boo-checkbox formControlName="isActive" label="Active" />
+                        <p class="m-0 mt-1 text-xs text-secondary">Clear to mark this appointment type inactive.</p>
                     </div>
-                </div>
-
-                <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0 shadow-top-md">
-                    <div>
-                        <boo-button-admin *ngIf="currentId" (click)="onDelete()" background="transparent" textColor="#EF4444" padding="6px 8px" [fontSize]="14" fontWeight="500" [gap]="6" buttonClass="group">
-                            <physio-icon 
-                                name="trash" 
-                                [size]="16"
-                            [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
-                            ></physio-icon> 
-                            <span>Delete</span>
-                        </boo-button-admin>
-                    </div>
-                    <div class="flex gap-3">
-                        <boo-button-admin
-                            buttonClass="hover:!bg-gray-200"
-                            background="transparent"
-                            (click)="onClose()"
-                            [disabled]="loadingSrv.isLoading('search-by-id')"
-                        >
-                            Cancel
-                        </boo-button-admin>
-                        <boo-button-admin
-                            textColor="white"
-                            (click)="onSave()"
-                            [disabled]="loadingSrv.isLoading('search-by-id') || loadingSrv.isLoading('create') || loadingSrv.isLoading('update')"
-                            [loading]="loadingSrv.isLoading('update')"
-                        >
-                            Save Changes
-                        </boo-button-admin>
-                    </div>
-                </div>
-            </div>
-        </drawer>
+                </section>
+            </ng-container>
+        </common-category-drawer-shell>
     `
 })
+export class CommonCategoryAppointmentTypeDrawerComponent extends CategoryDrawerBase<AppointmentType> {
+    protected override readonly noun = 'appointment type';
+    protected override readonly service = inject(AppointmentTypeService);
 
-export class CommonCategoryAppointmentTypeDrawerComponent implements OnChanges {
-    // #region Inputs, Outputs, Properties
-    @Input() isOpen = false;
-    @Input() currentId: string | null = null;
-    @Output() close = new EventEmitter<void>();
-    @Output() saveSuccess = new EventEmitter<AppointmentType>();
-    @Output() delete = new EventEmitter<string>();
-    @ViewChild('scrollContainer') scrollContainer!: ElementRef;
-    form: FormGroup;
-    // #endregion
+    override readonly form = inject(FormBuilder).group({
+        name: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/\S/)]],
+        description: [null as string | null],
+        defaultDuration: [30 as number | string, [Validators.required, Validators.min(1)]],
+        bufferTime: [0 as number | string, [Validators.min(0)]],
+        consultationFee: [0 as number | string, [Validators.min(0)]],
+        colorCode: ['#FB7185' as string | null, [Validators.pattern(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/)]],
+        isEmergency: [false],
+        requiresPreparation: [false],
+        preparationInstructions: [null as string | null],
+        isFollowUp: [false],
+        isActive: [true]
+    });
 
-    // #region Init (Lifecycle + Setup)
-    constructor(
-        private fb: FormBuilder,
-        private toastSrv: ToastService,
-        private appointmentTypeSrv: AppointmentTypeService,
-        protected loadingSrv: LocalLoadingService
-    ) {
-        this.form = this.initForm();
+    protected override defaults() {
+        return {
+            name: '', description: null, defaultDuration: 30, bufferTime: 0, consultationFee: 0, colorCode: '#FB7185',
+            isEmergency: false, requiresPreparation: false, preparationInstructions: null, isFollowUp: false, isActive: true
+        };
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (!this.isOpen) return;
-
-        if (changes['currentId'] && this.currentId) {
-            this.loadDetail(this.currentId);
-        } else if (!this.currentId) {
-            this.resetForm();
-        }
-    }
-    // #endregion
-
-    // #region Methods
-    private initForm(): FormGroup {
-        return this.fb.group({
-            name: ['', [Validators.required]],
-            description: [null],
-            defaultDuration: [30, [Validators.required]],
-            bufferTime: [0, [Validators.required]],
-            isEmergency: [false],
-            requiresPreparation: [false],
-            preparationInstructions: [null],
-            isFollowUp: [false],
-            consultationFee: [0, [Validators.required]],
-            colorCode: [null]
-        });
+    protected override toFormValue(item: AppointmentType) {
+        return {
+            name: item.name,
+            description: item.description,
+            defaultDuration: item.defaultDuration,
+            bufferTime: item.bufferTime,
+            consultationFee: item.consultationFee,
+            colorCode: item.colorCode,
+            isEmergency: !!item.isEmergency,
+            requiresPreparation: !!item.requiresPreparation,
+            preparationInstructions: item.preparationInstructions,
+            isFollowUp: !!item.isFollowUp,
+            isActive: item.isActive
+        };
     }
 
-    loadDetail(id: string) {
-        this.form.disable();
-
-        this.appointmentTypeSrv.search_by_id(id)
-            .pipe(
-                finalize(() => this.form.enable())
-            )
-            .subscribe(_res => {
-                if (_res.success) {
-                    this.form.patchValue({
-                        name: _res.data?.name,
-                        description: _res.data?.description,
-                        defaultDuration: _res.data?.defaultDuration,
-                        bufferTime: _res.data?.bufferTime,
-                        isEmergency: _res.data?.isEmergency || false,
-                        requiresPreparation: _res.data?.requiresPreparation || false,
-                        preparationInstructions: _res.data?.preparationInstructions,
-                        isFollowUp: _res.data?.isFollowUp || false,
-                        consultationFee: _res.data?.consultationFee,
-                        colorCode: _res.data?.colorCode
-                    })
-                }
-            })
-    }
-
-    toggleCheck(controlName: string) {
-        const currentValue = this.form.get(controlName)?.value;
-
-        this.form.patchValue({
-            [controlName]: !currentValue
-        });
-        this.form.markAsDirty();
-    }
-
-    onIconUploaded(data: { url: string; publicId: string }) {
-        this.form.patchValue({
-            iconUrl: data.url,
-            iconPublicId: data.publicId
-        });
-        this.form.markAsDirty();
-    }
-
-    async onSave() {
-        if (this.form.invalid) {
-            this.toastSrv.error('Please check required fields');
-            this.form.markAllAsTouched();
-            return;
-        }
-
-        const rawValue = this.form.getRawValue();
-        const formData = {
-            ...this.form.getRawValue(),
-            isEmergency: !!rawValue.isEmergency,
-            requiresPreparation: !!rawValue.requiresPreparation,
-            isFollowUp: !!rawValue.isFollowUp
-        }
-
-        try {
-            let id: string;
-            if (this.currentId) {
-                await firstValueFrom(this.appointmentTypeSrv.update(this.currentId, formData));
-                id = this.currentId;
-            } else {
-                const createRes = await firstValueFrom(this.appointmentTypeSrv.create(formData));
-                if (!createRes.success || !createRes.data) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
-                id = createRes.data;
-            }
-
-            const response = await firstValueFrom(this.appointmentTypeSrv.search_by_id(id));
-            if (response.success && response.data) {
-                this.saveSuccess.emit(response.data);
-            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (err) {
-            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            return;
-        }
-    }
-
-    resetForm() {
-        this.form.reset({
-            defaultDuration: 30,
-            bufferTime: 0,
-            consultationFee: 0,
-            colorCode: '#FB7185',
-            isEmergency: false,
-            requiresPreparation: false,
-            isFollowUp: false
-        });
-    }
-
-    onClose() {
-        if (this.scrollContainer) {
-            this.scrollContainer.nativeElement.scrollTop = 0;
-        }
-
-        this.close.emit();
-    }
-
-    onDelete() {
-        if (this.currentId) this.delete.emit(this.currentId);
+    protected override toPayload(raw: Record<string, any>) {
+        return {
+            name: this.text(raw['name']),
+            description: this.text(raw['description']),
+            defaultDuration: this.num(raw['defaultDuration'], 30),
+            bufferTime: this.num(raw['bufferTime']),
+            consultationFee: this.num(raw['consultationFee']),
+            colorCode: this.text(raw['colorCode']),
+            isEmergency: !!raw['isEmergency'],
+            requiresPreparation: !!raw['requiresPreparation'],
+            preparationInstructions: this.text(raw['preparationInstructions']),
+            isFollowUp: !!raw['isFollowUp'],
+            // Update requires it (create ignores it); omitting it used to deactivate the type on every edit.
+            isActive: !!raw['isActive']
+        };
     }
 }

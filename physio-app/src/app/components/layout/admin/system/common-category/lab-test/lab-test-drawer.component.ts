@@ -1,400 +1,238 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize, firstValueFrom, Observable } from "rxjs";
+import { Component, OnChanges, SimpleChanges, inject } from "@angular/core";
+import { FormBuilder, Validators } from "@angular/forms";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { LabTestCategoryService } from "../../../../../../services/admin/lab-test-category.service";
 import { LabTestService } from "../../../../../../services/admin/lab-test.service";
-import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../../../services/common/toast.service";
-import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../../shared/shared-imports";
-import { Lookup } from "../../../../../../shared/types/common";
 import { LabTest } from "../../../../../../shared/types/laboratory-imaging.types";
-import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
-import { DrawerComponent } from "../../../../../drawer/drawer.component";
 import { BooSelectComponent } from "../../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";
-import { BooDevJsonFillerComponent } from "../../../../dev/json-input/boo-json-input.component";
+import { CategoryDrawerBase } from "../shared/category-drawer.base";
+import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-shell.component";
 
+/** Create / edit a lab test (POST /lab-tests, PATCH /lab-tests/{id}). The test code is assigned by the server. */
 @Component({
     selector: 'common-category-lab-test-drawer',
     standalone: true,
     imports: [
         SharedModule,
-        DrawerComponent,
+        CommonCategoryDrawerShellComponent,
         BooInputComponent,
-
         BooTextareaComponent,
-        BooButtonAdminComponent,
-        BooSelectComponent,
         BooCheckboxComponent,
-        BooDevJsonFillerComponent
+        BooSelectComponent
     ],
     template: `
-        <drawer
+        <common-category-drawer-shell
+            [form]="form"
             [isOpen]="isOpen"
-            [isShowDialog]="true"
-            (close)="onClose()"
+            [title]="isEdit ? 'Edit lab test' : 'New lab test'"
+            subtitle="What is collected, how it is reported and what it costs."
+            [isEdit]="isEdit"
+            [canDelete]="canDelete"
+            [loading]="loading"
+            [loadFailed]="loadFailed"
+            [saving]="saving"
+            (save)="save()"
+            (cancel)="requestClose()"
+            (discard)="discard()"
+            (delete)="onDelete()"
+            (retry)="loadDetail()"
         >
-            <div class="flex flex-col h-full bg-surface relative">
-                <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
-                    <div>
-                        <h2 class="text-xl font-bold text-primary leading-none mb-1">
-                            {{ currentId ? 'Edit Test' : 'New Test' }}
-                        </h2>
-                        <p class="text-sm text-secondary m-0">Configure diagnostic test details and requirements</p>
+            <ng-container [formGroup]="form">
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Test</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <boo-input class="sm:col-span-2" label="Test name" [required]="true" formControlName="testName" [maxlength]="200" placeholder="e.g. Complete blood count (CBC)" />
+                        <boo-select class="sm:col-span-2" label="Category" formControlName="categoryId" [options]="categoryOptions" [required]="true" />
+                        <boo-input label="Methodology" formControlName="methodology" [maxlength]="150" placeholder="e.g. Spectrophotometry" />
+                        <boo-input label="Unit of measurement" formControlName="unitOfMeasurement" [maxlength]="50" placeholder="e.g. mg/dL" />
                     </div>
-                    <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <physio-icon name="x" [size]="20"></physio-icon>
-                    </button>
-                </div>
-
-                <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
-                    <boo-json-editor [targetForms]="form"></boo-json-editor>
-                    
-                    <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
+                    <p *ngIf="form.controls['categoryId'].touched && form.controls['categoryId'].invalid" class="m-0 mt-1 text-xs text-danger" role="alert">Choose a category.</p>
+                    <div class="mt-4">
+                        <boo-textarea label="Description" formControlName="description" />
                     </div>
-                    
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Basic Information</h3>
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-2 gap-4">
-                                <boo-input label="Test Name" [required]="true" formControlName="testName" placeholder="Ex: Complete Blood Count (CBC)"></boo-input>
-                                <boo-select 
-                                    label="Category"
-                                    formControlName="categoryId"
-                                    [options]="(labTestCategorySrv.lookup() | async) || []"
-                                ></boo-select>
-                            </div>
+                </section>
 
-                            <div class="grid grid-cols-2 gap-4">
-                                <boo-input label="Sample Type" formControlName="sampleType" placeholder="Ex: Blood, Urine..."></boo-input>
-                                <boo-input label="Sample Volume" formControlName="sampleVolume" placeholder="Ex: 5 ml"></boo-input>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4">
-                                <boo-input label="Unit of Measurement" formControlName="unitOfMeasurement" placeholder="Ex: mg/dL, mmol/L"></boo-input>
-                                <boo-input label="Methodology" formControlName="methodology" placeholder="Ex: Spectrophotometry"></boo-input>
-                            </div>
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Specimen and collection</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <boo-input label="Sample type" formControlName="sampleType" [maxlength]="100" placeholder="e.g. Whole blood" />
+                        <boo-input label="Sample volume" formControlName="sampleVolume" [maxlength]="50" placeholder="e.g. 5 ml" />
+                    </div>
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="preparationRequired" label="Preparation required" />
+                        </div>
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="fastingRequired" label="Fasting required" />
                         </div>
                     </div>
-
-                    <div class="h-px bg-gray-100 mx-6"></div>
-
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Patient Preparation</h3>
-                        
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('preparationRequired')?.value, 'border-gray-200': !form.get('preparationRequired')?.value}"
-                                (click)="toggleCheck('preparationRequired')">
-                                <span class="text-sm font-medium text-gray-700">Preparation Required</span>
-                                <boo-checkbox formControlName="preparationRequired"></boo-checkbox>
-                            </div>
-                            
-                            <div class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('fastingRequired')?.value, 'border-gray-200': !form.get('fastingRequired')?.value}"
-                                (click)="toggleCheck('fastingRequired')">
-                                <span class="text-sm font-medium text-gray-700">Fasting Required</span>
-                                <boo-checkbox formControlName="fastingRequired"></boo-checkbox>
-                            </div>
+                    <div class="mt-4 flex flex-col gap-4">
+                        <div *ngIf="form.value.fastingRequired" class="sm:w-1/2 sm:pr-2">
+                            <boo-input type="number" label="Fasting (hours)" formControlName="fastingHours" placeholder="8" />
                         </div>
+                        <boo-textarea *ngIf="form.value.preparationRequired" label="Patient preparation" formControlName="preparationInstructions" />
+                        <boo-textarea label="Collection instructions" formControlName="collectionInstructions" placeholder="For the staff collecting the sample" />
+                    </div>
+                </section>
 
-                        <div class="space-y-4">
-                            <div *ngIf="form.get('fastingRequired')?.value">
-                                <boo-input type="number" label="Fasting Hours" formControlName="fastingHours" placeholder="Ex: 8"></boo-input>
-                            </div>
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Reference ranges</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <boo-input label="Male" formControlName="normalRangeMale" [maxlength]="100" placeholder="e.g. 4.5–5.5" />
+                        <boo-input label="Female" formControlName="normalRangeFemale" [maxlength]="100" placeholder="e.g. 4.0–5.0" />
+                        <boo-input label="Pediatric" formControlName="normalPediatric" [maxlength]="100" placeholder="e.g. 3.8–4.8" />
+                    </div>
+                </section>
 
-                            <boo-textarea label="Preparation Instructions" formControlName="preparationInstructions" placeholder="Specific instructions for the patient..."></boo-textarea>
-                            <boo-textarea label="Collection Instructions" formControlName="collectionInstructions" placeholder="Instructions for the medical staff collecting the sample..."></boo-textarea>
+                <section class="px-6 py-5">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Ordering, turnaround and price</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <boo-input type="number" label="Price (USD)" formControlName="cost" placeholder="0.00" />
+                        <boo-input type="number" label="Turnaround (hours)" formControlName="reportingTimeHours" placeholder="24" />
+                    </div>
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="isProfile" label="Panel of several tests" />
+                        </div>
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="requiresAppoinment" label="Appointment required" />
+                        </div>
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="isUrgentAvailable" label="Urgent processing" />
+                        </div>
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="isHomeCollectionAvailable" label="Home collection" />
                         </div>
                     </div>
-
-                    <div class="h-px bg-gray-100 mx-6"></div>
-
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Normal Ranges</h3>
-                        <div class="grid grid-cols-3 gap-4">
-                            <boo-input label="Male" formControlName="normalRangeMale" placeholder="Ex: 4.5 - 5.5"></boo-input>
-                            <boo-input label="Female" formControlName="normalRangeFemale" placeholder="Ex: 4.0 - 5.0"></boo-input>
-                            <boo-input label="Pediatric" formControlName="normalPediatric" placeholder="Ex: 3.8 - 4.8"></boo-input>
-                        </div>
+                    <div *ngIf="form.value.isUrgentAvailable" class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <boo-input type="number" label="Urgent price (USD)" formControlName="urgentCost" placeholder="0.00" />
+                        <boo-input type="number" label="Urgent turnaround (hours)" formControlName="urgentReportingTimeHours" placeholder="2" />
                     </div>
-
-                    <div class="h-px bg-gray-100 mx-6"></div>
-
-                    <div class="p-6 pb-10">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Pricing & Logistics</h3>
-                        
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('isProfile')?.value, 'border-gray-200': !form.get('isProfile')?.value}"
-                                (click)="toggleCheck('isProfile')">
-                                <span class="text-sm font-medium text-gray-700">Is Profile (Panel)</span>
-                                <boo-checkbox formControlName="isProfile"></boo-checkbox>
-                            </div>
-
-                            <div class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('requiresAppoinment')?.value, 'border-gray-200': !form.get('requiresAppoinment')?.value}"
-                                (click)="toggleCheck('requiresAppoinment')">
-                                <span class="text-sm font-medium text-gray-700">Requires Appointment</span>
-                                <boo-checkbox formControlName="requiresAppoinment"></boo-checkbox>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <boo-input type="number" label="Standard Cost" formControlName="cost" placeholder="0.00"></boo-input>
-                            <boo-input type="number" label="Reporting Time (Hours)" formControlName="reportingTimeHours" placeholder="Ex: 24"></boo-input>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm mb-3"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('isUrgentAvailable')?.value, 'border-gray-200': !form.get('isUrgentAvailable')?.value}"
-                                (click)="toggleCheck('isUrgentAvailable')">
-                                <span class="text-sm font-medium text-gray-700">Urgent Processing Available</span>
-                                <boo-checkbox formControlName="isUrgentAvailable"></boo-checkbox>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 gap-4" *ngIf="form.get('isUrgentAvailable')?.value">
-                                <boo-input type="number" label="Urgent Cost" formControlName="urgentCost" placeholder="0.00"></boo-input>
-                                <boo-input type="number" label="Urgent Reporting (Hours)" formControlName="urgentReportingTimeHours" placeholder="Ex: 2"></boo-input>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm mb-3"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('isHomeCollectionAvailable')?.value, 'border-gray-200': !form.get('isHomeCollectionAvailable')?.value}"
-                                (click)="toggleCheck('isHomeCollectionAvailable')">
-                                <span class="text-sm font-medium text-gray-700">Home Collection Available</span>
-                                <boo-checkbox formControlName="isHomeCollectionAvailable"></boo-checkbox>
-                            </div>
-                            
-                            <div *ngIf="form.get('isHomeCollectionAvailable')?.value">
-                                <boo-input type="number" label="Home Collection Charge" formControlName="homeCollectionCharge" placeholder="0.00"></boo-input>
-                            </div>
-                        </div>
+                    <div *ngIf="form.value.isHomeCollectionAvailable" class="mt-4 sm:w-1/2 sm:pr-2">
+                        <boo-input type="number" label="Home collection charge (USD)" formControlName="homeCollectionCharge" placeholder="0.00" />
                     </div>
-                </div>
-
-                <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0 shadow-top-md">
-                    <div>
-                        <boo-button-admin *ngIf="currentId" (click)="onDelete()" background="transparent" textColor="#EF4444" padding="6px 8px" [fontSize]="14" fontWeight="500" [gap]="6" buttonClass="group">
-                            <physio-icon 
-                                name="trash" 
-                                [size]="16"
-                                [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
-                            ></physio-icon> 
-                            <span>Delete</span>
-                        </boo-button-admin>
+                    <div *ngIf="isEdit" class="mt-4 rounded-xl border border-borderGray px-3 py-2.5">
+                        <boo-checkbox formControlName="isActive" label="Active" />
+                        <p class="m-0 mt-1 text-xs text-secondary">Clear to mark this test inactive.</p>
                     </div>
-                    <div class="flex gap-3">
-                        <boo-button-admin
-                            buttonClass="hover:!bg-gray-200"
-                            background="transparent"
-                            (click)="onClose()"
-                            [disabled]="loadingSrv.isLoading('search-by-id')"
-                        >
-                            Cancel
-                        </boo-button-admin>
-                        <boo-button-admin
-                            textColor="white"
-                            (click)="onSave()"
-                            [disabled]="loadingSrv.isLoading('search-by-id') || loadingSrv.isLoading('create') || loadingSrv.isLoading('update')"
-                            [loading]="loadingSrv.isLoading('update')"
-                        >
-                            Save Changes
-                        </boo-button-admin>
-                    </div>
-                </div>
-            </div>
-        </drawer>
+                </section>
+            </ng-container>
+        </common-category-drawer-shell>
     `
 })
+export class CommonCategoryLabTestDrawerComponent extends CategoryDrawerBase<LabTest> implements OnChanges {
+    protected override readonly noun = 'lab test';
+    protected override readonly service = inject(LabTestService);
+    private readonly categorySrv = inject(LabTestCategoryService);
 
-export class CommonCategoryLabTestDrawerComponent implements OnChanges {
-    // #region Inputs, Outputs, Properties
-    @Input() isOpen = false;
-    @Input() currentId: string | null = null;
-    @Output() close = new EventEmitter<void>();
-    @Output() saveSuccess = new EventEmitter<LabTest>();
-    @Output() delete = new EventEmitter<string>();
-    @ViewChild('scrollContainer') scrollContainer!: ElementRef;
-    form: FormGroup;
-    categories$?: Observable<Lookup[]>;
-    // #endregion
+    categoryOptions: { label: string; value: string }[] = [];
 
-    // #region Init (Lifecycle + Setup)
-    constructor(
-        private fb: FormBuilder,
-        private toastSrv: ToastService,
-        private labTestSrv: LabTestService,
-        protected labTestCategorySrv: LabTestCategoryService,
-        protected loadingSrv: LocalLoadingService
-    ) {
-        this.form = this.initForm();
-    }
+    override readonly form = inject(FormBuilder).group({
+        testName: ['', [Validators.required, Validators.maxLength(200), Validators.pattern(/\S/)]],
+        categoryId: [null as string | null, [Validators.required]],
+        description: [null as string | null],
+        sampleType: [null as string | null],
+        sampleVolume: [null as string | null],
+        unitOfMeasurement: [null as string | null],
+        methodology: [null as string | null],
+        preparationRequired: [false],
+        preparationInstructions: [null as string | null],
+        fastingRequired: [false],
+        fastingHours: [0 as number | string, [Validators.min(0)]],
+        collectionInstructions: [null as string | null],
+        normalRangeMale: [null as string | null],
+        normalRangeFemale: [null as string | null],
+        normalPediatric: [null as string | null],
+        cost: [0 as number | string, [Validators.min(0)]],
+        reportingTimeHours: [0 as number | string, [Validators.min(0)]],
+        isProfile: [false],
+        requiresAppoinment: [false],
+        isUrgentAvailable: [false],
+        urgentCost: [0 as number | string, [Validators.min(0)]],
+        urgentReportingTimeHours: [0 as number | string, [Validators.min(0)]],
+        isHomeCollectionAvailable: [false],
+        homeCollectionCharge: [0 as number | string, [Validators.min(0)]],
+        isActive: [true]
+    });
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (!this.isOpen) return;
-
-        if (changes['currentId'] && this.currentId) {
-            this.loadDetail(this.currentId);
-        } else if (!this.currentId) {
-            this.resetForm();
-        }
-    }
-    // #endregion
-
-    // #region Methods
-    private initForm(): FormGroup {
-        return this.fb.group({
-            testName: ['', [Validators.required]],
-            categoryId: [null, [Validators.required]],
-            description: [null],
-            sampleType: [null],
-            sampleVolume: [null],
-            unitOfMeasurement: [null],
-            methodology: [null],
-            preparationRequired: [false],
-            preparationInstructions: [null],
-            fastingRequired: [false],
-            fastingHours: [0],
-            collectionInstructions: [null],
-            normalRangeMale: [null],
-            normalRangeFemale: [null],
-            normalPediatric: [null],
-            cost: [0],
-            reportingTimeHours: [0],
-            isProfile: [false],
-            requiresAppoinment: [false],
-            isUrgentAvailable: [false],
-            urgentCost: [0],
-            urgentReportingTimeHours: [0],
-            isHomeCollectionAvailable: [false],
-            homeCollectionCharge: [0]
-        });
-    }
-
-    loadDetail(id: string) {
-        this.form.disable();
-
-        this.labTestSrv.search_by_id(id)
-            .pipe(
-                finalize(() => this.form.enable())
-            )
-            .subscribe(_res => {
-                if (_res.success) {
-                    this.form.patchValue({
-                        testName: _res.data?.testName,
-                        categoryId: _res.data?.categoryId,
-                        description: _res.data?.description,
-                        sampleType: _res.data?.sampleType,
-                        sampleVolume: _res.data?.sampleVolume,
-                        unitOfMeasurement: _res.data?.unitOfMeasurement,
-                        methodology: _res.data?.methodology,
-                        preparationRequired: _res.data?.preparationRequired ?? false,
-                        preparationInstructions: _res.data?.preparationInstructions,
-                        fastingRequired: _res.data?.fastingRequired ?? false,
-                        fastingHours: _res.data?.fastingHours ?? 0,
-                        collectionInstructions: _res.data?.collectionInstructions,
-                        normalRangeMale: _res.data?.normalRangeMale,
-                        normalRangeFemale: _res.data?.normalRangeFemale,
-                        normalPediatric: _res.data?.normalPediatric,
-                        cost: _res.data?.cost ?? 0,
-                        reportingTimeHours: _res.data?.reportingTimeHours ?? 0,
-                        isProfile: _res.data?.isProfile ?? false,
-                        requiresAppoinment: _res.data?.requiresAppoinment ?? false,
-                        isUrgentAvailable: _res.data?.isUrgentAvailable ?? false,
-                        urgentCost: _res.data?.urgentCost ?? 0,
-                        urgentReportingTimeHours: _res.data?.urgentReportingTimeHours ?? 0,
-                        isHomeCollectionAvailable: _res.data?.isHomeCollectionAvailable ?? false,
-                        homeCollectionCharge: _res.data?.homeCollectionCharge ?? 0
-                    })
-                }
-            })
-    }
-
-    toggleCheck(controlName: string) {
-        const currentValue = this.form.get(controlName)?.value;
-
-        this.form.patchValue({
-            [controlName]: !currentValue
-        });
-        this.form.markAsDirty();
-    }
-
-    async onSave() {
-        if (this.form.invalid) {
-            this.toastSrv.error('Please check required fields');
-            this.form.markAllAsTouched();
-            return;
-        }
-
-        const formData = { ...this.form.getRawValue() }
-
-        try {
-            let id: string;
-            if (this.currentId) {
-                await firstValueFrom(this.labTestSrv.update(this.currentId, formData));
-                id = this.currentId;
-            } else {
-                const createRes = await firstValueFrom(this.labTestSrv.create(formData));
-                if (!createRes.success || !createRes.data) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
-                id = createRes.data;
-            }
-
-            const response = await firstValueFrom(this.labTestSrv.search_by_id(id));
-            if (response.success && response.data) {
-                this.saveSuccess.emit(response.data);
-            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (err) {
-            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            console.error(err);
+    override ngOnChanges(changes: SimpleChanges): void {
+        super.ngOnChanges(changes);
+        // Categories can change on their own page; read the (cached) lookup each time the drawer opens.
+        if (changes['isOpen'] && this.isOpen) {
+            this.categorySrv.lookup().subscribe(options => this.categoryOptions = options);
         }
     }
 
-    resetForm() {
-        this.form.reset({
-            testName: '',
-            categoryId: null,
-            description: null,
-            sampleType: null,
-            sampleVolume: null,
-            unitOfMeasurement: null,
-            methodology: null,
-            preparationRequired: false,
-            preparationInstructions: null,
-            fastingRequired: false,
-            fastingHours: 0,
-            collectionInstructions: null,
-            normalRangeMale: null,
-            normalRangeFemale: null,
-            normalPediatric: null,
-            cost: 0,
-            reportingTimeHours: 0,
-            isProfile: false,
-            requiresAppoinment: false,
-            isUrgentAvailable: false,
-            urgentCost: 0,
-            urgentReportingTimeHours: 0,
-            isHomeCollectionAvailable: false,
-            homeCollectionCharge: 0
-        });
+    protected override defaults() {
+        return {
+            testName: '', categoryId: null, description: null, sampleType: null, sampleVolume: null, unitOfMeasurement: null,
+            methodology: null, preparationRequired: false, preparationInstructions: null, fastingRequired: false, fastingHours: 0,
+            collectionInstructions: null, normalRangeMale: null, normalRangeFemale: null, normalPediatric: null, cost: 0,
+            reportingTimeHours: 0, isProfile: false, requiresAppoinment: false, isUrgentAvailable: false, urgentCost: 0,
+            urgentReportingTimeHours: 0, isHomeCollectionAvailable: false, homeCollectionCharge: 0, isActive: true
+        };
     }
 
-    onClose() {
-        if (this.scrollContainer) {
-            this.scrollContainer.nativeElement.scrollTop = 0;
-        }
-
-        this.close.emit();
+    protected override toFormValue(item: LabTest) {
+        return {
+            testName: item.testName,
+            categoryId: item.categoryId,
+            description: item.description,
+            sampleType: item.sampleType,
+            sampleVolume: item.sampleVolume,
+            unitOfMeasurement: item.unitOfMeasurement,
+            methodology: item.methodology,
+            preparationRequired: !!item.preparationRequired,
+            preparationInstructions: item.preparationInstructions,
+            fastingRequired: !!item.fastingRequired,
+            fastingHours: item.fastingHours ?? 0,
+            collectionInstructions: item.collectionInstructions,
+            normalRangeMale: item.normalRangeMale,
+            normalRangeFemale: item.normalRangeFemale,
+            normalPediatric: item.normalPediatric,
+            cost: item.cost ?? 0,
+            reportingTimeHours: item.reportingTimeHours ?? 0,
+            isProfile: !!item.isProfile,
+            requiresAppoinment: !!item.requiresAppoinment,
+            isUrgentAvailable: !!item.isUrgentAvailable,
+            urgentCost: item.urgentCost ?? 0,
+            urgentReportingTimeHours: item.urgentReportingTimeHours ?? 0,
+            isHomeCollectionAvailable: !!item.isHomeCollectionAvailable,
+            homeCollectionCharge: item.homeCollectionCharge ?? 0,
+            isActive: item.isActive
+        };
     }
 
-    onDelete() {
-        if (this.currentId) this.delete.emit(this.currentId);
+    protected override toPayload(raw: Record<string, any>) {
+        return {
+            testName: this.text(raw['testName']),
+            categoryId: raw['categoryId'],
+            description: this.text(raw['description']),
+            sampleType: this.text(raw['sampleType']),
+            sampleVolume: this.text(raw['sampleVolume']),
+            collectionInstructions: this.text(raw['collectionInstructions']),
+            preparationRequired: !!raw['preparationRequired'],
+            preparationInstructions: this.text(raw['preparationInstructions']),
+            fastingRequired: !!raw['fastingRequired'],
+            fastingHours: this.num(raw['fastingHours']),
+            normalRangeMale: this.text(raw['normalRangeMale']),
+            normalRangeFemale: this.text(raw['normalRangeFemale']),
+            normalPediatric: this.text(raw['normalPediatric']),
+            unitOfMeasurement: this.text(raw['unitOfMeasurement']),
+            methodology: this.text(raw['methodology']),
+            reportingTimeHours: this.num(raw['reportingTimeHours']),
+            cost: this.num(raw['cost']),
+            isProfile: !!raw['isProfile'],
+            isUrgentAvailable: !!raw['isUrgentAvailable'],
+            urgentCost: this.num(raw['urgentCost']),
+            urgentReportingTimeHours: this.num(raw['urgentReportingTimeHours']),
+            isHomeCollectionAvailable: !!raw['isHomeCollectionAvailable'],
+            homeCollectionCharge: this.num(raw['homeCollectionCharge']),
+            requiresAppoinment: !!raw['requiresAppoinment'],
+            // Update requires it (create ignores it); omitting it used to deactivate the test on every edit.
+            isActive: !!raw['isActive']
+        };
     }
 }

@@ -1,82 +1,136 @@
-<div class="py-4 flex flex-col flex-1 min-h-0 overflow-y-auto"
-  style="border-top-left-radius: 12px"
-  custom-scrollbar>
-  <div class="container">
-    <div class="flex-auto w-full">
-
-      <header class="flex flex-col mb-6">
-        <div class="flex items-start justify-between mt-2 gap-4">
-          <div>
-            <p class="tracking-tight font-bold leading-none text-[22px] m-0">Account</p>
-            <p class="text-sm text-gray-500 mt-1">Your public profile and private personal information.</p>
-          </div>
-          <ng-container *ngIf="(userInfo$ | async) as u">
-            <div class="flex items-center gap-2 shrink-0" *ngIf="u?.email">
-              <span class="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded inline-flex items-center gap-1"
-                *ngIf="u?.isVerified">
-                <physio-icon name="badge-check" class="w-3 h-3" />
-                Verified
-              </span>
-              <span class="text-[10px] font-semibold uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded inline-flex items-center gap-1"
-                *ngIf="!u?.isVerified">
-                <physio-icon name="warning-circle" class="w-3 h-3" />
-                Unverified
-              </span>
-            </div>
-          </ng-container>
+<setting-page
+  heading="Account"
+  description="Your personal and contact details. They appear on your profile and on records you create."
+  loadingLabel="Loading your account…"
+  failedTitle="We couldn’t load your account"
+  [loading]="loading()"
+  [loadFailed]="loadFailed()"
+  [dirty]="form.dirty"
+  [saving]="saving()"
+  (save)="onSave()"
+  (discard)="onDiscard()"
+  (retry)="load()"
+>
+  <form class="flex flex-col gap-5" [formGroup]="form" (ngSubmit)="onSave()" novalidate>
+    <!-- Read-only identity -->
+    <setting-section heading="Sign-in identity" description="Your email is how you sign in. Ask an administrator of your clinic to change it.">
+      <div class="flex flex-wrap items-center gap-4">
+        <div class="w-16 h-16 rounded-full overflow-hidden bg-primary/10 text-primary flex items-center justify-center text-lg font-semibold shrink-0" aria-hidden="true">
+          <img *ngIf="account()?.avatarUrl; else initialsTpl" [appSrc]="account()?.avatarUrl" alt="" class="w-full h-full object-cover" />
+          <ng-template #initialsTpl>{{ initials }}</ng-template>
         </div>
-      </header>
-
-      <form class="flex flex-col gap-6" (ngSubmit)="onSave()">
-
-        <section class="bg-surface rounded-lg border border-gray-200 p-5">
-          <admin-account-profile [userInfo]="(userInfo$ | async)" [form]="form" />
-        </section>
-
-        <section class="bg-surface rounded-lg border border-gray-200 p-5">
-          <admin-account-contact [form]="form" />
-        </section>
-
-        <section class="bg-surface rounded-lg border border-gray-200 p-5">
-          <admin-account-emergency [form]="form" />
-        </section>
-
-        <!-- <ng-container *ngIf="(userInfo$ | async | defaultUser).doctor != null">
-          <section class="bg-surface rounded-lg border border-gray-200 p-5">
-            <admin-account-doctor />
-          </section>
-        </ng-container> -->
-
-        <!-- <ng-container *ngIf="(userInfo$ | async).patient != null">
-          <section class="bg-surface rounded-lg border border-gray-200 p-5">
-            <admin-account-patient />
-          </section>
-        </ng-container> -->
-
-        <section class="bg-surface rounded-lg border border-red-200 p-5">
-          <div class="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <h2 class="text-base font-semibold text-red-700 mb-1">Danger zone</h2>
-              <p class="text-sm text-gray-500">Permanent actions that affect your account.</p>
-            </div>
-            <p class="text-sm text-gray-600 max-w-sm">
-              To delete your account, ask an administrator of your clinic to remove it.
-            </p>
+        <dl class="m-0 grid gap-x-8 gap-y-2 sm:grid-cols-2 min-w-0 flex-1">
+          <div class="min-w-0">
+            <dt class="text-xs text-secondary">Email</dt>
+            <dd class="m-0 mt-0.5 flex flex-wrap items-center gap-2 text-sm text-regular">
+              <span class="truncate">{{ account()?.email }}</span>
+              <ng-container *ngIf="userInfo() as u">
+                <boo-status-badge *ngIf="u.isVerified" dotted label="Verified" tone="success" />
+                <boo-status-badge *ngIf="!u.isVerified" dotted label="Not verified" tone="warning" />
+              </ng-container>
+            </dd>
           </div>
-        </section>
+          <div class="min-w-0">
+            <dt class="text-xs text-secondary">Name shown to others</dt>
+            <dd class="m-0 mt-0.5 text-sm text-regular truncate">{{ userInfo()?.fullName || '—' }}</dd>
+          </div>
+        </dl>
+      </div>
+    </setting-section>
 
-        <footer class="flex justify-end gap-2">
-          <boo-button-admin (click)="onCancel()" [disabled]="saving()" background="white" textColor="#55434B" [border]="{ width: 1, color: '#EFE3E7' }" padding="8px 16px" [fontSize]="14" fontWeight="500">
-            Discard changes
-          </boo-button-admin>
-          <boo-button-admin (click)="onSave()" [disabled]="saving()" textColor="white" padding="8px 16px" [fontSize]="14" fontWeight="500" [gap]="8">
-            <physio-icon *ngIf="saving()" name="loader-circle" [class]="'w-4 h-4 animate-spin'" />
-            <span>{{ saving() ? 'Saving…' : 'Save changes' }}</span>
-          </boo-button-admin>
-        </footer>
+    <setting-section heading="Personal details" description="Fields marked * are required.">
+      <div class="grid gap-x-4 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="flex flex-col gap-1.5">
+          <label for="acc-first-name" class="text-xs font-medium text-regular">First name <span class="text-danger" aria-hidden="true">*</span></label>
+          <boo-input id="acc-first-name" size="small" label="First name" formControlName="firstName" [maxlength]="100" required />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="acc-middle-name" class="text-xs font-medium text-regular">Middle name</label>
+          <boo-input id="acc-middle-name" size="small" label="Middle name" formControlName="middleName" [maxlength]="100" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="acc-last-name" class="text-xs font-medium text-regular">Last name <span class="text-danger" aria-hidden="true">*</span></label>
+          <boo-input id="acc-last-name" size="small" label="Last name" formControlName="lastName" [maxlength]="100" required />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="acc-dob" class="text-xs font-medium text-regular">Date of birth</label>
+          <boo-datepicker id="acc-dob" size="small" label="DD/MM/YYYY" formControlName="dateOfBirth" disableFuture />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <span class="text-xs font-medium text-regular">Gender</span>
+          <boo-select size="small" label="Select gender" formControlName="gender" [options]="genderOptions" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <span class="text-xs font-medium text-regular">Marital status</span>
+          <boo-select size="small" label="Select status" formControlName="maritalStatus" [options]="maritalStatusOptions" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="acc-nationality" class="text-xs font-medium text-regular">Nationality</label>
+          <boo-input id="acc-nationality" size="small" label="e.g. Vietnamese" formControlName="nationality" [maxlength]="100" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <span class="text-xs font-medium text-regular">Blood group</span>
+          <boo-select size="small" label="Select blood group" formControlName="bloodGroup" [options]="bloodGroupOptions" />
+        </div>
+      </div>
+    </setting-section>
 
-      </form>
+    <setting-section heading="Contact" description="How the clinic reaches you.">
+      <div class="grid gap-x-4 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="flex flex-col gap-1.5">
+          <label for="acc-phone" class="text-xs font-medium text-regular">Phone <span class="text-danger" aria-hidden="true">*</span></label>
+          <boo-input id="acc-phone" type="tel" size="small" label="e.g. +84 912 345 678" formControlName="phone" [maxlength]="20" required />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="acc-alt-phone" class="text-xs font-medium text-regular">Alternate phone</label>
+          <boo-input id="acc-alt-phone" type="tel" size="small" label="Optional" formControlName="alternatePhone" [maxlength]="20" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <span class="text-xs font-medium text-regular">Preferred contact method</span>
+          <boo-select size="small" label="Select method" formControlName="preferredCommunication" [options]="communicationOptions" />
+        </div>
+      </div>
+    </setting-section>
 
-    </div>
-  </div>
-</div>
+    <setting-section heading="Identification" description="An ID document on file, for example a national ID card or passport.">
+      <div class="grid gap-x-4 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="flex flex-col gap-1.5">
+          <label for="acc-id-type" class="text-xs font-medium text-regular">Document type</label>
+          <boo-input id="acc-id-type" size="small" label="e.g. Passport" formControlName="identificationType" [maxlength]="50" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="acc-id-number" class="text-xs font-medium text-regular">Document number</label>
+          <boo-input id="acc-id-number" size="small" label="Document number" formControlName="identificationNumber" [maxlength]="50" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="acc-id-expiry" class="text-xs font-medium text-regular">Expiry date</label>
+          <boo-datepicker id="acc-id-expiry" size="small" label="DD/MM/YYYY" formControlName="identificationExpiry" />
+        </div>
+      </div>
+    </setting-section>
+
+    <setting-section heading="Emergency contact" description="Who to call if something happens to you at work.">
+      <div class="grid gap-x-4 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="flex flex-col gap-1.5">
+          <label for="acc-ec-name" class="text-xs font-medium text-regular">Name</label>
+          <boo-input id="acc-ec-name" size="small" label="Full name" formControlName="emergencyContactName" [maxlength]="150" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="acc-ec-phone" class="text-xs font-medium text-regular">Phone</label>
+          <boo-input id="acc-ec-phone" type="tel" size="small" label="Phone number" formControlName="emergencyContactPhone" [maxlength]="20" />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="acc-ec-relationship" class="text-xs font-medium text-regular">Relationship</label>
+          <boo-input id="acc-ec-relationship" size="small" label="e.g. Spouse" formControlName="emergencyContactRelationship" [maxlength]="50" />
+        </div>
+      </div>
+    </setting-section>
+
+    <setting-section
+      heading="Delete account"
+      description="Your account can only be removed by an administrator of your clinic, from Settings › Team."
+      tone="danger"
+      [headerOnly]="true"
+    />
+  </form>
+</setting-page>

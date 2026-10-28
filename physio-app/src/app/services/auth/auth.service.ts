@@ -133,6 +133,12 @@ export class AuthService {
         return this.profile$;
     }
 
+    /** Reflects an edit of the signed-in user's own details (Settings > Account) without reloading the session. */
+    patchUserInfo(changes: Partial<UserProfileBase>): void {
+        const current = this.userInfoSubject.getValue();
+        if (current) this.userInfoSubject.next({ ...current, ...changes });
+    }
+
     private loadPostLoginData(): void {
         // The theme is applied once the preferences arrive. Applying it earlier would read an empty cache,
         // fall back to light and strip the `dark` class that ThemeService.initTheme() set for first paint.

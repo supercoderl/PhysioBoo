@@ -1,15 +1,14 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
+import { Component } from "@angular/core";
+import { BooStatusBadgeComponent } from "@physioboo/ui";
 import { ColumnDefDirective } from "../../../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../../../shared/shared-imports";
-import { ActionItem, PaginationData } from "../../../../../../shared/types/common";
-import { SortOption } from "../../../../../../shared/types/sort";
 import { Supplier } from "../../../../../../shared/types/support.types";
-import { BulkAction, GroupableColumn } from "../../../../../../shared/types/table.types";
-import { ColorUtils } from "../../../../../../shared/utils/color.utils";
+import { SupplierType } from "../../../../../../shared/enums/supplier-type";
 import { BooActionAdminComponent } from "../../../../../table/boo-table-admin/boo-action-admin.component";
-import { BooTableAdminComponent, FilterConfig } from "../../../../../table/boo-table-admin/boo-table-admin.component";
+import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo-table-admin.component";
+import { CategoryTableCardBase } from "../shared/category-table-card.base";
 
+/** Suppliers: identity and type, contact, location and the purchasing terms (lead time, credit limit). */
 @Component({
   selector: 'common-category-supplier-table-card',
   standalone: true,
@@ -17,136 +16,89 @@ import { BooTableAdminComponent, FilterConfig } from "../../../../../table/boo-t
     SharedModule,
     BooTableAdminComponent,
     ColumnDefDirective,
-    BooActionAdminComponent
+    BooActionAdminComponent,
+    BooStatusBadgeComponent
   ],
-  host: { class: 'block h-full min-h-0' },
   template: `
-    <div class="bg-surface rounded-[6px] border border-gray-200 h-full overflow-hidden">
-      <boo-table-admin 
-        [data]="data?.items ?? []" 
-        tdClass="px-4 py-3"
-        [showFooter]="true" 
-        [currentPage]="data?.pageNumber ?? filter.pageNumber"
-        [pageSize]="data?.pageSize ?? filter.pageSize"
-        [totalItems]="data?.totalCount ?? 0"
-        [availableTools]="['sort']"
-        [bulkActions]="bulkActions"
-        [sortOptions]="sortOptions"
-        [currentSort]="currentSort"
-        [filterConfigs]="filterConfigs"
-        [currentFilter]="currentFilter"
-        [groupableColumns]="groupableColumns"
-        (pageChange)="onPageClick($event)"
-        (searchChange)="onSearchChange($event)"
-        (reload)="onReloadClick()"
-        (bulkAction)="bulkAction.emit($event)"
-        (sortApply)="sortApply.emit($event)"
-        (filterApply)="filterApply.emit($event)"
-        [loading]="loadingSrv.isLoading('search')"
-      >  
+    <boo-table-admin
+      class="flex-1 min-h-0 rounded-[6px] overflow-hidden"
+      [data]="data?.items ?? []"
+      [currentPage]="data?.pageNumber ?? filter.pageNumber"
+      [pageSize]="data?.pageSize ?? filter.pageSize"
+      [totalItems]="data?.totalCount ?? 0"
+      [loading]="loading"
+      [availableTools]="tools"
+      [bulkActions]="bulkActions"
+      [sortOptions]="sortOptions"
+      [currentSort]="currentSort"
+      [filterConfigs]="filterConfigs"
+      [currentFilter]="currentFilter"
+      minTableWidth="1040px"
+      (pageChange)="pageChange.emit($event)"
+      (searchChange)="searchChange.emit($event)"
+      (reload)="reloadClick.emit()"
+      (sortApply)="sortApply.emit($event)"
+      (filterApply)="filterApply.emit($event)"
+      (bulkAction)="onBulkAction($event)"
+    >
+      <ng-container *ngIf="canDelete">
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
+      </ng-container>
 
-        <ng-template appColumnDef="supplierName" headerLabel="Name" headerClass="text-left" let-item>
-          <div class="flex items-center gap-3 overflow-hidden" (click)="onEditClick(item.id)">
-            <div class="min-w-0 flex-1">
-              <div class="truncate text-sm font-semibold text-danger cursor-pointer" [title]="item.supplierName">
-                {{ item.supplierName }}
-              </div>
-            </div>
+      <ng-template appColumnDef="name" headerLabel="Supplier" headerClass="text-left" let-item>
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="min-w-0">
+            <button
+              *ngIf="canUpdate; else plainName"
+              type="button"
+              class="block max-w-full truncate p-0 bg-transparent border-0 text-left text-sm leading-4 font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm"
+              [title]="item.supplierName"
+              (click)="onRowOpen(item)"
+            >{{ item.supplierName }}</button>
+            <ng-template #plainName><span class="block truncate text-sm leading-4 font-semibold text-regular" [title]="item.supplierName">{{ item.supplierName }}</span></ng-template>
+            <div class="truncate text-xs leading-4 text-secondary">{{ item.supplierCode || empty }}</div>
           </div>
+        </div>
+      </ng-template>
+      <ng-template appColumnDef="type" headerLabel="Type" headerClass="text-left" width="160px" let-item>
+        <boo-status-badge [label]="typeLabel(item.type)" tone="neutral" />
+      </ng-template>
+      <ng-template appColumnDef="contact" headerLabel="Contact" headerClass="text-left" let-item>
+        <div class="min-w-0">
+          <div class="truncate text-sm leading-4 text-regular">{{ item.contactPerson || empty }}</div>
+          <div class="truncate text-xs leading-4 text-secondary">{{ item.phone || item.email || empty }}</div>
+        </div>
+      </ng-template>
+      <ng-template appColumnDef="location" headerLabel="Location" headerClass="text-left" let-item>
+        <div class="min-w-0">
+          <div class="truncate text-sm leading-4 text-regular">{{ join(item.city, item.stateProvince) || empty }}</div>
+          <div class="truncate text-xs leading-4 text-secondary">{{ item.country || empty }}</div>
+        </div>
+      </ng-template>
+      <ng-template appColumnDef="leadTimeDays" headerLabel="Lead time" headerClass="text-right" cellClass="text-right" width="110px" let-item>
+        <span class="text-sm tabular-nums">{{ item.leadTimeDays ? item.leadTimeDays + (item.leadTimeDays === 1 ? ' day' : ' days') : empty }}</span>
+      </ng-template>
+      <ng-template appColumnDef="creditLimit" headerLabel="Credit limit" headerClass="text-right" cellClass="text-right" width="140px" let-item>
+        <span class="text-sm tabular-nums">{{ item.creditLimit ? (item.creditLimit | currency:(item.currency || 'USD'):'symbol':'1.0-2') : empty }}</span>
+      </ng-template>
+      <ng-container *ngIf="tableActions.length">
+        <ng-template appColumnDef="actions" headerLabel="" width="64px" headerClass="text-center" cellClass="flex justify-center" let-item>
+          <boo-action-admin [items]="tableActions" [data]="item" />
         </ng-template>
-
-        <ng-template appColumnDef="supplierCode" headerLabel="Code" headerClass="text-left" let-item>
-          <div class="text-sm">{{ item.supplierCode }}</div>
-        </ng-template>
-
-        <ng-template appColumnDef="phone" headerLabel="Phone" headerClass="text-left" let-item>
-          <div class="text-sm">{{ item.phone }}</div>
-        </ng-template>
-
-        <ng-template appColumnDef="address" headerLabel="Address" headerClass="text-left" let-item>
-          <div class="text-sm">{{ item.address }}</div>
-        </ng-template>
-
-        <ng-template appColumnDef="actions" headerLabel="Actions" let-item headerClass="text-center" cellClass="text-center">
-          <div class="relative">
-            <boo-action-admin
-              [items]="tableActions"
-              [data]="item"
-            />
-          </div>
-        </ng-template>
-      </boo-table-admin>
-    </div>
-  `,
-  styles: [`
-    :host ::ng-deep {
-      .pi {
-        font-size: 0.875rem;
-      }
-    }
-  `]
+      </ng-container>
+    </boo-table-admin>
+  `
 })
-export class CommonCategorySupplierTableCardComponent {
-  // #region Inputs, Outputs, Properties
-  @Input() data: PaginationData<Supplier> | null = null;
-  @Input() filter!: { pageNumber: number, pageSize: number };
-  @Input() sortOptions: SortOption[] = [];
-  @Input() currentSort: string = '';
-  @Input() filterConfigs: FilterConfig[] = [];
-  @Input() currentFilter: Record<string, any> = {};
-  @Output() pageChange = new EventEmitter<number>();
-  @Output() searchChange = new EventEmitter<string>();
-  @Output() editClick = new EventEmitter<string>();
-  @Output() deleteClick = new EventEmitter<string>();
-  @Output() reloadClick = new EventEmitter<void>();
-  @Output() bulkAction = new EventEmitter<{ action: BulkAction; ids: (number | string)[]; selectAllPages: boolean }>();
-  @Output() sortApply = new EventEmitter<SortOption>();
-  @Output() filterApply = new EventEmitter<{ key: string; value: any }>();
-
-  readonly groupableColumns: GroupableColumn[] = [
-
-  ];
-  ColorUtils = ColorUtils;
-
-  readonly bulkActions: BulkAction[] = [
-    { key: 'delete', label: 'Delete', icon: 'trash', variant: 'danger', requireConfirm: true },
-  ];
-
-  readonly tableActions: ActionItem[] = [
-    {
-      label: 'Delete',
-      isDanger: true,
-      onClick: (item: any) => this.onDeleteClick(item.id)
-    }
-  ];
-  // #endregion
-
-  // #region Init (Lifecycle + Setup)
-  constructor(
-    protected loadingSrv: LocalLoadingService
-  ) { }
-  // #endregion
-
-  // #region Methods
-  onPageClick(page: number) {
-    this.pageChange.emit(page);
+export class CommonCategorySupplierTableCardComponent extends CategoryTableCardBase<Supplier> {
+  /** "MedicalEquipment" → "Medical equipment". */
+  typeLabel(type: SupplierType | null | undefined): string {
+    const key = type === null || type === undefined ? undefined : SupplierType[type];
+    if (!key) return '—';
+    const words = key.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase();
+    return words.charAt(0).toUpperCase() + words.slice(1);
   }
 
-  onEditClick(id: string) {
-    this.editClick.emit(id);
+  join(...parts: (string | null | undefined)[]): string {
+    return parts.filter(Boolean).join(', ');
   }
-
-  onDeleteClick(id: string) {
-    this.deleteClick.emit(id);
-  }
-
-  onSearchChange(val: string) {
-    this.searchChange.emit(val);
-  }
-
-  onReloadClick() {
-    this.reloadClick.emit();
-  }
-  // #endregion
 }

@@ -25,7 +25,7 @@ const SEARCH_DEBOUNCE_MS = 400;
   template: `
     <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
       <div class="flex flex-wrap items-end gap-3">
-        <boo-search-field class="w-full md:w-72" label="Search surgeries" placeholder="Surgery #, patient or MRN"
+        <boo-search-field size="middle" class="w-full md:w-72" label="Search surgeries" placeholder="Surgery #, patient or MRN"
           [(ngModel)]="search" (ngModelChange)="searchInput$.next($event)" (clear)="search = ''; applyFilters()" />
         <boo-select class="w-44" label="Priority" [(ngModel)]="priorityFilter" (ngModelChange)="applyFilters()" [options]="priorityOptions" bindLabel="label" bindValue="value"></boo-select>
         <boo-select class="w-52" label="Status" [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()" [options]="statusOptions" bindLabel="label" bindValue="value"></boo-select>

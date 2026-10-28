@@ -1,317 +1,155 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize, firstValueFrom } from "rxjs";
+import { Component, inject } from "@angular/core";
+import { FormBuilder, Validators } from "@angular/forms";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { ImagingModalityService } from "../../../../../../services/admin/imaging-modality.service";
-import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../../../services/common/toast.service";
-import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { ImagingModality } from "../../../../../../shared/types/laboratory-imaging.types";
-import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
-import { DrawerComponent } from "../../../../../drawer/drawer.component";
 import { BooSelectComponent } from "../../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";
+import { CategoryDrawerBase } from "../shared/category-drawer.base";
+import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-shell.component";
 
+const MODALITY_CATEGORIES = ['X-Ray', 'Ultrasound', 'MRI', 'CT Scan', 'Nuclear Medicine'];
+
+/** Create / edit an imaging modality (POST /imaging-modalities, PATCH /imaging-modalities/{id}). */
 @Component({
     selector: 'common-category-imaging-modality-drawer',
     standalone: true,
     imports: [
         SharedModule,
-        DrawerComponent,
+        CommonCategoryDrawerShellComponent,
         BooInputComponent,
-
         BooTextareaComponent,
-        BooButtonAdminComponent,
-        BooSelectComponent,
-        BooCheckboxComponent
+        BooCheckboxComponent,
+        BooSelectComponent
     ],
     template: `
-        <drawer
+        <common-category-drawer-shell
+            [form]="form"
             [isOpen]="isOpen"
-            [isShowDialog]="true"
-            (close)="onClose()"
+            [title]="isEdit ? 'Edit imaging modality' : 'New imaging modality'"
+            subtitle="How the exam is scheduled and what the patient needs to know."
+            [isEdit]="isEdit"
+            [canDelete]="canDelete"
+            [loading]="loading"
+            [loadFailed]="loadFailed"
+            [saving]="saving"
+            (save)="save()"
+            (cancel)="requestClose()"
+            (discard)="discard()"
+            (delete)="onDelete()"
+            (retry)="loadDetail()"
         >
-            <div class="flex flex-col h-full bg-surface relative">
-                <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
-                    <div>
-                        <h2 class="text-xl font-bold text-primary leading-none mb-1">
-                            {{ currentId ? 'Edit Imaging Modality' : 'New Imaging Modality' }}
-                        </h2>
-                        <p class="text-sm text-secondary m-0">Configure imaging modality details and parameters</p>
-                    </div>
-                    <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <physio-icon name="x" [size]="20"></physio-icon>
-                    </button>
-                </div>
-
-                <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
-                    <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
-                    </div>
-
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Basic Information</h3>
-                        <div class="space-y-4">
-                            <boo-input label="Modality Name" [required]="true" formControlName="name" placeholder="Ex: Magnetic Resonance Imaging"></boo-input>
-                            <div class="flex gap-4">
-                                <div class="flex-1">
-                                    <boo-input label="Code" formControlName="code" placeholder="Ex: MRI"></boo-input>
-                                </div>
-                                <div class="flex-1">
-                                    <boo-select 
-                                        label="Category"
-                                        formControlName="category"
-                                        [options]="[
-                                            { label: 'X-Ray', value: 'X-Ray' },
-                                            { label: 'Ultrasound', value: 'Ultrasound' },
-                                            { label: 'MRI', value: 'MRI' },
-                                            { label: 'CT Scan', value: 'CT Scan' },
-                                            { label: 'Nuclear Medicine', value: 'Nuclear Medicine' }
-                                        ]"
-                                    ></boo-select>
-                                </div>
-                            </div>
+            <ng-container [formGroup]="form">
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Basic information</h3>
+                    <div class="flex flex-col gap-4">
+                        <boo-input label="Name" [required]="true" formControlName="name" [maxlength]="150" placeholder="e.g. Magnetic resonance imaging" />
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <boo-input label="Code" formControlName="code" [maxlength]="20" placeholder="e.g. MRI" />
+                            <boo-select label="Category" formControlName="category" [options]="categoryOptions" />
                         </div>
                     </div>
+                </section>
 
-                    <div class="h-px bg-gray-100 mx-6"></div>
-
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Metrics & Parameters</h3>
-                        <div class="flex gap-4">
-                            <div class="flex-1">
-                                <boo-input type="number" label="Avg. Duration (Mins)" formControlName="averageDurationMinutes" placeholder="30"></boo-input>
-                            </div>
-                            <div class="flex-1">
-                                <boo-input type="number" label="Radiation Dose (mSv)" formControlName="radiationDose" placeholder="0.00"></boo-input>
-                            </div>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-2">* Note: Set Radiation Dose to 0 for Ultrasound and MRI.</p>
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Exam parameters</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <boo-input type="number" label="Average duration (min)" formControlName="averageDurationMinutes" placeholder="30" />
+                        <boo-input type="number" label="Radiation dose (mSv)" formControlName="radiationDose" placeholder="0" />
                     </div>
+                    <p class="m-0 mt-2 text-xs text-secondary">Use 0 for modalities without ionizing radiation, such as ultrasound and MRI.</p>
+                </section>
 
-                    <div class="h-px bg-gray-100 mx-6"></div>
-
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Clinical Settings</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            
-                            <div 
-                                class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-purple-400 hover:shadow-sm"
-                                [ngClass]="{'border-purple-500 bg-purple-50/50': form.get('requiresContrast')?.value, 'border-gray-200': !form.get('requiresContrast')?.value}"
-                                (click)="toggleCheck('requiresContrast')"
-                            >
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                                        <physio-icon name="droplet" [size]="16" class="text-[#a855f7]"></physio-icon>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Requires Contrast</span>
-                                </div>
-                                <boo-checkbox formControlName="requiresContrast"></boo-checkbox>
-                            </div>
-
-                            <div 
-                                class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-orange-400 hover:shadow-sm"
-                                [ngClass]="{'border-orange-500 bg-orange-50/50': form.get('preparationRequired')?.value, 'border-gray-200': !form.get('preparationRequired')?.value}"
-                                (click)="toggleCheck('preparationRequired')"
-                            >
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
-                                        <physio-icon name="clipboard" [size]="16" class="text-[#f97316]"></physio-icon>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Preparation Needed</span>
-                                </div>
-                                <boo-checkbox formControlName="preparationRequired"></boo-checkbox>
-                            </div>
-
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Patient preparation</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="requiresContrast" label="Contrast agent" />
+                        </div>
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="preparationRequired" label="Preparation required" />
                         </div>
                     </div>
-
-                    <div class="h-px bg-gray-100 mx-6"></div>
-
-                    <div class="p-6 pb-10">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Details & Instructions</h3>    
-                        <div class="space-y-4">
-                            <div *ngIf="form.get('preparationRequired')?.value" class="animate-fade-in-up">
-                                <boo-textarea 
-                                    label="Preparation Instructions" 
-                                    formControlName="preparationInstructions" 
-                                    placeholder="Ex: Patient must fast for 6 hours prior. Drink 1 liter of water..."></boo-textarea>
-                            </div>
-                            <boo-textarea 
-                                label="Description" 
-                                formControlName="description" 
-                                placeholder="General description of this modality..."></boo-textarea>
-                        </div>
+                    <div *ngIf="form.value.preparationRequired" class="mt-4">
+                        <boo-textarea label="Preparation instructions" formControlName="preparationInstructions" placeholder="e.g. Fast for 6 hours; drink 1 litre of water an hour before" />
                     </div>
-                </div>
+                </section>
 
-                <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0 shadow-top-md">
-                    <div>
-                        <boo-button-admin *ngIf="currentId" (click)="onDelete()" background="transparent" textColor="#EF4444" padding="6px 8px" [fontSize]="14" fontWeight="500" [gap]="6" buttonClass="group">
-                            <physio-icon 
-                                name="trash" 
-                                [size]="16"
-                                [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
-                            ></physio-icon> 
-                            <span>Delete</span>
-                        </boo-button-admin>
+                <section class="px-6 py-5">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Details</h3>
+                    <boo-textarea label="Description" formControlName="description" placeholder="What this modality is used for" />
+                    <div *ngIf="isEdit" class="mt-4 rounded-xl border border-borderGray px-3 py-2.5">
+                        <boo-checkbox formControlName="isActive" label="Active" />
+                        <p class="m-0 mt-1 text-xs text-secondary">Clear to mark this modality inactive.</p>
                     </div>
-                    <div class="flex gap-3">
-                        <boo-button-admin
-                            buttonClass="hover:!bg-gray-200"
-                            background="transparent"
-                            (click)="onClose()"
-                            [disabled]="loadingSrv.isLoading('search-by-id')"
-                        >
-                            Cancel
-                        </boo-button-admin>
-                        <boo-button-admin
-                            textColor="white"
-                            (click)="onSave()"
-                            [disabled]="loadingSrv.isLoading('search-by-id') || loadingSrv.isLoading('create') || loadingSrv.isLoading('update')"
-                            [loading]="loadingSrv.isLoading('update')"
-                        >
-                            Save Changes
-                        </boo-button-admin>
-                    </div>
-                </div>
-            </div>
-        </drawer>
+                </section>
+            </ng-container>
+        </common-category-drawer-shell>
     `
 })
+export class CommonCategoryImagingModalityDrawerComponent extends CategoryDrawerBase<ImagingModality> {
+    protected override readonly noun = 'imaging modality';
+    protected override readonly service = inject(ImagingModalityService);
 
-export class CommonCategoryImagingModalityDrawerComponent implements OnChanges {
-    // #region Inputs, Outputs, Properties
-    @Input() isOpen = false;
-    @Input() currentId: string | null = null;
-    @Output() close = new EventEmitter<void>();
-    @Output() saveSuccess = new EventEmitter<ImagingModality>();
-    @Output() delete = new EventEmitter<string>();
-    @ViewChild('scrollContainer') scrollContainer!: ElementRef;
-    form: FormGroup;
-    // #endregion
+    override readonly form = inject(FormBuilder).group({
+        name: ['', [Validators.required, Validators.maxLength(150), Validators.pattern(/\S/)]],
+        code: [null as string | null],
+        category: [null as string | null],
+        description: [null as string | null],
+        requiresContrast: [false],
+        preparationRequired: [false],
+        preparationInstructions: [null as string | null],
+        averageDurationMinutes: [0 as number | string, [Validators.min(0)]],
+        radiationDose: [0 as number | string, [Validators.min(0)]],
+        isActive: [true]
+    });
 
-    // #region Init (Lifecycle + Setup)
-    constructor(
-        private fb: FormBuilder,
-        private toastSrv: ToastService,
-        private imagingModalitySrv: ImagingModalityService,
-        protected loadingSrv: LocalLoadingService
-    ) {
-        this.form = this.initForm();
+    /** The preset list, plus a stored category that is not in it, so editing never drops it. */
+    categoryOptions = this.optionsWith(null);
+
+    protected override defaults() {
+        this.categoryOptions = this.optionsWith(null);
+        return {
+            name: '', code: null, category: null, description: null, requiresContrast: false, preparationRequired: false,
+            preparationInstructions: null, averageDurationMinutes: 0, radiationDose: 0, isActive: true
+        };
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (!this.isOpen) return;
-
-        if (changes['currentId'] && this.currentId) {
-            this.loadDetail(this.currentId);
-        } else if (!this.currentId) {
-            this.resetForm();
-        }
-    }
-    // #endregion
-
-    // #region Methods
-    private initForm(): FormGroup {
-        return this.fb.group({
-            name: ['', [Validators.required]],
-            code: [''],
-            category: ['Clinical'],
-            description: [''],
-            requiresContrast: [false],
-            preparationRequired: [false],
-            preparationInstructions: [null],
-            averageDurationMinutes: [0],
-            radiationDose: [0]
-        });
+    protected override toFormValue(item: ImagingModality) {
+        this.categoryOptions = this.optionsWith(item.category);
+        return {
+            name: item.name,
+            code: item.code,
+            category: item.category,
+            description: item.description,
+            requiresContrast: !!item.requiresContrast,
+            preparationRequired: !!item.preparationRequired,
+            preparationInstructions: item.preparationInstructions,
+            averageDurationMinutes: item.averageDurationMinutes ?? 0,
+            radiationDose: item.radiationDose ?? 0,
+            isActive: item.isActive
+        };
     }
 
-    loadDetail(id: string) {
-        this.form.disable();
-
-        this.imagingModalitySrv.search_by_id(id)
-            .pipe(
-                finalize(() => this.form.enable())
-            )
-            .subscribe(_res => {
-                if (_res.success) {
-                    this.form.patchValue({
-                        name: _res.data?.name,
-                        code: _res.data?.code,
-                        category: _res.data?.category,
-                        description: _res.data?.description,
-                        requiresContrast: _res.data?.requiresContrast || false,
-                        preparationRequired: _res.data?.preparationRequired || false,
-                        preparationInstructions: _res.data?.preparationInstructions,
-                        averageDurationMinutes: _res.data?.averageDurationMinutes || 0,
-                        radiationDose: _res.data?.radiationDose || 0,
-                    })
-                }
-            })
+    protected override toPayload(raw: Record<string, any>) {
+        return {
+            name: this.text(raw['name']),
+            code: this.text(raw['code']),
+            category: this.text(raw['category']),
+            description: this.text(raw['description']),
+            requiresContrast: !!raw['requiresContrast'],
+            preparationRequired: !!raw['preparationRequired'],
+            preparationInstructions: this.text(raw['preparationInstructions']),
+            averageDurationMinutes: this.num(raw['averageDurationMinutes']),
+            radiationDose: this.num(raw['radiationDose']),
+            // Update requires it (create ignores it); omitting it used to deactivate the modality on every edit.
+            isActive: !!raw['isActive']
+        };
     }
 
-    toggleCheck(controlName: string) {
-        const currentValue = this.form.get(controlName)?.value;
-
-        this.form.patchValue({
-            [controlName]: !currentValue
-        });
-        this.form.markAsDirty();
-    }
-
-    async onSave() {
-        if (this.form.invalid) {
-            this.toastSrv.error('Please check required fields');
-            this.form.markAllAsTouched();
-            return;
-        }
-
-        const formData = { ...this.form.getRawValue() }
-
-        try {
-            let id: string;
-            if (this.currentId) {
-                await firstValueFrom(this.imagingModalitySrv.update(this.currentId, formData));
-                id = this.currentId;
-            } else {
-                const createRes = await firstValueFrom(this.imagingModalitySrv.create(formData));
-                if (!createRes.success || !createRes.data) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
-                id = createRes.data;
-            }
-
-            const response = await firstValueFrom(this.imagingModalitySrv.search_by_id(id));
-            if (response.success && response.data) {
-                this.saveSuccess.emit(response.data);
-            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (err) {
-            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            return;
-        }
-    }
-
-    resetForm() {
-        this.form.reset({
-            requiresContrast: false,
-            preparationRequired: false,
-            averageDurationMinutes: 0,
-            radiationDose: 0
-        });
-    }
-
-    onClose() {
-        if (this.scrollContainer) {
-            this.scrollContainer.nativeElement.scrollTop = 0;
-        }
-
-        this.close.emit();
-    }
-
-    onDelete() {
-        if (this.currentId) this.delete.emit(this.currentId);
+    private optionsWith(current: string | null): { label: string; value: string }[] {
+        const all = current && !MODALITY_CATEGORIES.includes(current) ? [...MODALITY_CATEGORIES, current] : MODALITY_CATEGORIES;
+        return all.map(c => ({ label: c, value: c }));
     }
 }

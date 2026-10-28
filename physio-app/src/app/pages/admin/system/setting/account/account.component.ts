@@ -1,30 +1,57 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { finalize } from 'rxjs';
-import { AdminAccountContactComponent } from "../../../../../components/layout/admin/setting/account/account-contact.componen";
-import { AdminAccountDoctorComponent } from "../../../../../components/layout/admin/setting/account/account-doctor.component";
-import { AdminAccountEmergencyComponent } from "../../../../../components/layout/admin/setting/account/account-emergency.component";
-import { AdminAccountPatientComponent } from '../../../../../components/layout/admin/setting/account/account-patient.component';
-import { AdminAccountProfileComponent } from "../../../../../components/layout/admin/setting/account/account-profile.component";
+import { BooDatepickerComponent } from '../../../../../components/date-picker/boo-date-picker.component';
+import { SettingPageComponent } from '../../../../../components/layout/admin/setting/shared/setting-page.component';
+import { SettingSectionComponent } from '../../../../../components/layout/admin/setting/shared/setting-section.component';
+import { BooSelectComponent } from '../../../../../components/select/boo-select/boo-select.component';
 import { UserService } from '../../../../../services/admin/user.service';
 import { AuthService } from '../../../../../services/auth/auth.service';
 import { ToastService } from '../../../../../services/common/toast.service';
+import { BloodGroup } from '../../../../../shared/enums/blood-group';
+import { Gender } from '../../../../../shared/enums/gender';
+import { MaritalStatus } from '../../../../../shared/enums/marital-status';
+import { PreferredCommunication } from '../../../../../shared/enums/preferred-communication';
 import { SharedModule } from '../../../../../shared/shared-imports';
 import { MyAccount, UpdateMyAccountRequest } from '../../../../../shared/types/account.types';
-import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
 
+/** "PreferNotToSay" → "Prefer not to say", "O_Positive" → "O+". The value stays the enum name the API expects. */
+function enumOptions(enumObj: object, label: (name: string) => string = humanize): { label: string; value: string }[] {
+  return Object.keys(enumObj).filter(key => isNaN(Number(key))).map(key => ({ label: label(key), value: key }));
+}
+
+function humanize(name: string): string {
+  const words = name.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+function bloodGroupLabel(name: string): string {
+  return name.replace('_Positive', '+').replace('_Negative', '−');
+}
+
+/** The API sends dates as ISO date-times; the date pickers work with `yyyy-MM-dd`. */
+function dateOnly(value: string | null | undefined): string | null {
+  return value ? value.slice(0, 10) : null;
+}
+
+/**
+ * Settings > Account: the signed-in user's own personal, contact, identification and emergency-contact details
+ * (GET/PUT /api/users/me/account). Email is the sign-in identity and is shown read-only.
+ * `/admin/profile/general` is the read-only overview that links here for edits.
+ */
 @Component({
   selector: 'setting-account',
   standalone: true,
   imports: [
     SharedModule,
-
-    AdminAccountProfileComponent,
-    AdminAccountContactComponent,
-    AdminAccountEmergencyComponent,
-    AdminAccountDoctorComponent,
-    AdminAccountPatientComponent,
-    BooButtonAdminComponent
+    SettingPageComponent,
+    SettingSectionComponent,
+    BooInputComponent,
+    BooSelectComponent,
+    BooDatepickerComponent,
+    BooStatusBadgeComponent
   ],
   templateUrl: './account.component.html'
 })
@@ -34,13 +61,19 @@ export class SettingAccountComponent implements OnInit {
   private toastSrv = inject(ToastService);
   private fb = inject(FormBuilder);
 
-  userInfo$ = this.authSrv.userInfo$;
-  saving = signal(false);
-  loading = signal(false);
-  private loaded: MyAccount | null = null;
+  readonly userInfo = toSignal(this.authSrv.userInfo$, { initialValue: null });
+  readonly loading = signal(true);
+  readonly loadFailed = signal(false);
+  readonly saving = signal(false);
+  readonly account = signal<MyAccount | null>(null);
 
-  // One form for all sections; each section component binds to it via [form].
-  form: FormGroup = this.fb.group({
+  readonly genderOptions = enumOptions(Gender);
+  readonly maritalStatusOptions = enumOptions(MaritalStatus);
+  readonly bloodGroupOptions = enumOptions(BloodGroup, bloodGroupLabel);
+  readonly communicationOptions = enumOptions(PreferredCommunication, name => name === 'SMS' ? 'SMS' : humanize(name));
+
+  // Limits mirror UpdateMyAccountCommandValidation on the server.
+  readonly form: FormGroup = this.fb.group({
     firstName: ['', [Validators.required, Validators.maxLength(100)]],
     middleName: ['', Validators.maxLength(100)],
     lastName: ['', [Validators.required, Validators.maxLength(100)]],
@@ -49,8 +82,7 @@ export class SettingAccountComponent implements OnInit {
     maritalStatus: [null as string | null],
     nationality: ['', Validators.maxLength(100)],
     bloodGroup: [null as string | null],
-    email: [{ value: '', disabled: true }],
-    phoneNumber: ['', [Validators.required, Validators.maxLength(20)]],
+    phone: ['', [Validators.required, Validators.maxLength(20)]],
     alternatePhone: ['', Validators.maxLength(20)],
     preferredCommunication: [null as string | null],
     identificationType: ['', Validators.maxLength(50)],
@@ -62,33 +94,48 @@ export class SettingAccountComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.load();
+  }
+
+  get initials(): string {
+    const a = this.account();
+    const name = a ? `${a.firstName ?? ''} ${a.lastName ?? ''}`.trim() : '';
+    const parts = name.split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    return (parts[0].charAt(0) + (parts.length > 1 ? parts[parts.length - 1].charAt(0) : '')).toUpperCase();
+  }
+
+  load(): void {
     this.loading.set(true);
+    this.loadFailed.set(false);
     this.userSrv.getMyAccount()
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: res => { if (res.success && res.data) this.fill(res.data); },
-        error: () => this.toastSrv.error('Failed to load your account')
+        next: res => {
+          if (res.success && res.data) this.fill(res.data);
+          else this.loadFailed.set(true);
+        },
+        error: () => this.loadFailed.set(true)
       });
   }
 
   private fill(a: MyAccount): void {
-    this.loaded = a;
+    this.account.set(a);
     this.form.reset({
-      firstName: a.firstName,
+      firstName: a.firstName ?? '',
       middleName: a.middleName ?? '',
-      lastName: a.lastName,
-      dateOfBirth: a.dateOfBirth,
+      lastName: a.lastName ?? '',
+      dateOfBirth: dateOnly(a.dateOfBirth),
       gender: a.gender,
       maritalStatus: a.maritalStatus,
       nationality: a.nationality ?? '',
       bloodGroup: a.bloodGroup,
-      email: a.email,
-      phoneNumber: a.phone,
+      phone: a.phone ?? '',
       alternatePhone: a.alternatePhone ?? '',
       preferredCommunication: a.preferredCommunication,
       identificationType: a.identificationType ?? '',
       identificationNumber: a.identificationNumber ?? '',
-      identificationExpiry: a.identificationExpiry ? a.identificationExpiry.slice(0, 10) : null,
+      identificationExpiry: dateOnly(a.identificationExpiry),
       emergencyContactName: a.emergencyContactName ?? '',
       emergencyContactPhone: a.emergencyContactPhone ?? '',
       emergencyContactRelationship: a.emergencyContactRelationship ?? '',
@@ -96,7 +143,7 @@ export class SettingAccountComponent implements OnInit {
   }
 
   onSave(): void {
-    if (this.saving()) return;
+    if (this.saving() || !this.form.dirty) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.toastSrv.error('Please check the highlighted fields');
@@ -104,24 +151,25 @@ export class SettingAccountComponent implements OnInit {
     }
 
     const v = this.form.getRawValue();
+    const text = (value: string | null) => (value ?? '').trim();
     const request: UpdateMyAccountRequest = {
-      firstName: v.firstName,
-      middleName: v.middleName,
-      lastName: v.lastName,
-      dateOfBirth: v.dateOfBirth,
+      firstName: text(v.firstName),
+      middleName: text(v.middleName) || null,
+      lastName: text(v.lastName),
+      dateOfBirth: v.dateOfBirth || null,
       gender: v.gender,
       maritalStatus: v.maritalStatus,
-      nationality: v.nationality,
+      nationality: text(v.nationality) || null,
       bloodGroup: v.bloodGroup,
-      phone: v.phoneNumber,
-      alternatePhone: v.alternatePhone,
+      phone: text(v.phone),
+      alternatePhone: text(v.alternatePhone) || null,
       preferredCommunication: v.preferredCommunication,
-      identificationType: v.identificationType,
-      identificationNumber: v.identificationNumber,
-      identificationExpiry: v.identificationExpiry,
-      emergencyContactName: v.emergencyContactName,
-      emergencyContactPhone: v.emergencyContactPhone,
-      emergencyContactRelationship: v.emergencyContactRelationship,
+      identificationType: text(v.identificationType) || null,
+      identificationNumber: text(v.identificationNumber) || null,
+      identificationExpiry: v.identificationExpiry || null,
+      emergencyContactName: text(v.emergencyContactName) || null,
+      emergencyContactPhone: text(v.emergencyContactPhone) || null,
+      emergencyContactRelationship: text(v.emergencyContactRelationship) || null,
     };
 
     this.saving.set(true);
@@ -129,16 +177,25 @@ export class SettingAccountComponent implements OnInit {
       .pipe(finalize(() => this.saving.set(false)))
       .subscribe({
         next: res => {
+          // On failure the form keeps what was typed, so nothing is lost.
           if (!res.success) { this.toastSrv.error('Unable to update your account'); return; }
-          if (res.data) this.fill(res.data);
+          const saved = res.data ?? { ...this.account()!, ...request };
+          this.fill(saved);
+          this.authSrv.patchUserInfo({
+            firstName: saved.firstName,
+            lastName: saved.lastName,
+            phone: saved.phone,
+            fullName: [saved.firstName, saved.middleName, saved.lastName].filter(Boolean).join(' '),
+          });
           this.toastSrv.success('Account updated');
         },
-        error: err => this.toastSrv.error(err?.error?.errors?.[0] ?? 'Unable to update your account')
+        // The HTTP interceptor toasts the server's reason; the form keeps what was typed.
+        error: () => undefined
       });
   }
 
-  onCancel(): void {
-    if (this.loaded) this.fill(this.loaded);
-    this.toastSrv.success('Changes discarded');
+  onDiscard(): void {
+    const a = this.account();
+    if (a) this.fill(a);
   }
 }

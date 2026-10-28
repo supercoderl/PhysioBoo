@@ -45,15 +45,18 @@ namespace PhysioBoo.Application.Queries.ImagingModalities.GetAll
 
                 if (q.Request.Filter.RequiresContrast.HasValue)
                 {
-                    Query.Where(x => q.Request.Filter.RequiresContrast.Value);
+                    bool requiresContrast = q.Request.Filter.RequiresContrast.Value;
+                    Query.Where(x => x.RequiresContrast == requiresContrast);
                 }
                 if (q.Request.Filter.PreparationRequired.HasValue)
                 {
-                    Query.Where(x => q.Request.Filter.PreparationRequired.Value);
+                    bool preparationRequired = q.Request.Filter.PreparationRequired.Value;
+                    Query.Where(x => x.PreparationRequired == preparationRequired);
                 }
                 if (q.Request.Filter.IsActive.HasValue)
                 {
-                    Query.Where(x => q.Request.Filter.IsActive.Value);
+                    bool isActive = q.Request.Filter.IsActive.Value;
+                    Query.Where(x => x.IsActive == isActive);
                 }
             }
 

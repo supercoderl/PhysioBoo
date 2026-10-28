@@ -32,9 +32,11 @@
   <section class="flex-1 min-h-[360px] flex flex-col min-w-0 bg-surface border border-borderGray rounded-xl" aria-labelledby="doctor-list-title">
     <h2 id="doctor-list-title" class="sr-only">Doctors</h2>
 
-    <!-- Search, date added and sort: the filters the doctor search supports. Field labels (20px) over 36px controls line up with the 56px search field. -->
+    <!-- Search, date added and sort: the filters the doctor search supports. Every control is 36px high and the row aligns on its bottom edge, under the field labels. -->
     <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
       <boo-search-field
+        size="small"
+        [height]="36"
         class="flex-1 basis-64 min-w-0"
         label="Search doctors by employee ID"
         placeholder="Search by employee ID"

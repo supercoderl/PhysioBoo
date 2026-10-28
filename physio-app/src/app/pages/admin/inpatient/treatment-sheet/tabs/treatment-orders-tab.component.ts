@@ -25,9 +25,9 @@ interface OrderDraft {
   template: `
     <div class="flex flex-wrap items-center gap-3 mb-4">
       <boo-input label="Search orders..." size="small" (search)="onSearch($event)"></boo-input>
-      <boo-select label="Order Type" [(ngModel)]="typeFilter" [options]="typeOptions" bindLabel="label" bindValue="value"></boo-select>
-      <boo-select label="Status" [(ngModel)]="statusFilter" [options]="statusOptions" bindLabel="label" bindValue="value"></boo-select>
-      <boo-select label="Priority" [(ngModel)]="priorityFilter" [options]="priorityOptions" bindLabel="label" bindValue="value"></boo-select>
+      <boo-select size="small" label="Order Type" [(ngModel)]="typeFilter" [options]="typeOptions" bindLabel="label" bindValue="value"></boo-select>
+      <boo-select size="small" label="Status" [(ngModel)]="statusFilter" [options]="statusOptions" bindLabel="label" bindValue="value"></boo-select>
+      <boo-select size="small" label="Priority" [(ngModel)]="priorityFilter" [options]="priorityOptions" bindLabel="label" bindValue="value"></boo-select>
       <button type="button" (click)="groupByCategory = !groupByCategory" [attr.aria-pressed]="groupByCategory"
         class="px-3 py-2 rounded-lg text-xs font-semibold border transition-colors"
         [ngClass]="groupByCategory ? 'bg-primary/10 border-primary text-primary' : 'bg-surface border-gray-200 text-gray-600'">

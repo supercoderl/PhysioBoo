@@ -37,7 +37,7 @@ type ActionKind = 'edit' | 'reject' | 'return';
 
     <ng-container *ngIf="!isLoading() && !error()">
       <div class="flex flex-wrap items-end gap-3 mb-4">
-        <boo-search-field class="w-full md:w-80" label="Search results" placeholder="Order #, patient, MRN or test"
+        <boo-search-field size="middle" class="w-full md:w-80" label="Search results" placeholder="Order #, patient, MRN or test"
           [(ngModel)]="search" (ngModelChange)="applyFilters()" (clear)="search = ''; applyFilters()" />
         <boo-select class="w-56" label="Verification" [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()" [options]="statusOptions" />
         <boo-select class="w-48" label="Flag" [(ngModel)]="flagFilter" (ngModelChange)="applyFilters()" [options]="flagOptions" />

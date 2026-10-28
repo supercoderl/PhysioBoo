@@ -98,7 +98,7 @@ namespace PhysioBoo.Presentation.Endpoints
             {
                 await bus.SendCommandAsync(new UpdateAppointmentTypeCommand(appointmentType, id));
 
-                return Results.NoContent;
+                return Results.NoContent();
             }).WithName("UpdateAppointmentType")
             .WithSummary("Update appointment type")
             .Produces(StatusCodes.Status201Created)

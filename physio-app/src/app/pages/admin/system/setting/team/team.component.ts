@@ -1,223 +1,357 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { finalize, forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormBuilder, Validators } from '@angular/forms';
+import { BooButtonComponent, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { concat, finalize, map, of, switchMap, toArray } from 'rxjs';
+import { DrawerComponent } from '../../../../../components/drawer/drawer.component';
+import { CommonCategoryDrawerShellComponent } from '../../../../../components/layout/admin/system/common-category/shared/category-drawer-shell.component';
+import { CommonCategoryPageComponent } from '../../../../../components/layout/admin/system/common-category/shared/category-page.component';
+import { EMPTY_CELL } from '../../../../../components/layout/admin/system/common-category/shared/category-table-card.base';
+import { BooSelectComponent } from '../../../../../components/select/boo-select/boo-select.component';
+import { BooActionAdminComponent } from '../../../../../components/table/boo-table-admin/boo-action-admin.component';
+import { BooTableAdminComponent } from '../../../../../components/table/boo-table-admin/boo-table-admin.component';
 import { InviteService } from '../../../../../services/admin/invite.service';
 import { RoleService } from '../../../../../services/admin/role.service';
 import { UserService } from '../../../../../services/admin/user.service';
 import { AuthService } from '../../../../../services/auth/auth.service';
+import { DialogService } from '../../../../../services/common/dialog.service';
 import { ToastService } from '../../../../../services/common/toast.service';
+import { Permissions } from '../../../../../shared/constants/permission.constant';
+import { ColumnDefDirective } from '../../../../../shared/directives/column-def.directive';
 import { SharedModule } from '../../../../../shared/shared-imports';
+import { ActionItem } from '../../../../../shared/types/common';
 import { User } from '../../../../../shared/types/core.types';
+import { FilterConfig } from '../../../../../shared/types/filter.types';
+import { TenantInvite } from '../../../../../shared/types/invite.types';
 import { Role } from '../../../../../shared/types/role.types';
-import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
+import { SortOption } from '../../../../../shared/types/sort';
+import { CommonCategoryListBase } from '../../common-category/common-category-list.base';
 
-interface PendingInvite {
-  id: string;
-  email: string;
-  invitedAt: string;
-  expiresAt: string;
-  roleCode: string;
-}
-
-// Invites carry a built-in role code (backend Role enum); custom roles are assigned after sign-up.
+// Invites carry a built-in role code (backend Role enum, SUPER_ADMIN excluded); custom roles are assigned after sign-up.
 const INVITABLE_ROLE_CODES = [
   'ADMIN', 'NURSE', 'PHAMACIST', 'CASHIER', 'LAB_TECHNICIAN', 'RADIOLOGIST',
   'RECEPTIONIST', 'ACCOUNTANT', 'INVENTORY_MANAGER', 'IT_SUPPORT', 'DOCTOR',
 ];
 
+/** GetAllUsersQueryHandler sorts by email or creation date only. */
+const TEAM_SORT_OPTIONS: SortOption[] = [
+  { label: 'Recently added', value: '-createdAt' },
+  { label: 'Oldest first', value: '+createdAt' },
+  { label: 'Email (A-Z)', value: '+email' },
+  { label: 'Email (Z-A)', value: '-email' },
+];
+
+const TEAM_FILTERS: FilterConfig[] = [
+  { key: 'isActive', label: 'Status', type: 'boolean', trueLabel: 'Active', falseLabel: 'Inactive' },
+];
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Settings > Team: the clinic's members (POST /api/users/search, server-side search by email, status filter, paging
+ * sized to the screen), their roles (POST/DELETE /api/users/{id}/roles/{roleId}), account deletion
+ * (DELETE /api/users/{id}, a soft delete) and invitations (/api/invites). Every action follows the caller's permissions.
+ */
 @Component({
   selector: 'setting-team',
   standalone: true,
   imports: [
     SharedModule,
-    FormsModule,
-    BooSelectComponent
-
+    CommonCategoryPageComponent,
+    CommonCategoryDrawerShellComponent,
+    DrawerComponent,
+    BooTableAdminComponent,
+    BooActionAdminComponent,
+    ColumnDefDirective,
+    BooSelectComponent,
+    BooInputComponent,
+    BooStatusBadgeComponent,
+    BooEmptyStateComponent,
+    BooButtonComponent
   ],
-  templateUrl: './team.component.html'
+  templateUrl: './team.component.html',
+  host: { class: 'flex flex-1 min-h-0 min-w-0 flex-col' }
 })
-export class TeamComponent implements OnInit {
-  private userSrv = inject(UserService);
-  private roleSrv = inject(RoleService);
-  private inviteSrv = inject(InviteService);
-  private authSrv = inject(AuthService);
-  private toastSrv = inject(ToastService);
+export class TeamComponent extends CommonCategoryListBase<User> implements OnInit {
+  private readonly userSrv = inject(UserService);
+  private readonly roleSrv = inject(RoleService);
+  private readonly inviteSrv = inject(InviteService);
+  private readonly auth = inject(AuthService);
+  private readonly dialog = inject(DialogService);
+  private readonly toast = inject(ToastService);
+  private readonly fb = inject(FormBuilder);
 
-  loading = signal(false);
-  inviting = signal(false);
-  removing = signal<string | null>(null);
-  changingRoleFor = signal<string | null>(null);
+  override readonly sortOptions = TEAM_SORT_OPTIONS;
+  readonly empty = EMPTY_CELL;
 
-  members = signal<User[]>([]);
-  roles = signal<Role[]>([]);
-  pendingInvites = signal<PendingInvite[]>([]);
-  invitableRoles = computed(() => this.roles().filter(r => INVITABLE_ROLE_CODES.includes(r.code)));
+  readonly canReadInvites = this.auth.hasPermission(Permissions.Admin.InviteRead);
+  readonly canRevokeInvites = this.auth.hasPermission(Permissions.Admin.InviteRevoke);
+  readonly currentUserId = computed(() => this.currentUser()?.id ?? null);
+  private readonly currentUser = toSignal(this.auth.userInfo$, { initialValue: null });
 
-  search = signal('');
-  inviteEmail = signal('');
-  inviteRoleId = signal('');
+  readonly roles = signal<Role[]>([]);
+  readonly invitableRoles = computed(() => this.roles()
+    .filter(r => INVITABLE_ROLE_CODES.includes(r.code))
+    .map(r => ({ label: r.name, value: r.id })));
+  readonly roleOptions = computed(() => this.roles().map(r => ({ label: r.name, value: r.id })));
 
-  currentUserId = '';
+  // #region Invitations
+  readonly invites = signal<TenantInvite[]>([]);
+  readonly invitesLoading = signal(false);
+  readonly invitesFailed = signal(false);
+  readonly invitesOpen = signal(false);
+  readonly revokingInvite = signal<string | null>(null);
 
-  filteredMembers = computed(() => {
-    const term = this.search().toLowerCase().trim();
-    if (!term) return this.members();
-    return this.members().filter(m =>
-      m.email.toLowerCase().includes(term) ||
-      this.displayNameFor(m).toLowerCase().includes(term)
-    );
+  isInviteOpen = false;
+  inviting = false;
+  readonly inviteForm = this.fb.nonNullable.group({
+    email: ['', [Validators.required, Validators.email, Validators.pattern(EMAIL), Validators.maxLength(256)]],
+    roleId: ['', Validators.required],
+  });
+  // #endregion
+
+  // #region Role change
+  roleMember: User | null = null;
+  savingRole = false;
+  readonly roleForm = this.fb.nonNullable.group({
+    roleId: ['', Validators.required],
+  });
+  // #endregion
+
+  /** Row menu per member; your own row has none, so you can't delete yourself or change your own role here. */
+  readonly rowActions = computed(() => {
+    const me = this.currentUserId();
+    const actions = new Map<string, ActionItem[]>();
+    for (const m of this.tableData()?.items ?? []) {
+      if (m.id === me) { actions.set(m.id, []); continue; }
+      actions.set(m.id, [
+        ...(this.canUpdate ? [{ label: 'Change role', icon: 'user-cog', onClick: (u: User) => this.openRole(u) }] : []),
+        ...(this.canDelete ? [{ label: 'Delete account', icon: 'trash', isDanger: true, onClick: (u: User) => this.onDelete(u.id) }] : []),
+      ]);
+    }
+    return actions;
   });
 
-  ngOnInit(): void {
-    this.authSrv.userInfo$.subscribe(u => { if (u) this.currentUserId = u.id; });
-    this.loadMembers();
-    this.loadRoles();
-    this.loadInvites();
-  }
-
-  loadMembers(): void {
-    this.loading.set(true);
-    this.userSrv.search({
-      pageNumber: 1,
-      pageSize: 100,
-      search: '',
-      sort: '+email',
-      filter: { isActive: null }
-    }).pipe(
-      finalize(() => this.loading.set(false)),
-      catchError(() => { this.toastSrv.error('Failed to load members'); return of(null); })
-    ).subscribe(res => {
-      if (res?.success && res.data) this.members.set(res.data.items ?? []);
+  constructor() {
+    const service = inject(UserService);
+    super({
+      service,
+      noun: ['member', 'members'],
+      permissions: {
+        create: Permissions.Admin.InviteCreate,
+        update: Permissions.Iam.UserAssignRole,
+        delete: Permissions.Iam.UserDelete
+      },
+      filters: TEAM_FILTERS,
+      itemName: user => displayNameOf(user),
     });
   }
 
-  loadRoles(): void {
+  ngOnInit(): void {
+    this.loadRoles();
+    if (this.canReadInvites) this.loadInvites();
+  }
+
+  // #region Display helpers
+  displayName(u: User): string {
+    return displayNameOf(u);
+  }
+
+  initials(u: User): string {
+    const parts = displayNameOf(u).split(/[\s@.]+/).filter(Boolean);
+    if (!parts.length) return '?';
+    return (parts[0].charAt(0) + (parts.length > 1 ? parts[1].charAt(0) : '')).toUpperCase();
+  }
+
+  roleNames(u: User): string[] {
+    return (u.roles ?? []).map(r => r.name).filter(Boolean);
+  }
+
+  roleNameForCode(code: string): string {
+    return this.roles().find(r => r.code === code)?.name ?? code;
+  }
+  // #endregion
+
+  private loadRoles(): void {
     this.roleSrv.search({
       pageNumber: 1,
       pageSize: 100,
       search: '',
       sort: '+name',
       filter: { start: '', end: '', isActive: true, isSystemRole: null }
-    }).pipe(
-      catchError(() => { this.toastSrv.error('Failed to load roles'); return of(null); })
-    ).subscribe(res => {
-      if (res?.success && res.data) this.roles.set((res.data.items ?? []).filter(r => r.code !== 'SUPER_ADMIN'));
+    }).subscribe({
+      next: res => {
+        if (res?.success && res.data) this.roles.set((res.data.items ?? []).filter(r => r.code !== 'SUPER_ADMIN'));
+      },
+      error: () => undefined
     });
   }
 
+  // #region Invitations
   loadInvites(): void {
-    this.inviteSrv.getPending().pipe(
-      catchError(() => of(null))
-    ).subscribe(res => {
-      if (!res?.success) return;
-      this.pendingInvites.set(res.data.map(i => ({
-        id: i.id,
-        email: i.email ?? '(no email)',
-        invitedAt: new Date(i.invitedAt).toLocaleDateString(),
-        expiresAt: new Date(i.expiresAt).toLocaleDateString(),
-        roleCode: i.intendedRole
-      })));
-    });
+    this.invitesLoading.set(true);
+    this.invitesFailed.set(false);
+    this.inviteSrv.getPending()
+      .pipe(finalize(() => this.invitesLoading.set(false)))
+      .subscribe({
+        next: res => {
+          if (!res?.success) { this.invitesFailed.set(true); return; }
+          this.invites.set([...(res.data ?? [])].sort((a, b) => new Date(b.invitedAt).getTime() - new Date(a.invitedAt).getTime()));
+        },
+        error: () => this.invitesFailed.set(true)
+      });
+  }
+
+  openInvite(): void {
+    if (!this.canCreate) return;
+    this.inviteForm.reset({ email: '', roleId: '' });
+    this.isInviteOpen = true;
+  }
+
+  requestCloseInvite(): void {
+    if (this.inviting) return;
+    if (this.inviteForm.dirty) this.dialog.confirmUnsavedChanges(() => this.isInviteOpen = false);
+    else this.isInviteOpen = false;
   }
 
   onInvite(): void {
-    const email = this.inviteEmail().trim();
-    const role = this.roles().find(r => r.id === this.inviteRoleId());
-    if (!email || !role || this.inviting()) return;
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      this.toastSrv.error('Please enter a valid email address');
-      return;
-    }
-    if (this.members().some(m => m.email.toLowerCase() === email.toLowerCase())) {
-      this.toastSrv.error('That person is already a member');
+    if (this.inviting) return;
+    if (this.inviteForm.invalid) {
+      this.inviteForm.markAllAsTouched();
       return;
     }
 
-    this.inviting.set(true);
-    this.inviteSrv.create({ email, intendedRole: role.code })
-      .pipe(
-        finalize(() => this.inviting.set(false)),
-        catchError(() => { this.toastSrv.error('Failed to send invite'); return of(null); })
-      )
-      .subscribe(res => {
-        if (!res?.success) return;
-        this.inviteEmail.set('');
-        this.inviteRoleId.set('');
-        this.toastSrv.success(`Invited ${email}`);
-        this.loadInvites();
-      });
-  }
+    const email = this.inviteForm.controls.email.value.trim();
+    const role = this.roles().find(r => r.id === this.inviteForm.controls.roleId.value);
+    if (!role) return;
 
-  onChangeRole(member: User, roleId: string): void {
-    if (this.changingRoleFor()) return;
-    this.changingRoleFor.set(member.id);
-    // The team table shows one role per member, so switching replaces the previous role(s).
-    const previous = (member.roles ?? []).map(r => r.id).filter(id => id !== roleId);
-    forkJoin([
-      this.userSrv.assignRole({ userId: member.id, roleId }),
-      ...previous.map(id => this.userSrv.removeRole({ userId: member.id, roleId: id }))
-    ]).pipe(
-      finalize(() => this.changingRoleFor.set(null)),
-      catchError(() => { this.toastSrv.error('Failed to update role'); return of(null); })
-    ).subscribe(results => {
-      if (!results || results.some(r => !r.success)) return;
-      const role = this.roles().find(r => r.id === roleId);
-      this.members.update(list => list.map(m => m.id === member.id ? { ...m, roles: role ? [role] : [] } : m));
-      this.toastSrv.success('Role updated');
+    if (this.invites().some(i => i.email?.toLowerCase() === email.toLowerCase())) {
+      this.toast.error(`${email} already has a pending invitation`);
+      return;
+    }
+
+    this.inviting = true;
+    // Search matches emails by substring, so compare exactly before inviting someone who is already a member.
+    this.userSrv.search({ pageNumber: 1, pageSize: 20, search: email, sort: '+email', filter: { isActive: null } }).pipe(
+      map(res => (res.data?.items ?? []).some(u => u.email?.toLowerCase() === email.toLowerCase())),
+      switchMap(isMember => isMember ? of(null) : this.inviteSrv.create({ email, intendedRole: role.code })),
+      finalize(() => this.inviting = false)
+    ).subscribe({
+      next: res => {
+        if (res === null) { this.toast.error(`${email} is already a member`); return; }
+        if (!res.success) { this.toast.error('The invitation could not be sent'); return; }
+        this.isInviteOpen = false;
+        this.toast.success(`Invitation sent to ${email}`);
+        if (this.canReadInvites) this.loadInvites();
+      },
+      // The interceptor shows the server's reason; the drawer keeps the email and role.
+      error: () => undefined
     });
   }
 
-  onRemove(member: User): void {
-    if (member.id === this.currentUserId) return;
-    if (!confirm(`Remove ${this.displayNameFor(member)} from the team?`)) return;
+  onRevokeInvite(inv: TenantInvite): void {
+    if (!this.canRevokeInvites || this.revokingInvite()) return;
+    this.dialog.confirm(
+      `The invitation link sent to ${inv.email ?? 'this address'} will stop working.`,
+      () => {
+        this.revokingInvite.set(inv.id);
+        this.inviteSrv.revoke(inv.id)
+          .pipe(finalize(() => this.revokingInvite.set(null)))
+          .subscribe({
+            next: res => {
+              if (!res?.success) { this.toast.error('The invitation could not be revoked'); return; }
+              this.invites.update(list => list.filter(i => i.id !== inv.id));
+              this.toast.success('Invitation revoked');
+            },
+            error: () => undefined
+          });
+      },
+      'Revoke invitation?',
+      'danger',
+      'Revoke'
+    );
+  }
+  // #endregion
 
-    this.removing.set(member.id);
-    this.userSrv.delete(member.id)
-      .pipe(
-        finalize(() => this.removing.set(null)),
-        catchError(() => { this.toastSrv.error('Failed to remove member'); return of(null); })
-      )
-      .subscribe(res => {
-        if (!res?.success) return;
-        this.members.update(list => list.filter(m => m.id !== member.id));
-        this.toastSrv.success('Member removed');
-      });
+  // #region Role change
+  openRole(member: User): void {
+    if (!this.canUpdate || member.id === this.currentUserId()) return;
+    const current = (member.roles ?? []).find(r => this.roles().some(x => x.id === r.id));
+    this.roleMember = member;
+    this.roleForm.reset({ roleId: current?.id ?? '' });
   }
 
-  onRevokeInvite(inv: PendingInvite): void {
-    if (!confirm(`Revoke invitation for ${inv.email}?`)) return;
-    this.inviteSrv.revoke(inv.id).pipe(
-      catchError(() => { this.toastSrv.error('Failed to revoke invitation'); return of(null); })
-    ).subscribe(res => {
-      if (!res?.success) return;
-      this.pendingInvites.update(list => list.filter(i => i.id !== inv.id));
-      this.toastSrv.success('Invitation revoked');
+  requestCloseRole(): void {
+    if (this.savingRole) return;
+    if (this.roleForm.dirty) this.dialog.confirmUnsavedChanges(() => this.roleMember = null);
+    else this.roleMember = null;
+  }
+
+  /**
+   * Grants the new role first, then revokes the others one by one: if a step fails the member still has a role,
+   * and the list is reloaded so it shows what the server actually holds.
+   */
+  onSaveRole(): void {
+    const member = this.roleMember;
+    if (!member || this.savingRole) return;
+    if (this.roleForm.invalid) {
+      this.roleForm.markAllAsTouched();
+      return;
+    }
+
+    const roleId = this.roleForm.controls.roleId.value;
+    const others = (member.roles ?? []).map(r => r.id).filter(id => id !== roleId);
+    const alreadyHas = (member.roles ?? []).some(r => r.id === roleId);
+
+    this.savingRole = true;
+    concat(
+      alreadyHas ? of(null) : this.userSrv.assignRole({ userId: member.id, roleId }),
+      ...others.map(id => this.userSrv.removeRole({ userId: member.id, roleId: id }))
+    ).pipe(
+      toArray(),
+      finalize(() => this.savingRole = false)
+    ).subscribe({
+      next: () => {
+        this.roleMember = null;
+        this.toast.success(`${displayNameOf(member)} is now ${this.roles().find(r => r.id === roleId)?.name ?? 'updated'}`);
+        this.load();
+      },
+      error: () => this.load()
     });
   }
+  // #endregion
 
-  displayNameFor(u: User): string {
-    const p: any = (u as any).profile;
-    if (p?.fullName) return p.fullName;
-    if (p?.firstName || p?.lastName) return [p.firstName, p.lastName].filter(Boolean).join(' ');
-    return u.email;
-  }
+  /** Deletes the member's account (soft delete on the server): they can no longer sign in. */
+  override onDelete(id: string | null): void {
+    if (!id || !this.canDelete || id === this.currentUserId()) return;
+    const member = this.tableData()?.items.find(u => u.id === id);
+    const name = member ? displayNameOf(member) : 'this member';
 
-  initialsFor(u: User): string {
-    const name = this.displayNameFor(u);
-    const parts = name.split(/\s+/).filter(Boolean);
-    if (parts.length === 0) return '?';
-    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    this.dialog.confirm(
+      `${name}’s account will be deleted and they will no longer be able to sign in. Their past records are kept.`,
+      () => {
+        const data = this.tableData();
+        const wasLastOnPage = !!data && data.items.length === 1 && data.pageNumber > 1;
+        this.userSrv.delete(id).subscribe({
+          // 204 No Content: success carries no body.
+          next: () => {
+            this.toast.success(`${name}’s account was deleted`);
+            if (wasLastOnPage) this.params.pageNumber -= 1;
+            this.load();
+          },
+          error: () => undefined
+        });
+      },
+      'Delete account?',
+      'danger',
+      'Delete account'
+    );
   }
+}
 
-  roleIdFor(u: User): string {
-    const ids = (u.roles ?? []).map(r => r.id);
-    return this.roles().find(r => ids.includes(r.id))?.id ?? '';
-  }
-
-  roleNameFor(code: string): string {
-    return this.roles().find(r => r.code === code)?.name ?? code;
-  }
+function displayNameOf(u: User): string {
+  const p = u.profile;
+  if (p?.fullName) return p.fullName;
+  const name = [p?.firstName, p?.lastName].filter(Boolean).join(' ');
+  return name || u.email;
 }

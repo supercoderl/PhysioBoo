@@ -86,6 +86,8 @@
       <div *ngIf="wards.length" class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
         <div class="flex-1 basis-64 min-w-0">
           <boo-search-field
+            size="small"
+            [height]="36"
             label="Search beds"
             placeholder="Bed, room, patient name or patient no."
             [(ngModel)]="query"
@@ -95,15 +97,15 @@
         </div>
         <label class="flex flex-col min-w-0 w-full sm:w-44">
           <span class="mb-1 text-xs font-medium text-secondary">Ward</span>
-          <boo-select size="small" [options]="wardOptions" bindLabel="label" bindValue="value" [(ngModel)]="wardId" (ngModelChange)="applyFilters()" />
+          <boo-select size="small" [height]="36" [options]="wardOptions" bindLabel="label" bindValue="value" [(ngModel)]="wardId" (ngModelChange)="applyFilters()" />
         </label>
         <label class="flex flex-col min-w-0 w-full sm:w-32">
           <span class="mb-1 text-xs font-medium text-secondary">Floor</span>
-          <boo-select size="small" [options]="floorOptions" bindLabel="label" bindValue="value" [(ngModel)]="floor" (ngModelChange)="applyFilters()" />
+          <boo-select size="small" [height]="36" [options]="floorOptions" bindLabel="label" bindValue="value" [(ngModel)]="floor" (ngModelChange)="applyFilters()" />
         </label>
         <label class="flex flex-col min-w-0 w-full sm:w-40">
           <span class="mb-1 text-xs font-medium text-secondary">Bed type</span>
-          <boo-select size="small" [options]="typeOptions" bindLabel="label" bindValue="value" [(ngModel)]="bedType" (ngModelChange)="applyFilters()" />
+          <boo-select size="small" [height]="36" [options]="typeOptions" bindLabel="label" bindValue="value" [(ngModel)]="bedType" (ngModelChange)="applyFilters()" />
         </label>
       </div>
 

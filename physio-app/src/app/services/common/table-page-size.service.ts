@@ -1,6 +1,5 @@
-import { DestroyRef, ElementRef, Injectable, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, fromEvent, Observable } from 'rxjs';
+import { ElementRef, Injectable } from '@angular/core';
+import { fromEvent, Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
 
 export interface PageSizeOptions {
@@ -16,8 +15,6 @@ export interface PageSizeOptions {
 
 @Injectable({ providedIn: 'root' })
 export class TablePageSizeService {
-  private destroyRef = inject(DestroyRef);
-
   private static readonly DEFAULTS: Required<Omit<PageSizeOptions, 'hostElement'>> = {
     rowHeight: 48,
     toolbarHeight: 48,
@@ -44,20 +41,17 @@ export class TablePageSizeService {
     return Math.max(o.min, Math.min(o.max, rows));
   }
 
+  /**
+   * Emits the page size now and again whenever a window resize changes it. The resize listener belongs to the
+   * subscription, so callers unsubscribe (e.g. `takeUntilDestroyed`) to release it with their component.
+   */
   watch(opts: PageSizeOptions = {}): Observable<number> {
-    const subject = new BehaviorSubject<number>(this.calculate(opts));
-
-    fromEvent(window, 'resize')
-      .pipe(
-        debounceTime(120),
-        map(() => this.calculate(opts)),
-        startWith(subject.value),
-        distinctUntilChanged(),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(size => subject.next(size));
-
-    return subject.asObservable();
+    return fromEvent(window, 'resize').pipe(
+      debounceTime(120),
+      startWith(null),
+      map(() => this.calculate(opts)),
+      distinctUntilChanged()
+    );
   }
 
   private resolveHost(host?: ElementRef<HTMLElement> | HTMLElement): HTMLElement | null {

@@ -34,6 +34,8 @@
     <div *ngIf="loadError !== 'forbidden'" class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
       <div class="flex-1 basis-64 min-w-0">
         <boo-search-field
+          size="small"
+          [height]="36"
           label="Search admissions"
           placeholder="Patient name, patient no. or admission no."
           [busy]="loading && !!query.trim()"
@@ -44,21 +46,21 @@
       </div>
       <label class="flex flex-col min-w-0 w-full sm:w-40">
         <span class="mb-1 text-xs font-medium text-secondary">Status</span>
-        <boo-select size="small" [options]="statusOptions" [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()" />
+        <boo-select size="small" [height]="36" [options]="statusOptions" [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()" />
       </label>
       <label class="flex flex-col min-w-0 w-full sm:w-40">
         <span class="mb-1 text-xs font-medium text-secondary">Type</span>
-        <boo-select size="small" [options]="typeOptions" [(ngModel)]="typeFilter" (ngModelChange)="applyFilters()" />
+        <boo-select size="small" [height]="36" [options]="typeOptions" [(ngModel)]="typeFilter" (ngModelChange)="applyFilters()" />
       </label>
       <label class="flex flex-col min-w-0 w-full sm:w-48">
         <span class="mb-1 text-xs font-medium text-secondary">Department</span>
-        <boo-select size="small" [options]="departmentOptions" [(ngModel)]="departmentId" (ngModelChange)="applyFilters()" />
+        <boo-select size="small" [height]="36" [options]="departmentOptions" [(ngModel)]="departmentId" (ngModelChange)="applyFilters()" />
       </label>
       <fieldset class="m-0 p-0 border-0 min-w-0 flex items-end gap-2">
         <legend class="float-left w-full mb-1 text-xs font-medium text-secondary">Admitted between</legend>
-        <div class="w-36"><boo-datepicker size="small" label="From" [max]="to" [(ngModel)]="from" (ngModelChange)="applyFilters()" /></div>
+        <div class="w-36"><boo-datepicker size="small" [height]="36" label="From" [max]="to" [(ngModel)]="from" (ngModelChange)="applyFilters()" /></div>
         <span class="h-9 flex items-center text-secondary text-sm" aria-hidden="true">–</span>
-        <div class="w-36"><boo-datepicker size="small" label="To" [min]="from" [(ngModel)]="to" (ngModelChange)="applyFilters()" /></div>
+        <div class="w-36"><boo-datepicker size="small" [height]="36" label="To" [min]="from" [(ngModel)]="to" (ngModelChange)="applyFilters()" /></div>
       </fieldset>
     </div>
     <p *ngIf="rangeInvalid" class="m-0 px-4 py-2 text-xs text-danger border-b border-rowDivider" role="alert">The start date must be on or before the end date.</p>

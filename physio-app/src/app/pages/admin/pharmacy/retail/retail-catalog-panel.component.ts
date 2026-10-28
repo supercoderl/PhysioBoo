@@ -31,7 +31,7 @@ const PAGE_SIZE = 12;
   template: `
     <section class="flex h-full min-h-0 flex-col bg-surface border border-borderGray/60 rounded-2" aria-label="Medicine catalog">
       <div class="shrink-0 p-4 space-y-3 border-b border-borderGray/60">
-        <boo-search-field label="Search medicines" placeholder="Search by name, generic name or exact barcode (F2)" [busy]="loading() && view() === 'Catalog'"
+        <boo-search-field size="middle" label="Search medicines" placeholder="Search by name, generic name or exact barcode (F2)" [busy]="loading() && view() === 'Catalog'"
           [ngModel]="search" (ngModelChange)="onSearchInput($event)" (clear)="clearSearch()"></boo-search-field>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">

@@ -1,138 +1,265 @@
-import { Component, OnInit, signal } from "@angular/core";
-import { catchError, of } from "rxjs";
-import { ButtonIconComponent } from "../../../../../components/button/button-icon/button-icon.component";
-import { BooInputComponent } from '@physioboo/ui';
-import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
-import { SettingAdminMenuDrawerComponent } from "../../../../../components/layout/admin/setting/admin-menu/admin-menu-drawer.component";
-import { SettingAdminMenuTreeCardComponent } from "../../../../../components/layout/admin/setting/admin-menu/admin-menu-tree-card.component";
+import { Component, OnInit, computed, inject, signal } from "@angular/core";
+import { BooSearchFieldComponent } from '@physioboo/ui';
+import { finalize } from "rxjs";
+import { CategoryFilterChip, CommonCategoryPageComponent } from "../../../../../components/layout/admin/system/common-category/shared/category-page.component";
+import { SuperadminMenuDrawerComponent } from "../../../../../components/layout/superadmin/access/menu-drawer.component";
+import { MenuRowEvent, SuperadminMenuTreeComponent } from "../../../../../components/layout/superadmin/access/menu-tree.component";
 import { MenuService } from "../../../../../services/admin/menu.service";
+import { PermissionService } from "../../../../../services/admin/permission.service";
+import { AuthService } from "../../../../../services/auth/auth.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
-import { LocalLoadingService } from "../../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../../services/common/toast.service";
+import { Permissions } from "../../../../../shared/constants/permission.constant";
 import { SharedModule } from "../../../../../shared/shared-imports";
-import { LoadingKeys } from "../../../../../shared/types/loading";
 import { MenuItem } from "../../../../../shared/types/menu.types";
+import { Permission } from "../../../../../shared/types/permission.types";
+import { menuAreaOf, menuPermissionOf } from "../../../../../shared/utils/menu.utils";
 
+/**
+ * Settings > Admin Menu: the sections and pages of the admin sidebar (/api/admin-menus), two levels deep, each with
+ * an icon, route, display order, required permission and active flag. The rows are shared by every tenant; Super
+ * Admin rows (routes under /superadmin) are managed in the Super Admin console and are not listed here.
+ * The tree and drawer are the Super Admin menu editor's, opened on the admin area.
+ */
 @Component({
     selector: 'setting-admin-menu',
     standalone: true,
     imports: [
         SharedModule,
-        AdminContentHeaderComponent,
-        ButtonIconComponent,
-        BooInputComponent,
-        SettingAdminMenuTreeCardComponent,
-        SettingAdminMenuDrawerComponent
+        CommonCategoryPageComponent,
+        SuperadminMenuTreeComponent,
+        SuperadminMenuDrawerComponent,
+        BooSearchFieldComponent
     ],
-    templateUrl: './admin-menu.component.html',
-    host: { class: 'block h-full min-h-0' }
+    host: { class: 'flex flex-1 min-h-0 min-w-0 flex-col' },
+    template: `
+        <common-category-page
+            heading="Admin Menu"
+            description="Sections and pages of the admin sidebar"
+            plural="menu items"
+            createLabel="New section"
+            [countLabel]="countLabel()"
+            [canCreate]="canCreate"
+            [chips]="chips()"
+            [loading]="loading()"
+            [loadFailed]="loadFailed()"
+            [hasData]="loaded()"
+            (create)="openCreate(null)"
+            (removeChip)="onSearchClear()"
+            (clearFilters)="onSearchClear()"
+            (retry)="load()"
+        >
+            <div class="flex flex-1 min-h-0 min-w-0 flex-col gap-3">
+                <div class="shrink-0 flex flex-wrap items-center justify-between gap-3">
+                    <boo-search-field
+                        class="w-full sm:w-72"
+                        size="small"
+                        label="Search menu items"
+                        placeholder="Search by label or route"
+                        [ngModel]="search()"
+                        (ngModelChange)="search.set($event)"
+                        (clear)="onSearchClear()"
+                    />
+                    <p class="m-0 flex items-center gap-2 text-xs text-amber-800" role="note">
+                        <physio-icon name="triangle-alert" [size]="14" class="shrink-0" aria-hidden="true" />
+                        Changes apply to every clinic’s admin sidebar.
+                    </p>
+                </div>
+
+                <div class="flex-1 min-h-0 overflow-y-auto boo-scrollbar" aria-label="Menu structure">
+                    <div *ngIf="search() && !loading() && !visibleSections().length; else tree" class="bg-surface rounded-2 border border-borderGray/60 py-12 text-center text-sm text-secondary" role="status">
+                        No menu items match “{{ search() }}”.
+                    </div>
+                    <ng-template #tree>
+                        <superadmin-menu-tree
+                            [sections]="visibleSections()"
+                            [loading]="loading() && !loaded()"
+                            [canCreate]="canCreate"
+                            [canUpdate]="canUpdate"
+                            [canDelete]="canDelete"
+                            [expandAll]="!!search()"
+                            (addSection)="openCreate(null)"
+                            (addChild)="openCreate($event)"
+                            (edit)="openEdit($event)"
+                            (remove)="onDelete($event)"
+                        />
+                    </ng-template>
+                </div>
+            </div>
+        </common-category-page>
+
+        <superadmin-menu-drawer
+            [isOpen]="isDrawerOpen()"
+            [item]="editingItem()"
+            [parentId]="drawerParentId()"
+            [sections]="sections()"
+            [area]="'admin'"
+            [permissions]="permissions()"
+            [permissionsFailed]="permissionsFailed()"
+            (close)="closeDrawer()"
+            (saved)="onSaved()"
+        />
+    `
 })
 export class SettingAdminMenuComponent implements OnInit {
+    // #region Inject Services
+    private readonly menuSrv = inject(MenuService);
+    private readonly permissionSrv = inject(PermissionService);
+    private readonly authSrv = inject(AuthService);
+    private readonly dialogSrv = inject(DialogService);
+    private readonly toastSrv = inject(ToastService);
+    // #endregion
+
     // #region Inputs, Outputs, Properties
-    menus = signal<MenuItem[]>([]);
-    filteredMenus = signal<MenuItem[]>([]);
-    isDrawerOpen = false;
-    selectedItem: MenuItem | null = null;
-    pendingParentId: string | null = null;
-    searchTerm = '';
-    LoadingKeys = LoadingKeys;
+    readonly canCreate = this.authSrv.hasPermission(Permissions.Admin.AdminMenuCreate);
+    readonly canUpdate = this.authSrv.hasPermission(Permissions.Admin.AdminMenuUpdate);
+    readonly canDelete = this.authSrv.hasPermission(Permissions.Admin.AdminMenuDelete);
+
+    readonly roots = signal<MenuItem[]>([]);
+    readonly loading = signal(true);
+    readonly loaded = signal(false);
+    readonly loadFailed = signal(false);
+    readonly search = signal('');
+
+    readonly permissions = signal<Permission[]>([]);
+    readonly permissionsFailed = signal(false);
+
+    readonly isDrawerOpen = signal(false);
+    readonly editingItem = signal<MenuItem | null>(null);
+    readonly drawerParentId = signal<string | null>(null);
+
+    /** Admin-area sections in display order, each with its pages in order. */
+    readonly sections = computed(() => this.roots()
+        .filter(root => menuAreaOf(root) === 'admin')
+        .sort((a, b) => a.order - b.order)
+        .map(root => ({ ...root, children: [...(root.children ?? [])].sort((a, b) => a.order - b.order) })));
+
+    /** A section stays when it or one of its pages matches; a matching section keeps all its pages. */
+    readonly visibleSections = computed(() => {
+        const term = this.search().trim().toLowerCase();
+        if (!term) return this.sections();
+        const matches = (m: MenuItem) => [m.label, m.route, menuPermissionOf(m)].some(v => (v ?? '').toLowerCase().includes(term));
+        return this.sections().reduce<MenuItem[]>((acc, section) => {
+            if (matches(section)) acc.push(section);
+            else {
+                const children = (section.children ?? []).filter(matches);
+                if (children.length) acc.push({ ...section, children });
+            }
+            return acc;
+        }, []);
+    });
+
+    readonly countLabel = computed(() => {
+        if (!this.loaded()) return '';
+        const sections = this.sections();
+        const pages = sections.reduce((sum, s) => sum + (s.children?.length ?? 0), 0);
+        return `${sections.length} section${sections.length === 1 ? '' : 's'}, ${pages} page${pages === 1 ? '' : 's'}`;
+    });
+
+    readonly chips = computed<CategoryFilterChip[]>(() => this.search().trim()
+        ? [{ key: 'search', label: `“${this.search().trim()}”` }]
+        : []);
     // #endregion
 
     // #region Init (Lifecycle + Setup)
-    constructor(
-        private menuSrv: MenuService,
-        private dialogSrv: DialogService,
-        private toastSrv: ToastService,
-        protected loadingSrv: LocalLoadingService
-    ) { }
-
     ngOnInit(): void {
-        this.loadMenus();
+        this.load();
+        if (this.canCreate || this.canUpdate) this.loadPermissions();
     }
     // #endregion
 
     // #region Methods
-    loadMenus() {
-        this.menuSrv.search().subscribe(_res => {
-            if (_res.success) {
-                this.menus.set(_res.data?.items ?? []);
-                this.applySearch();
-            }
+    load(): void {
+        this.loading.set(true);
+        this.loadFailed.set(false);
+        this.menuSrv.search()
+            .pipe(finalize(() => this.loading.set(false)))
+            .subscribe({
+                next: res => {
+                    if (!res.success) { this.loadFailed.set(true); return; }
+                    this.roots.set(res.data?.items ?? []);
+                    this.loaded.set(true);
+                },
+                // The interceptor reports the reason; the last tree stays on screen with a retry.
+                error: () => this.loadFailed.set(true)
+            });
+    }
+
+    /** Feeds the drawer's permission picker; without it the drawer falls back to typing the code. */
+    private loadPermissions(): void {
+        this.permissionSrv.search({
+            pageNumber: 1,
+            pageSize: 500,
+            search: '',
+            sort: '+category',
+            filter: { start: '', end: '', category: null, isActive: null }
+        }).subscribe({
+            next: res => {
+                if (res.success) this.permissions.set(res.data?.items ?? []);
+                else this.permissionsFailed.set(true);
+            },
+            error: () => this.permissionsFailed.set(true)
         });
     }
 
-    applySearch() {
-        const term = this.searchTerm.toLowerCase().trim();
-        if (!term) {
-            this.filteredMenus.set(this.menus());
-            return;
-        }
-        this.filteredMenus.set(this.filterTree(this.menus(), term));
+    onSearchClear(): void {
+        this.search.set('');
     }
 
-    private filterTree(items: MenuItem[], term: string): MenuItem[] {
-        return items.reduce<MenuItem[]>((acc, item) => {
-            const matchesSelf = item.label.toLowerCase().includes(term) || item.route?.toLowerCase().includes(term);
-            const filteredChildren = this.filterTree(item.children ?? [], term);
-            if (matchesSelf || filteredChildren.length > 0) {
-                acc.push({ ...item, children: filteredChildren });
-            }
-            return acc;
-        }, []);
+    /** `section` = the section a new page goes into; `null` creates a new top-level section. */
+    openCreate(section: MenuItem | null): void {
+        if (!this.canCreate) return;
+        this.editingItem.set(null);
+        this.drawerParentId.set(section?.id ?? null);
+        this.isDrawerOpen.set(true);
     }
 
-    onSearch(val: string) {
-        this.searchTerm = val;
-        this.applySearch();
+    /** The detail endpoint returns no parent id, so the parent comes from the tree; saving keeps the row where it is. */
+    openEdit(event: MenuRowEvent): void {
+        if (!this.canUpdate) return;
+        this.editingItem.set(event.item);
+        this.drawerParentId.set(event.parent?.id ?? null);
+        this.isDrawerOpen.set(true);
     }
 
-    onOpenDrawer(item: MenuItem | null, parentId: string | null = null) {
-        this.selectedItem = item;
-        this.pendingParentId = parentId;
-        this.isDrawerOpen = true;
+    closeDrawer(): void {
+        this.isDrawerOpen.set(false);
+        this.editingItem.set(null);
+        this.drawerParentId.set(null);
     }
 
-    onCloseDrawer() {
-        this.isDrawerOpen = false;
-        this.selectedItem = null;
-        this.pendingParentId = null;
+    onSaved(): void {
+        this.closeDrawer();
+        this.load();
+        this.refreshSidebar();
     }
 
-    onSaveSuccess(_result: MenuItem) {
-        this.onCloseDrawer();
-        this.loadMenus();
-        this.toastSrv.success('Menu item saved successfully.');
-    }
+    onDelete(event: MenuRowEvent): void {
+        if (!this.canDelete) return;
+        const { item } = event;
+        const childCount = item.children?.length ?? 0;
+        const name = childCount
+            ? `"${item.label}" and its ${childCount} page${childCount === 1 ? '' : 's'}`
+            : `"${item.label}"`;
 
-    onDelete(id: string) {
         this.dialogSrv.confirmDelete(() => {
-            this.menuSrv.delete(id)
-                .pipe(
-                    catchError(_ => {
-                        this.toastSrv.error('System error occurred.');
-                        return of(null);
-                    })
-                )
-                .subscribe(_ => {
-                    if (_ !== null) {
-                        this.toastSrv.success('Item deleted. Please perform a hard refresh (Ctrl + F5) to update the menu.');
-                        this.isDrawerOpen && this.onCloseDrawer();
-                        this.loadMenus();
-                    }
-                });
+            this.menuSrv.delete(item.id).subscribe({
+                next: () => {
+                    this.toastSrv.success(`Deleted ${item.label}`);
+                    this.load();
+                    this.refreshSidebar();
+                },
+                error: () => undefined
+            });
+        }, name);
+    }
+
+    /** Re-reads the signed-in user's own menu so this sidebar shows the change without a reload. */
+    private refreshSidebar(): void {
+        this.menuSrv.getMine().subscribe({
+            next: res => { if (res.success) this.menuSrv.publish(res.data); },
+            error: () => undefined
         });
-    }
-
-    get flatMenus(): MenuItem[] {
-        return this.flattenTree(this.menus());
-    }
-
-    private flattenTree(items: MenuItem[]): MenuItem[] {
-        return items.reduce<MenuItem[]>((acc, item) => {
-            acc.push(item);
-            if (item.children?.length) acc.push(...this.flattenTree(item.children));
-            return acc;
-        }, []);
     }
     // #endregion
 }

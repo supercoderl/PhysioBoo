@@ -70,9 +70,11 @@
       </div>
     </div>
 
-    <!-- Search, priority, dates and sort. Field labels (20px) over 36px controls line up with the 56px search field. -->
+    <!-- Search, priority, dates and sort. Every control is 36px high and the row aligns on its bottom edge, under the field labels. -->
     <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
       <boo-search-field
+        size="small"
+        [height]="36"
         class="flex-1 basis-64 min-w-0"
         label="Search leads by name, phone or email"
         placeholder="Search by name, phone or email"

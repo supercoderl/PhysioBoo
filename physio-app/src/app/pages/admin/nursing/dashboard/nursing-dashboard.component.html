@@ -117,7 +117,7 @@
     <dashboard-panel title="Assigned patients" icon="users" [caption]="filteredPatients.length + ' of ' + patients.length + ' shown'">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end px-4 py-3 border-b border-rowDivider">
         <div class="md:col-span-2">
-          <boo-search-field label="Search patients" placeholder="Search by patient, number or bed" [(ngModel)]="search" (clear)="search = ''" />
+          <boo-search-field size="middle" label="Search patients" placeholder="Search by patient, number or bed" [(ngModel)]="search" (clear)="search = ''" />
         </div>
         <boo-select *ngIf="wards.length > 1" label="Ward" [(ngModel)]="wardId" [options]="wardOptions" bindLabel="label" bindValue="value" />
         <boo-select label="Risk" [(ngModel)]="riskFilter" [options]="riskOptions" bindLabel="label" bindValue="value" />

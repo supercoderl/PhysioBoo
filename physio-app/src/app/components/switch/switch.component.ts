@@ -12,6 +12,9 @@ import { SharedModule } from '../../shared/shared-imports';
 export class SwitchComponent {
   // #region Inputs, Outputs, Properties
   @Input() isOpen: boolean | null | undefined = false;
+  @Input() disabled = false;
+  /** Accessible name when no visible label is associated with the switch. */
+  @Input() ariaLabel = '';
   @Output() change = new EventEmitter<void>();
   // #endregion
 

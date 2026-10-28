@@ -34,6 +34,11 @@ export class LabTestCategoryService {
         return this.labTestCategories$;
     }
 
+    /** Drops the cached lookup so the next `lookup()` refetches (after categories change). */
+    clearLookupCache(): void {
+        this.labTestCategories$ = undefined;
+    }
+
     search_by_id(id: string) {
         return this.http.get<PagedResponse<LabTestCategory | null>>(`${BASE_API.LABTESTCATEGORY.BASE}/${id}`);
     }

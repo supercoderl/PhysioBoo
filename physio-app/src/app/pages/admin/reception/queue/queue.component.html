@@ -41,7 +41,7 @@
             <physio-icon name="chevron-left" [size]="16" />
           </button>
           <div class="w-40">
-            <boo-datepicker size="small" label="Queue date" [(ngModel)]="date" (ngModelChange)="onScopeChange()" />
+            <boo-datepicker size="small" [height]="36" label="Queue date" [(ngModel)]="date" (ngModelChange)="onScopeChange()" />
           </div>
           <button boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Next day" (click)="shiftDay(1)">
             <physio-icon name="chevron-right" [size]="16" />
@@ -54,6 +54,7 @@
         <span class="mb-1 text-xs font-medium text-secondary">Doctor</span>
         <boo-select
           size="small"
+          [height]="36"
           [options]="doctorOptions"
           bindLabel="fullName"
           bindValue="id"
@@ -63,24 +64,19 @@
         />
       </label>
 
-      <label class="flex flex-col min-w-0 flex-1 basis-56">
-        <span class="mb-1 text-xs font-medium text-secondary">Find a patient</span>
-        <span class="h-9 flex items-center gap-2 px-2.5 rounded-lg border border-borderGray bg-surface focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30">
-          <physio-icon name="search" [size]="15" class="flex-none text-secondary" aria-hidden="true" />
-          <input
-            type="search"
-            [(ngModel)]="query"
-            (ngModelChange)="onQueryChange()"
-            placeholder="Name, patient no., phone or booking no."
-            maxlength="100"
-            autocomplete="off"
-            class="flex-1 min-w-0 h-full border-0 bg-transparent text-sm text-regular placeholder:text-placeholder outline-none [&::-webkit-search-cancel-button]:hidden"
-          />
-          <button *ngIf="query" type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Clear search" (click)="clearQuery()">
-            <physio-icon name="x" [size]="14" />
-          </button>
-        </span>
-      </label>
+      <div class="flex flex-col min-w-0 flex-1 basis-56">
+        <span class="mb-1 text-xs font-medium text-secondary" aria-hidden="true">Find a patient</span>
+        <boo-search-field
+          size="small"
+          [height]="36"
+          label="Find a patient"
+          placeholder="Name, patient no., phone or booking no."
+          [maxlength]="100"
+          [(ngModel)]="query"
+          (ngModelChange)="onQueryChange()"
+          (clear)="clearQuery()"
+        />
+      </div>
     </div>
 
     <!-- Stage filter -->

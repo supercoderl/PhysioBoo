@@ -24,7 +24,7 @@ interface DispenseFilterChip extends BooFilterChip {
           <span class="text-xs text-secondary" aria-live="polite">{{ loading ? 'Loading…' : items.length + (items.length === 1 ? ' result' : ' results') }}</span>
         </div>
 
-        <boo-search-field label="Search prescriptions" placeholder="Patient, MRN or Rx number"
+        <boo-search-field size="middle" label="Search prescriptions" placeholder="Patient, MRN or Rx number"
           [ngModel]="search" (ngModelChange)="searchChange.emit($event)" (clear)="searchChange.emit('')" [busy]="searching"></boo-search-field>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">

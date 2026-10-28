@@ -31,7 +31,7 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
                 title="No menu sections yet"
                 description="Sections group the pages in the sidebar. Add one, then add pages to it."
             >
-                <boo-button-admin (click)="addSection.emit()" textColor="white" padding="8px 16px" fontWeight="600">
+                <boo-button-admin *ngIf="canCreate" (click)="addSection.emit()" textColor="white" padding="8px 16px" fontWeight="600">
                     New section
                 </boo-button-admin>
             </boo-empty-state>
@@ -83,13 +83,13 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
                         <boo-status-badge [label]="section.isActive ? 'Active' : 'Inactive'" [tone]="section.isActive ? 'success' : 'neutral'" [dotted]="true" />
                     </div>
                     <div role="cell" class="flex items-center justify-end px-2" (click)="$event.stopPropagation()">
-                        <button type="button" [class]="iconButton" [attr.aria-label]="'Add a page to ' + section.label" title="Add page" (click)="addChild.emit(section)">
+                        <button *ngIf="canCreate" type="button" [class]="iconButton" [attr.aria-label]="'Add a page to ' + section.label" title="Add page" (click)="addChild.emit(section)">
                             <physio-icon name="plus" />
                         </button>
-                        <button type="button" [class]="iconButton" [attr.aria-label]="'Edit section ' + section.label" title="Edit" (click)="edit.emit({ item: section, parent: null })">
+                        <button *ngIf="canUpdate" type="button" [class]="iconButton" [attr.aria-label]="'Edit section ' + section.label" title="Edit" (click)="edit.emit({ item: section, parent: null })">
                             <physio-icon name="pencil" />
                         </button>
-                        <button type="button" [class]="iconButton + ' hover:!text-danger'" [attr.aria-label]="'Delete section ' + section.label" title="Delete" (click)="remove.emit({ item: section, parent: null })">
+                        <button *ngIf="canDelete" type="button" [class]="iconButton + ' hover:!text-danger'" [attr.aria-label]="'Delete section ' + section.label" title="Delete" (click)="remove.emit({ item: section, parent: null })">
                             <physio-icon name="trash" />
                         </button>
                     </div>
@@ -130,10 +130,10 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
                         <boo-status-badge [label]="child.isActive ? 'Active' : 'Inactive'" [tone]="child.isActive ? 'success' : 'neutral'" [dotted]="true" />
                     </div>
                     <div role="cell" class="flex items-center justify-end px-2">
-                        <button type="button" [class]="iconButton" [attr.aria-label]="'Edit page ' + child.label" title="Edit" (click)="edit.emit({ item: child, parent: section })">
+                        <button *ngIf="canUpdate" type="button" [class]="iconButton" [attr.aria-label]="'Edit page ' + child.label" title="Edit" (click)="edit.emit({ item: child, parent: section })">
                             <physio-icon name="pencil" />
                         </button>
-                        <button type="button" [class]="iconButton + ' hover:!text-danger'" [attr.aria-label]="'Delete page ' + child.label" title="Delete" (click)="remove.emit({ item: child, parent: section })">
+                        <button *ngIf="canDelete" type="button" [class]="iconButton + ' hover:!text-danger'" [attr.aria-label]="'Delete page ' + child.label" title="Delete" (click)="remove.emit({ item: child, parent: section })">
                             <physio-icon name="trash" />
                         </button>
                     </div>
@@ -145,6 +145,12 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
 export class SuperadminMenuTreeComponent {
     @Input() sections: MenuItem[] = [];
     @Input() loading = false;
+    /** Row actions follow the caller's menu permissions; all on by default (the Super Admin console). */
+    @Input() canCreate = true;
+    @Input() canUpdate = true;
+    @Input() canDelete = true;
+    /** Shows every section open, e.g. while a search narrows the tree. */
+    @Input() expandAll = false;
     @Output() addSection = new EventEmitter<void>();
     @Output() addChild = new EventEmitter<MenuItem>();
     @Output() edit = new EventEmitter<MenuRowEvent>();
@@ -159,11 +165,11 @@ export class SuperadminMenuTreeComponent {
     readonly permission = menuPermissionOf;
 
     isOpen(section: MenuItem): boolean {
-        return this.expanded.has(section.id);
+        return this.expandAll || this.expanded.has(section.id);
     }
 
     toggle(section: MenuItem): void {
-        if (!section.children?.length) return;
+        if (!section.children?.length || this.expandAll) return;
         if (!this.expanded.delete(section.id)) this.expanded.add(section.id);
     }
 }

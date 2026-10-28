@@ -11,6 +11,7 @@ import {
     BooIconComponent,
     BooInlineErrorComponent,
     BooInlineErrorState,
+    BooSearchFieldComponent,
     BooStatusBadgeComponent,
 } from '@physioboo/ui';
 import { Subject, from, interval, of } from 'rxjs';
@@ -108,6 +109,7 @@ function fold(text: string | null | undefined): string {
         BooEmptyStateComponent,
         BooErrorStateComponent,
         BooInlineErrorComponent,
+        BooSearchFieldComponent,
         BookingDetailDrawerComponent,
     ],
     templateUrl: './queue.component.html',

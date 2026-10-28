@@ -1,44 +1,47 @@
-<admin-content-header>
-  <div
-    class="flex items-center md:flex-column gap-2 pb-3 mb-2 border-1 border-bottom"
-  >
-    <div class="flex-1">
-      <h4 class="text-[22px] text-primary font-semibold mb-0">Department</h4>
-    </div>
-    <div class="text-right flex">
-      <button-icon
-        buttonClass="!bg-primary ms-2 text-white"
-        (onClick)="onOpenDrawer(null)"
-      >
-        New Item
-      </button-icon>
-    </div>
-  </div>
-
-  <div class="flex-1 min-h-0" #tableHost>
+<common-category-page
+  heading="Departments"
+  description="Clinical and support units of the hospital, with beds, care provided and contacts"
+  plural="departments"
+  createLabel="New department"
+  [countLabel]="countLabel"
+  [canCreate]="canCreate"
+  [chips]="chips"
+  [loading]="loading()"
+  [loadFailed]="loadFailed()"
+  [hasData]="!!tableData()"
+  (create)="onOpenDrawer(null)"
+  (removeChip)="removeChip($event)"
+  (clearFilters)="clearFilters()"
+  (retry)="load()"
+>
+  <div #tableHost class="flex flex-1 min-h-0 min-w-0 flex-col">
     <common-category-department-table-card
       [data]="tableData()"
-      [sortOptions]="sort_options"
+      [filter]="params"
+      [loading]="loading()"
+      [sortOptions]="sortOptions"
       [currentSort]="params.sort"
-      [filterConfigs]="filter_configs"
+      [filterConfigs]="filterConfigs"
       [currentFilter]="params.filter"
+      [canUpdate]="canUpdate"
+      [canDelete]="canDelete"
       (pageChange)="onPageChanged($event)"
+      (searchChange)="onSearch($event)"
+      (reloadClick)="load()"
+      (sortApply)="onSortChange($event)"
+      (filterApply)="onFilterChange($event)"
       (editClick)="onOpenDrawer($event)"
       (deleteClick)="onDelete($event)"
-      (searchChange)="onSearch($event)"
-      (reloadClick)="loadDepartments()"
       (bulkAction)="onBulkAction($event)"
-      (sortApply)="onSortChange($event)"
-      (filterApply)="onSingleFilterChange($event)"
-      [filter]="params"
     />
   </div>
+</common-category-page>
 
-  <common-category-department-drawer
-    [isOpen]="isDrawerOpen"
-    [currentId]="selectedId"
-    (close)="onCloseDrawer()"
-    (saveSuccess)="onSaveSuccess()"
-    (delete)="onDelete($event)"
-  />
-</admin-content-header>
+<common-category-department-drawer
+  [isOpen]="isDrawerOpen"
+  [currentId]="selectedId"
+  [canDelete]="canDelete"
+  (close)="onCloseDrawer()"
+  (saveSuccess)="onSaveSuccess()"
+  (delete)="onDelete($event)"
+/>

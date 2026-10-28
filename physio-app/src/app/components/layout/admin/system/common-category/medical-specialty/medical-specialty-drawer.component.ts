@@ -1,326 +1,182 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { finalize, firstValueFrom } from "rxjs";
+import { Component, Input, OnChanges, SimpleChanges, inject } from "@angular/core";
+import { FormBuilder, Validators } from "@angular/forms";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { MedicalSpecialtyService } from "../../../../../../services/admin/medical-specialty.service";
-import { LocalLoadingService } from "../../../../../../services/common/local-loading.service";
-import { ToastService } from "../../../../../../services/common/toast.service";
-import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING } from "../../../../../../shared/constants/error.constant";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { MedicalSpecialty } from "../../../../../../shared/types/medical-staff.types";
-import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
-import { DrawerComponent } from "../../../../../drawer/drawer.component";
 import { BooSelectComponent } from "../../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";
 import { BooUploadComponent } from "../../../../../upload/boo-upload/boo-upload.component";
+import { CategoryDrawerBase } from "../shared/category-drawer.base";
+import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-shell.component";
 
+const SPECIALTY_CATEGORIES = ['Clinical', 'Paraclinical', 'Administrative'];
+
+/** Create / edit a medical specialty (POST /medical-specialties, PATCH /medical-specialties/{id}). */
 @Component({
     selector: 'common-category-medical-specialty-drawer',
     standalone: true,
     imports: [
         SharedModule,
-        DrawerComponent,
+        CommonCategoryDrawerShellComponent,
         BooInputComponent,
-
         BooTextareaComponent,
-        BooButtonAdminComponent,
-        BooSelectComponent,
         BooCheckboxComponent,
+        BooSelectComponent,
         BooUploadComponent
     ],
     template: `
-        <drawer
+        <common-category-drawer-shell
+            [form]="form"
             [isOpen]="isOpen"
-            [isShowDialog]="true"
-            (close)="onClose()"
+            [title]="isEdit ? 'Edit medical specialty' : 'New medical specialty'"
+            subtitle="How the specialty is classified and how long a consultation takes."
+            [isEdit]="isEdit"
+            [canDelete]="canDelete"
+            [loading]="loading"
+            [loadFailed]="loadFailed"
+            [saving]="saving"
+            (save)="save()"
+            (cancel)="requestClose()"
+            (discard)="discard()"
+            (delete)="onDelete()"
+            (retry)="loadDetail()"
         >
-            <div class="flex flex-col h-full bg-surface relative">
-                <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-surface z-10 sticky top-0">
-                    <div>
-                        <h2 class="text-xl font-bold text-primary leading-none mb-1">
-                            {{ currentId ? 'Edit Specialty' : 'New Specialty' }}
-                        </h2>
-                        <p class="text-sm text-secondary m-0">Configure specialty details and settings</p>
+            <ng-container [formGroup]="form">
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Basic information</h3>
+                    <div class="flex gap-5">
+                        <div class="flex-none">
+                            <boo-upload
+                                formControlName="iconUrl"
+                                width="5rem"
+                                height="5rem"
+                                [radius]="12"
+                                accept=".svg"
+                                [svgSize]="126"
+                                (uploadSuccess)="onIconUploaded($event)"
+                            />
+                            <p class="m-0 mt-1 w-20 text-center text-[11px] leading-4 text-secondary">SVG icon</p>
+                        </div>
+                        <div class="flex-1 min-w-0 flex flex-col gap-4">
+                            <boo-input label="Specialty name" [required]="true" formControlName="name" [maxlength]="150" placeholder="e.g. Cardiology" />
+                            <boo-input label="Code" formControlName="code" [maxlength]="20" placeholder="e.g. CARD" />
+                        </div>
                     </div>
-                    <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-                        <physio-icon name="x" [size]="20"></physio-icon>
-                    </button>
-                </div>
+                </section>
 
-                <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
-                    <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
+                <section class="px-6 py-5 border-b border-rowDivider">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Classification</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <boo-select label="Parent specialty" formControlName="parentSpecialtyId" [options]="parentChoices" />
+                        <boo-select label="Category" formControlName="category" [options]="categoryOptions" />
                     </div>
-                    <div class="p-6">
-                        <div class="flex gap-5">
-                            <div class="flex-shrink-0">
-                                <boo-upload 
-                                    formControlName="iconUrl"
-                                    width="5rem" 
-                                    height="5rem"
-                                    [radius]="12"
-                                    [accept]="'.svg'"
-                                    [svgSize]="126"
-                                    (uploadSuccess)="onIconUploaded($event)"
-                                />
-                            </div>
-                            <div class="flex-1 space-y-4">
-                                <boo-input label="Specialty Name" [required]="true" formControlName="name" placeholder="Ex: Cardiology"></boo-input>
-                                <boo-input label="Code" formControlName="code" placeholder="Ex: CARD-01"></boo-input>
-                            </div>
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="isSurgical" label="Surgical" />
+                        </div>
+                        <div class="rounded-xl border border-borderGray px-3 py-2.5">
+                            <boo-checkbox formControlName="isDiagnostic" label="Diagnostic" />
                         </div>
                     </div>
-                    <div class="h-px bg-gray-100 mx-6"></div>
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Classification</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Parent Specialty</label>
-                                <boo-select 
-                                    label="Root Level"
-                                    formControlName="parentSpecialtyId"
-                                    [options]="[
-                                        { label: 'Root Level', value: null }
-                                    ]"
-                                ></boo-select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Category Type</label>
-                                <boo-select 
-                                    label="Clinical"
-                                    formControlName="category"
-                                    [options]="[
-                                        { label: 'Clinical', value: 'Clinical' },
-                                        { label: 'Paraclinical', value: 'Paraclinical' },
-                                        { label: 'Adminstrative', value: 'Adminstrative' }
-                                    ]"
-                                ></boo-select>
-                            </div>
-                        </div>
+                    <div class="mt-4 sm:w-1/2 sm:pr-2">
+                        <boo-input type="number" label="Avg. consultation (min)" formControlName="averageConsultationDuration" placeholder="30" />
                     </div>
-                    <div class="h-px bg-gray-100 mx-6"></div>
-                    <div class="p-6">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Settings & Configuration</h3>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div 
-                                class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('isSurgical')?.value, 'border-gray-200': !form.get('isSurgical')?.value}"
-                                (click)="toggleCheck('isSurgical')"
-                            >
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center shrink-0">
-                                        <img src="assets/images/default/surgery.png" class="w-5 h-5 opacity-80" alt="icon" onerror="this.style.display='none'">
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Surgical</span>
-                                </div>
-                                <boo-checkbox formControlName="isSurgical"></boo-checkbox>
-                            </div>
-                            <div 
-                                class="border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 hover:shadow-sm"
-                                [ngClass]="{'border-primary bg-primary/5': form.get('isDiagnostic')?.value, 'border-gray-200': !form.get('isDiagnostic')?.value}"
-                                (click)="toggleCheck('isDiagnostic')"
-                            >
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-primarySoft flex items-center justify-center shrink-0">
-                                        <img src="assets/images/default/diagnostic.png" class="w-5 h-5 opacity-80" alt="icon" onerror="this.style.display='none'">
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Diagnostic</span>
-                                </div>
-                                <boo-checkbox formControlName="isDiagnostic"></boo-checkbox>
-                            </div>
-                        </div>
-                        <div>
-                            <boo-input type="number" label="Avg. Consultation Duration (Minutes)" formControlName="averageConsultationDuration" placeholder="30"></boo-input>
-                        </div>
+                </section>
+
+                <section class="px-6 py-5">
+                    <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Details</h3>
+                    <div class="flex flex-col gap-4">
+                        <boo-textarea label="Description" formControlName="description" />
+                        <boo-textarea label="Required qualifications" formControlName="requiredQualifications" placeholder="Degrees and certificates a doctor needs" />
                     </div>
-                    <div class="h-px bg-gray-100 mx-6"></div>
-                    <div class="p-6 pb-10">
-                        <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-4">Additional Info</h3>    
-                        <div class="space-y-4">
-                            <boo-textarea label="Description" formControlName="description" placeholder="Enter specialty description..."></boo-textarea>
-                            <boo-textarea label="Required Qualifications" formControlName="requiredQualifications" placeholder="Degrees, certificates required..."></boo-textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0 shadow-top-md">
-                    <div>
-                        <boo-button-admin *ngIf="currentId" (click)="onDelete()" background="transparent" textColor="#EF4444" padding="6px 8px" [fontSize]="14" fontWeight="500" [gap]="6" buttonClass="group">
-                            <physio-icon 
-                                name="trash" 
-                                [size]="16"
-                                [class]="'transition-transform group-hover:scale-110 text-[#ef4444]'"
-                            ></physio-icon> 
-                            <span>Delete</span>
-                        </boo-button-admin>
-                    </div>
-                    <div class="flex gap-3">
-                        <boo-button-admin
-                            buttonClass="hover:!bg-gray-200"
-                            background="transparent"
-                            (click)="onClose()"
-                            [disabled]="loadingSrv.isLoading('search-by-id')"
-                        >
-                            Cancel
-                        </boo-button-admin>
-                        <boo-button-admin
-                            textColor="white"
-                            (click)="onSave()"
-                            [disabled]="loadingSrv.isLoading('search-by-id') || loadingSrv.isLoading('create') || loadingSrv.isLoading('update')"
-                            [loading]="loadingSrv.isLoading('update')"
-                        >
-                            Save Changes
-                        </boo-button-admin>
-                    </div>
-                </div>
-            </div>
-        </drawer>
+                </section>
+            </ng-container>
+        </common-category-drawer-shell>
     `
 })
+export class CommonCategoryMedicalSpecialtyDrawerComponent extends CategoryDrawerBase<MedicalSpecialty> implements OnChanges {
+    /** Every specialty, from the list page; the one being edited is left out. */
+    @Input() parentOptions: { label: string; value: string }[] = [];
 
-export class CommonCategoryMedicalSpecialtyDrawerComponent implements OnChanges {
-    // #region Inputs, Outputs, Properties
-    @Input() isOpen = false;
-    @Input() currentId: string | null = null;
-    @Output() close = new EventEmitter<void>();
-    @Output() saveSuccess = new EventEmitter<MedicalSpecialty>();
-    @Output() delete = new EventEmitter<string>();
-    @ViewChild('scrollContainer') scrollContainer!: ElementRef;
-    form: FormGroup;
-    // #endregion
+    protected override readonly noun = 'medical specialty';
+    protected override readonly service = inject(MedicalSpecialtyService);
 
-    // #region Init (Lifecycle + Setup)
-    constructor(
-        private fb: FormBuilder,
-        private toastSrv: ToastService,
-        private medicalSpecialtySrv: MedicalSpecialtyService,
-        protected loadingSrv: LocalLoadingService
-    ) {
-        this.form = this.initForm();
-    }
+    parentChoices: { label: string; value: string | null }[] = [{ label: 'None (top level)', value: null }];
+    categoryOptions = this.categoriesWith(null);
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (!this.isOpen) return;
+    override readonly form = inject(FormBuilder).group({
+        name: ['', [Validators.required, Validators.maxLength(150), Validators.pattern(/\S/)]],
+        code: [null as string | null],
+        category: [null as string | null],
+        description: [null as string | null],
+        requiredQualifications: [null as string | null],
+        isDiagnostic: [false],
+        isSurgical: [false],
+        parentSpecialtyId: [null as string | null],
+        averageConsultationDuration: [30 as number | string, [Validators.min(0)]],
+        iconUrl: [null as string | null],
+        iconPublicId: [null as string | null]
+    });
 
-        if (changes['currentId'] && this.currentId) {
-            this.loadDetail(this.currentId);
-        } else if (!this.currentId) {
-            this.resetForm();
+    override ngOnChanges(changes: SimpleChanges): void {
+        super.ngOnChanges(changes);
+        if (changes['parentOptions'] || changes['currentId']) {
+            this.parentChoices = [
+                { label: 'None (top level)', value: null },
+                ...this.parentOptions.filter(o => o.value !== this.currentId)
+            ];
         }
     }
-    // #endregion
 
-    // #region Methods
-    private initForm(): FormGroup {
-        return this.fb.group({
-            name: ['', [Validators.required]],
-            code: [''],
-            category: ['Clinical'],
-            description: [''],
-            requiredQualifications: [''],
-            isDiagnostic: [false],
-            isSurgical: [false],
-            parentSpecialtyId: [null],
-            averageConsultationDuration: [0],
-            iconUrl: [null],
-            iconPublicId: [null]
-        });
-    }
-
-    loadDetail(id: string) {
-        this.form.disable();
-
-        this.medicalSpecialtySrv.search_by_id(id)
-            .pipe(
-                finalize(() => this.form.enable())
-            )
-            .subscribe(_res => {
-                if (_res.success) {
-                    this.form.patchValue({
-                        name: _res.data?.name,
-                        code: _res.data?.code,
-                        category: _res.data?.category,
-                        description: _res.data?.description,
-                        requiredQualifications: _res.data?.requiredQualifications,
-                        isDiagnostic: _res.data?.isDiagnostic,
-                        isSurgical: _res.data?.isSurgical,
-                        parentSpecialtyId: _res.data?.parentSpecialtyId,
-                        averageConsultationDuration: _res.data?.averageConsultationDuration,
-                        iconUrl: _res.data?.iconUrl
-                    })
-                }
-            })
-    }
-
-    toggleCheck(controlName: 'isSurgical' | 'isDiagnostic') {
-        const otherControlName = controlName === 'isSurgical' ? 'isDiagnostic' : 'isSurgical';
-        const currentValue = this.form.get(controlName)?.value;
-
-        this.form.patchValue({
-            [controlName]: !currentValue,
-            [otherControlName]: !currentValue ? false : this.form.get(otherControlName)?.value
-        });
+    onIconUploaded(data: { url: string; publicId: string }): void {
+        this.form.patchValue({ iconUrl: data.url, iconPublicId: data.publicId });
         this.form.markAsDirty();
     }
 
-    onIconUploaded(data: { url: string; publicId: string }) {
-        this.form.patchValue({
-            iconUrl: data.url,
-            iconPublicId: data.publicId
-        });
-        this.form.markAsDirty();
+    protected override defaults() {
+        this.categoryOptions = this.categoriesWith(null);
+        return {
+            name: '', code: null, category: null, description: null, requiredQualifications: null, isDiagnostic: false,
+            isSurgical: false, parentSpecialtyId: null, averageConsultationDuration: 30, iconUrl: null, iconPublicId: null
+        };
     }
 
-    async onSave() {
-        if (this.form.invalid) {
-            this.toastSrv.error('Please check required fields');
-            this.form.markAllAsTouched();
-            return;
-        }
-
-        const formData = { ...this.form.getRawValue() }
-
-        try {
-            let id: string;
-            if (this.currentId) {
-                await firstValueFrom(this.medicalSpecialtySrv.update(this.currentId, formData));
-                id = this.currentId;
-            } else {
-                const createRes = await firstValueFrom(this.medicalSpecialtySrv.create(formData));
-                if (!createRes.success || !createRes.data) {
-                    this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-                    return;
-                }
-                id = createRes.data;
-            }
-
-            const response = await firstValueFrom(this.medicalSpecialtySrv.search_by_id(id));
-            if (response.success && response.data) {
-                this.saveSuccess.emit(response.data);
-            } else this.toastSrv.error(SEARCH_BY_ID_FAILED_AFTER_CREATING_OR_UPDATING);
-        } catch (err) {
-            this.toastSrv.error(CATCH_ERROR_AFTER_CREATING_OR_UPDATING);
-            return;
-        }
+    protected override toFormValue(item: MedicalSpecialty) {
+        this.categoryOptions = this.categoriesWith(item.category ?? null);
+        return {
+            name: item.name,
+            code: item.code,
+            category: item.category,
+            description: item.description,
+            requiredQualifications: item.requiredQualifications,
+            isDiagnostic: !!item.isDiagnostic,
+            isSurgical: !!item.isSurgical,
+            parentSpecialtyId: item.parentSpecialtyId ?? null,
+            averageConsultationDuration: item.averageConsultationDuration ?? 0,
+            iconUrl: item.iconUrl
+        };
     }
 
-    resetForm() {
-        this.form.reset({
-            category: 'Clinical',
-            averageConsultationDuration: 0,
-            isDiagnostic: false,
-            isSurgical: false
-        });
+    protected override toPayload(raw: Record<string, any>) {
+        return {
+            name: this.text(raw['name']),
+            code: this.text(raw['code']),
+            category: this.text(raw['category']),
+            isSurgical: !!raw['isSurgical'],
+            isDiagnostic: !!raw['isDiagnostic'],
+            averageConsultationDuration: this.num(raw['averageConsultationDuration']),
+            description: this.text(raw['description']),
+            requiredQualifications: this.text(raw['requiredQualifications']),
+            parentSpecialtyId: raw['parentSpecialtyId'] || null,
+            iconUrl: raw['iconUrl'] || null,
+            iconPublicId: raw['iconPublicId'] || null
+        };
     }
 
-    onClose() {
-        if (this.scrollContainer) {
-            this.scrollContainer.nativeElement.scrollTop = 0;
-        }
-
-        this.close.emit();
-    }
-
-    onDelete() {
-        if (this.currentId) this.delete.emit(this.currentId);
+    /** The preset list, plus a stored category outside it (e.g. the old "Adminstrative" spelling). */
+    private categoriesWith(current: string | null): { label: string; value: string }[] {
+        const all = current && !SPECIALTY_CATEGORIES.includes(current) ? [...SPECIALTY_CATEGORIES, current] : SPECIALTY_CATEGORIES;
+        return all.map(c => ({ label: c, value: c }));
     }
 }

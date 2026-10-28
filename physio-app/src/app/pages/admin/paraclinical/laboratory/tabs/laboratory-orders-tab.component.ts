@@ -29,7 +29,7 @@ const PAGE_SIZE = 25;
 
     <ng-container *ngIf="!isLoading() && !error()">
       <div class="flex flex-wrap items-end gap-3 mb-4">
-        <boo-search-field class="w-full md:w-80" label="Search orders" placeholder="Order #, patient or MRN"
+        <boo-search-field size="middle" class="w-full md:w-80" label="Search orders" placeholder="Order #, patient or MRN"
           [(ngModel)]="search" (ngModelChange)="applyFilters()" (clear)="search = ''; applyFilters()" />
         <boo-select class="w-44" label="Priority" [(ngModel)]="priorityFilter" (ngModelChange)="applyFilters()" [options]="priorityOptions" />
         <boo-select class="w-48" label="Lab status" [(ngModel)]="labStatusFilter" (ngModelChange)="applyFilters()" [options]="labStatusOptions" />

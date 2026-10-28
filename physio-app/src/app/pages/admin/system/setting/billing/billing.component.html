@@ -1,170 +1,184 @@
-<div class="py-4 flex flex-col flex-1 min-h-0 overflow-y-auto"
-  style="border-top-left-radius: 12px"
-  custom-scrollbar>
-  <div class="container">
-    <div class="flex-auto w-full">
+<setting-page
+  heading="Plan & Billing"
+  description="Your clinic’s PhysioBoo subscription and invoices."
+  loadingLabel="Loading your subscription…"
+  failedTitle="We couldn’t load your subscription"
+  [loading]="loading()"
+  [loadFailed]="loadFailed()"
+  (retry)="load()"
+>
+  <!-- Current subscription -->
+  <setting-section heading="Current plan" [description]="hasSubscription() ? 'What your clinic is subscribed to now.' : 'Your clinic has no subscription on file.'">
+    <boo-status-badge sectionActions dotted [label]="statusInfo().label" [tone]="statusInfo().tone" />
 
-      <header class="flex flex-col mb-6">
-        <div class="flex items-start justify-between mt-2">
-          <div>
-            <p class="tracking-tight font-bold leading-none text-[22px] m-0">Plan &amp; Billing</p>
-            <p class="text-sm text-gray-500 mt-1">Manage your subscription, payment method, and invoices.</p>
+    <ng-container *ngIf="hasSubscription(); else noSubscription">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div class="min-w-0">
+          <p class="m-0 text-sm font-medium text-regular">{{ subscription()?.planName || 'Unknown plan' }}</p>
+          <p class="m-0 mt-1 flex items-baseline gap-1">
+            <span class="text-2xl font-bold text-regular tabular-nums">{{ subscription()!.monthlyPrice | number:'1.0-2' }} {{ subscription()!.currency }}</span>
+            <span class="text-sm text-secondary">/ month</span>
+          </p>
+        </div>
+        <button
+          *ngIf="canManage && !isCancelled()"
+          type="button"
+          boo-button
+          variant="ghost"
+          size="sm"
+          classname="!text-danger"
+          [loading]="cancelling()"
+          (click)="cancelSubscription()"
+        >Cancel subscription</button>
+      </div>
+
+      <dl class="m-0 mt-4 pt-4 border-t border-rowDivider grid gap-x-6 gap-y-3 sm:grid-cols-3 text-sm">
+        <div *ngIf="status() === 'Trial' && subscription()?.trialEndsAt">
+          <dt class="text-xs text-secondary">Trial ends</dt>
+          <dd class="m-0 mt-0.5 text-regular">{{ subscription()!.trialEndsAt | date:'mediumDate' }}</dd>
+        </div>
+        <div *ngIf="subscription()?.currentPeriodStart">
+          <dt class="text-xs text-secondary">Current period</dt>
+          <dd class="m-0 mt-0.5 text-regular">
+            {{ subscription()!.currentPeriodStart | date:'mediumDate' }} – {{ subscription()!.currentPeriodEnd ? (subscription()!.currentPeriodEnd | date:'mediumDate') : '—' }}
+          </dd>
+        </div>
+        <div *ngIf="isCancelled() && subscription()?.cancelledAt">
+          <dt class="text-xs text-secondary">Cancelled on</dt>
+          <dd class="m-0 mt-0.5 text-regular">{{ subscription()!.cancelledAt | date:'mediumDate' }}</dd>
+        </div>
+        <div *ngIf="subscription()?.billingEmail">
+          <dt class="text-xs text-secondary">Billing email</dt>
+          <dd class="m-0 mt-0.5 text-regular truncate">{{ subscription()!.billingEmail }}</dd>
+        </div>
+      </dl>
+    </ng-container>
+
+    <ng-template #noSubscription>
+      <p class="m-0 text-sm text-secondary">
+        {{ canManage && plans().length ? 'Choose a plan below to subscribe.' : 'Contact PhysioBoo to set up a subscription for your clinic.' }}
+      </p>
+    </ng-template>
+  </setting-section>
+
+  <!-- Plans -->
+  <setting-section
+    *ngIf="plans().length"
+    heading="Plans"
+    [description]="canManage ? 'Switching takes effect immediately.' : 'Ask a clinic administrator with billing access to change the plan.'"
+  >
+    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <div
+        *ngFor="let plan of plans()"
+        class="relative flex flex-col p-4 rounded-xl border"
+        [ngClass]="plan.id === currentPlanId() ? 'border-primary bg-primary/5' : 'border-borderGray'"
+      >
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <p class="m-0 text-sm font-semibold text-regular">{{ plan.name }}</p>
+            <p *ngIf="plan.description" class="m-0 mt-0.5 text-xs text-secondary">{{ plan.description }}</p>
           </div>
+          <boo-status-badge *ngIf="plan.id === currentPlanId()" label="Current" tone="primary" />
         </div>
-      </header>
 
-      <section class="bg-surface rounded-lg border border-gray-200 mb-6">
-        <div class="p-5 border-b border-gray-100 flex items-center justify-between gap-4">
-          <div>
-            <h2 class="text-base font-semibold text-gray-900 mb-1">Current plan</h2>
-            <p class="text-sm text-gray-500">You are on the <span class="font-medium text-gray-700">{{ currentPlan().name }}</span> plan.</p>
-          </div>
-          <span class="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded border"
-            [ngClass]="{
-              'text-emerald-700 bg-emerald-50 border-emerald-200': status() === 'Active' || status() === 'Trial',
-              'text-amber-700 bg-amber-50 border-amber-200': status() === 'PastDue',
-              'text-gray-600 bg-gray-50 border-gray-200': isCancelled()
-            }">
-            <span class="w-1.5 h-1.5 rounded-full"
-              [ngClass]="status() === 'Active' || status() === 'Trial' ? 'bg-emerald-500' : status() === 'PastDue' ? 'bg-amber-500' : 'bg-gray-400'"></span>
-            {{ status() === 'None' ? 'No subscription' : status() === 'PastDue' ? 'Past due' : status() }}
-          </span>
-        </div>
-        <div class="p-5 flex items-end justify-between flex-wrap gap-4">
-          <div>
-            <div class="flex items-baseline gap-1">
-              <span class="text-3xl font-bold text-gray-900">{{ currentPlan().price | number:'1.0-2' }} {{ currentPlan().currency }}</span>
-              <span class="text-sm text-gray-500">/ {{ currentPlan().interval }}</span>
-            </div>
-            <p class="text-xs text-gray-500 mt-1">{{ isCancelled() ? 'Access ends on' : 'Renews on' }} {{ renewsAt() }}</p>
-          </div>
-          <button *ngIf="!isCancelled()" type="button" (click)="cancelSubscription()"
-            class="text-sm text-gray-500 hover:text-red-600 hover:underline transition-colors">
-            Cancel subscription
-          </button>
-        </div>
-      </section>
+        <p class="m-0 mt-3 flex items-baseline gap-1">
+          <span class="text-xl font-bold text-regular tabular-nums">{{ plan.monthlyPrice | number:'1.0-2' }} {{ plan.currency }}</span>
+          <span class="text-xs text-secondary">/ month</span>
+        </p>
 
-      <section class="bg-surface rounded-lg border border-gray-200 mb-6">
-        <div class="p-5 border-b border-gray-100">
-          <h2 class="text-base font-semibold text-gray-900 mb-1">Change plan</h2>
-          <p class="text-sm text-gray-500">Upgrade or downgrade. Changes take effect immediately and are prorated.</p>
-        </div>
-        <div class="p-5 grid gap-4 sm:grid-cols-3">
-          <div *ngFor="let plan of plans"
-            class="relative flex flex-col p-5 rounded-lg border-2 transition-all"
-            [class.border-primary]="currentPlanId() === plan.id"
-            [class.bg-primary]="currentPlanId() === plan.id"
-            [class.text-white]="currentPlanId() === plan.id"
-            [class.border-gray-200]="currentPlanId() !== plan.id"
-            [class.hover:border-gray-300]="currentPlanId() !== plan.id">
+        <ul class="m-0 mt-3 p-0 list-none space-y-1.5 flex-1">
+          <li *ngFor="let limit of planLimits(plan)" class="flex items-start gap-2 text-xs text-regular">
+            <physio-icon name="check" [size]="14" class="mt-px shrink-0 text-primary" aria-hidden="true" />
+            <span>{{ limit }}</span>
+          </li>
+        </ul>
 
-            <span *ngIf="plan.recommended && currentPlanId() !== plan.id"
-              class="absolute -top-2 right-3 text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 border border-primary/30 px-2 py-0.5 rounded">
-              Recommended
-            </span>
-            <span *ngIf="currentPlanId() === plan.id"
-              class="absolute top-3 right-3 text-[10px] font-semibold uppercase tracking-wider text-white/90 bg-white/15 px-2 py-0.5 rounded">
-              Current
-            </span>
-
-            <div class="flex flex-col">
-              <span class="text-base font-semibold"
-                [class.text-white]="currentPlanId() === plan.id"
-                [class.text-gray-900]="currentPlanId() !== plan.id">{{ plan.name }}</span>
-              <span class="text-xs mt-0.5"
-                [class.text-white]="currentPlanId() === plan.id"
-                [class.text-gray-500]="currentPlanId() !== plan.id">{{ plan.description }}</span>
-            </div>
-
-            <div class="flex items-baseline gap-1 mt-4">
-              <span class="text-2xl font-bold"
-                [class.text-white]="currentPlanId() === plan.id"
-                [class.text-gray-900]="currentPlanId() !== plan.id">{{ plan.price | number:'1.0-2' }} {{ plan.currency }}</span>
-              <span class="text-xs"
-                [class.text-white]="currentPlanId() === plan.id"
-                [class.text-gray-500]="currentPlanId() !== plan.id">/ {{ plan.interval }}</span>
-            </div>
-
-            <ul class="mt-4 space-y-2 flex-1">
-              <li *ngFor="let f of plan.features" class="flex items-start gap-2 text-xs"
-                [class.text-white]="currentPlanId() === plan.id"
-                [class.text-gray-700]="currentPlanId() !== plan.id">
-                <physio-icon name="check" [class]="'w-3.5 h-3.5 mt-0.5 shrink-0'" />
-                <span>{{ f }}</span>
-              </li>
-            </ul>
-
-            <!-- <button type="button"
-              (click)="selectPlan(plan)"
-              [disabled]="currentPlanId() === plan.id || changingPlan()"
-              class="mt-5 inline-flex items-center justify-center gap-2 h-9 px-3 text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              [class.bg-white]="currentPlanId() === plan.id"
-              [class.text-primary]="currentPlanId() === plan.id"
-              [class.bg-primary]="currentPlanId() !== plan.id"
-              [class.text-white]="currentPlanId() !== plan.id"
-              [class.hover:bg-primaryHover]="currentPlanId() !== plan.id">
-              <physio-icon *ngIf="changingPlan() === plan.id" name="loader-circle" [class]="'w-4 h-4 animate-spin'" />
-              <span>
-                {{ changingPlan() === plan.id ? 'Switching…' : currentPlanId() === plan.id ? 'Current plan' : 'Switch to ' + plan.name }}
-              </span>
-            </button> -->
-          </div>
-        </div>
-      </section>
-
-      <section class="bg-surface rounded-lg border border-gray-200 mb-6">
-        <div class="p-5 border-b border-gray-100">
-          <h2 class="text-base font-semibold text-gray-900 mb-1">Payment</h2>
-          <p class="text-sm text-gray-500">Invoices are paid by bank transfer. Quote the invoice number as the reference.</p>
-        </div>
-        <div class="p-5 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-            <physio-icon name="landmark" class="w-5 h-5 text-gray-500" />
-          </div>
-          <div *ngIf="outstanding() > 0; else allPaid">
-            <div class="text-sm font-medium text-gray-900">{{ outstanding() | number:'1.2-2' }} {{ currentPlan().currency }} outstanding</div>
-            <div class="text-xs text-gray-500">Payments are recorded by our billing team once the transfer arrives.</div>
-          </div>
-          <ng-template #allPaid>
-            <div class="text-sm text-gray-700">You have no outstanding invoices.</div>
-          </ng-template>
-        </div>
-      </section>
-
-      <section class="bg-surface rounded-lg border border-gray-200">
-        <div class="p-5 border-b border-gray-100">
-          <h2 class="text-base font-semibold text-gray-900 mb-1">Billing history</h2>
-          <p class="text-sm text-gray-500">Download invoices for your records.</p>
-        </div>
-        <div class="divide-y divide-gray-100">
-          <div *ngIf="!invoices().length" class="p-10 text-center text-sm text-gray-400">
-            No invoices yet.
-          </div>
-          <div *ngFor="let inv of invoices()"
-            class="flex items-center gap-4 px-5 py-3 hover:bg-gray-50/60 transition-colors">
-            <div class="flex-1 min-w-0">
-              <div class="text-sm font-medium text-gray-900 truncate">{{ inv.number }}</div>
-              <div class="text-xs text-gray-500">{{ inv.date }}</div>
-            </div>
-            <div class="text-sm font-medium text-gray-900">{{ inv.amount | number:'1.2-2' }}</div>
-            <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded"
-              [ngClass]="{
-                'bg-emerald-50 text-emerald-700 border border-emerald-200': inv.status === 'paid',
-                'bg-amber-50 text-amber-700 border border-amber-200': inv.status === 'pending',
-                'bg-red-50 text-red-700 border border-red-200': inv.status === 'failed'
-              }">
-              {{ inv.label }}
-            </span>
-            <button type="button" (click)="downloadInvoice(inv)"
-              class="p-1.5 rounded-md text-gray-400 hover:text-primary hover:bg-primary/5 transition-colors"
-              title="Download invoice">
-              <physio-icon name="download" class="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </section>
-
+        <button
+          *ngIf="canManage && plan.id !== currentPlanId()"
+          type="button"
+          boo-button
+          variant="secondary"
+          size="sm"
+          classname="mt-4"
+          [block]="true"
+          [loading]="changingPlan() === plan.id"
+          [disabled]="!!changingPlan()"
+          (click)="selectPlan(plan)"
+        >{{ changingPlan() === plan.id ? 'Switching…' : (hasSubscription() && !isCancelled() ? 'Switch to ' + plan.name : 'Choose ' + plan.name) }}</button>
+      </div>
     </div>
-  </div>
-</div>
+  </setting-section>
+
+  <!-- Payment -->
+  <setting-section heading="Payment" description="Invoices are paid by bank transfer. Quote the invoice number as the payment reference.">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0" aria-hidden="true">
+        <physio-icon name="landmark" [size]="18" class="text-secondary" />
+      </div>
+      <div *ngIf="outstanding() > 0; else allPaid" class="min-w-0">
+        <p class="m-0 text-sm font-medium text-regular tabular-nums">
+          {{ outstanding() | number:'1.2-2' }} {{ subscription()?.currency }} outstanding
+          <span class="font-normal text-secondary">· {{ openInvoices() }} open invoice{{ openInvoices() === 1 ? '' : 's' }}</span>
+        </p>
+        <p class="m-0 mt-0.5 text-xs text-secondary">A payment is marked as received once the transfer reaches PhysioBoo.</p>
+      </div>
+      <ng-template #allPaid>
+        <p class="m-0 text-sm text-regular">Nothing outstanding.</p>
+      </ng-template>
+    </div>
+  </setting-section>
+
+  <!-- Invoices -->
+  <setting-section heading="Invoices" description="Download a printable copy for your records." [flush]="true">
+    <boo-empty-state
+      *ngIf="!invoices().length"
+      icon="receipt"
+      title="No invoices yet"
+      description="Invoices appear here once they are issued for your subscription."
+      [headingLevel]="3"
+    />
+
+    <div *ngIf="invoices().length" class="overflow-x-auto boo-scrollbar">
+      <table class="w-full min-w-[640px] text-sm">
+        <thead>
+          <tr class="text-left text-xs text-secondary border-b border-rowDivider">
+            <th scope="col" class="px-5 py-2.5 font-medium">Invoice</th>
+            <th scope="col" class="px-3 py-2.5 font-medium">Period</th>
+            <th scope="col" class="px-3 py-2.5 font-medium">Due</th>
+            <th scope="col" class="px-3 py-2.5 font-medium text-right">Amount</th>
+            <th scope="col" class="px-3 py-2.5 font-medium">Status</th>
+            <th scope="col" class="px-5 py-2.5"><span class="sr-only">Download</span></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-rowDivider">
+          <tr *ngFor="let inv of invoices()">
+            <td class="px-5 py-3">
+              <div class="font-medium text-regular">{{ inv.invoiceNumber }}</div>
+              <div class="text-xs text-secondary">{{ inv.planName }} · issued {{ inv.issuedAt | date:'mediumDate' }}</div>
+            </td>
+            <td class="px-3 py-3 text-regular whitespace-nowrap">{{ inv.periodStart | date:'MMM d' }} – {{ inv.periodEnd | date:'MMM d, y' }}</td>
+            <td class="px-3 py-3 text-regular whitespace-nowrap">
+              {{ inv.status === 'Paid' && inv.paidAt ? 'Paid ' + (inv.paidAt | date:'mediumDate') : (inv.dueDate | date:'mediumDate') }}
+            </td>
+            <td class="px-3 py-3 text-right font-medium text-regular tabular-nums whitespace-nowrap">{{ inv.amount | number:'1.2-2' }} {{ inv.currency }}</td>
+            <td class="px-3 py-3"><boo-status-badge dotted [label]="invoiceStatus(inv).label" [tone]="invoiceStatus(inv).tone" /></td>
+            <td class="px-5 py-3 text-right">
+              <button
+                type="button"
+                boo-button
+                variant="ghost"
+                size="sm"
+                [iconOnly]="true"
+                classname="!h-8 !w-8"
+                [loading]="downloading() === inv.id"
+                [attr.aria-label]="'Download ' + inv.invoiceNumber"
+                title="Download"
+                (click)="downloadInvoice(inv)"
+              ><physio-icon *ngIf="downloading() !== inv.id" name="download" [size]="16" /></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </setting-section>
+</setting-page>

@@ -1051,7 +1051,7 @@ export const SETTINGS_MANAGEMENT = [
         id: 2,
         name: "Security",
         description:
-            "Manage your password and 2-step verification preferences",
+            "Change your password and sign out other devices",
         icon: "lock",
         route: "/admin/system/settings/security"
     },
@@ -1059,7 +1059,7 @@ export const SETTINGS_MANAGEMENT = [
         id: 3,
         name: "Plan & Billing",
         description:
-            "Manage your subscription plan, payment method and billing information",
+            "Your clinic's plan, subscription status and invoices",
         icon: "credit-card",
         route: "/admin/system/settings/billing"
     },
@@ -1067,7 +1067,7 @@ export const SETTINGS_MANAGEMENT = [
         id: 4,
         name: "Notification",
         description:
-            "Manage when you'll be notified on which channels",
+            "Choose which updates you want to receive",
         icon: "bell",
         route: "/admin/system/settings/notification"
     },
@@ -1075,7 +1075,7 @@ export const SETTINGS_MANAGEMENT = [
         id: 5,
         name: "Team",
         description:
-            "Manage your existing team and change roles/permissions",
+            "Members, roles and pending invitations",
         icon: "users",
         route: "/admin/system/settings/team"
     },
@@ -1083,7 +1083,7 @@ export const SETTINGS_MANAGEMENT = [
         id: 6,
         name: "Theme",
         description:
-            "Manage your theme which is being applied on the page",
+            "Light or dark mode and text size",
         icon: "palette",
         route: "/admin/system/settings/theme"
     },
@@ -1091,15 +1091,15 @@ export const SETTINGS_MANAGEMENT = [
         id: 7,
         name: "Sequence Tracker",
         description:
-            "Track and manage the order of system records and processes.",
-        icon: "pi",
+            "Numbering rules for auto-generated record codes",
+        icon: "list-ordered",
         route: "/admin/system/settings/sequence-tracker"
     },
     {
         id: 8,
         name: "Admin Menu",
         description:
-            "Manage administrative menus, configurations, and system settings.",
+            "Sections and pages of the admin sidebar",
         icon: "layout-list",
         route: "/admin/system/settings/admin-menu"
     },

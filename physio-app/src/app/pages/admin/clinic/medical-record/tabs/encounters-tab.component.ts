@@ -2,21 +2,19 @@ import { Component, Input, computed, signal } from "@angular/core";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { AppointmentStatus, EncounterRow } from "../../../../../shared/types/medical-record.types";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
+import { BooSearchFieldComponent } from "@physioboo/ui";
 
 @Component({
   selector: 'mr-encounters-tab',
   standalone: true,
-  imports: [SharedModule, BooSelectComponent],
+  imports: [SharedModule, BooSelectComponent, BooSearchFieldComponent],
   template: `
     <div class="bg-surface border border-gray-200 rounded-lg overflow-hidden">
       <!-- Filter strip -->
       <div class="px-5 py-3 border-b border-gray-200 flex items-center gap-3 flex-wrap">
-        <div class="relative flex-1 min-w-[200px]">
-          <physio-icon name="search" [class]="'w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2'"></physio-icon>
-          <input type="text" [ngModel]="search()" (ngModelChange)="search.set($event)"
-            placeholder="Search by doctor, department, complaint…"
-            class="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
-        </div>
+        <boo-search-field size="small" class="flex-1 min-w-[200px]" label="Search encounters"
+          placeholder="Search by doctor, department, complaint…"
+          [ngModel]="search()" (ngModelChange)="search.set($event)" (clear)="search.set('')"></boo-search-field>
         <boo-select label="All departments" size="small" class="w-48" [options]="departmentOptions()"
           [ngModel]="dept()" (ngModelChange)="dept.set($event ?? '')"></boo-select>
         <boo-select label="All status" size="small" class="w-48" [options]="statusOptions"

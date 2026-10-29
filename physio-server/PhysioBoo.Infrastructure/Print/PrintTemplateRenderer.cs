@@ -1,6 +1,7 @@
 ﻿using PhysioBoo.Application.Interfaces;
 using Scriban;
 using Scriban.Runtime;
+using System.Text.Json;
 
 namespace PhysioBoo.Infrastructure.Print
 {
@@ -44,6 +45,8 @@ namespace PhysioBoo.Infrastructure.Print
 
         private static object? ToScribanValue(object? v)
         {
+            // Render data posted by the client arrives as JsonElement; Scriban cannot walk into those.
+            if (v is JsonElement json) return FromJson(json);
             if (v is IReadOnlyDictionary<string, object?> nested)
             {
                 ScriptObject so = new ScriptObject();
@@ -62,6 +65,30 @@ namespace PhysioBoo.Infrastructure.Print
                 return list;
             }
             return v;
+        }
+
+        private static object? FromJson(JsonElement json)
+        {
+            switch (json.ValueKind)
+            {
+                case JsonValueKind.Object:
+                    ScriptObject so = new ScriptObject();
+                    foreach (JsonProperty p in json.EnumerateObject())
+                        so[p.Name] = FromJson(p.Value);
+                    return so;
+                case JsonValueKind.Array:
+                    return json.EnumerateArray().Select(FromJson).ToList();
+                case JsonValueKind.String:
+                    return json.GetString();
+                case JsonValueKind.Number:
+                    return json.TryGetInt64(out long l) ? l : json.GetDecimal();
+                case JsonValueKind.True:
+                    return true;
+                case JsonValueKind.False:
+                    return false;
+                default:
+                    return null;
+            }
         }
     }
 }

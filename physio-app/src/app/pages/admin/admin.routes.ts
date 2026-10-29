@@ -454,10 +454,10 @@ export const routes: Routes = [
                         ]
                     },
                     {
+                        // Hospital now lives in Settings; the old address (and any sidebar menu row stored with it) still lands there.
                         path: 'hospital',
-                        data: { breadcrumb: ['hospital'] },
-                        loadComponent: () => import('./system/hospital/list.component').then(m => m.AdminHospitalListComponent),
-                        canActivate: [permissionGuard(Permissions.Admin.HospitalRead)]
+                        redirectTo: 'settings/hospital',
+                        pathMatch: 'full'
                     },
                     {
                         path: 'settings',

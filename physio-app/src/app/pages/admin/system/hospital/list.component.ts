@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, ElementRef, signal, ViewChild } from "@angular/core";
-import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
-import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
+import { CommonCategoryPageComponent } from "../../../../components/layout/admin/system/common-category/shared/category-page.component";
 import { AdminHospitalDrawerComponent } from "../../../../components/layout/admin/system/hospital/hospital-drawer.component";
 import { AdminHospitalTableCardComponent } from "../../../../components/layout/admin/system/hospital/hospital-table-card.component";
 import { AuthService } from "../../../../services/auth/auth.service";
@@ -20,27 +19,23 @@ import { Hospital } from "../../../../shared/types/support.types";
     standalone: true,
     imports: [
         SharedModule,
-        AdminContentHeaderComponent,
-        ButtonIconComponent,
+        CommonCategoryPageComponent,
         AdminHospitalTableCardComponent,
         AdminHospitalDrawerComponent
     ],
-    host: { class: 'block h-full min-h-0' },
+    // Settings > Hospital: the settings pane gives this host its height; the table region takes what the heading leaves.
+    host: { class: 'flex flex-1 min-h-0 min-w-0 flex-col' },
     template: `
-        <admin-content-header>
-            <div class="flex items-center md:flex-column gap-2 pb-3 mb-2 border-1 border-bottom">
-                <div class="flex-1">
-                    <h4 class="text-[22px] text-primary font-semibold mb-0">Hospital</h4>
-                    <p class="text-sm text-secondary m-0">Branches of your hospital group</p>
-                </div>
-                <div class="text-right flex">
-                    <button-icon *ngIf="canCreate" buttonClass="!bg-primary ms-2 text-white" (onClick)="onOpenDrawer(null)">
-                        New branch
-                    </button-icon>
-                </div>
-            </div>
-
-            <div class="flex-1 min-h-0" #tableHost>
+        <common-category-page
+            heading="Hospital"
+            description="Branches of your hospital group"
+            plural="branches"
+            createLabel="New branch"
+            [countLabel]="countLabel"
+            [canCreate]="canCreate"
+            (create)="onOpenDrawer(null)"
+        >
+            <div class="flex flex-1 min-h-0 min-w-0 flex-col" #tableHost>
                 <admin-hospital-table-card
                     [data]="tableData()"
                     [filter]="params"
@@ -55,15 +50,15 @@ import { Hospital } from "../../../../shared/types/support.types";
                     (deleteClick)="onDelete($event)"
                 />
             </div>
+        </common-category-page>
 
-            <admin-hospital-drawer
-                [isOpen]="isDrawerOpen"
-                [currentId]="selectedId"
-                (close)="onCloseDrawer()"
-                (saveSuccess)="onSaveSuccess()"
-                (delete)="onDelete($event)"
-            />
-        </admin-content-header>
+        <admin-hospital-drawer
+            [isOpen]="isDrawerOpen"
+            [currentId]="selectedId"
+            (close)="onCloseDrawer()"
+            (saveSuccess)="onSaveSuccess()"
+            (delete)="onDelete($event)"
+        />
     `
 })
 export class AdminHospitalListComponent implements AfterViewInit {
@@ -91,6 +86,12 @@ export class AdminHospitalListComponent implements AfterViewInit {
         { label: 'Code (A-Z)', value: '+code' },
         { label: 'Code (Z-A)', value: '-code' },
     ];
+
+    /** "3 branches" next to the description, once the first page has loaded. */
+    get countLabel(): string {
+        const total = this.tableData()?.totalCount;
+        return total === undefined ? '' : `${total} ${total === 1 ? 'branch' : 'branches'}`;
+    }
     // #endregion
 
     // #region Init (Lifecycle + Setup)
@@ -113,7 +114,7 @@ export class AdminHospitalListComponent implements AfterViewInit {
                 toolbarHeight: 48,
                 headerHeight: 48,
                 footerHeight: 44,
-                extraOffset: 16,
+                extraOffset: 32,
                 min: 5,
                 max: 50
             })

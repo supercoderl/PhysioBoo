@@ -71,7 +71,7 @@ interface NavItem {
         HomeTestimonialEditDrawerComponent,
     ],
     templateUrl: './home-configuration.component.html',
-    host: { class: 'flex flex-col min-h-full' },
+    host: { class: 'flex flex-1 min-h-0 min-w-0 flex-col' },
 })
 export class AdminHomeConfigurationComponent implements OnInit, HasUnsavedChanges {
     // #region Inputs, Outputs, Properties

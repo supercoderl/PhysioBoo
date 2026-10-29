@@ -9,8 +9,13 @@ import { SortOption } from '../../../shared/types/sort';
 import { BulkAction, GroupableColumn, SavedView, TableComment } from '../../../shared/types/table.types';
 import { PHYSIO_BOO_ANIMATION } from '../../../shared/utils/animation.utils';
 import { BooInputComponent } from '@physioboo/ui';
+import { LocalStorage } from '../../../shared/utils/storage';
 import { PaginationComponent } from "./boo-pagination-admin.component";
 export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
+
+export type TableTool = 'settings' | 'columns' | 'filter' | 'view' | 'sort' | 'group' | 'comment';
+
+const COLUMN_PREFS_PREFIX = 'boo-table-columns:';
 
 @Component({
   selector: 'boo-table-admin',
@@ -246,6 +251,10 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
               <button *ngIf="availableTools.includes('settings')" [class]="toolBtnCls('settings')" title="View settings" (click)="onToolClick('settings')">
                 <physio-icon name="settings" class="w-4 h-4" />
               </button>
+              <button *ngIf="availableTools.includes('columns') && hideableColumns.length" [class]="toolBtnCls('columns')" title="Columns"
+                aria-haspopup="true" [attr.aria-expanded]="activeTool === 'columns'" (click)="onToolClick('columns')">
+                <physio-icon name="columns-3" class="w-4 h-4" />
+              </button>
               <button *ngIf="availableTools.includes('filter')" [class]="toolBtnCls('filter')" title="Filter" (click)="onToolClick('filter')">
                 <physio-icon name="filter" class="w-4 h-4" />
               </button>
@@ -368,6 +377,35 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                 (click)="onResetView()">
                 <physio-icon name="rotate-ccw" class="w-4 h-4" />
                 <span>Reset view</span>
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="activeTool === 'columns'"
+            class="absolute top-12 z-40 w-64 bg-surface border border-gray-200 rounded-md shadow-lg py-1 max-h-80 overflow-y-auto"
+            [style.left]="toolAnchorLeft + 'px'"
+            role="group" aria-label="Visible columns">
+            <div class="flex items-center justify-between px-3 py-2">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Columns</span>
+              <span class="text-[11px] text-slate-400 tabular-nums">{{ shownColumnCount }} of {{ hideableColumns.length }} shown</span>
+            </div>
+            <label *ngFor="let col of hideableColumns"
+              class="w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-slate-50"
+              [class.cursor-pointer]="!isOnlyShownColumn(col)"
+              [title]="isOnlyShownColumn(col) ? 'At least one column stays visible' : ''">
+              <span class="boo-checkbox">
+                <input type="checkbox" [checked]="isColumnShown(col)" [disabled]="isOnlyShownColumn(col)" (change)="toggleColumn(col)" />
+                <span class="box"></span>
+                <svg class="check" width="10" height="10" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 8.5L6.5 12L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="truncate">{{ col.headerLabel }}</span>
+            </label>
+            <div class="border-t border-gray-100 mt-1 pt-1">
+              <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50" (click)="resetColumns()">
+                <physio-icon name="rotate-ccw" class="w-4 h-4" />
+                <span>Reset to default columns</span>
               </button>
             </div>
           </div>
@@ -520,16 +558,16 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
 
       <!-- ── Table scroll area ─────────────────────────────────────────── -->
       <div #scrollArea custom-scrollbar class="flex-1 min-h-0 w-full overflow-auto relative">
-        <table class="w-full table-auto border-separate" style="border-spacing: 0;" [style.min-width]="minTableWidth">
+        <table class="w-full table-auto border-separate" style="border-spacing: 0;" [style.min-width]="tableMinWidth">
 
           <!-- Header -->
           <thead
-            *ngIf="showHeader && columnsArray.length > 0"
+            *ngIf="showHeader && displayColumns.length > 0"
             class="bg-surface sticky top-0 z-10"
           >
             <tr cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="drop($event)">
               <th
-                *ngFor="let col of columnsArray; let i = index"
+                *ngFor="let col of displayColumns; let i = index"
                 class="group p-0 h-12 bg-surface border-b border-borderGray select-none"
                 [ngClass]="col.headerClass"
                 [style.width]="col.width"
@@ -594,11 +632,11 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
             @if (loading) {
               @for (item of skeletonRows; track $index) {
                 <tr>
-                  @for (col of columnsArray; track col; let ci = $index) {
+                  @for (col of displayColumns; track col; let ci = $index) {
                     <td [ngClass]="[tdPaddingClass]">
                       <div class="flex items-center gap-2" [ngClass]="contentLimitClass">
                         <div *ngIf="ci === 0" class="shimmer w-7 h-7 rounded-lg shrink-0"></div>
-                        <div class="shimmer h-3 rounded-full flex-1" [style.max-width.%]="getStableWidth($index * columnsArray.length + ci)"></div>
+                        <div class="shimmer h-3 rounded-full flex-1" [style.max-width.%]="getStableWidth($index * displayColumns.length + ci)"></div>
                       </div>
                     </td>
                   }
@@ -609,7 +647,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
               @if (currentGroupBy) {
                 @for (group of groupedData; track group.key) {
                   <tr class="bg-slate-50 cursor-pointer select-none" (click)="toggleGroup(group.key)">
-                    <td [attr.colspan]="columnsArray.length + (showAddColumn ? 1 : 0)"
+                    <td [attr.colspan]="displayColumns.length + (showAddColumn ? 1 : 0)"
                       class="px-3 py-1.5 text-xs font-semibold text-slate-700 border-b border-gray-200">
                       <div class="flex items-center gap-1.5">
                         <physio-icon [name]="collapsedGroups.has(group.key) ? 'chevron-right' : 'chevron-down'" class="w-3.5 h-3.5 text-slate-500" />
@@ -626,7 +664,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                         [class.selected]="isSelected(row[rowKey])"
                         [ngClass]="rowHeightClass"
                       >
-                        @for (col of columnsArray; track col) {
+                        @for (col of displayColumns; track col) {
                           <td class="text-sm text-gray-800 transition-colors duration-100" [class]="tdClass" [ngClass]="[tdPaddingClass]">
                             <div class="flex items-center w-full overflow-hidden" [ngClass]="contentLimitClass">
                               <label *ngIf="col.type === 'checkbox'" class="boo-checkbox mr-3">
@@ -658,7 +696,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
                   [class.selected]="isSelected(row.id)"
                   [ngClass]="rowHeightClass"
                 >
-                  @for (col of columnsArray; track col) {
+                  @for (col of displayColumns; track col) {
                     <td class="text-sm text-gray-800 transition-colors duration-100" [class]="tdClass" [ngClass]="[tdPaddingClass]">
                       <div class="flex items-center w-full overflow-hidden" [ngClass]="contentLimitClass">
                         <label *ngIf="col.type === 'checkbox'" class="boo-checkbox mr-3">
@@ -684,7 +722,7 @@ export { FilterConfig, FilterOption } from '../../../shared/types/filter.types';
               }
               @for (filler of paddingRows; track $index) {
                 <tr class="padding-row" [ngClass]="rowHeightClass" aria-hidden="true">
-                  @for (col of columnsArray; track col) {
+                  @for (col of displayColumns; track col) {
                     <td [ngClass]="[tdPaddingClass]"></td>
                   }
                   @if (showAddColumn) { <td></td> }
@@ -801,7 +839,9 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
   @Input() showAddRecord: boolean = false;
   @Input() showAddColumn: boolean = false;
   @Input() showCollapse: boolean = false;
-  @Input() activeTool: '' | 'settings' | 'filter' | 'view' | 'sort' | 'group' | 'comment' = '';
+  @Input() activeTool: '' | TableTool = '';
+  /** Remembers this table's column choices in the browser under this key; without it they reset on reload. */
+  @Input() columnsStorageKey: string | null = null;
   @Input() sortOptions: SortOption[] = [];
   @Input() currentSort?: string = '';
   @Input() filterConfigs: FilterConfig[] = [];
@@ -812,7 +852,8 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
   @Input() currentGroupBy: string | null = null;
   @Input() comments: TableComment[] = [];
   @Input() currentUserName: string = 'You';
-  @Input() availableTools: ('settings' | 'filter' | 'view' | 'sort' | 'group' | 'comment')[]
+  /** 'columns' (the column chooser) is opt-in: it lists the columns that can be hidden. */
+  @Input() availableTools: TableTool[]
     = ['settings', 'filter', 'view', 'sort', 'group', 'comment'];
   @Input() fillEmpty: boolean = true;
 
@@ -842,6 +883,12 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
   @ContentChildren(ColumnDefDirective, { descendants: true }) columnDefs!: QueryList<ColumnDefDirective>;
 
   columnsArray: any[] = [];
+  /** The columns rendered: `columnsArray` minus the ones the user (or `defaultHidden`) hid. */
+  displayColumns: any[] = [];
+  /** Columns offered in the column chooser. */
+  hideableColumns: ColumnDefDirective[] = [];
+  /** Shown/hidden per column name, only for columns the user toggled; the rest follow `defaultHidden`. */
+  private columnPrefs: Record<string, boolean> = {};
   selectedRows: (number | string)[] = [];
   allDataSelected = false;
   sortConfig = { key: '', direction: 'asc' as 'asc' | 'desc' };
@@ -908,6 +955,20 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
   get rangeEnd(): number {
     return Math.min(this.currentPage * this.pageSize, this.totalItems);
   }
+
+  get shownColumnCount(): number {
+    return this.hideableColumns.filter(c => this.isColumnShown(c)).length;
+  }
+
+  /** `minTableWidth` less the fixed widths of hidden columns, so fewer columns don't leave the table needlessly wide. */
+  get tableMinWidth(): string | null {
+    const base = this.minTableWidth;
+    if (!base || !/^\d+(\.\d+)?px$/.test(base)) return base;
+    const hidden = this.columnsArray
+      .filter(c => !this.displayColumns.includes(c))
+      .reduce((sum, c) => sum + this.pxWidth(c.width), 0);
+    return `${Math.max(parseFloat(base) - hidden, 0)}px`;
+  }
   // #endregion
 
   // #region Init (Lifecycle + Setup)
@@ -915,11 +976,14 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
     if (this.totalItems === 0 && this.data) {
       this.totalItems = this.data.length;
     }
+    this.columnPrefs = this.loadColumnPrefs();
     this.columnDefs.changes.subscribe(() => {
       this.columnsArray = this.columnDefs.toArray();
+      this.refreshColumns();
     });
     if (this.columnDefs) {
       this.columnsArray = this.columnDefs.toArray();
+      this.refreshColumns();
     }
   }
   // #endregion
@@ -939,7 +1003,7 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
 
   toolAnchorLeft = 0;
 
-  onToolClick(tool: 'settings' | 'filter' | 'view' | 'sort' | 'group' | 'comment'): void {
+  onToolClick(tool: TableTool): void {
     this.activeTool = this.activeTool === tool ? '' : tool;
     if (this.activeTool && typeof document !== 'undefined') {
       setTimeout(() => {
@@ -958,7 +1022,7 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
 
   private titleFor(tool: string): string {
     const map: Record<string, string> = {
-      settings: 'View settings', filter: 'Filter', view: 'View',
+      settings: 'View settings', columns: 'Columns', filter: 'Filter', view: 'View',
       sort: 'Sort', group: 'Group', comment: 'Comment'
     };
     return map[tool] ?? '';
@@ -998,6 +1062,67 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
     this.striped = true;
     this.resetView.emit();
     this.closeToolPanel();
+  }
+
+  // Column chooser
+  isColumnShown(col: ColumnDefDirective): boolean {
+    return this.columnPrefs[col.name] ?? !col.defaultHidden;
+  }
+
+  /** When every data column can be hidden, the last one shown stays, so the table never renders empty rows. */
+  isOnlyShownColumn(col: ColumnDefDirective): boolean {
+    if (this.columnsArray.some(c => this.isDataColumn(c) && !this.canHideColumn(c))) return false;
+    return this.isColumnShown(col) && this.shownColumnCount === 1;
+  }
+
+  toggleColumn(col: ColumnDefDirective): void {
+    if (this.isOnlyShownColumn(col)) return;
+    this.columnPrefs = { ...this.columnPrefs, [col.name]: !this.isColumnShown(col) };
+    this.saveColumnPrefs();
+    this.refreshColumns();
+  }
+
+  resetColumns(): void {
+    this.columnPrefs = {};
+    this.saveColumnPrefs();
+    this.refreshColumns();
+  }
+
+  /** Selection, row actions (no header label) and columns marked `hideable="false"` always stay. */
+  private canHideColumn(col: ColumnDefDirective): boolean {
+    return col.hideable && this.isDataColumn(col);
+  }
+
+  private isDataColumn(col: ColumnDefDirective): boolean {
+    return col.type !== 'checkbox' && col.name !== 'actions' && !!col.headerLabel;
+  }
+
+  private refreshColumns(): void {
+    this.hideableColumns = this.columnsArray.filter(c => this.canHideColumn(c));
+    this.displayColumns = this.columnsArray.filter(c => !this.canHideColumn(c) || this.isColumnShown(c));
+    // Fewer or more columns change the row height the filler rows were measured against.
+    setTimeout(() => {
+      this.measureVisibleRows();
+      this.cdr.markForCheck();
+    });
+  }
+
+  private pxWidth(width: string | number): number {
+    if (typeof width === 'number') return width;
+    return /^\d+(\.\d+)?px$/.test(width) ? parseFloat(width) : 0;
+  }
+
+  private loadColumnPrefs(): Record<string, boolean> {
+    if (!this.columnsStorageKey) return {};
+    const saved = LocalStorage.load<Record<string, boolean>>(COLUMN_PREFS_PREFIX + this.columnsStorageKey);
+    return saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : {};
+  }
+
+  private saveColumnPrefs(): void {
+    if (!this.columnsStorageKey) return;
+    const key = COLUMN_PREFS_PREFIX + this.columnsStorageKey;
+    if (Object.keys(this.columnPrefs).length) LocalStorage.save(key, this.columnPrefs);
+    else LocalStorage.remove(key);
   }
 
   pickView(v: SavedView): void {
@@ -1081,7 +1206,12 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
   }
 
   drop(event: CdkDragDrop<any[]>): void {
-    moveItemInArray(this.columnsArray, event.previousIndex, event.currentIndex);
+    // The header lists only the shown columns; move the same columns in the full list.
+    const from = this.columnsArray.indexOf(this.displayColumns[event.previousIndex]);
+    const to = this.columnsArray.indexOf(this.displayColumns[event.currentIndex]);
+    if (from < 0 || to < 0) return;
+    moveItemInArray(this.columnsArray, from, to);
+    this.refreshColumns();
   }
 
   // Row Selection Logic

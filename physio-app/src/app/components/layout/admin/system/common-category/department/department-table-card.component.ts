@@ -27,6 +27,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       [totalItems]="data?.totalCount ?? 0"
       [loading]="loading"
       [availableTools]="tools"
+      columnsStorageKey="common-category.department"
       [bulkActions]="bulkActions"
       [sortOptions]="sortOptions"
       [currentSort]="currentSort"
@@ -44,7 +45,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
       </ng-container>
 
-      <ng-template appColumnDef="name" headerLabel="Department" headerClass="text-left" let-item>
+      <ng-template appColumnDef="name" hideable="false" headerLabel="Department" headerClass="text-left" let-item>
         <div class="flex items-center gap-3 min-w-0">
           <div class="min-w-0">
             <button
@@ -68,7 +69,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       <ng-template appColumnDef="bedCount" headerLabel="Beds" headerClass="text-right" cellClass="text-right" width="80px" let-item>
         <span class="text-sm tabular-nums">{{ item.bedCount | number }}</span>
       </ng-template>
-      <ng-template appColumnDef="services" headerLabel="Care" headerClass="text-left" width="330px" let-item>
+      <ng-template appColumnDef="services" defaultHidden headerLabel="Care" headerClass="text-left" width="330px" let-item>
         <div class="flex flex-wrap gap-1 overflow-hidden">
           <boo-status-badge *ngIf="item.isEmergency" [label]="'Emergency'" tone="danger" />
           <boo-status-badge *ngIf="item.isCriticalCare" [label]="'Critical care'" tone="warning" />
@@ -77,7 +78,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
           <span *ngIf="!(item.isEmergency) && !(item.isCriticalCare) && !(item.isInPatient) && !(item.isOutPatient)" class="text-sm text-secondary">{{ empty }}</span>
         </div>
       </ng-template>
-      <ng-template appColumnDef="contact" headerLabel="Contact" headerClass="text-left" let-item>
+      <ng-template appColumnDef="contact" defaultHidden headerLabel="Contact" headerClass="text-left" let-item>
         <div class="min-w-0">
           <div class="truncate text-sm leading-4 text-regular">{{ item.phone || empty }}</div>
           <div class="truncate text-xs leading-4 text-secondary">{{ item.operationHours || item.email || empty }}</div>

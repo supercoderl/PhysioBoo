@@ -1,5 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild, signal } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild, inject, signal } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Orientation } from '../../../shared/enums/print-orientation';
 import { PaperSize } from '../../../shared/enums/print-paper-size';
 import { SharedModule } from '../../../shared/shared-imports';
@@ -93,8 +94,10 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
             [style.width]="pageWidth"
             [style.minHeight]="pageHeight"
             [style.padding]="'24px'">
+            <!-- No allow-scripts: the trusted markup below can style the page but never run code. -->
             <iframe #frame
               class="w-full h-full border-0"
+              sandbox="allow-same-origin allow-modals"
               [srcdoc]="srcdoc"
               [style.minHeight]="pageHeight"></iframe>
           </div>
@@ -114,11 +117,14 @@ export class PrintPreviewComponent implements OnChanges {
 
   zoom = signal(0.85);
   printing = signal(false);
-  srcdoc = '';
+  srcdoc: SafeHtml = '';
+
+  private sanitizer = inject(DomSanitizer);
 
   ngOnChanges(_: SimpleChanges): void {
     if (this.result) {
-      this.srcdoc = this.buildSrcDoc(this.result);
+      // Angular's default sanitising of srcdoc strips <style> and every style attribute, so templates printed unstyled.
+      this.srcdoc = this.sanitizer.bypassSecurityTrustHtml(this.buildSrcDoc(this.result));
     }
   }
 

@@ -18,11 +18,13 @@ import { BooTableAdminComponent, FilterConfig } from "../../../../table/boo-tabl
     ColumnDefDirective,
     BooActionAdminComponent
   ],
-  host: { class: 'block h-full min-h-0' },
+  // Fills the tab's table region; boo-table-admin scrolls its own rows (docs/admin-layout-contract.md).
+  host: { class: 'flex flex-1 min-h-0 min-w-0 flex-col' },
   template: `
-    <div class="bg-surface rounded-[6px] border border-gray-200 h-full overflow-hidden">
-      <boo-table-admin 
-        [data]="data?.items ?? []" 
+    <div class="flex flex-1 min-h-0 min-w-0 flex-col bg-surface rounded-[6px] border border-gray-200 overflow-hidden">
+      <boo-table-admin
+        class="flex-1 min-h-0"
+        [data]="data?.items ?? []"
         tdClass="px-4 py-3"
         [showFooter]="true" 
         [currentPage]="data?.pageNumber ?? filter.pageNumber"

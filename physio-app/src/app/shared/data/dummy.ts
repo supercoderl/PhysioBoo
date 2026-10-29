@@ -1040,6 +1040,14 @@ export const CATEGORIES_MANAGEMENT = [
 // #region Setting Management
 export const SETTINGS_MANAGEMENT = [
     {
+        id: 9,
+        name: "Hospital",
+        description:
+            "Branches of your hospital group",
+        icon: "hospital",
+        route: "/admin/system/settings/hospital"
+    },
+    {
         id: 1,
         name: "Account",
         description:

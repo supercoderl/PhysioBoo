@@ -28,6 +28,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       [totalItems]="data?.totalCount ?? 0"
       [loading]="loading"
       [availableTools]="tools"
+      columnsStorageKey="common-category.insurance-company"
       [bulkActions]="bulkActions"
       [sortOptions]="sortOptions"
       [currentSort]="currentSort"
@@ -45,7 +46,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
       </ng-container>
 
-      <ng-template appColumnDef="name" headerLabel="Insurer" headerClass="text-left" let-item>
+      <ng-template appColumnDef="name" hideable="false" headerLabel="Insurer" headerClass="text-left" let-item>
         <div class="flex items-center gap-3 min-w-0">
           <div class="min-w-0">
             <button
@@ -69,14 +70,14 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
           <div class="truncate text-xs leading-4 text-secondary">{{ item.phone || item.email || empty }}</div>
         </div>
       </ng-template>
-      <ng-template appColumnDef="claims" headerLabel="Claims" headerClass="text-left" width="210px" let-item>
+      <ng-template appColumnDef="claims" defaultHidden headerLabel="Claims" headerClass="text-left" width="210px" let-item>
         <div class="flex flex-wrap gap-1 overflow-hidden">
           <boo-status-badge *ngIf="item.cashlessFacility" [label]="'Cashless'" tone="success" />
           <boo-status-badge *ngIf="item.reimbursementFacility" [label]="'Reimbursement'" tone="primary" />
           <span *ngIf="!(item.cashlessFacility) && !(item.reimbursementFacility)" class="text-sm text-secondary">{{ empty }}</span>
         </div>
       </ng-template>
-      <ng-template appColumnDef="settlement" headerLabel="Settlement" headerClass="text-left" width="130px" let-item>
+      <ng-template appColumnDef="settlement" defaultHidden headerLabel="Settlement" headerClass="text-left" width="130px" let-item>
         <div class="min-w-0">
           <div class="truncate text-sm leading-4 text-regular">{{ item.claimSettlementRatio !== null && item.claimSettlementRatio !== undefined ? (item.claimSettlementRatio | number:'1.0-2') + '%' : empty }}</div>
           <div class="truncate text-xs leading-4 text-secondary">{{ item.averageClaimSettlementTime ? '~' + item.averageClaimSettlementTime + ' days' : empty }}</div>

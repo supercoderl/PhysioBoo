@@ -1,4 +1,4 @@
-import { Directive, Input, TemplateRef } from '@angular/core';
+import { Directive, Input, TemplateRef, booleanAttribute } from '@angular/core';
 
 @Directive({
     selector: '[appColumnDef]',
@@ -17,6 +17,10 @@ export class ColumnDefDirective {
     @Input() headerClass: string = '';
     @Input() cellClass: string = '';
     @Input() width: string | number = 'auto';
+    /** False keeps the column out of the table's column chooser (e.g. the row's name). Selection and unlabelled action columns never appear there. */
+    @Input({ transform: booleanAttribute }) hideable: boolean = true;
+    /** The column starts hidden; users can show it from the table's column chooser. */
+    @Input({ transform: booleanAttribute }) defaultHidden: boolean = false;
     // #endregion
 
     // #region Init (Lifecycle + Setup)

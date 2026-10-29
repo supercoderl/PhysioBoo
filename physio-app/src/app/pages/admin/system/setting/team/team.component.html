@@ -40,7 +40,8 @@
         [pageSize]="tableData()?.pageSize ?? params.pageSize"
         [totalItems]="tableData()?.totalCount ?? 0"
         [loading]="loading()"
-        [availableTools]="['filter', 'sort']"
+        [availableTools]="['columns', 'filter', 'sort']"
+        columnsStorageKey="settings.team"
         [sortOptions]="sortOptions"
         [currentSort]="params.sort"
         [filterConfigs]="filterConfigs"
@@ -52,7 +53,7 @@
         (sortApply)="onSortChange($event)"
         (filterApply)="onFilterChange($event)"
       >
-        <ng-template appColumnDef="member" headerLabel="Member" headerClass="text-left" let-item>
+        <ng-template appColumnDef="member" hideable="false" headerLabel="Member" headerClass="text-left" let-item>
           <div class="flex items-center gap-3 min-w-0">
             <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold shrink-0 overflow-hidden" aria-hidden="true">
               <img *ngIf="item.profilePicture; else initialsTpl" [src]="item.profilePicture" alt="" class="w-full h-full object-cover" />
@@ -82,7 +83,7 @@
         <ng-template appColumnDef="lastLoginAt" headerLabel="Last sign-in" headerClass="text-left" width="140px" let-item>
           <span class="text-sm text-regular">{{ item.lastLoginAt ? (item.lastLoginAt | date:'mediumDate') : 'Never' }}</span>
         </ng-template>
-        <ng-template appColumnDef="createdAt" headerLabel="Joined" headerClass="text-left" width="130px" let-item>
+        <ng-template appColumnDef="createdAt" defaultHidden headerLabel="Joined" headerClass="text-left" width="130px" let-item>
           <span class="text-sm text-regular">{{ item.createdAt ? (item.createdAt | date:'mediumDate') : empty }}</span>
         </ng-template>
         <ng-container *ngIf="canUpdate || canDelete">

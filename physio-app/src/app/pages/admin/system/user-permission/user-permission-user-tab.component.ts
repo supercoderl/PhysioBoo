@@ -19,8 +19,10 @@ import { BulkAction } from "../../../../shared/types/table.types";
         SharedModule,
         UserPermissionUserTableCardComponent
     ],
+    // A flex column of the tab's height, so the table card below gets a definite height and scrolls its own rows.
+    host: { class: 'flex flex-1 min-h-0 min-w-0 flex-col' },
     template: `
-        <div class="flex-1 min-h-0" #tableHost>
+        <div class="flex flex-1 min-h-0 min-w-0 flex-col" #tableHost>
             <user-permission-user-table-card
                 [data]="tableData()"
                 [sortOptions]="sort_options"
@@ -91,7 +93,7 @@ export class AdminUserPermissionUserTabComponent implements AfterViewInit {
                 toolbarHeight: 48,
                 headerHeight: 48,
                 footerHeight: 44,
-                extraOffset: 16,
+                extraOffset: 36,
                 min: 5,
                 max: 50
             })

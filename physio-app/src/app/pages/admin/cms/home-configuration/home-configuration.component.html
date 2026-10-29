@@ -1,7 +1,7 @@
-<div class="flex flex-1 min-h-0 flex-col gap-4 pb-5">
+<div class="flex flex-1 min-h-0 flex-col gap-4">
 
   <!-- Page header -->
-  <header class="flex flex-wrap items-end justify-between gap-3">
+  <header class="shrink-0 flex flex-wrap items-end justify-between gap-3">
     <div class="min-w-0">
       <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Home page</h1>
       <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">
@@ -23,15 +23,17 @@
 
   <p class="sr-only" aria-live="polite">{{ announcement }}</p>
 
-  <p *ngIf="!canUpdate" class="m-0 flex items-start gap-2 px-4 py-3 rounded-xl border border-borderGray bg-body text-sm text-regular">
+  <p *ngIf="!canUpdate" class="shrink-0 m-0 flex items-start gap-2 px-4 py-3 rounded-xl border border-borderGray bg-body text-sm text-regular">
     <physio-icon name="lock" [size]="16" class="mt-0.5 flex-none text-secondary" aria-hidden="true" />
     <span>You can view the home page setup. Changing it needs edit access to home page settings.</span>
   </p>
 
+  <!-- Sections scroll here; the heading above stays put. -->
+  <div class="boo-scrollbar flex-1 min-h-0 overflow-y-auto pb-5">
   <div class="grid grid-cols-1 lg:grid-cols-[200px_minmax(0,1fr)] gap-6 items-start">
 
     <!-- Section navigation (wide screens) -->
-    <nav class="hidden lg:block sticky top-4" aria-label="Home page sections">
+    <nav class="hidden lg:block sticky top-0" aria-label="Home page sections">
       <p class="m-0 mb-1.5 px-3 text-xs font-medium text-secondary">On this page</p>
       <ul class="m-0 p-0 list-none flex flex-col gap-0.5">
         <li *ngFor="let item of nav; trackBy: trackById">
@@ -489,6 +491,7 @@
         </ul>
       </home-config-section>
     </div>
+  </div>
   </div>
 </div>
 

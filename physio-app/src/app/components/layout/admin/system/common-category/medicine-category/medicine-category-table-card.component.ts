@@ -27,6 +27,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       [totalItems]="data?.totalCount ?? 0"
       [loading]="loading"
       [availableTools]="tools"
+      columnsStorageKey="common-category.medicine-category"
       [bulkActions]="bulkActions"
       [sortOptions]="sortOptions"
       [currentSort]="currentSort"
@@ -44,7 +45,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
       </ng-container>
 
-      <ng-template appColumnDef="name" headerLabel="Category" headerClass="text-left" let-item>
+      <ng-template appColumnDef="name" hideable="false" headerLabel="Category" headerClass="text-left" let-item>
         <div class="flex items-center gap-3 min-w-0">
           <div class="min-w-0">
             <button
@@ -71,7 +72,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
           <span *ngIf="!(item.requiresPrescription) && !(item.isControlled)" class="text-sm text-secondary">{{ empty }}</span>
         </div>
       </ng-template>
-      <ng-template appColumnDef="storageConditions" headerLabel="Storage" headerClass="text-left" let-item>
+      <ng-template appColumnDef="storageConditions" defaultHidden headerLabel="Storage" headerClass="text-left" let-item>
         <div class="truncate text-sm" [title]="item.storageConditions || ''">{{ item.storageConditions || empty }}</div>
       </ng-template>
       <ng-container *ngIf="tableActions.length">

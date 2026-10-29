@@ -353,9 +353,10 @@
     </div>
 
     <!-- Paging -->
-    <footer *ngIf="data && data.totalCount > 0" class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-rowDivider">
+    <footer *ngIf="data && data.totalCount > 0" class="shrink-0 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2 border-t border-rowDivider">
       <p class="m-0 text-xs text-secondary tabular-nums" aria-live="polite">Showing {{ firstShown }}–{{ lastShown }} of {{ data.totalCount }}</p>
-      <boo-pagination *ngIf="totalPages > 1" [page]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)" />
+      <!-- The admin tables' compact pager (32px), not the public listings' 44px one. -->
+      <boo-pagination-admin *ngIf="totalPages > 1" [currentPage]="page" [totalItems]="data.totalCount" [pageSize]="pageSize" (pageChange)="onPageChange($event)" />
     </footer>
   </section>
 </div>

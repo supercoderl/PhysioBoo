@@ -13,13 +13,13 @@ import {
     BooIconComponent,
     BooInlineErrorComponent,
     BooInlineErrorState,
-    BooPaginationComponent,
     BooSearchFieldComponent,
     BooStatusBadgeComponent,
 } from '@physioboo/ui';
 import { Observable, Subject, of } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap } from 'rxjs/operators';
 import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
+import { PaginationComponent } from '../../../../components/table/boo-table-admin/boo-pagination-admin.component';
 import { DepartmentService } from '../../../../services/admin/department.service';
 import { DoctorService } from '../../../../services/admin/doctor.service';
 import { MedicalServiceService } from '../../../../services/admin/medical-service.service';
@@ -82,7 +82,7 @@ const PAGE_SIZE = 20;
         BooFilterChipsComponent,
         BooSelectComponent,
         BooStatusBadgeComponent,
-        BooPaginationComponent,
+        PaginationComponent,
         BooEmptyStateComponent,
         BooErrorStateComponent,
         BooInlineErrorComponent,
@@ -136,6 +136,7 @@ export class AdminServiceComponent implements OnInit {
     availabilityFilter: ServiceAvailability | null = null;
     sort = '-updatedAt';
     page = 1;
+    readonly pageSize = PAGE_SIZE;
 
     data: PaginationData<MedicalService> | null = null;
     stats: ServiceStats | null = null;

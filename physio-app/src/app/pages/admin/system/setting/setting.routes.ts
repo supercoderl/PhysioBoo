@@ -14,6 +14,12 @@ export const routes: Routes = [
                 pathMatch: 'full'
             },
             {
+                path: 'hospital',
+                data: { breadcrumb: ['hospital'], permission: Permissions.Admin.HospitalRead },
+                loadComponent: () => import('../hospital/list.component').then(m => m.AdminHospitalListComponent),
+                canActivate: [permissionGuard(Permissions.Admin.HospitalRead)]
+            },
+            {
                 path: 'account',
                 data: { breadcrumb: ['account'] },
                 loadComponent: () => import('./account/account.component').then(m => m.SettingAccountComponent)

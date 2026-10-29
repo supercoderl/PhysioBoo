@@ -27,6 +27,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       [totalItems]="data?.totalCount ?? 0"
       [loading]="loading"
       [availableTools]="tools"
+      columnsStorageKey="common-category.appointment-type"
       [bulkActions]="bulkActions"
       [sortOptions]="sortOptions"
       [currentSort]="currentSort"
@@ -44,7 +45,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
       </ng-container>
 
-      <ng-template appColumnDef="name" headerLabel="Appointment type" headerClass="text-left" let-item>
+      <ng-template appColumnDef="name" hideable="false" headerLabel="Appointment type" headerClass="text-left" let-item>
         <div class="flex items-center gap-3 min-w-0">
           <span class="flex-none w-2.5 h-2.5 rounded-full ring-2 ring-surface shadow-[0_0_0_1px_rgba(0,0,0,0.08)]" [style.background-color]="item.colorCode || '#CBD5E1'" aria-hidden="true"></span>
           <div class="min-w-0">
@@ -69,7 +70,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       <ng-template appColumnDef="consultationFee" headerLabel="Consultation fee" headerClass="text-right" cellClass="text-right" width="150px" let-item>
         <span class="text-sm tabular-nums">{{ item.consultationFee | currency:'USD':'symbol':'1.2-2' }}</span>
       </ng-template>
-      <ng-template appColumnDef="flags" headerLabel="Booking" headerClass="text-left" width="240px" let-item>
+      <ng-template appColumnDef="flags" defaultHidden headerLabel="Booking" headerClass="text-left" width="240px" let-item>
         <div class="flex flex-wrap gap-1 overflow-hidden">
           <boo-status-badge *ngIf="item.isEmergency" [label]="'Emergency'" tone="danger" />
           <boo-status-badge *ngIf="item.isFollowUp" [label]="'Follow-up'" tone="primary" />

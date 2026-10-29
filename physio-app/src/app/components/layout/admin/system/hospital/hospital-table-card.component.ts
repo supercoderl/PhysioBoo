@@ -19,10 +19,11 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
     ColumnDefDirective,
     BooActionAdminComponent
   ],
-  host: { class: 'block h-full min-h-0' },
+  // Fills the page's table region; boo-table-admin scrolls its own rows (docs/admin-layout-contract.md).
+  host: { class: 'flex flex-1 min-h-0 min-w-0 flex-col' },
   template: `
-    <div class="bg-surface rounded-[6px] border border-gray-200 h-full overflow-hidden">
       <boo-table-admin
+        class="flex-1 min-h-0 rounded-[6px] overflow-hidden"
         [data]="data?.items ?? []"
         tdClass="px-4 py-3"
         [showFooter]="true"
@@ -31,14 +32,16 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
         [totalItems]="data?.totalCount ?? 0"
         [sortOptions]="sortOptions"
         [currentSort]="currentSort"
-        [availableTools]="['sort']"
+        [availableTools]="['columns', 'sort']"
+        columnsStorageKey="settings.hospital"
+        minTableWidth="760px"
         [loading]="loadingSrv.isLoading('search')"
         (pageChange)="pageChange.emit($event)"
         (searchChange)="searchChange.emit($event)"
         (reload)="reloadClick.emit()"
         (sortApply)="sortApply.emit($event)"
       >
-        <ng-template appColumnDef="name" headerLabel="Branch" headerClass="text-left" let-item>
+        <ng-template appColumnDef="name" hideable="false" headerLabel="Branch" headerClass="text-left" let-item>
           <div class="min-w-0 cursor-pointer" (click)="editClick.emit(item.id)">
             <div class="truncate text-sm font-semibold text-primary" [title]="item.name">{{ item.name }}</div>
             <div class="text-xs text-secondary">{{ item.hospitalCode || '—' }}</div>
@@ -57,7 +60,7 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
           <span class="text-sm font-medium tabular-nums">{{ item.bedCapacity }} / {{ item.icuCapacity }}</span>
         </ng-template>
 
-        <ng-template appColumnDef="services" headerLabel="Services" headerClass="text-center" cellClass="text-center" let-item>
+        <ng-template appColumnDef="services" defaultHidden headerLabel="Services" headerClass="text-center" cellClass="text-center" let-item>
           <div class="flex justify-center gap-1 flex-wrap">
             <span *ngIf="item.emergencyCapacity > 0" class="inline-flex px-1.5 py-0.5 rounded text-xs bg-red-100 text-red-600">ER</span>
             <span *ngIf="item.icuCapacity > 0" class="inline-flex px-1.5 py-0.5 rounded text-xs bg-orange-100 text-orange-600">ICU</span>
@@ -81,7 +84,6 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
           </div>
         </ng-template>
       </boo-table-admin>
-    </div>
   `
 })
 export class AdminHospitalTableCardComponent {

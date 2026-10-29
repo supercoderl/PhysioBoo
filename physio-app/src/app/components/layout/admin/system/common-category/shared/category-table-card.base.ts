@@ -3,7 +3,7 @@ import { ActionItem, PaginationData } from "../../../../../../shared/types/commo
 import { FilterConfig } from "../../../../../../shared/types/filter.types";
 import { SortOption } from "../../../../../../shared/types/sort";
 import { BulkAction } from "../../../../../../shared/types/table.types";
-import { BooTableAdminComponent } from "../../../../../table/boo-table-admin/boo-table-admin.component";
+import { BooTableAdminComponent, TableTool } from "../../../../../table/boo-table-admin/boo-table-admin.component";
 
 /** Placeholder for empty optional values in table cells. */
 export const EMPTY_CELL = '—';
@@ -61,9 +61,9 @@ export abstract class CategoryTableCardBase<T extends { id: string }> {
     // #endregion
 
     // #region Methods
-    /** Tools the toolbar offers: filter only when the endpoint supports one. */
-    get tools(): ('filter' | 'sort')[] {
-        return this.filterConfigs.length ? ['filter', 'sort'] : ['sort'];
+    /** Tools the toolbar offers: the column chooser, and filter only when the endpoint supports one. */
+    get tools(): TableTool[] {
+        return this.filterConfigs.length ? ['columns', 'filter', 'sort'] : ['columns', 'sort'];
     }
 
     onBulkAction(event: { action: BulkAction; ids: (number | string)[] }): void {

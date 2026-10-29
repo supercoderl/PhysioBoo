@@ -28,6 +28,7 @@ import { SEQUENCE_ENTITY_TYPES, buildSequenceCode, dateFormatRepeatsCodes, nextS
       [totalItems]="data?.totalCount ?? 0"
       [loading]="loading"
       [availableTools]="tools"
+      columnsStorageKey="settings.sequence-tracker"
       [bulkActions]="bulkActions"
       [sortOptions]="sortOptions"
       [currentSort]="currentSort"
@@ -45,7 +46,7 @@ import { SEQUENCE_ENTITY_TYPES, buildSequenceCode, dateFormatRepeatsCodes, nextS
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
       </ng-container>
 
-      <ng-template appColumnDef="entityType" headerLabel="Record type" headerClass="text-left" let-item>
+      <ng-template appColumnDef="entityType" hideable="false" headerLabel="Record type" headerClass="text-left" let-item>
         <div class="min-w-0">
           <button
             *ngIf="canUpdate; else plainType"
@@ -70,7 +71,7 @@ import { SEQUENCE_ENTITY_TYPES, buildSequenceCode, dateFormatRepeatsCodes, nextS
           <boo-status-badge *ngIf="repeats(item)" label="Can repeat" tone="warning" [title]="repeatHint" />
         </div>
       </ng-template>
-      <ng-template appColumnDef="currentSequence" headerLabel="Last issued #" headerClass="text-right" cellClass="text-right" width="120px" let-item>
+      <ng-template appColumnDef="currentSequence" defaultHidden headerLabel="Last issued #" headerClass="text-right" cellClass="text-right" width="120px" let-item>
         <span class="text-sm tabular-nums">{{ item.currentSequence | number }}</span>
       </ng-template>
       <ng-template appColumnDef="updatedAt" headerLabel="Updated" headerClass="text-left" width="140px" let-item>

@@ -1,4 +1,5 @@
-<admin-content-header>
+<!-- Heading keeps its natural height; the notes below fill the rest and scroll. -->
+<admin-content-header class="!flex-none">
   <div
     class="flex min-w-0 flex-auto flex-col gap-2 sm:flex-row sm:items-center"
   >
@@ -50,7 +51,7 @@
   </div>
 </admin-content-header>
 
-<div class="relative z-10 container flex flex-auto flex-col overflow-hidden">
+<div class="boo-scrollbar relative z-10 container flex flex-1 min-h-0 flex-col overflow-y-auto">
   <div class="flex-[1_0_auto]">
     <div class="flex w-full flex-col items-center p-4 md:p-6">
       <!-- Composer -->

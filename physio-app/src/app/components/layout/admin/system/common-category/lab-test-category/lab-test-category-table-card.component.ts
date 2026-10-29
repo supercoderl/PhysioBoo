@@ -27,6 +27,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       [totalItems]="data?.totalCount ?? 0"
       [loading]="loading"
       [availableTools]="tools"
+      columnsStorageKey="common-category.lab-test-category"
       [bulkActions]="bulkActions"
       [sortOptions]="sortOptions"
       [currentSort]="currentSort"
@@ -44,7 +45,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
       </ng-container>
 
-      <ng-template appColumnDef="name" headerLabel="Category" headerClass="text-left" let-item>
+      <ng-template appColumnDef="name" hideable="false" headerLabel="Category" headerClass="text-left" let-item>
         <div class="flex items-center gap-3 min-w-0">
           <div class="min-w-0">
             <button

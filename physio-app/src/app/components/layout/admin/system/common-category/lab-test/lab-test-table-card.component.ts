@@ -27,6 +27,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       [totalItems]="data?.totalCount ?? 0"
       [loading]="loading"
       [availableTools]="tools"
+      columnsStorageKey="common-category.lab-test"
       [bulkActions]="bulkActions"
       [sortOptions]="sortOptions"
       [currentSort]="currentSort"
@@ -44,7 +45,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
       </ng-container>
 
-      <ng-template appColumnDef="name" headerLabel="Test" headerClass="text-left" let-item>
+      <ng-template appColumnDef="name" hideable="false" headerLabel="Test" headerClass="text-left" let-item>
         <div class="flex items-center gap-3 min-w-0">
           <div class="min-w-0">
             <button
@@ -62,13 +63,13 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       <ng-template appColumnDef="category" headerLabel="Category" headerClass="text-left" width="170px" let-item>
         <div class="truncate text-sm">{{ categoryNames[item.categoryId] || empty }}</div>
       </ng-template>
-      <ng-template appColumnDef="sample" headerLabel="Specimen" headerClass="text-left" width="150px" let-item>
+      <ng-template appColumnDef="sample" defaultHidden headerLabel="Specimen" headerClass="text-left" width="150px" let-item>
         <div class="min-w-0">
           <div class="truncate text-sm leading-4 text-regular">{{ item.sampleType || empty }}</div>
           <div class="truncate text-xs leading-4 text-secondary">{{ item.sampleVolume || item.unitOfMeasurement || empty }}</div>
         </div>
       </ng-template>
-      <ng-template appColumnDef="reportingTimeHours" headerLabel="Turnaround" headerClass="text-left" width="130px" let-item>
+      <ng-template appColumnDef="reportingTimeHours" defaultHidden headerLabel="Turnaround" headerClass="text-left" width="130px" let-item>
         <div class="min-w-0">
           <div class="truncate text-sm leading-4 text-regular">{{ item.reportingTimeHours ? item.reportingTimeHours + ' h' : empty }}</div>
           <div class="truncate text-xs leading-4 text-secondary">{{ item.isUrgentAvailable && item.urgentReportingTimeHours ? 'Urgent ' + item.urgentReportingTimeHours + ' h' : 'Routine only' }}</div>
@@ -77,7 +78,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       <ng-template appColumnDef="cost" headerLabel="Price" headerClass="text-right" cellClass="text-right" width="120px" let-item>
         <span class="text-sm tabular-nums">{{ item.cost | currency:'USD':'symbol':'1.2-2' }}</span>
       </ng-template>
-      <ng-template appColumnDef="options" headerLabel="Options" headerClass="text-left" width="230px" let-item>
+      <ng-template appColumnDef="options" defaultHidden headerLabel="Options" headerClass="text-left" width="230px" let-item>
         <div class="flex flex-wrap gap-1 overflow-hidden">
           <boo-status-badge *ngIf="item.fastingRequired" [label]="'Fasting'" tone="warning" />
           <boo-status-badge *ngIf="item.isHomeCollectionAvailable" [label]="'Home collection'" tone="primary" />

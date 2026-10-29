@@ -27,6 +27,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       [totalItems]="data?.totalCount ?? 0"
       [loading]="loading"
       [availableTools]="tools"
+      columnsStorageKey="common-category.medical-specialty"
       [bulkActions]="bulkActions"
       [sortOptions]="sortOptions"
       [currentSort]="currentSort"
@@ -44,7 +45,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
       </ng-container>
 
-      <ng-template appColumnDef="name" headerLabel="Specialty" headerClass="text-left" let-item>
+      <ng-template appColumnDef="name" hideable="false" headerLabel="Specialty" headerClass="text-left" let-item>
         <div class="flex items-center gap-3 min-w-0">
           <span class="flex-none inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primarySoft text-primary overflow-hidden" aria-hidden="true">
             <span *ngIf="isInlineSvg(item.iconUrl)" class="w-5 h-5 [&>svg]:w-full [&>svg]:h-full" [innerHTML]="item.iconUrl | safeHtml"></span>
@@ -72,7 +73,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       <ng-template appColumnDef="category" headerLabel="Category" headerClass="text-left" width="140px" let-item>
         <div class="truncate text-sm">{{ item.category || empty }}</div>
       </ng-template>
-      <ng-template appColumnDef="classification" headerLabel="Classification" headerClass="text-left" width="190px" let-item>
+      <ng-template appColumnDef="classification" defaultHidden headerLabel="Classification" headerClass="text-left" width="190px" let-item>
         <div class="flex flex-wrap gap-1 overflow-hidden">
           <boo-status-badge *ngIf="item.isSurgical" [label]="'Surgical'" tone="primary" />
           <boo-status-badge *ngIf="item.isDiagnostic" [label]="'Diagnostic'" tone="neutral" />

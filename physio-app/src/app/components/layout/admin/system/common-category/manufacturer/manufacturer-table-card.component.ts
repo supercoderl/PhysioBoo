@@ -27,6 +27,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       [totalItems]="data?.totalCount ?? 0"
       [loading]="loading"
       [availableTools]="tools"
+      columnsStorageKey="common-category.manufacturer"
       [bulkActions]="bulkActions"
       [sortOptions]="sortOptions"
       [currentSort]="currentSort"
@@ -44,7 +45,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
       </ng-container>
 
-      <ng-template appColumnDef="name" headerLabel="Manufacturer" headerClass="text-left" let-item>
+      <ng-template appColumnDef="name" hideable="false" headerLabel="Manufacturer" headerClass="text-left" let-item>
         <div class="flex items-center gap-3 min-w-0">
           <div class="min-w-0">
             <button
@@ -71,7 +72,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
           <div class="truncate text-xs leading-4 text-secondary">{{ item.email || item.website || empty }}</div>
         </div>
       </ng-template>
-      <ng-template appColumnDef="certifications" headerLabel="Certifications" headerClass="text-left" width="200px" let-item>
+      <ng-template appColumnDef="certifications" defaultHidden headerLabel="Certifications" headerClass="text-left" width="200px" let-item>
         <div class="flex flex-wrap gap-1 overflow-hidden">
           <boo-status-badge *ngIf="item.gmpCertified" [label]="'GMP'" tone="success" />
           <boo-status-badge *ngIf="item.isoCertified" [label]="'ISO'" tone="primary" />
@@ -79,7 +80,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
           <span *ngIf="!(item.gmpCertified) && !(item.isoCertified) && !(item.fdaApproved)" class="text-sm text-secondary">{{ empty }}</span>
         </div>
       </ng-template>
-      <ng-template appColumnDef="licenseNumber" headerLabel="License no." headerClass="text-left" width="150px" let-item>
+      <ng-template appColumnDef="licenseNumber" defaultHidden headerLabel="License no." headerClass="text-left" width="150px" let-item>
         <div class="truncate text-sm tabular-nums">{{ item.licenseNumber || empty }}</div>
       </ng-template>
       <ng-template appColumnDef="isActive" headerLabel="Status" headerClass="text-left" width="120px" let-item>

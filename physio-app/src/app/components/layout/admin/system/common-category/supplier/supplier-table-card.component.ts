@@ -28,6 +28,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       [totalItems]="data?.totalCount ?? 0"
       [loading]="loading"
       [availableTools]="tools"
+      columnsStorageKey="common-category.supplier"
       [bulkActions]="bulkActions"
       [sortOptions]="sortOptions"
       [currentSort]="currentSort"
@@ -45,7 +46,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
       </ng-container>
 
-      <ng-template appColumnDef="name" headerLabel="Supplier" headerClass="text-left" let-item>
+      <ng-template appColumnDef="name" hideable="false" headerLabel="Supplier" headerClass="text-left" let-item>
         <div class="flex items-center gap-3 min-w-0">
           <div class="min-w-0">
             <button
@@ -69,7 +70,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
           <div class="truncate text-xs leading-4 text-secondary">{{ item.phone || item.email || empty }}</div>
         </div>
       </ng-template>
-      <ng-template appColumnDef="location" headerLabel="Location" headerClass="text-left" let-item>
+      <ng-template appColumnDef="location" defaultHidden headerLabel="Location" headerClass="text-left" let-item>
         <div class="min-w-0">
           <div class="truncate text-sm leading-4 text-regular">{{ join(item.city, item.stateProvince) || empty }}</div>
           <div class="truncate text-xs leading-4 text-secondary">{{ item.country || empty }}</div>
@@ -78,7 +79,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       <ng-template appColumnDef="leadTimeDays" headerLabel="Lead time" headerClass="text-right" cellClass="text-right" width="110px" let-item>
         <span class="text-sm tabular-nums">{{ item.leadTimeDays ? item.leadTimeDays + (item.leadTimeDays === 1 ? ' day' : ' days') : empty }}</span>
       </ng-template>
-      <ng-template appColumnDef="creditLimit" headerLabel="Credit limit" headerClass="text-right" cellClass="text-right" width="140px" let-item>
+      <ng-template appColumnDef="creditLimit" defaultHidden headerLabel="Credit limit" headerClass="text-right" cellClass="text-right" width="140px" let-item>
         <span class="text-sm tabular-nums">{{ item.creditLimit ? (item.creditLimit | currency:(item.currency || 'USD'):'symbol':'1.0-2') : empty }}</span>
       </ng-template>
       <ng-container *ngIf="tableActions.length">

@@ -27,6 +27,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       [totalItems]="data?.totalCount ?? 0"
       [loading]="loading"
       [availableTools]="tools"
+      columnsStorageKey="common-category.imaging-modality"
       [bulkActions]="bulkActions"
       [sortOptions]="sortOptions"
       [currentSort]="currentSort"
@@ -44,7 +45,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
         <ng-template appColumnDef="select" type="checkbox" width="48px"></ng-template>
       </ng-container>
 
-      <ng-template appColumnDef="name" headerLabel="Modality" headerClass="text-left" let-item>
+      <ng-template appColumnDef="name" hideable="false" headerLabel="Modality" headerClass="text-left" let-item>
         <div class="flex items-center gap-3 min-w-0">
           <div class="min-w-0">
             <button
@@ -65,10 +66,10 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       <ng-template appColumnDef="averageDurationMinutes" headerLabel="Avg. duration" headerClass="text-right" cellClass="text-right" width="130px" let-item>
         <span class="text-sm tabular-nums">{{ item.averageDurationMinutes ? item.averageDurationMinutes + ' min' : empty }}</span>
       </ng-template>
-      <ng-template appColumnDef="radiationDose" headerLabel="Radiation dose" headerClass="text-right" cellClass="text-right" width="140px" let-item>
+      <ng-template appColumnDef="radiationDose" defaultHidden headerLabel="Radiation dose" headerClass="text-right" cellClass="text-right" width="140px" let-item>
         <span class="text-sm tabular-nums" [class.text-secondary]="!item.radiationDose">{{ item.radiationDose ? (item.radiationDose | number:'1.0-2') + ' mSv' : 'None' }}</span>
       </ng-template>
-      <ng-template appColumnDef="prep" headerLabel="Patient preparation" headerClass="text-left" width="210px" let-item>
+      <ng-template appColumnDef="prep" defaultHidden headerLabel="Patient preparation" headerClass="text-left" width="210px" let-item>
         <div class="flex flex-wrap gap-1 overflow-hidden">
           <boo-status-badge *ngIf="item.requiresContrast" [label]="'Contrast'" tone="warning" />
           <boo-status-badge *ngIf="item.preparationRequired" [label]="'Preparation'" tone="primary" />

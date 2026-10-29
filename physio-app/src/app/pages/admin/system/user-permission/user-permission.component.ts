@@ -52,7 +52,7 @@ interface TabDef {
 
 ],
     templateUrl: './user-permission.component.html',
-    host: { class: 'block h-full min-h-0' }
+    host: { class: 'flex flex-1 min-h-0 min-w-0 flex-col' }
 })
 export class AdminUserPermissionComponent implements OnInit {
     /** Blocks a second submit while a save (which may be several requests) is still running. */

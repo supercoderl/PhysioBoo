@@ -1,6 +1,6 @@
 <!-- Loading -->
 <div *ngIf="state === 'loading'" aria-busy="true" aria-label="Loading service"
-  class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 flex flex-col gap-5 animate-pulse motion-reduce:animate-none">
+  class="public-container pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 flex flex-col gap-5 animate-pulse motion-reduce:animate-none">
   <span class="h-3 w-[220px] rounded-md bg-[#F4ECEF]"></span>
   <span class="aspect-[4/3] lg:aspect-[21/8] rounded-[20px] bg-[#F4ECEF]"></span>
   <div class="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_360px] gap-10">
@@ -29,7 +29,7 @@
 </div>
 
 <!-- Error -->
-<div *ngIf="state === 'error'" class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 lg:pt-10 lg:pb-20">
+<div *ngIf="state === 'error'" class="public-container pt-6 pb-12 md:pt-8 lg:pt-10 lg:pb-20">
   <div role="alert" class="border border-dangerBorder bg-dangerSoft rounded-2xl px-6 py-12 text-center">
     <physio-icon name="cloud-off" [size]="32" class="text-danger inline-flex" />
     <h1 class="text-[22px] font-semibold mt-3.5 mb-1.5">We couldn't load this service</h1>
@@ -47,14 +47,14 @@
   <!-- Breadcrumb -->
   <div class="bg-gray-50 border-b border-gray-200">
     <boo-breadcrumb
-      class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4"
+      class="public-container py-3.5 md:py-4"
       [wrap]="true"
       [items]="[{ label: 'Home', link: '/' }, { label: 'Services', link: '/services', queryParams: backQuery }, { label: s.name }]"
     />
   </div>
 
   <!-- Hero: image first on tablet and mobile, beside the text on desktop -->
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 md:pt-8 lg:pt-12 lg:pb-2 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] gap-6 lg:gap-14 items-center">
+  <div class="public-container pt-5 md:pt-8 lg:pt-12 lg:pb-2 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] gap-6 lg:gap-14 items-center">
     <div class="flex flex-col gap-3.5 min-w-0 order-1 lg:order-none">
       <span *ngIf="s.clinic" class="text-sm font-semibold text-primaryDeep flex gap-1.5 items-center">
         <physio-icon name="building-2" [size]="15" />{{ s.clinic.name }}
@@ -100,7 +100,7 @@
     </div>
   </div>
 
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-8 pb-12 md:pt-9 md:pb-16 lg:pt-10 lg:pb-20 flex flex-col gap-8 md:gap-10">
+  <div class="public-container pt-8 pb-12 md:pt-9 md:pb-16 lg:pt-10 lg:pb-20 flex flex-col gap-8 md:gap-10">
     <!-- About: the description after its first paragraph -->
     <section appReveal *ngIf="paragraphs.length" aria-labelledby="ov-h" class="flex flex-col gap-4 pt-8 md:pt-10 border-t border-gray-200">
       <h2 id="ov-h" class="text-2xl leading-8 font-semibold m-0">About this service</h2>

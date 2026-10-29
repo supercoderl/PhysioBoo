@@ -1,6 +1,6 @@
 <div class="sticky top-0 z-[999]">
   <div *ngIf="tenant.showEmergency" class="bg-gray-900 text-white text-[13px] leading-[18px] xl:text-sm">
-    <div class="max-w-[1200px] mx-auto px-5 xl:px-0 py-2.5 flex gap-2.5 items-start xl:items-center">
+    <div class="public-container py-2.5 flex gap-2.5 items-start xl:items-center">
       <physio-icon name="siren" [size]="16" class="text-[#FDA4AF] mt-0.5 xl:mt-0" />
       <span>
         In a medical emergency, call your local emergency number.
@@ -10,7 +10,7 @@
   </div>
 
   <header class="bg-surface border-b border-gray-200">
-    <div class="max-w-[1200px] mx-auto h-16 xl:h-[76px] pl-5 pr-3 xl:px-0 flex items-center gap-10">
+    <div class="public-container max-xl:pr-3 h-16 xl:h-[76px] flex items-center gap-10">
       <a routerLink="/" aria-label="Home" class="flex items-center flex-none">
         <img src="assets/logo/logo.webp" [alt]="tenant.name" class="h-6 xl:h-[30px]" />
       </a>

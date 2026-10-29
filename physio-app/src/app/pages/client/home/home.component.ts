@@ -10,12 +10,17 @@ import { ClinicCardComponent } from '../../../components/layout/client/hospital/
 import { PublicArticleService } from '../../../services/public/public-article.service';
 import { PublicDoctorService } from '../../../services/public/public-doctor.service';
 import { PublicHospitalService } from '../../../services/public/public-hospital.service';
+import { PublicSiteService } from '../../../services/public/public-site.service';
 import { CLIENT_TENANT } from '../../../shared/data/client-site';
 import { SharedModule } from '../../../shared/shared-imports';
 import { PagedResponse, PaginationData } from '../../../shared/types/common';
 import { PublicArticle } from '../../../shared/types/public-article.types';
 import { PublicDoctor, PublicOption } from '../../../shared/types/public-doctor.types';
 import { PublicHospital } from '../../../shared/types/public-hospital.types';
+import { PublicSiteProfile } from '../../../shared/types/public-site.types';
+import { telHref } from '../../../shared/utils/contact.utils';
+import { HomeHeroMediaComponent } from './home-hero-media.component';
+import { HomeRequestStripComponent } from './home-request-strip.component';
 import {
   HOME_ARTICLE_COUNT,
   HOME_CLINIC_COUNT,
@@ -60,6 +65,8 @@ function loadingSection<T>(): HomeSection<T> {
     DoctorCardComponent,
     ClinicCardComponent,
     ArticleCardComponent,
+    HomeHeroMediaComponent,
+    HomeRequestStripComponent,
   ],
   templateUrl: './home.component.html',
   styles: `
@@ -76,10 +83,13 @@ export class HomeComponent implements OnInit {
   private readonly doctorSrv = inject(PublicDoctorService);
   private readonly hospitalSrv = inject(PublicHospitalService);
   private readonly articleSrv = inject(PublicArticleService);
+  private readonly siteSrv = inject(PublicSiteService);
 
   @ViewChild('searchInput') private searchInput?: ElementRef<HTMLInputElement>;
 
   readonly tenant = CLIENT_TENANT;
+  /** Contact details and hero photo; the static defaults until the tenant profile loads, and if it fails. */
+  profile: PublicSiteProfile = { phone: CLIENT_TENANT.phone, email: CLIENT_TENANT.email, hero: null };
   readonly steps = HOME_STEPS;
   readonly reasons = HOME_REASONS;
   readonly faqs = HOME_FAQS;
@@ -119,6 +129,11 @@ export class HomeComponent implements OnInit {
     // Server render shows the skeletons; data is fetched in the browser only, like the listing pages.
     if (!this.isBrowser) return;
 
+    // A failed profile leaves the defaults in place: the page then shows the motif and the contact-page link.
+    this.siteSrv.getProfile()
+      .pipe(takeUntilDestroyed(this.destroyRef), catchError(() => of(null)))
+      .subscribe(profile => { if (profile) this.profile = profile; });
+
     this.track('specialties', () => this.doctorSrv.getFilterOptions().pipe(
       map(res => this.unwrap(res).specialties.slice(0, HOME_SPECIALTY_COUNT).map(s => ({ ...s, icon: specialtyIcon(s.name) })))
     ));
@@ -136,6 +151,10 @@ export class HomeComponent implements OnInit {
     }).pipe(
       map(res => this.page(res))
     ));
+  }
+
+  get phoneHref(): string {
+    return this.profile.phone ? telHref(this.profile.phone) : '';
   }
 
   // #region Search

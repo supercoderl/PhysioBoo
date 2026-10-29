@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-29T00:00:00.000Z",
+  "title": "Design System: PhysioBoo",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Signal Rose", "canonical": "#E11D48", "tonalRamp": ["#4C0519", "#881337", "#9F1239", "#BE123C", "#E11D48", "#FB7185", "#FDA4AF", "#FFE9EE"] },
+      "primary-deep": { "role": "primary", "displayName": "Deep Rose", "canonical": "#9F1239", "tonalRamp": ["#4C0519", "#701A32", "#881337", "#9F1239", "#BE123C", "#E11D48", "#FB7185", "#FFE9EE"] },
+      "primary-soft": { "role": "primary", "displayName": "Blush Tint", "canonical": "#FFE9EE", "tonalRamp": ["#9F1239", "#E11D48", "#F43F5E", "#FB7185", "#FDA4AF", "#FDD9E1", "#FFE9EE", "#FFF5F7"] },
+      "page": { "role": "neutral", "displayName": "Blush Paper", "canonical": "#FDF8F9", "tonalRamp": ["#26141A", "#3F2129", "#55434B", "#71606A", "#85757D", "#E3D5DA", "#EFE3E7", "#FDF8F9"] },
+      "text": { "role": "neutral", "displayName": "Plum Ink", "canonical": "#26141A", "tonalRamp": ["#1A0E12", "#26141A", "#3F2129", "#55434B", "#71606A", "#85757D", "#E3D5DA", "#FAF1F3"] },
+      "text-secondary": { "role": "neutral", "displayName": "Dusty Mauve", "canonical": "#71606A", "tonalRamp": ["#26141A", "#3F2129", "#55434B", "#71606A", "#85757D", "#A98A93", "#E3D5DA", "#FAF1F3"] },
+      "border": { "role": "neutral", "displayName": "Warm Hairline", "canonical": "#EFE3E7", "tonalRamp": ["#55434B", "#71606A", "#85757D", "#A1A1AA", "#E3D5DA", "#EFE3E7", "#FAF1F3", "#FDF8F9"] },
+      "danger": { "role": "semantic", "displayName": "Alert Brick", "canonical": "#B42318", "tonalRamp": ["#55160C", "#7A271A", "#912018", "#B42318", "#D92D20", "#F97066", "#F3C7C2", "#FEF3F2"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Home hero headline only; 34px/40px on mobile, 56px/64px from lg." },
+      "headline": { "displayName": "Headline", "purpose": "Section titles; 24px/30px on mobile, 36px/44px from lg." },
+      "title": { "displayName": "Title", "purpose": "Card titles, list item names and button labels." },
+      "body": { "displayName": "Body", "purpose": "Paragraphs; 640-760px measure for reading copy." },
+      "label": { "displayName": "Label", "purpose": "Geist Mono uppercase eyebrow above a heading." }
+    },
+    "shadows": [
+      { "name": "card-hover", "value": "0 12px 32px rgb(38 20 26 / 0.08)", "purpose": "Cards on hover or focus-within (.motion-card)." },
+      { "name": "popover", "value": "0 12px 32px rgba(38, 20, 26, 0.12)", "purpose": "Account menu and open selects." },
+      { "name": "hero-search", "value": "0 8px 24px rgba(38, 20, 26, 0.06)", "purpose": "Hero search bar, desktop only." },
+      { "name": "card", "value": "0 1px 4px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)", "purpose": "Compact panels in admin." }
+    ],
+    "motion": [
+      { "name": "motion-fast", "value": "150ms", "purpose": "Color, border and link transitions." },
+      { "name": "motion-base", "value": "220ms", "purpose": "Card hover shadow, border and lift; collapse." },
+      { "name": "motion-slow", "value": "280ms", "purpose": "Large inline feedback panels." },
+      { "name": "motion-reveal", "value": "400ms", "purpose": "Scroll reveal below the fold; staggered 60ms." },
+      { "name": "ease-out", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Entrances, reveals and lifts." },
+      { "name": "ease-in-out", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "State changes on controls." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single most important action on a screen.",
+      "html": "<button class=\"ds-btn-primary\">Send request</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 18px; border: 1px solid transparent; border-radius: 10px; background: #E11D48; color: #fff; font: 600 14px/1 Geist, Roboto, Helvetica, Arial, sans-serif; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), transform 100ms; } .ds-btn-primary:hover { background: #BE123C; } .ds-btn-primary:active { background: #9F1239; transform: scale(0.98); } .ds-btn-primary:focus-visible { outline: 2px solid #E11D48; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A neutral alternative next to a primary action.",
+      "html": "<button class=\"ds-btn-secondary\">View profile</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 18px; border: 1px solid #E3D5DA; border-radius: 10px; background: #fff; color: #26141A; font: 600 14px/1 Geist, Roboto, Helvetica, Arial, sans-serif; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms; } .ds-btn-secondary:hover { background: #FDF8F9; border-color: #A1A1AA; } .ds-btn-secondary:focus-visible { outline: 2px solid #E11D48; outline-offset: 2px; }"
+    },
+    {
+      "name": "Soft Button",
+      "kind": "button",
+      "refersTo": "button-soft",
+      "description": "A tinted button for supporting actions.",
+      "html": "<button class=\"ds-btn-soft\">Call the clinic</button>",
+      "css": ".ds-btn-soft { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 18px; border: 1px solid #E11D48; border-radius: 10px; background: #FFE9EE; color: #9F1239; font: 600 14px/1 Geist, Roboto, Helvetica, Arial, sans-serif; cursor: pointer; } .ds-btn-soft:focus-visible { outline: 2px solid #E11D48; outline-offset: 2px; }"
+    },
+    {
+      "name": "Search Bar",
+      "kind": "input",
+      "refersTo": "search-bar",
+      "description": "The hero search container; the border turns rose when the field has focus.",
+      "html": "<div class=\"ds-search\"><input class=\"ds-search-input\" placeholder=\"Doctor, specialty, clinic or service\" /><button class=\"ds-search-btn\">Search</button></div>",
+      "css": ".ds-search { display: flex; gap: 6px; align-items: center; padding: 8px; background: #fff; border: 1px solid #E3D5DA; border-radius: 16px; box-shadow: 0 8px 24px rgba(38, 20, 26, 0.06); transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-search:focus-within { border-color: #E11D48; } .ds-search-input { flex: 1; min-width: 0; border: 0; outline: none; padding: 8px 12px; background: transparent; color: #26141A; font: 400 15px/1.4 Geist, Roboto, Helvetica, Arial, sans-serif; } .ds-search-input::placeholder { color: #85757D; } .ds-search-btn { height: 52px; padding: 0 22px; border: 1px solid transparent; border-radius: 12px; background: #E11D48; color: #fff; font: 600 15px/1 Geist, Roboto, Helvetica, Arial, sans-serif; cursor: pointer; } .ds-search-btn:hover { background: #BE123C; }"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Popular-search shortcut; hover turns the border and text rose.",
+      "html": "<button class=\"ds-chip\">Back pain</button>",
+      "css": ".ds-chip { height: 34px; padding: 0 14px; border: 1px solid #E3D5DA; border-radius: 9999px; background: #fff; color: #26141A; font: 400 14px/1 Geist, Roboto, Helvetica, Arial, sans-serif; white-space: nowrap; cursor: pointer; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms, transform 100ms; } .ds-chip:hover { border-color: #E11D48; color: #9F1239; } .ds-chip:active { transform: scale(0.98); } .ds-chip:focus-visible { outline: 2px solid #E11D48; outline-offset: 2px; }"
+    },
+    {
+      "name": "Specialty Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Whole-card link with a Blush Tint icon tile; flat at rest, lifts 3px on hover.",
+      "html": "<a class=\"ds-card\" href=\"#\"><span class=\"ds-card-tile\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg></span><span class=\"ds-card-title\">Orthopaedics</span></a>",
+      "css": ".ds-card { display: flex; align-items: center; gap: 16px; padding: 20px; background: #fff; border: 1px solid #EFE3E7; border-radius: 16px; color: #26141A; text-decoration: none; transition: box-shadow 220ms cubic-bezier(0.4, 0, 0.2, 1), border-color 220ms, transform 220ms; } .ds-card:hover, .ds-card:focus-visible { box-shadow: 0 12px 32px rgb(38 20 26 / 0.08); border-color: #E11D48; transform: translateY(-3px); } .ds-card:focus-visible { outline: 2px solid #E11D48; outline-offset: 2px; } .ds-card-tile { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 12px; background: #FFE9EE; color: #9F1239; flex: none; } .ds-card-title { font: 600 16px/1.4 Geist, Roboto, Helvetica, Arial, sans-serif; }"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "button-ghost",
+      "description": "Header link; quiet at rest, tinted on hover.",
+      "html": "<a class=\"ds-nav-link\" href=\"#\">Doctors</a>",
+      "css": ".ds-nav-link { display: inline-block; padding: 8px 12px; border-radius: 8px; color: #26141A; font: 500 15px/1.4 Geist, Roboto, Helvetica, Arial, sans-serif; text-decoration: none; white-space: nowrap; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-link:hover { color: #E11D48; } .ds-nav-link:focus-visible { outline: 2px solid #E11D48; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Calm Front Desk",
+    "overview": "A well-run clinic reception: warm, orderly and unhurried. The visitor may be unwell, anxious or booking for a relative, so the interface never shouts. It sits on warm off-white and rose-tinted neutrals, speaks in plain sentences, and puts one clear next step on each screen. The same system serves staff in /admin, where the calm becomes precision.",
+    "keyCharacteristics": [
+      "Warm neutrals, never cool grays.",
+      "One accent, rose #E11D48, used rarely and on purpose.",
+      "Flat, bordered surfaces at rest; a soft shadow and a 3px lift appear only on hover or focus.",
+      "Geist for text, Geist Mono for small uppercase eyebrow labels.",
+      "Motion is short, opacity/transform only, and fully switched off under prefers-reduced-motion.",
+      "Light and dark themes share one token set."
+    ],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "Rose marks the one action or state that matters on a screen. Most of any page is warm neutral.", "section": "colors" },
+      { "name": "The Warm Neutral Rule", "body": "Never introduce a cool gray, slate-blue or pure-black text. Use the remapped gray scale and Plum Ink.", "section": "colors" },
+      { "name": "The Danger Is Not Brand Rule", "body": "Destructive and error states use Alert Brick, never Signal Rose.", "section": "colors" },
+      { "name": "The Weight Over Size Rule", "body": "Hierarchy comes from 600 vs 400 and from the defined size steps, not from extra sizes.", "section": "typography" },
+      { "name": "The Mono Is An Eyebrow Rule", "body": "Geist Mono is for short uppercase labels only; never body copy or buttons.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Nothing is raised at rest. Shadow and lift are earned by hover, focus or an open state, never decoration.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use .public-container for every public section wrapper.",
+      "Do build buttons with boo-button and a variant; use physio-icon for icons.",
+      "Do use the remapped warm gray scale and Plum Ink (#26141A) for text.",
+      "Do reserve Signal Rose (#E11D48) for the one primary action or state per area.",
+      "Do keep surfaces flat with 1px #EFE3E7 borders; add lift and shadow only on hover or focus via .motion-card / .motion-card-lift.",
+      "Do give every interactive control the global 2px rose focus ring and a 44px touch target.",
+      "Do write copy that describes an appointment as a request the clinic confirms.",
+      "Do honor prefers-reduced-motion for any new animation, using the shared motion tokens."
+    ],
+    "donts": [
+      "Don't use the legacy gradient button (rose to cyan #06aed4) outside the auth pages.",
+      "Don't introduce cool grays, blue-tinted neutrals or pure black text.",
+      "Don't use Signal Rose for destructive states; use Alert Brick (#B42318).",
+      "Don't use #A1A1AA for meaningful text: it is for table headers, disabled and decorative text, and is below AA contrast on white.",
+      "Don't add shadows to resting cards, or nest cards inside cards.",
+      "Don't hard-code max-w-[1200px] mx-auto px-* on public pages.",
+      "Don't put Geist Mono in body copy or buttons.",
+      "Don't invent testimonials, ratings, patient counts or accreditations."
+    ]
+  }
+}

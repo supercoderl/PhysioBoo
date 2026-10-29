@@ -5,7 +5,7 @@
 
 <!-- Hero: breadcrumb, title, lead, actions, photo -->
 <section aria-labelledby="ab-h1" class="bg-gray-50 border-b border-gray-200">
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 pb-8 md:pt-6 md:pb-10 lg:pt-7 lg:pb-14 flex flex-col gap-5">
+  <div class="public-container pt-5 pb-8 md:pt-6 md:pb-10 lg:pt-7 lg:pb-14 flex flex-col gap-5">
     <boo-breadcrumb separator="slash" [items]="[{ label: 'Home', link: '/' }, { label: 'About Us' }]" />
 
     <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] gap-6 md:gap-8 lg:gap-14 items-center">
@@ -48,7 +48,7 @@
 </section>
 
 <!-- Who we are -->
-<section appReveal aria-labelledby="ab-who" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-11 md:py-14 lg:py-[72px]">
+<section appReveal aria-labelledby="ab-who" class="public-container py-11 md:py-14 lg:py-[72px]">
   <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-5 md:gap-6 lg:gap-16 items-start">
     <div class="flex flex-col gap-2.5 min-w-0">
       <span class="text-[13px] font-semibold tracking-[.08em] text-primaryDeep">WHO WE ARE</span>
@@ -75,7 +75,7 @@
 
 <!-- Mission and vision -->
 <section aria-labelledby="ab-mv" class="bg-gray-50 border-y border-gray-200">
-  <div appReveal class="max-w-[1200px] mx-auto px-5 xl:px-0 py-11 md:py-14 lg:py-[72px] flex flex-col gap-6">
+  <div appReveal class="public-container py-11 md:py-14 lg:py-[72px] flex flex-col gap-6">
     <h2 id="ab-mv" class="text-2xl leading-8 md:text-[28px] md:leading-9 lg:text-[32px] lg:leading-10 font-semibold tracking-[-0.01em] m-0">Our mission and vision</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       <div *ngFor="let m of missionVision" class="bg-surface border border-gray-200 rounded-[20px] p-6 md:p-8 flex flex-col gap-3.5 min-w-0">
@@ -93,7 +93,7 @@
 </section>
 
 <!-- Core values -->
-<section aria-labelledby="ab-val" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-11 md:py-14 lg:py-[72px] flex flex-col gap-6">
+<section aria-labelledby="ab-val" class="public-container py-11 md:py-14 lg:py-[72px] flex flex-col gap-6">
   <div class="flex flex-col gap-2 max-w-[640px]">
     <h2 id="ab-val" class="text-2xl leading-8 md:text-[28px] md:leading-9 lg:text-[32px] lg:leading-10 font-semibold tracking-[-0.01em] m-0">Our core values</h2>
     <p class="text-base leading-[25px] text-gray-700 m-0">The principles we use when deciding what to build and how to present information.</p>
@@ -105,7 +105,7 @@
 
 <!-- How PhysioBoo helps -->
 <section aria-labelledby="ab-how" class="bg-gray-50 border-y border-gray-200">
-  <div appReveal class="max-w-[1200px] mx-auto px-5 xl:px-0 py-11 md:py-14 lg:py-[72px] flex flex-col gap-7">
+  <div appReveal class="public-container py-11 md:py-14 lg:py-[72px] flex flex-col gap-7">
     <div class="flex flex-col gap-2 max-w-[640px]">
       <h2 id="ab-how" class="text-2xl leading-8 md:text-[28px] md:leading-9 lg:text-[32px] lg:leading-10 font-semibold tracking-[-0.01em] m-0">How PhysioBoo helps</h2>
       <p class="text-base leading-[25px] text-gray-700 m-0">Three steps from looking around to getting in touch with a provider.</p>
@@ -132,7 +132,7 @@
 </section>
 
 <!-- Explore -->
-<section aria-labelledby="ab-exp" class="max-w-[1200px] mx-auto px-5 xl:px-0 py-11 md:py-14 lg:py-[72px] flex flex-col gap-6">
+<section aria-labelledby="ab-exp" class="public-container py-11 md:py-14 lg:py-[72px] flex flex-col gap-6">
   <div class="flex flex-col gap-2 max-w-[640px]">
     <h2 id="ab-exp" class="text-2xl leading-8 md:text-[28px] md:leading-9 lg:text-[32px] lg:leading-10 font-semibold tracking-[-0.01em] m-0">Explore PhysioBoo</h2>
     <p class="text-base leading-[25px] text-gray-700 m-0">Start with whatever you already know: a doctor, a type of care, or a place.</p>
@@ -143,7 +143,7 @@
 </section>
 
 <!-- Trust and transparency -->
-<section appReveal aria-labelledby="ab-trust" class="max-w-[1200px] mx-auto px-5 xl:px-0 pb-11 md:pb-14 lg:pb-[72px]">
+<section appReveal aria-labelledby="ab-trust" class="public-container pb-11 md:pb-14 lg:pb-[72px]">
   <div class="border border-gray-200 rounded-[20px] px-5 pt-6 pb-3 md:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-5 md:gap-6 lg:gap-16 items-start">
     <div class="flex flex-col gap-2.5 min-w-0">
       <span aria-hidden="true" class="w-11 h-11 rounded-xl bg-primarySoft text-primaryDeep flex items-center justify-center mb-1"><physio-icon name="shield-check" [size]="20" /></span>
@@ -161,7 +161,7 @@
 </section>
 
 <!-- Contact CTA -->
-<section aria-labelledby="ab-cta" class="max-w-[1200px] mx-auto px-5 xl:px-0 pb-12 md:pb-16 lg:pb-20">
+<section aria-labelledby="ab-cta" class="public-container pb-12 md:pb-16 lg:pb-20">
   <div class="bg-primarySoft rounded-3xl px-5 py-7 md:p-10 lg:px-14 lg:py-12 flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
     <div class="flex flex-col gap-2 max-w-[560px]">
       <h2 id="ab-cta" class="text-2xl leading-8 md:text-[28px] md:leading-9 lg:text-[32px] lg:leading-10 font-semibold tracking-[-0.01em] m-0 text-gray-900">We're here to help</h2>

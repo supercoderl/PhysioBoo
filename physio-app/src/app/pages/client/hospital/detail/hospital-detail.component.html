@@ -1,6 +1,6 @@
 <!-- Loading -->
 <div *ngIf="state === 'loading'" aria-busy="true" aria-label="Loading clinic"
-  class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 flex flex-col gap-5 animate-pulse motion-reduce:animate-none">
+  class="public-container pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 flex flex-col gap-5 animate-pulse motion-reduce:animate-none">
   <span class="h-3 w-[220px] rounded-md bg-[#F4ECEF]"></span>
   <span class="aspect-[4/3] md:aspect-[21/8] rounded-[20px] bg-[#F4ECEF]"></span>
   <div class="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_360px] gap-10">
@@ -29,7 +29,7 @@
 </div>
 
 <!-- Error -->
-<div *ngIf="state === 'error'" class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 lg:pt-10 lg:pb-20">
+<div *ngIf="state === 'error'" class="public-container pt-6 pb-12 md:pt-8 lg:pt-10 lg:pb-20">
   <div role="alert" class="border border-dangerBorder bg-dangerSoft rounded-2xl px-6 py-12 text-center">
     <physio-icon name="cloud-off" [size]="32" class="text-danger inline-flex" />
     <h1 class="text-[22px] font-semibold mt-3.5 mb-1.5">We couldn't load this clinic</h1>
@@ -47,14 +47,14 @@
   <!-- Breadcrumb -->
   <div class="bg-gray-50 border-b border-gray-200">
     <boo-breadcrumb
-      class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4"
+      class="public-container py-3.5 md:py-4"
       [wrap]="true"
       [items]="[{ label: 'Home', link: '/' }, { label: 'Clinics', link: '/hospitals', queryParams: backQuery }, { label: c.name }]"
     />
   </div>
 
   <!-- Photo -->
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-4 md:pt-6 lg:pt-8">
+  <div class="public-container pt-4 md:pt-6 lg:pt-8">
     <div class="relative aspect-[4/3] md:aspect-[21/8] rounded-[20px] overflow-hidden" [ngClass]="c.imageUrl && !imageFailed ? 'ph-stripes' : 'bg-[#FAF5F7]'">
       <img appImgFade
         *ngIf="c.imageUrl && !imageFailed"
@@ -69,7 +69,7 @@
     </div>
   </div>
 
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-9 lg:pb-20 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_360px] gap-9 lg:gap-14 items-start">
+  <div class="public-container pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-9 lg:pb-20 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_360px] gap-9 lg:gap-14 items-start">
     <div class="flex flex-col gap-8 md:gap-10 min-w-0">
 
       <!-- Overview -->

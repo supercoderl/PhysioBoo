@@ -1,6 +1,6 @@
 <!-- Loading -->
 <div *ngIf="state === 'loading'" aria-busy="true" aria-label="Loading doctor profile"
-  class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_400px] gap-10">
+  class="public-container pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_400px] gap-10">
   <div class="flex flex-col gap-4 animate-pulse motion-reduce:animate-none">
     <span class="h-3 w-[220px] rounded-md bg-[#F4ECEF]"></span>
     <div class="flex flex-col md:flex-row gap-6">
@@ -32,7 +32,7 @@
 </div>
 
 <!-- Error -->
-<div *ngIf="state === 'error'" class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 lg:pt-10 lg:pb-20">
+<div *ngIf="state === 'error'" class="public-container pt-6 pb-12 md:pt-8 lg:pt-10 lg:pb-20">
   <div role="alert" class="motion-feedback border border-dangerBorder bg-dangerSoft rounded-2xl px-6 py-12 text-center">
     <physio-icon name="cloud-off" [size]="32" class="text-danger inline-flex" />
     <h1 class="text-[22px] font-semibold mt-3.5 mb-1.5">We couldn't load this profile</h1>
@@ -50,13 +50,13 @@
   <!-- Breadcrumb -->
   <div class="bg-gray-50 border-b border-gray-200">
     <boo-breadcrumb
-      class="max-w-[1200px] mx-auto px-5 xl:px-0 py-3.5 md:py-4"
+      class="public-container py-3.5 md:py-4"
       [wrap]="true"
       [items]="[{ label: 'Home', link: '/' }, { label: 'Doctors', link: '/doctor' }, { label: d.fullName }]"
     />
   </div>
 
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_400px] gap-10 lg:gap-14 items-start">
+  <div class="public-container pt-6 pb-12 md:pt-8 md:pb-16 lg:pt-10 lg:pb-20 grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_400px] gap-10 lg:gap-14 items-start">
     <div class="flex flex-col gap-8 md:gap-10 min-w-0">
 
       <!-- Hero -->
@@ -317,7 +317,7 @@
 
   <!-- Related doctors -->
   <section *ngIf="related.length" aria-labelledby="rel-h" class="bg-gray-50 border-t border-gray-200">
-    <div appReveal class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-10 pb-12 md:pt-12 md:pb-14 lg:pt-14 lg:pb-[72px]">
+    <div appReveal class="public-container pt-10 pb-12 md:pt-12 md:pb-14 lg:pt-14 lg:pb-[72px]">
       <div class="flex justify-between items-end gap-4 mb-6 flex-wrap">
         <div>
           <h2 id="rel-h" class="text-2xl leading-8 font-semibold m-0 mb-1">Related doctors</h2>

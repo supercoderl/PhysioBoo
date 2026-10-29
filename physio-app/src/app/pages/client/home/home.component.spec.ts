@@ -4,6 +4,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { PublicArticleService } from '../../../services/public/public-article.service';
 import { PublicDoctorService } from '../../../services/public/public-doctor.service';
 import { PublicHospitalService } from '../../../services/public/public-hospital.service';
+import { PublicSiteService } from '../../../services/public/public-site.service';
 import { HomeComponent } from './home.component';
 
 const page = (items: unknown[]) => of({ success: true, data: { items, totalCount: items.length } });
@@ -16,6 +17,7 @@ function setup(overrides: {
     doctors?: () => Observable<any>;
     clinics?: () => Observable<any>;
     articles?: () => Observable<any>;
+    profile?: () => Observable<any>;
     platform?: string;
 } = {}) {
     const calls: Calls = { filters: [], doctors: [], clinics: [], articles: [], navigate: [] };
@@ -30,6 +32,7 @@ function setup(overrides: {
             },
             { provide: PublicHospitalService, useValue: { search: record('clinics', overrides.clinics ?? (() => page([{ id: 'h1' }]))) } },
             { provide: PublicArticleService, useValue: { search: record('articles', overrides.articles ?? (() => page([{ id: 'a1' }]))) } },
+            { provide: PublicSiteService, useValue: { getProfile: overrides.profile ?? (() => of({ phone: null, email: null, hero: null })) } },
             { provide: Router, useValue: { navigate: (cmds: any[], extras: any) => { calls['navigate'].push({ cmds, extras }); return Promise.resolve(true); } } },
             { provide: ActivatedRoute, useValue: { fragment: of(null) } },
             { provide: PLATFORM_ID, useValue: overrides.platform ?? 'browser' },
@@ -51,6 +54,18 @@ describe('HomeComponent (public homepage)', () => {
         expect(cmp.articles.state).toBe('results');
         expect(calls['doctors'][0]).toEqual({ pageNumber: 1, pageSize: 3 });
         expect(calls['articles'][0].sort).toBe('-publishDate');
+    });
+
+    it('uses the tenant profile for contact details and builds a dialable phone link', () => {
+        const { cmp } = setup({ profile: () => of({ phone: '+84 28 1234 5678', email: 'hello@clinic.test', hero: null }) });
+        expect(cmp.profile.email).toBe('hello@clinic.test');
+        expect(cmp.phoneHref).toBe('tel:+842812345678');
+    });
+
+    it('keeps the static defaults when the tenant profile fails, so contact fields stay hidden', () => {
+        const { cmp } = setup({ profile: () => throwError(() => new Error('down')) });
+        expect(cmp.profile).toEqual({ phone: null, email: null, hero: null });
+        expect(cmp.phoneHref).toBe('');
     });
 
     it('maps known specialties to their icon and falls back for the rest', () => {

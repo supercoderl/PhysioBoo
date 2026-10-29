@@ -5,6 +5,24 @@
 
 /* Design tokens (--twc-* and --color-* variables) come from @physioboo/ui: projects/physioboo-ui/styles/tokens.scss. */
 
+/* Public-site page width (header, footer and every client page): one source for the max width and the side gutters.
+   `.public-container` caps the content at --public-max, centres it and adds responsive gutters; the cap applies to the
+   content box, so the gutters never eat into it. Text blocks keep their own max-w-* for readability. It sits in the
+   components layer so Tailwind utilities (py-*, max-xl:pr-3, max-md:px-0, ...) can still adjust it. */
+:root {
+  --public-gutter: clamp(1.25rem, 4vw, 4rem);
+  --public-max: 110rem;
+}
+
+@layer components {
+  .public-container {
+    width: 100%;
+    max-width: calc(var(--public-max) + 2 * var(--public-gutter));
+    margin-inline: auto;
+    padding-inline: var(--public-gutter);
+  }
+}
+
 @layer utilities {
   .flex-center-between {
     @apply flex items-center justify-between;

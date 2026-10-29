@@ -1,6 +1,6 @@
 <!-- Intro: breadcrumb, title, lead -->
 <section class="bg-gray-50 border-b border-gray-200">
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 pb-7 md:pt-6 md:pb-9 lg:pt-7 lg:pb-10 flex flex-col gap-3.5">
+  <div class="public-container pt-5 pb-7 md:pt-6 md:pb-9 lg:pt-7 lg:pb-10 flex flex-col gap-3.5">
     <boo-breadcrumb separator="slash" [items]="[{ label: 'Home', link: '/' }, { label: 'Contact' }]" />
 
     <div class="flex gap-6 items-center justify-between flex-wrap">
@@ -21,7 +21,7 @@
 </section>
 
 <!-- Optional notice from tenant settings -->
-<div *ngIf="tenant.notice as n" class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 md:pt-6 lg:pt-7">
+<div *ngIf="tenant.notice as n" class="public-container pt-5 md:pt-6 lg:pt-7">
   <div role="region" aria-label="Important notice" class="border border-[#F0D49B] bg-[#FFFBF2] rounded-[14px] px-[18px] py-4 flex gap-3.5 items-start flex-wrap">
     <physio-icon name="info" [size]="20" class="text-[#8A5300] mt-px flex-none" />
     <div class="flex-[1_1_260px]">
@@ -36,7 +36,7 @@
 </div>
 
 <!-- Contact details (each card hides when its setting is missing) -->
-<section *ngIf="infoCards.length" aria-label="Contact details" class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-5 md:pt-6 lg:pt-7">
+<section *ngIf="infoCards.length" aria-label="Contact details" class="public-container pt-5 md:pt-6 lg:pt-7">
   <div appReveal appRevealStagger class="grid grid-cols-1 md:grid-cols-2 gap-4" [ngClass]="infoCols">
     <div *ngFor="let c of infoCards" class="bg-surface border border-gray-200 rounded-2xl p-5 flex flex-col gap-2 min-w-0">
       <span class="w-10 h-10 rounded-xl bg-primarySoft text-primaryDeep flex items-center justify-center mb-1" aria-hidden="true"><physio-icon [name]="c.icon" [size]="18" /></span>
@@ -60,7 +60,7 @@
 </section>
 
 <!-- Form and booking help -->
-<div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-7 pb-12 md:pt-8 md:pb-14 lg:pt-10 lg:pb-[72px] grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-6 lg:gap-8 items-start">
+<div class="public-container pt-7 pb-12 md:pt-8 md:pb-14 lg:pt-10 lg:pb-[72px] grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-6 lg:gap-8 items-start">
   <div class="border border-gray-200 rounded-[20px] bg-surface shadow-[0_12px_40px_rgba(38,20,26,.06)] p-5 md:p-8 min-w-0">
     <!-- Success -->
     <div *ngIf="submitState === 'success'" role="status" aria-live="polite" class="motion-feedback motion-feedback-lg flex flex-col gap-3.5 items-start">
@@ -256,7 +256,7 @@
 
 <!-- Clinics -->
 <section aria-labelledby="fc-h" class="bg-gray-50 border-t border-gray-200">
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-10 pb-12 md:pt-12 md:pb-14 lg:pt-14 lg:pb-[72px]">
+  <div class="public-container pt-10 pb-12 md:pt-12 md:pb-14 lg:pt-14 lg:pb-[72px]">
     <div class="flex justify-between items-end gap-4 mb-6 flex-wrap">
       <div class="max-w-[620px]">
         <h2 id="fc-h" class="text-2xl leading-8 md:text-[28px] md:leading-9 font-semibold m-0 mb-1.5">Find a clinic near you</h2>

@@ -1,14 +1,10 @@
 <!-- Hero -->
-<section class="relative isolate overflow-hidden bg-gray-50">
-  <!-- Photo fills the right side; the mask fades its left and bottom edges into the page background. -->
+<section class="bg-gray-50">
   <div
-    class="absolute inset-y-0 right-0 -z-10 w-full lg:w-[60%] bg-cover bg-[position:75%_center] bg-no-repeat opacity-30 lg:opacity-100 bg-[url('/assets/images/background/hero-hospital.png')] [mask-image:linear-gradient(to_right,transparent,#000_40%),linear-gradient(to_bottom,#000_55%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,#000_40%),linear-gradient(to_bottom,#000_55%,transparent)] [mask-composite:intersect] [-webkit-mask-composite:source-in]"
-    aria-hidden="true"
-  ></div>
-  <div
-    class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-8 pb-9 lg:pt-14 lg:pb-12"
+    class="public-container pt-8 pb-9 lg:pt-14 lg:pb-14"
+    [ngClass]="profile.hero ? 'lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:gap-16 lg:items-center' : ''"
   >
-    <div class="min-w-0 max-w-[600px]">
+    <div class="min-w-0 max-w-[760px]">
       <p
         class="font-mono font-medium text-xs lg:text-[13px] text-primaryDeep tracking-[.04em] uppercase mb-3.5 lg:mb-5"
       >
@@ -74,6 +70,19 @@
         Type a doctor’s name, a specialty, a clinic or a service to search.
       </p>
 
+      <!-- Phone users get a one-tap call under Search; hidden until the tenant publishes a number. -->
+      <a
+        *ngIf="profile.phone"
+        boo-button
+        variant="secondary"
+        size="lg"
+        [block]="true"
+        [href]="phoneHref"
+        class="sm:!hidden mt-3"
+      >
+        <physio-icon name="phone" [size]="16" />Call the clinic
+      </a>
+
       <div
         *ngIf="popular.length"
         class="flex gap-2 items-center mt-4 lg:mt-5 -mx-5 px-5 lg:mx-0 lg:px-0 overflow-x-auto lg:overflow-visible lg:flex-wrap no-scrollbar"
@@ -91,16 +100,27 @@
         </button>
       </div>
     </div>
+
+    <!-- Only when the tenant published a photo; large screens only, so the search stays in the first mobile screen. -->
+    <home-hero-media *ngIf="profile.hero" class="hidden lg:block" [hero]="profile.hero" />
   </div>
 </section>
 
+<!-- What a request is, before any doctor card asks for one. -->
+<home-request-strip
+  [steps]="steps"
+  [phone]="profile.phone"
+  [email]="profile.email"
+/>
+
+<!-- Specialties: one divided directory panel, deliberately unlike the card grids below. -->
 <section
   *ngIf="specialties.state !== 'empty'"
   appReveal
   id="specialties"
-  class="scroll-mt-24 pt-12 pb-6 lg:pt-24 lg:pb-12"
+  class="scroll-mt-24 pt-12 pb-6 lg:pt-16 lg:pb-12"
 >
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0">
+  <div class="public-container">
     <div
       class="flex justify-between items-baseline lg:items-end gap-4 mb-[18px] lg:mb-8"
     >
@@ -135,51 +155,73 @@
       (retry)="retry('specialties')"
     />
 
+    <!-- Hairlines come from each row's top and left border; the list is shifted 1px so the panel's own border closes the edges. -->
     <div
       *ngIf="specialties.state === 'loading'"
       aria-busy="true"
       aria-label="Loading specialties"
-      class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 lg:gap-4"
+      class="overflow-hidden rounded-2xl border border-gray-200 bg-surface"
     >
-      <span
-        *ngFor="let s of specialtySkeletons; let i = index"
-        class="h-[104px] lg:h-[88px] rounded-[14px] lg:rounded-2xl bg-[#F4ECEF] animate-pulse motion-reduce:animate-none"
-        [ngClass]="i >= 6 ? 'hidden lg:block' : 'block'"
-      ></span>
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 -mt-px -ml-px w-[calc(100%+1px)]"
+      >
+        <span
+          *ngFor="let s of specialtySkeletons; let i = index"
+          class="min-h-14 px-4 lg:px-5 border-t border-l border-gray-200 items-center gap-3"
+          [ngClass]="i >= 6 ? 'hidden sm:flex' : 'flex'"
+        >
+          <span
+            class="w-8 h-8 rounded-[10px] bg-[#F4ECEF] animate-pulse motion-reduce:animate-none flex-none"
+          ></span>
+          <span
+            class="h-3.5 w-2/5 rounded-md bg-[#F4ECEF] animate-pulse motion-reduce:animate-none"
+          ></span>
+        </span>
+      </div>
     </div>
 
     <div
       *ngIf="specialties.state === 'results'"
-      class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 lg:gap-4"
+      class="overflow-hidden rounded-2xl border border-gray-200 bg-surface"
     >
-      <a
-        *ngFor="let s of specialties.items; let i = index; trackBy: trackById"
-        routerLink="/doctor"
-        [queryParams]="{ specialty: s.id }"
-        class="min-w-0 flex-col lg:flex-row gap-3 lg:gap-4 lg:items-center p-4 lg:p-5 border border-gray-200 rounded-[14px] lg:rounded-2xl bg-surface text-gray-900 hover:text-gray-900 motion-card motion-card-lift motion-card-accent motion-arrow"
-        [ngClass]="i >= 6 ? 'hidden lg:flex' : 'flex'"
+      <ul
+        role="list"
+        class="list-none m-0 p-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 -mt-px -ml-px w-[calc(100%+1px)]"
       >
-        <span
-          class="w-10 h-10 lg:w-12 lg:h-12 rounded-[10px] lg:rounded-xl bg-primarySoft text-primaryDeep flex items-center justify-center flex-none"
+        <li
+          *ngFor="let s of specialties.items; let i = index; trackBy: trackById"
+          class="min-w-0 border-t border-l border-gray-200"
+          [ngClass]="i >= 6 ? 'hidden sm:block' : 'block'"
         >
-          <physio-icon [name]="s.icon" [size]="22" />
-        </span>
-        <span class="text-[15px] lg:text-base font-semibold break-words">{{
-          s.name
-        }}</span>
-        <physio-icon
-          name="chevron-right"
-          [size]="16"
-          class="hidden lg:inline-block ml-auto text-gray-400 flex-none"
-        />
-      </a>
+          <a
+            routerLink="/doctor"
+            [queryParams]="{ specialty: s.id }"
+            class="flex items-center gap-3 min-h-14 px-4 lg:px-5 py-2 text-gray-900 hover:text-gray-900 hover:bg-gray-50 focus-visible:outline-offset-[-2px] motion-chip motion-arrow"
+          >
+            <span
+              class="w-8 h-8 rounded-[10px] bg-primarySoft text-primaryDeep flex items-center justify-center flex-none"
+            >
+              <physio-icon [name]="s.icon" [size]="18" />
+            </span>
+            <span class="min-w-0 flex-1 text-base font-semibold break-words">{{
+              s.name
+            }}</span>
+            <physio-icon
+              name="chevron-right"
+              [size]="16"
+              class="text-gray-400 flex-none"
+              aria-hidden="true"
+            />
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
 </section>
 
 <!-- Doctors -->
 <section appReveal class="pt-8 pb-12 lg:pt-12 lg:pb-24">
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0">
+  <div class="public-container">
     <div
       class="flex justify-between items-baseline lg:items-end gap-4 mb-[18px] lg:mb-8"
     >
@@ -231,7 +273,7 @@
     *ngIf="doctors.state === 'loading' || doctors.state === 'results'"
     [attr.aria-busy]="doctors.state === 'loading' ? true : null"
     [attr.aria-label]="doctors.state === 'loading' ? 'Loading doctors' : null"
-    class="list-none m-0 max-w-[1200px] mx-auto px-5 xl:px-0 flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 overflow-x-auto md:overflow-visible snap-x snap-mandatory no-scrollbar"
+    class="list-none public-container flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 overflow-x-auto md:overflow-visible snap-x snap-mandatory no-scrollbar"
   >
     <ng-container *ngIf="doctors.state === 'loading'">
       <li
@@ -250,67 +292,9 @@
   </ul>
 </section>
 
-<!-- How appointment requests work -->
-<section class="bg-gray-50 border-y border-gray-200">
-  <div
-    appReveal
-    class="max-w-[1200px] mx-auto px-5 xl:px-0 py-12 lg:py-24 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16"
-  >
-    <div>
-      <h2
-        class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em] mb-5 lg:mb-3"
-      >
-        How appointment requests work
-      </h2>
-      <p class="hidden lg:block text-base leading-[26px] text-gray-700 mb-7">
-        Three steps from search to a call back from the clinic.
-      </p>
-      <a
-        boo-button
-        variant="primary"
-        size="lg"
-        routerLink="/doctor"
-        class="!hidden lg:!inline-flex"
-        >Find a doctor</a
-      >
-    </div>
-
-    <!-- Mobile list -->
-    <ol class="list-none m-0 p-0 lg:hidden flex flex-col gap-5">
-      <li *ngFor="let s of steps; let i = index" class="flex gap-4">
-        <span
-          class="w-8 h-8 rounded-full bg-primary text-white font-mono font-semibold text-[13px] flex items-center justify-center flex-none"
-          aria-hidden="true"
-          >{{ i + 1 }}</span
-        >
-        <div>
-          <h3 class="text-base font-semibold mb-1">{{ s.t }}</h3>
-          <p class="text-[15px] leading-[22px] text-gray-700">{{ s.d }}</p>
-        </div>
-      </li>
-    </ol>
-
-    <!-- Desktop cards -->
-    <ol class="list-none m-0 p-0 hidden lg:grid grid-cols-3 gap-5">
-      <li
-        *ngFor="let s of steps"
-        class="bg-surface border border-gray-200 rounded-2xl p-6"
-      >
-        <span
-          class="font-mono font-semibold text-sm text-primary"
-          aria-hidden="true"
-          >{{ s.n }}</span
-        >
-        <h3 class="text-lg font-semibold mt-3.5 mb-2">{{ s.t }}</h3>
-        <p class="text-[15px] leading-6 text-gray-700">{{ s.d }}</p>
-      </li>
-    </ol>
-  </div>
-</section>
-
 <!-- Hospitals and clinics -->
 <section appReveal class="py-12 lg:py-24">
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0">
+  <div class="public-container">
     <div
       class="flex justify-between items-baseline lg:items-end gap-4 mb-[18px] lg:mb-8"
     >
@@ -378,7 +362,7 @@
 
 <!-- Why choose us -->
 <section appReveal class="pb-12 lg:pb-24">
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0">
+  <div class="public-container">
     <div
       class="lg:border-t border-gray-200 lg:pt-[72px] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16"
     >
@@ -413,7 +397,7 @@
   *ngIf="testimonials.length"
   class="bg-gray-50 border-y border-gray-200"
 >
-  <div appReveal class="max-w-[1200px] mx-auto px-5 xl:px-0 py-12 lg:py-24">
+  <div appReveal class="public-container py-12 lg:py-24">
     <h2
       class="text-2xl leading-[30px] lg:text-4xl lg:leading-[44px] font-semibold lg:tracking-[-.01em] mb-6 lg:mb-8"
     >
@@ -442,7 +426,7 @@
 <!-- FAQ -->
 <section appReveal class="pb-12 lg:py-24">
   <div
-    class="max-w-[1200px] mx-auto px-5 xl:px-0 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16"
+    class="public-container lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16"
   >
     <div>
       <h2
@@ -501,7 +485,7 @@
 
 <!-- Articles (hidden when nothing is published) -->
 <section appReveal *ngIf="articles.state !== 'empty'" class="pb-12 lg:pb-24">
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0">
+  <div class="public-container">
     <div
       class="flex justify-between items-baseline lg:items-end gap-4 mb-[18px] lg:mb-8"
     >
@@ -556,9 +540,9 @@
 </section>
 
 <!-- Final CTA -->
-<section class="px-5 xl:px-0 pb-12 lg:pb-24">
+<section class="public-container pb-12 lg:pb-24">
   <div
-    class="max-w-[1200px] mx-auto bg-primarySoft rounded-[20px] lg:rounded-3xl px-[22px] py-7 lg:px-16 lg:py-14 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-5 lg:gap-10"
+    class="bg-primarySoft rounded-[20px] lg:rounded-3xl px-[22px] py-7 lg:px-16 lg:py-14 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-5 lg:gap-10"
   >
     <div>
       <h2
@@ -567,14 +551,24 @@
         Ready to see a doctor?
       </h2>
       <p class="text-[15px] leading-[22px] lg:text-base text-gray-800">
-        <ng-container *ngIf="tenant.phone || tenant.email; else contactLink">
+        <ng-container *ngIf="profile.phone || profile.email; else contactLink">
           Questions first?
-          <ng-container *ngIf="tenant.phone"
-            >Call <b class="font-semibold">{{ tenant.phone }}</b></ng-container
+          <ng-container *ngIf="profile.phone"
+            >Call
+            <a
+              [href]="phoneHref"
+              class="inline-block py-3 font-semibold text-primaryDeep hover:text-primaryDeep underline underline-offset-2"
+              >{{ profile.phone }}</a
+            ></ng-container
           >
-          <ng-container *ngIf="tenant.phone && tenant.email"> or </ng-container>
-          <ng-container *ngIf="tenant.email"
-            >email <b class="font-semibold">{{ tenant.email }}</b></ng-container
+          <ng-container *ngIf="profile.phone && profile.email"> or </ng-container>
+          <ng-container *ngIf="profile.email"
+            >email
+            <a
+              [href]="'mailto:' + profile.email"
+              class="inline-block py-3 font-semibold text-primaryDeep hover:text-primaryDeep underline underline-offset-2 break-all"
+              >{{ profile.email }}</a
+            ></ng-container
           >.
         </ng-container>
         <ng-template #contactLink>

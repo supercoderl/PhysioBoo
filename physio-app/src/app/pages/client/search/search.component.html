@@ -1,6 +1,6 @@
 <!-- Intro: breadcrumb, title, search form -->
 <section aria-labelledby="sr-h1" class="bg-gray-50 border-b border-gray-200">
-  <div class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-4 pb-6 md:pt-5 md:pb-7 lg:pt-6 lg:pb-8 flex flex-col gap-4">
+  <div class="public-container pt-4 pb-6 md:pt-5 md:pb-7 lg:pt-6 lg:pb-8 flex flex-col gap-4">
     <boo-breadcrumb [items]="[{ label: 'Home', link: '/' }, { label: 'Search' }]" />
 
     <h1 id="sr-h1" class="text-[28px] leading-9 md:text-[32px] md:leading-10 lg:text-4xl lg:leading-[44px] font-semibold tracking-[-0.02em] text-gray-900 m-0">
@@ -61,7 +61,7 @@
 </section>
 
 <!-- Initial: browse by category -->
-<section *ngIf="!submitted" aria-labelledby="sr-browse" class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-10 md:pt-7 md:pb-12 lg:pt-8 lg:pb-14 flex flex-col gap-5">
+<section *ngIf="!submitted" aria-labelledby="sr-browse" class="public-container pt-6 pb-10 md:pt-7 md:pb-12 lg:pt-8 lg:pb-14 flex flex-col gap-5">
   <h2 id="sr-browse" class="text-[22px] leading-[30px] font-semibold m-0">Or browse by category</h2>
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
     <a
@@ -83,7 +83,7 @@
   *ngIf="submitted"
   #results
   aria-labelledby="sr-sum"
-  class="max-w-[1200px] mx-auto px-5 xl:px-0 pt-6 pb-10 md:pt-7 md:pb-12 lg:pt-8 lg:pb-14 flex flex-col gap-5 scroll-mt-24"
+  class="public-container pt-6 pb-10 md:pt-7 md:pb-12 lg:pt-8 lg:pb-14 flex flex-col gap-5 scroll-mt-24"
 >
   <div class="flex gap-3 items-center justify-between flex-wrap">
     <div class="flex flex-col gap-0.5 min-w-0">

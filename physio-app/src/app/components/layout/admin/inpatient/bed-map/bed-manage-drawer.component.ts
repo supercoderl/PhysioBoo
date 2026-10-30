@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signal } from "@angular/core";
+import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 import { finalize } from "rxjs";
 import { BedMapService } from "../../../../../services/admin/bed-map.service";
 import { DepartmentService } from "../../../../../services/admin/department.service";
@@ -7,10 +8,9 @@ import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { Bed, BedType, CreateBedRequest } from "../../../../../shared/types/bed.types";
 import { CreateWardRequest, Ward } from "../../../../../shared/types/ward.types";
+import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
-import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 
 /**
  * Ward and bed set-up for the bed map: add, rename and delete wards; add and delete beds.
@@ -19,7 +19,7 @@ import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
 @Component({
     selector: 'bed-map-manage-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent,BooSelectComponent, BooButtonAdminComponent, BooInputComponent, BooCheckboxComponent],
+    imports: [SharedModule, DrawerComponent, BooSelectComponent, BooButtonAdminComponent, BooInputComponent, BooCheckboxComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="close.emit()">
             <div class="flex flex-col h-full bg-surface">
@@ -87,7 +87,7 @@ import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
                                 <div class="flex flex-col gap-1 text-xs text-gray-600">Type
                                     <boo-select [(ngModel)]="bedForm.bedType" [options]="bedTypeOptions" size="small"></boo-select>
                                 </div>
-                                <boo-button-admin (click)="addBed(w)" [disabled]="!bedForm.number.trim() || saving()" textColor="white" [fontSize]="14" [radius]="8">Add bed</boo-button-admin>
+                                <boo-button-admin class="!h-auto" (click)="addBed(w)" [disabled]="!bedForm.number.trim() || saving()" textColor="white" [fontSize]="14" [radius]="8">Add bed</boo-button-admin>
                                 <boo-checkbox class="col-span-4" size="small" [(ngModel)]="bedForm.isolationRequired"><span class="text-gray-600">Isolation required</span></boo-checkbox>
                             </div>
                         </div>

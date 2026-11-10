@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { BooStatusBadgeComponent } from "@physioboo/ui";
+import { BooStatusBadgeComponent, BooButtonComponent } from "@physioboo/ui";
 import { ColumnDefDirective } from "../../../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { Department } from "../../../../../../shared/types/operation.types";
@@ -16,8 +16,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
     BooTableAdminComponent,
     ColumnDefDirective,
     BooActionAdminComponent,
-    BooStatusBadgeComponent
-  ],
+    BooStatusBadgeComponent, BooButtonComponent],
   template: `
     <boo-table-admin
       class="flex-1 min-h-0 rounded-[6px] overflow-hidden"
@@ -48,13 +47,7 @@ import { CategoryTableCardBase } from "../shared/category-table-card.base";
       <ng-template appColumnDef="name" hideable="false" headerLabel="Department" headerClass="text-left" let-item>
         <div class="flex items-center gap-3 min-w-0">
           <div class="min-w-0">
-            <button
-              *ngIf="canUpdate; else plainName"
-              type="button"
-              class="block max-w-full truncate p-0 bg-transparent border-0 text-left text-sm leading-4 font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm"
-              [title]="item.name"
-              (click)="onRowOpen(item)"
-            >{{ item.name }}</button>
+            <button type="button" boo-button variant="text" classname="max-w-full truncate text-sm leading-4 font-semibold text-primary" *ngIf="canUpdate; else plainName" [title]="item.name" (click)="onRowOpen(item)">{{ item.name }}</button>
             <ng-template #plainName><span class="block truncate text-sm leading-4 font-semibold text-regular" [title]="item.name">{{ item.name }}</span></ng-template>
             <div class="truncate text-xs leading-4 text-secondary">{{ item.departmentCode || empty }}</div>
           </div>

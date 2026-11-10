@@ -73,12 +73,7 @@ import { RegisterTenantRequest } from '../../../shared/types/tenant.types';
                   >
                     <div class="flex items-center justify-between mb-3">
                       <span class="text-xs14 font-semibold text-primary">Branch {{ i + 1 }}</span>
-                      <button
-                        *ngIf="branches.length > 1"
-                        type="button"
-                        (click)="removeBranch(i)"
-                        class="text-red-500 hover:text-red-700"
-                      >trash
+                      <button type="button" boo-button variant="ghost" size="sm" classname="!text-danger" *ngIf="branches.length> 1" (click)="removeBranch(i)">trash
                         <physio-icon name="trash" [size]="16"></physio-icon>
                       </button>
                     </div>
@@ -100,8 +95,11 @@ import { RegisterTenantRequest } from '../../../shared/types/tenant.types';
 
                   <button
                     type="button"
+                    boo-button
+                    variant="secondary"
+                    size="sm"
+                    [block]="true"
                     (click)="addBranch()"
-                    class="w-full border border-dashed border-gray-300 rounded-xl py-2.5 text-xs14 text-primary font-medium hover:bg-primary/5 transition-smooth"
                   >
                     + Add another branch
                   </button>

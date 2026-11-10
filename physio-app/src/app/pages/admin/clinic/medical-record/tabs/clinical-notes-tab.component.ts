@@ -47,12 +47,12 @@ import { ClinicalNoteRow, RecordType } from "../../../../../shared/types/medical
 
         <div class="p-6 space-y-5 text-sm leading-relaxed">
           <section *ngFor="let s of sectionsOf(n)" [hidden]="!s.body">
-            <h4 class="text-[11px] font-bold text-secondary uppercase tracking-wider mb-1">{{ s.label }}</h4>
+            <h4 class="text-xs font-bold text-secondary uppercase tracking-wider mb-1">{{ s.label }}</h4>
             <p class="text-primary whitespace-pre-wrap m-0">{{ s.body }}</p>
           </section>
 
           <section *ngIf="n.icd10Codes?.length">
-            <h4 class="text-[11px] font-bold text-secondary uppercase tracking-wider mb-1">ICD-10 codes</h4>
+            <h4 class="text-xs font-bold text-secondary uppercase tracking-wider mb-1">ICD-10 codes</h4>
             <div class="flex flex-wrap gap-1.5">
               <span *ngFor="let c of n.icd10Codes" class="font-mono text-xs bg-gray-100 text-primary px-2 py-0.5 rounded">{{ c }}</span>
             </div>

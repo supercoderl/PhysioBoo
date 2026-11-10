@@ -13,16 +13,14 @@ import {
 import { billingStatusLabel, billingStatusTone, formatMoney } from "../../../../shared/utils/billing.utils";
 import { DrawerComponent } from "../../../drawer/drawer.component";
 import { BooSelectComponent } from "../../../select/boo-select/boo-select.component";
-import { BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent, BooButtonComponent } from '@physioboo/ui';
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
 import { BooTextareaComponent } from "../../../textarea/boo-textarea/boo-textarea.component";
-
-const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
 @Component({
     selector: 'superadmin-tenant-subscription-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooSelectComponent, BooStatusBadgeComponent, BooErrorStateComponent, BooButtonAdminComponent, BooInputComponent, BooTextareaComponent],
+    imports: [SharedModule, DrawerComponent, BooSelectComponent, BooStatusBadgeComponent, BooErrorStateComponent, BooButtonAdminComponent, BooInputComponent, BooTextareaComponent, BooButtonComponent],
     template: `
         <drawer [isOpen]="isOpen" (close)="close.emit()">
             <div
@@ -36,23 +34,18 @@ const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface t
                         <h2 id="subscription-drawer-title" class="text-lg font-bold text-regular leading-tight m-0 truncate">
                             {{ detail()?.tenantName ?? 'Subscription' }}
                         </h2>
-                        <p class="text-[13px] text-secondary m-0 truncate">{{ detail()?.tenantEmail || 'Tenant subscription' }}</p>
+                        <p class="text-sm text-secondary m-0 truncate">{{ detail()?.tenantEmail || 'Tenant subscription' }}</p>
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
                         <a
                             *ngIf="hospitalGroupId"
                             [routerLink]="['/superadmin/tenants/hospital-group', hospitalGroupId]"
-                            class="h-9 px-3 inline-flex items-center rounded-1.5 text-[13px] font-medium text-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                            class="h-9 px-3 inline-flex items-center rounded-1.5 text-sm font-medium text-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                             (click)="close.emit()"
                         >
                             View tenant
                         </a>
-                        <button
-                            type="button"
-                            class="w-9 h-9 flex items-center justify-center rounded-1.5 text-secondary hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
-                            aria-label="Close"
-                            (click)="close.emit()"
-                        >
+                        <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Close" (click)="close.emit()">
                             <physio-icon name="x" />
                         </button>
                     </div>
@@ -78,7 +71,7 @@ const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface t
                         <!-- Overview -->
                         <section aria-labelledby="sub-overview-title">
                             <h3 id="sub-overview-title" class="sr-only">Overview</h3>
-                            <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-[13px] m-0">
+                            <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm m-0">
                                 <div>
                                     <dt class="text-secondary">Status</dt>
                                     <dd class="m-0 mt-1"><boo-status-badge [label]="statusLabel(t.status)" [tone]="statusTone(t.status)" dotted /></dd>
@@ -110,7 +103,7 @@ const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface t
                         <section aria-labelledby="sub-plan-title" class="space-y-3">
                             <h3 id="sub-plan-title" class="text-xs font-bold text-secondary uppercase tracking-wider m-0">Plan</h3>
                             <div class="space-y-1">
-                                <span class="block text-[13px] font-medium text-regular">Plan</span>
+                                <span class="block text-sm font-medium text-regular">Plan</span>
                                 <boo-select
                                     label="Choose a plan"
                                     required
@@ -139,11 +132,11 @@ const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface t
                         <section *ngIf="t.status !== 'None'" aria-labelledby="sub-details-title" class="space-y-3">
                             <h3 id="sub-details-title" class="text-xs font-bold text-secondary uppercase tracking-wider m-0">Billing details</h3>
                             <div class="space-y-1">
-                                <label for="sub-email" class="text-[13px] font-medium text-regular">Billing email</label>
+                                <label for="sub-email" class="text-sm font-medium text-regular">Billing email</label>
                                 <boo-input [id]="'sub-email'" type="email" [(ngModel)]="billingEmail" size="small"></boo-input>
                             </div>
                             <div class="space-y-1">
-                                <label for="sub-notes" class="text-[13px] font-medium text-regular">Notes</label>
+                                <label for="sub-notes" class="text-sm font-medium text-regular">Notes</label>
                                 <boo-textarea [id]="'sub-notes'" [rows]="3" [maxlength]="1000" [(ngModel)]="notes" size="small"></boo-textarea>
                             </div>
                             <boo-button-admin [disabled]="busy()" (click)="change('UpdateDetails')" background="transparent" textColor="rgb(var(--twc-regular))" [border]="{ width: 1, color: 'rgb(var(--twc-border))' }" padding="8px 14px" fontWeight="500">Save details</boo-button-admin>
@@ -153,22 +146,16 @@ const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface t
                         <section aria-labelledby="sub-invoices-title" class="space-y-3">
                             <div class="flex items-center justify-between gap-2">
                                 <h3 id="sub-invoices-title" class="text-xs font-bold text-secondary uppercase tracking-wider m-0">Invoices</h3>
-                                <button
-                                    *ngIf="t.status === 'Active' || t.status === 'PastDue'"
-                                    type="button"
-                                    class="text-[13px] font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-1.5 disabled:opacity-50 cursor-pointer"
-                                    [disabled]="busy()"
-                                    (click)="issueInvoice()"
-                                >
+                                <button type="button" boo-button variant="text" classname="text-sm font-semibold text-primary rounded-1.5 disabled:opacity-50" *ngIf="t.status === 'Active' || t.status === 'PastDue'" [disabled]="busy()" (click)="issueInvoice()">
                                     Bill current period
                                 </button>
                             </div>
 
-                            <p *ngIf="!t.invoices.length" class="text-[13px] text-secondary m-0">No invoices yet.</p>
+                            <p *ngIf="!t.invoices.length" class="text-sm text-secondary m-0">No invoices yet.</p>
 
                             <article
                                 *ngFor="let inv of t.invoices"
-                                class="rounded-2 border border-borderGray/60 p-3 text-[13px]"
+                                class="rounded-2 border border-borderGray/60 p-3 text-sm"
                             >
                                 <div class="flex items-center justify-between gap-2">
                                     <span class="font-mono font-semibold text-regular">{{ inv.invoiceNumber }}</span>
@@ -186,13 +173,13 @@ const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface t
                                 </div>
 
                                 <div *ngIf="inv.status === 'Open'" class="flex items-center gap-2 mt-3">
-                                    <input
-                                        type="text"
-                                        maxlength="120"
-                                        placeholder="Payment reference (optional)"
-                                        [attr.aria-label]="'Payment reference for ' + inv.invoiceNumber"
+                                    <boo-input
+                                        class="flex-1 min-w-0"
+                                        label="Payment reference (optional)"
+                                        [ariaLabel]="'Payment reference for ' + inv.invoiceNumber"
+                                        [maxlength]="120"
+                                        size="small"
                                         [(ngModel)]="paymentReference[inv.id]"
-                                        [class]="field"
                                     />
                                     <boo-button-admin [disabled]="busy()" (click)="payInvoice(inv)" background="transparent" textColor="#047857" [border]="{ width: 1, color: '#6EE7B7' }" padding="8px 14px" fontWeight="500" class="shrink-0">Mark paid</boo-button-admin>
                                     <boo-button-admin [disabled]="busy()" (click)="voidInvoice(inv)" background="transparent" textColor="rgb(var(--twc-danger))" [border]="{ width: 1, color: 'rgb(var(--twc-danger) / 0.3)' }" padding="8px 14px" fontWeight="500" class="shrink-0">Void</boo-button-admin>
@@ -214,7 +201,6 @@ export class SuperadminTenantSubscriptionDrawerComponent implements OnChanges {
     /** Emitted after any change so the page can refresh its list, stats and plan subscriber counts. */
     @Output() changed = new EventEmitter<void>();
 
-    readonly field = FIELD;
     readonly money = formatMoney;
     readonly statusTone = billingStatusTone;
     readonly statusLabel = billingStatusLabel;

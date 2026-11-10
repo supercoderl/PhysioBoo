@@ -1,3 +1,4 @@
+import { BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SharedModule } from '../../../../shared/shared-imports';
 import { DevDataModule, DevDataModuleStatus } from '../../../../shared/types/dev-data.types';
@@ -21,13 +22,13 @@ const STATUS_DOT: Record<DevDataModuleStatus, string> = {
 @Component({
     selector: 'superadmin-dev-data-module-card',
     standalone: true,
-    imports: [SharedModule],
+    imports: [SharedModule, BooButtonComponent, BooSpinnerComponent],
     template: `
         <section class="bg-surface rounded-[14px] border border-borderGray p-5 flex flex-col gap-3" [attr.aria-labelledby]="titleId">
             <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
                     <h3 [id]="titleId" class="text-[15px] font-medium text-regular m-0">{{ module.label }}</h3>
-                    <p class="text-[13px] text-secondary mt-1 mb-0">{{ module.description }}</p>
+                    <p class="text-sm text-secondary mt-1 mb-0">{{ module.description }}</p>
                 </div>
                 <span class="shrink-0 inline-flex items-center gap-1.5 text-[12px] text-secondary">
                     <span class="w-2 h-2 rounded-full" [ngClass]="statusDot" aria-hidden="true"></span>
@@ -47,17 +48,19 @@ const STATUS_DOT: Record<DevDataModuleStatus, string> = {
                 <ng-template #noDependencies><span>nothing</span></ng-template>
             </div>
 
-            <p *ngIf="lastResult" class="text-[13px] text-secondary m-0 font-mono">{{ lastResult }}</p>
+            <p *ngIf="lastResult" class="text-sm text-secondary m-0 font-mono">{{ lastResult }}</p>
 
             <div class="flex items-center gap-2 mt-auto pt-1">
                 <button
                     type="button"
-                    class="h-8 px-3.5 rounded-lg bg-surface border border-borderGray text-[13px] font-medium text-primary hover:border-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-borderGray cursor-pointer inline-flex items-center gap-2 transition-colors"
+                    boo-button
+                    variant="secondary"
+                    size="sm"
                     [disabled]="disabled"
                     [attr.aria-disabled]="disabled"
                     (click)="generate.emit(module.key)"
                 >
-                    <span *ngIf="status === 'generating'" class="w-3.5 h-3.5 rounded-full border-2 border-primary/30 border-t-primary animate-spin motion-reduce:animate-none" aria-hidden="true"></span>
+                    <boo-spinner *ngIf="status === 'generating'" [inline]="true" tone="primary" [size]="14" />
                     {{ status === 'generating' ? 'Generating…' : status === 'failed' ? 'Retry' : 'Generate' }}
                 </button>
             </div>

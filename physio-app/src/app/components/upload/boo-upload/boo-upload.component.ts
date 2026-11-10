@@ -1,3 +1,4 @@
+import { BooSpinnerComponent } from '@physioboo/ui';
 import { AfterViewInit, Component, ElementRef, EventEmitter, forwardRef, Input, NgZone, OnDestroy, Output, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -10,7 +11,7 @@ import { SharedModule } from '../../../shared/shared-imports'; // Chứa CommonM
 @Component({
   selector: 'boo-upload',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooSpinnerComponent],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -39,7 +40,7 @@ import { SharedModule } from '../../../shared/shared-imports'; // Chứa CommonM
         [style.border-radius.px]="radius"
       >
         <div *ngIf="loadingSrv.isLoading('upload')" class="absolute inset-0 bg-surface/80 z-20 flex flex-col items-center justify-center backdrop-blur-[1px]">
-          <physio-icon name="loader" [size]="iconSize" [class]="'animate-spin text-primary'"></physio-icon>
+          <boo-spinner [inline]="true" tone="primary" [size]="16" />
         </div>
         <ng-container *ngIf="previewUrl; else emptyState">
           <img *ngIf="!isSvgString" [src]="previewUrl" (error)="onImageError()" class="w-full h-full object-cover">

@@ -1,6 +1,6 @@
 import { Component, DestroyRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { BooButtonComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooInputComponent, BooSearchFieldComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooInputComponent, BooSearchFieldComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { EMPTY, Subject, catchError, debounceTime, distinctUntilChanged, map, of, switchMap, tap } from "rxjs";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
 import { RetailPosService } from "../../../../services/admin/retail-pos.service";
@@ -10,13 +10,13 @@ import { RetailCustomer } from "../../../../shared/types/retail-pos.types";
 @Component({
   selector: 'retail-customer-lookup-drawer',
   standalone: true,
-  imports: [SharedModule, DrawerComponent, BooButtonComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooInputComponent, BooSearchFieldComponent],
+  imports: [SharedModule, DrawerComponent, BooButtonComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooInputComponent, BooSearchFieldComponent, BooFieldErrorComponent],
   template: `
     <drawer [isOpen]="isOpen" (close)="requestClose()">
       <div class="p-5" role="dialog" aria-modal="true" aria-labelledby="retail-customer-title" [attr.aria-hidden]="!isOpen">
         <div class="flex items-center justify-between mb-4">
           <h2 id="retail-customer-title" class="text-base font-semibold text-regular m-0">Find customer</h2>
-          <button type="button" (click)="requestClose()" class="w-8 h-8 rounded-1.5 flex items-center justify-center text-gray-500 hover:bg-gray-100" aria-label="Close customer lookup">
+          <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="requestClose()" aria-label="Close customer lookup">
             <physio-icon name="x" [size]="18"></physio-icon>
           </button>
         </div>
@@ -46,7 +46,7 @@ import { RetailCustomer } from "../../../../shared/types/retail-pos.types";
           <p class="text-xs font-semibold text-secondary uppercase m-0">Walk-in customer</p>
           <boo-input name="walkInName" label="Name" [required]="true" [(ngModel)]="walkInName" [maxlength]="120" [disabled]="submitting"></boo-input>
           <boo-input name="walkInPhone" type="tel" label="Phone (optional)" [(ngModel)]="walkInPhone" [maxlength]="30" [disabled]="submitting"></boo-input>
-          <p *ngIf="walkInTouched && !walkInName.trim()" class="text-xs text-danger m-0" role="alert">Enter the customer's name.</p>
+          <boo-field-error size="sm" announce *ngIf="walkInTouched && !walkInName.trim()">Enter the customer's name.</boo-field-error>
           <button boo-button type="submit" variant="primary" size="sm" [block]="true" [loading]="submitting" [disabled]="submitting">Use walk-in customer</button>
         </form>
       </div>

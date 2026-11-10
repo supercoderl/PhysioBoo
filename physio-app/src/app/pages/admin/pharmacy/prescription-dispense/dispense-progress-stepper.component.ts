@@ -12,7 +12,7 @@ import { DISPENSE_PROGRESS_STAGES, DispenseProgressStage } from "../../../../sha
         <div class="flex items-center gap-2 shrink-0" role="listitem">
           <div class="flex flex-col items-center gap-1">
             <div
-              class="w-7 h-7 rounded-full flex items-center justify-center border-2 text-[11px] font-semibold"
+              class="w-7 h-7 rounded-full flex items-center justify-center border-2 text-xs font-semibold"
               [ngClass]="stageClass(i)"
               [attr.aria-current]="s.stage === currentStage ? 'step' : null"
             >

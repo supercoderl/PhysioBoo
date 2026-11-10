@@ -5,11 +5,12 @@ import { PrintTemplateService } from '../../../services/admin/print-template.ser
 import { SharedModule } from '../../../shared/shared-imports';
 import { PrintTemplate } from '../../../shared/types/print-template.types';
 import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-button-admin.component';
+import { BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 
 @Component({
   selector: 'print-template-picker',
   standalone: true,
-  imports: [SharedModule, BooButtonAdminComponent],
+  imports: [SharedModule, BooButtonAdminComponent, BooButtonComponent, BooSpinnerComponent],
   animations: [
     trigger('overlayAnim', [
       transition(':enter', [style({ opacity: 0 }), animate('120ms', style({ opacity: 1 }))]),
@@ -41,15 +42,14 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
               <div class="text-xs text-gray-500 truncate" *ngIf="documentType">{{ documentType }}</div>
             </div>
           </div>
-          <button type="button" (click)="onClose()"
-            class="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-900">
+          <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="onClose()" aria-label="Close">
             <physio-icon name="x" class="w-4 h-4" />
           </button>
         </header>
 
         <div class="flex-1 max-h-[60vh] overflow-y-auto">
           <div *ngIf="loading()" class="p-8 flex items-center justify-center text-sm text-gray-400">
-            <physio-icon name="loader-circle" [class]="'w-5 h-5 mr-2 animate-spin'" />
+            <boo-spinner [inline]="true" tone="primary" [size]="20" class="mr-2" />
             Loading templates…
           </div>
 

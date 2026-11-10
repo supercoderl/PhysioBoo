@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -8,10 +8,10 @@ import { QueueEntry, QueueStatus, RadiologyPriority } from "../../../../../share
 @Component({
   selector: 'radiology-queue-tab',
   standalone: true,
-  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonComponent, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <div *ngIf="!isLoading() && !entries().length">
@@ -32,8 +32,7 @@ import { QueueEntry, QueueStatus, RadiologyPriority } from "../../../../../share
             </div>
             <div class="text-xs text-gray-500">{{ e.examinationName }} · {{ e.roomName }}</div>
             <div class="text-xs text-gray-400" *ngIf="e.calledAt">Called {{ e.calledAt | date:'shortTime' }}</div>
-            <button *ngIf="nextAction(col.key)" (click)="advance(e, nextAction(col.key)!.status)"
-              class="mt-2 text-primary text-[11px] font-semibold hover:underline">
+            <button type="button" boo-button variant="text" classname="mt-2 text-primary text-xs font-semibold" *ngIf="nextAction(col.key)" (click)="advance(e, nextAction(col.key)!.status)">
               {{ nextAction(col.key)!.label }}
             </button>
           </div>

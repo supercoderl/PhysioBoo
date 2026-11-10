@@ -30,8 +30,8 @@ const CATEGORY: Record<DashboardEventCategory, { icon: string; label: string }> 
                         <span class="sr-only">{{ category(event).label }}</span>
                     </span>
                     <div class="flex-1 min-w-0 pt-0.5">
-                        <p class="m-0 text-[13px] leading-5 text-regular break-words">{{ event.text }}</p>
-                        <p class="m-0 text-[11px] leading-4 text-placeholder tabular-nums">{{ category(event).label }} · {{ event.occurredAt }}</p>
+                        <p class="m-0 text-sm leading-5 text-regular break-words">{{ event.text }}</p>
+                        <p class="m-0 text-xs leading-4 text-placeholder tabular-nums">{{ category(event).label }} · {{ event.occurredAt }}</p>
                     </div>
                 </li>
             </ol>

@@ -42,12 +42,12 @@ interface QueueRow {
                         </span>
                         <span class="flex-1 min-w-0">
                             <span class="flex items-baseline justify-between gap-2">
-                                <span class="text-[13px] font-medium text-regular truncate">{{ row.name }}</span>
+                                <span class="text-sm font-medium text-regular truncate">{{ row.name }}</span>
                                 <span class="flex-none text-sm font-semibold text-regular tabular-nums">
                                     {{ row.value }} <span class="text-xs font-normal text-secondary">{{ row.unit }}</span>
                                 </span>
                             </span>
-                            <span class="block text-[11px] leading-4 text-placeholder break-words">
+                            <span class="block text-xs leading-4 text-placeholder break-words">
                                 <span [class.text-danger]="row.urgent.count > 0" [class.font-semibold]="row.urgent.count > 0">{{ row.urgent.count }} {{ row.urgent.label }}</span>
                                 · {{ row.detail }}
                             </span>

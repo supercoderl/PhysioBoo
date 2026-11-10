@@ -12,9 +12,7 @@ import { DrawerComponent } from "../../../drawer/drawer.component";
 import { BooIconSelectComponent } from "../../../select/boo-icon-select/boo-icon-select.component";
 import { BooSelectComponent } from "../../../select/boo-select/boo-select.component";
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent } from '@physioboo/ui';
-
-const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
+import { BooButtonComponent, BooCheckboxComponent, BooFormFieldComponent, BooInputComponent } from '@physioboo/ui';
 
 const knownIconValidator = (control: AbstractControl): ValidationErrors | null =>
     !control.value || isKnownMenuIcon(String(control.value).trim()) ? null : { unknownIcon: true };
@@ -23,7 +21,7 @@ const knownIconValidator = (control: AbstractControl): ValidationErrors | null =
 @Component({
     selector: 'superadmin-menu-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooSelectComponent, BooIconSelectComponent, BooButtonAdminComponent, BooCheckboxComponent],
+    imports: [SharedModule, DrawerComponent, BooSelectComponent, BooIconSelectComponent, BooButtonAdminComponent, BooCheckboxComponent, BooButtonComponent, BooFormFieldComponent, BooInputComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" (close)="close.emit()">
             <div
@@ -36,29 +34,22 @@ const knownIconValidator = (control: AbstractControl): ValidationErrors | null =
                 <div class="flex-none px-6 py-4 border-b border-borderGray/60 flex items-center justify-between gap-3">
                     <div class="min-w-0">
                         <h2 id="menu-drawer-title" class="text-lg font-bold text-regular leading-tight m-0">{{ title }}</h2>
-                        <p class="text-[13px] text-secondary m-0">
+                        <p class="text-sm text-secondary m-0">
                             {{ area === 'superadmin' ? 'Shown in the Super Admin sidebar.' : 'Shown in every tenant\\'s admin sidebar.' }}
                         </p>
                     </div>
-                    <button
-                        type="button"
-                        class="w-9 h-9 shrink-0 flex items-center justify-center rounded-1.5 text-secondary hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
-                        aria-label="Close"
-                        (click)="close.emit()"
-                    >
+                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Close" (click)="close.emit()">
                         <physio-icon name="x" />
                     </button>
                 </div>
 
                 <div class="flex-1 overflow-y-auto p-6 space-y-4" custom-scrollbar>
-                    <div class="space-y-1">
-                        <label for="menu-label" class="text-[13px] font-medium text-regular">Label <span class="text-danger" aria-hidden="true">*</span></label>
-                        <input id="menu-label" type="text" formControlName="label" maxlength="80" [class]="field" autocomplete="off" />
-                        <p *ngIf="showError('label')" class="text-[12px] text-danger m-0">Enter a label.</p>
-                    </div>
+                    <boo-form-field label="Label" for="menu-label" required [error]="showError('label') ? 'Enter a label.' : null">
+                        <boo-input [id]="'menu-label'" label="Label" formControlName="label" [maxlength]="80" size="small" />
+                    </boo-form-field>
 
                     <div class="space-y-1">
-                        <span class="block text-[13px] font-medium text-regular">Placement</span>
+                        <span class="block text-sm font-medium text-regular">Placement</span>
                         <boo-select
                             formControlName="parentId"
                             label="Top-level section"
@@ -72,7 +63,7 @@ const knownIconValidator = (control: AbstractControl): ValidationErrors | null =
 
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-1">
-                            <label for="menu-icon" class="text-[13px] font-medium text-regular">Icon <span class="text-danger" aria-hidden="true">*</span></label>
+                            <label for="menu-icon" class="text-sm font-medium text-regular">Icon <span class="text-danger" aria-hidden="true">*</span></label>
                             <boo-icon-select
                                 inputId="menu-icon"
                                 formControlName="icon"
@@ -80,35 +71,31 @@ const knownIconValidator = (control: AbstractControl): ValidationErrors | null =
                                 [icons]="iconNames"
                             ></boo-icon-select>
                         </div>
-                        <div class="space-y-1">
-                            <label for="menu-order" class="text-[13px] font-medium text-regular">Order</label>
-                            <input id="menu-order" type="number" min="0" formControlName="order" [class]="field" inputmode="numeric" />
-                            <p class="text-[12px] text-secondary m-0">Lower numbers come first.</p>
-                        </div>
+                        <boo-form-field label="Order" for="menu-order" helper="Lower numbers come first.">
+                            <boo-input [id]="'menu-order'" label="Order" type="number" numberValue min="0" inputmode="numeric" formControlName="order" size="small" />
+                        </boo-form-field>
                     </div>
 
-                    <div class="space-y-1">
-                        <label for="menu-route" class="text-[13px] font-medium text-regular">Route <span class="text-danger" aria-hidden="true">*</span></label>
-                        <input
-                            id="menu-route"
-                            type="text"
+                    <boo-form-field
+                        label="Route"
+                        for="menu-route"
+                        required
+                        [error]="showError('route') ? (area === 'superadmin' ? 'Enter a route that starts with ' + prefix + '.' : 'Enter a route.') : null"
+                        [helper]="form.get('parentId')?.value ? '' : 'For a section this only marks which sidebar it belongs to.'"
+                    >
+                        <boo-input
+                            [id]="'menu-route'"
+                            class="font-mono"
                             formControlName="route"
-                            [class]="field + ' font-mono'"
-                            autocomplete="off"
-                            [placeholder]="area === 'superadmin' ? '/superadmin/users' : 'reception/booking/list'"
+                            [label]="area === 'superadmin' ? '/superadmin/users' : 'reception/booking/list'"
+                            size="small"
                         />
-                        <p *ngIf="showError('route')" class="text-[12px] text-danger m-0">
-                            {{ area === 'superadmin' ? 'Enter a route that starts with ' + prefix + '.' : 'Enter a route.' }}
-                        </p>
-                        <p *ngIf="!showError('route') && !form.get('parentId')?.value" class="text-[12px] text-secondary m-0">
-                            For a section this only marks which sidebar it belongs to.
-                        </p>
-                    </div>
+                    </boo-form-field>
 
                     <div class="space-y-1">
-                        <label *ngIf="permissionsFailed; else permissionTitle" for="menu-permission" class="text-[13px] font-medium text-regular">Permission <span class="text-danger" aria-hidden="true">*</span></label>
+                        <label *ngIf="permissionsFailed; else permissionTitle" for="menu-permission" class="text-sm font-medium text-regular">Permission <span class="text-danger" aria-hidden="true">*</span></label>
                         <ng-template #permissionTitle>
-                            <span class="block text-[13px] font-medium text-regular">Permission <span class="text-danger" aria-hidden="true">*</span></span>
+                            <span class="block text-sm font-medium text-regular">Permission <span class="text-danger" aria-hidden="true">*</span></span>
                         </ng-template>
                         <boo-select
                             *ngIf="!permissionsFailed"
@@ -118,21 +105,20 @@ const knownIconValidator = (control: AbstractControl): ValidationErrors | null =
                             [height]="36"
                             [options]="permissionOptions"
                         ></boo-select>
-                        <input
+                        <boo-input
                             *ngIf="permissionsFailed"
-                            id="menu-permission"
-                            type="text"
+                            [id]="'menu-permission'"
+                            class="font-mono"
                             formControlName="permissionCode"
-                            [class]="field + ' font-mono'"
-                            autocomplete="off"
-                            placeholder="e.g. iam:user:read"
+                            label="e.g. iam:user:read"
+                            size="small"
                         />
                         <p *ngIf="showError('permissionCode')" class="text-[12px] text-danger m-0">Choose the permission a user needs to see this item.</p>
                         <p *ngIf="!showError('permissionCode') && permissionsFailed" class="text-[12px] text-secondary m-0">The permission list could not be loaded, so type the code.</p>
                     </div>
 
                     <boo-checkbox *ngIf="item" formControlName="isActive">
-                        <span class="text-[13px] text-regular">Active (visible to users who have the permission)</span>
+                        <span class="text-sm text-regular">Active (visible to users who have the permission)</span>
                     </boo-checkbox>
                 </div>
 
@@ -163,7 +149,6 @@ export class SuperadminMenuDrawerComponent implements OnChanges {
     @Output() close = new EventEmitter<void>();
     @Output() saved = new EventEmitter<void>();
 
-    readonly field = FIELD;
     readonly prefix = SUPERADMIN_ROUTE_PREFIX;
     readonly iconNames = MENU_ICON_NAMES;
     placementOptions: { label: string; value: string }[] = [];

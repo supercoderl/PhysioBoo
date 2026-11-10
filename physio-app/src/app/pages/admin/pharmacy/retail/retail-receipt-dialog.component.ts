@@ -1,5 +1,5 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild, inject, signal } from "@angular/core";
-import { BooButtonComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, signal } from "@angular/core";
+import { BooButtonComponent, BooInputComponent, BooStatusBadgeComponent, BooDialogComponent } from '@physioboo/ui';
 import { RetailPosService } from "../../../../services/admin/retail-pos.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -16,22 +16,11 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 @Component({
   selector: 'retail-receipt-dialog',
   standalone: true,
-  imports: [SharedModule, BooButtonComponent, BooInputComponent, BooStatusBadgeComponent],
+  imports: [SharedModule, BooButtonComponent, BooInputComponent, BooStatusBadgeComponent, BooDialogComponent],
   template: `
-    <div *ngIf="transaction" class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="requestClose()" aria-hidden="true"></div>
-
-      <div #panel role="dialog" aria-modal="true" aria-labelledby="retail-receipt-title" tabindex="-1"
-        class="relative bg-surface rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-gray-100 outline-none">
-        <div class="px-5 py-4 border-b border-gray-100 flex items-start justify-between gap-3">
-          <div class="min-w-0">
-            <h2 id="retail-receipt-title" class="text-base font-semibold text-regular m-0">{{ transaction.status === 'Refunded' ? 'Sale refunded' : 'Sale complete' }}</h2>
-            <p class="text-xs text-secondary m-0 mt-0.5">{{ transaction.transactionNumber }} · {{ transaction.completedAt | date:'medium' }}</p>
-          </div>
+    <boo-dialog *ngIf="transaction" [heading]="transaction.status === 'Refunded' ? 'Sale refunded' : 'Sale complete'" [description]="transaction.transactionNumber + ' · ' + (transaction.completedAt | date:'medium')" tone="success" icon="receipt" [busy]="refundBusy()" (dismiss)="requestClose()">
+        <div class="space-y-4">
           <boo-status-badge [label]="transaction.status" [tone]="transaction.status === 'Completed' ? 'success' : 'warning'" [dotted]="true"></boo-status-badge>
-        </div>
-
-        <div class="p-5 space-y-4">
           <p *ngIf="transaction.customer" class="text-sm text-regular m-0">{{ transaction.customer.fullName }}<span *ngIf="transaction.customer.mrn" class="text-secondary"> · MRN {{ transaction.customer.mrn }}</span></p>
 
           <ul class="list-none m-0 p-0 divide-y divide-borderGray/60 border border-borderGray/60 rounded-1.5">
@@ -73,17 +62,13 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
               <boo-input label="Refund reason" size="small" [(ngModel)]="reason" [required]="true" [disabled]="refundBusy()"></boo-input>
               <div class="flex justify-end gap-2">
                 <button boo-button variant="ghost" size="sm" (click)="refunding.set(false)" [disabled]="refundBusy()">Keep sale</button>
-                <button boo-button variant="primary" size="sm" (click)="refund()" [disabled]="!reason.trim()" [loading]="refundBusy()" class="!bg-danger">Confirm refund</button>
+                <button boo-button variant="danger" size="sm" (click)="refund()" [disabled]="!reason.trim()" [loading]="refundBusy()" >Confirm refund</button>
               </div>
             </div>
           </div>
         </div>
-
-        <div class="px-5 py-4 border-t border-gray-100 bg-gray-50 flex justify-end rounded-b-xl">
-          <button boo-button variant="primary" size="sm" (click)="requestClose()">Done</button>
-        </div>
-      </div>
-    </div>
+        <button boo-dialog-footer type="button" boo-button variant="primary" size="sm" (click)="requestClose()">Done</button>
+    </boo-dialog>
   `,
 })
 export class RetailReceiptDialogComponent implements OnChanges {
@@ -94,7 +79,6 @@ export class RetailReceiptDialogComponent implements OnChanges {
   @Output() close = new EventEmitter<void>();
   @Output() refunded = new EventEmitter<RetailTransaction>();
 
-  @ViewChild('panel') private panel?: ElementRef<HTMLElement>;
 
   private readonly srv = inject(RetailPosService);
   private readonly toastSrv = inject(ToastService);
@@ -107,26 +91,15 @@ export class RetailReceiptDialogComponent implements OnChanges {
   refunding = signal(false);
   refundBusy = signal(false);
 
-  private openedFrom: HTMLElement | null = null;
-
   ngOnChanges(changes: SimpleChanges): void {
     const change = changes['transaction'];
     if (!change) return;
     if (change.currentValue && !change.previousValue) {
-      this.openedFrom = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       this.email = '';
       this.phone = this.transaction?.customer?.phone ?? '';
       this.reason = '';
       this.refunding.set(false);
-      setTimeout(() => this.panel?.nativeElement.focus());
-    } else if (!change.currentValue && change.previousValue) {
-      setTimeout(() => this.openedFrom?.focus());
     }
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    if (this.transaction) this.requestClose();
   }
 
   requestClose(): void {

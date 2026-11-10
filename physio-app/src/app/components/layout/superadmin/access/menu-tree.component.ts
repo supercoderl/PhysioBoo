@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { MenuItem } from "../../../../shared/types/menu.types";
 import { isKnownMenuIcon, menuPermissionOf } from "../../../../shared/utils/menu.utils";
-import { BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooStatusBadgeComponent, BooButtonComponent } from '@physioboo/ui';
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
 
 export interface MenuRowEvent {
@@ -12,14 +12,12 @@ export interface MenuRowEvent {
 }
 
 const ROW_GRID = 'grid grid-cols-[minmax(0,1fr)_132px] sm:grid-cols-[minmax(0,1fr)_100px_132px] md:grid-cols-[minmax(0,1fr)_240px_100px_132px]';
-const ORDER_BADGE = 'shrink-0 inline-flex items-center justify-center rounded border border-borderGray/60 bg-gray-100 text-[11px] text-secondary tabular-nums';
-const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-secondary hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors cursor-pointer';
-
+const ORDER_BADGE = 'shrink-0 inline-flex items-center justify-center rounded border border-borderGray/60 bg-gray-100 text-xs text-secondary tabular-nums';
 /** Two-level menu table: sections (roots) with their pages joined by a dashed tree connector. */
 @Component({
     selector: 'superadmin-menu-tree',
     standalone: true,
-    imports: [SharedModule, BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonAdminComponent],
+    imports: [SharedModule, BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonAdminComponent, BooButtonComponent],
     template: `
         <div *ngIf="loading" class="space-y-3" aria-busy="true">
             <div *ngFor="let _ of [1, 2, 3]" class="h-[120px] rounded-2 border border-borderGray/60 bg-surface animate-pulse motion-reduce:animate-none"></div>
@@ -64,10 +62,10 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
                         <div class="min-w-0">
                             <div class="flex items-center gap-2 min-w-0">
                                 <span class="text-[15px] font-medium text-regular truncate">{{ section.label }}</span>
-                                <span *ngIf="section.children?.length" class="text-[11px] text-secondary shrink-0">{{ section.children!.length }} {{ section.children!.length === 1 ? 'page' : 'pages' }}</span>
+                                <span *ngIf="section.children?.length" class="text-xs text-secondary shrink-0">{{ section.children!.length }} {{ section.children!.length === 1 ? 'page' : 'pages' }}</span>
                                 <span
                                     *ngIf="!isKnown(section.icon)"
-                                    class="text-[11px] text-danger shrink-0"
+                                    class="text-xs text-danger shrink-0"
                                     title="This icon is not registered, so the sidebar cannot draw it."
                                 >Unknown icon “{{ section.icon }}”</span>
                             </div>
@@ -75,7 +73,7 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
                         </div>
                     </div>
                     <div role="cell" class="hidden md:block px-3 min-w-0">
-                        <span *ngIf="permission(section)" class="px-1.5 py-0.5 rounded bg-gray-100 text-[11px] font-mono text-secondary truncate max-w-full inline-block align-middle" [title]="permission(section)">
+                        <span *ngIf="permission(section)" class="px-1.5 py-0.5 rounded bg-gray-100 text-xs font-mono text-secondary truncate max-w-full inline-block align-middle" [title]="permission(section)">
                             {{ permission(section) }}
                         </span>
                     </div>
@@ -83,13 +81,13 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
                         <boo-status-badge [label]="section.isActive ? 'Active' : 'Inactive'" [tone]="section.isActive ? 'success' : 'neutral'" [dotted]="true" />
                     </div>
                     <div role="cell" class="flex items-center justify-end px-2" (click)="$event.stopPropagation()">
-                        <button *ngIf="canCreate" type="button" [class]="iconButton" [attr.aria-label]="'Add a page to ' + section.label" title="Add page" (click)="addChild.emit(section)">
+                        <button *ngIf="canCreate" type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-9 !w-9" [attr.aria-label]="'Add a page to ' + section.label" title="Add page" (click)="addChild.emit(section)">
                             <physio-icon name="plus" />
                         </button>
-                        <button *ngIf="canUpdate" type="button" [class]="iconButton" [attr.aria-label]="'Edit section ' + section.label" title="Edit" (click)="edit.emit({ item: section, parent: null })">
+                        <button *ngIf="canUpdate" type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-9 !w-9" [attr.aria-label]="'Edit section ' + section.label" title="Edit" (click)="edit.emit({ item: section, parent: null })">
                             <physio-icon name="pencil" />
                         </button>
-                        <button *ngIf="canDelete" type="button" [class]="iconButton + ' hover:!text-danger'" [attr.aria-label]="'Delete section ' + section.label" title="Delete" (click)="remove.emit({ item: section, parent: null })">
+                        <button *ngIf="canDelete" type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-9 !w-9 !text-danger" [attr.aria-label]="'Delete section ' + section.label" title="Delete" (click)="remove.emit({ item: section, parent: null })">
                             <physio-icon name="trash" />
                         </button>
                     </div>
@@ -114,7 +112,7 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
                                 <span class="text-[15px] text-regular truncate">{{ child.label }}</span>
                                 <span
                                     *ngIf="!isKnown(child.icon)"
-                                    class="text-[11px] text-danger shrink-0"
+                                    class="text-xs text-danger shrink-0"
                                     title="This icon is not registered, so the sidebar cannot draw it."
                                 >Unknown icon “{{ child.icon }}”</span>
                             </div>
@@ -122,7 +120,7 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
                         </div>
                     </div>
                     <div role="cell" class="hidden md:block px-3 min-w-0">
-                        <span class="px-1.5 py-0.5 rounded bg-gray-100 text-[11px] font-mono text-secondary truncate max-w-full inline-block align-middle" [title]="permission(child)">
+                        <span class="px-1.5 py-0.5 rounded bg-gray-100 text-xs font-mono text-secondary truncate max-w-full inline-block align-middle" [title]="permission(child)">
                             {{ permission(child) || 'no permission' }}
                         </span>
                     </div>
@@ -130,10 +128,10 @@ const ICON_BUTTON = 'w-9 h-9 flex items-center justify-center rounded-1.5 text-s
                         <boo-status-badge [label]="child.isActive ? 'Active' : 'Inactive'" [tone]="child.isActive ? 'success' : 'neutral'" [dotted]="true" />
                     </div>
                     <div role="cell" class="flex items-center justify-end px-2">
-                        <button *ngIf="canUpdate" type="button" [class]="iconButton" [attr.aria-label]="'Edit page ' + child.label" title="Edit" (click)="edit.emit({ item: child, parent: section })">
+                        <button *ngIf="canUpdate" type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-9 !w-9" [attr.aria-label]="'Edit page ' + child.label" title="Edit" (click)="edit.emit({ item: child, parent: section })">
                             <physio-icon name="pencil" />
                         </button>
-                        <button *ngIf="canDelete" type="button" [class]="iconButton + ' hover:!text-danger'" [attr.aria-label]="'Delete page ' + child.label" title="Delete" (click)="remove.emit({ item: child, parent: section })">
+                        <button *ngIf="canDelete" type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-9 !w-9 !text-danger" [attr.aria-label]="'Delete page ' + child.label" title="Delete" (click)="remove.emit({ item: child, parent: section })">
                             <physio-icon name="trash" />
                         </button>
                     </div>
@@ -160,7 +158,6 @@ export class SuperadminMenuTreeComponent {
 
     readonly rowGrid = ROW_GRID;
     readonly orderBadge = ORDER_BADGE;
-    readonly iconButton = ICON_BUTTON;
     readonly isKnown = isKnownMenuIcon;
     readonly permission = menuPermissionOf;
 

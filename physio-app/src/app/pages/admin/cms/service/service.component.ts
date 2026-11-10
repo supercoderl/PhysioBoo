@@ -3,19 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, ElementRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import {
-    BooButtonComponent,
-    BooCheckboxComponent,
-    BooEmptyStateComponent,
-    BooErrorStateComponent,
-    BooFilterChip,
-    BooFilterChipsComponent,
-    BooIconComponent,
-    BooInlineErrorComponent,
-    BooInlineErrorState,
-    BooSearchFieldComponent,
-    BooStatusBadgeComponent,
-} from '@physioboo/ui';
+import { BooButtonComponent, BooCheckboxComponent, BooEmptyStateComponent, BooErrorStateComponent, BooFilterChip, BooFilterChipsComponent, BooIconComponent, BooInlineErrorComponent, BooInlineErrorState, BooSearchFieldComponent, BooStatusBadgeComponent, BooTabsComponent } from '@physioboo/ui';
 import { Observable, Subject, of } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap } from 'rxjs/operators';
 import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
@@ -87,8 +75,7 @@ const PAGE_SIZE = 20;
         BooErrorStateComponent,
         BooInlineErrorComponent,
         CmsServiceDetailDrawerComponent,
-        CmsServiceEditDrawerComponent,
-    ],
+        CmsServiceEditDrawerComponent, BooTabsComponent],
     templateUrl: './service.component.html',
     host: { class: 'flex flex-col min-h-full' },
 })
@@ -101,7 +88,6 @@ export class AdminServiceComponent implements OnInit {
     private readonly dialogSrv = inject(DialogService);
     private readonly toastSrv = inject(ToastService);
     private readonly destroyRef = inject(DestroyRef);
-    private readonly host: HTMLElement = inject(ElementRef).nativeElement;
 
     readonly statusTabs: StatusTab[] = [
         { value: null, label: 'All services' },
@@ -329,18 +315,6 @@ export class AdminServiceComponent implements OnInit {
     }
 
     /** Arrow keys, Home and End move between status tabs. */
-    onTabKey(event: KeyboardEvent, index: number): void {
-        const last = this.statusTabs.length - 1;
-        const next = event.key === 'ArrowRight' ? (index === last ? 0 : index + 1)
-            : event.key === 'ArrowLeft' ? (index === 0 ? last : index - 1)
-            : event.key === 'Home' ? 0
-            : event.key === 'End' ? last
-            : null;
-        if (next === null) return;
-        event.preventDefault();
-        this.selectStatus(this.statusTabs[next].value);
-        this.host.querySelector<HTMLElement>(`#service-tab-${next}`)?.focus();
-    }
 
     onFilterChange(): void {
         this.page = 1;

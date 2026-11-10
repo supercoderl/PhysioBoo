@@ -20,7 +20,7 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
                 buttonClass="!bg-surface h-full min-w-[180px] flex-row-reverse !justify-between"
                 [border]="{ width: 1, color: isOpen ? '#FB7185' : '#EFE3E7' }"
             >
-                <span class="text-[13px] font-medium text-placeholder">{{ displayText }}</span>
+                <span class="text-sm font-medium text-placeholder">{{ displayText }}</span>
             </boo-button-admin>
 
             <div *ngIf="isOpen" 

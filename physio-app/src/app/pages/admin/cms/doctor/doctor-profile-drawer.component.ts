@@ -98,20 +98,20 @@ const WHOLE = [Validators.required, Validators.min(0), Validators.pattern(/^\d+$
                         <div class="flex flex-col gap-4">
                             <div>
                                 <div class="flex items-baseline justify-between gap-3 mb-1">
-                                    <label for="de-bio" class="text-[13px] font-medium text-regular">Short bio</label>
+                                    <label for="de-bio" class="text-sm font-medium text-regular">Short bio</label>
                                     <span class="text-xs text-secondary tabular-nums" aria-live="polite">{{ form.controls.bio.value.length }} / {{ max.text }}</span>
                                 </div>
                                 <boo-textarea id="de-bio" formControlName="bio" label="One or two sentences shown on doctor cards" [rows]="3" [maxlength]="max.text" />
                             </div>
                             <div>
                                 <div class="flex items-baseline justify-between gap-3 mb-1">
-                                    <label for="de-about" class="text-[13px] font-medium text-regular">About</label>
+                                    <label for="de-about" class="text-sm font-medium text-regular">About</label>
                                     <span class="text-xs text-secondary tabular-nums" aria-live="polite">{{ form.controls.about.value.length }} / {{ max.text }}</span>
                                 </div>
                                 <boo-textarea id="de-about" formControlName="about" label="Background, approach to care and what patients can expect" [rows]="6" [maxlength]="max.text" />
                             </div>
                             <div>
-                                <label for="de-langs" class="block mb-1 text-[13px] font-medium text-regular">Languages spoken</label>
+                                <label for="de-langs" class="block mb-1 text-sm font-medium text-regular">Languages spoken</label>
                                 <boo-input name="de-langs" formControlName="languages" label="e.g. Vietnamese, English" [maxlength]="max.languages" />
                                 <p class="m-0 mt-1 text-xs text-secondary">Separate languages with commas.</p>
                             </div>
@@ -124,29 +124,29 @@ const WHOLE = [Validators.required, Validators.min(0), Validators.pattern(/^\d+$
                         <div class="flex flex-col gap-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="de-exp" class="block mb-1 text-[13px] font-medium text-regular">Years of experience <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="de-exp" class="block mb-1 text-sm font-medium text-regular">Years of experience <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-input name="de-exp" type="number" formControlName="yearsOfExperience" label="Years" />
                                 </div>
                                 <div>
-                                    <label for="de-practice" class="block mb-1 text-[13px] font-medium text-regular">Years in practice <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="de-practice" class="block mb-1 text-sm font-medium text-regular">Years in practice <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-input name="de-practice" type="number" formControlName="yearsOfPractice" label="Years" />
                                 </div>
                                 <div>
-                                    <label for="de-pubs" class="block mb-1 text-[13px] font-medium text-regular">Publications <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="de-pubs" class="block mb-1 text-sm font-medium text-regular">Publications <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-input name="de-pubs" type="number" formControlName="publicationsCount" label="Number" />
                                 </div>
                                 <div>
-                                    <label for="de-talks" class="block mb-1 text-[13px] font-medium text-regular">Conference talks <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="de-talks" class="block mb-1 text-sm font-medium text-regular">Conference talks <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-input name="de-talks" type="number" formControlName="conferencePresentations" label="Number" />
                                 </div>
                             </div>
                             <p class="m-0 -mt-2 text-xs text-secondary">Whole numbers, 0 or more.</p>
                             <div>
-                                <label for="de-achieve" class="block mb-1 text-[13px] font-medium text-regular">Achievements</label>
+                                <label for="de-achieve" class="block mb-1 text-sm font-medium text-regular">Achievements</label>
                                 <boo-textarea id="de-achieve" formControlName="archivements" label="Awards, fellowships and recognitions" [rows]="3" [maxlength]="max.text" />
                             </div>
                             <div>
-                                <label for="de-research" class="block mb-1 text-[13px] font-medium text-regular">Research interests</label>
+                                <label for="de-research" class="block mb-1 text-sm font-medium text-regular">Research interests</label>
                                 <boo-textarea id="de-research" formControlName="researchInterests" label="Areas the doctor studies or publishes in" [rows]="3" [maxlength]="max.text" />
                             </div>
                         </div>

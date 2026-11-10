@@ -1,7 +1,7 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, HostListener, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BooEmptyStateComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooButtonComponent } from '@physioboo/ui';
 import { ScrumboardService } from '../../../../../services/admin/scrumboard.service';
 import { DialogService } from '../../../../../services/common/dialog.service';
 import { ToastService } from '../../../../../services/common/toast.service';
@@ -28,8 +28,7 @@ interface CardDraft {
     BooEmptyStateComponent,
     BooButtonAdminComponent,
     BooTextareaComponent,
-    BooDatepickerComponent
-  ],
+    BooDatepickerComponent, BooButtonComponent],
   templateUrl: './board.component.html'
 })
 export class BoardScrumboardComponent implements OnInit {

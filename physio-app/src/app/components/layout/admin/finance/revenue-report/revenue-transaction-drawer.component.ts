@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { RevenueTransactionDetail } from "../../../../../shared/types/revenue.types";
+import { BooButtonComponent } from '@physioboo/ui';
 
 @Component({
     selector: 'revenue-transaction-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent],
+    imports: [SharedModule, DrawerComponent, BooButtonComponent],
     template: `
     <drawer [isOpen]="isOpen" [isShowDialog]="false" (close)="close.emit()">
       <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
@@ -14,7 +15,7 @@ import { RevenueTransactionDetail } from "../../../../../shared/types/revenue.ty
           <h3 class="text-base font-semibold text-regular">Transaction Detail</h3>
           <p class="text-xs text-secondary" *ngIf="detail as d">{{ d.billNo }}</p>
         </div>
-        <button type="button" (click)="close.emit()" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center">
+        <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="close.emit()" aria-label="Close">
           <physio-icon name="x" [size]="16" class="text-gray-500"></physio-icon>
         </button>
       </div>

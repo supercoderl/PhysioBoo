@@ -13,8 +13,8 @@
       </p>
     </div>
     <div class="flex items-center gap-2">
-      <button boo-button variant="secondary" size="sm" [loading]="loading" (click)="refresh()">
-        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      <button boo-button variant="secondary" size="sm" [disabled]="loading" (click)="refresh()">
+        <physio-icon name="refresh" [size]="15" aria-hidden="true" />Refresh
       </button>
       <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
         <physio-icon name="plus" [size]="15" aria-hidden="true" />New campaign
@@ -34,28 +34,7 @@
     <h2 id="campaign-list-title" class="sr-only">Campaign list</h2>
 
     <!-- Lifecycle lens: one status at a time, as the server filters -->
-    <div class="boo-scrollbar overflow-x-auto border-b border-rowDivider">
-      <div class="flex min-w-max gap-1 px-4" role="tablist" aria-label="Campaign status">
-        <button
-          *ngFor="let tab of statusTabs; let i = index"
-          type="button"
-          role="tab"
-          [id]="'campaign-tab-' + i"
-          aria-controls="campaign-results"
-          [attr.aria-selected]="tab.value === statusFilter"
-          [attr.tabindex]="tab.value === statusFilter ? 0 : -1"
-          class="relative -mb-px px-3 py-3 bg-transparent border-0 border-b-2 text-sm whitespace-nowrap cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary rounded-t aria-[selected=false]:hover:text-regular"
-          [class.border-primary]="tab.value === statusFilter"
-          [class.text-primaryDeep]="tab.value === statusFilter"
-          [class.font-semibold]="tab.value === statusFilter"
-          [class.border-transparent]="tab.value !== statusFilter"
-          [class.text-secondary]="tab.value !== statusFilter"
-          [class.font-medium]="tab.value !== statusFilter"
-          (click)="selectStatus(tab.value)"
-          (keydown)="onTabKey($event, i)"
-        >{{ tab.label }}</button>
-      </div>
-    </div>
+    <boo-tabs [tabs]="statusTabs" [value]="statusFilter" (valueChange)="selectStatus($event)" label="Campaign status" idPrefix="campaign-tab" controls="campaign-results" listClass="px-4" />
 
     <!-- Search, channel, dates and sort. Every control is 36px high and the row aligns on its bottom edge, under the field labels. -->
     <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
@@ -152,14 +131,7 @@
                     <physio-icon [name]="channel(c).icon" [size]="16" />
                   </span>
                   <div class="min-w-0">
-                    <button
-                      type="button"
-                      class="block max-w-full p-0 bg-transparent border-0 text-left font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
-                      [attr.aria-label]="'Open details of ' + c.name"
-                      aria-haspopup="dialog"
-                      [title]="c.name"
-                      (click)="$event.stopPropagation(); openDetail(c)"
-                    >{{ c.name }}</button>
+                    <button type="button" boo-button variant="text" classname="max-w-full font-semibold !text-regular truncate rounded" [attr.aria-label]="'Open details of ' + c.name" aria-haspopup="dialog" [title]="c.name" (click)="$event.stopPropagation(); openDetail(c)">{{ c.name }}</button>
                     <div class="mt-0.5 text-xs text-secondary truncate">
                       <span class="tabular-nums">{{ c.code }}</span><span aria-hidden="true"> · </span>{{ channel(c).label }}
                     </div>

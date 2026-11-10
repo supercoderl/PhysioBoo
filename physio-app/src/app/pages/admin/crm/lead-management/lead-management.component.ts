@@ -3,19 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, ElementRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import {
-    BooButtonComponent,
-    BooEmptyStateComponent,
-    BooErrorStateComponent,
-    BooFilterChip,
-    BooFilterChipsComponent,
-    BooIconComponent,
-    BooInlineErrorComponent,
-    BooInlineErrorState,
-    BooPaginationComponent,
-    BooSearchFieldComponent,
-    BooStatusBadgeComponent,
-} from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooFilterChip, BooFilterChipsComponent, BooIconComponent, BooInlineErrorComponent, BooInlineErrorState, BooPaginationComponent, BooSearchFieldComponent, BooStatusBadgeComponent, BooTab, BooTabsComponent } from '@physioboo/ui';
 import { Observable, Subject, forkJoin, of, throwError } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap } from 'rxjs/operators';
 import { BooDatepickerComponent } from '../../../../components/date-picker/boo-date-picker.component';
@@ -119,8 +107,7 @@ const EMPTY_STAGE: Record<LeadStatus, string> = {
         BooErrorStateComponent,
         BooInlineErrorComponent,
         CrmLeadDetailDrawerComponent,
-        CrmLeadEditDrawerComponent,
-    ],
+        CrmLeadEditDrawerComponent, BooTabsComponent],
     templateUrl: './lead-management.component.html',
     host: { class: 'flex flex-col min-h-full' },
 })
@@ -379,6 +366,25 @@ export class AdminLeadManagementComponent implements OnInit {
         return tab.value === null ? this.totalCount : this.counts[tab.value];
     }
 
+    private statCache: { key: string; tabs: BooTab<LeadStatus | null>[] } | null = null;
+
+    /** Tab strip data: rebuilt only when a count changes, so the input keeps its reference between checks. */
+    get statTabItems(): BooTab<LeadStatus | null>[] {
+        const counts = this.stageTabs.map(t => this.countOf(t));
+        const key = counts.join('|');
+        if (this.statCache?.key !== key) {
+            const last = this.stageTabs.length - 1;
+            this.statCache = {
+                key,
+                tabs: this.stageTabs.map((t, i) => ({
+                    value: t.value, label: t.label, dot: t.dot, count: counts[i], countUnit: counts[i] === 1 ? 'lead' : 'leads',
+                    divider: (i === 1 || i === last ? 'line' : i > 1 && i < last ? 'arrow' : undefined) as 'line' | 'arrow' | undefined,
+                })),
+            };
+        }
+        return this.statCache.tabs;
+    }
+
     onQueryChange(): void {
         this.searchPending = this.searchTerm !== this.lastSearched;
         this.query$.next(this.query);
@@ -396,18 +402,6 @@ export class AdminLeadManagementComponent implements OnInit {
         this.load();
     }
 
-    onTabKey(event: KeyboardEvent, index: number): void {
-        const last = this.stageTabs.length - 1;
-        const next = event.key === 'ArrowRight' ? (index === last ? 0 : index + 1)
-            : event.key === 'ArrowLeft' ? (index === 0 ? last : index - 1)
-            : event.key === 'Home' ? 0
-            : event.key === 'End' ? last
-            : -1;
-        if (next < 0) return;
-        event.preventDefault();
-        this.selectStage(this.stageTabs[next].value);
-        this.host.querySelector<HTMLElement>(`#lead-tab-${next}`)?.focus();
-    }
 
     /** Search, priority and dates change what the counts cover too. */
     onFilterChange(): void {

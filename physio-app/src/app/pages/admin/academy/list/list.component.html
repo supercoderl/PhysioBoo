@@ -12,8 +12,8 @@
       </p>
     </div>
     <div class="flex flex-wrap items-center gap-2">
-      <button boo-button variant="secondary" size="sm" [loading]="loading" (click)="load()">
-        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      <button boo-button variant="secondary" size="sm" [disabled]="loading" (click)="load()">
+        <physio-icon name="refresh" [size]="15" aria-hidden="true" />Refresh
       </button>
       <button
         *ngIf="canManage"

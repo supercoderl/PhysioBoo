@@ -34,7 +34,7 @@ import { BooControlSize } from './control-size';
       <span [class]="labelTextClasses">
         <ng-content></ng-content>
         <span *ngIf="label && !hasContent">{{ label }}</span>
-        <span *ngIf="required" class="text-red-500 ml-0.5">*</span>
+        <span *ngIf="required" class="text-form-error ml-0.5">*</span>
       </span>
     </label>
   `,
@@ -64,7 +64,7 @@ export class BooCheckboxComponent implements ControlValueAccessor {
   }
 
   get labelTextClasses(): string {
-    const base = 'inline-block text-[#26141A] select-none pt-0.5';
+    const base = 'inline-block text-form-text select-none pt-0.5';
 
     let sizeClass = '';
     switch (this.size) {
@@ -98,9 +98,9 @@ export class BooCheckboxComponent implements ControlValueAccessor {
     }
 
     const stateClass = this.model
-      ? `bg-primary border-primary before:opacity-100`
-      : `bg-surface border-gray-300 before:opacity-0 hover:border-primary`;
-    const disabledClass = this.disabled ? '!cursor-not-allowed !bg-gray-100 !border-gray-200' : '';
+      ? `bg-form-accent border-form-accent before:opacity-100`
+      : `bg-form-surface border-form-border-hover before:opacity-0 hover:border-form-accent`;
+    const disabledClass = this.disabled ? '!cursor-not-allowed !bg-form-subtle !border-form-border' : '';
     return `${base} ${sizeClass} ${stateClass} ${disabledClass}`;
   }
   // #endregion

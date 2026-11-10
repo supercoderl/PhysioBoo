@@ -57,13 +57,13 @@ const DESKTOP_BREAKPOINT_PX = 1024;
       </div>
       <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
         <dl *ngIf="canRead && stats() as s" class="flex flex-wrap items-center gap-x-5 gap-y-1 m-0" aria-label="Today's dispensing">
-          <div><dt class="text-[11px] uppercase tracking-wide text-secondary">Pending</dt><dd class="text-sm font-semibold text-regular m-0">{{ s.pendingCount }}</dd></div>
-          <div><dt class="text-[11px] uppercase tracking-wide text-secondary">In progress</dt><dd class="text-sm font-semibold text-regular m-0">{{ s.inProgressCount }}</dd></div>
-          <div><dt class="text-[11px] uppercase tracking-wide text-secondary">Done today</dt><dd class="text-sm font-semibold text-regular m-0">{{ s.completedTodayCount }}</dd></div>
-          <div><dt class="text-[11px] uppercase tracking-wide text-secondary">Avg. time</dt><dd class="text-sm font-semibold text-regular m-0">{{ s.averageDispensingMinutes | number:'1.0-1' }} min</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-secondary">Pending</dt><dd class="text-sm font-semibold text-regular m-0">{{ s.pendingCount }}</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-secondary">In progress</dt><dd class="text-sm font-semibold text-regular m-0">{{ s.inProgressCount }}</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-secondary">Done today</dt><dd class="text-sm font-semibold text-regular m-0">{{ s.completedTodayCount }}</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-secondary">Avg. time</dt><dd class="text-sm font-semibold text-regular m-0">{{ s.averageDispensingMinutes | number:'1.0-1' }} min</dd></div>
         </dl>
         <button *ngIf="canRead" boo-button variant="secondary" size="sm" (click)="refreshAll()" [disabled]="queueLoading()">
-          <physio-icon name="refresh" [size]="16" [class]="queueLoading() ? 'animate-spin' : ''"></physio-icon>Refresh
+          <physio-icon name="refresh" [size]="16"></physio-icon>Refresh
         </button>
       </div>
     </header>

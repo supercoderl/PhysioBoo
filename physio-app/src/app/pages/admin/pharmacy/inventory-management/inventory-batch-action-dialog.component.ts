@@ -1,6 +1,6 @@
-import { Component, ElementRef, EventEmitter, HostListener, inject, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
+import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
-import { BooButtonComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooInputComponent, BooDialogComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
@@ -29,48 +29,35 @@ const ACTION_COPY: Record<BatchActionKind, ActionCopy> = {
 @Component({
     selector: 'inventory-batch-action-dialog',
     standalone: true,
-    imports: [SharedModule, BooButtonComponent, BooInputComponent, BooSelectComponent, BooDatepickerComponent, BooTextareaComponent],
+    imports: [SharedModule, BooButtonComponent, BooInputComponent, BooSelectComponent, BooDatepickerComponent, BooTextareaComponent, BooDialogComponent, BooFieldErrorComponent],
     template: `
-    <div *ngIf="isOpen && kind && batch" class="fixed inset-0 z-[10001] flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-black/40" aria-hidden="true" (click)="requestClose()"></div>
-
-      <form
-        #dialogEl
-        role="dialog"
-        aria-modal="true"
-        tabindex="-1"
-        [attr.aria-labelledby]="titleId"
-        [formGroup]="form"
-        (ngSubmit)="onSubmit()"
-        novalidate
-        class="relative bg-surface rounded-xl shadow-2xl w-full max-w-md max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden border border-gray-100 outline-none"
-      >
-        <div class="flex-none px-6 py-5 border-b border-gray-100 flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" [ngClass]="copy.tone === 'danger' ? 'bg-rose-50' : 'bg-primary/10'">
-            <physio-icon [name]="copy.icon" [size]="20" [class]="copy.tone === 'danger' ? 'text-rose-600' : 'text-primary'"></physio-icon>
-          </div>
-          <div class="min-w-0">
-            <h3 [id]="titleId" class="text-lg font-semibold text-gray-900 m-0">{{ copy.title }}</h3>
-            <p class="text-sm text-secondary mt-1 mb-0 leading-relaxed">{{ copy.description }}</p>
-          </div>
-        </div>
-
-        <div class="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-4" custom-scrollbar>
+    <boo-dialog
+      *ngIf="isOpen && kind && batch"
+      [heading]="copy.title"
+      [description]="copy.description"
+      [icon]="copy.icon"
+      [tone]="copy.tone === 'danger' ? 'danger' : 'default'"
+      [busy]="submitting"
+      [form]="true"
+      (formSubmit)="onSubmit()"
+      (dismiss)="requestClose()"
+    >
+        <div [formGroup]="form" class="space-y-4">
           <dl class="grid grid-cols-3 gap-2 m-0 text-center">
             <div class="col-span-3 text-left">
               <dt class="sr-only">Batch</dt>
               <dd class="m-0 text-sm font-semibold text-regular truncate">{{ medicineName }} · {{ batch.batchNo || 'No batch number' }}</dd>
             </div>
             <div class="rounded-1.5 bg-gray-50 px-2 py-2">
-              <dt class="text-[11px] text-secondary">On hand</dt>
+              <dt class="text-xs text-secondary">On hand</dt>
               <dd class="m-0 text-sm font-semibold text-regular tabular-nums">{{ batch.quantity | number }}</dd>
             </div>
             <div class="rounded-1.5 bg-gray-50 px-2 py-2">
-              <dt class="text-[11px] text-secondary">Reserved</dt>
+              <dt class="text-xs text-secondary">Reserved</dt>
               <dd class="m-0 text-sm font-semibold text-regular tabular-nums">{{ batch.reservedQuantity | number }}</dd>
             </div>
             <div class="rounded-1.5 bg-gray-50 px-2 py-2">
-              <dt class="text-[11px] text-secondary">Free</dt>
+              <dt class="text-xs text-secondary">Free</dt>
               <dd class="m-0 text-sm font-semibold text-regular tabular-nums">{{ free | number }}</dd>
             </div>
           </dl>
@@ -80,11 +67,11 @@ const ACTION_COPY: Record<BatchActionKind, ActionCopy> = {
             <ng-container *ngSwitchCase="'receive'">
               <div>
                 <boo-input label="Quantity received" type="number" formControlName="quantity" required></boo-input>
-                <p *ngIf="error('quantity') as msg" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+                <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="error('quantity') as msg">{{ msg }}</boo-field-error>
               </div>
               <div>
                 <boo-input label="Unit purchase price (optional)" type="number" formControlName="purchasePrice"></boo-input>
-                <p *ngIf="error('purchasePrice') as msg" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+                <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="error('purchasePrice') as msg">{{ msg }}</boo-field-error>
               </div>
               <boo-datepicker label="Expiry date (optional)" formControlName="expiryDate"></boo-datepicker>
             </ng-container>
@@ -92,14 +79,14 @@ const ACTION_COPY: Record<BatchActionKind, ActionCopy> = {
             <ng-container *ngSwitchCase="'adjust'">
               <div>
                 <boo-input label="New on-hand quantity" type="number" formControlName="newQuantity" required></boo-input>
-                <p *ngIf="error('newQuantity') as msg; else adjustHint" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+                <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="error('newQuantity') as msg; else adjustHint">{{ msg }}</boo-field-error>
                 <ng-template #adjustHint>
                   <p class="mt-1 mb-0 text-xs text-secondary">Currently {{ batch.quantity | number }}<ng-container *ngIf="batch.reservedQuantity"> · cannot go below the {{ batch.reservedQuantity | number }} reserved</ng-container>.</p>
                 </ng-template>
               </div>
               <div>
                 <boo-textarea label="Reason" formControlName="reason" required [rows]="3" [maxlength]="reasonMaxLength"></boo-textarea>
-                <p *ngIf="error('reason') as msg" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+                <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="error('reason') as msg">{{ msg }}</boo-field-error>
               </div>
             </ng-container>
 
@@ -107,12 +94,12 @@ const ACTION_COPY: Record<BatchActionKind, ActionCopy> = {
               <div>
                 <boo-select label="Destination zone" formControlName="toZoneId" required [options]="zones" bindLabel="name" bindValue="id"></boo-select>
                 <p *ngIf="zonesState === 'loading'" class="mt-1 mb-0 text-xs text-secondary">Loading zones…</p>
-                <p *ngIf="zonesState === 'error'" class="mt-1 mb-0 text-xs text-danger" role="alert">Couldn't load warehouse zones. Close this dialog and try again.</p>
-                <p *ngIf="error('toZoneId') as msg" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+                <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="zonesState === 'error'">Couldn't load warehouse zones. Close this dialog and try again.</boo-field-error>
+                <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="error('toZoneId') as msg">{{ msg }}</boo-field-error>
               </div>
               <div>
                 <boo-input label="Quantity to move" type="number" formControlName="quantity" required></boo-input>
-                <p *ngIf="error('quantity') as msg; else transferHint" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+                <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="error('quantity') as msg; else transferHint">{{ msg }}</boo-field-error>
                 <ng-template #transferHint>
                   <p class="mt-1 mb-0 text-xs text-secondary">Up to {{ free | number }} unreserved units. Moving part of the batch splits it.</p>
                 </ng-template>
@@ -122,14 +109,14 @@ const ACTION_COPY: Record<BatchActionKind, ActionCopy> = {
             <ng-container *ngSwitchCase="'dispose'">
               <div>
                 <boo-input label="Quantity to dispose" type="number" formControlName="quantity" required></boo-input>
-                <p *ngIf="error('quantity') as msg; else disposeHint" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+                <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="error('quantity') as msg; else disposeHint">{{ msg }}</boo-field-error>
                 <ng-template #disposeHint>
                   <p class="mt-1 mb-0 text-xs text-secondary">Up to {{ free | number }} unreserved units.</p>
                 </ng-template>
               </div>
               <div>
                 <boo-textarea label="Reason" formControlName="reason" required [rows]="3" [maxlength]="reasonMaxLength"></boo-textarea>
-                <p *ngIf="error('reason') as msg" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+                <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="error('reason') as msg">{{ msg }}</boo-field-error>
               </div>
               <p class="m-0 rounded-1.5 bg-rose-50 px-3 py-2 text-xs text-rose-700" role="note">
                 Disposed units leave the sellable pool for good. Disposing the whole batch closes it.
@@ -137,20 +124,17 @@ const ACTION_COPY: Record<BatchActionKind, ActionCopy> = {
             </ng-container>
           </ng-container>
         </div>
-
-        <div class="flex-none px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-          <button boo-button type="button" variant="secondary" (click)="requestClose()" [disabled]="submitting">Cancel</button>
+        <button boo-dialog-footer boo-button type="button" variant="secondary" size="sm" (click)="requestClose()" [disabled]="submitting">Cancel</button>
           <button
+            boo-dialog-footer
             boo-button
             type="submit"
-            variant="primary"
-            [classname]="copy.tone === 'danger' ? '!bg-rose-600 hover:!bg-rose-700' : ''"
+            size="sm"
+            [variant]="copy.tone === 'danger' ? 'danger' : 'primary'"
             [loading]="submitting"
             [disabled]="submitting || (kind === 'transfer' && zonesState !== 'ready')"
           >{{ copy.submit }}</button>
-        </div>
-      </form>
-    </div>
+    </boo-dialog>
   `,
 })
 export class InventoryBatchActionDialogComponent implements OnChanges {
@@ -165,7 +149,6 @@ export class InventoryBatchActionDialogComponent implements OnChanges {
     @Input() submitting = false;
     @Output() close = new EventEmitter<void>();
     @Output() confirm = new EventEmitter<BatchActionRequest>();
-    @ViewChild('dialogEl') dialogEl?: ElementRef<HTMLFormElement>;
 
     readonly titleId = 'inventory-batch-action-title';
     readonly reasonMaxLength = REASON_MAX_LENGTH;
@@ -182,7 +165,6 @@ export class InventoryBatchActionDialogComponent implements OnChanges {
     });
 
     private attempted = false;
-    private returnFocusTo: HTMLElement | null = null;
 
     get copy(): ActionCopy {
         return ACTION_COPY[this.kind ?? 'receive'];
@@ -197,19 +179,6 @@ export class InventoryBatchActionDialogComponent implements OnChanges {
         const retargeted = this.isOpen && (changes['kind'] || changes['batch']) && !changes['isOpen'];
         if (opened || retargeted) this.reset();
 
-        if (changes['isOpen'] && !this.isOpen) {
-            const target = this.returnFocusTo;
-            this.returnFocusTo = null;
-            setTimeout(() => target?.focus());
-        }
-    }
-
-    @HostListener('document:keydown.escape', ['$event'])
-    onEscape(event: Event): void {
-        if (!this.isOpen) return;
-        // Marks the key as handled so the stock panel behind the dialog stays open.
-        event.preventDefault();
-        this.requestClose();
     }
 
     requestClose(): void {
@@ -312,11 +281,5 @@ export class InventoryBatchActionDialogComponent implements OnChanges {
 
         // A sensible starting point: adjust opens on the current quantity so only the change needs typing.
         if (this.kind === 'adjust' && this.batch) this.form.patchValue({ newQuantity: this.batch.quantity });
-
-        this.returnFocusTo = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-        setTimeout(() => {
-            const el = this.dialogEl?.nativeElement;
-            (el?.querySelector('input, textarea') as HTMLElement | null ?? el)?.focus();
-        });
     }
 }

@@ -1,3 +1,4 @@
+import { BooSegment, BooSegmentedComponent } from '@physioboo/ui';
 import { Component, Input, computed, signal } from "@angular/core";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { LabReportRow, LabResultRow } from "../../../../../shared/types/medical-record.types";
@@ -13,7 +14,7 @@ interface LabPanelGroup {
 @Component({
   selector: 'mr-laboratory-tab',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooSegmentedComponent],
   template: `
     <div class="space-y-3">
       <!-- Critical / abnormal banner -->
@@ -28,10 +29,7 @@ interface LabPanelGroup {
       <!-- Toggle: abnormal only -->
       <div class="bg-surface border border-gray-200 rounded-lg px-4 py-2.5 flex items-center gap-3 flex-wrap">
         <span class="text-xs text-secondary">Show:</span>
-        <button (click)="abnormalOnly.set(false)" class="px-2.5 py-1 text-xs rounded-full"
-          [ngClass]="!abnormalOnly() ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'">All ({{ allCount() }})</button>
-        <button (click)="abnormalOnly.set(true)" class="px-2.5 py-1 text-xs rounded-full"
-          [ngClass]="abnormalOnly() ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'">Abnormal only ({{ abnormalCount() }})</button>
+        <boo-segmented size="sm" label="Show" [options]="resultFilters()" [value]="abnormalOnly()" (valueChange)="abnormalOnly.set($event)" />
       </div>
 
       <!-- Panel groups -->
@@ -119,6 +117,10 @@ export class LaboratoryTabComponent {
   private _results = signal<LabResultRow[]>([]);
 
   abnormalOnly = signal(false);
+  readonly resultFilters = computed<BooSegment<boolean>[]>(() => [
+    { value: false, label: `All (${this.allCount()})` },
+    { value: true, label: `Abnormal only (${this.abnormalCount()})` },
+  ]);
 
   allCount = computed(() => this._results().length);
   abnormalCount = computed(() => this._results().filter(r => r.abnormalFlag && r.abnormalFlag !== 'N').length);

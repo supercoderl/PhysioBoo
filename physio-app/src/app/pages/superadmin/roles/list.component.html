@@ -155,7 +155,7 @@
                 {{ role.name }}
               </h3>
               <span
-                class="text-[11px] font-mono bg-gray-100 text-secondary px-1.5 py-0.5 rounded mt-0.5 inline-block"
+                class="text-xs font-mono bg-gray-100 text-secondary px-1.5 py-0.5 rounded mt-0.5 inline-block"
                 >{{ role.code }}</span
               >
             </div>
@@ -167,7 +167,7 @@
       <!-- Description -->
       <p
         *ngIf="role.description"
-        class="text-[13px] text-secondary mt-2.5 mb-0 line-clamp-2"
+        class="text-sm text-secondary mt-2.5 mb-0 line-clamp-2"
       >
         {{ role.description }}
       </p>
@@ -204,46 +204,7 @@
       }}
       of {{ tableData()!.totalCount }} roles
     </span>
-    <div class="flex items-center gap-1">
-      <button
-        type="button"
-        class="w-9 h-9 flex items-center justify-center rounded-1.5 border border-borderGray text-secondary hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-        aria-label="Previous page"
-        [disabled]="!tableData()!.hasPrevious"
-        (click)="onPageClick(tableData()!.pageNumber - 1)"
-      >
-        <physio-icon name="chevron-left" [size]="14"></physio-icon>
-      </button>
-      <ng-container
-        *ngFor="
-          let page of getPages(tableData()!.pageNumber, tableData()!.totalPages)
-        "
-      >
-        <button
-          type="button"
-          class="w-9 h-9 flex items-center justify-center rounded-1.5 border text-xs font-medium tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors cursor-pointer"
-          [ngClass]="
-            page === tableData()!.pageNumber
-              ? 'border-primary bg-primary text-white'
-              : 'border-borderGray text-secondary hover:bg-black/5'
-          "
-          [attr.aria-current]="page === tableData()!.pageNumber ? 'page' : null"
-          [attr.aria-label]="'Page ' + page"
-          (click)="onPageClick(page)"
-        >
-          {{ page }}
-        </button>
-      </ng-container>
-      <button
-        type="button"
-        class="w-9 h-9 flex items-center justify-center rounded-1.5 border border-borderGray text-secondary hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-        aria-label="Next page"
-        [disabled]="!tableData()!.hasNext"
-        (click)="onPageClick(tableData()!.pageNumber + 1)"
-      >
-        <physio-icon name="chevron-right" [size]="14"></physio-icon>
-      </button>
-    </div>
+    <boo-pagination [page]="tableData()!.pageNumber" [totalPages]="tableData()!.totalPages" (pageChange)="onPageClick($event)" />
   </nav>
 </div>
 

@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit, signal } from '@angular/core';
-import { BooEmptyStateComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooButtonComponent, BooDialogComponent, BooFormFieldComponent, BooInputComponent } from '@physioboo/ui';
 import { ScrumboardService } from '../../../../../services/admin/scrumboard.service';
 import { ToastService } from '../../../../../services/common/toast.service';
 import { SharedModule } from '../../../../../shared/shared-imports';
@@ -14,8 +14,7 @@ import { BooTextareaComponent } from "../../../../../components/textarea/boo-tex
     SharedModule,
     BooEmptyStateComponent,
     BooButtonAdminComponent,
-    BooTextareaComponent
-  ],
+    BooTextareaComponent, BooButtonComponent, BooDialogComponent, BooFormFieldComponent, BooInputComponent],
   templateUrl: './list.component.html'
 })
 export class ListScrumboardComponent implements OnInit {

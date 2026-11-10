@@ -11,7 +11,7 @@ import { MenuItem } from '../../../../../shared/types/menu.types';
   ],
   template: `
     <a
-      class="group mb-0.5 flex w-full items-center justify-start gap-2.5 rounded-1.5 px-2.5 py-2 relative cursor-pointer text-[13px] transition-all duration-200"
+      class="group mb-0.5 flex w-full items-center justify-start gap-2.5 rounded-1.5 px-2.5 py-2 relative cursor-pointer text-sm transition-all duration-200"
       [class.bg-sidebarActive]="isActive && !item.children"
       [class.text-primaryHover]="isActive"
       [class.font-semibold]="isActive"
@@ -35,7 +35,7 @@ import { MenuItem } from '../../../../../shared/types/menu.types';
         class="shrink-0"
       />
       <div class="flex min-w-0 flex-auto flex-col items-start gap-1">
-        <p class="truncate max-w-full m-0 text-[13px]">
+        <p class="truncate max-w-full m-0 text-sm">
           {{ item.label }}
         </p>
       </div>

@@ -9,7 +9,7 @@ import { SharedModule } from "../../../../../shared/shared-imports";
 import { Bed } from "../../../../../shared/types/bed.types";
 import { BooDatepickerComponent } from "../../../../date-picker/boo-date-picker.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooButtonComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
 
@@ -22,8 +22,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
         BooDatepickerComponent,
         BooTextareaComponent,
         BooButtonComponent,
-        BooSelectComponent
-    ],
+        BooSelectComponent, BooSpinnerComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="onClose()">
             <div class="flex flex-col h-full bg-surface relative">
@@ -39,7 +38,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
 
                 <div class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
                     <div *ngIf="loadingSrv.isLoading('bed-assign-patients')" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
+                        <boo-spinner [inline]="true" tone="primary" [size]="32" />
                     </div>
 
                     <div class="p-6 space-y-4">

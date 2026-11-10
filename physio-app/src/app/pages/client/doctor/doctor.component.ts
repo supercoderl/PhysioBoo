@@ -3,7 +3,7 @@ import { Component, DestroyRef, ElementRef, OnInit, PLATFORM_ID, ViewChild, inje
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { Subject, catchError, debounceTime, distinctUntilChanged, map, merge, of, switchMap, tap } from 'rxjs';
-import { BooBreadcrumbComponent, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooFilterChipsComponent, BooPaginationComponent, BooSearchFieldComponent, BooSheetComponent } from '@physioboo/ui';
+import { BooBreadcrumbComponent, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooFilterChipsComponent, BooPaginationComponent, BooSearchFieldComponent, BooSheetComponent, BooCheckboxComponent } from '@physioboo/ui';
 import { DoctorCardComponent } from '../../../components/layout/client/doctor/doctor-card.component';
 import { PublicDoctorService } from '../../../services/public/public-doctor.service';
 import { SharedModule } from '../../../shared/shared-imports';
@@ -42,8 +42,7 @@ const EMPTY_QUERY: Query = { q: '', specialty: '', facility: '', online: false, 
   standalone: true,
   imports: [
     SharedModule, BooButtonComponent, DoctorCardComponent, BooEmptyStateComponent, BooErrorStateComponent, BooBreadcrumbComponent,
-    BooSearchFieldComponent, BooFilterChipsComponent, BooPaginationComponent, BooSheetComponent
-  ],
+    BooSearchFieldComponent, BooFilterChipsComponent, BooPaginationComponent, BooSheetComponent, BooCheckboxComponent],
   templateUrl: './doctor.component.html'
 })
 export class DoctorComponent implements OnInit {

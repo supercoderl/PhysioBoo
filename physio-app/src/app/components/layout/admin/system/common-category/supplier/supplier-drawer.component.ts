@@ -1,6 +1,6 @@
 import { Component, inject } from "@angular/core";
 import { FormBuilder, Validators } from "@angular/forms";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
+import { BooCheckboxComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { SupplierService } from "../../../../../../services/admin/supplier.service";
 import { SupplierType } from "../../../../../../shared/enums/supplier-type";
 import { SharedModule } from "../../../../../../shared/shared-imports";
@@ -28,8 +28,7 @@ const REQUIRED_TEXT = [Validators.required, Validators.pattern(/\S/)];
         BooTextareaComponent,
         BooCheckboxComponent,
         BooSelectComponent,
-        BooDatepickerComponent
-    ],
+        BooDatepickerComponent, BooFieldErrorComponent],
     template: `
         <common-category-drawer-shell
             [form]="form"
@@ -76,7 +75,7 @@ const REQUIRED_TEXT = [Validators.required, Validators.pattern(/\S/)];
                         <boo-input label="Country" formControlName="country" [required]="true" [maxlength]="100" />
                         <boo-input label="Postal code" formControlName="postalCode" [maxlength]="20" />
                     </div>
-                    <p *ngIf="locationMissing" class="m-0 mt-2 text-xs text-danger" role="alert">Address, city, state and country are required.</p>
+                    <boo-field-error size="sm" announce class="mt-2" *ngIf="locationMissing">Address, city, state and country are required.</boo-field-error>
                 </section>
 
                 <section class="px-6 py-5 border-b border-rowDivider">
@@ -121,7 +120,7 @@ const REQUIRED_TEXT = [Validators.required, Validators.pattern(/\S/)];
                         <boo-input type="number" label="Total purchase value" formControlName="totalPurchaseValue" />
                         <boo-datepicker label="Last order date" formControlName="lastOrderDate" outputFormat="yyyy-MM-dd" [disableFuture]="true" />
                     </div>
-                    <p *ngIf="ratingsInvalid" class="m-0 mt-2 text-xs text-danger" role="alert">Reliability is 0–100; quality and service ratings are 0–5.</p>
+                    <boo-field-error size="sm" announce class="mt-2" *ngIf="ratingsInvalid">Reliability is 0–100; quality and service ratings are 0–5.</boo-field-error>
                 </section>
             </ng-container>
         </common-category-drawer-shell>

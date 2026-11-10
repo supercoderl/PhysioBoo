@@ -10,6 +10,7 @@ import { ThemeConfigService } from '../../../../services/common/theme-config.ser
 import { ToastService } from '../../../../services/common/toast.service';
 import { SharedModule } from '../../../../shared/shared-imports';
 import { MenuItem } from '../../../../shared/types/menu.types';
+import { BooButtonComponent } from '@physioboo/ui';
 
 /** A navigable menu leaf, flattened out of the user's menu tree. */
 export interface HeaderPage {
@@ -31,8 +32,7 @@ const MAX_SEARCH_RESULTS = 8;
   selector: 'admin-main-header',
   standalone: true,
   imports: [
-    SharedModule
-  ],
+    SharedModule, BooButtonComponent],
   templateUrl: './main-header.component.html',
   styleUrl: './main-header.component.scss'
 })

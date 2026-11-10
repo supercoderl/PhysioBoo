@@ -19,7 +19,7 @@ import { MasterDataConfig } from "../../../shared/types/master-data.types";
 
             <div
                 role="note"
-                class="flex items-start gap-3 rounded-2 border border-primary/20 bg-primary/5 px-4 py-3 text-[13px] text-regular"
+                class="flex items-start gap-3 rounded-2 border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-regular"
             >
                 <physio-icon name="info" [class]="'text-primary shrink-0 mt-0.5'" />
                 <p class="m-0">
@@ -47,11 +47,11 @@ import { MasterDataConfig } from "../../../shared/types/master-data.types";
                                     ></span>
                                     <span
                                         *ngIf="counts()[cfg.slug] !== undefined"
-                                        class="px-1.5 py-0.5 rounded-full bg-black/5 text-[11px] font-semibold tabular-nums text-regular"
+                                        class="px-1.5 py-0.5 rounded-full bg-black/5 text-xs font-semibold tabular-nums text-regular"
                                     >{{ counts()[cfg.slug] ?? '—' }}</span>
                                 </span>
                             </span>
-                            <span class="block text-[13px] text-secondary mt-0.5">{{ cfg.description }}</span>
+                            <span class="block text-sm text-secondary mt-0.5">{{ cfg.description }}</span>
                         </span>
                     </a>
                 </li>

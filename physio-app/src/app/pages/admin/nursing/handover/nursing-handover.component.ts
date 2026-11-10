@@ -6,8 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
   BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooIconComponent, BooInlineErrorComponent,
-  BooInlineErrorState, BooSearchFieldComponent, BooStatusBadgeComponent
-} from '@physioboo/ui';
+  BooInlineErrorState, BooSearchFieldComponent, BooStatusBadgeComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { Subscription, finalize } from 'rxjs';
 import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
 import { BooTextareaComponent } from '../../../../components/textarea/boo-textarea/boo-textarea.component';
@@ -35,8 +34,7 @@ const SBAR_MAX_LENGTH = 2000;
     NgIf, NgFor, NgTemplateOutlet, DatePipe, FormsModule, RouterLink,
     BooButtonComponent, BooIconComponent, BooEmptyStateComponent, BooErrorStateComponent, BooInlineErrorComponent,
     BooStatusBadgeComponent, BooSearchFieldComponent, BooSelectComponent, BooTextareaComponent,
-    DashboardKpiTileComponent, DashboardPanelComponent,
-  ],
+    DashboardKpiTileComponent, DashboardPanelComponent, BooFieldErrorComponent],
   templateUrl: './nursing-handover.component.html',
 })
 export class AdminNursingHandoverComponent implements OnInit {

@@ -3,19 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, ElementRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import {
-    BooButtonComponent,
-    BooEmptyStateComponent,
-    BooErrorStateComponent,
-    BooFilterChip,
-    BooFilterChipsComponent,
-    BooIconComponent,
-    BooInlineErrorComponent,
-    BooInlineErrorState,
-    BooPaginationComponent,
-    BooSearchFieldComponent,
-    BooStatusBadgeComponent,
-} from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooFilterChip, BooFilterChipsComponent, BooIconComponent, BooInlineErrorComponent, BooInlineErrorState, BooPaginationComponent, BooSearchFieldComponent, BooStatusBadgeComponent, BooTab, BooTabsComponent } from '@physioboo/ui';
 import { Subject, forkJoin, of } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap } from 'rxjs/operators';
 import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
@@ -82,8 +70,7 @@ const REWARDS_SIZE = 100;
         CrmMemberPointsDrawerComponent,
         CrmMemberEditDrawerComponent,
         CrmMemberEnrollDrawerComponent,
-        CrmRewardsCatalogDrawerComponent,
-    ],
+        CrmRewardsCatalogDrawerComponent, BooTabsComponent],
     templateUrl: './member-point.component.html',
     host: { class: 'flex flex-col min-h-full' },
 })
@@ -299,6 +286,25 @@ export class AdminMemberPointComponent implements OnInit {
         return tab.value === null ? STATUSES.reduce((sum, s) => sum + this.counts![s], 0) : this.counts[tab.value];
     }
 
+    private statCache: { key: string; tabs: BooTab<MemberStatus | null>[] } | null = null;
+
+    /** Tab strip data: rebuilt only when a count changes, so the input keeps its reference between checks. */
+    get statTabItems(): BooTab<MemberStatus | null>[] {
+        const counts = this.statusTabs.map(t => this.countOf(t));
+        const key = counts.join('|');
+        if (this.statCache?.key !== key) {
+            const last = this.statusTabs.length - 1;
+            this.statCache = {
+                key,
+                tabs: this.statusTabs.map((t, i) => ({
+                    value: t.value, label: t.label, dot: t.dot, count: counts[i], countUnit: counts[i] === 1 ? 'member' : 'members',
+                    divider: (i === 1 ? 'line' : undefined) as 'line' | 'arrow' | undefined,
+                })),
+            };
+        }
+        return this.statCache.tabs;
+    }
+
     selectStatus(value: MemberStatus | null): void {
         if (value === this.statusFilter) return;
         this.statusFilter = value;
@@ -306,18 +312,6 @@ export class AdminMemberPointComponent implements OnInit {
         this.load();
     }
 
-    onTabKey(event: KeyboardEvent, index: number): void {
-        const last = this.statusTabs.length - 1;
-        const next = event.key === 'ArrowRight' ? (index === last ? 0 : index + 1)
-            : event.key === 'ArrowLeft' ? (index === 0 ? last : index - 1)
-            : event.key === 'Home' ? 0
-            : event.key === 'End' ? last
-            : null;
-        if (next === null) return;
-        event.preventDefault();
-        this.selectStatus(this.statusTabs[next].value);
-        this.host.querySelector<HTMLElement>(`#member-tab-${next}`)?.focus();
-    }
 
     onQueryChange(): void {
         this.searchPending = cleanMemberSearch(this.query) !== this.lastSearched;

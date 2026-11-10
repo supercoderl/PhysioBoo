@@ -2,7 +2,7 @@ import { NgIf } from '@angular/common';
 import { Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { BooButtonComponent, BooCheckboxComponent, BooIconComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooCheckboxComponent, BooIconComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { finalize, switchMap } from 'rxjs/operators';
 import { BooDatepickerComponent } from '../../../../components/date-picker/boo-date-picker.component';
 import { DrawerComponent } from '../../../../components/drawer/drawer.component';
@@ -51,8 +51,7 @@ function jsonText(control: AbstractControl<string>): ValidationErrors | null {
         BooSelectComponent,
         BooDatepickerComponent,
         BooTextareaComponent,
-        CustomScrollbarDirective,
-    ],
+        CustomScrollbarDirective, BooFieldErrorComponent],
     template: `
         <drawer [isOpen]="!!patient" [isShowDialog]="form.dirty && !submitting" (close)="discard()">
             <form
@@ -87,15 +86,15 @@ function jsonText(control: AbstractControl<string>): ValidationErrors | null {
                         <legend class="mb-3 text-sm font-semibold text-regular">Care</legend>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label for="pe-type" class="block mb-1 text-[13px] font-medium text-regular">Patient type <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="pe-type" class="block mb-1 text-sm font-medium text-regular">Patient type <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-select id="pe-type" formControlName="patientType" label="Patient type" required [options]="typeOptions" />
                             </div>
                             <div>
-                                <label for="pe-risk" class="block mb-1 text-[13px] font-medium text-regular">Risk level <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="pe-risk" class="block mb-1 text-sm font-medium text-regular">Risk level <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-select id="pe-risk" formControlName="riskLevel" label="Risk level" required [options]="riskOptions" />
                             </div>
                             <div class="sm:col-span-2">
-                                <label for="pe-doctor" class="block mb-1 text-[13px] font-medium text-regular">Primary doctor <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="pe-doctor" class="block mb-1 text-sm font-medium text-regular">Primary doctor <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-select id="pe-doctor" formControlName="primaryDoctorId" label="Primary doctor" required [options]="doctors" bindLabel="fullName" bindValue="id" />
                             </div>
                         </div>
@@ -111,23 +110,23 @@ function jsonText(control: AbstractControl<string>): ValidationErrors | null {
                         <legend class="mb-3 text-sm font-semibold text-regular">Preferences</legend>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label for="pe-pref-doctor" class="block mb-1 text-[13px] font-medium text-regular">Preferred doctor</label>
+                                <label for="pe-pref-doctor" class="block mb-1 text-sm font-medium text-regular">Preferred doctor</label>
                                 <boo-select id="pe-pref-doctor" formControlName="preferredDoctorId" label="No preference" [options]="doctors" bindLabel="fullName" bindValue="id" />
                             </div>
                             <div>
-                                <label for="pe-pref-hospital" class="block mb-1 text-[13px] font-medium text-regular">Preferred facility</label>
+                                <label for="pe-pref-hospital" class="block mb-1 text-sm font-medium text-regular">Preferred facility</label>
                                 <boo-select id="pe-pref-hospital" formControlName="preferredHospitalId" label="No preference" [options]="hospitals" bindLabel="name" bindValue="id" />
                             </div>
                             <div>
-                                <label for="pe-pref-time" class="block mb-1 text-[13px] font-medium text-regular">Preferred time</label>
+                                <label for="pe-pref-time" class="block mb-1 text-sm font-medium text-regular">Preferred time</label>
                                 <boo-input name="pe-pref-time" formControlName="preferredAppointmentTime" [maxlength]="20" label="e.g. Weekday mornings" />
                             </div>
                             <div>
-                                <label for="pe-occupation" class="block mb-1 text-[13px] font-medium text-regular">Occupation</label>
+                                <label for="pe-occupation" class="block mb-1 text-sm font-medium text-regular">Occupation</label>
                                 <boo-input name="pe-occupation" formControlName="occupation" [maxlength]="255" label="e.g. Teacher" />
                             </div>
                             <div>
-                                <label for="pe-income" class="block mb-1 text-[13px] font-medium text-regular">Annual income range</label>
+                                <label for="pe-income" class="block mb-1 text-sm font-medium text-regular">Annual income range</label>
                                 <boo-input name="pe-income" formControlName="annualIncomeRange" [maxlength]="50" label="e.g. 200–300M VND" />
                             </div>
                         </div>
@@ -138,19 +137,19 @@ function jsonText(control: AbstractControl<string>): ValidationErrors | null {
                         <legend class="mb-3 text-sm font-semibold text-regular">Insurance</legend>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label for="pe-ins-provider" class="block mb-1 text-[13px] font-medium text-regular">Provider</label>
+                                <label for="pe-ins-provider" class="block mb-1 text-sm font-medium text-regular">Provider</label>
                                 <boo-input name="pe-ins-provider" formControlName="inssuranceProvider" [maxlength]="255" label="Insurance provider" />
                             </div>
                             <div>
-                                <label for="pe-ins-policy" class="block mb-1 text-[13px] font-medium text-regular">Policy number</label>
+                                <label for="pe-ins-policy" class="block mb-1 text-sm font-medium text-regular">Policy number</label>
                                 <boo-input name="pe-ins-policy" formControlName="inssurancePolicyNumber" [maxlength]="100" label="Policy number" />
                             </div>
                             <div>
-                                <label for="pe-ins-expiry" class="block mb-1 text-[13px] font-medium text-regular">Expiry date</label>
+                                <label for="pe-ins-expiry" class="block mb-1 text-sm font-medium text-regular">Expiry date</label>
                                 <boo-datepicker id="pe-ins-expiry" formControlName="inssuranceExpiryDate" label="Expiry date" />
                             </div>
                             <div>
-                                <label for="pe-ins-coverage" class="block mb-1 text-[13px] font-medium text-regular">Coverage amount</label>
+                                <label for="pe-ins-coverage" class="block mb-1 text-sm font-medium text-regular">Coverage amount</label>
                                 <boo-input name="pe-ins-coverage" type="number" formControlName="inssuranceCoverageAmount" [maxlength]="16" label="Coverage amount" />
                             </div>
                         </div>
@@ -161,29 +160,29 @@ function jsonText(control: AbstractControl<string>): ValidationErrors | null {
                         <legend class="mb-3 text-sm font-semibold text-regular">Clinical background</legend>
                         <div class="flex flex-col gap-4">
                             <div>
-                                <label for="pe-allergy" class="block mb-1 text-[13px] font-medium text-regular">Allergies</label>
+                                <label for="pe-allergy" class="block mb-1 text-sm font-medium text-regular">Allergies</label>
                                 <boo-textarea id="pe-allergy" formControlName="allergyInformation" label="Known allergies" [rows]="2" />
                             </div>
                             <div>
-                                <label for="pe-history" class="block mb-1 text-[13px] font-medium text-regular">Medical history</label>
+                                <label for="pe-history" class="block mb-1 text-sm font-medium text-regular">Medical history</label>
                                 <boo-textarea id="pe-history" formControlName="medicalHistory" label="Medical history" [rows]="3" />
                             </div>
                             <div>
-                                <label for="pe-meds" class="block mb-1 text-[13px] font-medium text-regular">Current medications</label>
+                                <label for="pe-meds" class="block mb-1 text-sm font-medium text-regular">Current medications</label>
                                 <boo-textarea id="pe-meds" formControlName="currentMedications" label="Current medications" [rows]="2" />
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="pe-surgical" class="block mb-1 text-[13px] font-medium text-regular">Surgical history</label>
+                                    <label for="pe-surgical" class="block mb-1 text-sm font-medium text-regular">Surgical history</label>
                                     <boo-textarea id="pe-surgical" formControlName="surgicalHistory" label="Surgical history" [rows]="2" />
                                 </div>
                                 <div>
-                                    <label for="pe-family" class="block mb-1 text-[13px] font-medium text-regular">Family history</label>
+                                    <label for="pe-family" class="block mb-1 text-sm font-medium text-regular">Family history</label>
                                     <boo-textarea id="pe-family" formControlName="familyHistory" label="Family history" [rows]="2" />
                                 </div>
                             </div>
                             <div>
-                                <label for="pe-lifestyle" class="block mb-1 text-[13px] font-medium text-regular">Lifestyle notes</label>
+                                <label for="pe-lifestyle" class="block mb-1 text-sm font-medium text-regular">Lifestyle notes</label>
                                 <boo-textarea id="pe-lifestyle" formControlName="lifestyleNotes" label="Lifestyle notes" [rows]="2" />
                             </div>
                         </div>
@@ -198,11 +197,11 @@ function jsonText(control: AbstractControl<string>): ValidationErrors | null {
                             <boo-checkbox formControlName="consentForMarketing" label="Marketing" />
                         </div>
                         <div class="mt-4">
-                            <label for="pe-comms" class="block mb-1 text-[13px] font-medium text-regular">Communication preferences <span class="font-normal text-secondary">(JSON)</span></label>
+                            <label for="pe-comms" class="block mb-1 text-sm font-medium text-regular">Communication preferences <span class="font-normal text-secondary">(JSON)</span></label>
                             <boo-textarea id="pe-comms" formControlName="communicationPreferences" label='e.g. {"sms": true, "email": true}' [rows]="2" />
-                            <p *ngIf="form.controls.communicationPreferences.touched && form.controls.communicationPreferences.hasError('json')" class="m-0 mt-1 text-xs text-danger" role="alert">
+                            <boo-field-error size="sm" announce class="mt-1" *ngIf="form.controls.communicationPreferences.touched && form.controls.communicationPreferences.hasError('json')">
                                 Enter valid JSON, or leave this empty.
-                            </p>
+                            </boo-field-error>
                         </div>
                     </fieldset></div>
                 </div>

@@ -45,7 +45,7 @@ interface FlowBar {
 
                 <div class="relative flex gap-2">
                     <!-- Y axis -->
-                    <div class="flex flex-col justify-between h-40 text-[11px] leading-none text-placeholder tabular-nums text-right w-5 flex-none" aria-hidden="true">
+                    <div class="flex flex-col justify-between h-40 text-xs leading-none text-placeholder tabular-nums text-right w-5 flex-none" aria-hidden="true">
                         <span>{{ axisMax }}</span>
                         <span>{{ axisMid }}</span>
                         <span>0</span>
@@ -70,7 +70,7 @@ interface FlowBar {
                                 <p class="m-0 px-3 py-1.5 rounded-lg bg-surface text-xs text-secondary">No admissions or discharges recorded yet today.</p>
                             </div>
                         </div>
-                        <div class="flex mt-1.5 text-[11px] leading-none text-placeholder tabular-nums" aria-hidden="true">
+                        <div class="flex mt-1.5 text-xs leading-none text-placeholder tabular-nums" aria-hidden="true">
                             <span *ngFor="let bar of bars; trackBy: trackByHour" class="flex-1 text-center whitespace-nowrap overflow-visible">
                                 {{ bar.showLabel ? bar.point.hour.slice(0, 2) : '' }}
                             </span>
@@ -94,12 +94,12 @@ interface FlowBar {
                 <div class="px-4 py-3 min-w-0">
                     <dt class="text-xs text-secondary">Due for discharge</dt>
                     <dd class="m-0 mt-0.5 text-lg font-semibold text-regular tabular-nums">{{ flow.dischargesPending }}</dd>
-                    <dd class="m-0 text-[11px] leading-4 text-placeholder">Expected by end of day, not yet discharged</dd>
+                    <dd class="m-0 text-xs leading-4 text-placeholder">Expected by end of day, not yet discharged</dd>
                 </div>
                 <div class="px-4 py-3 min-w-0">
                     <dt class="text-xs text-secondary">Average length of stay</dt>
                     <dd class="m-0 mt-0.5 text-lg font-semibold text-regular tabular-nums">{{ averageOrDash(flow.avgLengthOfStayDays, ' days') }}</dd>
-                    <dd class="m-0 text-[11px] leading-4 text-placeholder">Patients discharged in the last 30 days</dd>
+                    <dd class="m-0 text-xs leading-4 text-placeholder">Patients discharged in the last 30 days</dd>
                 </div>
                 <div class="px-4 py-3 min-w-0">
                     <dt class="text-xs text-secondary">Bed turnover</dt>
@@ -110,7 +110,7 @@ interface FlowBar {
                             {{ flow.bedTurnoverTrendPct > 0 ? '+' : '' }}{{ flow.bedTurnoverTrendPct }}% vs prior 30 days
                         </span>
                     </dd>
-                    <dd class="m-0 text-[11px] leading-4 text-placeholder">Discharges per bed, last 30 days</dd>
+                    <dd class="m-0 text-xs leading-4 text-placeholder">Discharges per bed, last 30 days</dd>
                 </div>
             </dl>
         </dashboard-panel>

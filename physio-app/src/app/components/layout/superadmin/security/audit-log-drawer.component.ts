@@ -5,13 +5,13 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { AuditLog } from "../../../../shared/types/audit-log.types";
 import { auditActionTone, auditChanges } from "../../../../shared/utils/audit-log.utils";
 import { DrawerComponent } from "../../../drawer/drawer.component";
-import { BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooErrorStateComponent, BooStatusBadgeComponent, BooButtonComponent } from '@physioboo/ui';
 
 /** Full detail of one audit entry: who, when, from where, and the column-by-column change. */
 @Component({
     selector: 'superadmin-audit-log-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooStatusBadgeComponent, BooErrorStateComponent],
+    imports: [SharedModule, DrawerComponent, BooStatusBadgeComponent, BooErrorStateComponent, BooButtonComponent],
     template: `
         <drawer [isOpen]="isOpen" (close)="close.emit()">
             <div
@@ -23,14 +23,9 @@ import { BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
                 <div class="flex-none px-6 py-4 border-b border-borderGray/60 flex items-start justify-between gap-3">
                     <div class="min-w-0">
                         <h2 id="audit-drawer-title" class="text-lg font-bold text-regular leading-tight m-0">Audit entry</h2>
-                        <p class="text-[13px] text-secondary m-0 truncate">{{ log()?.tableName ?? 'Loading…' }}</p>
+                        <p class="text-sm text-secondary m-0 truncate">{{ log()?.tableName ?? 'Loading…' }}</p>
                     </div>
-                    <button
-                        type="button"
-                        class="w-9 h-9 shrink-0 flex items-center justify-center rounded-1.5 text-secondary hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
-                        aria-label="Close"
-                        (click)="close.emit()"
-                    >
+                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Close" (click)="close.emit()">
                         <physio-icon name="x" />
                     </button>
                 </div>
@@ -51,7 +46,7 @@ import { BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
                     </div>
 
                     <div *ngIf="!loading() && !failed() && log() as entry" class="p-6 space-y-6">
-                        <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-[13px] m-0">
+                        <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm m-0">
                             <div>
                                 <dt class="text-secondary">Action</dt>
                                 <dd class="m-0 mt-1"><boo-status-badge [label]="entry.action" [tone]="tone(entry.action)" dotted /></dd>
@@ -84,7 +79,7 @@ import { BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 
                         <section aria-labelledby="audit-changes-title">
                             <h3 id="audit-changes-title" class="text-xs font-bold text-secondary uppercase tracking-wider m-0 mb-3">Changes</h3>
-                            <p *ngIf="!changes().length" class="text-[13px] text-secondary m-0">No column values were recorded for this entry.</p>
+                            <p *ngIf="!changes().length" class="text-sm text-secondary m-0">No column values were recorded for this entry.</p>
                             <div *ngIf="changes().length" class="rounded-2 border border-borderGray/60 overflow-x-auto max-h-[50svh]" custom-scrollbar>
                                 <table class="w-full text-[12px] text-left">
                                     <caption class="sr-only">Column changes</caption>

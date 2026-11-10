@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, OnDestroy, signal } from "@angular/core";
-import { BooErrorStateComponent } from '@physioboo/ui';
+import { BooErrorStateComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { Subscription, finalize } from "rxjs";
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -8,10 +8,10 @@ import { SurgeryDashboardTrend, SurgeryRange } from "../../../../../shared/types
 @Component({
   selector: 'surgery-dashboard-tab',
   standalone: true,
-  imports: [SharedModule, BooErrorStateComponent],
+  imports: [SharedModule, BooErrorStateComponent, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <boo-error-state *ngIf="!isLoading() && error()" appearance="panel" icon="cloud-off" title="We couldn't load the surgery trends"

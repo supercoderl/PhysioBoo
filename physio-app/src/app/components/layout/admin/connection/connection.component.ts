@@ -7,7 +7,7 @@ import { FormatDatePipe } from '../../../../shared/pipes/date.pipe';
 import { SharedModule } from '../../../../shared/shared-imports';
 import { ChatContact, ChatThreadMessage } from '../../../../shared/types/conversation.types';
 import { DATE_FORMATS } from '../../../../shared/types/date.types';
-import { BooEmptyStateComponent, BooErrorStateComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooErrorStateComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
@@ -29,8 +29,7 @@ interface ChatThread {
     SharedModule,
     FormatDatePipe,
     BooEmptyStateComponent,
-    BooErrorStateComponent
-  ],
+    BooErrorStateComponent, BooButtonComponent, BooSpinnerComponent],
   templateUrl: './connection.component.html',
   styleUrl: './connection.component.css'
 })

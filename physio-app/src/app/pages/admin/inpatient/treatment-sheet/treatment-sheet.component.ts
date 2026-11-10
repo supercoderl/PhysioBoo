@@ -3,7 +3,7 @@ import { Component, DestroyRef, OnInit, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, Router } from "@angular/router";
 import { finalize, forkJoin } from "rxjs";
-import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent, BooButtonComponent, BooTab, BooTabsComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { AdmissionService } from "../../../../services/admin/admission.service";
@@ -52,8 +52,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     TreatmentImagingTabComponent,
     TreatmentNotesTabComponent,
     BooButtonAdminComponent,
-    ButtonIconComponent
-  ],
+    ButtonIconComponent, BooButtonComponent, BooTabsComponent, BooSpinnerComponent],
   template: `
     <!-- No patient selected -->
     <div *ngIf="!patientId" class="mx-auto max-w-xl pt-8">
@@ -68,7 +67,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
     <!-- Loading -->
     <div *ngIf="patientId && loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3">
-      <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="32" />
       <span class="text-gray-500 text-sm">Loading treatment sheet...</span>
     </div>
 
@@ -112,14 +111,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         </div>
 
         <!-- Tab nav -->
-        <nav class="px-4 border-t border-gray-200 flex items-center gap-1 overflow-x-auto" role="tablist">
-          <button *ngFor="let t of tabs" type="button" (click)="setTab(t.key)" [attr.aria-selected]="activeTab() === t.key" role="tab"
-            class="px-4 py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 -mb-px whitespace-nowrap"
-            [ngClass]="activeTab() === t.key ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
-            <physio-icon [name]="t.icon" class="w-4 h-4"></physio-icon>
-            {{ t.label }}
-          </button>
-        </nav>
+        <boo-tabs [tabs]="tabItems" [value]="activeTab()" (valueChange)="setTab($event)" label="Sections" [bordered]="false" listClass="px-4 gap-1" class="border-t border-gray-200" />
       </div>
 
       <main class="boo-scrollbar min-h-0 min-w-0 flex-1 overflow-auto pb-5">
@@ -134,7 +126,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
               </div>
               <p class="text-xs text-gray-700 mt-1">{{ a.message }}</p>
             </div>
-            <button *ngIf="canWrite" type="button" (click)="acknowledgeAlert(a)" class="text-gray-400 hover:text-gray-600" aria-label="Acknowledge alert">
+            <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" *ngIf="canWrite" (click)="acknowledgeAlert(a)" aria-label="Acknowledge alert">
               <physio-icon name="x" [size]="16"></physio-icon>
             </button>
           </div>
@@ -213,6 +205,7 @@ export class AdminTreatmentSheetComponent implements OnInit {
     { key: 'imaging', label: 'Imaging', icon: 'scan' },
     { key: 'notes', label: 'Notes', icon: 'file-text' },
   ];
+  readonly tabItems: BooTab<TabKey>[] = this.tabs.map(t => ({ value: t.key, label: t.label, icon: t.icon }));
 
   constructor(
     private srv: TreatmentSheetService,

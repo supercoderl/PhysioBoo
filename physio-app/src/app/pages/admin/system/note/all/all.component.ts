@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy, OnInit, signal } from '@angular/core';
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
 import { AdminContentHeaderComponent } from "../../../../../components/layout/admin/content-header/content-header.component";
-import { BooEmptyStateComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooButtonComponent } from '@physioboo/ui';
 import { NoteService } from '../../../../../services/admin/note.service';
 import { DialogService } from '../../../../../services/common/dialog.service';
 import { ToastService } from '../../../../../services/common/toast.service';
@@ -30,8 +30,7 @@ const SEARCH_DEBOUNCE_MS = 300;
     AdminContentHeaderComponent,
     SharedModule,
     BooEmptyStateComponent,
-    BooButtonAdminComponent
-  ],
+    BooButtonAdminComponent, BooButtonComponent],
   templateUrl: './all.component.html',
   styleUrl: './all.component.scss'
 })

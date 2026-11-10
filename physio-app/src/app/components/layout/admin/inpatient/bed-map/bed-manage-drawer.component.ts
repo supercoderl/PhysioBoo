@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signal } from "@angular/core";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
+import { BooCheckboxComponent, BooInputComponent, BooButtonComponent } from '@physioboo/ui';
 import { finalize } from "rxjs";
 import { BedMapService } from "../../../../../services/admin/bed-map.service";
 import { DepartmentService } from "../../../../../services/admin/department.service";
@@ -19,7 +19,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
 @Component({
     selector: 'bed-map-manage-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooSelectComponent, BooButtonAdminComponent, BooInputComponent, BooCheckboxComponent],
+    imports: [SharedModule, DrawerComponent, BooSelectComponent, BooButtonAdminComponent, BooInputComponent, BooCheckboxComponent, BooButtonComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="close.emit()">
             <div class="flex flex-col h-full bg-surface">
@@ -28,7 +28,7 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                         <h2 class="text-xl font-bold text-primary leading-none mb-1">Wards & Beds</h2>
                         <p class="text-sm text-secondary m-0">Set up the wards and beds shown on the map.</p>
                     </div>
-                    <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100" aria-label="Close">
+                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="close.emit()" aria-label="Close">
                         <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
@@ -65,16 +65,14 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
                                 <span class="font-semibold text-gray-800">{{ w.name }}</span>
                                 <span class="text-xs text-gray-500">{{ w.code ? w.code + ' · ' : '' }}Floor {{ w.floor }} · {{ w.totalBeds }} bed{{ w.totalBeds === 1 ? '' : 's' }}</span>
                             </button>
-                            <button (click)="deleteWard(w)" [disabled]="w.totalBeds > 0" [title]="w.totalBeds > 0 ? 'Remove its beds first' : 'Delete ward'"
-                                class="text-xs text-red-600 hover:underline disabled:text-gray-300 disabled:no-underline">Delete</button>
+                            <button type="button" boo-button variant="text" classname="text-xs !text-red-600 disabled:text-gray-300 disabled:no-underline" (click)="deleteWard(w)" [disabled]="w.totalBeds> 0" [title]="w.totalBeds > 0 ? 'Remove its beds first' : 'Delete ward'">Delete</button>
                         </div>
 
                         <div *ngIf="expandedWardId() === w.id" class="border-t border-gray-100 px-4 py-3 space-y-3">
                             <div *ngIf="!beds().length" class="text-xs text-gray-500">No beds in this ward.</div>
                             <div *ngFor="let b of beds()" class="flex items-center justify-between text-sm">
                                 <span>Bed {{ b.number }}<span class="text-gray-500"> · {{ b.bedType }}{{ b.roomNumber ? ' · Room ' + b.roomNumber : '' }} · {{ b.status }}</span></span>
-                                <button (click)="deleteBed(w, b)" [disabled]="b.status === 'Occupied'" [title]="b.status === 'Occupied' ? 'Discharge the patient first' : 'Delete bed'"
-                                    class="text-xs text-red-600 hover:underline disabled:text-gray-300 disabled:no-underline">Delete</button>
+                                <button type="button" boo-button variant="text" classname="text-xs !text-red-600 disabled:text-gray-300 disabled:no-underline" (click)="deleteBed(w, b)" [disabled]="b.status === 'Occupied'" [title]="b.status === 'Occupied' ? 'Discharge the patient first' : 'Delete bed'">Delete</button>
                             </div>
 
                             <div class="grid grid-cols-4 gap-2 items-end pt-2 border-t border-dashed border-gray-200">

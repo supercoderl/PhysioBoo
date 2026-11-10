@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { finalize, forkJoin } from "rxjs";
-import { BooBadgeTone, BooButtonComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooButtonComponent, BooErrorStateComponent, BooStatusBadgeComponent, BooTab, BooTabsComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { AuthService } from "../../../../services/auth/auth.service";
 import { SurgeryService } from "../../../../services/admin/surgery.service";
@@ -41,8 +41,7 @@ const LOADING_KEY = 'surgery';
     SurgeryDetailDrawerComponent,
     SurgeryCreateDrawerComponent,
     SurgeryCancelDrawerComponent,
-    BooButtonComponent,
-  ],
+    BooButtonComponent, BooTabsComponent, BooSpinnerComponent],
   template: `
     <!-- Permission denied -->
     <div *ngIf="!canRead" class="pt-4">
@@ -52,7 +51,7 @@ const LOADING_KEY = 'surgery';
 
     <!-- Loading -->
     <div *ngIf="canRead && loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" role="status" class="flex flex-col items-center justify-center py-24 gap-3">
-      <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="32" />
       <span class="text-gray-500 text-sm">Loading operating room workspace...</span>
     </div>
 
@@ -87,14 +86,7 @@ const LOADING_KEY = 'surgery';
         </div>
 
         <!-- Tab nav -->
-        <nav class="px-4 border-t border-gray-200 flex items-center gap-1 overflow-x-auto" role="tablist">
-          <button *ngFor="let t of tabs" type="button" (click)="setTab(t.key)" [attr.aria-selected]="activeTab() === t.key" role="tab"
-            class="px-4 py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 -mb-px whitespace-nowrap"
-            [ngClass]="activeTab() === t.key ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
-            <physio-icon [name]="t.icon" class="w-4 h-4"></physio-icon>
-            {{ t.label }}
-          </button>
-        </nav>
+        <boo-tabs [tabs]="tabItems" [value]="activeTab()" (valueChange)="setTab($event)" label="Sections" [bordered]="false" listClass="px-4 gap-1" class="border-t border-gray-200" />
       </div>
 
       <main class="boo-scrollbar min-h-0 min-w-0 flex-1 overflow-auto pb-5">
@@ -107,7 +99,7 @@ const LOADING_KEY = 'surgery';
               <boo-status-badge [label]="a.severity" [tone]="alertTone(a.severity)"></boo-status-badge>
               <p class="text-xs text-gray-700 mt-1">{{ a.description }}</p>
             </div>
-            <button *ngIf="canUpdate" type="button" (click)="acknowledgeAlert(a)" [disabled]="acknowledgingId() !== null" class="text-gray-400 hover:text-gray-600" aria-label="Acknowledge alert">
+            <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" *ngIf="canUpdate" (click)="acknowledgeAlert(a)" [disabled]="acknowledgingId() !== null" aria-label="Acknowledge alert">
               <physio-icon name="x" [size]="16"></physio-icon>
             </button>
           </div>
@@ -174,6 +166,7 @@ export class AdminSurgeryComponent implements OnInit {
     { key: 'postop', label: 'Post-Operative Recovery', icon: 'bed' },
     { key: 'alerts', label: 'Clinical Alerts', icon: 'triangle-alert' },
   ];
+  readonly tabItems: BooTab<TabKey>[] = this.tabs.map(t => ({ value: t.key, label: t.label, icon: t.icon }));
 
   readonly dateRanges: { key: SurgeryRange; label: string }[] = [
     { key: 'today', label: 'Today' },

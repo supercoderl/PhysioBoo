@@ -1,6 +1,6 @@
 import { Router } from "@angular/router";
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -9,10 +9,10 @@ import { TreatmentImagingOrderRow } from "../../../../../shared/types/treatment-
 @Component({
   selector: 'treatment-imaging-tab',
   standalone: true,
-  imports: [SharedModule, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent],
+  imports: [SharedModule, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent, BooButtonComponent, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <boo-error-state *ngIf="!isLoading() && loadError()" title="Couldn't load imaging requests" [description]="loadError()" appearance="panel" (retry)="load()"></boo-error-state>
@@ -43,8 +43,8 @@ import { TreatmentImagingOrderRow } from "../../../../../shared/types/treatment-
               <boo-status-badge [label]="s.imagesAvailable ? 'Available' : 'Pending'" [tone]="s.imagesAvailable ? 'success' : 'neutral'"></boo-status-badge>
             </td>
             <td class="px-4 py-3 flex gap-3">
-              <button (click)="viewReport()" [disabled]="!s.reportAvailable" class="text-primary text-xs font-semibold hover:underline disabled:opacity-40 disabled:no-underline">Report</button>
-              <button (click)="viewImages()" [disabled]="!s.imagesAvailable" class="text-primary text-xs font-semibold hover:underline disabled:opacity-40 disabled:no-underline">Images</button>
+              <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold disabled:opacity-40 disabled:no-underline" (click)="viewReport()" [disabled]="!s.reportAvailable">Report</button>
+              <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold disabled:opacity-40 disabled:no-underline" (click)="viewImages()" [disabled]="!s.imagesAvailable">Images</button>
             </td>
           </tr>
         </tbody>

@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -8,10 +8,10 @@ import { CriticalFindingAlert, RadiologyAlertSeverity } from "../../../../../sha
 @Component({
   selector: 'radiology-critical-findings-tab',
   standalone: true,
-  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonComponent, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <div *ngIf="!isLoading() && !alerts().length">
@@ -42,7 +42,7 @@ import { CriticalFindingAlert, RadiologyAlertSeverity } from "../../../../../sha
             <td class="px-4 py-3"><boo-status-badge [label]="a.acknowledged ? 'Acknowledged' : 'Open'" [tone]="a.acknowledged ? 'success' : 'warning'"></boo-status-badge></td>
             <td class="px-4 py-3 text-gray-500">{{ a.raisedAt | date:'short' }}</td>
             <td class="px-4 py-3">
-              <button *ngIf="!a.acknowledged" (click)="acknowledge(a)" class="text-primary text-xs font-semibold hover:underline">Acknowledge</button>
+              <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold" *ngIf="!a.acknowledged" (click)="acknowledge(a)">Acknowledge</button>
             </td>
           </tr>
         </tbody>

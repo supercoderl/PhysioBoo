@@ -2,8 +2,7 @@ import { DatePipe, NgFor, NgIf } from "@angular/common";
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, signal } from "@angular/core";
 import {
   BooBadgeTone, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooIconComponent,
-  BooInlineErrorComponent, BooPaginationComponent, BooStatusBadgeComponent
-} from '@physioboo/ui';
+  BooInlineErrorComponent, BooPaginationComponent, BooStatusBadgeComponent, BooAlertComponent } from '@physioboo/ui';
 import { finalize } from "rxjs";
 import { NursingService } from "../../../../../services/admin/nursing.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
@@ -16,8 +15,7 @@ import { MarEntry } from "../../../../../shared/types/nursing.types";
   imports: [
     NgIf, NgFor, DatePipe,
     BooButtonComponent, BooIconComponent, BooEmptyStateComponent, BooErrorStateComponent, BooInlineErrorComponent,
-    BooPaginationComponent, BooStatusBadgeComponent,
-  ],
+    BooPaginationComponent, BooStatusBadgeComponent, BooAlertComponent],
   template: `
     <div *ngIf="loading()" aria-hidden="true" class="h-48 rounded-xl border border-borderGray bg-surface animate-pulse"></div>
     <span *ngIf="loading()" class="sr-only" role="status">Loading medications…</span>
@@ -28,10 +26,7 @@ import { MarEntry } from "../../../../../shared/types/nursing.types";
     <div *ngIf="!loading() && (!error() || entries().length)" class="flex flex-col gap-4">
       <boo-inline-error *ngIf="error()" what="the medication record" (retry)="load()" />
 
-      <div *ngIf="hasAllergies" role="note" class="px-4 py-2.5 rounded-lg border border-dangerBorder bg-dangerSoft text-sm text-danger flex items-start gap-2">
-        <physio-icon name="triangle-alert" [size]="16" class="flex-none mt-0.5" aria-hidden="true" />
-        <span>This patient has a recorded allergy. Check it before giving any medication.</span>
-      </div>
+      <boo-alert *ngIf="hasAllergies" tone="error" role="note" icon="triangle-alert">This patient has a recorded allergy. Check it before giving any medication.</boo-alert>
 
       <h2 class="m-0 text-sm font-semibold text-regular">Medication administration record</h2>
 

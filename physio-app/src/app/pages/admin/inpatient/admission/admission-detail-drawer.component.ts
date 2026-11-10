@@ -115,7 +115,7 @@ import { admissionStatus, admissionTypeTone, isActive } from './admission.utils'
                             The discharge time is set to now.<ng-container *ngIf="a.bedNumber"> Bed {{ a.bedNumber }} becomes available.</ng-container>
                         </p>
                         <div class="mt-3">
-                            <label for="adm-discharge-notes" class="block mb-1 text-[13px] font-medium text-regular">Discharge notes</label>
+                            <label for="adm-discharge-notes" class="block mb-1 text-sm font-medium text-regular">Discharge notes</label>
                             <boo-textarea id="adm-discharge-notes" [formControl]="notes" label="Discharge notes" [rows]="3" [maxlength]="2000" />
                         </div>
                         <div class="mt-3 flex items-center justify-end gap-2">

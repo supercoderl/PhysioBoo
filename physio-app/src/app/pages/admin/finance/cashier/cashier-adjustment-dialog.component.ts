@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
-import { BooButtonComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -39,7 +39,7 @@ const KIND_COPY: Record<CashierAdjustmentKind, KindCopy> = {
 @Component({
     selector: 'cashier-adjustment-dialog',
     standalone: true,
-    imports: [SharedModule, CashierDialogComponent, BooButtonComponent, BooInputComponent, BooSelectComponent, BooTextareaComponent],
+    imports: [SharedModule, CashierDialogComponent, BooButtonComponent, BooInputComponent, BooSelectComponent, BooTextareaComponent, BooFieldErrorComponent],
     template: `
     <cashier-dialog
       [open]="open && !!bill && !!kind"
@@ -58,7 +58,7 @@ const KIND_COPY: Record<CashierAdjustmentKind, KindCopy> = {
           <ng-container *ngSwitchCase="'discount'">
             <div>
               <boo-input label="Discount (%)" type="number" [(ngModel)]="percent" required></boo-input>
-              <p *ngIf="touched && percentError as msg; else percentHint" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+              <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="touched && percentError as msg; else percentHint">{{ msg }}</boo-field-error>
               <ng-template #percentHint>
                 <p class="mt-1 mb-0 text-xs text-secondary">Currently {{ b.discountPercent | number:'1.0-2' }}% ({{ b.discountAmount | currency:'USD':'symbol':'1.2-2' }}) on a subtotal of {{ b.subtotal | currency:'USD':'symbol':'1.2-2' }}.</p>
               </ng-template>
@@ -69,17 +69,17 @@ const KIND_COPY: Record<CashierAdjustmentKind, KindCopy> = {
             <div>
               <boo-select label="Insurance company" [options]="companies" bindLabel="name" bindValue="id" [(ngModel)]="companyId" required></boo-select>
               <p *ngIf="companiesState === 'loading'" class="mt-1 mb-0 text-xs text-secondary">Loading insurance companies…</p>
-              <p *ngIf="companiesState === 'unavailable'" class="mt-1 mb-0 text-xs text-danger" role="alert">You don't have permission to list insurance companies.</p>
-              <p *ngIf="companiesState === 'error'" class="mt-1 mb-0 text-xs text-danger" role="alert">Couldn't load insurance companies. Close this dialog and try again.</p>
-              <p *ngIf="touched && !companyId" class="mt-1 mb-0 text-xs text-danger" role="alert">Choose the insurance company.</p>
+              <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="companiesState === 'unavailable'">You don't have permission to list insurance companies.</boo-field-error>
+              <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="companiesState === 'error'">Couldn't load insurance companies. Close this dialog and try again.</boo-field-error>
+              <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="touched && !companyId">Choose the insurance company.</boo-field-error>
             </div>
             <div>
               <boo-input label="Policy number" [(ngModel)]="policyNo" [maxlength]="100" required></boo-input>
-              <p *ngIf="touched && !policyNo.trim()" class="mt-1 mb-0 text-xs text-danger" role="alert">Enter the policy number.</p>
+              <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="touched && !policyNo.trim()">Enter the policy number.</boo-field-error>
             </div>
             <div>
               <boo-input label="Covered amount" type="number" [(ngModel)]="coverage" required></boo-input>
-              <p *ngIf="touched && coverageError as msg; else coverageHint" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+              <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="touched && coverageError as msg; else coverageHint">{{ msg }}</boo-field-error>
               <ng-template #coverageHint>
                 <p class="mt-1 mb-0 text-xs text-secondary">At most {{ maxCoverage | currency:'USD':'symbol':'1.2-2' }}, the bill total before coverage.</p>
               </ng-template>
@@ -89,7 +89,7 @@ const KIND_COPY: Record<CashierAdjustmentKind, KindCopy> = {
           <ng-container *ngSwitchCase="'void'">
             <div>
               <boo-textarea label="Reason" [(ngModel)]="reason" required [rows]="3" [maxlength]="reasonMaxLength"></boo-textarea>
-              <p *ngIf="touched && !reason.trim()" class="mt-1 mb-0 text-xs text-danger" role="alert">Enter the reason for voiding this bill.</p>
+              <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="touched && !reason.trim()">Enter the reason for voiding this bill.</boo-field-error>
             </div>
           </ng-container>
         </fieldset>

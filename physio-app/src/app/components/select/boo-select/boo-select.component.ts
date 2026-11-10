@@ -2,13 +2,13 @@ import { Component, ElementRef, forwardRef, HostListener, inject, Injector, Inpu
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared-imports';
 import { Size } from '../../../shared/types/common';
-import { booValidationMessage } from '@physioboo/ui';
+import { BOO_FORM_FIELD, booValidationMessage } from '@physioboo/ui';
 
 @Component({
   selector: 'boo-select',
   standalone: true,
   imports: [
-    SharedModule,
+    SharedModule,
   ],
   providers: [
     {
@@ -18,22 +18,24 @@ import { booValidationMessage } from '@physioboo/ui';
     }
   ],
   template: `
-    <div class="w-full relative group" #container>      
+    <div class="w-full relative group/field" #container>      
       <div
         (click)="toggleDropdown()"
         [class]="inputClasses"
         [style.height.px.important]="height"
         [style.border-radius.px]="radius"
         [style.border-width.px]="borderWidth"
-        [style.border-color]="isOpen ? '#FB7185' : errorText ? 'rgb(var(--twc-danger))' : borderColor"
+        [style.border-color]="isOpen ? 'rgb(var(--form-accent))' : errorText ? 'rgb(var(--form-error))' : success ? 'rgb(var(--form-success))' : (borderColor || null)"
+        [class.ring-1]="isOpen"
+        [class.ring-form-accent]="isOpen"
         [attr.aria-invalid]="errorText ? true : null"
         tabindex="0"
         (blur)="onTouched()"
       >
         <div class="flex-1 truncate mr-2 select-none">      
-            <span class="text-regular" [ngClass]="{'text-slate-400': !hasValidSelection()}">
+            <span [class.text-form-text]="hasValidSelection()" [class.text-form-muted]="!hasValidSelection()">
                 {{ getDisplayLabel() }}
-                <span *ngIf="!hasValidSelection() && required" class="text-red-500 ml-0.5">*</span>
+                <span *ngIf="!hasValidSelection() && required" class="text-form-error ml-0.5">*</span>
             </span>
         </div>
 
@@ -48,14 +50,14 @@ import { booValidationMessage } from '@physioboo/ui';
       <div 
         #dropdownList
         *ngIf="isOpen"
-        class="absolute top-[calc(100%+4px)] left-0 w-full bg-surface shadow-xl border border-slate-100 overflow-hidden z-50 animate-fade-in-down"
+        class="absolute top-[calc(100%+4px)] left-0 w-full bg-form-surface shadow-xl border border-form-border overflow-hidden z-50 animate-fade-in-down"
         [ngClass]="{
           'top-[calc(100%+4px)] animate-fade-in-down': !dropUp,
           'bottom-[calc(100%+4px)] animate-fade-in-up': dropUp
         }"
         [style.border-radius.px]="radius"
       >
-        <div *ngIf="showSearch" class="p-2 border-b border-slate-100">
+        <div *ngIf="showSearch" class="p-2 border-b border-form-border">
           <input
             #searchInput
             type="text"
@@ -64,7 +66,7 @@ import { booValidationMessage } from '@physioboo/ui';
             placeholder="Search..."
             aria-label="Search options"
             autocomplete="off"
-            class="w-full h-8 px-3 text-xs rounded-md border border-border bg-surface text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/70"
+            class="w-full h-8 px-3 text-xs rounded-md border border-form-border bg-form-surface text-form-text focus:outline-none focus:ring-1 focus:ring-form-accent focus:border-form-accent"
           />
         </div>
         <ul class="max-h-60 overflow-y-auto py-1 m-0" custom-scrollbar>
@@ -79,15 +81,15 @@ import { booValidationMessage } from '@physioboo/ui';
                 <li 
                     *ngFor="let opt of filteredOptions"
                     (click)="selectOption(opt)"
-                    class="px-4 py-2.5 text-sm cursor-pointer transition-colors flex items-center justify-between group/item hover:bg-borderGray hover:text-slate-900"
-                    [class.bg-primarySoft]="opt[bindValue] === model"
-                    [class.text-primary]="opt[bindValue] === model"
+                    class="px-4 py-2.5 text-sm cursor-pointer transition-colors flex items-center justify-between group/item hover:bg-form-subtle"
+                    [class.bg-form-subtle]="opt[bindValue] === model"
+                    [class.text-form-accent]="opt[bindValue] === model"
                     [class.font-medium]="opt[bindValue] === model"
-                    [class.text-slate-600]="opt[bindValue] !== model"
+                    [class.text-form-text]="opt[bindValue] !== model"
                 >
-                    <span class="text-regular group-hover/item:text-regular">{{ opt[bindLabel] }}</span>
+                    <span>{{ opt[bindLabel] }}</span>
                     
-                    <span *ngIf="opt[bindValue] === model" class="text-primary">
+                    <span *ngIf="opt[bindValue] === model" class="text-form-accent">
                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </span>
                 </li>
@@ -101,7 +103,7 @@ import { booValidationMessage } from '@physioboo/ui';
         </ul>
       </div>
     </div>
-    <p *ngIf="errorText" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ errorText }}</p>
+    <p *ngIf="errorText && !inField" class="mt-1 mb-0 text-xs text-form-error" role="alert">{{ errorText }}</p>
   `,
   styles: [`
     .animate-fade-in-down {
@@ -142,7 +144,8 @@ export class BooSelectComponent implements ControlValueAccessor {
   @Input() size: Size = "middle";
   @Input() radius: number = 6;
   @Input() borderWidth: number = 1;
-  @Input() borderColor: string = '#e6e8ee';
+  @Input() borderColor: string = '';
+  @Input({ transform: (v: unknown) => v === '' || v === true || v === 'true' }) success: boolean = false;
   @Input() fitLabel: boolean = false;
   @Input() options: any[] = [];
   /** `auto` shows the search box only when the list is long enough to need it. */
@@ -158,6 +161,8 @@ export class BooSelectComponent implements ControlValueAccessor {
   dropUp: boolean = false;
 
   private readonly injector = inject(Injector);
+  /** Inside a `boo-form-field` the field shows the validation message. */
+  readonly inField = !!inject(BOO_FORM_FIELD, { optional: true });
 
   constructor(private _elementRef: ElementRef) { }
 
@@ -191,13 +196,13 @@ export class BooSelectComponent implements ControlValueAccessor {
 
   get labelClasses(): string {
     const base = 'flex items-center justify-between w-full transition-all focus:outline-none focus:ring-2 focus:ring-primary/25 cursor-pointer border-solid';
-    const focusEffect = 'group-focus-within:translate-x-4 group-focus-within:opacity-0 group-focus-within:invisible';
+    const focusEffect = 'group-focus-within/field:translate-x-4 group-focus-within/field:opacity-0 group-focus-within/field:invisible';
 
     let sizeClass = '';
     switch (this.size) {
       case 'small': sizeClass = 'px-3 text-[12px]'; break;
       case 'large': sizeClass = 'px-5 text-[14px]'; break;
-      default: sizeClass = 'px-4 text-[13px]'; break;
+      default: sizeClass = 'px-4 text-sm'; break;
     }
 
     return `${base} ${focusEffect} ${sizeClass}`;
@@ -205,7 +210,7 @@ export class BooSelectComponent implements ControlValueAccessor {
 
   get inputClasses(): string {
     const base =
-      'bg-surface flex items-center w-full text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary/25 cursor-pointer border-solid';
+      'bg-form-surface flex items-center w-full text-form-text transition-colors focus:outline-none focus:ring-1 focus:ring-form-accent focus:border-form-accent cursor-pointer border-solid border-form-border hover:border-form-border-hover';
 
     let sizeClass = '';
     switch (this.size) {
@@ -220,13 +225,13 @@ export class BooSelectComponent implements ControlValueAccessor {
         break;
 
       default:
-        sizeClass = 'px-4 text-[13px]';
+        sizeClass = 'px-4 text-sm';
         if (!this.height) sizeClass += ' h-11';
         break;
     }
 
     const disabledClass = this.disabled
-      ? 'bg-gray-100 cursor-not-allowed opacity-70'
+      ? '!bg-form-subtle !text-form-muted cursor-not-allowed hover:!border-form-border'
       : '';
 
     return `${base} ${sizeClass} ${disabledClass}`;

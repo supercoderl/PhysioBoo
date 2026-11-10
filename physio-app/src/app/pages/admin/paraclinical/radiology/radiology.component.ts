@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { finalize, forkJoin } from "rxjs";
-import { BooBadgeTone, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooErrorStateComponent, BooStatusBadgeComponent, BooButtonComponent, BooTab, BooTabsComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { RadiologyService } from "../../../../services/admin/radiology.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
@@ -39,12 +39,11 @@ const LOADING_KEY = 'radiology';
     RadiologyReportingTabComponent,
     RadiologyCriticalFindingsTabComponent,
     RadiologyPatientStudyDrawerComponent,
-    BooButtonAdminComponent
-  ],
+    BooButtonAdminComponent, BooButtonComponent, BooTabsComponent, BooSpinnerComponent],
   template: `
     <!-- Loading -->
     <div *ngIf="loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3">
-      <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="32" />
       <span class="text-gray-500 text-sm">Loading radiology workspace...</span>
     </div>
 
@@ -67,14 +66,7 @@ const LOADING_KEY = 'radiology';
         </div>
 
         <!-- Tab nav -->
-        <nav class="px-4 border-t border-gray-200 flex items-center gap-1 overflow-x-auto" role="tablist">
-          <button *ngFor="let t of tabs" type="button" (click)="setTab(t.key)" [attr.aria-selected]="activeTab() === t.key" role="tab"
-            class="px-4 py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 -mb-px whitespace-nowrap"
-            [ngClass]="activeTab() === t.key ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
-            <physio-icon [name]="t.icon" class="w-4 h-4"></physio-icon>
-            {{ t.label }}
-          </button>
-        </nav>
+        <boo-tabs [tabs]="tabItems" [value]="activeTab()" (valueChange)="setTab($event)" label="Sections" [bordered]="false" listClass="px-4 gap-1" class="border-t border-gray-200" />
       </div>
 
       <main class="boo-scrollbar min-h-0 min-w-0 flex-1 overflow-auto pb-5">
@@ -87,7 +79,7 @@ const LOADING_KEY = 'radiology';
               <boo-status-badge [label]="a.severity" [tone]="alertTone(a.severity)"></boo-status-badge>
               <p class="text-xs text-gray-700 mt-1">{{ a.description }}</p>
             </div>
-            <button (click)="acknowledgeAlert(a)" class="text-gray-400 hover:text-gray-600" aria-label="Acknowledge alert">
+            <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="acknowledgeAlert(a)" aria-label="Acknowledge alert">
               <physio-icon name="x" [size]="16"></physio-icon>
             </button>
           </div>
@@ -141,6 +133,7 @@ export class AdminRadiologyComponent implements OnInit {
     { key: 'reporting', label: 'Radiologist Reporting & Verification', icon: 'file-edit' },
     { key: 'critical-findings', label: 'Critical Findings', icon: 'triangle-alert' },
   ];
+  readonly tabItems: BooTab<TabKey>[] = this.tabs.map(t => ({ value: t.key, label: t.label, icon: t.icon }));
 
   constructor(
     private route: ActivatedRoute,

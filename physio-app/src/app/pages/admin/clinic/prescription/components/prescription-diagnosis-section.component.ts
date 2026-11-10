@@ -15,11 +15,11 @@ export const RX_TEXT_MAX = 2000;
             <h2 id="rx-details-title" class="m-0 mb-3 text-sm font-semibold text-regular">Details</h2>
             <form *ngIf="editable" [formGroup]="form" class="grid grid-cols-1 lg:grid-cols-2 gap-4" novalidate>
                 <div>
-                    <label for="rx-diagnosis" class="block mb-1 text-[13px] font-medium text-regular">Diagnosis</label>
+                    <label for="rx-diagnosis" class="block mb-1 text-sm font-medium text-regular">Diagnosis</label>
                     <boo-textarea id="rx-diagnosis" name="rx-diagnosis" formControlName="diagnosis" label="Diagnosis" [rows]="4" [maxlength]="max" />
                 </div>
                 <div>
-                    <label for="rx-instructions" class="block mb-1 text-[13px] font-medium text-regular">Instructions for the patient</label>
+                    <label for="rx-instructions" class="block mb-1 text-sm font-medium text-regular">Instructions for the patient</label>
                     <boo-textarea id="rx-instructions" name="rx-instructions" formControlName="instructions" label="Instructions" [rows]="4" [maxlength]="max" />
                 </div>
             </form>

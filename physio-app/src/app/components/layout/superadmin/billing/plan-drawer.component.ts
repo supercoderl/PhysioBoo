@@ -8,15 +8,13 @@ import { SharedModule } from "../../../../shared/shared-imports";
 import { SaveSubscriptionPlanRequest, SubscriptionPlan } from "../../../../shared/types/billing.types";
 import { DrawerComponent } from "../../../drawer/drawer.component";
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooCheckboxComponent, BooFormFieldComponent, BooInputComponent } from '@physioboo/ui';
 import { BooTextareaComponent } from "../../../textarea/boo-textarea/boo-textarea.component";
-
-const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:bg-black/5 disabled:cursor-not-allowed';
 
 @Component({
     selector: 'superadmin-plan-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooButtonAdminComponent, BooInputComponent, BooTextareaComponent, BooCheckboxComponent],
+    imports: [SharedModule, DrawerComponent, BooButtonAdminComponent, BooInputComponent, BooTextareaComponent, BooCheckboxComponent, BooButtonComponent, BooFormFieldComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" (close)="close.emit()">
             <div
@@ -31,71 +29,53 @@ const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface t
                         <h2 id="plan-drawer-title" class="text-lg font-bold text-regular leading-tight m-0">
                             {{ plan ? 'Edit plan' : 'New plan' }}
                         </h2>
-                        <p class="text-[13px] text-secondary m-0">Plan changes apply immediately to subscribed tenants.</p>
+                        <p class="text-sm text-secondary m-0">Plan changes apply immediately to subscribed tenants.</p>
                     </div>
-                    <button
-                        type="button"
-                        class="w-9 h-9 shrink-0 flex items-center justify-center rounded-1.5 text-secondary hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
-                        aria-label="Close"
-                        (click)="close.emit()"
-                    >
+                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Close" (click)="close.emit()">
                         <physio-icon name="x" />
                     </button>
                 </div>
 
                 <div class="flex-1 overflow-y-auto p-6 space-y-4" custom-scrollbar>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label for="plan-code" class="text-[13px] font-medium text-regular">Code <span class="text-danger" aria-hidden="true">*</span></label>
-                            <input id="plan-code" type="text" formControlName="code" maxlength="32" [class]="field" autocomplete="off" />
-                            <p *ngIf="showError('code')" class="text-[12px] text-danger m-0">Enter a code.</p>
-                            <p *ngIf="plan" class="text-[12px] text-secondary m-0">The code can't be changed once created.</p>
-                        </div>
-                        <div class="space-y-1">
-                            <label for="plan-name" class="text-[13px] font-medium text-regular">Name <span class="text-danger" aria-hidden="true">*</span></label>
-                            <input id="plan-name" type="text" formControlName="name" maxlength="80" [class]="field" autocomplete="off" />
-                            <p *ngIf="showError('name')" class="text-[12px] text-danger m-0">Enter a name.</p>
-                        </div>
+                        <boo-form-field label="Code" for="plan-code" required [error]="showError('code') ? 'Enter a code.' : null" [helper]="plan ? 'The code cannot be changed once created.' : ''">
+                            <boo-input [id]="'plan-code'" label="Code" formControlName="code" [maxlength]="32" size="small" />
+                        </boo-form-field>
+                        <boo-form-field label="Name" for="plan-name" required [error]="showError('name') ? 'Enter a name.' : null">
+                            <boo-input [id]="'plan-name'" label="Name" formControlName="name" [maxlength]="80" size="small" />
+                        </boo-form-field>
                     </div>
 
                     <div class="space-y-1">
-                        <label for="plan-description" class="text-[13px] font-medium text-regular">Description</label>
+                        <label for="plan-description" class="text-sm font-medium text-regular">Description</label>
                         <boo-textarea [id]="'plan-description'" formControlName="description" [rows]="3" [maxlength]="500" size="small"></boo-textarea>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label for="plan-price" class="text-[13px] font-medium text-regular">Monthly price <span class="text-danger" aria-hidden="true">*</span></label>
-                            <input id="plan-price" type="number" min="0" step="0.01" formControlName="monthlyPrice" [class]="field" inputmode="decimal" />
-                            <p *ngIf="showError('monthlyPrice')" class="text-[12px] text-danger m-0">Enter a price of 0 or more.</p>
-                        </div>
-                        <div class="space-y-1">
-                            <label for="plan-currency" class="text-[13px] font-medium text-regular">Currency <span class="text-danger" aria-hidden="true">*</span></label>
-                            <input id="plan-currency" type="text" formControlName="currency" maxlength="3" [class]="field + ' uppercase'" autocomplete="off" />
-                            <p *ngIf="showError('currency')" class="text-[12px] text-danger m-0">Use a 3-letter code, e.g. USD.</p>
-                        </div>
+                        <boo-form-field label="Monthly price" for="plan-price" required [error]="showError('monthlyPrice') ? 'Enter a price of 0 or more.' : null">
+                            <boo-input [id]="'plan-price'" label="Monthly price" type="number" numberValue min="0" step="0.01" inputmode="decimal" formControlName="monthlyPrice" size="small" />
+                        </boo-form-field>
+                        <boo-form-field label="Currency" for="plan-currency" required [error]="showError('currency') ? 'Use a 3-letter code, e.g. USD.' : null">
+                            <boo-input [id]="'plan-currency'" class="uppercase" label="Currency" formControlName="currency" [maxlength]="3" size="small" />
+                        </boo-form-field>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label for="plan-users" class="text-[13px] font-medium text-regular">Max users</label>
-                            <input id="plan-users" type="number" min="1" formControlName="maxUsers" [class]="field" placeholder="Unlimited" inputmode="numeric" />
-                            <p class="text-[12px] text-secondary m-0">Leave empty for unlimited.</p>
-                        </div>
-                        <div class="space-y-1">
-                            <label for="plan-branches" class="text-[13px] font-medium text-regular">Max branches</label>
-                            <input id="plan-branches" type="number" min="1" formControlName="maxBranches" [class]="field" placeholder="Unlimited" inputmode="numeric" />
-                            <p class="text-[12px] text-secondary m-0">Leave empty for unlimited.</p>
-                        </div>
+                        <boo-form-field label="Max users" for="plan-users" helper="Leave empty for unlimited.">
+                            <boo-input [id]="'plan-users'" label="Unlimited" type="number" numberValue min="1" inputmode="numeric" formControlName="maxUsers" size="small" />
+                        </boo-form-field>
+                        <boo-form-field label="Max branches" for="plan-branches" helper="Leave empty for unlimited.">
+                            <boo-input [id]="'plan-branches'" label="Unlimited" type="number" numberValue min="1" inputmode="numeric" formControlName="maxBranches" size="small" />
+                        </boo-form-field>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 items-end">
                         <div class="space-y-1">
-                            <label for="plan-sort" class="text-[13px] font-medium text-regular">Sort order</label>
-                            <boo-input [id]="'plan-sort'" type="number" formControlName="sortOrder" size="small"></boo-input>
+                            <label for="plan-sort" class="text-sm font-medium text-regular">Sort order</label>
+                            <boo-input [id]="'plan-sort'" type="number" numberValue formControlName="sortOrder" size="small"></boo-input>
                         </div>
                         <boo-checkbox formControlName="isActive" class="h-9 flex items-center">
-                            <span class="text-[13px] text-regular">Offered to tenants</span>
+                            <span class="text-sm text-regular">Offered to tenants</span>
                         </boo-checkbox>
                     </div>
                 </div>
@@ -120,7 +100,6 @@ export class SuperadminPlanDrawerComponent implements OnChanges {
     @Output() close = new EventEmitter<void>();
     @Output() saved = new EventEmitter<void>();
 
-    readonly field = FIELD;
     saving = signal(false);
     form: FormGroup;
     // #endregion

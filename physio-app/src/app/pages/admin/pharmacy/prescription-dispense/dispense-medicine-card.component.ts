@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
-import { BooButtonComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooInputComponent, BooStatusBadgeComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DispenseLineAction, DispenseMedicationItem } from "../../../../shared/types/dispensing.types";
@@ -21,7 +21,7 @@ let nextCardId = 0;
 @Component({
   selector: 'dispense-medicine-card',
   standalone: true,
-  imports: [SharedModule, BooButtonComponent, BooInputComponent, BooStatusBadgeComponent, BooSelectComponent],
+  imports: [SharedModule, BooButtonComponent, BooInputComponent, BooStatusBadgeComponent, BooSelectComponent, BooFieldErrorComponent],
   template: `
     <article class="rounded-2 border bg-surface" [ngClass]="blocked ? 'border-rose-300' : 'border-borderGray/60'" [attr.aria-label]="item.name">
       <header class="flex items-start justify-between gap-3 p-4 pb-3">
@@ -43,10 +43,10 @@ let nextCardId = 0;
 
       <!-- Prescription: what the prescriber ordered -->
       <dl class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 px-4 pb-3 m-0">
-        <div><dt class="text-[11px] uppercase tracking-wide text-secondary">Dose</dt><dd class="text-sm font-medium text-regular m-0">{{ item.dose || '—' }}</dd></div>
-        <div><dt class="text-[11px] uppercase tracking-wide text-secondary">Frequency</dt><dd class="text-sm font-medium text-regular m-0">{{ item.frequency || '—' }}</dd></div>
-        <div><dt class="text-[11px] uppercase tracking-wide text-secondary">Duration</dt><dd class="text-sm font-medium text-regular m-0">{{ item.durationDays }} {{ item.durationDays === 1 ? 'day' : 'days' }}</dd></div>
-        <div><dt class="text-[11px] uppercase tracking-wide text-secondary">Prescribed</dt><dd class="text-sm font-medium text-regular m-0">{{ item.qtyPrescribed }} {{ item.unit }}</dd></div>
+        <div><dt class="text-xs uppercase tracking-wide text-secondary">Dose</dt><dd class="text-sm font-medium text-regular m-0">{{ item.dose || '—' }}</dd></div>
+        <div><dt class="text-xs uppercase tracking-wide text-secondary">Frequency</dt><dd class="text-sm font-medium text-regular m-0">{{ item.frequency || '—' }}</dd></div>
+        <div><dt class="text-xs uppercase tracking-wide text-secondary">Duration</dt><dd class="text-sm font-medium text-regular m-0">{{ item.durationDays }} {{ item.durationDays === 1 ? 'day' : 'days' }}</dd></div>
+        <div><dt class="text-xs uppercase tracking-wide text-secondary">Prescribed</dt><dd class="text-sm font-medium text-regular m-0">{{ item.qtyPrescribed }} {{ item.unit }}</dd></div>
       </dl>
 
       <!-- Quantity progress -->
@@ -90,7 +90,7 @@ let nextCardId = 0;
             <label class="block text-xs font-medium text-secondary mb-1" [for]="id + '-qty'">Quantity</label>
             <boo-input [id]="id + '-qty'" name="qty" label="Quantity" type="number" [maxlength]="6" [debounce]="600" [disabled]="locked"
               [ngModel]="qtyDraft" (ngModelChange)="qtyDraft = $event" (search)="commitQuantity($event)"></boo-input>
-            <p *ngIf="qtyError" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ qtyError }}</p>
+            <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="qtyError">{{ qtyError }}</boo-field-error>
           </div>
           <div>
             <span class="block text-xs font-medium text-secondary mb-1">Batch</span>

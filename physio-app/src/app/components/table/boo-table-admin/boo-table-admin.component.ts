@@ -226,7 +226,7 @@ const COLUMN_PREFS_PREFIX = 'boo-table-columns:';
               <physio-icon name="chevrons-left" class="w-4 h-4" />
             </button>
 
-            <div *ngIf="title || subtitle" class="inline-flex items-center gap-1.5 text-[13px] text-slate-600 px-1.5">
+            <div *ngIf="title || subtitle" class="inline-flex items-center gap-1.5 text-sm text-slate-600 px-1.5">
               <span *ngIf="title">{{ title }}</span>
               <span *ngIf="title && subtitle" class="text-slate-300">/</span>
               <span *ngIf="subtitle"
@@ -238,7 +238,7 @@ const COLUMN_PREFS_PREFIX = 'boo-table-columns:';
             </div>
 
             <button *ngIf="showAddRecord"
-              class="inline-flex items-center gap-1 h-7 pl-2 pr-2.5 text-[13px] font-medium text-primary rounded transition-colors hover:bg-primary/10"
+              class="inline-flex items-center gap-1 h-7 pl-2 pr-2.5 text-sm font-medium text-primary rounded transition-colors hover:bg-primary/10"
               (click)="addRecord.emit()"
             >
               <physio-icon name="plus" class="w-4 h-4" />
@@ -278,12 +278,9 @@ const COLUMN_PREFS_PREFIX = 'boo-table-columns:';
           <!-- Right: search -->
           <div class="flex items-center shrink-0">
             <span class="w-px h-[18px] bg-gray-200 mx-1.5"></span>
-            <button [class]="toolBtn" title="Reload" (click)="onReload()">
-              <physio-icon
-                [class.animate-spin]="loading"
-                [name]="loading ? 'loader-circle' : 'refresh'"
-              class="w-4 h-4"
-              />
+            <button [class]="toolBtn" title="Reload" aria-label="Reload" [disabled]="loading"
+              [class.opacity-50]="loading" [class.cursor-not-allowed]="loading" (click)="onReload()">
+              <physio-icon name="refresh" class="w-4 h-4" />
             </button>
 
             <div class="inline-flex items-center overflow-hidden transition-[width] duration-200"
@@ -331,7 +328,7 @@ const COLUMN_PREFS_PREFIX = 'boo-table-columns:';
           <div *ngIf="activeTool === 'sort'"
             class="absolute top-12 z-40 w-56 bg-surface border border-gray-200 rounded-md shadow-lg py-1"
             [style.left]="toolAnchorLeft + 'px'">
-            <div class="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Sort by</div>
+            <div class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Sort by</div>
             <ng-container *ngIf="sortOptions.length; else emptySort">
               <button *ngFor="let opt of sortOptions"
                 class="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50 transition-colors"
@@ -350,7 +347,7 @@ const COLUMN_PREFS_PREFIX = 'boo-table-columns:';
           <div *ngIf="activeTool === 'settings'"
             class="absolute top-12 z-40 w-64 bg-surface border border-gray-200 rounded-md shadow-lg py-1"
             [style.left]="toolAnchorLeft + 'px'">
-            <div class="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Density</div>
+            <div class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Density</div>
             <div class="px-3 py-1 flex gap-1">
               <button *ngFor="let d of ['small','middle','large']"
                 class="flex-1 px-2 py-1 text-xs rounded border transition-colors"
@@ -386,8 +383,8 @@ const COLUMN_PREFS_PREFIX = 'boo-table-columns:';
             [style.left]="toolAnchorLeft + 'px'"
             role="group" aria-label="Visible columns">
             <div class="flex items-center justify-between px-3 py-2">
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Columns</span>
-              <span class="text-[11px] text-slate-400 tabular-nums">{{ shownColumnCount }} of {{ hideableColumns.length }} shown</span>
+              <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Columns</span>
+              <span class="text-xs text-slate-400 tabular-nums">{{ shownColumnCount }} of {{ hideableColumns.length }} shown</span>
             </div>
             <label *ngFor="let col of hideableColumns"
               class="w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-slate-50"
@@ -413,7 +410,7 @@ const COLUMN_PREFS_PREFIX = 'boo-table-columns:';
           <div *ngIf="activeTool === 'view'"
             class="absolute top-12 z-40 w-64 bg-surface border border-gray-200 rounded-md shadow-lg py-1 max-h-80 overflow-y-auto"
             [style.left]="toolAnchorLeft + 'px'">
-            <div class="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Saved views</div>
+            <div class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Saved views</div>
             <ng-container *ngIf="savedViews.length; else emptyViews">
               <div *ngFor="let v of savedViews"
                 class="group flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50 cursor-pointer"
@@ -446,7 +443,7 @@ const COLUMN_PREFS_PREFIX = 'boo-table-columns:';
           <div *ngIf="activeTool === 'group'"
             class="absolute top-12 z-40 w-64 bg-surface border border-gray-200 rounded-md shadow-lg py-1 max-h-80 overflow-y-auto"
             [style.left]="toolAnchorLeft + 'px'">
-            <div class="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Group by</div>
+            <div class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Group by</div>
             <button class="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50"
               (click)="pickGroup(null)">
               <span>No grouping</span>
@@ -470,7 +467,7 @@ const COLUMN_PREFS_PREFIX = 'boo-table-columns:';
           <div *ngIf="activeTool === 'comment'"
             class="absolute top-12 z-40 w-80 bg-surface border border-gray-200 rounded-md shadow-lg flex flex-col max-h-96"
             [style.left]="toolAnchorLeft + 'px'">
-            <div class="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400 border-b border-gray-100">
+            <div class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400 border-b border-gray-100">
               Comments ({{ comments.length }})
             </div>
             <div class="flex-1 overflow-y-auto px-3 py-2 space-y-3">
@@ -485,7 +482,7 @@ const COLUMN_PREFS_PREFIX = 'boo-table-columns:';
                       <span class="font-medium text-slate-800 text-xs">{{ c.author }}</span>
                       <span class="text-[10px] text-slate-400">{{ c.createdAt }}</span>
                     </div>
-                    <p class="text-[13px] text-slate-700 mt-0.5 break-words whitespace-pre-wrap m-0">{{ c.text }}</p>
+                    <p class="text-sm text-slate-700 mt-0.5 break-words whitespace-pre-wrap m-0">{{ c.text }}</p>
                   </div>
                   <button class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 p-0.5"
                     (click)="commentDelete.emit(c)">
@@ -517,7 +514,7 @@ const COLUMN_PREFS_PREFIX = 'boo-table-columns:';
             [style.left]="toolAnchorLeft + 'px'">
             <ng-container *ngIf="filterConfigs.length; else emptyFilter">
               <div *ngFor="let cfg of filterConfigs" class="border-b border-gray-100 last:border-0 py-1">
-                <div class="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                <div class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
                   {{ cfg.label }}
                 </div>
                 <button class="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50"
@@ -998,6 +995,7 @@ export class BooTableAdminComponent implements AfterContentInit, AfterViewInit, 
   }
 
   onReload(): void {
+    if (this.loading) return;
     this.reload.emit();
   }
 

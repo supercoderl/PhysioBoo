@@ -219,7 +219,7 @@ export type LeadBusy = LeadStatus | 'delete' | 'assign' | 'note';
                         <ng-template #noNotesTpl><p class="m-0 text-sm text-placeholder">No notes yet</p></ng-template>
 
                         <form *ngIf="canUpdate && savable(l)" class="mt-4" (ngSubmit)="submitNote(l)" novalidate>
-                            <label for="ld-note" class="block mb-1 text-[13px] font-medium text-regular">Log a follow-up</label>
+                            <label for="ld-note" class="block mb-1 text-sm font-medium text-regular">Log a follow-up</label>
                             <boo-textarea
                                 id="ld-note"
                                 name="ld-note"

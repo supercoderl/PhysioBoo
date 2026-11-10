@@ -116,19 +116,19 @@
           <div class="flex items-start justify-between gap-2">
             <div class="min-w-0">
               <h3 class="text-sm font-bold text-regular m-0 truncate">{{ plan.name }}</h3>
-              <span class="text-[11px] font-mono text-secondary">{{ plan.code }}</span>
+              <span class="text-xs font-mono text-secondary">{{ plan.code }}</span>
             </div>
             <boo-status-badge *ngIf="!plan.isActive" label="Hidden" tone="neutral" />
           </div>
 
-          <p *ngIf="plan.description" class="text-[13px] text-secondary mt-2 mb-0 line-clamp-2">{{ plan.description }}</p>
+          <p *ngIf="plan.description" class="text-sm text-secondary mt-2 mb-0 line-clamp-2">{{ plan.description }}</p>
 
           <div class="flex items-baseline gap-1 mt-3">
             <span class="text-2xl font-bold text-regular tabular-nums">{{ money(plan.monthlyPrice, plan.currency) }}</span>
             <span class="text-xs text-secondary">/ month</span>
           </div>
 
-          <ul class="list-none p-0 m-0 mt-3 text-[13px] text-regular space-y-1">
+          <ul class="list-none p-0 m-0 mt-3 text-sm text-regular space-y-1">
             <li>{{ plan.maxUsers ?? 'Unlimited' }} users</li>
             <li>{{ plan.maxBranches ?? 'Unlimited' }} branches</li>
             <li class="text-secondary tabular-nums">{{ plan.subscriberCount }} subscribed tenant(s)</li>
@@ -137,7 +137,9 @@
           <div class="mt-auto pt-4">
             <button
               type="button"
-              class="h-9 px-3.5 rounded-1.5 border border-borderGray bg-surface text-[13px] font-medium text-regular hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
+              boo-button
+              variant="secondary"
+              size="sm"
               [attr.aria-label]="'Edit plan ' + plan.name"
               (click)="openPlan(plan)"
             >

@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
-import { BooEmptyStateComponent, BooErrorStateComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooErrorStateComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { TimelineCategory, TimelineRangeKey, TreatmentTimelineEntry } from "../../../../../shared/types/treatment-sheet.types";
@@ -8,7 +8,7 @@ import { TimelineCategory, TimelineRangeKey, TreatmentTimelineEntry } from "../.
 @Component({
   selector: 'treatment-timeline-tab',
   standalone: true,
-  imports: [SharedModule, BooSelectComponent, BooEmptyStateComponent, BooErrorStateComponent],
+  imports: [SharedModule, BooSelectComponent, BooEmptyStateComponent, BooErrorStateComponent, BooSpinnerComponent],
   template: `
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <h3 class="text-sm font-semibold text-primary m-0">Treatment Timeline</h3>
@@ -16,7 +16,7 @@ import { TimelineCategory, TimelineRangeKey, TreatmentTimelineEntry } from "../.
     </div>
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <boo-error-state *ngIf="!isLoading() && loadError()" title="Couldn't load the timeline" [description]="loadError()" appearance="panel" (retry)="load()"></boo-error-state>

@@ -33,21 +33,21 @@ import { InsuranceCompany } from "../../../../shared/types/support.types";
             <button type="button" (click)="select.emit(item)" [attr.aria-current]="item.id === selectedId ? 'true' : null"
               class="block max-w-full truncate text-left text-sm font-semibold hover:underline cursor-pointer"
               [ngClass]="item.id === selectedId ? 'text-primary underline' : 'text-regular'" [title]="item.name">{{ item.name }}</button>
-            <div class="truncate text-[11px] text-secondary">{{ item.code || 'No code' }} · {{ typeLabel(item.type) }}</div>
+            <div class="truncate text-xs text-secondary">{{ item.code || 'No code' }} · {{ typeLabel(item.type) }}</div>
           </div>
         </ng-template>
 
         <ng-template appColumnDef="contact" headerLabel="Contact" headerClass="text-left" let-item>
           <div class="min-w-0 leading-tight">
             <div class="truncate text-sm text-regular">{{ item.contactPerson || '—' }}</div>
-            <div class="truncate text-[11px] text-secondary">{{ item.phone || item.email || 'No phone or email' }}</div>
+            <div class="truncate text-xs text-secondary">{{ item.phone || item.email || 'No phone or email' }}</div>
           </div>
         </ng-template>
 
         <ng-template appColumnDef="terms" headerLabel="Claims terms" headerClass="text-left" let-item>
           <div class="leading-tight">
             <div class="text-sm text-regular tabular-nums">{{ item.averageClaimSettlementTime }} day{{ item.averageClaimSettlementTime === 1 ? '' : 's' }} avg. settlement</div>
-            <div class="text-[11px] text-secondary">{{ settlementModes(item) }}</div>
+            <div class="text-xs text-secondary">{{ settlementModes(item) }}</div>
           </div>
         </ng-template>
 

@@ -1,6 +1,6 @@
-<div class="pb-5 flex flex-col gap-4 min-w-0" [attr.aria-busy]="loading">
+<div class="flex flex-1 min-h-0 min-w-0 flex-col gap-4 pb-5" [attr.aria-busy]="loading">
   <!-- Page header -->
-  <header class="flex flex-wrap items-end justify-between gap-3">
+  <header class="shrink-0 flex flex-wrap items-end justify-between gap-3">
     <div class="min-w-0">
       <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Shift handover</h1>
       <p class="m-0 mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs leading-5 text-secondary">
@@ -18,11 +18,14 @@
         <boo-select label="Outgoing shift" [ngModel]="outgoingShift" (ngModelChange)="onShiftChange($event)"
           [disabled]="!!editingId" [options]="shiftOptions" bindLabel="label" bindValue="value" />
       </div>
-      <button boo-button variant="primary" size="sm" [loading]="loading" [disabled]="!!editingId" (click)="load()">
-        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      <button boo-button variant="primary" size="sm" [disabled]="loading || !!editingId" (click)="load()">
+        <physio-icon name="refresh" [size]="15" aria-hidden="true" />Refresh
       </button>
     </div>
   </header>
+
+  <!-- Only this region scrolls; the page header above stays in view. -->
+  <div class="boo-scrollbar min-h-0 flex-1 space-y-4 overflow-auto pr-1">
 
   <p *ngIf="editingId" class="m-0 -mt-2 text-xs text-secondary">Save or cancel your edit to change the shift or refresh.</p>
 
@@ -101,7 +104,7 @@
             <label [for]="f.key + '-' + c.id" class="text-xs font-medium text-secondary">{{ f.label }}</label>
             <boo-textarea [rows]="4" [maxlength]="maxLength" [id]="f.key + '-' + c.id" [name]="f.key + '-' + c.id"
               [(ngModel)]="draft[f.key]" [disabled]="savingId === c.id" />
-            <p *ngIf="draftError(f.key) as err" class="m-0 text-xs text-danger" role="alert">{{ err }}</p>
+            <boo-field-error size="sm" announce *ngIf="draftError(f.key) as err">{{ err }}</boo-field-error>
           </div>
         </div>
         <div class="mt-3 flex justify-end gap-2">
@@ -163,4 +166,5 @@
       />
     </ng-template>
   </ng-template>
+  </div>
 </div>

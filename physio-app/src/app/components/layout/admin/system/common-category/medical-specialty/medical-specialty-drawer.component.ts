@@ -56,7 +56,7 @@ const SPECIALTY_CATEGORIES = ['Clinical', 'Paraclinical', 'Administrative'];
                                 [svgSize]="126"
                                 (uploadSuccess)="onIconUploaded($event)"
                             />
-                            <p class="m-0 mt-1 w-20 text-center text-[11px] leading-4 text-secondary">SVG icon</p>
+                            <p class="m-0 mt-1 w-20 text-center text-xs leading-4 text-secondary">SVG icon</p>
                         </div>
                         <div class="flex-1 min-w-0 flex flex-col gap-4">
                             <boo-input label="Specialty name" [required]="true" formControlName="name" [maxlength]="150" placeholder="e.g. Cardiology" />

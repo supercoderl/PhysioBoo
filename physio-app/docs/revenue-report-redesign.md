@@ -204,3 +204,9 @@ Endpoints below already exist and were read from the backend source; all return 
 | Excel export | `POST /api/revenue-report/export` | filter | `.xlsx` blob | Export button |
 
 Proposed additions (not implemented, not assumed by the UI): `currency` on every aggregate; `previousRevenue` on summary; `billCount` on summary; `totals` on register and breakdown responses; `paymentStatuses` in `RevenueReportFilter`. Lookups reuse `departments/search`, `doctors/search`, `insurance-companies/search`.
+
+## Update: quick periods
+
+The Period presets are Today, Yesterday, This week (Monday to today), Last 7 days, Last 30 days (default), This month and This quarter. `presetRange` builds local dates, so Yesterday is a single-day range.
+
+Not offered because the API has no such filter: payment *status* (the report counts paid payments; open balances are the Outstanding section) and revenue by service category.

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from "@angular/core";
 import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
-import { BooButtonComponent, BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooCheckboxComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
@@ -46,7 +46,7 @@ const integerValue: ValidatorFn = (control: AbstractControl): ValidationErrors |
 @Component({
     selector: 'insurance-company-form-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooButtonComponent, BooInputComponent, BooSelectComponent, BooTextareaComponent, BooCheckboxComponent],
+    imports: [SharedModule, DrawerComponent, BooButtonComponent, BooInputComponent, BooSelectComponent, BooTextareaComponent, BooCheckboxComponent, BooFieldErrorComponent],
     template: `
     <drawer [isOpen]="open" [isShowDialog]="true" (close)="requestClose()">
       <form
@@ -106,7 +106,7 @@ const integerValue: ValidatorFn = (control: AbstractControl): ValidationErrors |
               <boo-input label="Settlement ratio (0–100 %)" type="number" formControlName="claimSettlementRatio"></boo-input>
               <boo-input label="Avg. settlement (days)" type="number" formControlName="averageClaimSettlementTime"></boo-input>
             </div>
-            <p *ngIf="numberErrors as msg" class="m-0 text-xs text-danger" role="alert">{{ msg }}</p>
+            <boo-field-error size="sm" announce *ngIf="numberErrors as msg">{{ msg }}</boo-field-error>
           </section>
 
           <div class="h-px bg-gray-100 mx-6"></div>

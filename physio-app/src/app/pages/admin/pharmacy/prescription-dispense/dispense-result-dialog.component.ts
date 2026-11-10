@@ -1,5 +1,5 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
-import { BooButtonComponent } from '@physioboo/ui';
+import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { BooButtonComponent, BooDialogComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DispenseSummary } from "../../../../shared/types/dispensing.types";
 
@@ -7,20 +7,10 @@ import { DispenseSummary } from "../../../../shared/types/dispensing.types";
 @Component({
   selector: 'dispense-result-dialog',
   standalone: true,
-  imports: [SharedModule, BooButtonComponent],
+  imports: [SharedModule, BooButtonComponent, BooDialogComponent],
   template: `
-    <div *ngIf="summary" class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-black/40" (click)="close.emit()" aria-hidden="true"></div>
-      <div #panel tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="dispense-result-title"
-        class="relative bg-surface rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100 focus:outline-none">
-        <div class="px-6 pt-5 pb-4 flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center shrink-0"><physio-icon name="circle-check" [size]="20" class="text-emerald-600"></physio-icon></div>
-          <div>
-            <h2 id="dispense-result-title" class="text-lg font-semibold text-gray-900 m-0">{{ summary.itemsRemainingCount ? 'Partially dispensed' : 'Dispensing complete' }}</h2>
-            <p class="text-sm text-gray-600 mt-1 mb-0">{{ prescriptionNumber }}<ng-container *ngIf="summary.itemsRemainingCount"> · {{ summary.itemsRemainingCount }} {{ summary.itemsRemainingCount === 1 ? 'line' : 'lines' }} still to dispense.</ng-container></p>
-          </div>
-        </div>
-        <dl class="px-6 pb-5 m-0 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+    <boo-dialog *ngIf="summary" [heading]="summary.itemsRemainingCount ? 'Partially dispensed' : 'Dispensing complete'" [description]="subtitle" tone="success" icon="circle-check" (dismiss)="close.emit()">
+        <dl class="m-0 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
           <div><dt class="text-xs text-secondary">Lines dispensed</dt><dd class="font-semibold text-regular m-0">{{ summary.itemsDispensedCount }}</dd></div>
           <div><dt class="text-xs text-secondary">Lines remaining</dt><dd class="font-semibold text-regular m-0">{{ summary.itemsRemainingCount }}</dd></div>
           <div><dt class="text-xs text-secondary">Stock movements recorded</dt><dd class="font-semibold text-regular m-0">{{ summary.inventoryChangesCount }}</dd></div>
@@ -29,27 +19,20 @@ import { DispenseSummary } from "../../../../shared/types/dispensing.types";
           <div><dt class="text-xs text-secondary">Patient payment</dt><dd class="font-semibold text-regular m-0">{{ summary.patientPaymentAmount | number:'1.2-2' }}</dd></div>
           <div class="col-span-2" *ngIf="summary.pharmacistName"><dt class="text-xs text-secondary">Pharmacist</dt><dd class="font-semibold text-regular m-0">{{ summary.pharmacistName }}</dd></div>
         </dl>
-        <div class="px-6 py-4 bg-gray-50 flex justify-end">
-          <button boo-button variant="primary" (click)="close.emit()">Done</button>
-        </div>
-      </div>
-    </div>
+        <button boo-dialog-footer type="button" boo-button variant="primary" size="sm" (click)="close.emit()">Done</button>
+    </boo-dialog>
   `,
 })
-export class DispenseResultDialogComponent implements OnChanges {
+export class DispenseResultDialogComponent {
   @Input() summary: DispenseSummary | null = null;
   @Input() prescriptionNumber = '';
   @Output() close = new EventEmitter<void>();
 
-  @ViewChild('panel') private panel?: ElementRef<HTMLElement>;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['summary'] && this.summary) setTimeout(() => this.panel?.nativeElement.focus());
-  }
 
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    if (this.summary) this.close.emit();
+  get subtitle(): string {
+    const remaining = this.summary?.itemsRemainingCount ?? 0;
+    return this.prescriptionNumber + (remaining ? ` · ${remaining} ${remaining === 1 ? 'line' : 'lines'} still to dispense.` : '');
   }
 
   get duration(): string {

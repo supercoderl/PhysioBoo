@@ -48,7 +48,7 @@ const SEVERITY: Record<AlertSeverity, { label: string; tone: BooBadgeTone; icon:
                             <span class="text-xs font-semibold text-regular">{{ alert.department }}</span>
                             <span class="text-xs text-placeholder tabular-nums">· {{ alert.occurredAt }}</span>
                         </div>
-                        <p class="m-0 mt-1 text-[13px] leading-5 text-regular break-words">{{ alert.message }}</p>
+                        <p class="m-0 mt-1 text-sm leading-5 text-regular break-words">{{ alert.message }}</p>
                     </div>
                     <button
                         *ngIf="canDismiss"
@@ -76,7 +76,7 @@ const SEVERITY: Record<AlertSeverity, { label: string; tone: BooBadgeTone; icon:
                 </div>
             </ng-template>
 
-            <p class="m-0 px-4 py-2.5 border-t border-rowDivider text-[11px] leading-4 text-placeholder">
+            <p class="m-0 px-4 py-2.5 border-t border-rowDivider text-xs leading-4 text-placeholder">
                 Shows up to the 10 most recent open alerts per module. Times are when each alert was raised.
             </p>
         </dashboard-panel>

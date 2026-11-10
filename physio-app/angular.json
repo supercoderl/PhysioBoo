@@ -149,6 +149,14 @@
             "polyfills": [
               "zone.js",
               "zone.js/testing"
+            ],
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              { "glob": "**/*", "input": "src/assets", "output": "/assets" }
+            ],
+            "styles": [
+              "projects/physioboo-ui/styles/tokens.scss",
+              "src/styles.scss"
             ]
           }
         }

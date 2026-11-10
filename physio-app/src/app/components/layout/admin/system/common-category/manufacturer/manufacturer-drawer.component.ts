@@ -1,6 +1,6 @@
 import { Component, inject } from "@angular/core";
 import { FormBuilder, Validators } from "@angular/forms";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
+import { BooCheckboxComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { ManufacturerService } from "../../../../../../services/admin/manufacturer.service";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { Manufacturer } from "../../../../../../shared/types/support.types";
@@ -15,8 +15,7 @@ import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-sh
         SharedModule,
         CommonCategoryDrawerShellComponent,
         BooInputComponent,
-        BooCheckboxComponent
-    ],
+        BooCheckboxComponent, BooFieldErrorComponent],
     template: `
         <common-category-drawer-shell
             [form]="form"
@@ -41,7 +40,7 @@ import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-sh
                         <boo-input label="Company name" [required]="true" formControlName="name" [maxlength]="200" placeholder="e.g. MedTech Inc." />
                         <boo-input type="number" label="Established" formControlName="establishedYear" placeholder="e.g. 1990" />
                     </div>
-                    <p *ngIf="form.controls['establishedYear'].touched && form.controls['establishedYear'].invalid" class="m-0 mt-1 text-xs text-danger" role="alert">Enter a year between 1800 and {{ thisYear }}.</p>
+                    <boo-field-error size="sm" announce class="mt-1" *ngIf="form.controls['establishedYear'].touched && form.controls['establishedYear'].invalid">Enter a year between 1800 and {{ thisYear }}.</boo-field-error>
                 </section>
 
                 <section class="px-6 py-5 border-b border-rowDivider">

@@ -61,7 +61,7 @@ const DEFAULTS: Record<string, boolean> = {
               <p class="m-0 mt-0.5 text-xs text-secondary">{{ item.description }}</p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
-              <span *ngIf="isChanged(item.key)" class="text-[11px] font-medium text-amber-700">Unsaved</span>
+              <span *ngIf="isChanged(item.key)" class="text-xs font-medium text-amber-700">Unsaved</span>
               <switch [isOpen]="state()[item.key]" [disabled]="saving()" [ariaLabel]="item.label" (change)="toggle(item.key)" />
             </div>
           </li>

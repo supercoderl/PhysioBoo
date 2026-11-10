@@ -26,7 +26,7 @@
             <span class="sr-only">{{ ruleState()[rule.key] ? '(met)' : '(not met)' }}</span>
           </li>
         </ul>
-        <p *ngIf="sameAsCurrent" class="m-0 text-xs text-danger" role="alert">Choose a password different from your current one.</p>
+        <boo-field-error size="sm" announce *ngIf="sameAsCurrent">Choose a password different from your current one.</boo-field-error>
       </div>
 
       <div class="flex flex-col gap-1.5">
@@ -37,7 +37,7 @@
             <physio-icon [name]="showConfirm() ? 'eye-crossed' : 'eye'" [size]="15" />
           </button>
         </boo-input>
-        <p *ngIf="confirmError" class="m-0 text-xs text-danger" role="alert">{{ confirmError }}</p>
+        <boo-field-error size="sm" announce *ngIf="confirmError">{{ confirmError }}</boo-field-error>
       </div>
 
       <div class="flex justify-end">

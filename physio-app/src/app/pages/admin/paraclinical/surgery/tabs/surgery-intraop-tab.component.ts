@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { BooEmptyStateComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { SurgeryCase, SurgeryRow } from "../../../../../shared/types/surgery.types";
@@ -7,10 +7,10 @@ import { SurgeryCase, SurgeryRow } from "../../../../../shared/types/surgery.typ
 @Component({
   selector: 'surgery-intraop-tab',
   standalone: true,
-  imports: [SharedModule,BooEmptyStateComponent],
+  imports: [SharedModule,BooEmptyStateComponent, BooButtonComponent, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <div *ngIf="!isLoading() && !cases().length"><boo-empty-state icon="activity" title="No surgeries currently in progress"></boo-empty-state></div>
@@ -22,7 +22,7 @@ import { SurgeryCase, SurgeryRow } from "../../../../../shared/types/surgery.typ
             <div class="text-sm font-semibold text-gray-800">{{ s.surgeryNumber }} · {{ s.procedure }}</div>
             <div class="text-xs text-gray-500">{{ s.patientName }} · {{ s.operatingRoomNumber }} · {{ s.primarySurgeon }}</div>
           </div>
-          <button (click)="viewCase.emit(s.id)" class="text-primary text-xs font-semibold hover:underline">View Details</button>
+          <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold" (click)="viewCase.emit(s.id)">View Details</button>
         </div>
 
         <div class="mb-3">
@@ -43,7 +43,7 @@ import { SurgeryCase, SurgeryRow } from "../../../../../shared/types/surgery.typ
         <div *ngIf="detail[s.id]" class="mb-3">
           <div class="text-xs text-gray-400 mb-1">Surgical Team</div>
           <div class="flex flex-wrap gap-1.5">
-            <span *ngFor="let m of detail[s.id].team" class="px-2 py-0.5 bg-gray-100 rounded-full text-[11px] text-gray-600">{{ m.name }} · {{ m.role }}</span>
+            <span *ngFor="let m of detail[s.id].team" class="px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-600">{{ m.name }} · {{ m.role }}</span>
           </div>
         </div>
 

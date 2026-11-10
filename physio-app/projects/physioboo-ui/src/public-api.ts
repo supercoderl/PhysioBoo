@@ -22,13 +22,20 @@ export * from './lib/pagination/pagination.component';
 export * from './lib/state/empty-state.component';
 export * from './lib/state/error-state.component';
 export * from './lib/state/inline-error.component';
+export * from './lib/alert/alert.component';
 export * from './lib/status-badge/status-badge.component';
+
+// Tabs and segmented controls
+export * from './lib/tabs/roving';
+export * from './lib/tabs/tabs.component';
+export * from './lib/tabs/segmented.component';
 
 // Filters and search
 export * from './lib/filter-chips/filter-chips.component';
 export * from './lib/search-field/search-field.component';
 
 // Overlays
+export * from './lib/dialog/dialog.component';
 export * from './lib/sheet/sheet.component';
 
 // Forms
@@ -38,3 +45,12 @@ export * from './lib/forms/form.component';
 export * from './lib/forms/input.component';
 export * from './lib/forms/checkbox.component';
 export * from './lib/forms/field-error.component';
+export * from './lib/forms/form-field-context';
+export * from './lib/forms/form-field.component';
+export * from './lib/forms/form-container.component';
+export * from './lib/forms/form-section.component';
+export * from './lib/forms/form-section-header.component';
+export * from './lib/forms/form-row.component';
+export * from './lib/forms/form-column.component';
+export * from './lib/forms/form-actions.component';
+export * from './lib/forms/form-divider.component';

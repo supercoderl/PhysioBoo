@@ -62,9 +62,42 @@ body:has(#admin-layout) {
   overflow: hidden;
 }
 
+/* Typography tokens. Ordinary text (body, inputs, table cells, buttons) is 14px; headings and captions step away from it.
+   Tailwind's text-sm is 14px and text-xs is 12px, so utilities and tokens agree. */
+:root {
+  --font-size-page-title: 20px;
+  --font-size-section-title: 16px;
+  --font-size-card-title: 14px;
+  --font-size-body: 14px;
+  --font-size-caption: 12px;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  --line-height-body: 1.5;
+}
+
 body {
   color: rgb(var(--twc-regular));
   -webkit-font-smoothing: antialiased;
+}
+
+/* The admin workspace sets the body size once; controls inherit it (Tailwind preflight). The element rules below sit in
+   :where() so they carry no specificity and every text-* utility on a page still wins. */
+#admin-layout {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+}
+
+:where(#admin-layout) :where(th) {
+  font-weight: var(--font-weight-semibold);
+}
+
+:where(#admin-layout) :where(h1) {
+  font-size: var(--font-size-page-title);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* ------------------------------------------------------------------------------------------------

@@ -1,3 +1,4 @@
+import { BooSpinnerComponent } from '@physioboo/ui';
 import { Component, OnInit, signal } from "@angular/core";
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -6,10 +7,10 @@ import { RadiologyDashboardTrend, RadiologyDashboardTrendPoint } from "../../../
 @Component({
   selector: 'radiology-dashboard-tab',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <div *ngIf="!isLoading() && trend()" class="grid grid-cols-1 lg:grid-cols-2 gap-4">

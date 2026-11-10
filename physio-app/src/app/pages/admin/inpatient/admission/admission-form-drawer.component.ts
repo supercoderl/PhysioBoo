@@ -4,7 +4,7 @@ import { Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, O
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { BooButtonComponent, BooCheckboxComponent, BooIconComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooCheckboxComponent, BooIconComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { Observable, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { BooDatepickerComponent } from '../../../../components/date-picker/boo-date-picker.component';
@@ -53,8 +53,7 @@ const PATIENT_RESULTS = 8;
     imports: [
         NgIf, NgFor, DatePipe, ReactiveFormsModule, RouterLink, DrawerComponent, CustomScrollbarDirective,
         BooButtonComponent, BooCheckboxComponent, BooIconComponent, BooInputComponent,
-        BooSelectComponent, BooDatepickerComponent, BooTextareaComponent,
-    ],
+        BooSelectComponent, BooDatepickerComponent, BooTextareaComponent, BooFieldErrorComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" (close)="discard()">
             <form
@@ -104,7 +103,7 @@ const PATIENT_RESULTS = 8;
                             </div>
 
                             <ng-template #patientSearchTpl>
-                                <label for="adm-patient" class="block mb-1 text-[13px] font-medium text-regular">Find patient <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="adm-patient" class="block mb-1 text-sm font-medium text-regular">Find patient <span class="text-danger" aria-hidden="true">*</span></label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-3 flex items-center text-placeholder pointer-events-none" aria-hidden="true">
                                         <physio-icon [name]="patientSearching ? 'loader-circle' : 'search'" [size]="16" [class.animate-spin]="patientSearching" />
@@ -170,30 +169,30 @@ const PATIENT_RESULTS = 8;
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <ng-container *ngIf="!editing">
                                 <div class="min-w-0">
-                                    <label for="adm-date" class="block mb-1 text-[13px] font-medium text-regular">Admission date <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="adm-date" class="block mb-1 text-sm font-medium text-regular">Admission date <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-datepicker id="adm-date" formControlName="admissionDate" label="Admission date" required />
-                                    <p *ngIf="showError('admissionDate')" class="m-0 mt-1 text-xs text-danger" role="alert">Pick the admission date.</p>
+                                    <boo-field-error size="sm" announce class="mt-1" *ngIf="showError('admissionDate')">Pick the admission date.</boo-field-error>
                                 </div>
                                 <div class="min-w-0">
-                                    <label for="adm-time" class="block mb-1 text-[13px] font-medium text-regular">Admission time <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="adm-time" class="block mb-1 text-sm font-medium text-regular">Admission time <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-input id="adm-time" name="admissionTime" type="time" formControlName="admissionTime" label="Admission time" required />
                                 </div>
                             </ng-container>
                             <div class="min-w-0">
-                                <label for="adm-type" class="block mb-1 text-[13px] font-medium text-regular">Admission type <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="adm-type" class="block mb-1 text-sm font-medium text-regular">Admission type <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-select id="adm-type" formControlName="admissionType" label="Admission type" required [options]="typeOptions" />
                             </div>
                             <div class="min-w-0">
-                                <label for="adm-ref" class="block mb-1 text-[13px] font-medium text-regular">Referred by</label>
+                                <label for="adm-ref" class="block mb-1 text-sm font-medium text-regular">Referred by</label>
                                 <boo-input id="adm-ref" name="referredBy" formControlName="referredBy" [maxlength]="120" label="Referring physician or facility" />
                             </div>
                             <div class="min-w-0">
-                                <label for="adm-dept" class="block mb-1 text-[13px] font-medium text-regular">Department <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="adm-dept" class="block mb-1 text-sm font-medium text-regular">Department <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-select id="adm-dept" formControlName="departmentId" label="Department" required [options]="departments.items" bindLabel="name" bindValue="id" />
                                 <p *ngIf="departments.error || departments.loading" class="m-0 mt-1 text-xs" [class.text-danger]="departments.error" [class.text-secondary]="!departments.error">{{ departments.error || 'Loading departments…' }}</p>
                             </div>
                             <div class="min-w-0">
-                                <label for="adm-doctor" class="block mb-1 text-[13px] font-medium text-regular">Assigned doctor <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="adm-doctor" class="block mb-1 text-sm font-medium text-regular">Assigned doctor <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-select id="adm-doctor" formControlName="doctorId" label="Doctor" required [options]="doctors.items" bindLabel="fullName" bindValue="id" />
                                 <p *ngIf="doctors.error || doctors.loading" class="m-0 mt-1 text-xs" [class.text-danger]="doctors.error" [class.text-secondary]="!doctors.error">{{ doctors.error || 'Loading doctors…' }}</p>
                             </div>
@@ -205,17 +204,17 @@ const PATIENT_RESULTS = 8;
                         <legend class="mb-2 text-sm font-semibold text-regular">Bed <span class="font-normal text-secondary">(optional)</span></legend>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="min-w-0">
-                                <label for="adm-ward" class="block mb-1 text-[13px] font-medium text-regular">Ward</label>
+                                <label for="adm-ward" class="block mb-1 text-sm font-medium text-regular">Ward</label>
                                 <boo-select id="adm-ward" formControlName="wardId" label="No bed" [options]="wardOptions" />
                                 <p *ngIf="wards.error || wards.loading" class="m-0 mt-1 text-xs" [class.text-danger]="wards.error" [class.text-secondary]="!wards.error">{{ wards.error || 'Loading wards…' }}</p>
                             </div>
                             <div class="min-w-0">
-                                <label for="adm-bed" class="block mb-1 text-[13px] font-medium text-regular">Available bed</label>
+                                <label for="adm-bed" class="block mb-1 text-sm font-medium text-regular">Available bed</label>
                                 <boo-select id="adm-bed" formControlName="bedId" [label]="bedPlaceholder" [options]="bedOptions" />
-                                <p *ngIf="bedsError" class="m-0 mt-1 text-xs text-danger" role="alert">{{ bedsError }}</p>
+                                <boo-field-error size="sm" announce class="mt-1" *ngIf="bedsError">{{ bedsError }}</boo-field-error>
                             </div>
                             <div class="min-w-0">
-                                <label for="adm-edd" class="block mb-1 text-[13px] font-medium text-regular">Expected discharge</label>
+                                <label for="adm-edd" class="block mb-1 text-sm font-medium text-regular">Expected discharge</label>
                                 <boo-datepicker id="adm-edd" formControlName="expectedDischargeDate" label="Expected discharge" [min]="today" />
                             </div>
                         </div>
@@ -227,23 +226,23 @@ const PATIENT_RESULTS = 8;
                         <legend class="mb-2 text-sm font-semibold text-regular">Clinical information</legend>
                         <div class="flex flex-col gap-4">
                             <div>
-                                <label for="adm-cc" class="block mb-1 text-[13px] font-medium text-regular">Chief complaint <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="adm-cc" class="block mb-1 text-sm font-medium text-regular">Chief complaint <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-textarea id="adm-cc" formControlName="chiefComplaint" label="Chief complaint" required [rows]="2" [maxlength]="1000" />
                             </div>
                             <div>
-                                <label for="adm-dx" class="block mb-1 text-[13px] font-medium text-regular">Provisional diagnosis <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="adm-dx" class="block mb-1 text-sm font-medium text-regular">Provisional diagnosis <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-textarea id="adm-dx" formControlName="provisionalDiagnosis" label="Provisional diagnosis" required [rows]="2" [maxlength]="1000" />
                             </div>
                             <div>
-                                <label for="adm-allergies" class="block mb-1 text-[13px] font-medium text-regular">Known allergies</label>
+                                <label for="adm-allergies" class="block mb-1 text-sm font-medium text-regular">Known allergies</label>
                                 <boo-textarea id="adm-allergies" formControlName="allergies" label="Known allergies" [rows]="2" [maxlength]="1000" />
                             </div>
                             <div>
-                                <label for="adm-meds" class="block mb-1 text-[13px] font-medium text-regular">Current medications</label>
+                                <label for="adm-meds" class="block mb-1 text-sm font-medium text-regular">Current medications</label>
                                 <boo-textarea id="adm-meds" formControlName="currentMedications" label="Current medications" [rows]="2" [maxlength]="1000" />
                             </div>
                             <div>
-                                <label for="adm-history" class="block mb-1 text-[13px] font-medium text-regular">Medical history</label>
+                                <label for="adm-history" class="block mb-1 text-sm font-medium text-regular">Medical history</label>
                                 <boo-textarea id="adm-history" formControlName="medicalHistory" label="Medical history" [rows]="3" [maxlength]="2000" />
                             </div>
                         </div>
@@ -255,11 +254,11 @@ const PATIENT_RESULTS = 8;
                         <boo-checkbox name="hasInsurance" formControlName="hasInsurance" label="Patient has health insurance" />
                         <div *ngIf="form.controls.hasInsurance.value" class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="min-w-0">
-                                <label for="adm-ins" class="block mb-1 text-[13px] font-medium text-regular">Insurance provider <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="adm-ins" class="block mb-1 text-sm font-medium text-regular">Insurance provider <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input id="adm-ins" name="insuranceProvider" formControlName="insuranceProvider" [maxlength]="120" label="Insurance provider" required />
                             </div>
                             <div class="min-w-0">
-                                <label for="adm-policy" class="block mb-1 text-[13px] font-medium text-regular">Policy number</label>
+                                <label for="adm-policy" class="block mb-1 text-sm font-medium text-regular">Policy number</label>
                                 <boo-input id="adm-policy" name="policyNumber" formControlName="policyNumber" [maxlength]="64" label="Policy number" />
                             </div>
                         </div>

@@ -1,8 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, signal } from "@angular/core";
-import {
-  BooBadgeTone, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooPaginationComponent,
-  BooSearchFieldComponent, BooStatusBadgeComponent,
-} from '@physioboo/ui';
+import { BooBadgeTone, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooPaginationComponent, BooSearchFieldComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { Subject, Subscription, debounceTime, distinctUntilChanged, finalize } from "rxjs";
 import { BooDatepickerComponent } from "../../../../../components/date-picker/boo-date-picker.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
@@ -92,8 +89,8 @@ const SEARCH_DEBOUNCE_MS = 400;
             <td class="px-4 py-3"><boo-status-badge [label]="s.status" [tone]="statusTone(s.status)"></boo-status-badge></td>
             <td class="px-4 py-3">
               <div class="flex items-center gap-3">
-                <button type="button" (click)="viewCase.emit(s.id)" class="text-primary text-xs font-semibold hover:underline">View</button>
-                <button *ngIf="canSchedule && s.status !== 'Cancelled' && s.status !== 'Discharged'" type="button" (click)="cancelCase.emit(s)" class="text-rose-600 text-xs font-semibold hover:underline">Cancel</button>
+                <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold" (click)="viewCase.emit(s.id)">View</button>
+                <button type="button" boo-button variant="text" classname="text-rose-600 text-xs font-semibold" *ngIf="canSchedule && s.status !== 'Cancelled' && s.status !== 'Discharged'" (click)="cancelCase.emit(s)">Cancel</button>
               </div>
             </td>
           </tr>
@@ -104,13 +101,13 @@ const SEARCH_DEBOUNCE_MS = 400;
     <!-- Timeline view: per-room swimlane for today -->
     <div *ngIf="!error() && cases().length && viewMode() === 'timeline'" class="bg-surface border border-gray-200 rounded-lg p-4 overflow-x-auto">
       <div class="min-w-[900px]">
-        <div class="flex items-center text-[11px] text-gray-400 pl-28 mb-2">
+        <div class="flex items-center text-xs text-gray-400 pl-28 mb-2">
           <span *ngFor="let h of hourMarks" class="flex-1 text-center">{{ h }}</span>
         </div>
         <div *ngFor="let lane of timelineLanes()" class="flex items-center mb-2">
           <span class="w-28 shrink-0 text-xs font-semibold text-gray-700">{{ lane.room }}</span>
           <div class="relative flex-1 h-10 bg-gray-50 rounded-md border border-gray-100">
-            <div *ngFor="let s of lane.items" class="absolute top-1 bottom-1 rounded-md px-2 flex items-center text-[11px] font-medium text-white overflow-hidden whitespace-nowrap"
+            <div *ngFor="let s of lane.items" class="absolute top-1 bottom-1 rounded-md px-2 flex items-center text-xs font-medium text-white overflow-hidden whitespace-nowrap"
               [ngClass]="hasConflict(s) ? 'ring-2 ring-rose-500' : ''"
               [style.left.%]="timelineLeft(s)" [style.width.%]="timelineWidth(s)"
               [ngStyle]="{ background: timelineColor(s.status) }"
@@ -127,9 +124,9 @@ const SEARCH_DEBOUNCE_MS = 400;
     <div *ngIf="!error() && cases().length && viewMode() === 'calendar'" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-3">
       <div *ngFor="let day of calendarDays()" class="bg-surface border border-gray-200 rounded-lg p-3 min-h-[140px]">
         <div class="text-xs font-semibold text-gray-700 mb-2">{{ day.label }}</div>
-        <div *ngIf="!day.items.length" class="text-[11px] text-gray-400">No surgeries</div>
+        <div *ngIf="!day.items.length" class="text-xs text-gray-400">No surgeries</div>
         <button *ngFor="let s of day.items" type="button" (click)="viewCase.emit(s.id)"
-          class="w-full text-left mb-1.5 px-2 py-1.5 rounded-md text-[11px] font-medium hover:opacity-90 transition-opacity"
+          class="w-full text-left mb-1.5 px-2 py-1.5 rounded-md text-xs font-medium hover:opacity-90 transition-opacity"
           [ngStyle]="{ background: timelineColor(s.status) + '22', color: timelineColor(s.status) }">
           {{ s.scheduledStart | date:'shortTime' }} · {{ s.patientName }} · {{ s.operatingRoomNumber }}
         </button>

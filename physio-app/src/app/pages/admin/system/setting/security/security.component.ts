@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ValidationErrors, Validators } from '@angular/forms';
-import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { finalize, map, startWith } from 'rxjs';
 import { SettingPageComponent } from '../../../../../components/layout/admin/setting/shared/setting-page.component';
 import { SettingSectionComponent } from '../../../../../components/layout/admin/setting/shared/setting-section.component';
@@ -55,8 +55,7 @@ function differsFromCurrent(group: AbstractControl): ValidationErrors | null {
     BooButtonComponent,
     BooStatusBadgeComponent,
     BooEmptyStateComponent,
-    BooErrorStateComponent
-  ],
+    BooErrorStateComponent, BooFieldErrorComponent],
   templateUrl: './security.component.html'
 })
 export class SecurityComponent implements OnInit {

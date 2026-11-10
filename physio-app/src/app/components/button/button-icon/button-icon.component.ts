@@ -1,39 +1,34 @@
 import { AfterContentInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { SharedModule } from '../../../shared/shared-imports';
-import { BooSpinnerComponent } from '@physioboo/ui';
 
 @Component({
   selector: 'button-icon',
   standalone: true,
   imports: [
-    SharedModule,
-    BooSpinnerComponent
+    SharedModule
   ],
   template: `
     <button
       tabindex="0"
       type="button"
       [ngClass]="{
-        'border border-solid inlineFlex-center-center relative bg-transparent cursor-pointer align-middle text-center text-[#71606A] outline-none rounded-md hover:bg-gray-200 transition-background duration-300 ease-in-out': true,
+        'border border-solid inlineFlex-center-center relative bg-transparent align-middle text-center text-[#71606A] outline-none rounded-md transition-background duration-300 ease-in-out': true,
+        'cursor-pointer hover:bg-gray-200': !(disabled || loading),
+        'cursor-not-allowed bg-gray-100 opacity-60': disabled || loading,
         'w-8 h-8 p-2': !hasContent,
         'px-3 py-2 gap-2': hasContent
       }"
       [class]="buttonClass"
-      [disabled]="disabled"
+      [disabled]="disabled || loading"
       [attr.aria-label]="ariaLabel"
+      [attr.aria-busy]="loading ? 'true' : null"
       (click)="onClick.emit()"
     >
-      <physio-icon 
-        *ngIf="icon && !loading"
-        [name]="icon.name" 
+      <physio-icon
+        *ngIf="icon"
+        [name]="icon.name"
         [size]="icon.size || 16"
         [class]="icon.class"
-      />
-      <boo-spinner 
-        *ngIf="loading" 
-        position="relative"
-        strokeColor="#c3c3c3"
-        mainColor="#000000"
       />
       <ng-container #contentWrapper>
         <ng-content></ng-content>

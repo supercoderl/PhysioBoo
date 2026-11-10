@@ -6,11 +6,12 @@ import { PaperSize } from '../../../shared/enums/print-paper-size';
 import { SharedModule } from '../../../shared/shared-imports';
 import { PrintRenderResult } from '../../../shared/types/print-template.types';
 import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-button-admin.component';
+import { BooButtonComponent } from '@physioboo/ui';
 
 @Component({
   selector: 'print-preview',
   standalone: true,
-  imports: [SharedModule, BooButtonAdminComponent],
+  imports: [SharedModule, BooButtonAdminComponent, BooButtonComponent],
   animations: [
     trigger('overlayAnim', [
       transition(':enter', [style({ opacity: 0 }), animate('120ms', style({ opacity: 1 }))]),
@@ -46,19 +47,11 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
           </div>
 
           <div class="flex items-center gap-2 shrink-0">
-            <button type="button"
-              (click)="zoomOut()"
-              [disabled]="zoom() <= 0.5"
-              class="p-1.5 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-900 disabled:opacity-30"
-              title="Zoom out">
+            <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" (click)="zoomOut()" [disabled]="zoom() <= 0.5" title="Zoom out">
               <physio-icon name="zoom-out" class="w-4 h-4" />
             </button>
             <span class="text-xs font-medium text-gray-600 w-12 text-center">{{ (zoom() * 100) | number:'1.0-0' }}%</span>
-            <button type="button"
-              (click)="zoomIn()"
-              [disabled]="zoom() >= 2"
-              class="p-1.5 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-900 disabled:opacity-30"
-              title="Zoom in">
+            <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" (click)="zoomIn()" [disabled]="zoom()>= 2" title="Zoom in">
               <physio-icon name="zoom-in" class="w-4 h-4" />
             </button>
 
@@ -79,10 +72,7 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
                 [class]="printing() ? 'w-4 h-4 animate-spin' : 'w-4 h-4'" />
               <span>{{ printing() ? 'Sending…' : 'Print' }}</span>
             </boo-button-admin>
-            <button type="button"
-              (click)="onClose()"
-              class="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-900 ml-1"
-              title="Close">
+            <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="onClose()" title="Close">
               <physio-icon name="x" class="w-4 h-4" />
             </button>
           </div>

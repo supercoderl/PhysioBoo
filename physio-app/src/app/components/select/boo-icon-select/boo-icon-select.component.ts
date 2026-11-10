@@ -20,7 +20,7 @@ import { booValidationMessage } from '@physioboo/ui';
       <button
         type="button"
         #trigger
-        class="w-full h-9 px-3 flex items-center gap-2 rounded-1.5 border bg-surface text-[13px] text-regular text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-gray-100"
+        class="w-full h-9 px-3 flex items-center gap-2 rounded-1.5 border bg-surface text-sm text-regular text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-gray-100"
         [class.border-borderGray]="!isOpen && !errorText"
         [class.border-rose-400]="isOpen"
         [class.border-danger]="!isOpen && errorText"
@@ -66,7 +66,7 @@ import { booValidationMessage } from '@physioboo/ui';
               role="option"
               [attr.aria-selected]="name === model"
               [title]="name"
-              class="flex flex-col items-center gap-1 px-1 py-2 rounded-1.5 text-[11px] text-secondary hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
+              class="flex flex-col items-center gap-1 px-1 py-2 rounded-1.5 text-xs text-secondary hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
               [ngClass]="name === model ? 'bg-primary/10 !text-primary font-medium' : ''"
               (click)="select(name)"
             >

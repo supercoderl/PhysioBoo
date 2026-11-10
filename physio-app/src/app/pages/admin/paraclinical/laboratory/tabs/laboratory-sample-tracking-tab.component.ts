@@ -99,11 +99,11 @@ type ActionKind = 'collect' | 'recollect' | 'reject' | 'result';
             <ol class="m-0 p-0 list-none flex items-center overflow-x-auto pb-1" aria-label="Specimen timeline">
               <ng-container *ngFor="let ev of s.timeline; let last = last">
                 <li class="flex flex-col items-center gap-1 shrink-0 w-28">
-                  <div class="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold"
+                  <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold"
                     [ngClass]="ev.occurredAt ? 'bg-primary text-white' : 'bg-gray-200 text-gray-400'">
                     <physio-icon [name]="ev.occurredAt ? 'check' : 'circle'" [size]="14"></physio-icon>
                   </div>
-                  <span class="text-[11px] font-medium text-gray-700 text-center">{{ stageLabels[ev.stage] }}</span>
+                  <span class="text-xs font-medium text-gray-700 text-center">{{ stageLabels[ev.stage] }}</span>
                   <span class="text-[10px] text-gray-500 text-center">{{ ev.occurredAt ? (ev.occurredAt | date: 'MMM d, HH:mm') : 'Pending' }}</span>
                 </li>
                 <li *ngIf="!last" aria-hidden="true" class="h-0.5 flex-1 min-w-[16px]" [ngClass]="ev.occurredAt ? 'bg-primary' : 'bg-gray-200'"></li>

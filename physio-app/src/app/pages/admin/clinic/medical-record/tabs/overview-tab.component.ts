@@ -133,7 +133,7 @@ import {
           </div>
         </section>
 
-        <div *ngIf="history?.lastUpdatedAt" class="text-[11px] text-secondary text-right px-1">
+        <div *ngIf="history?.lastUpdatedAt" class="text-xs text-secondary text-right px-1">
           Last updated {{ history?.lastUpdatedAt | date:'medium' }} by {{ history?.lastUpdatedByName || '—' }}
         </div>
       </div>

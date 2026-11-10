@@ -13,8 +13,8 @@
       </p>
     </div>
     <div class="flex flex-wrap items-center gap-2">
-      <button boo-button variant="secondary" size="sm" [loading]="loading" (click)="refresh()">
-        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      <button boo-button variant="secondary" size="sm" [disabled]="loading" (click)="refresh()">
+        <physio-icon name="refresh" [size]="15" aria-hidden="true" />Refresh
       </button>
       <button *ngIf="canReadRewards" boo-button variant="secondary" size="sm" aria-haspopup="dialog" (click)="openRewards()">
         <physio-icon name="gift" [size]="15" aria-hidden="true" />Rewards
@@ -66,39 +66,7 @@
     <h2 id="member-list-title" class="sr-only">Member list</h2>
 
     <!-- Status: one tab per membership status, with how many members are in it under the current search and tier -->
-    <div class="boo-scrollbar overflow-x-auto border-b border-rowDivider">
-      <div class="flex min-w-max items-stretch px-2" role="tablist" aria-label="Membership status">
-        <ng-container *ngFor="let tab of statusTabs; let i = index">
-          <span *ngIf="i === 1" class="self-center w-px h-8 mx-1.5 bg-rowDivider" aria-hidden="true"></span>
-          <button
-            type="button"
-            role="tab"
-            [id]="'member-tab-' + i"
-            aria-controls="member-results"
-            [attr.aria-selected]="tab.value === statusFilter"
-            [attr.tabindex]="tab.value === statusFilter ? 0 : -1"
-            class="relative -mb-px flex flex-col items-start gap-0.5 px-3 py-2.5 min-w-[92px] bg-transparent border-0 border-b-2 text-left cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary rounded-t"
-            [ngClass]="tab.value === statusFilter ? 'border-primary' : 'border-transparent hover:bg-body'"
-            (click)="selectStatus(tab.value)"
-            (keydown)="onTabKey($event, i)"
-          >
-            <span class="flex items-center gap-1.5 text-xs whitespace-nowrap"
-              [class.font-semibold]="tab.value === statusFilter"
-              [class.text-primaryDeep]="tab.value === statusFilter"
-              [class.font-medium]="tab.value !== statusFilter"
-              [class.text-secondary]="tab.value !== statusFilter"
-            >
-              <span *ngIf="tab.dot" class="w-1.5 h-1.5 rounded-full flex-none" [ngClass]="tab.dot" aria-hidden="true"></span>{{ tab.label }}
-            </span>
-            <span class="text-lg leading-6 font-semibold tabular-nums" [class.text-regular]="countOf(tab) !== null" [class.text-placeholder]="countOf(tab) === null">
-              <ng-container *ngIf="countOf(tab) !== null; else noCountTpl">{{ countOf(tab) | number }}</ng-container>
-              <ng-template #noCountTpl><span aria-hidden="true">–</span></ng-template>
-            </span>
-            <span *ngIf="countOf(tab) !== null" class="sr-only">{{ countOf(tab) === 1 ? 'member' : 'members' }}</span>
-          </button>
-        </ng-container>
-      </div>
-    </div>
+    <boo-tabs variant="stat" [tabs]="statTabItems" [value]="statusFilter" (valueChange)="selectStatus($event)" label="Membership status" idPrefix="member-tab" controls="member-results" />
 
     <!-- Search, tier and sort. Every control is 36px high and the row aligns on its bottom edge, under the field labels. -->
     <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
@@ -158,15 +126,9 @@
               <!-- Identity -->
               <td class="px-4 py-3 align-top min-w-0 max-w-[300px]">
                 <div class="flex items-start gap-3 min-w-0">
-                  <span class="flex-none w-8 h-8 rounded-full bg-primarySoft text-primaryDeep text-[11px] font-semibold flex items-center justify-center" aria-hidden="true">{{ initials(m) }}</span>
+                  <span class="flex-none w-8 h-8 rounded-full bg-primarySoft text-primaryDeep text-xs font-semibold flex items-center justify-center" aria-hidden="true">{{ initials(m) }}</span>
                   <div class="min-w-0">
-                    <button
-                      type="button"
-                      class="block max-w-full p-0 bg-transparent border-0 text-left font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
-                      [attr.aria-label]="'Open points of ' + name(m)"
-                      aria-haspopup="dialog"
-                      (click)="$event.stopPropagation(); openMember(m)"
-                    >{{ name(m) }}</button>
+                    <button type="button" boo-button variant="text" classname="max-w-full font-semibold !text-regular truncate rounded" [attr.aria-label]="'Open points of ' + name(m)" aria-haspopup="dialog" (click)="$event.stopPropagation(); openMember(m)">{{ name(m) }}</button>
                     <div class="mt-0.5 text-xs text-secondary tabular-nums truncate">{{ m.memberNumber }}</div>
                     <div class="mt-1 sm:hidden"><boo-status-badge dotted [label]="status(m).label" [tone]="status(m).tone" /></div>
                   </div>

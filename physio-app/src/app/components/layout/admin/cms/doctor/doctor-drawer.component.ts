@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { BooInputComponent } from '@physioboo/ui';
+import { BooInputComponent, BooButtonComponent } from '@physioboo/ui';
 import { firstValueFrom } from "rxjs";
 import { DoctorService } from "../../../../../services/admin/doctor.service";
 import { MedicalSpecialtyService } from "../../../../../services/admin/medical-specialty.service";
@@ -43,8 +43,7 @@ interface StepConfig {
         BooButtonAdminComponent,
         BooSelectComponent,
         BooDevJsonFillerComponent,
-        BooJsonInputComponent
-    ],
+        BooJsonInputComponent, BooButtonComponent],
     template: `
         <drawer
             [isOpen]="isOpen"
@@ -57,8 +56,7 @@ interface StepConfig {
                         <h2 class="text-xl font-bold text-primary leading-none mb-1">{{ isEdit ? 'Edit Doctor' : 'New Doctor Account' }}</h2>
                         <p class="text-sm text-secondary m-0">{{ isEdit ? 'Update the professional details. Account and profile are managed separately.' : 'Complete all 3 steps to register a new medical professional' }}</p>
                     </div>
-                    <button (click)="onClose()"
-                        class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="onClose()" aria-label="Close">
                         <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
@@ -107,11 +105,7 @@ interface StepConfig {
                                     (error)="avatarLoadFailed = true" />
                                 <ng-template #initialsTpl>{{ initials }}</ng-template>
                             </div>
-                            <button type="button"
-                                class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-sm hover:bg-primaryHover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                                [disabled]="isAvatarBusy"
-                                [attr.aria-label]="avatarUrl ? 'Change avatar' : 'Upload avatar'"
-                                (click)="avatarInput.click()">
+                            <button type="button" boo-button variant="primary" size="sm" [iconOnly]="true" classname="!h-8 !w-8" [disabled]="isAvatarBusy" [attr.aria-label]="avatarUrl ? 'Change avatar' : 'Upload avatar'" (click)="avatarInput.click()">
                                 <physio-icon name="upload" [size]="14"></physio-icon>
                             </button>
                             <input #avatarInput type="file" class="hidden"

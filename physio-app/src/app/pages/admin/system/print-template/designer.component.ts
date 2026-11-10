@@ -3,7 +3,7 @@ import { AfterViewInit, Component, DestroyRef, ElementRef, NgZone, OnInit, ViewC
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BooButtonComponent, BooEmptyStateComponent, BooSearchFieldComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooSearchFieldComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { catchError, forkJoin, Observable, of } from 'rxjs';
 import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
 import { PrintTemplateService } from '../../../../services/admin/print-template.service';
@@ -31,8 +31,7 @@ const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 2];
   standalone: true,
   imports: [
     SharedModule, ReactiveFormsModule, BooSelectComponent, BooButtonComponent, BooSearchFieldComponent,
-    BooEmptyStateComponent, PrintElementPropertiesComponent
-  ],
+    BooEmptyStateComponent, PrintElementPropertiesComponent, BooSpinnerComponent],
   styleUrls: ['./designer/designer.styles.css'],
   host: { class: 'block h-full min-h-0', '(document:keydown)': 'onKeydown($event)' },
   template: `
@@ -116,7 +115,7 @@ const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 2];
             cdkDropList id="ptd-palette" cdkDropListSortingDisabled
             [cdkDropListConnectedTo]="sectionListIds" [cdkDropListEnterPredicate]="noEnter">
 
-            <p class="text-[11px] text-gray-500 mt-3 mb-2 leading-snug">Drag onto the page, or click to add after the selected element.</p>
+            <p class="text-xs text-gray-500 mt-3 mb-2 leading-snug">Drag onto the page, or click to add after the selected element.</p>
 
             <ng-container *ngIf="filteredElements().length">
               <h3 class="ptd-group-title mt-3 mb-2">Elements</h3>
@@ -173,7 +172,7 @@ const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 2];
         <!-- #region Canvas -->
         <main #viewport class="min-h-0 min-w-0 overflow-auto bg-slate-100 relative" (click)="select(null)">
           <div *ngIf="isLoading()" class="absolute inset-0 z-10 flex items-center justify-center bg-slate-100/70">
-            <physio-icon name="loader-circle" [size]="24" class="animate-spin text-primary" />
+            <boo-spinner [inline]="true" tone="primary" [size]="24" />
           </div>
 
           <div class="min-w-max min-h-full flex justify-center px-10 py-8">
@@ -212,7 +211,7 @@ const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 2];
 
                     <ng-container *ngIf="selectedId() === el.id">
                       <div class="ptd-el-bar" (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()">
-                        <span class="px-1.5 text-[11px] font-medium">{{ kindLabel(el) }}</span>
+                        <span class="px-1.5 text-xs font-medium">{{ kindLabel(el) }}</span>
                         <button type="button" title="Move up" (click)="moveBy(el.id, -1)"><physio-icon name="arrow-up" [size]="12" /></button>
                         <button type="button" title="Move down" (click)="moveBy(el.id, 1)"><physio-icon name="arrow-down" [size]="12" /></button>
                         <button type="button" title="Duplicate (Ctrl+D)" (click)="duplicate(el.id)"><physio-icon name="copy" [size]="12" /></button>
@@ -279,7 +278,7 @@ const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 2];
           <ng-template #pagePanel>
             <div class="px-4 py-3 border-b border-gray-200">
               <div class="text-sm font-semibold text-gray-900">Page settings</div>
-              <div class="text-[11px] text-gray-500">Select an element on the page to edit it.</div>
+              <div class="text-xs text-gray-500">Select an element on the page to edit it.</div>
             </div>
 
             <section class="ptd-group" formGroupName="version">
@@ -332,7 +331,7 @@ const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 2];
             <section class="ptd-group">
               <h4 class="ptd-group-title">Advanced</h4>
               <label class="ptd-label">Extra CSS</label>
-              <textarea class="ptd-input ptd-textarea font-mono text-[11px]" rows="6" spellcheck="false"
+              <textarea class="ptd-input ptd-textarea font-mono text-xs" rows="6" spellcheck="false"
                 placeholder="/* Optional CSS applied when printing */"
                 [ngModelOptions]="{ standalone: true }" [ngModel]="extraCss()" (ngModelChange)="setExtraCss($event)"></textarea>
               <p class="ptd-hint">The header prints once at the top of the document and the footer once at the end; they do not repeat on every page.</p>
@@ -340,7 +339,7 @@ const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 2];
 
             <section class="ptd-group">
               <h4 class="ptd-group-title">Shortcuts</h4>
-              <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[11px] text-gray-600 m-0">
+              <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs text-gray-600 m-0">
                 <dt class="font-mono text-gray-800">Del</dt><dd class="m-0">Delete selected</dd>
                 <dt class="font-mono text-gray-800">Ctrl+D</dt><dd class="m-0">Duplicate</dd>
                 <dt class="font-mono text-gray-800">Alt+↑/↓</dt><dd class="m-0">Move up / down</dd>

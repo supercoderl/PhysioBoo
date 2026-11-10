@@ -27,7 +27,7 @@ import { CashierTransactionEvent, cashierMethodLabel } from "../../../../shared/
           <button type="button" (click)="open.emit(e)" class="w-full px-4 py-3 flex items-center justify-between gap-4 text-left hover:bg-gray-50 focus-visible:bg-gray-50 outline-none">
             <span class="min-w-0 leading-tight">
               <span class="block truncate text-sm font-semibold text-regular">{{ e.invoiceNumber || 'Unknown bill' }} · {{ e.patientName || '—' }}</span>
-              <span class="block truncate text-[11px] text-secondary">
+              <span class="block truncate text-xs text-secondary">
                 {{ e.type === 'Refund' ? 'Refund' : 'Payment' }} · {{ methodLabel(e.method) }} · {{ e.occurredAt | date:'medium' }}<ng-container *ngIf="e.performedBy"> · {{ e.performedBy }}</ng-container>
               </span>
             </span>

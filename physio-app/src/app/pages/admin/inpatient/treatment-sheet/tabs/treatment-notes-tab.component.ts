@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angular/core";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
-import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -13,7 +13,7 @@ const NOTE_MAX_LENGTH = 4000;
 @Component({
   selector: 'treatment-notes-tab',
   standalone: true,
-  imports: [SharedModule, BooSelectComponent, BooTextareaComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent, BooButtonAdminComponent],
+  imports: [SharedModule, BooSelectComponent, BooTextareaComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent, BooButtonAdminComponent, BooSpinnerComponent],
   template: `
     <form *ngIf="canWrite" (ngSubmit)="submit()" class="rounded-lg border border-dashed border-amber-400 bg-amber-50/40 p-4 mb-4" aria-label="Add a progress note">
       <div class="flex items-center gap-2 mb-3">
@@ -37,7 +37,7 @@ const NOTE_MAX_LENGTH = 4000;
     </form>
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16" aria-live="polite">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <boo-error-state *ngIf="!isLoading() && loadError()" title="Couldn't load progress notes" [description]="loadError()" appearance="panel" (retry)="load()"></boo-error-state>

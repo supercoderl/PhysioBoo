@@ -43,7 +43,7 @@ function notBlank(control: AbstractControl<string>): ValidationErrors | null {
                 <div class="flex-1 min-h-0 overflow-y-auto px-6 py-5 flex flex-col gap-4" custom-scrollbar>
                     <p class="m-0 text-sm text-secondary">The prescription stays on record as cancelled and can no longer be dispensed. This cannot be undone.</p>
                     <div>
-                        <label for="rx-cancel-reason" class="block mb-1 text-[13px] font-medium text-regular">Reason <span class="text-danger" aria-hidden="true">*</span></label>
+                        <label for="rx-cancel-reason" class="block mb-1 text-sm font-medium text-regular">Reason <span class="text-danger" aria-hidden="true">*</span></label>
                         <boo-textarea id="rx-cancel-reason" name="rx-cancel-reason" formControlName="reason" label="Reason" required [rows]="5" [maxlength]="max" />
                     </div>
                 </div>

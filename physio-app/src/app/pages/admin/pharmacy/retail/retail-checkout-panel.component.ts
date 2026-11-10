@@ -33,10 +33,10 @@ import { formatRetailMoney, retailCartTotals } from "../../../../shared/utils/re
           </div>
 
           <div class="flex flex-wrap gap-1.5 mt-2">
-            <span *ngIf="customer.insuranceProvider" class="px-2 py-0.5 rounded-full bg-primarySoft text-primaryDeep text-[11px] font-medium">{{ customer.insuranceProvider }}</span>
-            <span *ngIf="customer.loyaltyPoints" class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[11px] font-medium">{{ customer.loyaltyPoints }} pts</span>
-            <span *ngIf="customer.prescriptionReference" class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 text-[11px] font-medium">Rx {{ customer.prescriptionReference }}</span>
-            <span *ngIf="customer.allergyInformation" class="px-2 py-0.5 rounded-full bg-dangerSoft text-gray-900 text-[11px] font-medium inline-flex items-center gap-1">
+            <span *ngIf="customer.insuranceProvider" class="px-2 py-0.5 rounded-full bg-primarySoft text-primaryDeep text-xs font-medium">{{ customer.insuranceProvider }}</span>
+            <span *ngIf="customer.loyaltyPoints" class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 text-xs font-medium">{{ customer.loyaltyPoints }} pts</span>
+            <span *ngIf="customer.prescriptionReference" class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 text-xs font-medium">Rx {{ customer.prescriptionReference }}</span>
+            <span *ngIf="customer.allergyInformation" class="px-2 py-0.5 rounded-full bg-dangerSoft text-gray-900 text-xs font-medium inline-flex items-center gap-1">
               <physio-icon name="triangle-alert" [size]="11" class="text-danger"></physio-icon> Allergy: {{ customer.allergyInformation }}
             </span>
           </div>

@@ -1,6 +1,6 @@
 import { CdkDragDrop, transferArrayItem } from "@angular/cdk/drag-drop";
 import { Component, OnInit, signal } from "@angular/core";
-import { BooEmptyStateComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooButtonComponent, BooInputComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -10,10 +10,10 @@ import { ScheduleSlot } from "../../../../../shared/types/radiology.types";
 @Component({
   selector: 'radiology-scheduling-tab',
   standalone: true,
-  imports: [SharedModule,BooEmptyStateComponent],
+  imports: [SharedModule,BooEmptyStateComponent, BooButtonComponent, BooInputComponent, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <div *ngIf="!isLoading() && !rooms().length">
@@ -43,15 +43,14 @@ import { ScheduleSlot } from "../../../../../shared/types/radiology.types";
             <div class="text-xs text-gray-500">{{ slot.examinationName }} · {{ slot.modalityName }}</div>
             <div *ngIf="reassigningId !== slot.id" class="text-xs text-gray-400">{{ slot.technicianName ?? 'Unassigned technician' }} · {{ slot.estimatedDurationMinutes }} min</div>
             <div *ngIf="reassigningId === slot.id" class="flex items-center gap-1 mt-1">
-              <input [(ngModel)]="technicianDraft" maxlength="150" placeholder="Technician name" (keydown.enter)="saveReassign(slot)"
-                class="flex-1 min-w-0 rounded border border-gray-300 px-2 py-1 text-xs" />
-              <button (click)="saveReassign(slot)" [disabled]="!technicianDraft.trim()" class="text-primary text-[11px] font-semibold hover:underline disabled:opacity-40">Save</button>
-              <button (click)="reassigningId = null" class="text-gray-500 text-[11px] hover:underline">Cancel</button>
+              <boo-input class="flex-1 min-w-0" label="Technician name" size="small" [maxlength]="150" [(ngModel)]="technicianDraft" (keydown.enter)="saveReassign(slot)" />
+              <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold disabled:opacity-40" (click)="saveReassign(slot)" [disabled]="!technicianDraft.trim()">Save</button>
+              <button type="button" boo-button variant="text" classname="!text-gray-500 text-xs" (click)="reassigningId = null">Cancel</button>
             </div>
             <div class="text-xs text-amber-600 mt-1" *ngIf="slot.preparationInstructions">{{ slot.preparationInstructions }}</div>
             <div class="flex gap-2 mt-2">
-              <button (click)="reassign(slot)" class="text-primary text-[11px] font-semibold hover:underline">Reassign</button>
-              <button (click)="cancelSlot(slot)" class="text-red-600 text-[11px] font-semibold hover:underline">Cancel</button>
+              <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold" (click)="reassign(slot)">Reassign</button>
+              <button type="button" boo-button variant="text" classname="!text-red-600 text-xs font-semibold" (click)="cancelSlot(slot)">Cancel</button>
             </div>
           </div>
         </div>

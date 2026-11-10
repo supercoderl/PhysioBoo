@@ -26,14 +26,14 @@
             <physio-icon name="blocks"></physio-icon>
           </div>
           <p class="font-medium leading-5 text-[14px] mt-5 m-0">{{ board.title }}</p>
-          <p *ngIf="board.description" class="line-clamp-2 mt-0.5 m-0 text-[13px] leading-[1.5]">{{ board.description }}</p>
+          <p *ngIf="board.description" class="line-clamp-2 mt-0.5 m-0 text-sm leading-[1.5]">{{ board.description }}</p>
           <hr class="w-12 h-0.5 mt-6 m-0 shrink-0 border-[0_0_thin] border-solid border-[#EFE3E7]" />
         </div>
         <div class="flex w-full flex-auto flex-col items-start justify-end">
-          <p class="m-0 mt-4 text-[13px] leading-[1.5] text-[#71606A]">
+          <p class="m-0 mt-4 text-sm leading-[1.5] text-[#71606A]">
             {{ board.listCount }} {{ board.listCount === 1 ? 'list' : 'lists' }} · {{ board.cardCount }} {{ board.cardCount === 1 ? 'card' : 'cards' }}
           </p>
-          <div class="mt-2 flex items-center text-[13px] leading-[1.5]">
+          <div class="mt-2 flex items-center text-sm leading-[1.5]">
             <span class="text-[#71606A]">Edited:</span>
             <span class="truncate mx-1">{{ board.updatedAt | date:'MMM d, y, h:mm a' }}</span>
           </div>
@@ -57,39 +57,15 @@
 </div>
 
 <!-- New board dialog -->
-<div *ngIf="draft() as d" class="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4" (click)="closeDialog()">
-  <div
-    role="dialog"
-    aria-modal="true"
-    aria-label="New board"
-    class="w-full max-w-md rounded-xl bg-surface shadow-xl"
-    (click)="$event.stopPropagation()"
-  >
-    <div class="border-b border-[#EFE3E7] px-4 py-3">
-      <h2 class="m-0 text-[16px] font-semibold">New board</h2>
-    </div>
-    <div class="space-y-3 px-4 py-3">
-      <label class="block">
-        <span class="mb-1 block text-[12px] font-semibold text-[#71606A]">Title</span>
-        <input
-          type="text"
-          [(ngModel)]="d.title"
-          (keydown.enter)="createBoard()"
-          maxlength="120"
-          autofocus
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-10 text-[14px] outline-none focus:border-primary"
-        />
-      </label>
-      <div class="block">
-        <label for="board-description" class="mb-1 block text-[12px] font-semibold text-[#71606A]">Description</label>
-        <boo-textarea [id]="'board-description'" [(ngModel)]="d.description" [maxlength]="500" [rows]="3"></boo-textarea>
-      </div>
-    </div>
-    <div class="flex justify-end gap-2 border-t border-[#EFE3E7] px-4 py-3">
-      <boo-button-admin (click)="closeDialog()" background="transparent" textColor="#71606A" padding="10px 12px" [radius]="8" fontWeight="500">Cancel</boo-button-admin>
-      <boo-button-admin (click)="createBoard()" [disabled]="!canCreate()" textColor="white" padding="10px 16px" [radius]="8" fontWeight="500">
-        {{ isSaving() ? 'Creating...' : 'Create' }}
-      </boo-button-admin>
-    </div>
+<boo-dialog *ngIf="draft() as d" heading="New board" [busy]="isSaving()" (dismiss)="closeDialog()">
+  <div class="space-y-3">
+    <boo-form-field label="Title" for="board-title">
+      <boo-input [id]="'board-title'" label="Title" [(ngModel)]="d.title" (keydown.enter)="createBoard()" [maxlength]="120" />
+    </boo-form-field>
+    <boo-form-field label="Description" for="board-description">
+      <boo-textarea [id]="'board-description'" [(ngModel)]="d.description" [maxlength]="500" [rows]="3"></boo-textarea>
+    </boo-form-field>
   </div>
-</div>
+  <button boo-dialog-footer type="button" boo-button variant="ghost" size="sm" [disabled]="isSaving()" (click)="closeDialog()">Cancel</button>
+  <button boo-dialog-footer type="button" boo-button variant="primary" size="sm" [disabled]="!canCreate()" [loading]="isSaving()" (click)="createBoard()">{{ isSaving() ? 'Creating...' : 'Create' }}</button>
+</boo-dialog>

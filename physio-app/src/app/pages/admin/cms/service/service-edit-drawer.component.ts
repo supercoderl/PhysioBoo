@@ -70,17 +70,17 @@ const MAX = { code: 32, name: 120, shortName: 60, description: 2000 };
                         <div class="flex flex-col gap-4">
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div>
-                                    <label for="se-code" class="block mb-1 text-[13px] font-medium text-regular">Code <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="se-code" class="block mb-1 text-sm font-medium text-regular">Code <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-input name="se-code" formControlName="code" label="Code" [maxlength]="max.code" />
                                     <p class="m-0 mt-1 text-xs text-secondary">Unique, e.g. ECG-001.</p>
                                 </div>
                                 <div class="sm:col-span-2">
-                                    <label for="se-name" class="block mb-1 text-[13px] font-medium text-regular">Name <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="se-name" class="block mb-1 text-sm font-medium text-regular">Name <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-input name="se-name" formControlName="name" label="Service name" [maxlength]="max.name" />
                                 </div>
                             </div>
                             <div>
-                                <label for="se-short" class="block mb-1 text-[13px] font-medium text-regular">Short name</label>
+                                <label for="se-short" class="block mb-1 text-sm font-medium text-regular">Short name</label>
                                 <boo-input name="se-short" formControlName="shortName" label="Short name" [maxlength]="max.shortName" />
                                 <p class="m-0 mt-1 text-xs" [class.text-secondary]="!clearedOnEdit('shortName')" [class.text-amber-700]="clearedOnEdit('shortName')">
                                     {{ clearedOnEdit('shortName') ? keepNote : 'Optional. Used where space is tight, and searchable.' }}
@@ -88,7 +88,7 @@ const MAX = { code: 32, name: 120, shortName: 60, description: 2000 };
                             </div>
                             <div>
                                 <div class="flex items-baseline justify-between gap-3 mb-1">
-                                    <label for="se-desc" class="text-[13px] font-medium text-regular">Description</label>
+                                    <label for="se-desc" class="text-sm font-medium text-regular">Description</label>
                                     <span class="text-xs text-secondary tabular-nums" aria-live="polite">{{ form.controls.description.value.length }} / {{ max.description }}</span>
                                 </div>
                                 <boo-textarea id="se-desc" formControlName="description" label="What the service includes and how patients should prepare" [rows]="4" [maxlength]="max.description" />
@@ -102,7 +102,7 @@ const MAX = { code: 32, name: 120, shortName: 60, description: 2000 };
                         <legend class="mb-3 text-sm font-semibold text-regular">Departments and doctors</legend>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label for="se-dept" class="block mb-1 text-[13px] font-medium text-regular">Primary department</label>
+                                <label for="se-dept" class="block mb-1 text-sm font-medium text-regular">Primary department</label>
                                 <boo-select id="se-dept" formControlName="departmentId" label="No department" [options]="departmentOptions" />
                                 <p class="m-0 mt-1 text-xs text-secondary">
                                     <ng-container *ngIf="!departmentOptions.length">No departments to choose from.</ng-container>
@@ -110,7 +110,7 @@ const MAX = { code: 32, name: 120, shortName: 60, description: 2000 };
                                 </p>
                             </div>
                             <div>
-                                <label for="se-doctor" class="block mb-1 text-[13px] font-medium text-regular">Primary doctor</label>
+                                <label for="se-doctor" class="block mb-1 text-sm font-medium text-regular">Primary doctor</label>
                                 <boo-select id="se-doctor" formControlName="doctorId" label="No doctor" [options]="doctorOptions" />
                                 <p class="m-0 mt-1 text-xs" [class.text-secondary]="!clearedOnEdit('doctorId')" [class.text-amber-700]="clearedOnEdit('doctorId')">
                                     <ng-container *ngIf="clearedOnEdit('doctorId')">{{ keepNote }}</ng-container>
@@ -127,12 +127,12 @@ const MAX = { code: 32, name: 120, shortName: 60, description: 2000 };
                         <div class="flex flex-col gap-4">
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div class="sm:col-span-2">
-                                    <label for="se-price" class="block mb-1 text-[13px] font-medium text-regular">Base price <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="se-price" class="block mb-1 text-sm font-medium text-regular">Base price <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-input name="se-price" type="number" formControlName="basePrice" label="Base price" />
                                     <p class="m-0 mt-1 text-xs text-secondary">0 or more. Use 0 for free services.</p>
                                 </div>
                                 <div>
-                                    <label for="se-currency" class="block mb-1 text-[13px] font-medium text-regular">Currency <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="se-currency" class="block mb-1 text-sm font-medium text-regular">Currency <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-select id="se-currency" formControlName="currency" label="Currency" required [options]="currencyOptions" />
                                 </div>
                             </div>
@@ -146,12 +146,12 @@ const MAX = { code: 32, name: 120, shortName: 60, description: 2000 };
                         <div class="flex flex-col gap-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="se-duration" class="block mb-1 text-[13px] font-medium text-regular">Duration (minutes) <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="se-duration" class="block mb-1 text-sm font-medium text-regular">Duration (minutes) <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-input name="se-duration" type="number" formControlName="durationMinutes" label="Duration" />
                                     <p class="m-0 mt-1 text-xs text-secondary">Whole minutes, at least 1.</p>
                                 </div>
                                 <div>
-                                    <label for="se-availability" class="block mb-1 text-[13px] font-medium text-regular">Availability <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="se-availability" class="block mb-1 text-sm font-medium text-regular">Availability <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-select id="se-availability" formControlName="availability" label="Availability" required [options]="availabilityOptions" />
                                 </div>
                             </div>
@@ -166,7 +166,7 @@ const MAX = { code: 32, name: 120, shortName: 60, description: 2000 };
                     <div class="pt-6 border-t border-rowDivider"><fieldset class="m-0 p-0 border-0 min-w-0">
                         <legend class="mb-3 text-sm font-semibold text-regular">Status</legend>
                         <div class="sm:w-1/2 sm:pr-2">
-                            <label for="se-status" class="block mb-1 text-[13px] font-medium text-regular">Status <span class="text-danger" aria-hidden="true">*</span></label>
+                            <label for="se-status" class="block mb-1 text-sm font-medium text-regular">Status <span class="text-danger" aria-hidden="true">*</span></label>
                             <boo-select id="se-status" formControlName="status" label="Status" required [options]="statusOptions" />
                             <p class="m-0 mt-1 text-xs text-secondary">{{ statusHint }}</p>
                         </div>

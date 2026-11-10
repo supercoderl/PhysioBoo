@@ -30,12 +30,10 @@
         boo-button
         variant="secondary"
         size="sm"
-        [loading]="loading"
+        [disabled]="loading"
         (click)="loadOverview()"
       >
-        <physio-icon
-          *ngIf="!loading"
-          name="refresh"
+        <physio-icon name="refresh"
           [size]="15"
           aria-hidden="true"
         />Refresh

@@ -12,8 +12,8 @@
       </p>
     </div>
     <div class="flex items-center gap-2">
-      <button boo-button variant="secondary" size="sm" [iconOnly]="true" [loading]="loading" aria-label="Refresh doctors" title="Refresh" (click)="load()">
-        <physio-icon *ngIf="!loading" name="refresh" [size]="15" />
+      <button boo-button variant="secondary" size="sm" [iconOnly]="true" [disabled]="loading" aria-label="Refresh doctors" title="Refresh" (click)="load()">
+        <physio-icon name="refresh" [size]="15" />
       </button>
       <button *ngIf="canRegister" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openRegister()">
         <physio-icon name="user-plus" [size]="15" aria-hidden="true" />Register doctor
@@ -121,14 +121,7 @@
                   </span>
                   <div class="min-w-0">
                     <div class="flex items-center gap-1.5 min-w-0">
-                      <button
-                        type="button"
-                        class="block min-w-0 max-w-full p-0 bg-transparent border-0 text-left text-[15px] leading-5 font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
-                        [attr.aria-label]="'View profile of ' + name(d)"
-                        aria-haspopup="dialog"
-                        [title]="name(d)"
-                        (click)="$event.stopPropagation(); openDetail(d)"
-                      >{{ name(d) }}</button>
+                      <button type="button" boo-button variant="text" classname="min-w-0 max-w-full text-[15px] leading-5 font-semibold !text-regular truncate rounded" [attr.aria-label]="'View profile of ' + name(d)" aria-haspopup="dialog" [title]="name(d)" (click)="$event.stopPropagation(); openDetail(d)">{{ name(d) }}</button>
                       <physio-icon *ngIf="d.isVerified" name="badge-check" [size]="15" class="flex-none text-primaryDeep" title="Verified" aria-hidden="true" />
                       <span *ngIf="d.isVerified" class="sr-only">Verified</span>
                     </div>

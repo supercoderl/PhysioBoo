@@ -3,15 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, ElementRef, HostListener, OnInit, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import {
-    BooButtonComponent,
-    BooCheckboxComponent,
-    BooErrorStateComponent,
-    BooEmptyStateComponent,
-    BooIconComponent,
-    BooInputComponent,
-    BooStatusBadgeComponent,
-} from '@physioboo/ui';
+import { BooButtonComponent, BooCheckboxComponent, BooErrorStateComponent, BooEmptyStateComponent, BooIconComponent, BooInputComponent, BooStatusBadgeComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { finalize } from 'rxjs/operators';
 import { BooTextareaComponent } from '../../../../components/textarea/boo-textarea/boo-textarea.component';
 import { HomeBannerService } from '../../../../services/admin/home-banner.service';
@@ -68,8 +60,7 @@ interface NavItem {
         HomeConfigSectionComponent,
         HomeBannerEditDrawerComponent,
         HomeFeatureEditDrawerComponent,
-        HomeTestimonialEditDrawerComponent,
-    ],
+        HomeTestimonialEditDrawerComponent, BooSpinnerComponent],
     templateUrl: './home-configuration.component.html',
     host: { class: 'flex flex-1 min-h-0 min-w-0 flex-col' },
 })

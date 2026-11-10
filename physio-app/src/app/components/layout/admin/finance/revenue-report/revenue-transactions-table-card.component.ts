@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooBadgeTone, BooStatusBadgeComponent } from "@physioboo/ui";
+import { BooBadgeTone, BooStatusBadgeComponent, BooButtonComponent } from "@physioboo/ui";
 import { ColumnDefDirective } from "../../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PaginationData } from "../../../../../shared/types/common";
@@ -9,7 +9,7 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
 @Component({
     selector: 'revenue-transactions-table-card',
     standalone: true,
-    imports: [SharedModule, BooTableAdminComponent, ColumnDefDirective, BooStatusBadgeComponent],
+    imports: [SharedModule, BooTableAdminComponent, ColumnDefDirective, BooStatusBadgeComponent, BooButtonComponent],
     template: `
     <div class="bg-surface rounded-2 border border-borderGray/60 h-full overflow-hidden">
       <boo-table-admin
@@ -25,7 +25,7 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
         [loading]="loading"
       >
         <ng-template appColumnDef="billNo" headerLabel="Bill No." headerClass="text-left" let-item>
-          <button type="button" class="text-sm font-semibold text-primary hover:underline" (click)="rowClick.emit(item.id)">
+          <button type="button" boo-button variant="text" classname="text-sm font-semibold text-primary" (click)="rowClick.emit(item.id)">
             {{ item.billNo }}
           </button>
         </ng-template>

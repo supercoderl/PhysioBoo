@@ -17,7 +17,7 @@
         Updated {{ lastUpdated | date: 'HH:mm' }}<ng-container *ngIf="isLive"><span aria-hidden="true"> · </span>auto-refreshes</ng-container>
       </p>
       <button boo-button variant="secondary" size="sm" [loading]="loading" [disabled]="!!doctorsError && !doctorId" (click)="load()">
-        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+        <physio-icon name="refresh" [size]="15" aria-hidden="true" />Refresh
       </button>
       <a *ngIf="bookingLink" boo-button variant="secondary" size="sm" [routerLink]="bookingLink">
         <physio-icon name="calendar-days" [size]="15" aria-hidden="true" />Bookings
@@ -94,7 +94,7 @@
         >
           {{ tabLabel(t) }}
           <span
-            class="min-w-[20px] h-5 px-1.5 inline-flex items-center justify-center rounded-full text-[11px] tabular-nums"
+            class="min-w-[20px] h-5 px-1.5 inline-flex items-center justify-center rounded-full text-xs tabular-nums"
             [class.bg-surface]="tab === t"
             [class.bg-body]="tab !== t"
           >{{ items ? counts[t] : '–' }}</span>
@@ -119,7 +119,7 @@
           </thead>
           <tbody *ngFor="let g of groups; trackBy: trackByStage">
             <tr class="bg-body border-b border-rowDivider">
-              <th scope="rowgroup" colspan="6" class="px-4 py-1.5 text-left text-[11px] font-semibold uppercase tracking-wide text-secondary">
+              <th scope="rowgroup" colspan="6" class="px-4 py-1.5 text-left text-xs font-semibold uppercase tracking-wide text-secondary">
                 {{ g.label }} <span class="ml-1 tabular-nums text-regular">{{ g.items.length }}</span>
               </th>
             </tr>
@@ -134,12 +134,7 @@
                 <div *ngIf="lateBy(a) as late" class="mt-1"><boo-status-badge [label]="lateLabel(late)" tone="warning" /></div>
               </td>
               <td class="px-4 py-3 align-top min-w-0 max-w-[280px]">
-                <button
-                  type="button"
-                  class="block max-w-full p-0 bg-transparent border-0 text-left font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
-                  [attr.aria-label]="'View appointment for ' + (a.patientName || 'unnamed patient')"
-                  (click)="$event.stopPropagation(); selected = a"
-                >{{ a.patientName || 'Unnamed patient' }}</button>
+                <button type="button" boo-button variant="text" classname="max-w-full font-semibold !text-regular truncate rounded" [attr.aria-label]="'View appointment for ' + (a.patientName || 'unnamed patient')" (click)="$event.stopPropagation(); selected = a">{{ a.patientName || 'Unnamed patient' }}</button>
                 <div class="mt-0.5 text-xs text-secondary tabular-nums truncate">
                   {{ a.patientMRN || '—' }}<ng-container *ngIf="a.patientPhone"><span aria-hidden="true"> · </span>{{ a.patientPhone }}</ng-container>
                 </div>

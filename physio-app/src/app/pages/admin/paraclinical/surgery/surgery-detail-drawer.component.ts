@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, inject, signal } fro
 import { Router } from "@angular/router";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
 import { finalize } from "rxjs";
-import { BooBadgeTone, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { AuthService } from "../../../../services/auth/auth.service";
 import { SurgeryService } from "../../../../services/admin/surgery.service";
 import { DialogService } from "../../../../services/common/dialog.service";
@@ -22,7 +22,7 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
 @Component({
   selector: 'surgery-detail-drawer',
   standalone: true,
-  imports: [SharedModule, DrawerComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent, BooButtonComponent, ButtonIconComponent],
+  imports: [SharedModule, DrawerComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent, BooButtonComponent, ButtonIconComponent, BooSpinnerComponent],
   template: `
     <drawer [isOpen]="isOpen" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
@@ -31,14 +31,14 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
             <h2 class="text-xl font-bold text-primary leading-none mb-1">Surgery Detail</h2>
             <p class="text-sm text-secondary m-0">{{ detail()?.surgeryNumber ?? 'Loading case...' }} — {{ detail()?.procedure }}</p>
           </div>
-          <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+          <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="onClose()" aria-label="Close">
             <physio-icon name="x" [size]="20"></physio-icon>
           </button>
         </div>
 
         <div class="flex-1 overflow-y-auto bg-surface" custom-scrollbar>
           <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-            <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+            <boo-spinner [inline]="true" tone="primary" [size]="24" />
           </div>
 
           <boo-error-state *ngIf="!isLoading() && loadError()" class="block p-6" appearance="panel" icon="cloud-off"
@@ -94,7 +94,7 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
                       [size]="16" [ngClass]="item.status === 'Completed' ? 'text-emerald-500' : item.status === 'NotApplicable' ? 'text-gray-400' : 'text-amber-500'"></physio-icon>
                     <span class="text-sm text-gray-700 truncate" [attr.aria-label]="item.label + ' — ' + item.status">{{ item.label }}</span>
                   </div>
-                  <span *ngIf="item.signedBy" class="text-[11px] text-gray-400 shrink-0">{{ item.signedBy }}</span>
+                  <span *ngIf="item.signedBy" class="text-xs text-gray-400 shrink-0">{{ item.signedBy }}</span>
                 </div>
               </div>
             </div>
@@ -125,11 +125,11 @@ const STAGE_LABELS: Record<SurgeryTimelineStage, string> = {
               <div class="flex items-center overflow-x-auto pb-1">
                 <ng-container *ngFor="let ev of c.timeline; let last = last">
                   <div class="flex flex-col items-center gap-1 shrink-0 w-24">
-                    <div class="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold"
+                    <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold"
                       [ngClass]="ev.occurredAt ? 'bg-primary text-white' : 'bg-gray-200 text-gray-400'">
                       <physio-icon [name]="ev.occurredAt ? 'check' : 'clock'" [size]="14"></physio-icon>
                     </div>
-                    <span class="text-[11px] font-medium text-gray-700 text-center">{{ STAGE_LABELS[ev.stage] }}</span>
+                    <span class="text-xs font-medium text-gray-700 text-center">{{ STAGE_LABELS[ev.stage] }}</span>
                     <span class="text-[10px] text-gray-400 text-center">{{ ev.occurredAt ? (ev.occurredAt | date:'short') : '—' }}</span>
                   </div>
                   <div *ngIf="!last" class="h-0.5 flex-1 min-w-[12px]" [ngClass]="ev.occurredAt ? 'bg-primary' : 'bg-gray-200'"></div>

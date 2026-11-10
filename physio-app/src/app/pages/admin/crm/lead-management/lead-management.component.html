@@ -13,8 +13,8 @@
       </p>
     </div>
     <div class="flex items-center gap-2">
-      <button boo-button variant="secondary" size="sm" [loading]="loading" [disabled]="rangeInvalid" (click)="refresh()">
-        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      <button boo-button variant="secondary" size="sm" [disabled]="loading || rangeInvalid" (click)="refresh()">
+        <physio-icon name="refresh" [size]="15" aria-hidden="true" />Refresh
       </button>
       <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
         <physio-icon name="plus" [size]="15" aria-hidden="true" />New lead
@@ -34,41 +34,7 @@
     <h2 id="lead-list-title" class="sr-only">Lead queue</h2>
 
     <!-- Pipeline: one tab per stage, with how many leads are in it under the current filters -->
-    <div class="boo-scrollbar overflow-x-auto border-b border-rowDivider">
-      <div class="flex min-w-max items-stretch px-2" role="tablist" aria-label="Lead stage">
-        <ng-container *ngFor="let tab of stageTabs; let i = index">
-          <!-- Separators: the forward path reads as one flow, the outcomes and "all" stand apart -->
-          <span *ngIf="i === 1 || i === stageTabs.length - 1" class="self-center w-px h-8 mx-1.5 bg-rowDivider" aria-hidden="true"></span>
-          <physio-icon *ngIf="i > 1 && i < stageTabs.length - 1" name="chevron-right" [size]="14" class="self-center flex-none text-placeholder" aria-hidden="true" />
-          <button
-            type="button"
-            role="tab"
-            [id]="'lead-tab-' + i"
-            aria-controls="lead-results"
-            [attr.aria-selected]="tab.value === stageFilter"
-            [attr.tabindex]="tab.value === stageFilter ? 0 : -1"
-            class="relative -mb-px flex flex-col items-start gap-0.5 px-3 py-2.5 min-w-[92px] bg-transparent border-0 border-b-2 text-left cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary rounded-t"
-            [ngClass]="tab.value === stageFilter ? 'border-primary' : 'border-transparent hover:bg-body'"
-            (click)="selectStage(tab.value)"
-            (keydown)="onTabKey($event, i)"
-          >
-            <span class="flex items-center gap-1.5 text-xs whitespace-nowrap"
-              [class.font-semibold]="tab.value === stageFilter"
-              [class.text-primaryDeep]="tab.value === stageFilter"
-              [class.font-medium]="tab.value !== stageFilter"
-              [class.text-secondary]="tab.value !== stageFilter"
-            >
-              <span *ngIf="tab.dot" class="w-1.5 h-1.5 rounded-full flex-none" [ngClass]="tab.dot" aria-hidden="true"></span>{{ tab.label }}
-            </span>
-            <span class="text-lg leading-6 font-semibold tabular-nums" [class.text-regular]="countOf(tab) !== null" [class.text-placeholder]="countOf(tab) === null">
-              <ng-container *ngIf="countOf(tab) !== null; else noCountTpl">{{ countOf(tab) }}</ng-container>
-              <ng-template #noCountTpl><span aria-hidden="true">–</span></ng-template>
-            </span>
-            <span *ngIf="countOf(tab) !== null" class="sr-only">{{ countOf(tab) === 1 ? 'lead' : 'leads' }}</span>
-          </button>
-        </ng-container>
-      </div>
-    </div>
+    <boo-tabs variant="stat" [tabs]="statTabItems" [value]="stageFilter" (valueChange)="selectStage($event)" label="Lead stage" idPrefix="lead-tab" controls="lead-results" />
 
     <!-- Search, priority, dates and sort. Every control is 36px high and the row aligns on its bottom edge, under the field labels. -->
     <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
@@ -162,16 +128,9 @@
               <!-- Identity, and how long they have been waiting -->
               <td class="px-4 py-3 align-top min-w-0 max-w-[300px]">
                 <div class="flex items-start gap-3 min-w-0">
-                  <span class="flex-none w-8 h-8 rounded-full bg-primarySoft text-primaryDeep text-[11px] font-semibold flex items-center justify-center" aria-hidden="true">{{ initials(l) }}</span>
+                  <span class="flex-none w-8 h-8 rounded-full bg-primarySoft text-primaryDeep text-xs font-semibold flex items-center justify-center" aria-hidden="true">{{ initials(l) }}</span>
                   <div class="min-w-0">
-                    <button
-                      type="button"
-                      class="block max-w-full p-0 bg-transparent border-0 text-left font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
-                      [attr.aria-label]="'Open details of ' + name(l)"
-                      aria-haspopup="dialog"
-                      [title]="name(l)"
-                      (click)="$event.stopPropagation(); openDetail(l)"
-                    >{{ name(l) }}</button>
+                    <button type="button" boo-button variant="text" classname="max-w-full font-semibold !text-regular truncate rounded" [attr.aria-label]="'Open details of ' + name(l)" aria-haspopup="dialog" [title]="name(l)" (click)="$event.stopPropagation(); openDetail(l)">{{ name(l) }}</button>
                     <div class="mt-0.5 text-xs truncate" [class.text-amber-700]="waiting(l)" [class.font-medium]="waiting(l)" [class.text-secondary]="!waiting(l)">
                       <ng-container *ngIf="waiting(l); else receivedTpl">{{ wait(l) }}</ng-container>
                       <ng-template #receivedTpl>Received {{ age(l).toLowerCase() }}</ng-template>

@@ -3,16 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import {
-    BooButtonComponent,
-    BooEmptyStateComponent,
-    BooErrorStateComponent,
-    BooIconComponent,
-    BooInlineErrorComponent,
-    BooInlineErrorState,
-    BooPaginationComponent,
-    BooStatusBadgeComponent,
-} from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooIconComponent, BooInlineErrorComponent, BooInlineErrorState, BooPaginationComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { Subject, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { BooDatepickerComponent } from '../../../../../components/date-picker/boo-date-picker.component';

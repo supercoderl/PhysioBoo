@@ -45,9 +45,31 @@
   --color-text: #26141A;
   --color-text-secondary: #71606A;
   --color-text-muted: #A1A1AA;
+
+  /* Form controls (inputs, selects, date pickers, section cards). Space separated RGB, like --twc-*.
+     Neutrals follow Google Material; --form-accent is separate from the rose brand accent on purpose. */
+  --form-text: 32 33 36; /* #202124 */
+  --form-muted: 95 99 104; /* #5F6368 (labels, helper text, placeholder) */
+  --form-border: 218 220 224; /* #DADCE0 */
+  --form-border-hover: 128 134 139; /* #80868B */
+  --form-surface: 255 255 255; /* #FFFFFF */
+  --form-subtle: 248 249 250; /* #F8F9FA (disabled and read-only fill) */
+  --form-accent: 26 115 232; /* #1A73E8 (focus) */
+  --form-error: 217 48 37; /* #D93025 */
+  --form-success: 24 128 56; /* #188038 */
 }
 
 :root.dark {
+  --form-text: var(--twc-regular);
+  --form-muted: var(--twc-secondary);
+  --form-border: var(--twc-border);
+  --form-border-hover: 154 160 166; /* #9AA0A6 */
+  --form-surface: var(--bg-surface);
+  --form-subtle: var(--twc-body);
+  --form-accent: 138 180 248; /* #8AB4F8 */
+  --form-error: 242 139 130; /* #F28B82 */
+  --form-success: 129 201 149; /* #81C995 */
+
   --twc-bg-header: 20 14 16; /* #140E10 */
   --twc-primary: 251 113 133; /* #FB7185 */
   --twc-primary-hover: 253 164 175; /* #FDA4AF */

@@ -5,7 +5,7 @@ import { SuperadminAuditLogDrawerComponent } from "../../../../components/layout
 import { SuperadminPageHeaderComponent } from "../../../../components/layout/superadmin/shared/superadmin-page-header.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BooTableAdminComponent } from "../../../../components/table/boo-table-admin/boo-table-admin.component";
-import { BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent, BooButtonComponent } from '@physioboo/ui';
 import { AuditLogService } from "../../../../services/admin/audit-log.service";
 import { ColumnDefDirective } from "../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -30,8 +30,7 @@ const ACTIONS = ['Create', 'Update', 'Delete', 'SoftDelete'];
         BooStatusBadgeComponent,
         BooErrorStateComponent,
         BooButtonAdminComponent,
-        BooInputComponent
-    ],
+        BooInputComponent, BooButtonComponent],
     host: { class: 'block h-full min-h-0' },
     template: `
         <div class="h-full flex flex-col gap-5">
@@ -90,10 +89,7 @@ const ACTIONS = ['Create', 'Update', 'Delete', 'SoftDelete'];
                         ></boo-datepicker>
                     </div>
                 </div>
-                <button
-                    type="submit"
-                    class="h-9 px-4 rounded-1.5 bg-primary text-white text-[13px] font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
-                >
+                <button type="submit" boo-button variant="primary" size="sm">
                     Apply
                 </button>
                 <boo-button-admin *ngIf="hasFilters" (click)="clear()" background="transparent" textColor="rgb(var(--twc-secondary))" padding="8px 12px" fontWeight="500">

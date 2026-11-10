@@ -1,3 +1,4 @@
+import { BooButtonComponent, BooDialogComponent } from '@physioboo/ui';
 import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
@@ -8,32 +9,13 @@ export type NoteDialogMode = 'approve' | 'reject' | 'cancel';
 @Component({
     selector: 'stock-take-note-dialog',
     standalone: true,
-    imports: [SharedModule,BooTextareaComponent, BooButtonAdminComponent],
+    imports: [SharedModule,BooTextareaComponent, BooButtonAdminComponent, BooButtonComponent, BooDialogComponent],
     template: `
-    <div *ngIf="isOpen" class="fixed inset-0 z-[10000] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="stock-take-note-title" (keydown.escape)="onClose()">
-      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="onClose()"></div>
-
-      <div class="relative bg-surface rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100">
-        <div class="px-6 py-5 border-b border-gray-100 flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" [ngClass]="iconBg">
-            <physio-icon [name]="iconName" [size]="20" [class]="iconColor"></physio-icon>
-          </div>
-          <div class="flex-1">
-            <h3 id="stock-take-note-title" class="text-lg font-semibold text-gray-900">{{ title }}</h3>
-            <p class="text-sm text-gray-500 mt-1 leading-relaxed">{{ subtitle }}</p>
-          </div>
-        </div>
-
-        <div class="px-6 py-4">
-          <boo-textarea [label]="noteLabel" [(ngModel)]="note" [required]="mode !== 'approve'"></boo-textarea>
-        </div>
-
-        <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3">
-          <boo-button-admin background="transparent" (click)="onClose()">Back</boo-button-admin>
-          <boo-button-admin textColor="white" [background]="mode === 'approve' ? 'rgb(var(--twc-primary))' : '#DC2626'" [disabled]="busy" [loading]="busy" (click)="onConfirm()">{{ confirmLabel }}</boo-button-admin>
-        </div>
-      </div>
-    </div>
+    <boo-dialog *ngIf="isOpen" [heading]="title" [description]="subtitle" [tone]="mode === 'approve' ? 'success' : 'danger'" [icon]="iconName" [busy]="busy" (dismiss)="onClose()">
+      <boo-textarea [label]="noteLabel" [(ngModel)]="note" [required]="mode !== 'approve'"></boo-textarea>
+      <button boo-dialog-footer type="button" boo-button variant="secondary" size="sm" [disabled]="busy" (click)="onClose()">Back</button>
+      <button boo-dialog-footer type="button" boo-button [variant]="mode === 'approve' ? 'primary' : 'danger'" size="sm" [loading]="busy" (click)="onConfirm()">{{ confirmLabel }}</button>
+    </boo-dialog>
   `,
 })
 export class StockTakeNoteDialogComponent implements OnChanges {
@@ -85,8 +67,6 @@ export class StockTakeNoteDialogComponent implements OnChanges {
         }
     }
 
-    get iconBg(): string { return this.mode === 'approve' ? 'bg-emerald-50' : 'bg-rose-50'; }
-    get iconColor(): string { return this.mode === 'approve' ? 'text-emerald-600' : 'text-rose-600'; }
 
     onClose(): void {
         this.close.emit();

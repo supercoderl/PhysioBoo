@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angular/core";
-import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { BooDatepickerComponent } from "../../../../../components/date-picker/boo-date-picker.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
@@ -23,7 +23,7 @@ interface ProcedureDraft {
 @Component({
   selector: 'treatment-procedures-tab',
   standalone: true,
-  imports: [SharedModule, BooDatepickerComponent, BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent, BooButtonAdminComponent],
+  imports: [SharedModule, BooDatepickerComponent, BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent, BooButtonAdminComponent, BooSpinnerComponent],
   template: `
     <div class="flex items-center justify-between mb-3">
       <h3 class="text-sm font-semibold text-primary m-0">Procedures</h3>
@@ -57,7 +57,7 @@ interface ProcedureDraft {
     </form>
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16" aria-live="polite">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <boo-error-state *ngIf="!isLoading() && loadError()" title="Couldn't load procedures" [description]="loadError()" appearance="panel" (retry)="load()"></boo-error-state>

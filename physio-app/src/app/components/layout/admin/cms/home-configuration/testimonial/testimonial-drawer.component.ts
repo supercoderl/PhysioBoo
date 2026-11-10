@@ -8,7 +8,7 @@ import { CATCH_ERROR_AFTER_CREATING_OR_UPDATING, SEARCH_BY_ID_FAILED_AFTER_CREAT
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { Testimonial } from "../../../../../../shared/types/testimonial.types";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
+import { BooCheckboxComponent, BooInputComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
 import { BooSelectComponent } from "../../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";
@@ -31,8 +31,7 @@ const RATING_OPTIONS = [
         BooTextareaComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
-        BooCheckboxComponent
-    ],
+        BooCheckboxComponent, BooButtonComponent, BooSpinnerComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="onClose()">
             <div class="flex flex-col h-full bg-surface relative">
@@ -43,14 +42,14 @@ const RATING_OPTIONS = [
                         </h2>
                         <p class="text-sm text-secondary m-0">Configure a patient testimonial shown on the home page</p>
                     </div>
-                    <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="onClose()" aria-label="Close">
                         <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
                 <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
                     <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
+                        <boo-spinner [inline]="true" tone="primary" [size]="32" />
                     </div>
 
                     <div class="p-6 space-y-4">
@@ -76,7 +75,7 @@ const RATING_OPTIONS = [
                 </div>
 
                 <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0">
-                    <button *ngIf="currentId" (click)="onDelete()" class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1.5">
+                    <button type="button" boo-button variant="ghost" size="sm" classname="!text-danger" *ngIf="currentId" (click)="onDelete()">
                         <physio-icon name="trash" [size]="16"></physio-icon>
                         Delete
                     </button>

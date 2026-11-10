@@ -1,6 +1,6 @@
 import { Component, inject } from "@angular/core";
 import { FormBuilder, Validators } from "@angular/forms";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
+import { BooCheckboxComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { InsuranceCompanyService } from "../../../../../../services/admin/insurance-company.service";
 import { InsuranceType } from "../../../../../../shared/enums/insurance-type";
 import { SharedModule } from "../../../../../../shared/shared-imports";
@@ -21,8 +21,7 @@ import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-sh
         BooInputComponent,
         BooTextareaComponent,
         BooCheckboxComponent,
-        BooSelectComponent
-    ],
+        BooSelectComponent, BooFieldErrorComponent],
     template: `
         <common-category-drawer-shell
             [form]="form"
@@ -77,7 +76,7 @@ import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-sh
                         <boo-input type="number" label="Settlement ratio (%)" formControlName="claimSettlementRatio" placeholder="95.5" />
                         <boo-input type="number" label="Avg. settlement (days)" formControlName="averageClaimSettlementTime" placeholder="7" />
                     </div>
-                    <p *ngIf="form.controls['claimSettlementRatio'].touched && form.controls['claimSettlementRatio'].invalid" class="m-0 mt-1 text-xs text-danger" role="alert">The settlement ratio is a percentage between 0 and 100.</p>
+                    <boo-field-error size="sm" announce class="mt-1" *ngIf="form.controls['claimSettlementRatio'].touched && form.controls['claimSettlementRatio'].invalid">The settlement ratio is a percentage between 0 and 100.</boo-field-error>
                 </section>
 
                 <section class="px-6 py-5">

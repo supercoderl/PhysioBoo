@@ -3,19 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, ElementRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import {
-    BooButtonComponent,
-    BooEmptyStateComponent,
-    BooErrorStateComponent,
-    BooFilterChip,
-    BooFilterChipsComponent,
-    BooIconComponent,
-    BooInlineErrorComponent,
-    BooInlineErrorState,
-    BooPaginationComponent,
-    BooSearchFieldComponent,
-    BooStatusBadgeComponent,
-} from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooFilterChip, BooFilterChipsComponent, BooIconComponent, BooInlineErrorComponent, BooInlineErrorState, BooPaginationComponent, BooSearchFieldComponent, BooStatusBadgeComponent, BooTabsComponent } from '@physioboo/ui';
 import { Subject, of } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap } from 'rxjs/operators';
 import { BooDatepickerComponent } from '../../../../../components/date-picker/boo-date-picker.component';
@@ -82,8 +70,7 @@ const PAGE_SIZE = 20;
         BooErrorStateComponent,
         BooInlineErrorComponent,
         CmsArticleDetailDrawerComponent,
-        CmsArticleEditDrawerComponent,
-    ],
+        CmsArticleEditDrawerComponent, BooTabsComponent],
     templateUrl: './list.component.html',
     host: { class: 'flex flex-col min-h-full' },
 })
@@ -94,7 +81,6 @@ export class CmsArticleNewsListComponent implements OnInit {
     private readonly dialogSrv = inject(DialogService);
     private readonly toastSrv = inject(ToastService);
     private readonly destroyRef = inject(DestroyRef);
-    private readonly host: HTMLElement = inject(ElementRef).nativeElement;
 
     readonly ArticleStatus = ArticleStatus;
     readonly statusTabs: StatusTab[] = [
@@ -316,18 +302,6 @@ export class CmsArticleNewsListComponent implements OnInit {
     }
 
     /** Arrow keys, Home and End move between status tabs. */
-    onTabKey(event: KeyboardEvent, index: number): void {
-        const last = this.statusTabs.length - 1;
-        const next = event.key === 'ArrowRight' ? (index === last ? 0 : index + 1)
-            : event.key === 'ArrowLeft' ? (index === 0 ? last : index - 1)
-            : event.key === 'Home' ? 0
-            : event.key === 'End' ? last
-            : null;
-        if (next === null) return;
-        event.preventDefault();
-        this.selectStatus(this.statusTabs[next].value);
-        this.host.querySelector<HTMLElement>(`#article-tab-${next}`)?.focus();
-    }
 
     onFilterChange(): void {
         // A half-picked or reversed range waits for the other date rather than reloading twice.

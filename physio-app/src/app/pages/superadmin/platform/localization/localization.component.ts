@@ -87,7 +87,7 @@ function flatten(value: unknown, prefix = ''): ResourceRow[] {
                             />
 
                             <div *ngIf="!rawText() && rows().length" class="overflow-x-auto max-h-[60svh]" custom-scrollbar>
-                                <table class="w-full text-[13px] text-left">
+                                <table class="w-full text-sm text-left">
                                     <caption class="sr-only">Resources for {{ languageCode() }}</caption>
                                     <thead class="sticky top-0 z-[1] bg-surface">
                                         <tr class="border-b border-borderGray/60 text-secondary">
@@ -115,12 +115,12 @@ function flatten(value: unknown, prefix = ''): ResourceRow[] {
                     <h3 id="import-title" class="text-sm font-semibold text-regular m-0 px-4 py-3 border-b border-borderGray/60">Import resources</h3>
                     <div class="p-4 space-y-5">
                         <div class="space-y-2">
-                            <label for="import-file" class="text-[13px] font-medium text-regular">From a file</label>
+                            <label for="import-file" class="text-sm font-medium text-regular">From a file</label>
                             <input
                                 id="import-file"
                                 type="file"
                                 accept=".json,application/json"
-                                class="block w-full text-[13px] text-regular file:mr-3 file:h-9 file:px-3 file:rounded-1.5 file:border file:border-borderGray file:bg-surface file:text-[13px] file:font-medium file:cursor-pointer"
+                                class="block w-full text-sm text-regular file:mr-3 file:h-9 file:px-3 file:rounded-1.5 file:border file:border-borderGray file:bg-surface file:text-sm file:font-medium file:cursor-pointer"
                                 (change)="onFileSelected($event)"
                             />
                             <boo-button-admin [disabled]="!file() || importing()" (click)="importFile()" textColor="white" padding="8px 16px" fontWeight="600">
@@ -129,14 +129,14 @@ function flatten(value: unknown, prefix = ''): ResourceRow[] {
                         </div>
 
                         <div class="space-y-2 pt-5 border-t border-borderGray/60">
-                            <label for="import-url" class="text-[13px] font-medium text-regular">From a URL</label>
+                            <label for="import-url" class="text-sm font-medium text-regular">From a URL</label>
                             <boo-input [id]="'import-url'" type="url" label="https://…/resources.json" size="small" [ngModel]="url()" (ngModelChange)="url.set($event)"></boo-input>
                             <boo-button-admin [disabled]="!url().trim() || importing()" (click)="importUrl()" background="transparent" textColor="rgb(var(--twc-regular))" [border]="{ width: 1, color: 'rgb(var(--twc-border))' }" padding="8px 16px" fontWeight="500">
                                 Import from URL
                             </boo-button-admin>
                         </div>
 
-                        <p *ngIf="lastResult() as result" class="m-0 text-[13px] text-regular rounded-1.5 bg-emerald-50 border border-emerald-200 px-3 py-2" role="status">
+                        <p *ngIf="lastResult() as result" class="m-0 text-sm text-regular rounded-1.5 bg-emerald-50 border border-emerald-200 px-3 py-2" role="status">
                             Imported — <strong class="tabular-nums">{{ result.inserted }}</strong> added,
                             <strong class="tabular-nums">{{ result.updated }}</strong> updated.
                         </p>

@@ -19,7 +19,7 @@ import { formatRetailMoney } from "../../../../shared/utils/retail-pos.utils";
             <h2 id="retail-detail-title" class="text-lg font-semibold text-regular m-0 break-words">{{ detail()?.name || 'Medicine details' }}</h2>
             <p *ngIf="detail() as d" class="text-sm text-secondary m-0">{{ subtitle(d) }}</p>
           </div>
-          <button type="button" (click)="close.emit()" class="w-8 h-8 shrink-0 rounded-1.5 flex items-center justify-center text-gray-500 hover:bg-gray-100" aria-label="Close details">
+          <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="close.emit()" aria-label="Close details">
             <physio-icon name="x" [size]="18"></physio-icon>
           </button>
         </div>

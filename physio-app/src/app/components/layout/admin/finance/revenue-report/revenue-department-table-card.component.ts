@@ -3,11 +3,12 @@ import { ColumnDefDirective } from "../../../../../shared/directives/column-def.
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { DepartmentRevenuePerformance } from "../../../../../shared/types/revenue.types";
 import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-table-admin.component";
+import { BooButtonComponent } from '@physioboo/ui';
 
 @Component({
     selector: 'revenue-department-table-card',
     standalone: true,
-    imports: [SharedModule, BooTableAdminComponent, ColumnDefDirective],
+    imports: [SharedModule, BooTableAdminComponent, ColumnDefDirective, BooButtonComponent],
     template: `
     <div class="bg-surface rounded-2 border border-borderGray/60 h-full overflow-hidden">
       <boo-table-admin
@@ -22,7 +23,7 @@ import { BooTableAdminComponent } from "../../../../table/boo-table-admin/boo-ta
         [loading]="loading"
       >
         <ng-template appColumnDef="name" headerLabel="Department" headerClass="text-left" let-item>
-          <button type="button" class="text-sm font-semibold text-regular hover:text-primary hover:underline" (click)="rowClick.emit(item.departmentId)">
+          <button type="button" boo-button variant="text" classname="text-sm font-semibold !text-regular" (click)="rowClick.emit(item.departmentId)">
             {{ item.name }}
           </button>
         </ng-template>

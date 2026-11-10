@@ -1,6 +1,6 @@
-<div class="pb-5 flex flex-col gap-4 min-w-0" [attr.aria-busy]="loading">
+<div class="flex flex-1 min-h-0 min-w-0 flex-col gap-4 pb-5" [attr.aria-busy]="loading">
   <!-- Page header -->
-  <header class="flex flex-wrap items-end justify-between gap-3">
+  <header class="shrink-0 flex flex-wrap items-end justify-between gap-3">
     <div class="min-w-0">
       <h1 class="m-0 text-xl leading-7 font-semibold tracking-tight text-regular">Nursing dashboard</h1>
       <p class="m-0 mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs leading-5 text-secondary">
@@ -20,11 +20,14 @@
       <button *ngIf="canAssign" boo-button variant="secondary" size="sm" [attr.aria-expanded]="assignOpen" (click)="toggleAssign()">
         <physio-icon name="user-plus" [size]="15" aria-hidden="true" />Assign patient
       </button>
-      <button boo-button variant="primary" size="sm" [loading]="loading" (click)="load()">
-        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      <button boo-button variant="primary" size="sm" [disabled]="loading" (click)="load()">
+        <physio-icon name="refresh" [size]="15" aria-hidden="true" />Refresh
       </button>
     </div>
   </header>
+
+  <!-- Only this region scrolls; the page header above stays in view. -->
+  <div class="boo-scrollbar min-h-0 flex-1 space-y-4 overflow-auto pr-1">
 
   <!-- Assign an admitted patient (Nursing manage) -->
   <section *ngIf="canAssign && assignOpen" aria-label="Assign a patient" class="bg-surface border border-borderGray rounded-xl p-4">
@@ -234,4 +237,5 @@
       />
     </ng-template>
   </ng-template>
+  </div>
 </div>

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -11,10 +11,10 @@ const QUEUE_STATUSES: SurgeryStatus[] = ['Scheduled', 'PatientArrived', 'PreOpRe
 @Component({
   selector: 'surgery-queue-tab',
   standalone: true,
-  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonComponent, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <div *ngIf="!isLoading() && !queue().length"><boo-empty-state icon="clipboard-check" title="The surgical queue is empty" description="No cases are currently in pre-operative stages."></boo-empty-state></div>
@@ -38,7 +38,7 @@ const QUEUE_STATUSES: SurgeryStatus[] = ['Scheduled', 'PatientArrived', 'PreOpRe
 
         <div *ngIf="expanded() === s.id" class="border-t border-gray-100 px-4 py-4 bg-gray-50">
           <div *ngIf="!checklists[s.id]" class="flex items-center justify-center py-6">
-            <physio-icon name="loader" [class]="'w-5 h-5 text-primary animate-spin'"></physio-icon>
+            <boo-spinner [inline]="true" tone="primary" [size]="20" />
           </div>
 
           <div *ngIf="checklists[s.id]" class="space-y-1.5">
@@ -49,8 +49,8 @@ const QUEUE_STATUSES: SurgeryStatus[] = ['Scheduled', 'PatientArrived', 'PreOpRe
                 <span class="text-sm text-gray-700 truncate" [attr.aria-label]="item.label + ' — ' + item.status">{{ item.label }}</span>
               </div>
               <div class="flex items-center gap-2 shrink-0">
-                <span *ngIf="item.signedBy" class="text-[11px] text-gray-400">{{ item.signedBy }} · {{ item.signedAt | date:'shortTime' }}</span>
-                <button *ngIf="item.status === 'Pending'" (click)="signOff(s, item)" class="text-primary text-xs font-semibold hover:underline">Sign Off</button>
+                <span *ngIf="item.signedBy" class="text-xs text-gray-400">{{ item.signedBy }} · {{ item.signedAt | date:'shortTime' }}</span>
+                <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold" *ngIf="item.status === 'Pending'" (click)="signOff(s, item)">Sign Off</button>
               </div>
             </div>
           </div>

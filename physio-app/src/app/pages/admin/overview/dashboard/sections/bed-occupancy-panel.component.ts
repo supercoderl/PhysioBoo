@@ -38,7 +38,7 @@ interface OccupancyRow {
             <ul *ngIf="rows.length; else emptyTpl" class="list-none m-0 px-4 py-3 flex flex-col gap-3 max-h-[22rem] overflow-y-auto">
                 <li *ngFor="let row of rows; trackBy: trackByName" class="min-w-0">
                     <div class="flex items-baseline justify-between gap-3">
-                        <span class="text-[13px] font-medium text-regular truncate" [title]="row.name">{{ row.name }}</span>
+                        <span class="text-sm font-medium text-regular truncate" [title]="row.name">{{ row.name }}</span>
                         <span class="flex-none inline-flex items-center gap-1.5 text-xs tabular-nums">
                             <span *ngIf="row.detail" class="text-placeholder">{{ row.detail }}</span>
                             <span *ngIf="row.high" class="inline-flex items-center gap-0.5 font-semibold text-danger">
@@ -60,7 +60,7 @@ interface OccupancyRow {
                 <boo-empty-state icon="bed" title="No beds configured" description="Wards and beds set up in the bed map appear here." />
             </ng-template>
 
-            <p *ngIf="rows.length" class="mt-auto mb-0 px-4 py-2.5 border-t border-rowDivider text-[11px] leading-4 text-placeholder">
+            <p *ngIf="rows.length" class="mt-auto mb-0 px-4 py-2.5 border-t border-rowDivider text-xs leading-4 text-placeholder">
                 Marked when occupancy reaches {{ threshold }}%.{{ view === 'department' ? ' Busiest 8 departments.' : '' }}
             </p>
         </dashboard-panel>

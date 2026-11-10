@@ -6,7 +6,7 @@ import { MasterDataColumn } from "../../../../shared/types/master-data.types";
 import { SortOption } from "../../../../shared/types/sort";
 import { BooActionAdminComponent } from "../../../table/boo-table-admin/boo-action-admin.component";
 import { BooTableAdminComponent, FilterConfig } from "../../../table/boo-table-admin/boo-table-admin.component";
-import { BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooStatusBadgeComponent, BooButtonComponent } from '@physioboo/ui';
 
 /** Table for any Master Data catalog: a clickable name column, the configured columns, and row actions. */
 @Component({
@@ -17,8 +17,7 @@ import { BooStatusBadgeComponent } from '@physioboo/ui';
     BooTableAdminComponent,
     ColumnDefDirective,
     BooActionAdminComponent,
-    BooStatusBadgeComponent
-  ],
+    BooStatusBadgeComponent, BooButtonComponent],
   host: { class: 'block h-full min-h-0' },
   template: `
     <div class="bg-surface rounded-2 border border-borderGray/60 h-full overflow-hidden">
@@ -43,7 +42,9 @@ import { BooStatusBadgeComponent } from '@physioboo/ui';
         <ng-template [appColumnDef]="nameKey" headerLabel="Name" headerClass="text-left" let-item>
           <button
             type="button"
-            class="min-w-0 max-w-full text-left rounded-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
+            boo-button
+            variant="text"
+            classname="min-w-0"
             [attr.aria-label]="'Edit ' + item[nameKey]"
             (click)="editClick.emit(item.id)"
           >

@@ -164,14 +164,8 @@
     <fieldset class="border-0 m-0 p-0">
       <legend class="text-sm font-semibold p-0 mb-2">Consultation type</legend>
       <div class="flex flex-col gap-2">
-        <label class="min-h-12 flex gap-3 items-center text-[15px]">
-          <input type="checkbox" [checked]="query.online" (change)="toggleOnline()" class="w-5 h-5 accent-primary" />
-          Online consultation
-        </label>
-        <label class="min-h-12 flex gap-3 items-center text-[15px]">
-          <input type="checkbox" [checked]="query.homeVisit" (change)="toggleHomeVisit()" class="w-5 h-5 accent-primary" />
-          Home visit
-        </label>
+        <boo-checkbox class="min-h-12 flex items-center text-[15px]" [ngModel]="query.online" (ngModelChange)="toggleOnline()">Online consultation</boo-checkbox>
+        <boo-checkbox class="min-h-12 flex items-center text-[15px]" [ngModel]="query.homeVisit" (ngModelChange)="toggleHomeVisit()">Home visit</boo-checkbox>
       </div>
     </fieldset>
   </div>

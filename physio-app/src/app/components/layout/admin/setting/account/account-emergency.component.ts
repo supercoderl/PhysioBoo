@@ -14,7 +14,7 @@ import { BooInputComponent } from '@physioboo/ui';
         <div class="flex flex-col gap-4" [formGroup]="form">
             <div class="w-full">
                 <p class="font-semibold text-base m-0">Emergency Contact</p>
-                <p class="m-0 text-[13px] leading-[1.5] text-[#71606A]">
+                <p class="m-0 text-sm leading-[1.5] text-[#71606A]">
                     Trusted contacts we can reach out to in urgent situations.
                 </p>
             </div>

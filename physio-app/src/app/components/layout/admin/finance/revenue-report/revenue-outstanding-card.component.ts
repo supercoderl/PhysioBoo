@@ -27,7 +27,7 @@ import { OutstandingAgingSummary, OutstandingInvoice } from "../../../../../shar
       <ng-container *ngIf="!loading && hasOutstanding">
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
           <div *ngFor="let bucket of aging" class="rounded-1.5 border border-gray-100 px-3 py-2.5" [ngClass]="bucketTone(bucket.bucket)">
-            <p class="text-[11px] font-medium uppercase tracking-wide text-secondary mb-0">{{ bucket.bucket }} days</p>
+            <p class="text-xs font-medium uppercase tracking-wide text-secondary mb-0">{{ bucket.bucket }} days</p>
             <p class="text-lg font-bold text-regular mt-0.5 mb-0 tabular-nums">{{ bucket.amount | currency }}</p>
             <p class="text-xs text-secondary mb-0">{{ bucket.count }} {{ bucket.count === 1 ? 'bill' : 'bills' }}</p>
           </div>

@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { AuthService } from '../../../services/auth/auth.service';
 import { SharedModule } from '../../../shared/shared-imports';
 import { BooAvatarComponent } from '../../image/avatar/boo-avatar.component';
+import { BooButtonComponent } from '@physioboo/ui';
 
 interface PatientNavItem {
     label: string;
@@ -24,7 +25,7 @@ export const PATIENT_NAV: readonly PatientNavItem[] = [
 @Component({
     selector: 'patient-layout',
     standalone: true,
-    imports: [SharedModule, BooAvatarComponent],
+    imports: [SharedModule, BooAvatarComponent, BooButtonComponent],
     template: `
         <a
             href="#patient-main"
@@ -74,13 +75,7 @@ export const PATIENT_NAV: readonly PatientNavItem[] = [
                                 {{ user.fullName || user.email }}
                             </span>
                         </ng-container>
-                        <button
-                            type="button"
-                            class="w-11 h-11 flex items-center justify-center rounded-1.5 text-danger hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors shrink-0 cursor-pointer"
-                            aria-label="Log out"
-                            title="Log out"
-                            (click)="logout()"
-                        >
+                        <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!text-danger" aria-label="Log out" title="Log out" (click)="logout()">
                             <physio-icon name="power" [size]="18" />
                         </button>
                     </div>

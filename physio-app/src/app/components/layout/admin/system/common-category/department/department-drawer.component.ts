@@ -1,6 +1,6 @@
 import { Component, inject } from "@angular/core";
 import { FormBuilder, Validators } from "@angular/forms";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
+import { BooCheckboxComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { DepartmentService } from "../../../../../../services/admin/department.service";
 import { DoctorService } from "../../../../../../services/admin/doctor.service";
 import { HospitalService } from "../../../../../../services/admin/hospital.service";
@@ -24,8 +24,7 @@ import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-sh
         BooInputComponent,
         BooTextareaComponent,
         BooCheckboxComponent,
-        BooSelectComponent
-    ],
+        BooSelectComponent, BooFieldErrorComponent],
     template: `
         <common-category-drawer-shell
             [form]="form"
@@ -52,7 +51,7 @@ import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-sh
                         <boo-select label="Hospital" formControlName="hospitalId" [options]="hospitalOptions" [required]="true" />
                         <boo-select label="Head of department" formControlName="headOfDepartment" [options]="doctorOptions" />
                     </div>
-                    <p *ngIf="form.controls['hospitalId'].touched && form.controls['hospitalId'].invalid" class="m-0 mt-1 text-xs text-danger" role="alert">Choose the hospital this department belongs to.</p>
+                    <boo-field-error size="sm" announce class="mt-1" *ngIf="form.controls['hospitalId'].touched && form.controls['hospitalId'].invalid">Choose the hospital this department belongs to.</boo-field-error>
                 </section>
 
                 <section class="px-6 py-5 border-b border-rowDivider">

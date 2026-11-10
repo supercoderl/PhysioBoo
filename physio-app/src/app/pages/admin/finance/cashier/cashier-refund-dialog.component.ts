@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
-import { BooButtonComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -19,7 +19,7 @@ const REASON_MAX_LENGTH = 500;
 @Component({
     selector: 'cashier-refund-dialog',
     standalone: true,
-    imports: [SharedModule, CashierDialogComponent, BooButtonComponent, BooInputComponent, BooSelectComponent, BooTextareaComponent],
+    imports: [SharedModule, CashierDialogComponent, BooButtonComponent, BooInputComponent, BooSelectComponent, BooTextareaComponent, BooFieldErrorComponent],
     template: `
     <cashier-dialog
       [open]="open && !!bill"
@@ -44,12 +44,12 @@ const REASON_MAX_LENGTH = 500;
         <fieldset class="m-0 p-0 border-0 space-y-4" [disabled]="busy">
           <div>
             <boo-select label="Payment to refund" [options]="paymentOptions" [ngModel]="paymentId" (ngModelChange)="onPaymentChange($event)" required></boo-select>
-            <p *ngIf="touched && !selected" class="mt-1 mb-0 text-xs text-danger" role="alert">Choose the payment to refund.</p>
+            <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="touched && !selected">Choose the payment to refund.</boo-field-error>
           </div>
 
           <div>
             <boo-input label="Refund amount" type="number" [(ngModel)]="amount" required></boo-input>
-            <p *ngIf="touched && amountError as msg; else amountHint" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+            <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="touched && amountError as msg; else amountHint">{{ msg }}</boo-field-error>
             <ng-template #amountHint>
               <p class="mt-1 mb-0 text-xs text-secondary" *ngIf="selected">Up to {{ selected.refundable | currency:'USD':'symbol':'1.2-2' }} can be refunded on this payment.</p>
             </ng-template>
@@ -57,7 +57,7 @@ const REASON_MAX_LENGTH = 500;
 
           <div>
             <boo-textarea label="Reason" [(ngModel)]="reason" required [rows]="3" [maxlength]="reasonMaxLength"></boo-textarea>
-            <p *ngIf="touched && reasonError as msg" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+            <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="touched && reasonError as msg">{{ msg }}</boo-field-error>
           </div>
         </fieldset>
       </ng-container>

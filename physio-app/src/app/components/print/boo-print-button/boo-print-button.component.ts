@@ -12,10 +12,8 @@ import { SharedModule } from '../../../shared/shared-imports';
       [disabled]="disabled || loading()"
       [class]="resolvedClass()"
       [title]="title || 'Print'">
-      <physio-icon
-        [name]="loading() ? 'loader-circle' : icon"
-        [class]="loading() ? 'w-4 h-4 animate-spin' : 'w-4 h-4'" />
-      <span *ngIf="label">{{ loading() ? 'Loading…' : label }}</span>
+      <physio-icon [name]="icon" class="w-4 h-4" />
+      <span *ngIf="label">{{ label }}</span>
     </button>
   `
 })

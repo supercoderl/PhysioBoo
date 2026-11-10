@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { BooBadgeTone, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -9,7 +9,7 @@ import { ImagingOrderRow, ImagingOrderStatus, RadiologyPriority, ReportStatus } 
 @Component({
   selector: 'radiology-orders-tab',
   standalone: true,
-  imports: [SharedModule,BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent],
+  imports: [SharedModule,BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonComponent, BooSpinnerComponent],
   template: `
     <div class="flex flex-wrap items-center gap-3 mb-4">
       <boo-input label="Search order #, patient, MRN..." size="small" (search)="onSearch($event)"></boo-input>
@@ -24,12 +24,12 @@ import { ImagingOrderRow, ImagingOrderStatus, RadiologyPriority, ReportStatus } 
     </div>
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <div *ngIf="!isLoading() && !filtered().length">
       <boo-empty-state icon="scan" title="No imaging orders match these filters">
-        <button (click)="clearFilters()" class="text-primary text-xs font-semibold hover:underline">Clear Filters</button>
+        <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold" (click)="clearFilters()">Clear Filters</button>
       </boo-empty-state>
     </div>
 
@@ -68,13 +68,13 @@ import { ImagingOrderRow, ImagingOrderStatus, RadiologyPriority, ReportStatus } 
               <td class="px-4 py-3 text-gray-500">{{ o.orderTime | date:'short' }}</td>
               <td class="px-4 py-3">
                 <div class="flex items-center gap-3">
-                  <button (click)="viewPatient.emit(o.mrn)" class="text-primary text-xs font-semibold hover:underline">View</button>
-                  <button *ngIf="o.status === 'Ordered' && schedulingId() !== o.id" (click)="startScheduling(o)" class="text-primary text-xs font-semibold hover:underline">Schedule</button>
+                  <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold" (click)="viewPatient.emit(o.mrn)">View</button>
+                  <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold" *ngIf="o.status === 'Ordered' && schedulingId() !== o.id" (click)="startScheduling(o)">Schedule</button>
                 </div>
                 <div *ngIf="schedulingId() === o.id" class="flex items-center gap-2 mt-2">
-                  <input type="datetime-local" [(ngModel)]="scheduleAt" class="border border-gray-300 rounded px-2 py-1 text-xs" />
-                  <button (click)="confirmSchedule(o)" [disabled]="!scheduleAt" class="text-primary text-xs font-semibold hover:underline disabled:opacity-50">Book</button>
-                  <button (click)="schedulingId.set(null)" class="text-gray-500 text-xs hover:underline">Cancel</button>
+                  <boo-input class="w-56" label="Schedule date and time" type="datetime-local" size="small" [(ngModel)]="scheduleAt" />
+                  <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold disabled:opacity-50" (click)="confirmSchedule(o)" [disabled]="!scheduleAt">Book</button>
+                  <button type="button" boo-button variant="text" classname="!text-gray-500 text-xs" (click)="schedulingId.set(null)">Cancel</button>
                 </div>
               </td>
             </tr>

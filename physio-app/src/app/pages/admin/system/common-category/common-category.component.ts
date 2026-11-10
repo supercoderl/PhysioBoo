@@ -25,7 +25,7 @@ import { canOpenNavLink, childRoutePermissions } from "../../../../shared/utils/
                   </div>
                   <div class="navigation px-3">
                     <a 
-                      class="p-2 rounded-md gap-2 w-full flex mb-3 cursor-pointer relative align-middle text-[13px] font-medium leading-none min-h-8 min-w-8 text-[#1F232B] transition-all duration-300 hover:scale-105"
+                      class="p-2 rounded-md gap-2 w-full flex mb-3 cursor-pointer relative align-middle text-sm font-medium leading-none min-h-8 min-w-8 text-[#1F232B] transition-all duration-300 hover:scale-105"
                       *ngFor="let category of categories"
                       [routerLink]="category.route"
                       routerLinkActive="active" 
@@ -37,12 +37,12 @@ import { canOpenNavLink, childRoutePermissions } from "../../../../shared/utils/
                       ></physio-icon>
                       <div class="flex min-w-0 flex-auto flex-col items-start gap-1">
                         <p 
-                          class="leading-none truncate max-w-full m-0 text-[13px] text-primary"
+                          class="leading-none truncate max-w-full m-0 text-sm text-primary"
                         >
                           {{ category.name }}
                         </p>
                         <p 
-                          class="leading-none text-[11px] truncate max-w-full m-0 text-regular"
+                          class="leading-none text-xs truncate max-w-full m-0 text-regular"
                         >
                           {{ category.description }}
                         </p>

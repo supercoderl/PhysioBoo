@@ -1,5 +1,6 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, NgZone, OnDestroy, ViewChild, computed, forwardRef, inject, signal } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { AfterViewInit, Component, ElementRef, HostListener, Injector, Input, NgZone, OnDestroy, ViewChild, computed, forwardRef, inject, signal } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
+import { booValidationMessage } from '@physioboo/ui';
 import { MONTH_NAMES, SHORT_WEEKDAY_NAMES } from '../../shared/constants/value.constant';
 import { SharedModule } from '../../shared/shared-imports';
 
@@ -39,11 +40,11 @@ export type DateFilterFn = (date: Date) => boolean;
         *ngIf="!model() && label"
         (click)="open()"
         [class]="labelClasses"
-        [style.color]="placeholderColor"
+        [style.color]="placeholderColor || null"
         [style.height.px.important]="height"
         [style.line-height.px]="height"
       >
-        {{ label }} <span *ngIf="required" class="text-red-500 ml-0.5">*</span>
+        {{ label }} <span *ngIf="required" class="text-form-error ml-0.5">*</span>
       </span>
 
       <button
@@ -53,12 +54,13 @@ export type DateFilterFn = (date: Date) => boolean;
         [class]="inputClasses"
         [style.height.px.important]="height"
         [style.border-radius.px]="radius"
-        [style.background-color]="backgroundColor"
+        [style.background-color]="backgroundColor || null"
         [style.border-width.px]="borderWidth"
-        [style.border-color]="borderColor"
+        [style.border-color]="stateBorderColor"
+        [attr.aria-invalid]="errorText ? true : null"
       >
         <span class="flex-1 text-left">{{ displayValue() }}</span>
-        <span class="pl-2 text-slate-400">
+        <span class="pl-2 text-form-muted">
           <physio-icon name="calendar" />
         </span>
       </button>
@@ -155,6 +157,7 @@ export type DateFilterFn = (date: Date) => boolean;
 })
 export class BooDatepickerComponent implements ControlValueAccessor, AfterViewInit, OnDestroy {
   private zone = inject(NgZone);
+  private readonly injector = inject(Injector);
   // #region Public inputs
   @Input() label = '';
   @Input({ transform: (v: unknown) => v === '' || v === true || v === 'true' }) required = false;
@@ -164,10 +167,11 @@ export class BooDatepickerComponent implements ControlValueAccessor, AfterViewIn
   /** Fixed control height in px; overrides the height of `size` so the picker can sit beside a `boo-select`. */
   @Input() height?: number;
   @Input() radius = 6;
-  @Input() backgroundColor = 'white';
+  @Input() backgroundColor = '';
   @Input() borderWidth = 1;
-  @Input() borderColor = '#e6e8ee';
-  @Input() placeholderColor = '#85757D';
+  @Input() borderColor = '';
+  @Input() placeholderColor = '';
+  @Input({ transform: (v: unknown) => v === '' || v === true || v === 'true' }) success = false;
 
   /** Min selectable date (inclusive). Accepts Date or 'yyyy-MM-dd'. */
   @Input() set min(v: Date | string | null | undefined) { this._min.set(this.parse(v)); }
@@ -451,6 +455,15 @@ export class BooDatepickerComponent implements ControlValueAccessor, AfterViewIn
   // #endregion
 
   // #region Style helpers
+  /** Validation message of the bound form control, once touched. Shown by the surrounding `boo-form-field`. */
+  get errorText(): string | null {
+    return booValidationMessage(this.injector.get(NgControl, null, { self: true, optional: true })?.control, this.label);
+  }
+  get stateBorderColor(): string | null {
+    if (this.errorText) return 'rgb(var(--form-error))';
+    if (this.success) return 'rgb(var(--form-success))';
+    return this.borderColor || null;
+  }
   get labelClasses(): string {
     const base = 'absolute left-0 z-[1] flex items-center transition-all duration-200 cursor-text truncate pointer-events-none';
     switch (this.size) {
@@ -460,14 +473,14 @@ export class BooDatepickerComponent implements ControlValueAccessor, AfterViewIn
     }
   }
   get inputClasses(): string {
-    const base = 'w-full inline-flex items-center text-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary border bg-surface';
+    const base = 'w-full inline-flex items-center text-form-text transition-colors focus:outline-none focus:ring-1 focus:ring-form-accent focus:border-form-accent border border-form-border bg-form-surface';
     let sizeClass = '';
     switch (this.size) {
       case 'small': sizeClass = 'px-3 h-8.5 text-xs'; break;
       case 'large': sizeClass = 'px-5 h-12 text-base'; break;
       default: sizeClass = 'px-4 h-11 text-sm'; break;
     }
-    const disabledClass = this.disabled ? 'bg-gray-100 cursor-not-allowed opacity-70' : 'hover:border-gray-300';
+    const disabledClass = this.disabled ? '!bg-form-subtle !text-form-muted cursor-not-allowed' : 'hover:border-form-border-hover';
     return `${base} ${sizeClass} ${disabledClass}`;
   }
   // #endregion

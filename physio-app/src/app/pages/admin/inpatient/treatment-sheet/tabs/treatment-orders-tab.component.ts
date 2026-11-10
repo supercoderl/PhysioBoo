@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angular/core";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { BooDatepickerComponent } from "../../../../../components/date-picker/boo-date-picker.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
@@ -21,7 +21,7 @@ interface OrderDraft {
 @Component({
   selector: 'treatment-orders-tab',
   standalone: true,
-  imports: [SharedModule, BooButtonAdminComponent, BooDatepickerComponent, BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent],
+  imports: [SharedModule, BooButtonAdminComponent, BooDatepickerComponent, BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent, BooSpinnerComponent],
   template: `
     <div class="flex flex-wrap items-center gap-3 mb-4">
       <boo-input label="Search orders..." size="small" (search)="onSearch($event)"></boo-input>
@@ -65,7 +65,7 @@ interface OrderDraft {
     </form>
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16" aria-live="polite">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <boo-error-state *ngIf="!isLoading() && loadError()" title="Couldn't load orders" [description]="loadError()" appearance="panel" (retry)="load()"></boo-error-state>

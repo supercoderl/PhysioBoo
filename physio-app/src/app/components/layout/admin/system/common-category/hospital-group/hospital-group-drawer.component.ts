@@ -13,7 +13,7 @@ import { EMPTY_LOCATION_VALUE } from "../../../../../../shared/types/location.ty
 import { HospitalGroup } from "../../../../../../shared/types/support.types";
 import { BooButtonAdminComponent } from "../../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../../drawer/drawer.component";
-import { BooInputComponent } from '@physioboo/ui';
+import { BooInputComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { BooLocationSelectComponent } from "../../../../../select/boo-location-select/boo-location-select.component";
 import { BooSelectComponent } from "../../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../../textarea/boo-textarea/boo-textarea.component";
@@ -30,8 +30,7 @@ import { BooUploadComponent } from "../../../../../upload/boo-upload/boo-upload.
         BooButtonAdminComponent,
         BooSelectComponent,
         BooLocationSelectComponent,
-        BooUploadComponent
-    ],
+        BooUploadComponent, BooButtonComponent, BooSpinnerComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="onClose()">
             <div class="flex flex-col h-full bg-surface relative">
@@ -42,14 +41,14 @@ import { BooUploadComponent } from "../../../../../upload/boo-upload/boo-upload.
                         </h2>
                         <p class="text-sm text-secondary m-0">Manage hospital group details and subscription</p>
                     </div>
-                    <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="onClose()" aria-label="Close">
                         <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
                 <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
                     <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
+                        <boo-spinner [inline]="true" tone="primary" [size]="32" />
                     </div>
 
                     <div class="p-6 space-y-4">

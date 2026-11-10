@@ -19,8 +19,8 @@ import { STATUS_LABELS, statusTone } from '../prescription-rx.util';
                 </div>
                 <p *ngIf="subtitle" class="m-0 mt-0.5 text-xs leading-5 text-secondary">{{ subtitle }}</p>
             </div>
-            <button *ngIf="showRefresh" type="button" boo-button variant="secondary" size="sm" [loading]="loading" [disabled]="loading" (click)="refresh.emit()">
-                <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+            <button *ngIf="showRefresh" type="button" boo-button variant="secondary" size="sm" [disabled]="loading" (click)="refresh.emit()">
+                <physio-icon name="refresh" [size]="15" aria-hidden="true" />Refresh
             </button>
         </header>
     `,

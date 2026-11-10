@@ -1,6 +1,6 @@
 import { RevenueReportFilter } from "../../../../../shared/types/filter.types";
 
-export type RevenuePreset = 'today' | '7d' | '30d' | 'month' | 'quarter';
+export type RevenuePreset = 'today' | 'yesterday' | 'week' | '7d' | '30d' | 'month' | 'quarter';
 
 /** A Daily range longer than this would draw hundreds of bars; the toolbar asks for Weekly or Monthly instead. */
 export const MAX_DAILY_RANGE_DAYS = 366;
@@ -15,6 +15,12 @@ export function toLocalIsoDate(date: Date): string {
 export function presetRange(preset: RevenuePreset, today = new Date()): { start: string; end: string } {
     const start = new Date(today);
     switch (preset) {
+        case 'yesterday': {
+            start.setDate(today.getDate() - 1);
+            return { start: toLocalIsoDate(start), end: toLocalIsoDate(start) };
+        }
+        // Weeks start on Monday.
+        case 'week': start.setDate(today.getDate() - ((today.getDay() + 6) % 7)); break;
         case '7d': start.setDate(today.getDate() - 6); break;
         case '30d': start.setDate(today.getDate() - 29); break;
         case 'month': start.setDate(1); break;
@@ -29,7 +35,7 @@ export function defaultRevenueFilter(): RevenueReportFilter {
 
 /** The preset whose range equals the filter's dates, or null for a custom range. */
 export function activePreset(filter: RevenueReportFilter): RevenuePreset | null {
-    const presets: RevenuePreset[] = ['today', '7d', '30d', 'month', 'quarter'];
+    const presets: RevenuePreset[] = ['today', 'yesterday', 'week', '7d', '30d', 'month', 'quarter'];
     return presets.find(p => {
         const range = presetRange(p);
         return range.start === filter.start && range.end === filter.end;

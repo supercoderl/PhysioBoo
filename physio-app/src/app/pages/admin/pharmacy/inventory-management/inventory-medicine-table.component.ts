@@ -28,8 +28,8 @@ import { InventoryMedicine, stockStatusLabel, stockStatusTone } from "../../../.
       >
         <ng-template appColumnDef="medicine" headerLabel="Medicine" headerClass="text-left" width="30%" let-item>
           <div class="min-w-0 leading-tight">
-            <button type="button" (click)="view.emit(item)" class="block max-w-full truncate text-left text-sm font-semibold text-primary hover:underline">{{ item.name }}</button>
-            <div class="truncate text-[11px] text-secondary">
+            <button type="button" boo-button variant="text" classname="max-w-full truncate text-sm font-semibold text-primary" (click)="view.emit(item)">{{ item.name }}</button>
+            <div class="truncate text-xs text-secondary">
               {{ item.genericName || 'No generic name' }}<ng-container *ngIf="item.barcode"> · {{ item.barcode }}</ng-container>
             </div>
           </div>
@@ -38,7 +38,7 @@ import { InventoryMedicine, stockStatusLabel, stockStatusTone } from "../../../.
         <ng-template appColumnDef="category" headerLabel="Category / location" headerClass="text-left" let-item>
           <div class="min-w-0 leading-tight">
             <div class="truncate text-sm text-regular">{{ item.category || '—' }}</div>
-            <div class="truncate text-[11px] text-secondary">{{ item.storageLocation || 'No location' }}</div>
+            <div class="truncate text-xs text-secondary">{{ item.storageLocation || 'No location' }}</div>
           </div>
         </ng-template>
 
@@ -59,7 +59,7 @@ import { InventoryMedicine, stockStatusLabel, stockStatusTone } from "../../../.
             <div class="text-sm tabular-nums" [ngClass]="item.isNearExpiry ? 'text-amber-700 font-semibold' : 'text-regular'">
               {{ item.soonestExpiryDate ? (item.soonestExpiryDate | date:'mediumDate') : '—' }}
             </div>
-            <div class="text-[11px] text-secondary">
+            <div class="text-xs text-secondary">
               {{ item.batchCount | number }} {{ item.batchCount === 1 ? 'batch' : 'batches' }}<ng-container *ngIf="item.isNearExpiry"> · near expiry</ng-container>
             </div>
           </div>

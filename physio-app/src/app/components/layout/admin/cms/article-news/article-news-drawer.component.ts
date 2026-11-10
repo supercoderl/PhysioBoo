@@ -11,7 +11,7 @@ import { Article } from "../../../../../shared/types/article.types";
 import { convertEnumToSelection } from "../../../../../shared/utils/common";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooInputComponent } from '@physioboo/ui';
+import { BooInputComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
 import { BooUploadComponent } from "../../../../upload/boo-upload/boo-upload.component";
@@ -26,8 +26,7 @@ import { BooUploadComponent } from "../../../../upload/boo-upload/boo-upload.com
         BooTextareaComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
-        BooUploadComponent
-    ],
+        BooUploadComponent, BooButtonComponent, BooSpinnerComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="onClose()">
             <div class="flex flex-col h-full bg-surface relative">
@@ -38,14 +37,14 @@ import { BooUploadComponent } from "../../../../upload/boo-upload/boo-upload.com
                         </h2>
                         <p class="text-sm text-secondary m-0">Author and publish news & articles for the public site</p>
                     </div>
-                    <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="onClose()" aria-label="Close">
                         <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
 
                 <div #scrollContainer class="flex-1 overflow-y-auto bg-surface" custom-scrollbar [formGroup]="form">
                     <div *ngIf="loadingSrv.isLoading('search-by-id') && currentId" class="absolute inset-0 bg-surface/80 z-50 flex items-center justify-center backdrop-blur-sm">
-                        <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
+                        <boo-spinner [inline]="true" tone="primary" [size]="32" />
                     </div>
 
                     <div class="p-6 space-y-4">
@@ -89,7 +88,7 @@ import { BooUploadComponent } from "../../../../upload/boo-upload/boo-upload.com
                 </div>
 
                 <div class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between z-20 sticky bottom-0">
-                    <button *ngIf="currentId" (click)="onDelete()" class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1.5">
+                    <button type="button" boo-button variant="ghost" size="sm" classname="!text-danger" *ngIf="currentId" (click)="onDelete()">
                         <physio-icon name="trash" [size]="16"></physio-icon>
                         Delete
                     </button>

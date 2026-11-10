@@ -30,8 +30,8 @@ import { primaryStockTakeAction, STOCK_TAKE_ACTION_META, StockTakeAccess, StockT
       >
         <ng-template appColumnDef="code" headerLabel="Session" headerClass="text-left" width="26%" let-item>
           <div class="min-w-0 leading-tight">
-            <button type="button" (click)="open.emit(item)" class="block max-w-full truncate text-left text-sm font-semibold text-primary hover:underline">{{ item.code }}</button>
-            <div class="truncate text-[11px] text-secondary">{{ item.warehouseName || '—' }} · {{ item.departmentName || '—' }}</div>
+            <button type="button" boo-button variant="text" classname="max-w-full truncate text-sm font-semibold text-primary" (click)="open.emit(item)">{{ item.code }}</button>
+            <div class="truncate text-xs text-secondary">{{ item.warehouseName || '—' }} · {{ item.departmentName || '—' }}</div>
           </div>
         </ng-template>
 
@@ -41,7 +41,7 @@ import { primaryStockTakeAction, STOCK_TAKE_ACTION_META, StockTakeAccess, StockT
 
         <ng-template appColumnDef="progress" headerLabel="Progress" headerClass="text-left" width="16%" let-item>
           <div *ngIf="item.itemsCount; else noItems" class="w-32 leading-tight">
-            <div class="flex items-center justify-between text-[11px] text-secondary mb-1 tabular-nums">
+            <div class="flex items-center justify-between text-xs text-secondary mb-1 tabular-nums">
               <span>{{ item.itemsCount | number }} items</span>
               <span class="font-semibold text-regular">{{ item.completedPercent | number:'1.0-1' }}%</span>
             </div>
@@ -50,13 +50,13 @@ import { primaryStockTakeAction, STOCK_TAKE_ACTION_META, StockTakeAccess, StockT
               <div class="h-full rounded-full bg-primary" [style.width.%]="item.completedPercent"></div>
             </div>
           </div>
-          <ng-template #noItems><span class="text-[11px] text-secondary">{{ item.status === 'Draft' ? 'Not started' : 'No items' }}</span></ng-template>
+          <ng-template #noItems><span class="text-xs text-secondary">{{ item.status === 'Draft' ? 'Not started' : 'No items' }}</span></ng-template>
         </ng-template>
 
         <ng-template appColumnDef="scheduledDate" headerLabel="Scheduled" headerClass="text-left" let-item>
           <div class="leading-tight">
             <div class="text-sm text-regular tabular-nums">{{ item.scheduledDate | date:'mediumDate' }}</div>
-            <div class="text-[11px] text-secondary">Updated {{ item.lastUpdated | date:'short' }}</div>
+            <div class="text-xs text-secondary">Updated {{ item.lastUpdated | date:'short' }}</div>
           </div>
         </ng-template>
 

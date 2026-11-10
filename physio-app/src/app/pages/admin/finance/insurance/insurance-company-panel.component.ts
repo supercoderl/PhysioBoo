@@ -46,8 +46,8 @@ import { InsuranceCompany } from "../../../../shared/types/support.types";
             <h3 class="text-xs font-bold uppercase tracking-wider text-secondary m-0 mb-2">Claims</h3>
             <div *ngIf="claimNode as n" class="rounded-1.5 bg-gray-50 px-3 py-3 flex items-center justify-between gap-3">
               <dl class="m-0 flex gap-6">
-                <div><dt class="text-[11px] font-medium text-secondary">Total</dt><dd class="m-0 text-base font-bold text-regular tabular-nums">{{ n.claimCount }}</dd></div>
-                <div><dt class="text-[11px] font-medium text-secondary">Pending</dt><dd class="m-0 text-base font-bold text-regular tabular-nums">{{ n.pendingCount }}</dd></div>
+                <div><dt class="text-xs font-medium text-secondary">Total</dt><dd class="m-0 text-base font-bold text-regular tabular-nums">{{ n.claimCount }}</dd></div>
+                <div><dt class="text-xs font-medium text-secondary">Pending</dt><dd class="m-0 text-base font-bold text-regular tabular-nums">{{ n.pendingCount }}</dd></div>
               </dl>
               <button *ngIf="canViewClaims" type="button" boo-button variant="secondary" size="sm" (click)="viewClaims.emit(c)">View claims</button>
             </div>
@@ -73,19 +73,19 @@ import { InsuranceCompany } from "../../../../shared/types/support.types";
             <h3 class="text-xs font-bold uppercase tracking-wider text-secondary m-0 mb-2">Settlement and coverage</h3>
             <dl class="m-0 grid grid-cols-2 gap-2">
               <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
-                <dt class="text-[11px] font-medium text-secondary">Settlement modes</dt>
+                <dt class="text-xs font-medium text-secondary">Settlement modes</dt>
                 <dd class="m-0 mt-0.5 text-sm font-semibold text-regular">{{ modes(c) }}</dd>
               </div>
               <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
-                <dt class="text-[11px] font-medium text-secondary">Avg. settlement time</dt>
+                <dt class="text-xs font-medium text-secondary">Avg. settlement time</dt>
                 <dd class="m-0 mt-0.5 text-sm font-semibold text-regular tabular-nums">{{ c.averageClaimSettlementTime }} day{{ c.averageClaimSettlementTime === 1 ? '' : 's' }}</dd>
               </div>
               <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
-                <dt class="text-[11px] font-medium text-secondary">Settlement ratio</dt>
+                <dt class="text-xs font-medium text-secondary">Settlement ratio</dt>
                 <dd class="m-0 mt-0.5 text-sm font-semibold text-regular tabular-nums">{{ c.claimSettlementRatio === null ? '—' : (c.claimSettlementRatio | number:'1.0-2') + '%' }}</dd>
               </div>
               <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
-                <dt class="text-[11px] font-medium text-secondary">Max. coverage</dt>
+                <dt class="text-xs font-medium text-secondary">Max. coverage</dt>
                 <dd class="m-0 mt-0.5 text-sm font-semibold text-regular tabular-nums">{{ c.maximumCoverageAmount === null ? '—' : (c.maximumCoverageAmount | number:'1.0-2') }}</dd>
               </div>
             </dl>

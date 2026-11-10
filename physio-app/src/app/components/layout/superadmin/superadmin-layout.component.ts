@@ -7,6 +7,7 @@ import { SharedModule } from '../../../shared/shared-imports';
 import { isStaff } from '../../../shared/utils/role.utils';
 import { BooAvatarComponent } from '../../image/avatar/boo-avatar.component';
 import { SidebarItemComponent } from '../admin/sidebar/sidebar-item/sidebar-item.component';
+import { BooButtonComponent } from '@physioboo/ui';
 
 @Component({
     selector: 'superadmin-layout',
@@ -16,8 +17,7 @@ import { SidebarItemComponent } from '../admin/sidebar/sidebar-item/sidebar-item
         RouterOutlet,
         RouterLink,
         SidebarItemComponent,
-        BooAvatarComponent,
-    ],
+        BooAvatarComponent, BooButtonComponent],
     template: `
         <a
             href="#superadmin-main"
@@ -45,7 +45,7 @@ import { SidebarItemComponent } from '../admin/sidebar/sidebar-item/sidebar-item
                     </div>
                     <div class="min-w-0">
                         <div class="text-sm font-bold text-regular leading-none">PhysioBoo</div>
-                        <div class="text-[11px] text-secondary font-medium mt-1 leading-none">Super Admin</div>
+                        <div class="text-xs text-secondary font-medium mt-1 leading-none">Super Admin</div>
                     </div>
                 </div>
 
@@ -66,18 +66,12 @@ import { SidebarItemComponent } from '../admin/sidebar/sidebar-item/sidebar-item
                 <div class="shrink-0 border-t border-sidebarDivider p-3 flex items-center gap-2.5">
                     <boo-avatar [src]="(userInfo$ | async)?.avatarUrl" class="shrink-0" />
                     <div class="flex-1 min-w-0">
-                        <div class="text-[13px] font-semibold text-regular truncate">
+                        <div class="text-sm font-semibold text-regular truncate">
                             {{ (userInfo$ | async)?.fullName ?? (userInfo$ | async)?.email }}
                         </div>
-                        <div class="text-[11px] text-secondary truncate">{{ (userInfo$ | async)?.email }}</div>
+                        <div class="text-xs text-secondary truncate">{{ (userInfo$ | async)?.email }}</div>
                     </div>
-                    <button
-                        type="button"
-                        class="w-9 h-9 flex bg-surface items-center justify-center rounded-1.5 text-danger hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors shrink-0 cursor-pointer"
-                        aria-label="Log out"
-                        title="Log out"
-                        (click)="logout()"
-                    >
+                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-9 !w-9 !text-danger" aria-label="Log out" title="Log out" (click)="logout()">
                         <physio-icon name="power" [size]="18" />
                     </button>
                 </div>
@@ -86,14 +80,7 @@ import { SidebarItemComponent } from '../admin/sidebar/sidebar-item/sidebar-item
             <div class="flex-1 flex flex-col min-w-0 min-h-0">
                 <header class="flex-none flex items-center justify-between gap-3 h-14 px-4 lg:px-6 bg-surface border-b border-borderGray/60 z-20">
                     <div class="flex items-center gap-2 min-w-0">
-                        <button
-                            type="button"
-                            class="lg:hidden w-11 h-11 -ml-2 flex items-center justify-center rounded-1.5 text-regular hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
-                            aria-label="Open navigation"
-                            aria-controls="superadmin-sidebar"
-                            [attr.aria-expanded]="isNavOpen()"
-                            (click)="openNav()"
-                        >
+                        <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Open navigation" aria-controls="superadmin-sidebar" [attr.aria-expanded]="isNavOpen()" (click)="openNav()">
                             <physio-icon name="menu" [size]="20" />
                         </button>
                         <h1 class="text-sm font-semibold text-regular m-0 truncate">{{ pageTitle }}</h1>

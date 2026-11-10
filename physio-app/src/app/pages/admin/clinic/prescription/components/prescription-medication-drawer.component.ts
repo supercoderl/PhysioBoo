@@ -8,8 +8,7 @@ import {
     BooIconComponent,
     BooInputComponent,
     BooSearchFieldComponent,
-    BooStatusBadgeComponent,
-} from '@physioboo/ui';
+    BooStatusBadgeComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { catchError, debounceTime, distinctUntilChanged, of, switchMap, tap } from 'rxjs';
 import { BooSelectComponent } from '../../../../../components/select/boo-select/boo-select.component';
 import { BooTextareaComponent } from '../../../../../components/textarea/boo-textarea/boo-textarea.component';
@@ -52,8 +51,7 @@ function amountAtLeastZero(control: AbstractControl<string>): ValidationErrors |
     imports: [
         NgIf, NgFor, ReactiveFormsModule, DrawerComponent, CustomScrollbarDirective,
         BooButtonComponent, BooIconComponent, BooInputComponent, BooCheckboxComponent, BooSearchFieldComponent, BooStatusBadgeComponent,
-        BooSelectComponent, BooTextareaComponent,
-    ],
+        BooSelectComponent, BooTextareaComponent, BooFieldErrorComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" (close)="discard()">
             <form
@@ -86,10 +84,10 @@ function amountAtLeastZero(control: AbstractControl<string>): ValidationErrors |
                             [busy]="searching"
                             (clear)="search.setValue('')"
                         />
-                        <p *ngIf="!canSearch" class="m-0 text-xs text-danger" role="alert">
+                        <boo-field-error size="sm" announce *ngIf="!canSearch">
                             Your account cannot search the medicine catalog, so a new medicine cannot be added.
-                        </p>
-                        <p *ngIf="searchError" class="m-0 text-xs text-danger" role="alert">{{ searchError }}</p>
+                        </boo-field-error>
+                        <boo-field-error size="sm" announce *ngIf="searchError">{{ searchError }}</boo-field-error>
                         <p *ngIf="searched && !searching && !searchError && !results.length" class="m-0 text-xs text-secondary" aria-live="polite">
                             No medicine matches "{{ search.value }}".
                         </p>
@@ -126,20 +124,20 @@ function amountAtLeastZero(control: AbstractControl<string>): ValidationErrors |
                             <boo-input id="rx-frequency" name="rx-frequency" formControlName="frequency" label="Frequency" required [maxlength]="100" />
                             <div>
                                 <boo-input id="rx-duration" name="rx-duration" type="number" formControlName="durationInDays" label="Duration (days)" required />
-                                <p *ngIf="showRange('durationInDays')" class="m-0 mt-1 text-xs text-danger" role="alert">Enter a whole number of 1 or more.</p>
+                                <boo-field-error size="sm" announce class="mt-1" *ngIf="showRange('durationInDays')">Enter a whole number of 1 or more.</boo-field-error>
                             </div>
                             <div>
                                 <boo-input id="rx-quantity" name="rx-quantity" type="number" formControlName="quantityPrescribed" label="Quantity" required />
-                                <p *ngIf="showRange('quantityPrescribed')" class="m-0 mt-1 text-xs text-danger" role="alert">Enter a whole number of 1 or more.</p>
+                                <boo-field-error size="sm" announce class="mt-1" *ngIf="showRange('quantityPrescribed')">Enter a whole number of 1 or more.</boo-field-error>
                             </div>
                             <boo-input id="rx-unit" name="rx-unit" formControlName="unit" label="Unit" required [maxlength]="50" />
                             <div>
                                 <boo-input id="rx-price" name="rx-price" type="number" formControlName="pricePerUnit" label="Price per unit" required />
-                                <p *ngIf="showRange('pricePerUnit')" class="m-0 mt-1 text-xs text-danger" role="alert">Enter 0 or more.</p>
+                                <boo-field-error size="sm" announce class="mt-1" *ngIf="showRange('pricePerUnit')">Enter 0 or more.</boo-field-error>
                             </div>
                             <div>
                                 <boo-input id="rx-refills" name="rx-refills" type="number" formControlName="refillCount" label="Refills" required />
-                                <p *ngIf="showRange('refillCount')" class="m-0 mt-1 text-xs text-danger" role="alert">Enter a whole number of 0 or more.</p>
+                                <boo-field-error size="sm" announce class="mt-1" *ngIf="showRange('refillCount')">Enter a whole number of 0 or more.</boo-field-error>
                             </div>
                             <boo-input id="rx-strength" name="rx-strength" formControlName="strength" label="Strength" [maxlength]="100" />
                             <boo-select id="rx-form" formControlName="dosageForm" label="Dosage form" [options]="dosageForms" bindLabel="label" bindValue="value" />
@@ -148,7 +146,7 @@ function amountAtLeastZero(control: AbstractControl<string>): ValidationErrors |
                         </div>
 
                         <fieldset class="m-0 p-0 border-0">
-                            <legend class="mb-2 p-0 text-[13px] font-medium text-regular">Time of day</legend>
+                            <legend class="mb-2 p-0 text-sm font-medium text-regular">Time of day</legend>
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2">
                                 <boo-checkbox id="rx-morning" name="rx-morning" formControlName="timingMorning" label="Morning" />
                                 <boo-checkbox id="rx-noon" name="rx-noon" formControlName="timingNoon" label="Noon" />
@@ -159,7 +157,7 @@ function amountAtLeastZero(control: AbstractControl<string>): ValidationErrors |
                         </fieldset>
 
                         <div>
-                            <label for="rx-special" class="block mb-1 text-[13px] font-medium text-regular">Special instructions</label>
+                            <label for="rx-special" class="block mb-1 text-sm font-medium text-regular">Special instructions</label>
                             <boo-textarea id="rx-special" name="rx-special" formControlName="specialInstructions" label="Special instructions" [rows]="3" [maxlength]="textMax" />
                         </div>
 

@@ -1,5 +1,5 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from "@angular/core";
-import { BooButtonComponent, BooInputComponent } from '@physioboo/ui';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
+import { BooButtonComponent, BooInputComponent, BooDialogComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailCheckoutPayload, RetailPaymentMethod, RetailPaymentSplit } from "../../../../shared/types/retail-pos.types";
@@ -10,21 +10,10 @@ type PaymentMode = RetailPaymentMethod | 'Split';
 @Component({
   selector: 'retail-payment-dialog',
   standalone: true,
-  imports: [SharedModule, BooButtonComponent, BooInputComponent, BooSelectComponent],
+  imports: [SharedModule, BooButtonComponent, BooInputComponent, BooSelectComponent, BooDialogComponent],
   template: `
-    <div *ngIf="isOpen" class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="requestClose()" aria-hidden="true"></div>
-
-      <div #panel role="dialog" aria-modal="true" aria-labelledby="retail-payment-title" tabindex="-1"
-        class="relative bg-surface rounded-xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto border border-gray-100 outline-none">
-        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 id="retail-payment-title" class="text-base font-semibold text-regular m-0">Payment</h2>
-          <button type="button" (click)="requestClose()" [disabled]="submitting" class="w-8 h-8 rounded-1.5 flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-40" aria-label="Close payment dialog">
-            <physio-icon name="x" [size]="18"></physio-icon>
-          </button>
-        </div>
-
-        <div class="p-5 space-y-5">
+    <boo-dialog *ngIf="isOpen" size="lg" heading="Payment" [busy]="submitting" closeLabel="Close payment dialog" (dismiss)="requestClose()">
+        <div class="space-y-5">
           <div class="flex items-baseline justify-between bg-gray-50 rounded-1.5 px-4 py-3">
             <span class="text-sm text-secondary">Total due</span>
             <span class="text-2xl font-bold text-primaryDeep">{{ money(grandTotal) }}</span>
@@ -60,7 +49,7 @@ type PaymentMode = RetailPaymentMethod | 'Split';
             <div *ngFor="let split of splits; let i = index" class="grid grid-cols-[1fr_1fr_auto] gap-2 items-start">
               <boo-select label="Method" size="small" [options]="splitMethods()" bindLabel="label" bindValue="value" [required]="true" [(ngModel)]="split.method" [ngModelOptions]="{ standalone: true }"></boo-select>
               <boo-input type="number" label="Amount" size="small" [(ngModel)]="split.amount" [ngModelOptions]="{ standalone: true }" [disabled]="submitting" [maxlength]="12"></boo-input>
-              <button type="button" (click)="removeSplit(i)" [disabled]="submitting || splits.length === 1" class="w-8 h-8 rounded-1.5 flex items-center justify-center text-gray-500 hover:text-danger hover:bg-gray-100 disabled:opacity-40" [attr.aria-label]="'Remove payment line ' + (i + 1)">
+              <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8 !text-danger" (click)="removeSplit(i)" [disabled]="submitting || splits.length === 1" [attr.aria-label]="'Remove payment line ' + (i + 1)">
                 <physio-icon name="x" [size]="14"></physio-icon>
               </button>
             </div>
@@ -75,13 +64,9 @@ type PaymentMode = RetailPaymentMethod | 'Split';
             <span>{{ errorMessage }}</span>
           </div>
         </div>
-
-        <div class="px-5 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2 rounded-b-xl">
-          <button boo-button variant="ghost" size="sm" (click)="requestClose()" [disabled]="submitting">Cancel</button>
-          <button boo-button variant="primary" size="sm" (click)="complete()" [disabled]="!canComplete()" [loading]="submitting">Complete sale</button>
-        </div>
-      </div>
-    </div>
+        <button boo-dialog-footer type="button" boo-button variant="ghost" size="sm" (click)="requestClose()" [disabled]="submitting">Cancel</button>
+        <button boo-dialog-footer type="button" boo-button variant="primary" size="sm" (click)="complete()" [disabled]="!canComplete()" [loading]="submitting">Complete sale</button>
+    </boo-dialog>
   `,
 })
 export class RetailPaymentDialogComponent implements OnChanges {
@@ -96,7 +81,6 @@ export class RetailPaymentDialogComponent implements OnChanges {
   @Output() close = new EventEmitter<void>();
   @Output() completeSale = new EventEmitter<RetailCheckoutPayload>();
 
-  @ViewChild('panel') private panel?: ElementRef<HTMLElement>;
 
   readonly modes: { key: PaymentMode; label: string; icon: string }[] = [
     { key: 'Cash', label: 'Cash', icon: 'banknote' },
@@ -110,24 +94,13 @@ export class RetailPaymentDialogComponent implements OnChanges {
   tendered: number | null = null;
   splits: { method: RetailPaymentMethod; amount: number | null }[] = [];
 
-  private openedFrom: HTMLElement | null = null;
-
   ngOnChanges(changes: SimpleChanges): void {
     const open = changes['isOpen'];
     if (open && this.isOpen) {
-      this.openedFrom = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       this.mode = 'Cash';
       this.tendered = this.grandTotal;
       this.splits = [{ method: 'Cash', amount: this.grandTotal }];
-      setTimeout(() => this.panel?.nativeElement.focus());
-    } else if (open && !this.isOpen) {
-      setTimeout(() => this.openedFrom?.focus());
     }
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    if (this.isOpen) this.requestClose();
   }
 
   requestClose(): void {

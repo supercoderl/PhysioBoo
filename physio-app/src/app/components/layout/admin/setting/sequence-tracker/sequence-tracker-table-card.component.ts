@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { BooStatusBadgeComponent } from "@physioboo/ui";
+import { BooStatusBadgeComponent, BooButtonComponent } from "@physioboo/ui";
 import { ColumnDefDirective } from "../../../../../shared/directives/column-def.directive";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { SequenceTracker } from "../../../../../shared/types/system.types";
@@ -17,8 +17,7 @@ import { SEQUENCE_ENTITY_TYPES, buildSequenceCode, dateFormatRepeatsCodes, nextS
     BooTableAdminComponent,
     ColumnDefDirective,
     BooActionAdminComponent,
-    BooStatusBadgeComponent
-  ],
+    BooStatusBadgeComponent, BooButtonComponent],
   template: `
     <boo-table-admin
       class="flex-1 min-h-0 rounded-[6px] overflow-hidden"
@@ -48,13 +47,7 @@ import { SEQUENCE_ENTITY_TYPES, buildSequenceCode, dateFormatRepeatsCodes, nextS
 
       <ng-template appColumnDef="entityType" hideable="false" headerLabel="Record type" headerClass="text-left" let-item>
         <div class="min-w-0">
-          <button
-            *ngIf="canUpdate; else plainType"
-            type="button"
-            class="block max-w-full truncate p-0 bg-transparent border-0 text-left text-sm leading-4 font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm"
-            [title]="item.entityType"
-            (click)="onRowOpen(item)"
-          >{{ item.entityType }}</button>
+          <button type="button" boo-button variant="text" classname="max-w-full truncate text-sm leading-4 font-semibold text-primary" *ngIf="canUpdate; else plainType" [title]="item.entityType" (click)="onRowOpen(item)">{{ item.entityType }}</button>
           <ng-template #plainType><span class="block truncate text-sm leading-4 font-semibold text-regular" [title]="item.entityType">{{ item.entityType }}</span></ng-template>
           <div *ngIf="!isKnownType(item.entityType)" class="mt-0.5 text-xs leading-4 text-danger" title="No record type asks for a code with this exact name, so this rule is never used.">Not used by any record type</div>
         </div>

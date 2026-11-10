@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angu
 import { Router } from "@angular/router";
 import { forkJoin } from "rxjs";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { LaboratoryService } from "../../../../services/admin/laboratory.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -13,7 +13,7 @@ import { ButtonIconComponent } from "../../../../components/button/button-icon/b
 @Component({
   selector: 'laboratory-patient-result-drawer',
   standalone: true,
-  imports: [SharedModule, DrawerComponent,BooStatusBadgeComponent, BooEmptyStateComponent, ButtonIconComponent],
+  imports: [SharedModule, DrawerComponent,BooStatusBadgeComponent, BooEmptyStateComponent, ButtonIconComponent, BooButtonComponent, BooSpinnerComponent],
   template: `
     <drawer [isOpen]="isOpen" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative">
@@ -22,14 +22,14 @@ import { ButtonIconComponent } from "../../../../components/button/button-icon/b
             <h2 class="text-xl font-bold text-primary leading-none mb-1">Patient Laboratory Results</h2>
             <p class="text-sm text-secondary m-0">{{ summary()?.fullName ?? 'Loading patient...' }}</p>
           </div>
-          <button (click)="onClose()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+          <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="onClose()" aria-label="Close">
             <physio-icon name="x" [size]="20"></physio-icon>
           </button>
         </div>
 
         <div class="flex-1 overflow-y-auto bg-surface" custom-scrollbar>
           <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-            <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+            <boo-spinner [inline]="true" tone="primary" [size]="24" />
           </div>
 
           <ng-container *ngIf="!isLoading() && summary()">

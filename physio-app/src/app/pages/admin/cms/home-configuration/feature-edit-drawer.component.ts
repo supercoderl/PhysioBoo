@@ -53,7 +53,7 @@ import { FEATURE_ICON_NAMES, LIMITS, POSITION_PATTERN } from './home-config.util
                         <legend class="mb-3 text-sm font-semibold text-regular">Content</legend>
                         <div class="flex flex-col gap-4">
                             <div>
-                                <label for="hf-icon" class="block mb-1 text-[13px] font-medium text-regular">Icon</label>
+                                <label for="hf-icon" class="block mb-1 text-sm font-medium text-regular">Icon</label>
                                 <div class="flex items-center gap-3">
                                     <span class="flex-none w-10 h-10 rounded-lg bg-primarySoft text-primary flex items-center justify-center" aria-hidden="true">
                                         <physio-icon [name]="form.controls.icon.value || 'circle'" [size]="20" />
@@ -63,12 +63,12 @@ import { FEATURE_ICON_NAMES, LIMITS, POSITION_PATTERN } from './home-config.util
                                 <button *ngIf="form.controls.icon.value && form.enabled" type="button" boo-button variant="link" size="sm" class="mt-1" (click)="clearIcon()">No icon</button>
                             </div>
                             <div>
-                                <label for="hf-title" class="block mb-1 text-[13px] font-medium text-regular">Title <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="hf-title" class="block mb-1 text-sm font-medium text-regular">Title <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input id="hf-title" name="hf-title" formControlName="title" label="Title" [maxlength]="max.featureTitle" />
                             </div>
                             <div>
                                 <div class="flex items-baseline justify-between gap-3 mb-1">
-                                    <label for="hf-desc" class="text-[13px] font-medium text-regular">Description</label>
+                                    <label for="hf-desc" class="text-sm font-medium text-regular">Description</label>
                                     <span class="text-xs text-secondary tabular-nums">{{ form.controls.description.value.length }} / {{ max.featureDescription }}</span>
                                 </div>
                                 <boo-textarea id="hf-desc" formControlName="description" label="A sentence or two about this feature" [rows]="3" [maxlength]="max.featureDescription" />
@@ -80,7 +80,7 @@ import { FEATURE_ICON_NAMES, LIMITS, POSITION_PATTERN } from './home-config.util
                         <legend class="mb-3 text-sm font-semibold text-regular">Display</legend>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
                             <div>
-                                <label for="hf-order" class="block mb-1 text-[13px] font-medium text-regular">Position <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="hf-order" class="block mb-1 text-sm font-medium text-regular">Position <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input id="hf-order" name="hf-order" type="number" formControlName="order" label="Position" />
                                 <p class="m-0 mt-1 text-xs text-secondary">Whole number, 1 or more. Lower numbers come first.</p>
                             </div>

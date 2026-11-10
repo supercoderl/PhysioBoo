@@ -1,6 +1,6 @@
 import { Router } from "@angular/router";
 import { Component, Input, OnChanges, signal } from "@angular/core";
-import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { ToastService } from "../../../../../services/common/toast.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -9,10 +9,10 @@ import { TreatmentLabOrderRow } from "../../../../../shared/types/treatment-shee
 @Component({
   selector: 'treatment-laboratory-tab',
   standalone: true,
-  imports: [SharedModule, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent],
+  imports: [SharedModule, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent, BooButtonComponent, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <boo-error-state *ngIf="!isLoading() && loadError()" title="Couldn't load laboratory orders" [description]="loadError()" appearance="panel" (retry)="load()"></boo-error-state>
@@ -39,7 +39,7 @@ import { TreatmentLabOrderRow } from "../../../../../shared/types/treatment-shee
             <td class="px-4 py-3"><boo-status-badge *ngIf="l.isCritical" label="Critical" tone="danger" [dotted]="true"></boo-status-badge><span *ngIf="!l.isCritical">—</span></td>
             <td class="px-4 py-3">{{ l.orderedAt | date:'short' }}</td>
             <td class="px-4 py-3">
-              <button (click)="viewResult()" [disabled]="l.resultStatus === 'Pending'" class="text-primary text-xs font-semibold hover:underline disabled:opacity-40 disabled:no-underline">View Result</button>
+              <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold disabled:opacity-40 disabled:no-underline" (click)="viewResult()" [disabled]="l.resultStatus === 'Pending'">View Result</button>
             </td>
           </tr>
         </tbody>

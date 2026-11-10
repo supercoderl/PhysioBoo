@@ -4,7 +4,7 @@ import { Component, DestroyRef, ElementRef, OnInit, inject } from '@angular/core
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { BooButtonComponent, BooIconComponent, BooInlineErrorComponent, BooInputComponent, BooSearchFieldComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooFormFieldComponent, BooFormRowComponent, BooFormSectionComponent, BooIconComponent, BooInlineErrorComponent, BooInputComponent, BooSearchFieldComponent } from '@physioboo/ui';
 import { catchError, debounceTime, distinctUntilChanged, finalize, map, of, switchMap, tap } from 'rxjs';
 import { BooDatepickerComponent } from '../../../../components/date-picker/boo-date-picker.component';
 import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
@@ -89,6 +89,9 @@ function validDob(control: AbstractControl<string>): ValidationErrors | null {
         ReactiveFormsModule,
         RouterLink,
         BooButtonComponent,
+        BooFormFieldComponent,
+        BooFormRowComponent,
+        BooFormSectionComponent,
         BooIconComponent,
         BooInlineErrorComponent,
         BooInputComponent,

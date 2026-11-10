@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
-import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
 import { StockTakeService } from "../../../../services/admin/stock-take.service";
 import { SharedModule } from "../../../../shared/shared-imports";
@@ -15,7 +15,7 @@ const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
 @Component({
   selector: 'stock-take-detail-drawer',
   standalone: true,
-  imports: [SharedModule, DrawerComponent, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent],
+  imports: [SharedModule, DrawerComponent, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent, BooSpinnerComponent],
   template: `
     <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="close.emit()">
       <div class="flex flex-col h-full bg-surface" role="dialog" aria-modal="true" aria-labelledby="stock-take-detail-title" (keydown.escape)="close.emit()">
@@ -26,7 +26,7 @@ const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
               <boo-status-badge [label]="statusLabel(stockTake.status)" [tone]="statusTone(stockTake.status)" dotted></boo-status-badge>
             </div>
           </div>
-          <button type="button" (click)="close.emit()" class="flex-none text-gray-500 hover:text-gray-700 w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100" aria-label="Close details">
+          <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="close.emit()" aria-label="Close details">
             <physio-icon name="x" [size]="20"></physio-icon>
           </button>
         </div>
@@ -75,7 +75,7 @@ const ACTIVITY_ICON: Record<StockTakeActivityType, string> = {
             <h3 class="text-xs font-bold text-secondary uppercase tracking-wider mb-3 mt-0">Activity</h3>
 
             <div *ngIf="loading" class="flex items-center justify-center py-8" role="status" aria-label="Loading activity">
-              <physio-icon name="loader-circle" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+              <boo-spinner [inline]="true" tone="primary" [size]="24" />
             </div>
 
             <boo-error-state *ngIf="!loading && failed" title="We couldn't load the activity" [description]="null" (retry)="load()"></boo-error-state>

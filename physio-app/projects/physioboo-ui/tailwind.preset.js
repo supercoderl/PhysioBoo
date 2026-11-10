@@ -57,6 +57,18 @@ module.exports = {
         regular: 'rgb(var(--twc-regular) / <alpha-value>)',
         body: 'rgb(var(--twc-body) / <alpha-value>)',
         placeholder: 'rgb(var(--twc-placeholder) / <alpha-value>)',
+        // Form controls: border-form-border, text-form-muted, ring-form-accent, ...
+        form: {
+          text: 'rgb(var(--form-text) / <alpha-value>)',
+          muted: 'rgb(var(--form-muted) / <alpha-value>)',
+          border: 'rgb(var(--form-border) / <alpha-value>)',
+          'border-hover': 'rgb(var(--form-border-hover) / <alpha-value>)',
+          surface: 'rgb(var(--form-surface) / <alpha-value>)',
+          subtle: 'rgb(var(--form-subtle) / <alpha-value>)',
+          accent: 'rgb(var(--form-accent) / <alpha-value>)',
+          error: 'rgb(var(--form-error) / <alpha-value>)',
+          success: 'rgb(var(--form-success) / <alpha-value>)',
+        },
       },
       fontSize: {
         xs14: "14px",

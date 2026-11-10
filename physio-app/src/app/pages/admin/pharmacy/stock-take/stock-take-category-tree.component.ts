@@ -17,7 +17,7 @@ import { StockTakeCategoryNode } from "../../../../shared/types/stock-take.types
             class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-1.5 text-left text-sm transition-colors"
             [ngClass]="!activeId ? 'bg-primarySoft text-primaryDeep font-semibold' : 'hover:bg-gray-50 text-regular'">
             <span>All items</span>
-            <span class="text-[11px] tabular-nums text-secondary">{{ countedTotal }}/{{ total }}</span>
+            <span class="text-xs tabular-nums text-secondary">{{ countedTotal }}/{{ total }}</span>
           </button>
         </li>
         <li *ngFor="let node of categories; trackBy: trackById">
@@ -25,7 +25,7 @@ import { StockTakeCategoryNode } from "../../../../shared/types/stock-take.types
             class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-1.5 text-left text-sm transition-colors"
             [ngClass]="activeId === node.id ? 'bg-primarySoft text-primaryDeep font-semibold' : 'hover:bg-gray-50 text-regular'">
             <span class="truncate">{{ node.name }}</span>
-            <span class="flex-none text-[11px] tabular-nums" [ngClass]="node.countedCount === node.itemCount ? 'text-emerald-600 font-semibold' : 'text-secondary'">
+            <span class="flex-none text-xs tabular-nums" [ngClass]="node.countedCount === node.itemCount ? 'text-emerald-600 font-semibold' : 'text-secondary'">
               {{ node.countedCount }}/{{ node.itemCount }}
             </span>
           </button>

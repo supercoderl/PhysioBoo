@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, inject, Input, Output } from "@angular/core";
-import { BooInputComponent } from '@physioboo/ui';
+import { BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { STOCK_TAKE_REASONS, stockTakeReasonLabel } from "../../../../shared/types/stock-take.types";
@@ -12,14 +12,14 @@ import { CountRow } from "./stock-take-counting.model";
 @Component({
     selector: 'stock-take-counting-table',
     standalone: true,
-    imports: [SharedModule, BooInputComponent, BooSelectComponent],
+    imports: [SharedModule, BooInputComponent, BooSelectComponent, BooFieldErrorComponent],
     host: { class: 'block h-full min-h-0 min-w-0' },
     template: `
     <div class="boo-scrollbar h-full overflow-auto">
       <table class="w-full min-w-[920px] text-sm border-collapse">
         <caption class="sr-only">Medicine batches to count. Enter the counted quantity of each batch.</caption>
         <thead class="sticky top-0 z-10 bg-gray-50">
-          <tr class="text-left text-[11px] text-secondary uppercase tracking-wide bg-gray-50 border-y border-borderGray/60">
+          <tr class="text-left text-xs text-secondary uppercase tracking-wide bg-gray-50 border-y border-borderGray/60">
             <th scope="col" class="px-4 py-2.5 font-semibold">Medicine</th>
             <th scope="col" class="px-3 py-2.5 font-semibold">Batch / expiry</th>
             <th scope="col" class="px-3 py-2.5 font-semibold text-right">System</th>
@@ -38,10 +38,10 @@ import { CountRow } from "./stock-take-counting.model";
                 <span class="mt-1.5 flex-none w-2 h-2 rounded-full" [ngClass]="row.dirty ? 'bg-amber-500' : row.counted ? 'bg-emerald-500' : 'bg-gray-300'" aria-hidden="true"></span>
                 <div class="min-w-0 leading-tight">
                   <p class="m-0 font-semibold text-regular break-words">{{ row.item.itemName || 'Unnamed medicine' }}</p>
-                  <p class="m-0 mt-0.5 text-[11px] text-secondary">
+                  <p class="m-0 mt-0.5 text-xs text-secondary">
                     {{ row.item.itemCode || 'No code' }}<ng-container *ngIf="row.item.unit"> · {{ row.item.unit }}</ng-container><ng-container *ngIf="row.item.barcode"> · {{ row.item.barcode }}</ng-container>
                   </p>
-                  <p class="m-0 mt-0.5 text-[11px] font-medium" [ngClass]="row.dirty ? 'text-amber-700' : row.counted ? 'text-emerald-700' : 'text-secondary'">
+                  <p class="m-0 mt-0.5 text-xs font-medium" [ngClass]="row.dirty ? 'text-amber-700' : row.counted ? 'text-emerald-700' : 'text-secondary'">
                     {{ row.dirty ? 'Unsaved' : row.counted ? 'Counted' : 'Not counted' }}
                   </p>
                 </div>
@@ -50,7 +50,7 @@ import { CountRow } from "./stock-take-counting.model";
 
             <td class="px-3 py-3 leading-tight whitespace-nowrap">
               <div class="text-regular">{{ row.item.batchNo || '—' }}</div>
-              <div class="text-[11px]" [ngClass]="row.expired ? 'text-rose-600 font-semibold' : 'text-secondary'">
+              <div class="text-xs" [ngClass]="row.expired ? 'text-rose-600 font-semibold' : 'text-secondary'">
                 {{ row.item.expiryDate ? (row.item.expiryDate | date:'mediumDate') : 'No expiry' }}<ng-container *ngIf="row.expired"> · Expired</ng-container>
               </div>
             </td>
@@ -63,7 +63,7 @@ import { CountRow } from "./stock-take-counting.model";
               <ng-template #qtyReadonly>
                 <span class="font-semibold tabular-nums text-regular">{{ row.qty === null ? '—' : (row.qty | number) }}</span>
               </ng-template>
-              <p *ngIf="row.error" class="m-0 mt-1 text-xs text-danger" role="alert">{{ row.error }}</p>
+              <boo-field-error size="sm" announce class="mt-1" *ngIf="row.error">{{ row.error }}</boo-field-error>
             </td>
 
             <td class="px-3 py-3 text-right tabular-nums font-semibold whitespace-nowrap"

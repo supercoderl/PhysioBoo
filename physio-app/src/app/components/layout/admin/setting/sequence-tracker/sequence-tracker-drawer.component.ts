@@ -1,6 +1,6 @@
 import { Component, inject } from "@angular/core";
 import { FormBuilder, Validators } from "@angular/forms";
-import { BooInputComponent } from '@physioboo/ui';
+import { BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { map } from "rxjs";
 import { SequenceTrackerService } from "../../../../../services/admin/sequence-tracker.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -25,8 +25,7 @@ const WHOLE_NUMBER = /^\d+$/;
         SharedModule,
         CommonCategoryDrawerShellComponent,
         BooInputComponent,
-        BooSelectComponent,
-    ],
+        BooSelectComponent, BooFieldErrorComponent],
     template: `
         <common-category-drawer-shell
             [form]="form"
@@ -48,7 +47,7 @@ const WHOLE_NUMBER = /^\d+$/;
                 <section class="px-6 py-5 border-b border-rowDivider">
                     <h3 class="m-0 mb-4 text-xs font-semibold uppercase tracking-wider text-secondary">Record type</h3>
                     <boo-select label="Record type" [required]="true" formControlName="entityType" [options]="entityTypeOptions" />
-                    <p *ngIf="duplicateType" class="m-0 mt-1 text-xs text-danger" role="alert">A rule for {{ duplicateType }} already exists. Edit that rule instead.</p>
+                    <boo-field-error size="sm" announce class="mt-1" *ngIf="duplicateType">A rule for {{ duplicateType }} already exists. Edit that rule instead.</boo-field-error>
                     <p *ngIf="isEdit && typeChanged" class="m-0 mt-2 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900" role="note">
                         <physio-icon name="triangle-alert" [size]="14" class="shrink-0 mt-px" aria-hidden="true" />
                         {{ loaded?.entityType }} records will have no numbering rule after this change, and creating them will fail until one is added.
@@ -63,11 +62,11 @@ const WHOLE_NUMBER = /^\d+$/;
                         <boo-select class="sm:col-span-2" label="Date part" formControlName="useDateFormating" [options]="dateFormats" />
                         <div>
                             <boo-input type="number" label="Number of digits" [required]="true" formControlName="sequenceLength" />
-                            <p *ngIf="form.controls.sequenceLength.touched && form.controls.sequenceLength.invalid" class="m-0 mt-1 text-xs text-danger" role="alert">Enter a whole number from 1 to 18.</p>
+                            <boo-field-error size="sm" announce class="mt-1" *ngIf="form.controls.sequenceLength.touched && form.controls.sequenceLength.invalid">Enter a whole number from 1 to 18.</boo-field-error>
                         </div>
                         <div>
                             <boo-input type="number" label="Last issued number" [required]="true" formControlName="currentSequence" />
-                            <p *ngIf="form.controls.currentSequence.touched && form.controls.currentSequence.invalid; else counterHint" class="m-0 mt-1 text-xs text-danger" role="alert">Enter a whole number, 0 or more.</p>
+                            <boo-field-error size="sm" announce class="mt-1" *ngIf="form.controls.currentSequence.touched && form.controls.currentSequence.invalid; else counterHint">Enter a whole number, 0 or more.</boo-field-error>
                             <ng-template #counterHint><p class="m-0 mt-1 text-xs text-secondary">The next code uses this number + 1.</p></ng-template>
                         </div>
                     </div>

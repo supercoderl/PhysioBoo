@@ -12,7 +12,7 @@ import { SharedModule } from "../../shared/shared-imports";
     <nav
       *ngIf="breadcrumbs.length"
       [ngClass]="{
-        'flex w-fit rounded-sm border border-solid border-[#EFE3E7] px-2 mb-3 text-[13px] leading-[1.5]': true,
+        'flex w-fit rounded-sm border border-solid border-[#EFE3E7] px-2 mb-3 text-sm leading-[1.5]': true,
         'text-[#71606A]': theme === 'light',
         'text-white': theme === 'dark'
       }"

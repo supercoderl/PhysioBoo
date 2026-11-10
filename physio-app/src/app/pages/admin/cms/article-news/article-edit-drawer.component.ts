@@ -75,19 +75,19 @@ const MAX = { title: 200, slug: 250, author: 200, tags: 500, excerpt: 300, readT
                         <legend class="mb-3 text-sm font-semibold text-regular">Story</legend>
                         <div class="flex flex-col gap-4">
                             <div>
-                                <label for="ae-title" class="block mb-1 text-[13px] font-medium text-regular">Title <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="ae-title" class="block mb-1 text-sm font-medium text-regular">Title <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input name="ae-title" formControlName="title" label="e.g. Five stretches for lower back pain" [maxlength]="max.title" />
                             </div>
                             <div>
                                 <div class="flex items-baseline justify-between gap-3 mb-1">
-                                    <label for="ae-excerpt" class="text-[13px] font-medium text-regular">Excerpt <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="ae-excerpt" class="text-sm font-medium text-regular">Excerpt <span class="text-danger" aria-hidden="true">*</span></label>
                                     <span class="text-xs text-secondary tabular-nums" aria-live="polite">{{ form.controls.excerpt.value.length }} / {{ max.excerpt }}</span>
                                 </div>
                                 <boo-textarea id="ae-excerpt" formControlName="excerpt" label="One or two sentences shown on the blog cards and under the title" [rows]="3" [maxlength]="max.excerpt" />
                             </div>
                             <div>
                                 <div class="flex items-baseline justify-between gap-3 mb-1">
-                                    <label for="ae-content" class="text-[13px] font-medium text-regular">Content <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="ae-content" class="text-sm font-medium text-regular">Content <span class="text-danger" aria-hidden="true">*</span></label>
                                     <span class="text-xs text-secondary tabular-nums">{{ wordCount }} {{ wordCount === 1 ? 'word' : 'words' }}</span>
                                 </div>
                                 <boo-textarea id="ae-content" formControlName="content" label="Write the full article…" [rows]="14" [maxlength]="max.content" />
@@ -105,7 +105,7 @@ const MAX = { title: 200, slug: 250, author: 200, tags: 500, excerpt: 300, readT
                         <legend class="mb-3 text-sm font-semibold text-regular">Presentation</legend>
                         <div class="flex flex-col gap-4">
                             <div>
-                                <span class="block mb-1 text-[13px] font-medium text-regular">Cover image</span>
+                                <span class="block mb-1 text-sm font-medium text-regular">Cover image</span>
                                 <boo-upload formControlName="coverImageUrl" width="100%" height="200px" [radius]="12" accept="image/jpeg,image/png,image/webp" [folder]="coverFolder" />
                                 <div class="mt-1.5 flex items-center justify-between gap-3">
                                     <p class="m-0 text-xs text-secondary">JPG, PNG or WebP. Shown at 16:9 on the blog.</p>
@@ -114,11 +114,11 @@ const MAX = { title: 200, slug: 250, author: 200, tags: 500, excerpt: 300, readT
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="ae-category" class="block mb-1 text-[13px] font-medium text-regular">Category <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="ae-category" class="block mb-1 text-sm font-medium text-regular">Category <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-select id="ae-category" formControlName="category" label="Category" required [options]="categoryOptions" />
                                 </div>
                                 <div>
-                                    <label for="ae-tags" class="block mb-1 text-[13px] font-medium text-regular">Tags</label>
+                                    <label for="ae-tags" class="block mb-1 text-sm font-medium text-regular">Tags</label>
                                     <boo-input name="ae-tags" formControlName="tags" label="e.g. Posture, Back pain" [maxlength]="max.tags" />
                                     <p class="m-0 mt-1 text-xs text-secondary">Separate with commas. Tags are searchable.</p>
                                 </div>
@@ -132,29 +132,29 @@ const MAX = { title: 200, slug: 250, author: 200, tags: 500, excerpt: 300, readT
                         <div class="flex flex-col gap-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="ae-author" class="block mb-1 text-[13px] font-medium text-regular">Author <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="ae-author" class="block mb-1 text-sm font-medium text-regular">Author <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-input name="ae-author" formControlName="author" label="e.g. Dr. Linh Tran" [maxlength]="max.author" />
                                 </div>
                                 <div>
-                                    <label for="ae-read" class="block mb-1 text-[13px] font-medium text-regular">Reading time</label>
+                                    <label for="ae-read" class="block mb-1 text-sm font-medium text-regular">Reading time</label>
                                     <boo-input name="ae-read" formControlName="readTime" label="e.g. 5 min read" [maxlength]="max.readTime" />
                                     <p class="m-0 mt-1 text-xs text-secondary">{{ readTimeManual ? 'Set by hand.' : 'Worked out from the content.' }}</p>
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="ae-status" class="block mb-1 text-[13px] font-medium text-regular">Status <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="ae-status" class="block mb-1 text-sm font-medium text-regular">Status <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-select id="ae-status" formControlName="status" label="Status" required [options]="statusOptions" />
                                     <p class="m-0 mt-1 text-xs text-secondary">{{ statusHint }}</p>
                                 </div>
                                 <div>
-                                    <label for="ae-date" class="block mb-1 text-[13px] font-medium text-regular">Publish date</label>
+                                    <label for="ae-date" class="block mb-1 text-sm font-medium text-regular">Publish date</label>
                                     <boo-datepicker id="ae-date" formControlName="publishDate" label="Publish date" />
                                     <p *ngIf="isPublishing && !form.controls.publishDate.value" class="m-0 mt-1 text-xs text-secondary">Today's date is used when left empty.</p>
                                 </div>
                             </div>
                             <div>
-                                <label for="ae-slug" class="block mb-1 text-[13px] font-medium text-regular">Slug <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="ae-slug" class="block mb-1 text-sm font-medium text-regular">Slug <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input name="ae-slug" formControlName="slug" label="five-stretches-for-lower-back-pain" [maxlength]="max.slug" />
                                 <p class="m-0 mt-1 text-xs text-secondary">
                                     Must be unique across articles.<ng-container *ngIf="!article && !slugManual"> Follows the title until you change it.</ng-container>

@@ -4,16 +4,7 @@ import { Component, DestroyRef, OnInit, PLATFORM_ID, inject } from '@angular/cor
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import {
-    BooButtonComponent,
-    BooEmptyStateComponent,
-    BooErrorStateComponent,
-    BooIconComponent,
-    BooInlineErrorComponent,
-    BooInlineErrorState,
-    BooSearchFieldComponent,
-    BooStatusBadgeComponent,
-} from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooIconComponent, BooInlineErrorComponent, BooInlineErrorState, BooSearchFieldComponent, BooStatusBadgeComponent } from '@physioboo/ui';
 import { Subject, from, interval, of } from 'rxjs';
 import { catchError, finalize, map, mergeMap, switchMap, toArray } from 'rxjs/operators';
 import { BooDatepickerComponent } from '../../../../components/date-picker/boo-date-picker.component';

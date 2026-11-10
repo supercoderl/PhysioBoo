@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { finalize } from "rxjs";
-import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { AuthService } from "../../../../../services/auth/auth.service";
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -11,10 +11,10 @@ import { SurgeryAlertSeverity, SurgeryCriticalAlert } from "../../../../../share
 @Component({
   selector: 'surgery-alerts-tab',
   standalone: true,
-  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonComponent, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <div *ngIf="!isLoading() && !alerts().length"><boo-empty-state icon="shield-check" title="No active clinical alerts" description="All consent, allergy, equipment, scheduling, and delay alerts have been acknowledged."></boo-empty-state></div>
@@ -41,7 +41,7 @@ import { SurgeryAlertSeverity, SurgeryCriticalAlert } from "../../../../../share
             <td class="px-4 py-3 text-gray-500">{{ a.suggestedAction }}</td>
             <td class="px-4 py-3 text-gray-500">{{ a.raisedAt | date:'short' }}</td>
             <td class="px-4 py-3">
-              <button *ngIf="canAcknowledge" type="button" [disabled]="acknowledgingId() !== null" (click)="acknowledge(a)" class="text-primary text-xs font-semibold hover:underline">Acknowledge</button>
+              <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold" *ngIf="canAcknowledge" [disabled]="acknowledgingId() !== null" (click)="acknowledge(a)">Acknowledge</button>
             </td>
           </tr>
         </tbody>

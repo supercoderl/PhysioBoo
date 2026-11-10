@@ -8,8 +8,7 @@ import {
     BooErrorStateComponent,
     BooIconComponent,
     BooPaginationComponent,
-    BooStatusBadgeComponent,
-} from '@physioboo/ui';
+    BooStatusBadgeComponent, BooTabsComponent } from '@physioboo/ui';
 import { Subject, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { DrawerComponent } from '../../../../components/drawer/drawer.component';
@@ -45,8 +44,7 @@ const LEDGER_PAGE_SIZE = 10;
         BooPaginationComponent,
         BooEmptyStateComponent,
         BooErrorStateComponent,
-        CustomScrollbarDirective,
-    ],
+        CustomScrollbarDirective, BooTabsComponent],
     template: `
         <drawer [isOpen]="!!member" (close)="close.emit()">
             <div
@@ -126,21 +124,7 @@ const LEDGER_PAGE_SIZE = 10;
                                 <h3 id="md-ledger" class="m-0 text-sm font-semibold text-regular">Point history</h3>
                                 <p class="m-0 mt-0.5 text-xs text-secondary">Newest first<ng-container *ngIf="ledger"> · {{ ledger.totalCount }} {{ ledger.totalCount === 1 ? 'entry' : 'entries' }}{{ type ? ' shown' : '' }}</ng-container></p>
                             </div>
-                            <div class="flex items-center gap-0.5 p-0.5 rounded-lg bg-body" role="tablist" aria-label="Entry type">
-                                <button
-                                    *ngFor="let t of typeTabs; let i = index"
-                                    type="button"
-                                    role="tab"
-                                    [id]="'md-type-' + i"
-                                    aria-controls="md-ledger-list"
-                                    [attr.aria-selected]="t.value === type"
-                                    [attr.tabindex]="t.value === type ? 0 : -1"
-                                    class="px-3 h-7 rounded-md border-0 text-xs cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                                    [ngClass]="t.value === type ? 'bg-surface text-regular font-semibold shadow-sm' : 'bg-transparent text-secondary font-medium hover:text-regular'"
-                                    (click)="selectType(t.value)"
-                                    (keydown)="onTypeKey($event, i)"
-                                >{{ t.label }}</button>
-                            </div>
+                            <boo-tabs variant="segment" [tabs]="typeTabs" [value]="type" (valueChange)="selectType($event)" label="Entry type" idPrefix="md-type" controls="md-ledger-list" />
                         </div>
 
                         <div id="md-ledger-list" role="tabpanel" class="flex-1 flex flex-col mt-3" [attr.aria-busy]="loading">
@@ -372,19 +356,6 @@ export class CrmMemberDetailDrawerComponent implements OnChanges {
         this.load();
     }
 
-    onTypeKey(event: KeyboardEvent, index: number): void {
-        const last = this.typeTabs.length - 1;
-        const next = event.key === 'ArrowRight' ? (index === last ? 0 : index + 1)
-            : event.key === 'ArrowLeft' ? (index === 0 ? last : index - 1)
-            : event.key === 'Home' ? 0
-            : event.key === 'End' ? last
-            : null;
-        if (next === null) return;
-        event.preventDefault();
-        this.selectType(this.typeTabs[next].value);
-        // The drawer is re-parented to <body>, so look the tab up from this component's own element.
-        this.host.ownerDocument.getElementById(`md-type-${next}`)?.focus();
-    }
 
     onPageChange(page: number): void {
         if (page < 1 || page > this.totalPages || page === this.page) return;

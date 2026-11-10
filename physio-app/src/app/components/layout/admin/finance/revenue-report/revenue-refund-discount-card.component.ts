@@ -1,3 +1,4 @@
+import { BooTab, BooTabsComponent } from '@physioboo/ui';
 import { Component, Input } from "@angular/core";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { DiscountRecord, RefundRecord } from "../../../../../shared/types/revenue.types";
@@ -6,26 +7,13 @@ import { DiscountRecord, RefundRecord } from "../../../../../shared/types/revenu
 @Component({
     selector: 'revenue-refund-discount-card',
     standalone: true,
-    imports: [SharedModule],
+    imports: [SharedModule, BooTabsComponent],
     template: `
     <div class="bg-surface rounded-2 border border-borderGray/60 p-4 h-full" [attr.aria-busy]="loading">
       <h3 class="text-sm font-semibold text-regular mb-0.5">Refunds and discounts</h3>
       <p class="text-xs text-secondary mb-3">Money returned and price reductions in the period</p>
 
-      <div role="tablist" aria-label="Adjustment type" class="flex items-center gap-1 bg-gray-100 rounded-xl p-1 w-fit mb-3">
-        <button type="button" role="tab" id="adj-tab-refunds" aria-controls="adj-panel" [attr.aria-selected]="activeTab === 'refunds'"
-          (click)="activeTab = 'refunds'"
-          class="px-3 min-h-10 lg:min-h-8 rounded-lg text-xs font-semibold transition-colors"
-          [ngClass]="activeTab === 'refunds' ? 'bg-surface text-regular shadow-sm' : 'text-secondary hover:text-regular'">
-          Refunds <span class="font-normal tabular-nums">({{ refundTotal }})</span>
-        </button>
-        <button type="button" role="tab" id="adj-tab-discounts" aria-controls="adj-panel" [attr.aria-selected]="activeTab === 'discounts'"
-          (click)="activeTab = 'discounts'"
-          class="px-3 min-h-10 lg:min-h-8 rounded-lg text-xs font-semibold transition-colors"
-          [ngClass]="activeTab === 'discounts' ? 'bg-surface text-regular shadow-sm' : 'text-secondary hover:text-regular'">
-          Discounts <span class="font-normal tabular-nums">({{ discountTotal }})</span>
-        </button>
-      </div>
+      <boo-tabs variant="segment" class="mb-3" [tabs]="tabItems" [value]="activeTab" (valueChange)="activeTab = $event" label="Adjustment type" idPrefix="adj-tab" controls="adj-panel" />
 
       <div id="adj-panel" role="tabpanel" [attr.aria-labelledby]="'adj-tab-' + activeTab">
         <div *ngIf="loading" class="space-y-2.5">
@@ -75,6 +63,15 @@ export class RevenueRefundDiscountCardComponent {
     /** Totals matching the filter, from the paged searches (the lists above hold only the first page). */
     @Input() refundTotal = 0;
     @Input() discountTotal = 0;
+
+    private tabCache: { key: string; tabs: BooTab<'refunds' | 'discounts'>[] } | null = null;
+    get tabItems(): BooTab<'refunds' | 'discounts'>[] {
+        const key = this.refundTotal + '|' + this.discountTotal;
+        if (this.tabCache?.key !== key) {
+            this.tabCache = { key, tabs: [{ value: 'refunds', label: `Refunds (${this.refundTotal})` }, { value: 'discounts', label: `Discounts (${this.discountTotal})` }] };
+        }
+        return this.tabCache.tabs;
+    }
     @Input() loading = false;
 
     activeTab: 'refunds' | 'discounts' = 'refunds';

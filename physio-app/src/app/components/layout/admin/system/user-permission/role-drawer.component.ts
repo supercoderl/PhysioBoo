@@ -5,7 +5,7 @@ import { Role } from "../../../../../shared/types/role.types";
 import { ColorUtils } from "../../../../../shared/utils/color.utils";
 import { IconUtils } from "../../../../../shared/utils/icon.utils";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
+import { BooCheckboxComponent, BooInputComponent, BooButtonComponent } from '@physioboo/ui';
 import { DrawerComponent } from "../../../../drawer/drawer.component";
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
 
@@ -18,8 +18,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
         BooCheckboxComponent,
         BooInputComponent,
         BooTextareaComponent,
-        SharedModule
-    ],
+        SharedModule, BooButtonComponent],
     template: `
         <drawer
             [isOpen]="isOpen"
@@ -47,10 +46,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                             </p>
                         </div>
                     </div>
-                    <button
-                        (click)="onClose()"
-                        class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
-                    >
+                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="onClose()" aria-label="Close">
                         <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>
@@ -223,11 +219,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                 <div
                     class="flex-none px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-3"
                 >
-                    <button
-                        *ngIf="selectedRole() && !selectedRole()!.isSystemRole"
-                        (click)="onDeleteRole(selectedRole()!)"
-                    class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1.5"
-                    >trash
+                    <button type="button" boo-button variant="ghost" size="sm" classname="!text-danger" *ngIf="selectedRole() && !selectedRole()!.isSystemRole" (click)="onDeleteRole(selectedRole()!)">trash
                         <physio-icon name="trash" [size]="16"></physio-icon>
                         Delete Role
                     </button>

@@ -1,7 +1,7 @@
 import { NgIf } from "@angular/common";
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { BooButtonComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { DrawerComponent } from "../../../../../components/drawer/drawer.component";
 import { BooTextareaComponent } from "../../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { LaboratoryDrawerShellComponent } from "./laboratory-drawer-shell.component";
@@ -34,7 +34,7 @@ const MAX_COMMENTS_LENGTH = 2000;
 @Component({
   selector: 'laboratory-result-entry-drawer',
   standalone: true,
-  imports: [NgIf, FormsModule, DrawerComponent, BooButtonComponent, BooInputComponent, BooTextareaComponent, LaboratoryDrawerShellComponent],
+  imports: [NgIf, FormsModule, DrawerComponent, BooButtonComponent, BooInputComponent, BooTextareaComponent, LaboratoryDrawerShellComponent, BooFieldErrorComponent],
   template: `
     <drawer [isOpen]="isOpen" (close)="requestClose()">
       <laboratory-drawer-shell *ngIf="isOpen && target" [title]="target.value ? 'Edit result' : 'Enter result'"
@@ -48,7 +48,7 @@ const MAX_COMMENTS_LENGTH = 2000;
 
           <div>
             <boo-input label="Result value" name="value" [required]="true" [maxlength]="valueMax" [(ngModel)]="value" [disabled]="submitting" />
-            <p *ngIf="attempted && !value.trim()" class="m-0 mt-1 text-xs text-danger" role="alert">A result value is required.</p>
+            <boo-field-error size="sm" announce class="mt-1" *ngIf="attempted && !value.trim()">A result value is required.</boo-field-error>
           </div>
 
           <div>

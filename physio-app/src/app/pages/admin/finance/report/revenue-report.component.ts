@@ -1,6 +1,6 @@
 import { Component, computed, DestroyRef, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { BooEmptyStateComponent, BooInlineErrorComponent } from "@physioboo/ui";
+import { BooEmptyStateComponent, BooInlineErrorComponent, BooTab, BooTabsComponent } from "@physioboo/ui";
 import { finalize, forkJoin, Observable, Subscription } from "rxjs";
 import { ButtonIconComponent } from "../../../../components/button/button-icon/button-icon.component";
 import { AdminContentHeaderComponent } from "../../../../components/layout/admin/content-header/content-header.component";
@@ -66,8 +66,7 @@ const GRANULARITY_LABEL = { day: 'Daily', week: 'Weekly', month: 'Monthly' } as 
         RevenueOutstandingCardComponent,
         RevenueRefundDiscountCardComponent,
         RevenueTransactionsTableCardComponent,
-        RevenueTransactionDrawerComponent,
-    ],
+        RevenueTransactionDrawerComponent, BooTabsComponent],
     template: `
     <admin-content-header>
       <div class="flex flex-col gap-6 pb-8">
@@ -128,13 +127,7 @@ const GRANULARITY_LABEL = { day: 'Daily', week: 'Weekly', month: 'Monthly' } as 
             <h2 id="rev-breakdown" class="text-base font-semibold text-regular mb-0.5">Where revenue comes from</h2>
             <p class="text-xs text-secondary mb-3">Select a department or doctor to apply it as a filter to the whole report.</p>
 
-            <div role="tablist" aria-label="Revenue breakdown" class="flex items-center gap-1 bg-gray-100 rounded-xl p-1 w-fit mb-3 max-w-full overflow-x-auto">
-              <button *ngFor="let tab of breakdownTabs" type="button" role="tab" [id]="'breakdown-tab-' + tab.id" aria-controls="breakdown-panel"
-                [attr.aria-selected]="breakdownTab() === tab.id" [attr.tabindex]="breakdownTab() === tab.id ? 0 : -1"
-                (click)="selectBreakdownTab(tab.id)" (keydown.arrowRight)="moveBreakdownTab(1)" (keydown.arrowLeft)="moveBreakdownTab(-1)"
-                class="px-3.5 min-h-10 lg:min-h-8 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors"
-                [ngClass]="breakdownTab() === tab.id ? 'bg-surface text-regular shadow-sm' : 'text-secondary hover:text-regular'">{{ tab.label }}</button>
-            </div>
+            <boo-tabs variant="segment" class="mb-3" [tabs]="breakdownTabItems" [value]="breakdownTab()" (valueChange)="selectBreakdownTab($event)" label="Revenue breakdown" idPrefix="breakdown-tab" controls="breakdown-panel" />
 
             <div id="breakdown-panel" role="tabpanel" [attr.aria-labelledby]="'breakdown-tab-' + breakdownTab()">
               <ng-container [ngSwitch]="breakdownTab()">
@@ -276,6 +269,7 @@ export class AdminRevenueReportComponent {
         { id: 'doctors', label: 'Doctors' },
         { id: 'insurance', label: 'Insurance' },
     ];
+    readonly breakdownTabItems: BooTab<BreakdownTab>[] = this.breakdownTabs.map(t => ({ value: t.id, label: t.label }));
     readonly breakdownTab = signal<BreakdownTab>('departments');
 
     readonly billsPage = signal(1);
@@ -346,13 +340,6 @@ export class AdminRevenueReportComponent {
     selectBreakdownTab(tab: BreakdownTab): void {
         this.breakdownTab.set(tab);
         this.activeBreakdown().ensure(this.appliedKey());
-    }
-
-    moveBreakdownTab(step: 1 | -1): void {
-        const index = this.breakdownTabs.findIndex(t => t.id === this.breakdownTab());
-        const next = this.breakdownTabs[(index + step + this.breakdownTabs.length) % this.breakdownTabs.length];
-        this.selectBreakdownTab(next.id);
-        queueMicrotask(() => document.getElementById(`breakdown-tab-${next.id}`)?.focus());
     }
 
     onBillsPageChange(page: number): void {

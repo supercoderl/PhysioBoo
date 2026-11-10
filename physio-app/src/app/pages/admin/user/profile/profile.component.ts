@@ -38,7 +38,7 @@ import { SharedModule } from '../../../../shared/shared-imports';
                   <h1 class="font-bold leading-tight text-[20px] m-0 truncate max-w-full">
                     {{ displayName(user) }}
                   </h1>
-                  <p class="m-0 text-[13px] leading-[1.5] text-[#71606A] truncate max-w-full">{{ user.email }}</p>
+                  <p class="m-0 text-sm leading-[1.5] text-[#71606A] truncate max-w-full">{{ user.email }}</p>
                   <div class="mt-2 flex flex-wrap items-center gap-2">
                     <boo-status-badge
                       [label]="user.isVerified ? 'Verified' : 'Unverified'"
@@ -74,7 +74,7 @@ import { SharedModule } from '../../../../shared/shared-imports';
                   <dd class="m-0 mt-1 text-[14px]">{{ user.phone || '—' }}</dd>
                 </div>
               </dl>
-              <p class="m-0 mt-4 text-[13px] text-[#71606A]">
+              <p class="m-0 mt-4 text-sm text-[#71606A]">
                 Names, date of birth, emergency contacts and other personal details are managed in your account settings.
               </p>
             </section>

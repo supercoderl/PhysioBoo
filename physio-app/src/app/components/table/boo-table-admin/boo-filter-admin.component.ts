@@ -37,7 +37,7 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
 
             <div *ngIf="config.type === 'boolean'" class="bg-surface border border-borderGray p-1 rounded-md flex gap-1">
                 <button (click)="config.value = null"
-                    class="flex-1 py-1.5 text-[11px] font-semibold rounded transition-all duration-200 text-center uppercase tracking-wide"
+                    class="flex-1 py-1.5 text-xs font-semibold rounded transition-all duration-200 text-center uppercase tracking-wide"
                     [class.bg-secondary]="config.value === null"
                     [class.text-white]="config.value === null"
                     [class.shadow-sm]="config.value === null"
@@ -47,7 +47,7 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
                 </button>
 
                 <button (click)="config.value = true"
-                    class="flex-1 py-1.5 text-[11px] font-semibold rounded transition-all duration-200 text-center uppercase tracking-wide"
+                    class="flex-1 py-1.5 text-xs font-semibold rounded transition-all duration-200 text-center uppercase tracking-wide"
                     [class.bg-secondary]="config.value === true"
                     [class.text-white]="config.value === true"
                     [class.shadow-sm]="config.value === true"
@@ -57,7 +57,7 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
                 </button>
 
                 <button (click)="config.value = false"
-                    class="flex-1 py-1.5 text-[11px] font-semibold rounded transition-all duration-200 text-center uppercase tracking-wide"
+                    class="flex-1 py-1.5 text-xs font-semibold rounded transition-all duration-200 text-center uppercase tracking-wide"
                     [class.bg-secondary]="config.value === false"
                     [class.text-white]="config.value === false" 
                     [class.shadow-sm]="config.value === false"
@@ -88,7 +88,7 @@ import { BooButtonAdminComponent } from '../../button/boo-button-admin/boo-butto
 
         <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-100">
           <button (click)="reset()" class="text-xs text-red-500 font-medium hover:underline">Reset All</button>
-          <button (click)="applyFilter()" class="bg-primary text-white text-[13px] font-semibold px-4 py-2 rounded-md hover:bg-primaryHover transition-colors shadow-sm">
+          <button (click)="applyFilter()" class="bg-primary text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-primaryHover transition-colors shadow-sm">
             Apply Filter
           </button>
         </div>

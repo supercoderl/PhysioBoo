@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges, signal } from "@angular/core";
-import { BooErrorStateComponent } from '@physioboo/ui';
+import { BooErrorStateComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { finalize } from "rxjs";
 import { LaboratoryService } from "../../../../../services/admin/laboratory.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
@@ -8,13 +8,13 @@ import { LabDashboardTrend } from "../../../../../shared/types/laboratory.types"
 @Component({
   selector: 'laboratory-dashboard-tab',
   standalone: true,
-  imports: [SharedModule, BooErrorStateComponent],
+  imports: [SharedModule, BooErrorStateComponent, BooSpinnerComponent],
   template: `
     <boo-error-state *ngIf="!isLoading() && error()" appearance="panel" icon="cloud-off" title="We couldn't load the dashboard"
       description="Check your connection and try again." retryLabel="Try again" (retry)="load()" />
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <div *ngIf="!isLoading() && !error() && trend()" class="grid grid-cols-1 lg:grid-cols-2 gap-4">

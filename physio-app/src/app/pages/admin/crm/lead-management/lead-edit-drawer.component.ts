@@ -67,15 +67,15 @@ import { LEAD_LIMITS, PRIORITY_OPTIONS, SOURCES, STAGE_OPTIONS, displayName } fr
                         <legend class="mb-3 text-sm font-semibold text-regular">Contact</legend>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="sm:col-span-2">
-                                <label for="le-name" class="block mb-1 text-[13px] font-medium text-regular">Full name <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="le-name" class="block mb-1 text-sm font-medium text-regular">Full name <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input name="le-name" formControlName="name" label="e.g. Nguyen Van An" [maxlength]="limits.name" />
                             </div>
                             <div>
-                                <label for="le-phone" class="block mb-1 text-[13px] font-medium text-regular">Phone <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="le-phone" class="block mb-1 text-sm font-medium text-regular">Phone <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input name="le-phone" type="tel" formControlName="phone" label="e.g. 0901 234 567" [maxlength]="limits.phone" />
                             </div>
                             <div>
-                                <label for="le-email" class="block mb-1 text-[13px] font-medium text-regular">Email <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="le-email" class="block mb-1 text-sm font-medium text-regular">Email <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input name="le-email" type="email" formControlName="email" label="name@example.com" [maxlength]="limits.email" />
                             </div>
                         </div>
@@ -86,19 +86,19 @@ import { LEAD_LIMITS, PRIORITY_OPTIONS, SOURCES, STAGE_OPTIONS, displayName } fr
                         <legend class="mb-3 text-sm font-semibold text-regular">Enquiry</legend>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="sm:col-span-2">
-                                <label for="le-service" class="block mb-1 text-[13px] font-medium text-regular">Interested in <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="le-service" class="block mb-1 text-sm font-medium text-regular">Interested in <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input name="le-service" formControlName="service" label="e.g. Physiotherapy for lower back pain" [maxlength]="limits.service" />
                             </div>
                             <div>
-                                <label for="le-source" class="block mb-1 text-[13px] font-medium text-regular">Source <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="le-source" class="block mb-1 text-sm font-medium text-regular">Source <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-select id="le-source" formControlName="source" label="Source" required [options]="sourceOptions" />
                             </div>
                             <div>
-                                <label for="le-priority" class="block mb-1 text-[13px] font-medium text-regular">Priority <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="le-priority" class="block mb-1 text-sm font-medium text-regular">Priority <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-select id="le-priority" formControlName="priority" label="Priority" required [options]="priorityOptions" />
                             </div>
                             <div>
-                                <label for="le-status" class="block mb-1 text-[13px] font-medium text-regular">Stage <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="le-status" class="block mb-1 text-sm font-medium text-regular">Stage <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-select id="le-status" formControlName="status" label="Stage" required [options]="stageOptions" />
                             </div>
                         </div>
@@ -110,7 +110,7 @@ import { LEAD_LIMITS, PRIORITY_OPTIONS, SOURCES, STAGE_OPTIONS, displayName } fr
                         <div class="flex flex-col gap-4">
                             <div>
                                 <div class="flex items-end justify-between gap-2 mb-1">
-                                    <label for="le-owner" class="block text-[13px] font-medium text-regular">Owner</label>
+                                    <label for="le-owner" class="block text-sm font-medium text-regular">Owner</label>
                                     <button
                                         *ngIf="me && form.controls.assignedTo.value !== me"
                                         type="button"
@@ -124,7 +124,7 @@ import { LEAD_LIMITS, PRIORITY_OPTIONS, SOURCES, STAGE_OPTIONS, displayName } fr
                                 <boo-input name="le-owner" formControlName="assignedTo" label="Who will follow this lead up" [maxlength]="limits.assignedTo" />
                             </div>
                             <div>
-                                <label for="le-notes" class="block mb-1 text-[13px] font-medium text-regular">Notes</label>
+                                <label for="le-notes" class="block mb-1 text-sm font-medium text-regular">Notes</label>
                                 <boo-textarea id="le-notes" formControlName="notes" label="What they asked about, when to call back…" [rows]="6" [maxlength]="limits.notes" />
                                 <p class="m-0 mt-1 text-xs text-secondary text-right tabular-nums">{{ form.controls.notes.value.length }} / {{ limits.notes }}</p>
                             </div>

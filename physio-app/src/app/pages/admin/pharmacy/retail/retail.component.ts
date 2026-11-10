@@ -1,6 +1,6 @@
-import { Component, DestroyRef, HostListener, OnInit, ViewChild, inject, signal } from "@angular/core";
+import { Component, computed, DestroyRef, HostListener, OnInit, ViewChild, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooInlineErrorComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooInlineErrorComponent, BooTab, BooTabsComponent } from '@physioboo/ui';
 import { Observable, Subscription, concatMap, from, last } from "rxjs";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { HospitalService } from "../../../../services/admin/hospital.service";
@@ -48,8 +48,7 @@ const FACILITY_STORAGE_KEY = 'physioboo.retail.hospitalId';
     RetailPaymentDialogComponent,
     RetailReceiptDialogComponent,
     RetailProductDetailDrawerComponent,
-    RetailCustomerLookupDrawerComponent,
-  ],
+    RetailCustomerLookupDrawerComponent, BooTabsComponent],
   template: `
     <!-- Permission denied: the catalog and insight are all guarded by pharmacy:medicine-inventory:read -->
     <main *ngIf="!canReadCatalog" class="py-5">
@@ -111,15 +110,7 @@ const FACILITY_STORAGE_KEY = 'physioboo.retail.hospitalId';
         <aside id="retail-sale" class="flex min-h-0 flex-col self-start bg-surface border border-borderGray/60 rounded-2 scroll-mt-4 xl:h-full xl:self-auto xl:overflow-hidden" aria-label="Current sale">
           <div class="shrink-0 px-4 py-3 border-b border-borderGray/60">
             <h2 class="text-base font-semibold text-regular m-0">Current sale</h2>
-            <div *ngIf="carts().length" class="mt-2 -mx-1 flex items-center gap-1 overflow-x-auto" role="tablist" aria-label="Open sales">
-              <button *ngFor="let c of carts(); let i = index" type="button" role="tab" [id]="'retail-tab-' + c.id" [attr.aria-selected]="activeCartId() === c.id"
-                [attr.tabindex]="activeCartId() === c.id ? 0 : -1" (click)="switchCart(c.id)" (keydown.arrowright)="moveTab(i, 1)" (keydown.arrowleft)="moveTab(i, -1)"
-                class="px-3 min-h-9 rounded-full text-xs font-medium flex items-center gap-1.5 border whitespace-nowrap transition-colors"
-                [ngClass]="activeCartId() === c.id ? 'bg-primarySoft border-primary text-primaryDeep' : 'bg-surface border-gray-300 text-gray-700 hover:border-gray-400'">
-                <span class="w-1.5 h-1.5 rounded-full" [ngClass]="c.status === 'Active' ? 'bg-emerald-500' : 'bg-amber-500'" aria-hidden="true"></span>
-                {{ c.name }} <span class="text-gray-500">({{ c.items.length }})</span><span *ngIf="c.status === 'Held'" class="text-amber-800">· on hold</span>
-              </button>
-            </div>
+            <boo-tabs *ngIf="carts().length" variant="pill" class="mt-2" [tabs]="cartTabs()" [value]="activeCartId()" (valueChange)="switchCart($event)" label="Open sales" idPrefix="retail-tab" panelPrefix="" />
           </div>
 
           <ng-container *ngIf="canReadCart; else cartDenied">
@@ -363,13 +354,6 @@ export class AdminRetailComponent implements OnInit {
     else if (event.ctrlKey && event.key.toLowerCase() === 'b') { event.preventDefault(); this.catalogPanel?.focusBarcode(); }
   }
 
-  moveTab(index: number, delta: number): void {
-    const list = this.carts();
-    const next = list[(index + delta + list.length) % list.length];
-    if (!next) return;
-    this.switchCart(next.id);
-    setTimeout(() => document.getElementById('retail-tab-' + next.id)?.focus());
-  }
   // #endregion
 
   // #region Cart operations — the API owns the cart; every response replaces the local copy
@@ -414,6 +398,12 @@ export class AdminRetailComponent implements OnInit {
     this.runCartOp(this.srv.createCart(hospitalId, `Sale ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`),
       cart => this.activeCartId.set(cart.id), () => this.creating.set(false));
   }
+
+  readonly cartTabs = computed<BooTab<string>[]>(() => this.carts().map(c => ({
+    value: c.id,
+    label: `${c.name} (${c.items.length})${c.status === 'Held' ? ' · on hold' : ''}`,
+    dot: c.status === 'Active' ? 'bg-emerald-500' : 'bg-amber-500',
+  })));
 
   switchCart(cartId: string): void {
     if (this.activeCartId() === cartId) return;

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { BooFilterChip, BooFilterChipsComponent, BooInputComponent } from "@physioboo/ui";
+import { BooFilterChip, BooFilterChipsComponent, BooInputComponent, BooButtonComponent, BooSegmentedComponent } from "@physioboo/ui";
 import { DepartmentService } from "../../../../../services/admin/department.service";
 import { DoctorService } from "../../../../../services/admin/doctor.service";
 import { InsuranceCompanyService } from "../../../../../services/admin/insurance-company.service";
@@ -23,19 +23,12 @@ const MIN_SEARCH_LENGTH = 2;
 @Component({
     selector: 'revenue-filter-bar',
     standalone: true,
-    imports: [SharedModule, BooSelectComponent, BooDatepickerComponent, BooInputComponent, BooFilterChipsComponent],
+    imports: [SharedModule, BooSelectComponent, BooDatepickerComponent, BooInputComponent, BooFilterChipsComponent, BooButtonComponent, BooSegmentedComponent],
     template: `
     <form class="bg-surface border border-borderGray/60 rounded-2 p-3.5 flex flex-col gap-3" aria-label="Report filters" (submit)="$event.preventDefault()">
       <div class="flex flex-col gap-2.5 lg:flex-row lg:items-end lg:gap-4">
         <div class="lg:w-[84px] lg:pb-3 text-xs font-semibold uppercase tracking-wide text-secondary" id="revenue-period-label">Period</div>
-        <div role="group" aria-labelledby="revenue-period-label" class="flex flex-wrap gap-1.5 lg:pb-1.5">
-          <button type="button" *ngFor="let p of rangePresets" (click)="applyPreset(p.value)"
-            [attr.aria-pressed]="preset === p.value"
-            class="px-3 min-h-10 lg:min-h-8 rounded-full text-xs font-medium transition-colors"
-            [ngClass]="preset === p.value ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'">
-            {{ p.label }}
-          </button>
-        </div>
+        <boo-segmented class="lg:pb-1" label="Period" [options]="rangePresets" [value]="preset" (valueChange)="applyPreset($event)" />
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 flex-1 lg:max-w-[560px]">
           <boo-datepicker label="From" [ngModel]="filter.start" name="start" (ngModelChange)="setDate('start', $event)"
             [attr.aria-describedby]="invalidMessage ? 'revenue-filter-invalid' : null"></boo-datepicker>
@@ -68,7 +61,7 @@ const MIN_SEARCH_LENGTH = 2;
 
       <div class="flex items-center justify-between gap-3 flex-wrap" *ngIf="chips.length">
         <boo-filter-chips [chips]="chips" (remove)="removeChip($event)"></boo-filter-chips>
-        <button type="button" (click)="reset.emit()" class="inline-flex items-center gap-1.5 min-h-10 lg:min-h-8 px-2 text-xs font-semibold text-primary hover:opacity-80">
+        <button type="button" boo-button variant="ghost" size="sm" (click)="reset.emit()">
           <physio-icon name="rotate-cw" [size]="14"></physio-icon>Reset filters
         </button>
       </div>
@@ -90,6 +83,8 @@ export class RevenueFilterBarComponent implements OnInit {
 
     readonly rangePresets: { label: string; value: RevenuePreset }[] = [
         { label: 'Today', value: 'today' },
+        { label: 'Yesterday', value: 'yesterday' },
+        { label: 'This week', value: 'week' },
         { label: 'Last 7 days', value: '7d' },
         { label: 'Last 30 days', value: '30d' },
         { label: 'This month', value: 'month' },

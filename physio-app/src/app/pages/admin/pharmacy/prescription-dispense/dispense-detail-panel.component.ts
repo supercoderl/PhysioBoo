@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooButtonComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooInlineErrorState, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooInlineErrorState, BooStatusBadgeComponent, BooTab, BooTabsComponent } from '@physioboo/ui';
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DispenseLineAction, DispenseMedicationItem, DispenseWorkspace, DispenseWorkspaceTab } from "../../../../shared/types/dispensing.types";
@@ -23,7 +23,7 @@ interface FlatWarning extends ClinicalWarning {
 @Component({
   selector: 'dispense-detail-panel',
   standalone: true,
-  imports: [SharedModule, BooButtonComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooTextareaComponent, DispenseProgressStepperComponent, DispenseMedicineCardComponent],
+  imports: [SharedModule, BooButtonComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooTextareaComponent, DispenseProgressStepperComponent, DispenseMedicineCardComponent, BooTabsComponent],
   template: `
     <section class="h-full flex flex-col bg-surface rounded-2 border border-borderGray/60 overflow-hidden" aria-label="Prescription workspace" [attr.aria-busy]="loading ? 'true' : null">
       <!-- Nothing selected -->
@@ -57,7 +57,7 @@ interface FlatWarning extends ClinicalWarning {
               </p>
             </div>
             <button boo-button variant="ghost" size="sm" (click)="refresh.emit()" [disabled]="loading" aria-label="Reload prescription">
-              <physio-icon name="refresh" [size]="16" [class]="loading ? 'animate-spin' : ''"></physio-icon>Reload
+              <physio-icon name="refresh" [size]="16"></physio-icon>Reload
             </button>
           </div>
 
@@ -112,12 +112,7 @@ interface FlatWarning extends ClinicalWarning {
           </section>
 
           <!-- Review / Dispense -->
-          <div *ngIf="canAct(ws)" role="tablist" aria-label="Workspace mode" class="inline-flex rounded-2 bg-gray-100 p-1 gap-1">
-            <button type="button" role="tab" id="dispense-tab-review" [attr.aria-selected]="tab === 'review'" aria-controls="dispense-tabpanel" (click)="tabChange.emit('review')"
-              class="h-9 px-4 rounded-1.5 text-sm font-semibold" [ngClass]="tab === 'review' ? 'bg-surface text-regular shadow-sm' : 'text-secondary hover:text-regular'">Review</button>
-            <button type="button" role="tab" id="dispense-tab-dispense" [attr.aria-selected]="tab === 'dispense'" aria-controls="dispense-tabpanel" (click)="tabChange.emit('dispense')"
-              class="h-9 px-4 rounded-1.5 text-sm font-semibold" [ngClass]="tab === 'dispense' ? 'bg-surface text-regular shadow-sm' : 'text-secondary hover:text-regular'">Dispense</button>
-          </div>
+          <boo-tabs *ngIf="canAct(ws)" variant="segment" class="self-start" [tabs]="modeTabs" [value]="tab" (valueChange)="tabChange.emit($event)" label="Workspace mode" idPrefix="dispense-tab" controls="dispense-tabpanel" />
 
           <div id="dispense-tabpanel" [attr.role]="canAct(ws) ? 'tabpanel' : null" [attr.aria-labelledby]="canAct(ws) ? 'dispense-tab-' + tab : null" class="space-y-3">
             <h3 *ngIf="!canAct(ws)" class="text-sm font-semibold text-regular m-0">Medicines ({{ ws.items.length }})</h3>
@@ -154,6 +149,7 @@ export class DispenseDetailPanelComponent {
   @Input() error: string | null = null;
   @Input() errorState: BooInlineErrorState = 'default';
   @Input() tab: DispenseWorkspaceTab = 'review';
+  readonly modeTabs: BooTab<DispenseWorkspaceTab>[] = [{ value: 'review', label: 'Review' }, { value: 'dispense', label: 'Dispense' }];
   /** The user holds the dispensing:process permission. */
   @Input() canProcess = false;
   /** A mutation is in flight: all actions are disabled. */

@@ -2,7 +2,7 @@ import { NgIf } from '@angular/common';
 import { Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { BooButtonComponent, BooIconComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooIconComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { DrawerComponent } from '../../../../components/drawer/drawer.component';
@@ -37,8 +37,7 @@ function patientIdText(control: AbstractControl<string>): ValidationErrors | nul
         BooInputComponent,
         BooSelectComponent,
         BooTextareaComponent,
-        CustomScrollbarDirective,
-    ],
+        CustomScrollbarDirective, BooFieldErrorComponent],
     template: `
         <drawer [isOpen]="open" [isShowDialog]="form.dirty && !submitting" (close)="discard()">
             <form
@@ -76,11 +75,11 @@ function patientIdText(control: AbstractControl<string>): ValidationErrors | nul
                         <legend class="mb-3 text-sm font-semibold text-regular">Complaint</legend>
                         <div class="flex flex-col gap-4">
                             <div>
-                                <label for="ce-subject" class="block mb-1 text-[13px] font-medium text-regular">Subject <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="ce-subject" class="block mb-1 text-sm font-medium text-regular">Subject <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input name="ce-subject" formControlName="subject" label="A short summary of the issue" [maxlength]="limits.subject" />
                             </div>
                             <div>
-                                <label for="ce-description" class="block mb-1 text-[13px] font-medium text-regular">What happened <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="ce-description" class="block mb-1 text-sm font-medium text-regular">What happened <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-textarea
                                     id="ce-description"
                                     formControlName="description"
@@ -92,15 +91,15 @@ function patientIdText(control: AbstractControl<string>): ValidationErrors | nul
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="ce-category" class="block mb-1 text-[13px] font-medium text-regular">Category <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="ce-category" class="block mb-1 text-sm font-medium text-regular">Category <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-select id="ce-category" formControlName="category" label="Category" required [options]="categoryOptions" />
                                 </div>
                                 <div>
-                                    <label for="ce-priority" class="block mb-1 text-[13px] font-medium text-regular">Priority <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="ce-priority" class="block mb-1 text-sm font-medium text-regular">Priority <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-select id="ce-priority" formControlName="priority" label="Priority" required [searchable]="false" [options]="priorityOptions" />
                                 </div>
                                 <div *ngIf="complaint">
-                                    <label for="ce-status" class="block mb-1 text-[13px] font-medium text-regular">Status <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="ce-status" class="block mb-1 text-sm font-medium text-regular">Status <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-select id="ce-status" formControlName="status" label="Status" required [searchable]="false" [options]="statusOptions" />
                                 </div>
                             </div>
@@ -112,23 +111,23 @@ function patientIdText(control: AbstractControl<string>): ValidationErrors | nul
                         <legend class="mb-3 text-sm font-semibold text-regular">Raised by</legend>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="sm:col-span-2">
-                                <label for="ce-name" class="block mb-1 text-[13px] font-medium text-regular">Full name <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="ce-name" class="block mb-1 text-sm font-medium text-regular">Full name <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input name="ce-name" formControlName="patientName" label="e.g. Nguyen Van An" [maxlength]="limits.patientName" />
                             </div>
                             <div>
-                                <label for="ce-phone" class="block mb-1 text-[13px] font-medium text-regular">Phone <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="ce-phone" class="block mb-1 text-sm font-medium text-regular">Phone <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input name="ce-phone" type="tel" formControlName="phone" label="e.g. 0901 234 567" [maxlength]="limits.phone" />
                             </div>
                             <div>
-                                <label for="ce-email" class="block mb-1 text-[13px] font-medium text-regular">Email <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="ce-email" class="block mb-1 text-sm font-medium text-regular">Email <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input name="ce-email" type="email" formControlName="email" label="name@example.com" [maxlength]="limits.email" />
                             </div>
                             <div class="sm:col-span-2">
-                                <label for="ce-patient" class="block mb-1 text-[13px] font-medium text-regular">Patient record ID <span class="font-normal text-secondary">(optional)</span></label>
+                                <label for="ce-patient" class="block mb-1 text-sm font-medium text-regular">Patient record ID <span class="font-normal text-secondary">(optional)</span></label>
                                 <boo-input name="ce-patient" formControlName="patientId" label="Links the ticket to an existing patient record" [maxlength]="36" />
-                                <p *ngIf="form.controls.patientId.touched && form.controls.patientId.hasError('guid'); else patientHintTpl" class="m-0 mt-1 text-xs text-danger" role="alert">
+                                <boo-field-error size="sm" announce class="mt-1" *ngIf="form.controls.patientId.touched && form.controls.patientId.hasError('guid'); else patientHintTpl">
                                     Enter a full patient record ID, or leave this empty.
-                                </p>
+                                </boo-field-error>
                                 <ng-template #patientHintTpl>
                                     <p class="m-0 mt-1 text-xs text-secondary">The record must already exist; the server checks it when you save.</p>
                                 </ng-template>
@@ -140,7 +139,7 @@ function patientIdText(control: AbstractControl<string>): ValidationErrors | nul
                     <div class="pt-6 border-t border-rowDivider"><fieldset class="m-0 p-0 border-0 min-w-0">
                         <legend class="mb-3 text-sm font-semibold text-regular">Handling</legend>
                         <div class="flex items-end justify-between gap-2 mb-1">
-                            <label for="ce-owner" class="block text-[13px] font-medium text-regular">Owner</label>
+                            <label for="ce-owner" class="block text-sm font-medium text-regular">Owner</label>
                             <button
                                 *ngIf="me && form.controls.assignedTo.value !== me"
                                 type="button"

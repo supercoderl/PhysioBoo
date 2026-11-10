@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, computed, signal } from "@angular/core";
 import { finalize, forkJoin } from "rxjs";
-import { BooEmptyStateComponent, BooErrorStateComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooErrorStateComponent, BooButtonComponent, BooSearchFieldComponent, BooSegment, BooSegmentedComponent, BooSpinnerComponent } from '@physioboo/ui';
+import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { InsuranceClaimsService } from "../../../../services/admin/insurance-claims.service";
 import { LocalLoadingService } from "../../../../services/common/local-loading.service";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -39,8 +40,7 @@ const LOADING_KEY = 'insurance-claims-workspace';
     InsuranceClaimCardComponent,
     InsuranceClaimDetailPanelComponent,
     InsuranceClaimActionDialogComponent,
-    BooButtonAdminComponent
-  ],
+    BooButtonAdminComponent, BooButtonComponent, BooSearchFieldComponent, BooSelectComponent, BooSegmentedComponent, BooSpinnerComponent],
   host: { class: 'block h-full overflow-hidden' },
   styles: [`
     :host {
@@ -66,7 +66,7 @@ const LOADING_KEY = 'insurance-claims-workspace';
   template: `
     <!-- Loading -->
     <div *ngIf="loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center h-full gap-3">
-      <physio-icon name="loader" [size]="28" [class]="'animate-spin text-[var(--ic-forest)]'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="28" />
       <span class="text-[var(--ic-warm-gray-600)] text-xs">Loading claim workspace…</span>
     </div>
 
@@ -78,29 +78,19 @@ const LOADING_KEY = 'insurance-claims-workspace';
     <div class="h-full flex flex-col" *ngIf="!error() && hasLoadedOnce">
       <!-- Top toolbar -->
       <header class="h-14 shrink-0 flex items-center gap-3 px-3 border-b border-[var(--ic-warm-gray-200)]">
-        <div class="relative w-64 shrink-0">
-          <physio-icon name="search" [size]="14" [class]="'absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--ic-warm-gray-500)]'"></physio-icon>
-          <input
-            type="text"
-            [ngModel]="searchQuery()"
-            (ngModelChange)="searchQuery.set($event)"
-            placeholder="Search claims, patients, claim #…"
-            class="w-full pl-8 pr-2 py-1.5 text-xs border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]"
-          />
-        </div>
+        <boo-search-field
+          class="w-64 shrink-0"
+          label="Search claims"
+          placeholder="Search claims, patients, claim #…"
+          size="small"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          (clear)="searchQuery.set('')"
+        />
 
-        <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)" class="text-xs px-2 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)]">
-          <option value="">All Status</option>
-          <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
-        </select>
+        <boo-select class="w-44 shrink-0" label="Status" size="small" [options]="statusSelectOptions" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)" />
 
-        <select [ngModel]="priorityFilter()" (ngModelChange)="priorityFilter.set($event)" class="text-xs px-2 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)]">
-          <option value="">Any Priority</option>
-          <option value="Low">Low</option>
-          <option value="Normal">Normal</option>
-          <option value="High">High</option>
-          <option value="Urgent">Urgent</option>
-        </select>
+        <boo-select class="w-40 shrink-0" label="Priority" size="small" [options]="prioritySelectOptions" [ngModel]="priorityFilter()" (ngModelChange)="priorityFilter.set($event)" />
 
         <div class="flex-1"></div>
 
@@ -129,14 +119,7 @@ const LOADING_KEY = 'insurance-claims-workspace';
           </div>
         </div>
 
-        <div class="flex items-center bg-[var(--ic-warm-gray-100)] rounded-1.5 p-0.5">
-          <button *ngFor="let d of densities" type="button" (click)="density.set(d.key)"
-            class="px-2 py-1 text-[10px] font-semibold rounded transition-colors"
-            [ngClass]="density() === d.key ? 'bg-[var(--ic-ivory)] text-[var(--ic-forest)] shadow-sm' : 'text-[var(--ic-warm-gray-600)]'"
-            [title]="d.label">
-            <physio-icon [name]="d.icon" [size]="13"></physio-icon>
-          </button>
-        </div>
+        <boo-segmented size="sm" [iconOnly]="true" label="Layout density" [options]="densityOptions" [value]="density()" (valueChange)="density.set($event)" />
 
         <boo-button-admin (click)="openDialog('create')" background="var(--ic-forest)" textColor="var(--ic-ivory)" [fontSize]="12" fontWeight="600" [gap]="6">
           <physio-icon name="circle-plus" [size]="14"></physio-icon> New Claim
@@ -205,7 +188,7 @@ const LOADING_KEY = 'insurance-claims-workspace';
           <!-- Timeline -->
           <div *ngIf="density() === 'timeline'" class="space-y-4">
             <div *ngFor="let grp of timelineGroups()">
-              <p class="text-[11px] font-bold uppercase tracking-wide text-[var(--ic-warm-gray-500)] mb-1.5">{{ grp.label }}</p>
+              <p class="text-xs font-bold uppercase tracking-wide text-[var(--ic-warm-gray-500)] mb-1.5">{{ grp.label }}</p>
               <div class="grid gap-2 lg:grid-cols-2">
                 <insurance-claim-card
                   *ngFor="let c of grp.items"
@@ -229,7 +212,7 @@ const LOADING_KEY = 'insurance-claims-workspace';
             (messageSent)="sendMessage($event)"
           ></insurance-claim-detail-panel>
         </div>
-        <button *ngIf="rightCollapsed()" type="button" class="shrink-0 w-8 border-l border-[var(--ic-warm-gray-200)] hover:bg-[var(--ic-warm-gray-100)] flex items-center justify-center" (click)="rightCollapsed.set(false)" aria-label="Open detail panel">
+        <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" *ngIf="rightCollapsed()" (click)="rightCollapsed.set(false)" aria-label="Open detail panel">
           <physio-icon name="panel-right-open" [size]="16" class="text-[var(--ic-warm-gray-500)]"></physio-icon>
         </button>
       </div>
@@ -279,6 +262,8 @@ export class InsuranceClaimsWorkspaceComponent implements OnInit {
   ];
 
   readonly statusOptions = ['Draft', 'WaitingDocuments', 'ReadyToSubmit', 'Submitted', 'UnderReview', 'NeedCorrection', 'Approved', 'Rejected', 'Appealed', 'Settled'];
+  readonly statusSelectOptions = [{ label: 'All Status', value: '' }, ...this.statusOptions.map(s => ({ label: s, value: s }))];
+  readonly prioritySelectOptions = [{ label: 'Any Priority', value: '' }, ...['Low', 'Normal', 'High', 'Urgent'].map(p => ({ label: p, value: p }))];
 
   readonly densities: { key: ClaimQueueDensity; label: string; icon: string }[] = [
     { key: 'compact', label: 'Compact', icon: 'list' },
@@ -286,6 +271,7 @@ export class InsuranceClaimsWorkspaceComponent implements OnInit {
     { key: 'kanban', label: 'Kanban', icon: 'columns-3' },
     { key: 'timeline', label: 'Timeline', icon: 'calendar-range' },
   ];
+  readonly densityOptions: BooSegment<ClaimQueueDensity>[] = this.densities.map(d => ({ value: d.key, label: d.label, icon: d.icon }));
 
   filteredClaims = computed(() => {
     const q = this.searchQuery().trim().toLowerCase();

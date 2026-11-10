@@ -51,7 +51,7 @@ interface QuickAction {
                 <h3 id="quick-actions-title" class="text-lg font-semibold text-regular m-0">
                     Welcome back{{ firstName((userInfo$ | async)?.fullName) }}
                 </h3>
-                <p class="text-[13px] text-secondary mt-0.5 mb-0">Jump straight to what you manage most.</p>
+                <p class="text-sm text-secondary mt-0.5 mb-0">Jump straight to what you manage most.</p>
 
                 <nav class="mt-6" aria-label="Quick actions">
                     <ul class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-3 gap-y-6 list-none p-0 m-0">
@@ -65,7 +65,7 @@ interface QuickAction {
                                 >
                                     <physio-icon [name]="action.icon" [size]="24" />
                                 </span>
-                                <span class="text-[13px] font-medium text-regular leading-tight">{{ action.label }}</span>
+                                <span class="text-sm font-medium text-regular leading-tight">{{ action.label }}</span>
                             </a>
                         </li>
                     </ul>
@@ -115,7 +115,7 @@ interface QuickAction {
                                 {{ initial(tenant.name) }}
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="text-[13px] font-medium text-regular truncate m-0">{{ tenant.name }}</p>
+                                <p class="text-sm font-medium text-regular truncate m-0">{{ tenant.name }}</p>
                                 <p class="text-[12px] text-secondary m-0 tabular-nums">
                                     {{ tenant.hospitalCount }} {{ tenant.hospitalCount === 1 ? 'hospital' : 'hospitals' }}
                                     · {{ tenant.createdAt | date: 'mediumDate' }}
@@ -172,7 +172,7 @@ interface QuickAction {
                                 {{ initial(user.email) }}
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="text-[13px] font-medium text-regular truncate m-0">{{ user.email }}</p>
+                                <p class="text-sm font-medium text-regular truncate m-0">{{ user.email }}</p>
                                 <p class="text-[12px] text-secondary m-0 tabular-nums">
                                     Joined {{ user.createdAt | date: 'mediumDate' }}
                                 </p>

@@ -15,8 +15,8 @@
       <button boo-button variant="secondary" size="sm" [loading]="exporting" [disabled]="!data?.totalCount" (click)="exportCsv()">
         <physio-icon *ngIf="!exporting" name="download" [size]="15" aria-hidden="true" />Export CSV
       </button>
-      <button boo-button variant="secondary" size="sm" [iconOnly]="true" [loading]="loading" aria-label="Refresh services" title="Refresh" (click)="load()">
-        <physio-icon *ngIf="!loading" name="refresh" [size]="15" />
+      <button boo-button variant="secondary" size="sm" [iconOnly]="true" [disabled]="loading" aria-label="Refresh services" title="Refresh" (click)="load()">
+        <physio-icon name="refresh" [size]="15" />
       </button>
       <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
         <physio-icon name="plus" [size]="15" aria-hidden="true" />New service
@@ -36,28 +36,7 @@
     <h2 id="service-list-title" class="sr-only">Service catalog</h2>
 
     <!-- Lifecycle: one status at a time, as the server filters -->
-    <div class="boo-scrollbar overflow-x-auto border-b border-rowDivider">
-      <div class="flex min-w-max gap-1 px-4" role="tablist" aria-label="Service status">
-        <button
-          *ngFor="let tab of statusTabs; let i = index"
-          type="button"
-          role="tab"
-          [id]="'service-tab-' + i"
-          aria-controls="service-results"
-          [attr.aria-selected]="tab.value === statusFilter"
-          [attr.tabindex]="tab.value === statusFilter ? 0 : -1"
-          class="relative -mb-px px-3 py-3 bg-transparent border-0 border-b-2 text-sm whitespace-nowrap cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary rounded-t aria-[selected=false]:hover:text-regular"
-          [class.border-primary]="tab.value === statusFilter"
-          [class.text-primaryDeep]="tab.value === statusFilter"
-          [class.font-semibold]="tab.value === statusFilter"
-          [class.border-transparent]="tab.value !== statusFilter"
-          [class.text-secondary]="tab.value !== statusFilter"
-          [class.font-medium]="tab.value !== statusFilter"
-          (click)="selectStatus(tab.value)"
-          (keydown)="onTabKey($event, i)"
-        >{{ tab.label }}</button>
-      </div>
-    </div>
+    <boo-tabs [tabs]="statusTabs" [value]="statusFilter" (valueChange)="selectStatus($event)" label="Service status" idPrefix="service-tab" controls="service-results" listClass="px-4" />
 
     <!-- Search, who delivers it, availability and sort. Every control is 36px high and the row aligns on its bottom edge, under the field labels. -->
     <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
@@ -167,14 +146,7 @@
               <!-- Identity: name first, then code and how it is booked -->
               <td class="px-4 py-3 align-top min-w-0">
                 <div class="min-w-0 max-w-[520px]">
-                  <button
-                    type="button"
-                    class="block max-w-full p-0 bg-transparent border-0 text-left text-[15px] leading-5 font-semibold text-regular line-clamp-2 break-words cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
-                    [attr.aria-label]="'View ' + s.name"
-                    aria-haspopup="dialog"
-                    [title]="s.name"
-                    (click)="$event.stopPropagation(); openDetail(s)"
-                  >{{ s.name }}</button>
+                  <button type="button" boo-button variant="text" classname="max-w-full text-[15px] leading-5 font-semibold !text-regular line-clamp-2 break-words rounded" [attr.aria-label]="'View ' + s.name" aria-haspopup="dialog" [title]="s.name" (click)="$event.stopPropagation(); openDetail(s)">{{ s.name }}</button>
                   <p *ngIf="s.shortName || s.description" class="m-0 mt-0.5 text-xs leading-5 text-secondary line-clamp-1 break-words">{{ s.shortName || s.description }}</p>
                   <p class="m-0 mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-secondary">
                     <span class="font-mono font-medium text-primaryDeep">{{ s.code }}</span>

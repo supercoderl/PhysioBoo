@@ -119,7 +119,7 @@ import {
                                 <dt class="text-xs text-secondary">{{ departments(s).length === 1 ? 'Department' : 'Departments' }}</dt>
                                 <dd class="m-0 mt-1">
                                     <ul *ngIf="departments(s).length; else noDeptTpl" class="m-0 p-0 list-none flex flex-wrap gap-1.5">
-                                        <li *ngFor="let d of departments(s)" class="px-2.5 py-1 rounded-md bg-body border border-rowDivider text-[13px] text-regular">{{ d }}</li>
+                                        <li *ngFor="let d of departments(s)" class="px-2.5 py-1 rounded-md bg-body border border-rowDivider text-sm text-regular">{{ d }}</li>
                                     </ul>
                                     <ng-template #noDeptTpl><span class="text-placeholder">Not linked to a department</span></ng-template>
                                 </dd>

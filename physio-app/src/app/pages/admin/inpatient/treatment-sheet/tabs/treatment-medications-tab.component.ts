@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angular/core";
 import { BooButtonAdminComponent } from "../../../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooErrorStateComponent, BooInputComponent, BooStatusBadgeComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { BooDatepickerComponent } from "../../../../../components/date-picker/boo-date-picker.component";
 import { BooSelectComponent } from "../../../../../components/select/boo-select/boo-select.component";
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
@@ -27,7 +27,7 @@ interface DoseDraft {
 @Component({
   selector: 'treatment-medications-tab',
   standalone: true,
-  imports: [SharedModule, BooButtonAdminComponent, BooDatepickerComponent, BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent],
+  imports: [SharedModule, BooButtonAdminComponent, BooDatepickerComponent, BooInputComponent, BooSelectComponent, BooStatusBadgeComponent, BooEmptyStateComponent, BooErrorStateComponent, BooSpinnerComponent],
   template: `
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-sm font-semibold text-primary m-0">Medication Administration Record</h3>
@@ -67,7 +67,7 @@ interface DoseDraft {
     </form>
 
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16" aria-live="polite">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <boo-error-state *ngIf="!isLoading() && loadError()" title="Couldn't load the medication record" [description]="loadError()" appearance="panel" (retry)="load()"></boo-error-state>

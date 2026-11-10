@@ -1,10 +1,6 @@
 import { NgIf } from "@angular/common";
 import { Component, Input } from "@angular/core";
 
-/**
- * A card on a settings page: heading and description, optional actions on the right, then the body. `flush` drops
- * the body padding for row lists that draw their own dividers; `tone="danger"` marks destructive sections.
- */
 @Component({
     selector: 'setting-section',
     standalone: true,
@@ -34,7 +30,6 @@ export class SettingSectionComponent {
     @Input({ required: true }) heading!: string;
     @Input() description = '';
     @Input() flush = false;
-    /** The card is only its header (e.g. a notice with an action). */
     @Input() headerOnly = false;
     @Input() tone: 'default' | 'danger' = 'default';
 

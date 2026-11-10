@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal } from "@angular/core";
+import { Component, computed, inject, OnInit, signal } from "@angular/core";
+import { BooTab, BooTabsComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { ActivatedRoute, Router } from "@angular/router";
 import { forkJoin } from "rxjs";
 import { ClinicalAction, ClinicalActionDrawerComponent } from "../../../../components/layout/admin/clinic/clinical-action-drawer.component";
@@ -44,6 +45,7 @@ interface TabDef {
     selector: 'admin-medical-record',
     standalone: true,
     imports: [
+        BooTabsComponent,
         ClinicalActionDrawerComponent,
         SharedModule,
         BooErrorStateComponent,
@@ -56,8 +58,7 @@ interface TabDef {
         LaboratoryTabComponent,
         ImagingTabComponent,
         ClinicalNotesTabComponent,
-        BillingTabComponent,
-    ],
+        BillingTabComponent, BooSpinnerComponent],
     templateUrl: './medical-record.component.html',
     host: { class: 'min-h-0' },
 })
@@ -91,6 +92,8 @@ export class AdminMedicalRecordComponent implements OnInit {
         { key: 'notes', label: 'Clinical Notes', icon: 'file-text', badge: () => this.notes().length },
         { key: 'billing', label: 'Billing', icon: 'wallet', badge: () => this.billing()?.outstandingBalance && this.billing()!.outstandingBalance > 0 ? 1 : null },
     ];
+
+    readonly tabItems = computed<BooTab<TabKey>[]>(() => this.tabs.map(t => ({ value: t.key, label: t.label, icon: t.icon, count: t.badge?.() || null })));
 
     // #region Inject Services
     private srv = inject(MedicalRecordService);

@@ -25,14 +25,14 @@ import { SharedModule } from "../../../shared/shared-imports";
             [style.color]="active === false ? '#000000' : isDisabled ? '#71606A' : textColor"
             [attr.data-bordered]="border.width > 0 ? '' : null"
             [disabled]="isDisabled"
+            [attr.aria-busy]="loading ? 'true' : null"
         >
-            <span 
+            <span
                 class="flex mr-1 -ml-1 text-base"
-                [class.animate-spin]="loading"
-                *ngIf="icon || loading"
+                *ngIf="icon"
             >
-                <physio-icon 
-                    [name]="loading ? 'loader-circle' : icon?.name || ''" 
+                <physio-icon
+                    [name]="icon.name"
                     [size]="icon?.size || 16" 
                     [class]="icon?.iconClass"
                 />
@@ -56,6 +56,9 @@ import { SharedModule } from "../../../shared/shared-imports";
             pointer-events: none;
             transition: opacity 0.2s;
         }
+        button:disabled {
+            cursor: not-allowed;
+        }
         button:not(:disabled):hover::after {
             opacity: 0.12;
         }
@@ -77,7 +80,7 @@ export class BooButtonAdminComponent {
     @Input() gap: number = 1;
     @Input() radius: number = 6;
     @Input() buttonClass: string = '';
-    @Input() fontSize: number = 13;
+    @Input() fontSize: number = 14;
     @Input() active?: boolean;
     @Input() disabled: boolean = false;
     @Input() loading: boolean = false;

@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooStatusBadgeComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { RadiologyService } from "../../../../../services/admin/radiology.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { StudyRecord, StudyTimelineStage } from "../../../../../shared/types/radiology.types";
@@ -19,10 +19,10 @@ const STAGE_LABELS: Record<StudyTimelineStage, string> = {
 @Component({
   selector: 'radiology-study-tracking-tab',
   standalone: true,
-  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <div *ngIf="!isLoading() && !studies().length">

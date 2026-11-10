@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, signal } from "@angular/core";
 import { forkJoin } from "rxjs";
-import { BooEmptyStateComponent, BooErrorStateComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooErrorStateComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { TreatmentSheetService } from "../../../../../services/admin/treatment-sheet.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { ClinicalAlert, TreatmentOrder, TreatmentTimelineEntry } from "../../../../../shared/types/treatment-sheet.types";
@@ -8,10 +8,10 @@ import { ClinicalAlert, TreatmentOrder, TreatmentTimelineEntry } from "../../../
 @Component({
   selector: 'treatment-overview-tab',
   standalone: true,
-  imports: [SharedModule, BooEmptyStateComponent, BooErrorStateComponent],
+  imports: [SharedModule, BooEmptyStateComponent, BooErrorStateComponent, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <boo-error-state *ngIf="!isLoading() && loadError()" title="Couldn't load the overview" [description]="loadError()" appearance="panel" (retry)="load()"></boo-error-state>

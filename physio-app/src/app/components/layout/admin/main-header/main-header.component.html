@@ -4,13 +4,7 @@
 >
   <div class="min-h-12 p-0 md:min-h-13.5 relative flex items-center">
     <div class="flex flex-1 items-center gap-3 px-2 md:px-4">
-      <button
-        class="h-7 w-7 border border-borderGray inlineFlex-center-center relative rounded-2 cursor-pointer transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
-        type="button"
-        aria-label="Toggle sidebar"
-        title="Toggle sidebar"
-        (click)="collapseEvent.emit()"
-      >
+      <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-7 !w-7" aria-label="Toggle sidebar" title="Toggle sidebar" (click)="collapseEvent.emit()">
         <physio-icon name="panel-left" class="w-4 h-4 stroke-regular" />
       </button>
       <div
@@ -29,14 +23,7 @@
           >
             <physio-icon [name]="shortcut.icon || 'bookmark'" class="w-4 h-4 stroke-regular" />
           </a>
-          <button
-            class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
-            type="button"
-            aria-haspopup="menu"
-            aria-label="Add or remove shortcuts"
-            title="Add or remove shortcuts"
-            [dropdown]="shortcutMenu"
-          >
+          <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" aria-haspopup="menu" aria-label="Add or remove shortcuts" title="Add or remove shortcuts" [dropdown]="shortcutMenu">
             <physio-icon name="star" class="w-4 h-4 stroke-yellow-400" />
           </button>
         </div>
@@ -62,19 +49,12 @@
           <physio-icon name="globe" class="w-4 h-4 stroke-regular" />
         </ng-template>
         <p
-          class="text-[11px] text-regular font-medium uppercase m-0 leading-none"
+          class="text-xs text-regular font-medium uppercase m-0 leading-none"
         >
           {{ language.code }}
         </p>
       </button>
-      <button
-        class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
-        type="button"
-        aria-haspopup="menu"
-        aria-label="Font size"
-        title="Font size"
-        (click)="openPopover($event, 'SIZE')"
-      >
+      <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" aria-haspopup="menu" aria-label="Font size" title="Font size" (click)="openPopover($event, 'SIZE')">
         <physio-icon name="a-large-small" class="w-4 h-4 stroke-regular" />
       </button>
       <button
@@ -91,29 +71,14 @@
           class="w-4 h-4 stroke-regular"
         />
       </button>
-      <button
-        class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)] disabled:cursor-wait"
-        type="button"
-        [disabled]="themeSaving()"
-        [attr.aria-label]="themeCfgSrv.isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
-        [title]="themeCfgSrv.isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
-        (click)="toggleTheme()"
-      >
+      <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" [disabled]="themeSaving()" [attr.aria-label]="themeCfgSrv.isDark() ? 'Switch to light theme' : 'Switch to dark theme'" [title]="themeCfgSrv.isDark() ? 'Switch to light theme' : 'Switch to dark theme'" (click)="toggleTheme()">
         <physio-icon
           [name]="themeCfgSrv.isDark() ? 'moon' : 'sun'"
           class="w-4 h-4 stroke-regular"
         />
       </button>
       <div class="flex">
-        <button
-          #searchTrigger
-          class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
-          type="button"
-          aria-label="Search pages"
-          title="Search pages"
-          [attr.aria-expanded]="isSearching()"
-          (click)="toggleSearch()"
-        >
+        <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" #searchTrigger aria-label="Search pages" title="Search pages" [attr.aria-expanded]="isSearching()" (click)="toggleSearch()">
           <physio-icon name="search" class="w-4 h-4 stroke-regular" />
         </button>
         <div
@@ -134,19 +99,14 @@
                 [attr.aria-activedescendant]="activeIndex() >= 0 ? 'admin-header-search-' + activeIndex() : null"
                 autocomplete="off"
                 placeholder="Search pages"
-                class="py-0 px-4 h-9 text-[13px] bg-transparent outline-none block min-w-0 w-full"
+                class="py-0 px-4 h-9 text-sm bg-transparent outline-none block min-w-0 w-full"
                 type="text"
                 [ngModel]="query()"
                 (ngModelChange)="onQueryChange($event)"
                 (keydown)="onSearchKeydown($event)"
               />
             </div>
-            <button
-              class="mx-2 inlineFlex-center-center relative bg-transparent cursor-pointer align-middle text-center text-[#71606A] text-[26px] w-9 h-9 max-h-9 m-0 flex-0 transition-[background-color_150ms_cubic-bezier(0.4,_0,_0.2,_1)] p-3 rounded-[8px] hover:bg-gray-100 focus:bg-gray-100"
-              type="button"
-              aria-label="Close search"
-              (click)="closeSearch()"
-            >
+            <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Close search" (click)="closeSearch()">
               <physio-icon name="x" class="w-4 h-4 stroke-regular" />
             </button>
           </div>
@@ -167,7 +127,7 @@
                 role="option"
                 [attr.aria-selected]="i === activeIndex()"
                 [ngClass]="{
-                  'flex items-center gap-2.5 px-4 py-2 cursor-pointer text-[13px]': true,
+                  'flex items-center gap-2.5 px-4 py-2 cursor-pointer text-sm': true,
                   'bg-[rgba(0,_0,_0,_0.05)]': i === activeIndex()
                 }"
                 (mouseenter)="activeIndex.set(i)"
@@ -176,7 +136,7 @@
                 <physio-icon [name]="page.icon || 'bookmark'" class="w-4 h-4 shrink-0 stroke-regular" />
                 <div class="flex min-w-0 flex-col">
                   <span class="truncate">{{ page.label }}</span>
-                  <span *ngIf="page.section" class="truncate text-[11px] text-secondary">{{ page.section }}</span>
+                  <span *ngIf="page.section" class="truncate text-xs text-secondary">{{ page.section }}</span>
                 </div>
               </li>
             </ul>
@@ -184,7 +144,7 @@
               <div
                 id="admin-header-search-results"
                 role="status"
-                class="flex items-center gap-2 px-4 py-3 text-[13px] text-secondary"
+                class="flex items-center gap-2 px-4 py-3 text-sm text-secondary"
               >
                 <physio-icon [name]="menuLoaded() ? 'search-x' : 'loader-circle'" class="w-4 h-4 shrink-0" />
                 {{ menuLoaded() ? 'No pages match "' + query().trim() + '"' : 'Loading your menu…' }}
@@ -193,32 +153,10 @@
           </div>
         </div>
       </div>
-      <button
-        class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
-        type="button"
-        aria-label="Quick panel"
-        title="Quick panel"
-        (click)="
-          drawerEvent.emit({
-            type: 'CLOUD',
-            data: null,
-          })
-        "
-      >
+      <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" aria-label="Quick panel" title="Quick panel" (click)=" drawerEvent.emit({ type: 'CLOUD', data: null, }) ">
         <physio-icon name="bookmark" class="w-4 h-4 stroke-regular" />
       </button>
-      <button
-        class="inlineFlex-center-center relative cursor-pointer p-2 rounded-2 transition-all duration-500 hover:bg-[rgba(0,_0,_0,_0.05)]"
-        type="button"
-        aria-label="Notifications"
-        title="Notifications"
-        (click)="
-          drawerEvent.emit({
-            type: 'NOTIFICATION',
-            data: null,
-          })
-        "
-      >
+      <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" aria-label="Notifications" title="Notifications" (click)=" drawerEvent.emit({ type: 'NOTIFICATION', data: null, }) ">
         <physio-icon name="bell" class="w-4 h-4 stroke-regular" />
       </button>
     </div>
@@ -232,7 +170,7 @@
     role="menu"
     aria-label="Shortcuts"
   >
-    <p class="m-0 px-4 pt-2 pb-1 text-[11px] font-medium uppercase text-secondary">
+    <p class="m-0 px-4 pt-2 pb-1 text-xs font-medium uppercase text-secondary">
       Shortcuts · {{ shortcuts().length }}/{{ maxShortcuts }}
     </p>
     <ng-container *ngIf="pages().length; else noPages">
@@ -242,13 +180,13 @@
         role="menuitemcheckbox"
         [attr.aria-checked]="shortcutSet().has(page.url)"
         [disabled]="shortcutSaving()"
-        class="flex w-full items-center gap-2.5 px-4 py-1.5 text-left text-[13px] bg-transparent cursor-pointer hover:bg-gray-100 disabled:cursor-wait"
+        class="flex w-full items-center gap-2.5 px-4 py-1.5 text-left text-sm bg-transparent cursor-pointer hover:bg-gray-100 disabled:cursor-wait"
         (click)="toggleShortcut(page)"
       >
         <physio-icon [name]="page.icon || 'bookmark'" class="w-4 h-4 shrink-0 stroke-regular" />
         <div class="flex min-w-0 flex-1 flex-col">
           <span class="truncate">{{ page.label }}</span>
-          <span *ngIf="page.section" class="truncate text-[11px] text-secondary">{{ page.section }}</span>
+          <span *ngIf="page.section" class="truncate text-xs text-secondary">{{ page.section }}</span>
         </div>
         <physio-icon
           name="star"
@@ -261,7 +199,7 @@
       </button>
     </ng-container>
     <ng-template #noPages>
-      <p class="m-0 px-4 py-3 text-[13px] text-secondary">
+      <p class="m-0 px-4 py-3 text-sm text-secondary">
         {{ menuLoaded() ? 'Your menu has no pages yet.' : 'Loading your menu…' }}
       </p>
     </ng-template>

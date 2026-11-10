@@ -3,7 +3,7 @@ import { Component, DestroyRef, ElementRef, LOCALE_ID, OnInit, PLATFORM_ID, View
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap, Params, Router } from '@angular/router';
 import { EMPTY, Observable, Subject, catchError, map, merge, mergeMap, of, switchMap, takeUntil, tap, throwError } from 'rxjs';
-import { BooBreadcrumbComponent, BooButtonComponent, BooFilterChipsComponent, BooInlineErrorComponent, BooInlineErrorState, BooPaginationComponent, BooSheetComponent } from '@physioboo/ui';
+import { BooBreadcrumbComponent, BooButtonComponent, BooFilterChipsComponent, BooInlineErrorComponent, BooInlineErrorState, BooPaginationComponent, BooSheetComponent, BooCheckboxComponent, BooTab, BooTabsComponent } from '@physioboo/ui';
 import { PublicArticleService } from '../../../services/public/public-article.service';
 import { PublicDoctorService } from '../../../services/public/public-doctor.service';
 import { PublicHospitalService } from '../../../services/public/public-hospital.service';
@@ -92,8 +92,7 @@ const CATEGORY_OPTIONS = Object.keys(ArticleCategory).filter(k => Number.isNaN(N
   standalone: true,
   imports: [
     BooButtonComponent, SharedModule, SearchResultComponent, BooInlineErrorComponent, BooBreadcrumbComponent,
-    BooFilterChipsComponent, BooPaginationComponent, BooSheetComponent
-  ],
+    BooFilterChipsComponent, BooPaginationComponent, BooSheetComponent, BooCheckboxComponent, BooTabsComponent],
   templateUrl: './search.component.html',
 })
 export class SearchComponent implements OnInit {
@@ -114,6 +113,15 @@ export class SearchComponent implements OnInit {
   readonly kinds = KINDS;
   readonly titles = TITLES;
   readonly tabs: { key: Tab; label: string }[] = [{ key: 'all', label: 'All' }, ...KINDS.map(k => ({ key: k as Tab, label: TITLES[k] }))];
+
+  private tabCache: { key: string; tabs: BooTab<Tab>[] } | null = null;
+  /** Tab strip data, rebuilt only when a count changes so the input keeps its reference between checks. */
+  get tabItems(): BooTab<Tab>[] {
+    const counts = this.tabs.map(t => this.tabCount(t.key));
+    const key = counts.join('|');
+    if (this.tabCache?.key !== key) this.tabCache = { key, tabs: this.tabs.map((t, i) => ({ value: t.key, label: t.label, count: counts[i] })) };
+    return this.tabCache.tabs;
+  }
   readonly typeOptions = TYPE_OPTIONS;
   readonly categoryOptions = CATEGORY_OPTIONS;
   readonly skeletons = Array.from({ length: 4 });
@@ -246,15 +254,6 @@ export class SearchComponent implements OnInit {
   }
 
   /** Arrow keys move between tabs (and select them, since each tab is its own URL). */
-  onTabKey(event: KeyboardEvent): void {
-    const i = this.tabs.findIndex(t => t.key === this.query.tab);
-    const next = event.key === 'ArrowRight' ? i + 1 : event.key === 'ArrowLeft' ? i - 1 : event.key === 'Home' ? 0 : event.key === 'End' ? this.tabs.length - 1 : -2;
-    if (next === -2) return;
-    event.preventDefault();
-    const tab = this.tabs[(next + this.tabs.length) % this.tabs.length].key;
-    this.selectTab(tab);
-    setTimeout(() => document.getElementById('sr-tab-' + tab)?.focus());
-  }
 
   seeAllParams(kind: Kind): Params {
     return { q: this.query.q, type: kind };

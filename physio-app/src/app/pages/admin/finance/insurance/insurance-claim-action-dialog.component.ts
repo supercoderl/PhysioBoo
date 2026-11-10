@@ -2,6 +2,9 @@ import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core
 import { SharedModule } from "../../../../shared/shared-imports";
 import { ClaimActionMode, ClaimPriority, InsuranceProviderNode } from "../../../../shared/types/insurance-claims.types";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
+import { BooButtonComponent, BooFormFieldComponent, BooInputComponent, BooDialogComponent } from '@physioboo/ui';
+import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
+import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
 
 export interface ClaimActionSubmitPayload {
   mode: ClaimActionMode;
@@ -35,77 +38,40 @@ const TITLES: Record<ClaimActionMode, string> = {
 @Component({
   selector: 'insurance-claim-action-dialog',
   standalone: true,
-  imports: [SharedModule, BooButtonAdminComponent],
+  imports: [SharedModule, BooButtonAdminComponent, BooButtonComponent, BooFormFieldComponent, BooInputComponent, BooSelectComponent, BooTextareaComponent, BooDialogComponent],
   template: `
-    <div class="fixed inset-0 z-[10000]" [style.pointer-events]="isOpen ? 'auto' : 'none'">
-      <div
-        aria-hidden="true"
-        (click)="close.emit()"
-        class="fixed inset-0 bg-[rgba(20,20,18,0.45)] backdrop-blur-[2px] transition-opacity duration-200"
-        [style.opacity]="isOpen ? '1' : '0'"
-      ></div>
-
-      <div
-        class="fixed left-1/2 top-1/2 w-[92vw] max-w-[520px] max-h-[85vh] flex flex-col rounded-2 bg-[var(--ic-ivory)] shadow-2xl border border-[var(--ic-warm-gray-200)] transition-all duration-200 overflow-hidden"
-        [style.transform]="isOpen ? 'translate(-50%,-50%) scale(1)' : 'translate(-50%,-50%) scale(0.96)'"
-        [style.opacity]="isOpen ? '1' : '0'"
-        role="dialog"
-        aria-modal="true"
-      >
-        <header class="flex items-center justify-between px-4 py-3 border-b border-[var(--ic-warm-gray-200)]">
-          <h2 class="text-sm font-bold text-[var(--ic-graphite)]">{{ mode ? titles[mode] : '' }}</h2>
-          <button type="button" class="p-1 rounded hover:bg-[var(--ic-warm-gray-200)]" (click)="close.emit()" aria-label="Close dialog">
-            <physio-icon name="x" [size]="16" class="text-[var(--ic-warm-gray-600)]"></physio-icon>
-          </button>
-        </header>
-
-        <div class="flex-1 overflow-y-auto p-4 space-y-3 text-xs" *ngIf="mode">
+    <boo-dialog *ngIf="isOpen && mode" [heading]="titles[mode]" (dismiss)="close.emit()">
+        <div class="space-y-3 text-xs">
           <!-- Create -->
           <ng-container *ngIf="mode === 'create'">
-            <label class="block">
-              <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Patient Name</span>
-              <input type="text" [(ngModel)]="form.create.patientName" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]" />
-            </label>
-            <label class="block">
-              <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Insurance Provider</span>
-              <select [(ngModel)]="form.create.providerId" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]">
-                <option value="">Select provider</option>
-                <option *ngFor="let p of providers" [value]="p.id">{{ p.name }}</option>
-              </select>
-            </label>
+            <boo-form-field label="Patient Name" for="claim-patient-name">
+              <boo-input [id]="'claim-patient-name'" label="Patient Name" size="small" [(ngModel)]="form.create.patientName" />
+            </boo-form-field>
+            <boo-form-field label="Insurance Provider" for="claim-provider">
+              <boo-select [id]="'claim-provider'" label="Select provider" size="small" [options]="providers" bindLabel="name" bindValue="id" [(ngModel)]="form.create.providerId" />
+            </boo-form-field>
             <div class="grid grid-cols-2 gap-3">
-              <label class="block">
-                <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Policy Number</span>
-                <input type="text" [(ngModel)]="form.create.policyNumber" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]" />
-              </label>
-              <label class="block">
-                <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Claim Amount (₫)</span>
-                <input type="number" min="0" [(ngModel)]="form.create.claimAmount" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]" />
-              </label>
+              <boo-form-field label="Policy Number" for="claim-policy-number">
+              <boo-input [id]="'claim-policy-number'" label="Policy Number" size="small" [(ngModel)]="form.create.policyNumber" />
+            </boo-form-field>
+              <boo-form-field label="Claim Amount (₫)" for="claim-claim-amount">
+              <boo-input [id]="'claim-claim-amount'" label="Claim Amount (₫)" type="number" numberValue min="0" size="small" [(ngModel)]="form.create.claimAmount" />
+            </boo-form-field>
             </div>
             <div class="grid grid-cols-2 gap-3">
-              <label class="block">
-                <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Department</span>
-                <input type="text" [(ngModel)]="form.create.department" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]" />
-              </label>
-              <label class="block">
-                <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Doctor</span>
-                <input type="text" [(ngModel)]="form.create.doctorName" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]" />
-              </label>
+              <boo-form-field label="Department" for="claim-department">
+              <boo-input [id]="'claim-department'" label="Department" size="small" [(ngModel)]="form.create.department" />
+            </boo-form-field>
+              <boo-form-field label="Doctor" for="claim-doctor">
+              <boo-input [id]="'claim-doctor'" label="Doctor" size="small" [(ngModel)]="form.create.doctorName" />
+            </boo-form-field>
             </div>
-            <label class="block">
-              <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Priority</span>
-              <select [(ngModel)]="form.create.priority" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]">
-                <option value="Low">Low</option>
-                <option value="Normal">Normal</option>
-                <option value="High">High</option>
-                <option value="Urgent">Urgent</option>
-              </select>
-            </label>
-            <label class="block">
-              <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Diagnosis</span>
-              <textarea rows="2" [(ngModel)]="form.create.diagnosis" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]"></textarea>
-            </label>
+            <boo-form-field label="Priority" for="claim-priority">
+              <boo-select [id]="'claim-priority'" label="Priority" size="small" [options]="priorityOptions" [(ngModel)]="form.create.priority" />
+            </boo-form-field>
+            <boo-form-field label="Diagnosis" for="claim-diagnosis">
+              <boo-textarea [id]="'claim-diagnosis'" label="Diagnosis" [rows]="2" size="small" [(ngModel)]="form.create.diagnosis" />
+            </boo-form-field>
           </ng-container>
 
           <!-- Upload -->
@@ -113,7 +79,7 @@ const TITLES: Record<ClaimActionMode, string> = {
             <div class="border-2 border-dashed border-[var(--ic-warm-gray-300)] rounded-1.5 p-6 text-center">
               <input type="file" multiple class="hidden" #fileInput (change)="filesPicked($event)" />
               <physio-icon name="upload-cloud" [size]="24" [class]="'text-[var(--ic-warm-gray-400)] mx-auto mb-2'"></physio-icon>
-              <button type="button" class="text-[11px] font-semibold text-[var(--ic-forest)] hover:underline" (click)="fileInput.click()">Choose files</button>
+              <button type="button" boo-button variant="text" classname="text-xs font-semibold !text-[var(--ic-forest)]" (click)="fileInput.click()">Choose files</button>
               <p class="text-[10px] text-[var(--ic-warm-gray-500)] mt-1">Medical bills, prescriptions, scans, reports</p>
             </div>
             <ul class="space-y-1" *ngIf="pickedFileNames.length">
@@ -125,59 +91,48 @@ const TITLES: Record<ClaimActionMode, string> = {
 
           <!-- Submit -->
           <ng-container *ngIf="mode === 'submit'">
-            <label class="block">
-              <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Submission Notes (optional)</span>
-              <textarea rows="3" [(ngModel)]="form.notes" placeholder="Any notes for the insurer…" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]"></textarea>
-            </label>
+            <boo-form-field label="Submission Notes" for="claim-submission-notes" optional>
+              <boo-textarea [id]="'claim-submission-notes'" label="Any notes for the insurer…" [rows]="3" size="small" [(ngModel)]="form.notes" />
+            </boo-form-field>
           </ng-container>
 
           <!-- Approve -->
           <ng-container *ngIf="mode === 'approve'">
-            <label class="block">
-              <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Approved Amount (₫)</span>
-              <input type="number" min="0" [(ngModel)]="form.approvedAmount" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]" />
-            </label>
-            <label class="block">
-              <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Notes (optional)</span>
-              <textarea rows="2" [(ngModel)]="form.notes" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]"></textarea>
-            </label>
+            <boo-form-field label="Approved Amount (₫)" for="claim-approved-amount">
+              <boo-input [id]="'claim-approved-amount'" label="Approved Amount (₫)" type="number" numberValue min="0" size="small" [(ngModel)]="form.approvedAmount" />
+            </boo-form-field>
+            <boo-form-field label="Notes" for="claim-notes" optional>
+              <boo-textarea [id]="'claim-notes'" label="Notes" [rows]="2" size="small" [(ngModel)]="form.notes" />
+            </boo-form-field>
           </ng-container>
 
           <!-- Reject -->
           <ng-container *ngIf="mode === 'reject'">
-            <label class="block">
-              <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Rejection Reason</span>
-              <textarea rows="3" required [(ngModel)]="form.notes" placeholder="Explain why this claim is being rejected…" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]"></textarea>
-            </label>
+            <boo-form-field label="Rejection Reason" for="claim-rejection-reason" required>
+              <boo-textarea [id]="'claim-rejection-reason'" label="Explain why this claim is being rejected…" required [rows]="3" size="small" [(ngModel)]="form.notes" />
+            </boo-form-field>
           </ng-container>
 
           <!-- Appeal -->
           <ng-container *ngIf="mode === 'appeal'">
-            <label class="block">
-              <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Grounds for Appeal</span>
-              <textarea rows="3" required [(ngModel)]="form.notes" placeholder="Explain the grounds for appeal…" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]"></textarea>
-            </label>
+            <boo-form-field label="Grounds for Appeal" for="claim-grounds-for-appeal" required>
+              <boo-textarea [id]="'claim-grounds-for-appeal'" label="Explain the grounds for appeal…" required [rows]="3" size="small" [(ngModel)]="form.notes" />
+            </boo-form-field>
           </ng-container>
 
           <!-- Settle -->
           <ng-container *ngIf="mode === 'settle'">
-            <label class="block">
-              <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Settled Amount (₫)</span>
-              <input type="number" min="0" [(ngModel)]="form.settledAmount" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]" />
-            </label>
-            <label class="block">
-              <span class="block text-[11px] font-semibold text-[var(--ic-warm-gray-600)] mb-1">Settlement Method</span>
-              <input type="text" placeholder="Bank transfer, cheque…" [(ngModel)]="form.settlementMethod" class="w-full px-2.5 py-1.5 border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]" />
-            </label>
+            <boo-form-field label="Settled Amount (₫)" for="claim-settled-amount">
+              <boo-input [id]="'claim-settled-amount'" label="Settled Amount (₫)" type="number" numberValue min="0" size="small" [(ngModel)]="form.settledAmount" />
+            </boo-form-field>
+            <boo-form-field label="Settlement Method" for="claim-settlement-method">
+              <boo-input [id]="'claim-settlement-method'" label="Bank transfer, cheque…" size="small" [(ngModel)]="form.settlementMethod" />
+            </boo-form-field>
           </ng-container>
         </div>
-
-        <footer class="flex items-center justify-end gap-2 px-4 py-3 border-t border-[var(--ic-warm-gray-200)]">
-          <boo-button-admin (click)="close.emit()" background="transparent" textColor="var(--ic-warm-gray-600)" [fontSize]="12" fontWeight="600">Cancel</boo-button-admin>
-          <boo-button-admin (click)="submit()" background="var(--ic-forest)" textColor="var(--ic-ivory)" [fontSize]="12" fontWeight="600">Confirm</boo-button-admin>
-        </footer>
-      </div>
-    </div>
+        <button boo-dialog-footer type="button" boo-button variant="ghost" size="sm" (click)="close.emit()">Cancel</button>
+        <button boo-dialog-footer type="button" boo-button variant="primary" size="sm" (click)="submit()">Confirm</button>
+    </boo-dialog>
   `,
 })
 export class InsuranceClaimActionDialogComponent implements OnChanges {
@@ -189,6 +144,7 @@ export class InsuranceClaimActionDialogComponent implements OnChanges {
   @Output() confirmed = new EventEmitter<ClaimActionSubmitPayload>();
 
   readonly titles = TITLES;
+  readonly priorityOptions = (['Low', 'Normal', 'High', 'Urgent'] as const).map(p => ({ label: p, value: p }));
   pickedFiles: File[] = [];
   pickedFileNames: string[] = [];
 

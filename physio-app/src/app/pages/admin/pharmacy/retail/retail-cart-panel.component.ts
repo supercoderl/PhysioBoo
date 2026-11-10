@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
-import { BooButtonComponent, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../shared/shared-imports";
 import { RetailCart, RetailCartLineItem } from "../../../../shared/types/retail-pos.types";
 import { formatRetailMoney } from "../../../../shared/utils/retail-pos.utils";
@@ -7,7 +7,7 @@ import { formatRetailMoney } from "../../../../shared/utils/retail-pos.utils";
 @Component({
   selector: 'retail-cart-panel',
   standalone: true,
-  imports: [SharedModule, BooButtonComponent, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent],
+  imports: [SharedModule, BooButtonComponent, BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent, BooFieldErrorComponent],
   template: `
     <section class="flex flex-col xl:h-full xl:min-h-0" aria-label="Sale items">
       <div class="p-3 border-b border-borderGray/60 flex items-center justify-between gap-2">
@@ -45,10 +45,9 @@ import { formatRetailMoney } from "../../../../shared/utils/retail-pos.utils";
               <div class="min-w-0">
                 <p class="text-sm font-medium text-regular m-0 break-words">{{ item.name }}</p>
                 <p class="text-xs text-secondary m-0 break-words">{{ subtitle(item) }}</p>
-                <p *ngIf="stockWarning(item) as w" class="text-[11px] text-danger m-0 mt-0.5">{{ w }}</p>
+                <p *ngIf="stockWarning(item) as w" class="text-xs text-danger m-0 mt-0.5">{{ w }}</p>
               </div>
-              <button *ngIf="canEdit" type="button" (click)="removeItem.emit(item)" [disabled]="busy"
-                class="shrink-0 w-8 h-8 -mr-1 rounded-1.5 flex items-center justify-center text-gray-500 hover:text-danger hover:bg-gray-100 disabled:opacity-40" [attr.aria-label]="'Remove ' + item.name">
+              <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8 !text-danger" *ngIf="canEdit" (click)="removeItem.emit(item)" [disabled]="busy" [attr.aria-label]="'Remove ' + item.name">
                 <physio-icon name="x" [size]="16"></physio-icon>
               </button>
             </div>
@@ -69,7 +68,7 @@ import { formatRetailMoney } from "../../../../shared/utils/retail-pos.utils";
               </div>
             </div>
 
-            <p *ngIf="rowErrors[item.id]" class="text-[11px] text-danger m-0 mt-1" role="alert">{{ rowErrors[item.id] }}</p>
+            <boo-field-error size="sm" announce class="mt-1" *ngIf="rowErrors[item.id]">{{ rowErrors[item.id] }}</boo-field-error>
 
             <div class="flex items-center justify-between mt-2 text-xs text-secondary">
               <span>{{ money(item.unitPrice) }} × {{ item.quantity }}<span *ngIf="item.discountPercent"> − {{ item.discountPercent }}%</span></span>

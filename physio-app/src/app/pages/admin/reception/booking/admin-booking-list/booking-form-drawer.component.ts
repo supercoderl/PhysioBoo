@@ -4,7 +4,7 @@ import { Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, O
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { BooButtonComponent, BooIconComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooIconComponent, BooInputComponent, BooStatusBadgeComponent, BooFormFieldComponent } from '@physioboo/ui';
 import { Observable, combineLatest, merge, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, finalize, map, startWith, switchMap, tap } from 'rxjs/operators';
 import { DrawerComponent } from '../../../../../components/drawer/drawer.component';
@@ -46,7 +46,6 @@ const PATIENT_RESULTS = 8;
 // Statuses that no longer hold the doctor's time.
 const FREED_STATUSES = new Set(['Cancelled', 'NoShow', 'Rescheduled']);
 
-const FIELD = 'w-full h-10 px-3 rounded-lg border border-borderGray bg-surface text-sm text-regular placeholder:text-placeholder transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary/70 disabled:bg-black/5 disabled:cursor-not-allowed aria-[invalid=true]:border-danger';
 const AREA = 'w-full px-3 py-2 rounded-lg border border-borderGray bg-surface text-sm text-regular placeholder:text-placeholder resize-y focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary/70 aria-[invalid=true]:border-danger';
 
 function notInPast(control: AbstractControl<string>): ValidationErrors | null {
@@ -58,10 +57,12 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
  * appointment type and doctor APIs; once a doctor and date are chosen it lists that doctor's existing bookings
  * for the day and warns about overlaps (the server does not block them).
  */
+const FIELD = 'w-full h-10 px-3 rounded-lg border border-borderGray bg-surface text-sm text-regular placeholder:text-placeholder transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary/70 disabled:bg-black/5 disabled:cursor-not-allowed aria-[invalid=true]:border-danger';
+
 @Component({
     selector: 'booking-form-drawer',
     standalone: true,
-    imports: [NgIf, NgFor, ReactiveFormsModule, RouterLink, DrawerComponent, BooButtonComponent, BooIconComponent, BooInputComponent, BooStatusBadgeComponent, BooSelectComponent, BooDatepickerComponent, BooTextareaComponent, CustomScrollbarDirective],
+    imports: [NgIf, NgFor, ReactiveFormsModule, RouterLink, DrawerComponent, BooButtonComponent, BooIconComponent, BooInputComponent, BooStatusBadgeComponent, BooSelectComponent, BooDatepickerComponent, BooTextareaComponent, CustomScrollbarDirective, BooFormFieldComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="form.dirty" (close)="discard()">
             <form
@@ -72,6 +73,7 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
                 [attr.inert]="isOpen ? null : ''"
                 [formGroup]="form"
                 (ngSubmit)="submit()"
+                (keydown.enter)="onEnter($event)"
                 novalidate
             >
                 <header class="flex-none px-6 py-4 border-b border-rowDivider flex items-start justify-between gap-3">
@@ -88,7 +90,7 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
                     <!-- 1. Patient -->
                     <fieldset class="m-0 p-0 border-0 min-w-0">
                         <legend class="mb-2 text-sm font-semibold text-regular flex items-center gap-2">
-                            <span class="w-5 h-5 rounded-full bg-primarySoft text-primaryDeep text-[11px] flex items-center justify-center" aria-hidden="true">1</span>Patient
+                            <span class="w-5 h-5 rounded-full bg-primarySoft text-primaryDeep text-xs flex items-center justify-center" aria-hidden="true">1</span>Patient
                         </legend>
 
                         <div *ngIf="form.controls.patient.value as p; else patientSearchTpl" class="flex items-center gap-3 p-3 rounded-lg border border-borderGray bg-body">
@@ -103,7 +105,7 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
                         </div>
 
                         <ng-template #patientSearchTpl>
-                            <label for="bf-patient" class="block mb-1 text-[13px] font-medium text-regular">Find patient <span class="text-danger" aria-hidden="true">*</span></label>
+                            <label for="bf-patient" class="block mb-1 text-sm font-medium text-regular">Find patient <span class="text-danger" aria-hidden="true">*</span></label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-3 flex items-center text-placeholder pointer-events-none" aria-hidden="true">
                                     <physio-icon [name]="patientSearching ? 'loader-circle' : 'search'" [size]="16" [class.animate-spin]="patientSearching" />
@@ -165,21 +167,21 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
                     <!-- 2. Visit -->
                     <fieldset class="m-0 p-0 border-0 min-w-0">
                         <legend class="mb-2 text-sm font-semibold text-regular flex items-center gap-2">
-                            <span class="w-5 h-5 rounded-full bg-primarySoft text-primaryDeep text-[11px] flex items-center justify-center" aria-hidden="true">2</span>Visit
+                            <span class="w-5 h-5 rounded-full bg-primarySoft text-primaryDeep text-xs flex items-center justify-center" aria-hidden="true">2</span>Visit
                         </legend>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="min-w-0">
-                                <label for="bf-hospital" class="block mb-1 text-[13px] font-medium text-regular">Facility <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="bf-hospital" class="block mb-1 text-sm font-medium text-regular">Facility <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-select id="bf-hospital" formControlName="hospitalId" label="Facility" required [options]="hospitals.items" bindLabel="name" bindValue="id" />
                                 <p id="bf-hospital-msg" *ngIf="hospitals.error" class="m-0 mt-1 text-xs text-danger">{{ hospitals.error }}</p>
                             </div>
                             <div class="min-w-0">
-                                <label for="bf-department" class="block mb-1 text-[13px] font-medium text-regular">Department <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="bf-department" class="block mb-1 text-sm font-medium text-regular">Department <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-select id="bf-department" formControlName="departmentId" label="Department" required [options]="hospitalDepartments" bindLabel="name" bindValue="id" />
                                 <p id="bf-department-msg" *ngIf="departments.error || departments.loading || !form.controls.hospitalId.value || !hospitalDepartments.length" class="m-0 mt-1 text-xs" [class.text-danger]="departments.error" [class.text-secondary]="!departments.error">{{ departments.error || departmentPlaceholder }}</p>
                             </div>
                             <div class="min-w-0">
-                                <label for="bf-type" class="block mb-1 text-[13px] font-medium text-regular">Appointment type <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="bf-type" class="block mb-1 text-sm font-medium text-regular">Appointment type <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-select id="bf-type" formControlName="appointmentTypeId" label="Appointment type" required [options]="typeOptions" bindLabel="name" bindValue="id" />
                                 <p id="bf-type-msg" *ngIf="types.error" class="m-0 mt-1 text-xs text-danger">{{ types.error }}</p>
                                 <p *ngIf="selectedType?.requiresPreparation && selectedType?.preparationInstructions" class="m-0 mt-1 text-xs text-secondary">
@@ -187,7 +189,7 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
                                 </p>
                             </div>
                             <div class="min-w-0">
-                                <label for="bf-doctor" class="block mb-1 text-[13px] font-medium text-regular">Doctor <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="bf-doctor" class="block mb-1 text-sm font-medium text-regular">Doctor <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-select id="bf-doctor" formControlName="doctorId" label="Doctor" required [options]="doctors.items" bindLabel="fullName" bindValue="id" />
                                 <p id="bf-doctor-msg" *ngIf="doctors.error" class="m-0 mt-1 text-xs text-danger">{{ doctors.error }}</p>
                             </div>
@@ -197,26 +199,33 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
                     <!-- 3. Schedule -->
                     <fieldset class="m-0 p-0 border-0 min-w-0">
                         <legend class="mb-2 text-sm font-semibold text-regular flex items-center gap-2">
-                            <span class="w-5 h-5 rounded-full bg-primarySoft text-primaryDeep text-[11px] flex items-center justify-center" aria-hidden="true">3</span>Date and time
+                            <span class="w-5 h-5 rounded-full bg-primarySoft text-primaryDeep text-xs flex items-center justify-center" aria-hidden="true">3</span>Date and time
                         </legend>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div class="min-w-0">
-                                <label for="bf-date" class="block mb-1 text-[13px] font-medium text-regular">Date <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="bf-date" class="block mb-1 text-sm font-medium text-regular">Date <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-datepicker id="bf-date" formControlName="scheduledDate" label="Date" required [min]="today" />
                                 <p id="bf-date-msg" *ngIf="showError('scheduledDate')" class="m-0 mt-1 text-xs text-danger">{{ form.controls.scheduledDate.hasError('past') ? 'Pick today or a later date.' : 'Pick a date.' }}</p>
                             </div>
-                            <div class="min-w-0">
-                                <label for="bf-time" class="block mb-1 text-[13px] font-medium text-regular">Start time <span class="text-danger" aria-hidden="true">*</span></label>
-                                <input id="bf-time" type="time" step="300" formControlName="scheduledTime" [class]="field" [attr.aria-invalid]="showError('scheduledTime') || endsPastMidnight ? true : null" aria-describedby="bf-time-msg" />
-                                <p id="bf-time-msg" *ngIf="showError('scheduledTime') || endsPastMidnight" class="m-0 mt-1 text-xs text-danger">{{ endsPastMidnight ? 'The visit must end before midnight.' : 'Pick a start time.' }}</p>
-                            </div>
-                            <div class="min-w-0">
-                                <label for="bf-duration" class="block mb-1 text-[13px] font-medium text-regular">Duration (min) <span class="text-danger" aria-hidden="true">*</span></label>
-                                <input id="bf-duration" type="number" inputmode="numeric" min="5" max="480" step="5" formControlName="durationMinutes" [class]="field" [attr.aria-invalid]="showError('durationMinutes') ? true : null" aria-describedby="bf-duration-msg" />
-                                <p id="bf-duration-msg" class="m-0 mt-1 text-xs" [class.text-danger]="showError('durationMinutes')" [class.text-secondary]="!showError('durationMinutes')">
-                                    {{ showError('durationMinutes') ? 'Enter 5 to 480 minutes.' : (endTimeLabel ? 'Ends at ' + endTimeLabel : '') }}
-                                </p>
-                            </div>
+                            <boo-form-field
+                                class="min-w-0"
+                                label="Start time"
+                                for="bf-time"
+                                required
+                                [error]="(showError('scheduledTime') || endsPastMidnight) ? (endsPastMidnight ? 'The visit must end before midnight.' : 'Pick a start time.') : null"
+                            >
+                                <boo-input [id]="'bf-time'" label="Start time" type="time" step="300" formControlName="scheduledTime" />
+                            </boo-form-field>
+                            <boo-form-field
+                                class="min-w-0"
+                                label="Duration (min)"
+                                for="bf-duration"
+                                required
+                                [error]="showError('durationMinutes') ? 'Enter 5 to 480 minutes.' : null"
+                                [helper]="endTimeLabel ? 'Ends at ' + endTimeLabel : ''"
+                            >
+                                <boo-input [id]="'bf-duration'" label="Duration (min)" type="number" numberValue inputmode="numeric" min="5" max="480" step="5" formControlName="durationMinutes" />
+                            </boo-form-field>
                         </div>
 
                         <!-- The chosen doctor's existing bookings that day -->
@@ -244,19 +253,19 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
                     <!-- 4. Notes -->
                     <fieldset class="m-0 p-0 border-0 min-w-0">
                         <legend class="mb-2 text-sm font-semibold text-regular flex items-center gap-2">
-                            <span class="w-5 h-5 rounded-full bg-primarySoft text-primaryDeep text-[11px] flex items-center justify-center" aria-hidden="true">4</span>Visit details <span class="font-normal text-secondary">(optional)</span>
+                            <span class="w-5 h-5 rounded-full bg-primarySoft text-primaryDeep text-xs flex items-center justify-center" aria-hidden="true">4</span>Visit details <span class="font-normal text-secondary">(optional)</span>
                         </legend>
                         <div class="flex flex-col gap-4">
                             <div>
-                                <label for="bf-complaint" class="block mb-1 text-[13px] font-medium text-regular">Chief complaint</label>
+                                <label for="bf-complaint" class="block mb-1 text-sm font-medium text-regular">Chief complaint</label>
                                 <boo-input name="bf-complaint" formControlName="chiefComplaint" [maxlength]="500" label="e.g. Lower back pain for two weeks" />
                             </div>
                             <div>
-                                <label for="bf-reason" class="block mb-1 text-[13px] font-medium text-regular">Reason for visit</label>
+                                <label for="bf-reason" class="block mb-1 text-sm font-medium text-regular">Reason for visit</label>
                                 <boo-textarea id="bf-reason" formControlName="reasonForVisit" label="Reason for visit" [rows]="2" [maxlength]="1000" />
                             </div>
                             <div>
-                                <label for="bf-notes" class="block mb-1 text-[13px] font-medium text-regular">Notes for the care team</label>
+                                <label for="bf-notes" class="block mb-1 text-sm font-medium text-regular">Notes for the care team</label>
                                 <boo-textarea id="bf-notes" formControlName="preAppointmentNotes" label="Visible to staff only" [rows]="2" [maxlength]="1000" />
                             </div>
                         </div>
@@ -274,6 +283,7 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
     `,
 })
 export class BookingFormDrawerComponent implements OnInit, OnChanges {
+    readonly field = FIELD;
     @Input() isOpen = false;
     /** Route to patient registration, when the user may register patients. */
     @Input() registerLink: string | null = null;
@@ -293,7 +303,6 @@ export class BookingFormDrawerComponent implements OnInit, OnChanges {
     private readonly doctorSrv = inject(DoctorService);
     private readonly dialogSrv = inject(DialogService);
 
-    readonly field = FIELD;
     readonly area = AREA;
     readonly status = bookingStatus;
     today = isoDate(new Date());
@@ -632,6 +641,12 @@ export class BookingFormDrawerComponent implements OnInit, OnChanges {
                 },
                 error: () => undefined,
             });
+    }
+
+    /** Enter inside a single-line field must not save the booking; only the submit button does. Textareas and buttons keep their own Enter. */
+    onEnter(event: Event): void {
+        const target = event.target as HTMLElement;
+        if (target.tagName === 'INPUT' && (target as HTMLInputElement).type !== 'submit') event.preventDefault();
     }
 
     requestClose(): void {

@@ -1,3 +1,4 @@
+import { BooSegment, BooSegmentedComponent } from '@physioboo/ui';
 import { Component, Input, computed, signal } from "@angular/core";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { PrescriptionRow, PrescriptionStatus } from "../../../../../shared/types/medical-record.types";
@@ -5,18 +6,13 @@ import { PrescriptionRow, PrescriptionStatus } from "../../../../../shared/types
 @Component({
   selector: 'mr-prescriptions-tab',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooSegmentedComponent],
   template: `
     <div class="space-y-3">
       <!-- Filter chips -->
       <div class="bg-surface border border-gray-200 rounded-lg px-4 py-2.5 flex items-center gap-2 flex-wrap">
         <span class="text-xs text-secondary mr-2">Status:</span>
-        <button *ngFor="let f of filters" type="button" (click)="status.set(f.key)"
-          class="px-2.5 py-1 text-xs rounded-full transition-colors"
-          [ngClass]="status() === f.key ? 'bg-primary text-white' : 'bg-gray-100 text-secondary hover:bg-gray-200'">
-          {{ f.label }}
-          <span class="ml-1 opacity-70">{{ countOf(f.key) }}</span>
-        </button>
+        <boo-segmented size="sm" label="Status" [options]="filterOptions()" [value]="status()" (valueChange)="status.set($event)" />
       </div>
 
       <!-- Prescription cards -->
@@ -101,6 +97,8 @@ export class PrescriptionsTabComponent {
     { key: 'Cancelled', label: 'Cancelled' },
     { key: 'All', label: 'All' },
   ];
+
+  readonly filterOptions = computed<BooSegment<'All' | PrescriptionStatus>[]>(() => this.filters.map(f => ({ value: f.key, label: f.label, count: this.countOf(f.key) })));
 
   countOf(key: 'All' | PrescriptionStatus) {
     return key === 'All' ? this._data().length : this._data().filter(x => x.status === key).length;

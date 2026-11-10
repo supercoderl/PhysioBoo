@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from "@angular/common";
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, PLATFORM_ID, ViewChild, computed, inject, signal } from "@angular/core";
 import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
-import { BooIconComponent } from '@physioboo/ui';
+import { BooIconComponent, BooButtonComponent } from '@physioboo/ui';
 import { PHYSIO_ICON_NAMES } from '../../../../shared/icons/icon-names';
 import { SuperadminPageHeaderComponent } from "../../../../components/layout/superadmin/shared/superadmin-page-header.component";
 import { ToastService } from "../../../../services/common/toast.service";
@@ -21,7 +21,7 @@ interface IconSource {
 @Component({
     selector: 'superadmin-icon-library',
     standalone: true,
-    imports: [BooIconComponent, SuperadminPageHeaderComponent],
+    imports: [BooIconComponent, SuperadminPageHeaderComponent, BooButtonComponent],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <!-- relative: contains the sr-only elements so they cannot extend the document past the shell's overflow-hidden -->
@@ -46,9 +46,9 @@ interface IconSource {
                         (keydown.escape)="query.set(''); search.blur()"
                         class="w-full h-[42px] pl-9 pr-12 rounded-[10px] border border-borderGray bg-surface text-[14px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30"
                     />
-                    <kbd class="hidden sm:block absolute right-3 top-1/2 -translate-y-1/2 rounded border border-borderGray px-1.5 text-[11px] font-mono text-placeholder">/</kbd>
+                    <kbd class="hidden sm:block absolute right-3 top-1/2 -translate-y-1/2 rounded border border-borderGray px-1.5 text-xs font-mono text-placeholder">/</kbd>
                 </label>
-                <p class="m-0 shrink-0 text-[13px] text-placeholder tabular-nums" aria-live="polite">
+                <p class="m-0 shrink-0 text-sm text-placeholder tabular-nums" aria-live="polite">
                     @if (query().trim()) {
                         {{ filtered().length }} of {{ total }} icons
                     } @else {
@@ -93,7 +93,7 @@ interface IconSource {
                 <div class="flex flex-col items-center gap-2 py-20 text-center bg-surface rounded-[14px] border border-borderGray">
                     <physio-icon name="search-x" [size]="28" [class]="'text-placeholder'" />
                     <p class="m-0 text-[14px] text-regular">No icons match “{{ query().trim() }}”</p>
-                    <button type="button" class="text-[13px] text-primary bg-transparent border-0 cursor-pointer p-0" (click)="query.set('')">Clear search</button>
+                    <button type="button" boo-button variant="text" classname="text-sm" (click)="query.set('')">Clear search</button>
                 </div>
             }
         </div>

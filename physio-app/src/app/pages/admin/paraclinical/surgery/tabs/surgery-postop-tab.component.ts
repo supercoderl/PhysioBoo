@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooStatusBadgeComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
 import { DialogService } from "../../../../../services/common/dialog.service";
 import { ToastService } from "../../../../../services/common/toast.service";
@@ -9,10 +9,10 @@ import { SurgeryCase, SurgeryRow } from "../../../../../shared/types/surgery.typ
 @Component({
   selector: 'surgery-postop-tab',
   standalone: true,
-  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonComponent, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <div *ngIf="!isLoading() && !cases().length"><boo-empty-state icon="bed" title="No patients currently in recovery"></boo-empty-state></div>
@@ -40,8 +40,8 @@ import { SurgeryCase, SurgeryRow } from "../../../../../shared/types/surgery.typ
             <td class="px-4 py-3 text-gray-500">{{ detail[s.id].complications ?? 'None reported' }}</td>
             <td class="px-4 py-3">
               <div class="flex items-center gap-3">
-                <button (click)="viewCase.emit(s.id)" class="text-primary text-xs font-semibold hover:underline">View</button>
-                <button (click)="discharge(s)" class="text-emerald-600 text-xs font-semibold hover:underline">Discharge from OR</button>
+                <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold" (click)="viewCase.emit(s.id)">View</button>
+                <button type="button" boo-button variant="text" classname="text-emerald-600 text-xs font-semibold" (click)="discharge(s)">Discharge from OR</button>
               </div>
             </td>
           </tr>

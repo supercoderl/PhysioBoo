@@ -52,7 +52,7 @@ import { consultModes, displayName, gapSummary, initials, languageList, licenceE
                     </section>
 
                     <!-- What still needs filling in for the public profile -->
-                    <div *ngIf="gaps(d) as gap" class="mx-6 mb-5 flex items-start gap-2 px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200 text-[13px] text-amber-800" role="note">
+                    <div *ngIf="gaps(d) as gap" class="mx-6 mb-5 flex items-start gap-2 px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-800" role="note">
                         <physio-icon name="circle-alert" [size]="15" class="flex-none mt-0.5" aria-hidden="true" />
                         <span>{{ gap }} on the public profile.<ng-container *ngIf="canUpdate"> Use Edit profile to add {{ gapCount(d) === 1 ? 'it' : 'them' }}.</ng-container></span>
                     </div>
@@ -73,7 +73,7 @@ import { consultModes, displayName, gapSummary, initials, languageList, licenceE
                                 <dt class="text-xs text-secondary">Languages</dt>
                                 <dd class="m-0 mt-1">
                                     <ul *ngIf="languages(d).length; else noLangTpl" class="m-0 p-0 list-none flex flex-wrap gap-1.5">
-                                        <li *ngFor="let l of languages(d)" class="px-2.5 py-1 rounded-md bg-body border border-rowDivider text-[13px] text-regular">{{ l }}</li>
+                                        <li *ngFor="let l of languages(d)" class="px-2.5 py-1 rounded-md bg-body border border-rowDivider text-sm text-regular">{{ l }}</li>
                                     </ul>
                                     <ng-template #noLangTpl><span class="text-placeholder">None listed</span></ng-template>
                                 </dd>

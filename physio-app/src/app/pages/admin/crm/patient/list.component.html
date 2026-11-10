@@ -13,8 +13,8 @@
       </p>
     </div>
     <div class="flex items-center gap-2">
-      <button boo-button variant="secondary" size="sm" [loading]="loading" [disabled]="rangeInvalid" (click)="load()">
-        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      <button boo-button variant="secondary" size="sm" [disabled]="loading || rangeInvalid" (click)="load()">
+        <physio-icon name="refresh" [size]="15" aria-hidden="true" />Refresh
       </button>
       <a *ngIf="registerLink" boo-button variant="primary" size="sm" [routerLink]="registerLink">
         <physio-icon name="user-plus" [size]="15" aria-hidden="true" />Register patient
@@ -113,15 +113,9 @@
               <!-- Identity -->
               <td class="px-4 py-3 align-top min-w-0 max-w-[300px]">
                 <div class="flex items-start gap-3 min-w-0">
-                  <span class="flex-none w-8 h-8 rounded-full bg-primarySoft text-primaryDeep text-[11px] font-semibold flex items-center justify-center" aria-hidden="true">{{ initials(p) }}</span>
+                  <span class="flex-none w-8 h-8 rounded-full bg-primarySoft text-primaryDeep text-xs font-semibold flex items-center justify-center" aria-hidden="true">{{ initials(p) }}</span>
                   <div class="min-w-0">
-                    <button
-                      type="button"
-                      class="block max-w-full p-0 bg-transparent border-0 text-left font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
-                      [attr.aria-label]="'Open profile of ' + name(p)"
-                      aria-haspopup="dialog"
-                      (click)="$event.stopPropagation(); openProfile(p)"
-                    >{{ name(p) }}</button>
+                    <button type="button" boo-button variant="text" classname="max-w-full font-semibold !text-regular truncate rounded" [attr.aria-label]="'Open profile of ' + name(p)" aria-haspopup="dialog" (click)="$event.stopPropagation(); openProfile(p)">{{ name(p) }}</button>
                     <div class="mt-0.5 text-xs text-secondary tabular-nums truncate">
                       {{ p.patientNumber }}<span *ngIf="p.phone" class="md:hidden"> · {{ p.phone }}</span>
                     </div>

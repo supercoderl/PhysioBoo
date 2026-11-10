@@ -2,7 +2,7 @@
   <!-- Loading skeleton -->
   <div *ngIf="isLoading()" class="flex-1 flex items-center justify-center">
     <div class="text-center">
-      <physio-icon name="loader" [class]="'w-8 h-8 text-primary animate-spin mx-auto mb-3'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="32" class="mb-3" />
       <div class="text-sm text-secondary">Loading medical record…</div>
     </div>
   </div>
@@ -19,23 +19,7 @@
       <mr-clinical-snapshot [snapshot]="snapshot()"></mr-clinical-snapshot>
 
       <!-- Tab nav -->
-      <nav class="px-6 border-b border-gray-200 flex items-center gap-1 overflow-y-hidden overflow-x-auto"
-        role="tablist">
-        <button *ngFor="let t of tabs" type="button" (click)="setTab(t.key)"
-          [attr.aria-selected]="activeTab() === t.key" role="tab"
-          class="px-4 py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 -mb-px whitespace-nowrap"
-          [ngClass]="activeTab() === t.key
-            ? 'border-primary text-primary'
-            : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
-          <physio-icon [name]="t.icon" class="w-4 h-4"></physio-icon>
-          {{ t.label }}
-          <span *ngIf="t.badge && t.badge() as n"
-            class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold leading-none"
-            [ngClass]="activeTab() === t.key ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-secondary'">
-            {{ n }}
-          </span>
-        </button>
-      </nav>
+      <boo-tabs class="border-gray-200" [tabs]="tabItems()" [value]="activeTab()" (valueChange)="setTab($event)" label="Medical record sections" listClass="px-6 gap-1" />
     </div>
 
     <!-- Tab content -->

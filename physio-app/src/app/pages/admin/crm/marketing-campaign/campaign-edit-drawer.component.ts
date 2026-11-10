@@ -2,7 +2,7 @@ import { NgIf } from '@angular/common';
 import { Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { BooButtonComponent, BooIconComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooIconComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { Observable } from 'rxjs';
 import { finalize, map, switchMap } from 'rxjs/operators';
 import { BooDatepickerComponent } from '../../../../components/date-picker/boo-date-picker.component';
@@ -51,8 +51,7 @@ function toAmount(v: string | number | null): number | null {
         BooSelectComponent,
         BooDatepickerComponent,
         BooTextareaComponent,
-        CustomScrollbarDirective,
-    ],
+        CustomScrollbarDirective, BooFieldErrorComponent],
     template: `
         <drawer [isOpen]="open" [isShowDialog]="form.dirty && !submitting" (close)="discard()">
             <form
@@ -87,21 +86,21 @@ function toAmount(v: string | number | null): number | null {
                         <legend class="mb-3 text-sm font-semibold text-regular">Campaign</legend>
                         <div class="flex flex-col gap-4">
                             <div>
-                                <label for="ce-name" class="block mb-1 text-[13px] font-medium text-regular">Name <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="ce-name" class="block mb-1 text-sm font-medium text-regular">Name <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input name="ce-name" formControlName="name" label="e.g. Spring back-care check-ups" [maxlength]="120" />
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="ce-type" class="block mb-1 text-[13px] font-medium text-regular">Channel <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="ce-type" class="block mb-1 text-sm font-medium text-regular">Channel <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-select id="ce-type" formControlName="type" label="Channel" required [options]="channelOptions" />
                                 </div>
                                 <div *ngIf="campaign">
-                                    <label for="ce-status" class="block mb-1 text-[13px] font-medium text-regular">Status <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="ce-status" class="block mb-1 text-sm font-medium text-regular">Status <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-select id="ce-status" formControlName="status" label="Status" required [options]="statusOptions" />
                                 </div>
                             </div>
                             <div>
-                                <label for="ce-goal" class="block mb-1 text-[13px] font-medium text-regular">Goal</label>
+                                <label for="ce-goal" class="block mb-1 text-sm font-medium text-regular">Goal</label>
                                 <boo-input name="ce-goal" formControlName="goal" label="e.g. Book 50 posture assessments" [maxlength]="255" />
                             </div>
                         </div>
@@ -112,7 +111,7 @@ function toAmount(v: string | number | null): number | null {
                         <legend class="mb-3 text-sm font-semibold text-regular">Audience and schedule</legend>
                         <div class="flex flex-col gap-4">
                             <div>
-                                <label for="ce-segment" class="block mb-1 text-[13px] font-medium text-regular">Audience segment</label>
+                                <label for="ce-segment" class="block mb-1 text-sm font-medium text-regular">Audience segment</label>
                                 <boo-select id="ce-segment" formControlName="audienceSegmentId" label="No specific audience" [options]="segmentOptions" />
                                 <p *ngIf="segmentError" class="m-0 mt-1 flex items-start gap-1.5 text-xs text-danger" role="alert">
                                     <physio-icon name="circle-alert" [size]="14" class="flex-none mt-px" />{{ segmentError }}
@@ -121,15 +120,15 @@ function toAmount(v: string | number | null): number | null {
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="ce-start" class="block mb-1 text-[13px] font-medium text-regular">Start date</label>
+                                    <label for="ce-start" class="block mb-1 text-sm font-medium text-regular">Start date</label>
                                     <boo-datepicker id="ce-start" formControlName="startDate" label="Start date" [max]="form.controls.endDate.value" />
                                 </div>
                                 <div>
-                                    <label for="ce-end" class="block mb-1 text-[13px] font-medium text-regular">End date</label>
+                                    <label for="ce-end" class="block mb-1 text-sm font-medium text-regular">End date</label>
                                     <boo-datepicker id="ce-end" formControlName="endDate" label="End date" [min]="form.controls.startDate.value" />
                                 </div>
                             </div>
-                            <p *ngIf="form.hasError('dateOrder')" class="m-0 -mt-2 text-xs text-danger" role="alert">The end date can't be before the start date.</p>
+                            <boo-field-error size="sm" announce class="-mt-2" *ngIf="form.hasError('dateOrder')">The end date can't be before the start date.</boo-field-error>
                         </div>
                     </fieldset></div>
 
@@ -138,21 +137,21 @@ function toAmount(v: string | number | null): number | null {
                         <legend class="mb-3 text-sm font-semibold text-regular">Budget</legend>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label for="ce-budget" class="block mb-1 text-[13px] font-medium text-regular">Budget</label>
+                                <label for="ce-budget" class="block mb-1 text-sm font-medium text-regular">Budget</label>
                                 <boo-input name="ce-budget" type="number" formControlName="budget" label="0" [maxlength]="20" />
                             </div>
                             <div *ngIf="campaign">
-                                <label for="ce-spent" class="block mb-1 text-[13px] font-medium text-regular">Spent so far</label>
+                                <label for="ce-spent" class="block mb-1 text-sm font-medium text-regular">Spent so far</label>
                                 <boo-input name="ce-spent" type="number" formControlName="spent" label="0" [maxlength]="20" />
                             </div>
                         </div>
-                        <p *ngIf="amountError" class="m-0 mt-2 text-xs text-danger" role="alert">Amounts can't be negative.</p>
+                        <boo-field-error size="sm" announce class="mt-2" *ngIf="amountError">Amounts can't be negative.</boo-field-error>
                     </fieldset></div>
 
                     <!-- Notes -->
                     <div class="pt-6 border-t border-rowDivider"><fieldset class="m-0 p-0 border-0 min-w-0">
                         <legend class="mb-3 text-sm font-semibold text-regular">Brief</legend>
-                        <label for="ce-description" class="block mb-1 text-[13px] font-medium text-regular">Description</label>
+                        <label for="ce-description" class="block mb-1 text-sm font-medium text-regular">Description</label>
                         <boo-textarea id="ce-description" formControlName="description" label="Message, offer and anything the team should know" [rows]="5" [maxlength]="2000" />
                     </fieldset></div>
                 </div>

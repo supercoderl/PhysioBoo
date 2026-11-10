@@ -3,7 +3,7 @@ import { FormGroup } from "@angular/forms";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
 import { DrawerComponent } from "../../../../drawer/drawer.component";
-import { BooInputComponent } from '@physioboo/ui';
+import { BooInputComponent, BooButtonComponent } from '@physioboo/ui';
 import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-textarea.component";
 
 @Component({
@@ -15,8 +15,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
         BooInputComponent, 
         BooTextareaComponent, 
         BooButtonAdminComponent,
-        SharedModule
-    ],
+        SharedModule, BooButtonComponent],
     template: `
         <drawer
             [isOpen]="isOpen"
@@ -35,10 +34,7 @@ import { BooTextareaComponent } from "../../../../textarea/boo-textarea/boo-text
                             An atomic access right that can be attached to roles
                         </p>
                     </div>
-                    <button
-                        (click)="onClose()"
-                        class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
-                    >
+                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="onClose()" aria-label="Close">
                         <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>

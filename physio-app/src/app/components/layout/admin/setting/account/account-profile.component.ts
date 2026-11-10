@@ -23,14 +23,14 @@ import { BooSelectComponent } from "../../../../select/boo-select/boo-select.com
         <div class="flex flex-col gap-4" [formGroup]="form">
             <div class="w-full">
               <p class="font-semibold text-base m-0">Profile</p>
-              <p class="m-0 text-[13px] leading-[1.5] text-[#71606A]">
+              <p class="m-0 text-sm leading-[1.5] text-[#71606A]">
                 Manage your name, date of birth, and other personal identity details.
               </p>
             </div>
             <div class="grid w-full gap-4 sm:grid-cols-4">
               <div class="sm:col-span-1">
                 <div
-                  class="border-4 border-solid w-40 h-40 overflow-hidden relative flex-center-center leading-none rounded-full overflow-hidden text-[13px] border-[#c3c3c3] bg-surface"
+                  class="border-4 border-solid w-40 h-40 overflow-hidden relative flex-center-center leading-none rounded-full overflow-hidden text-sm border-[#c3c3c3] bg-surface"
                 >
                   <img
                     alt="User avatar"

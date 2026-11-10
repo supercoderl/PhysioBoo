@@ -4,7 +4,7 @@ import { firstValueFrom } from "rxjs";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { BooDatepickerComponent } from "../../../../components/date-picker/boo-date-picker.component";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
-import { BooInputComponent } from '@physioboo/ui';
+import { BooInputComponent, BooButtonComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
 import { StockTakeService } from "../../../../services/admin/stock-take.service";
@@ -26,8 +26,7 @@ import { LoadingKeys } from "../../../../shared/types/loading";
         BooTextareaComponent,
         BooButtonAdminComponent,
         BooSelectComponent,
-        BooDatepickerComponent,
-    ],
+        BooDatepickerComponent, BooButtonComponent],
     template: `
     <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="onClose()">
       <div class="flex flex-col h-full bg-surface relative" role="dialog" aria-modal="true" aria-labelledby="stock-take-drawer-title" (keydown.escape)="onClose()">
@@ -36,7 +35,7 @@ import { LoadingKeys } from "../../../../shared/types/loading";
             <h2 id="stock-take-drawer-title" class="text-xl font-bold text-regular leading-none mb-1">{{ stockTake ? 'Edit draft' : 'New stock take' }}</h2>
             <p class="text-sm text-secondary m-0">Counting snapshots every active medicine batch of the warehouse when it starts.</p>
           </div>
-          <button (click)="onClose()" class="text-gray-500 hover:text-gray-700 w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors" aria-label="Close">
+          <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="onClose()" aria-label="Close">
             <physio-icon name="x" [size]="20"></physio-icon>
           </button>
         </div>

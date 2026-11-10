@@ -65,7 +65,7 @@ const PAGE_SIZE = 12;
           <table class="w-full min-w-[520px] text-sm border-collapse">
             <caption class="sr-only">Medicines available for retail sale</caption>
             <thead class="sticky top-0 z-10 bg-gray-50">
-              <tr class="text-left text-[11px] uppercase tracking-wide text-secondary bg-gray-50">
+              <tr class="text-left text-xs uppercase tracking-wide text-secondary bg-gray-50">
                 <th scope="col" class="px-4 py-2.5 font-semibold">Medicine</th>
                 <th scope="col" class="px-3 py-2.5 font-semibold hidden xl:table-cell">Category</th>
                 <th scope="col" class="px-3 py-2.5 font-semibold hidden lg:table-cell">Batch · expiry</th>
@@ -77,9 +77,9 @@ const PAGE_SIZE = 12;
             <tbody>
               <tr *ngFor="let med of items(); trackBy: trackById" class="border-t border-borderGray/60 hover:bg-gray-50/70" [class.text-gray-500]="med.stock <= 0">
                 <th scope="row" class="px-4 py-3 text-left font-normal align-top">
-                  <button type="button" (click)="viewDetail.emit(med.id)" class="text-left font-semibold text-regular hover:text-primaryDeep hover:underline break-words bg-transparent p-0 border-0 cursor-pointer">{{ med.name }}</button>
+                  <button type="button" boo-button variant="text" classname="font-semibold !text-regular break-words" (click)="viewDetail.emit(med.id)">{{ med.name }}</button>
                   <span class="block text-xs text-secondary break-words">{{ subtitle(med) }}</span>
-                  <span *ngIf="med.barcode" class="block text-[11px] text-gray-500 tabular-nums">{{ med.barcode }}</span>
+                  <span *ngIf="med.barcode" class="block text-xs text-gray-500 tabular-nums">{{ med.barcode }}</span>
                 </th>
                 <td class="px-3 py-3 align-top text-xs text-secondary hidden xl:table-cell">{{ med.category }}<span *ngIf="med.manufacturer" class="block text-gray-500">{{ med.manufacturer }}</span></td>
                 <td class="px-3 py-3 align-top text-xs text-secondary hidden lg:table-cell">
@@ -92,7 +92,7 @@ const PAGE_SIZE = 12;
                 </td>
                 <td class="px-3 py-3 align-top text-right tabular-nums whitespace-nowrap">
                   <span class="font-semibold text-regular">{{ money(med.price) }}</span>
-                  <span *ngIf="med.mrp && med.mrp > med.price" class="block text-[11px] text-gray-500 line-through">{{ money(med.mrp) }}</span>
+                  <span *ngIf="med.mrp && med.mrp > med.price" class="block text-xs text-gray-500 line-through">{{ money(med.mrp) }}</span>
                 </td>
                 <td class="px-4 py-3 align-top text-right">
                   <button boo-button variant="outline" size="sm" (click)="addToCart.emit(med)" [disabled]="med.stock <= 0 || addDisabled"

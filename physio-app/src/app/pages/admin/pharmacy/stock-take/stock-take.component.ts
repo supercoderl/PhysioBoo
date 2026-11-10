@@ -52,7 +52,7 @@ const PAGE_SIZE = 10;
           </p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-          <button boo-button variant="secondary" (click)="refresh()" [loading]="listState() === 'loading'">
+          <button boo-button variant="secondary" (click)="refresh()" [disabled]="listState() === 'loading'">
             <physio-icon name="refresh" [size]="16"></physio-icon>Refresh
           </button>
           <button *ngIf="access.export" boo-button variant="secondary" (click)="onExport()" [loading]="exporting()" [disabled]="exporting()">

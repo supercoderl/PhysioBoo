@@ -7,8 +7,8 @@
       <p class="m-0 mt-0.5 text-xs leading-5 text-secondary">Write, publish and archive stories for the public blog</p>
     </div>
     <div class="flex items-center gap-2">
-      <button boo-button variant="secondary" size="sm" [loading]="loading" (click)="load()">
-        <physio-icon *ngIf="!loading" name="refresh" [size]="15" aria-hidden="true" />Refresh
+      <button boo-button variant="secondary" size="sm" [disabled]="loading" (click)="load()">
+        <physio-icon name="refresh" [size]="15" aria-hidden="true" />Refresh
       </button>
       <button *ngIf="canCreate" boo-button variant="primary" size="sm" aria-haspopup="dialog" (click)="openCreate()">
         <physio-icon name="plus" [size]="15" aria-hidden="true" />New article
@@ -28,28 +28,7 @@
     <h2 id="article-list-title" class="sr-only">Article list</h2>
 
     <!-- Publishing state: one at a time, as the server filters -->
-    <div class="boo-scrollbar overflow-x-auto border-b border-rowDivider">
-      <div class="flex min-w-max gap-1 px-4" role="tablist" aria-label="Publishing status">
-        <button
-          *ngFor="let tab of statusTabs; let i = index"
-          type="button"
-          role="tab"
-          [id]="'article-tab-' + i"
-          aria-controls="article-results"
-          [attr.aria-selected]="tab.value === statusFilter"
-          [attr.tabindex]="tab.value === statusFilter ? 0 : -1"
-          class="relative -mb-px px-3 py-3 bg-transparent border-0 border-b-2 text-sm whitespace-nowrap cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary rounded-t aria-[selected=false]:hover:text-regular"
-          [class.border-primary]="tab.value === statusFilter"
-          [class.text-primaryDeep]="tab.value === statusFilter"
-          [class.font-semibold]="tab.value === statusFilter"
-          [class.border-transparent]="tab.value !== statusFilter"
-          [class.text-secondary]="tab.value !== statusFilter"
-          [class.font-medium]="tab.value !== statusFilter"
-          (click)="selectStatus(tab.value)"
-          (keydown)="onTabKey($event, i)"
-        >{{ tab.label }}</button>
-      </div>
-    </div>
+    <boo-tabs [tabs]="statusTabs" [value]="statusFilter" (valueChange)="selectStatus($event)" label="Publishing status" idPrefix="article-tab" controls="article-results" listClass="px-4" />
 
     <!-- Search, category, creation dates and sort. Every control is 36px high and the row aligns on its bottom edge, under the field labels. -->
     <div class="flex flex-wrap items-end gap-3 px-4 py-3 border-b border-rowDivider">
@@ -150,14 +129,7 @@
                     <ng-template #noCoverTpl><physio-icon name="image" [size]="18" class="text-placeholder" /></ng-template>
                   </div>
                   <div class="min-w-0 flex-1 max-w-[560px]">
-                    <button
-                      type="button"
-                      class="block max-w-full p-0 bg-transparent border-0 text-left text-[15px] leading-5 font-semibold text-regular line-clamp-2 break-words cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
-                      [attr.aria-label]="'Preview ' + a.title"
-                      aria-haspopup="dialog"
-                      [title]="a.title"
-                      (click)="$event.stopPropagation(); openDetail(a)"
-                    >{{ a.title }}</button>
+                    <button type="button" boo-button variant="text" classname="max-w-full text-[15px] leading-5 font-semibold !text-regular line-clamp-2 break-words rounded" [attr.aria-label]="'Preview ' + a.title" aria-haspopup="dialog" [title]="a.title" (click)="$event.stopPropagation(); openDetail(a)">{{ a.title }}</button>
                     <p *ngIf="a.excerpt" class="m-0 mt-1 text-xs leading-5 text-secondary line-clamp-1 break-words">{{ a.excerpt }}</p>
                     <p class="m-0 mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-secondary">
                       <span class="font-medium text-primaryDeep">{{ category(a) }}</span>

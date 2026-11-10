@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
-import { BooButtonComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { CASHIER_PAYMENT_METHODS, CashierInvoice, CashierPaymentMethod, CashierPaymentSplit, roundMoney } from "../../../../shared/types/cashier.types";
@@ -14,7 +14,7 @@ interface PaymentLine {
 @Component({
     selector: 'cashier-payment-dialog',
     standalone: true,
-    imports: [SharedModule, CashierDialogComponent, BooButtonComponent, BooInputComponent, BooSelectComponent],
+    imports: [SharedModule, CashierDialogComponent, BooButtonComponent, BooInputComponent, BooSelectComponent, BooFieldErrorComponent],
     template: `
     <cashier-dialog
       [open]="open && !!bill"
@@ -28,11 +28,11 @@ interface PaymentLine {
       <ng-container *ngIf="bill as b">
         <dl class="grid grid-cols-2 gap-2 m-0">
           <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
-            <dt class="text-[11px] font-medium text-secondary">Outstanding</dt>
+            <dt class="text-xs font-medium text-secondary">Outstanding</dt>
             <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ b.remainingBalance | currency:'USD':'symbol':'1.2-2' }}</dd>
           </div>
           <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
-            <dt class="text-[11px] font-medium text-secondary">Already paid</dt>
+            <dt class="text-xs font-medium text-secondary">Already paid</dt>
             <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ b.paidAmount | currency:'USD':'symbol':'1.2-2' }}</dd>
           </div>
         </dl>
@@ -44,7 +44,7 @@ interface PaymentLine {
             <boo-select label="Method" [options]="methods" [(ngModel)]="line.method" required></boo-select>
             <div>
               <boo-input label="Amount" type="number" [(ngModel)]="line.amount" required></boo-input>
-              <p *ngIf="touched && lineError(line) as msg" class="mt-1 mb-0 text-xs text-danger" role="alert">{{ msg }}</p>
+              <boo-field-error size="sm" announce class="mt-1 mb-0" *ngIf="touched && lineError(line) as msg">{{ msg }}</boo-field-error>
             </div>
             <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" class="mt-1" (click)="removeLine(i)" [disabled]="lines.length === 1" [attr.aria-label]="'Remove payment line ' + (i + 1)">
               <physio-icon name="x" [size]="18"></physio-icon>
@@ -60,7 +60,7 @@ interface PaymentLine {
           <div class="flex justify-between"><dt class="text-secondary">Collecting now</dt><dd class="m-0 font-semibold tabular-nums">{{ total | currency:'USD':'symbol':'1.2-2' }}</dd></div>
           <div class="flex justify-between"><dt class="text-secondary">Outstanding after payment</dt><dd class="m-0 font-semibold tabular-nums">{{ remainingAfter | currency:'USD':'symbol':'1.2-2' }}</dd></div>
         </dl>
-        <p *ngIf="touched && totalError as msg" class="m-0 text-xs text-danger" role="alert">{{ msg }}</p>
+        <boo-field-error size="sm" announce *ngIf="touched && totalError as msg">{{ msg }}</boo-field-error>
       </ng-container>
 
       <div dialogFooter class="contents">

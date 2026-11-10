@@ -57,15 +57,15 @@ export interface CashierBillPermissions {
             <div class="px-5 py-4 space-y-5">
               <dl class="grid grid-cols-3 gap-2 m-0" aria-label="Balance">
                 <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
-                  <dt class="text-[11px] font-medium text-secondary">Total</dt>
+                  <dt class="text-xs font-medium text-secondary">Total</dt>
                   <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ b.totalAmount | currency:'USD':'symbol':'1.2-2' }}</dd>
                 </div>
                 <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
-                  <dt class="text-[11px] font-medium text-secondary">Paid</dt>
+                  <dt class="text-xs font-medium text-secondary">Paid</dt>
                   <dd class="m-0 mt-0.5 text-base font-bold text-emerald-700 tabular-nums">{{ b.paidAmount | currency:'USD':'symbol':'1.2-2' }}</dd>
                 </div>
                 <div class="rounded-1.5 px-3 py-2.5" [ngClass]="b.remainingBalance > 0 ? 'bg-rose-50' : 'bg-gray-50'">
-                  <dt class="text-[11px] font-medium text-secondary">Outstanding</dt>
+                  <dt class="text-xs font-medium text-secondary">Outstanding</dt>
                   <dd class="m-0 mt-0.5 text-base font-bold tabular-nums" [ngClass]="b.remainingBalance > 0 ? 'text-rose-700' : 'text-regular'">{{ b.remainingBalance | currency:'USD':'symbol':'1.2-2' }}</dd>
                 </div>
               </dl>
@@ -77,7 +77,7 @@ export interface CashierBillPermissions {
                   <li *ngFor="let c of b.charges" class="px-3 py-2.5 flex items-start justify-between gap-3">
                     <div class="min-w-0 leading-tight">
                       <div class="text-sm font-medium text-regular break-words">{{ c.name || c.category }}</div>
-                      <div class="text-[11px] text-secondary">
+                      <div class="text-xs text-secondary">
                         {{ c.category }} · {{ c.quantity | number }} × {{ c.unitPrice | currency:'USD':'symbol':'1.2-2' }}<ng-container *ngIf="c.isInsuranceCovered"> · insurance covered</ng-container>
                       </div>
                     </div>
@@ -107,7 +107,7 @@ export interface CashierBillPermissions {
                     <li *ngFor="let p of payments; trackBy: trackEvent" class="px-3 py-2 flex items-center justify-between gap-3">
                       <div class="min-w-0 leading-tight">
                         <div class="text-sm text-regular">{{ p.type === 'Refund' ? 'Refund' : 'Payment' }} · {{ methodLabel(p.method) }}</div>
-                        <div class="text-[11px] text-secondary">{{ p.occurredAt | date:'medium' }}<ng-container *ngIf="p.performedBy"> · {{ p.performedBy }}</ng-container></div>
+                        <div class="text-xs text-secondary">{{ p.occurredAt | date:'medium' }}<ng-container *ngIf="p.performedBy"> · {{ p.performedBy }}</ng-container></div>
                       </div>
                       <div class="text-sm font-semibold tabular-nums flex-none" [ngClass]="p.amount < 0 ? 'text-rose-700' : 'text-emerald-700'">{{ p.amount | currency:'USD':'symbol':'1.2-2' }}</div>
                     </li>

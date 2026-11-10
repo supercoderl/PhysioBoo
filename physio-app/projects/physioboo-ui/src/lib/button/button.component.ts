@@ -1,13 +1,11 @@
 import { NgIf } from '@angular/common';
 import { Component, ElementRef, Input, inject } from '@angular/core';
-import { BooIconComponent } from '../icon/icon.component';
-import { BooSpinnerComponent } from '../spinner/spinner.component';
 
 /**
  * Setting `variant` switches the button to the public-site design system (token colours, fixed heights per size,
  * single-line label). Without it the button keeps its original gradient look, which the auth pages use.
  */
-export type BooButtonVariant = 'primary' | 'secondary' | 'outline' | 'soft' | 'subtle' | 'ghost' | 'link';
+export type BooButtonVariant = 'primary' | 'secondary' | 'outline' | 'soft' | 'subtle' | 'ghost' | 'link' | 'text' | 'danger';
 export type BooButtonSize = 'small' | 'medium' | 'large' | 'sm' | 'md' | 'lg';
 
 type DsSize = 'sm' | 'md' | 'lg';
@@ -35,6 +33,11 @@ const DS_VARIANT: Record<BooButtonVariant, string> = {
   subtle: 'border border-transparent bg-gray-100 text-gray-900 hover:bg-gray-200 hover:text-gray-900',
   ghost: 'border border-transparent bg-transparent text-gray-700 hover:bg-gray-100 hover:text-gray-900',
   link: 'border-0 !px-1.5 bg-transparent text-primaryDeep underline underline-offset-2 hover:text-primary',
+  // Destructive action (delete, discard, void): the danger token, filled.
+  danger: 'border border-transparent bg-danger text-white hover:opacity-90 hover:text-white active:opacity-80',
+  // Inline text action (e.g. a record name in a table cell): no fixed height or padding, so it sits in the line of text
+  // around it. Colour and weight come from `classname`; the size input is ignored.
+  text: 'p-0 border-0 bg-transparent text-left text-primary hover:underline hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm',
 };
 
 const DS_BASE = 'relative inline-flex items-center justify-center gap-2 whitespace-nowrap max-w-full font-semibold leading-none no-underline select-none cursor-pointer transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-150 ease-in-out';
@@ -42,22 +45,10 @@ const DS_BASE = 'relative inline-flex items-center justify-center gap-2 whitespa
 @Component({
   selector: 'button[boo-button], a[boo-button]',
   standalone: true,
-  imports: [NgIf, BooIconComponent, BooSpinnerComponent],
+  imports: [NgIf],
   template: `
-    <physio-icon
-      *ngIf="loading && variant"
-      name="loader-circle"
-      [size]="dsSize === 'lg' ? 18 : 16"
-      class="animate-spin flex-none"
-      aria-hidden="true"
-    />
     <span *ngIf="label" [class]="labelClass">{{ label }}</span>
     <ng-content *ngIf="!label"></ng-content>
-    <boo-spinner
-      [size]="20"
-      *ngIf="loading && !variant"
-      class="ml-2"
-    ></boo-spinner>
   `,
   host: {
     '[attr.type]': 'isAnchor ? null : (type ?? (variant ? "button" : "submit"))',
@@ -106,6 +97,14 @@ export class BooButtonComponent {
   private designSystemClasses(variant: BooButtonVariant): string {
     const size = this.dsSize;
     const inactive = this.disabled || this.loading;
+    if (variant === 'text') {
+      return [
+        'inline-block max-w-full cursor-pointer no-underline select-none',
+        DS_VARIANT.text,
+        inactive ? 'pointer-events-none opacity-50 cursor-not-allowed' : '',
+        this.classname,
+      ].filter(Boolean).join(' ');
+    }
     return [
       DS_BASE,
       DS_SIZE[size],
@@ -114,8 +113,7 @@ export class BooButtonComponent {
       this.block ? 'w-full' : '',
       // Inactive buttons ignore the pointer so hover colours don't suggest they can be pressed.
       inactive ? 'pointer-events-none' : '',
-      this.disabled && !this.loading ? 'opacity-50' : '',
-      this.loading ? 'cursor-wait opacity-80' : '',
+      inactive ? 'opacity-50 cursor-not-allowed' : '',
       this.classname,
     ].filter(Boolean).join(' ');
   }
@@ -137,7 +135,7 @@ export class BooButtonComponent {
         break;
     }
 
-    const loadingClass = this.loading ? 'cursor-wait opacity-80' : '';
+    const loadingClass = this.loading ? 'opacity-50 cursor-not-allowed' : '';
 
     return `${base} ${sizeClass} ${loadingClass} ${this.classname}`;
   }

@@ -1,5 +1,5 @@
-import { Component, EventEmitter, HostListener, inject, Input, OnChanges, Output, signal, SimpleChanges } from "@angular/core";
-import { BooButtonComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { Component, computed, EventEmitter, HostListener, inject, Input, OnChanges, Output, signal, SimpleChanges } from "@angular/core";
+import { BooButtonComponent, BooEmptyStateComponent, BooInlineErrorComponent, BooStatusBadgeComponent, BooTab, BooTabsComponent } from '@physioboo/ui';
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
 import { InventoryManagementService } from "../../../../services/admin/inventory-management.service";
 import { AuthService } from "../../../../services/auth/auth.service";
@@ -34,8 +34,7 @@ type PanelTab = 'batches' | 'history';
         BooEmptyStateComponent,
         BooInlineErrorComponent,
         BooStatusBadgeComponent,
-        InventoryBatchActionDialogComponent,
-    ],
+        InventoryBatchActionDialogComponent, BooTabsComponent],
     template: `
     <drawer [isOpen]="isOpen" (close)="close.emit()">
       <div *ngIf="medicine as med" class="flex flex-col h-screen bg-surface" role="dialog" aria-modal="true" aria-labelledby="inventory-panel-title">
@@ -65,27 +64,27 @@ type PanelTab = 'batches' | 'history';
               <dl *ngIf="detailState() !== 'error'" class="grid grid-cols-2 sm:grid-cols-3 gap-3 m-0">
                 <ng-container *ngIf="detail() as d; else summarySkeleton">
                   <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
-                    <dt class="text-[11px] font-medium text-secondary">On hand</dt>
+                    <dt class="text-xs font-medium text-secondary">On hand</dt>
                     <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ d.currentStock | number }}<span *ngIf="d.unit" class="ml-1 text-xs font-medium text-secondary">{{ d.unit }}</span></dd>
                   </div>
                   <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
-                    <dt class="text-[11px] font-medium text-secondary">Reorder level</dt>
+                    <dt class="text-xs font-medium text-secondary">Reorder level</dt>
                     <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ d.reorderLevel | number }}</dd>
                   </div>
                   <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
-                    <dt class="text-[11px] font-medium text-secondary">Safety stock</dt>
+                    <dt class="text-xs font-medium text-secondary">Safety stock</dt>
                     <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ d.safetyStock | number }}</dd>
                   </div>
                   <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
-                    <dt class="text-[11px] font-medium text-secondary">Average unit cost</dt>
+                    <dt class="text-xs font-medium text-secondary">Average unit cost</dt>
                     <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ d.averageUnitCost | currency:'USD':'symbol':'1.2-2' }}</dd>
                   </div>
                   <div class="rounded-1.5 bg-gray-50 px-3 py-2.5">
-                    <dt class="text-[11px] font-medium text-secondary">Stock value</dt>
+                    <dt class="text-xs font-medium text-secondary">Stock value</dt>
                     <dd class="m-0 mt-0.5 text-base font-bold text-regular tabular-nums">{{ d.totalValue | currency:'USD':'symbol':'1.2-2' }}</dd>
                   </div>
                   <div class="rounded-1.5 bg-gray-50 px-3 py-2.5 col-span-2 sm:col-span-1">
-                    <dt class="text-[11px] font-medium text-secondary">Storage</dt>
+                    <dt class="text-xs font-medium text-secondary">Storage</dt>
                     <dd class="m-0 mt-0.5 text-sm font-semibold text-regular break-words">{{ d.storageLocations.length ? d.storageLocations.join(', ') : 'Not recorded' }}</dd>
                   </div>
                 </ng-container>
@@ -100,20 +99,7 @@ type PanelTab = 'batches' | 'history';
 
             <!-- Tabs -->
             <section>
-              <div role="tablist" aria-label="Batches and history" class="flex items-center gap-1 border-b border-borderGray/60">
-                <button role="tab" type="button" id="inventory-tab-batches" [attr.aria-selected]="tab() === 'batches'" aria-controls="inventory-panel-batches"
-                  (click)="tab.set('batches')"
-                  class="px-3 py-2.5 text-sm font-semibold border-b-2 -mb-px whitespace-nowrap"
-                  [ngClass]="tab() === 'batches' ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-regular'">
-                  Batches<span *ngIf="batchState() === 'ready'" class="ml-1.5 text-xs font-medium text-secondary">{{ batches().length }}</span>
-                </button>
-                <button role="tab" type="button" id="inventory-tab-history" [attr.aria-selected]="tab() === 'history'" aria-controls="inventory-panel-history"
-                  (click)="openHistory()"
-                  class="px-3 py-2.5 text-sm font-semibold border-b-2 -mb-px whitespace-nowrap"
-                  [ngClass]="tab() === 'history' ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-regular'">
-                  History
-                </button>
-              </div>
+              <boo-tabs [tabs]="panelTabs()" [value]="tab()" (valueChange)="onPanelTab($event)" label="Batches and history" idPrefix="inventory-tab" panelPrefix="inventory-panel" />
 
               <!-- Batches -->
               <div *ngIf="tab() === 'batches'" id="inventory-panel-batches" role="tabpanel" aria-labelledby="inventory-tab-batches" class="pt-4 space-y-3">
@@ -141,31 +127,31 @@ type PanelTab = 'batches' | 'history';
 
                   <dl class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 mt-3 mb-0 text-sm">
                     <div>
-                      <dt class="text-[11px] text-secondary">Expiry</dt>
+                      <dt class="text-xs text-secondary">Expiry</dt>
                       <dd class="m-0 font-medium" [ngClass]="b.isExpired ? 'text-rose-600' : b.isNearExpiry ? 'text-amber-700' : 'text-regular'">{{ b.expiryDate ? (b.expiryDate | date:'mediumDate') : '—' }}</dd>
                     </div>
                     <div>
-                      <dt class="text-[11px] text-secondary">On hand</dt>
+                      <dt class="text-xs text-secondary">On hand</dt>
                       <dd class="m-0 font-medium text-regular tabular-nums">{{ b.quantity | number }}</dd>
                     </div>
                     <div>
-                      <dt class="text-[11px] text-secondary">Reserved</dt>
+                      <dt class="text-xs text-secondary">Reserved</dt>
                       <dd class="m-0 font-medium text-regular tabular-nums">{{ b.reservedQuantity | number }}</dd>
                     </div>
                     <div>
-                      <dt class="text-[11px] text-secondary">Free</dt>
+                      <dt class="text-xs text-secondary">Free</dt>
                       <dd class="m-0 font-medium text-regular tabular-nums">{{ free(b) | number }}</dd>
                     </div>
                     <div class="col-span-2">
-                      <dt class="text-[11px] text-secondary">Location</dt>
+                      <dt class="text-xs text-secondary">Location</dt>
                       <dd class="m-0 text-regular break-words">{{ b.storageLocation || '—' }}</dd>
                     </div>
                     <div>
-                      <dt class="text-[11px] text-secondary">Supplier</dt>
+                      <dt class="text-xs text-secondary">Supplier</dt>
                       <dd class="m-0 text-regular break-words">{{ b.supplier || '—' }}</dd>
                     </div>
                     <div>
-                      <dt class="text-[11px] text-secondary">Unit cost</dt>
+                      <dt class="text-xs text-secondary">Unit cost</dt>
                       <dd class="m-0 text-regular tabular-nums">{{ b.purchasePrice !== null ? (b.purchasePrice | currency:'USD':'symbol':'1.2-2') : '—' }}</dd>
                     </div>
                   </dl>
@@ -328,6 +314,16 @@ export class InventoryDetailDrawerComponent implements OnChanges {
             },
             error: () => { if (session === this.session) this.batchState.set('error'); },
         });
+    }
+
+    readonly panelTabs = computed<BooTab<PanelTab>[]>(() => [
+        { value: 'batches', label: 'Batches', count: this.batchState() === 'ready' ? this.batches().length : null },
+        { value: 'history', label: 'History' },
+    ]);
+
+    onPanelTab(value: PanelTab): void {
+        if (value === 'history') this.openHistory();
+        else this.tab.set('batches');
     }
 
     openHistory(): void {

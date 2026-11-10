@@ -17,7 +17,6 @@ import { PreferredCommunication } from '../../../../../shared/enums/preferred-co
 import { SharedModule } from '../../../../../shared/shared-imports';
 import { MyAccount, UpdateMyAccountRequest } from '../../../../../shared/types/account.types';
 
-/** "PreferNotToSay" → "Prefer not to say", "O_Positive" → "O+". The value stays the enum name the API expects. */
 function enumOptions(enumObj: object, label: (name: string) => string = humanize): { label: string; value: string }[] {
   return Object.keys(enumObj).filter(key => isNaN(Number(key))).map(key => ({ label: label(key), value: key }));
 }
@@ -31,16 +30,10 @@ function bloodGroupLabel(name: string): string {
   return name.replace('_Positive', '+').replace('_Negative', '−');
 }
 
-/** The API sends dates as ISO date-times; the date pickers work with `yyyy-MM-dd`. */
 function dateOnly(value: string | null | undefined): string | null {
   return value ? value.slice(0, 10) : null;
 }
 
-/**
- * Settings > Account: the signed-in user's own personal, contact, identification and emergency-contact details
- * (GET/PUT /api/users/me/account). Email is the sign-in identity and is shown read-only.
- * `/admin/profile/general` is the read-only overview that links here for edits.
- */
 @Component({
   selector: 'setting-account',
   standalone: true,
@@ -72,7 +65,6 @@ export class SettingAccountComponent implements OnInit {
   readonly bloodGroupOptions = enumOptions(BloodGroup, bloodGroupLabel);
   readonly communicationOptions = enumOptions(PreferredCommunication, name => name === 'SMS' ? 'SMS' : humanize(name));
 
-  // Limits mirror UpdateMyAccountCommandValidation on the server.
   readonly form: FormGroup = this.fb.group({
     firstName: ['', [Validators.required, Validators.maxLength(100)]],
     middleName: ['', Validators.maxLength(100)],
@@ -177,7 +169,6 @@ export class SettingAccountComponent implements OnInit {
       .pipe(finalize(() => this.saving.set(false)))
       .subscribe({
         next: res => {
-          // On failure the form keeps what was typed, so nothing is lost.
           if (!res.success) { this.toastSrv.error('Unable to update your account'); return; }
           const saved = res.data ?? { ...this.account()!, ...request };
           this.fill(saved);
@@ -189,7 +180,6 @@ export class SettingAccountComponent implements OnInit {
           });
           this.toastSrv.success('Account updated');
         },
-        // The HTTP interceptor toasts the server's reason; the form keeps what was typed.
         error: () => undefined
       });
   }

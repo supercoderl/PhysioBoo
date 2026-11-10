@@ -2,7 +2,7 @@ import { Component, OnInit, computed, signal } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { finalize, firstValueFrom } from "rxjs";
 import { BooButtonAdminComponent } from "../../../components/button/boo-button-admin/boo-button-admin.component";
-import { BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooInputComponent, BooStatusBadgeComponent, BooButtonComponent, BooPaginationComponent } from '@physioboo/ui';
 import { UserPermissionRoleDrawerComponent } from "../../../components/layout/admin/system/user-permission/role-drawer.component";
 import { SuperadminPageHeaderComponent } from "../../../components/layout/superadmin/shared/superadmin-page-header.component";
 import { StatCardComponent } from "../../../components/ui/stat-card.component";
@@ -38,8 +38,7 @@ import { IconUtils } from "../../../shared/utils/icon.utils";
         StatCardComponent,
         BooStatusBadgeComponent,
         BooEmptyStateComponent,
-        UserPermissionRoleDrawerComponent
-    ],
+        UserPermissionRoleDrawerComponent, BooButtonComponent, BooPaginationComponent],
     templateUrl: './list.component.html',
     host: { class: 'block h-full min-h-0' }
 })
@@ -229,13 +228,6 @@ export class SuperadminRoleListComponent implements OnInit {
     }
 
     min(a: number, b: number) { return Math.min(a, b); }
-
-    getPages(current: number, total: number): number[] {
-        const delta = 2;
-        const pages: number[] = [];
-        for (let i = Math.max(1, current - delta); i <= Math.min(total, current + delta); i++) pages.push(i);
-        return pages;
-    }
 
     permsByCategory(category: string): Permission[] {
         return (this.permissionsData()?.items ?? []).filter(p => p.category === category);

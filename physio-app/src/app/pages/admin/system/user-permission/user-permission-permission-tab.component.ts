@@ -2,14 +2,13 @@ import { Component, EventEmitter, Input, Output, Signal } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { Permission } from "../../../../shared/types/permission.types";
 import { ColorUtils } from "../../../../shared/utils/color.utils";
+import { BooButtonComponent } from '@physioboo/ui';
 
 @Component({
   selector: 'admin-user-permission-permission-tab',
   standalone: true,
   imports: [
-    SharedModule,
-
-  ],
+    SharedModule, BooButtonComponent],
   template: `
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div
@@ -57,18 +56,20 @@ import { ColorUtils } from "../../../../shared/utils/color.utils";
             <div
               class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
             >
-              <button
-                (click)="onEditClick(p)"
-                class="p-1.5 hover:bg-primary/10 rounded text-primary"
-                title="Edit"
-              >
+              <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" (click)="onEditClick(p)" title="Edit">
                 <physio-icon name="pencil" class="w-3.5 h-3.5"></physio-icon>
               </button>
               <button
-                (click)="onDeleteClick(p)"
-                class="p-1.5 hover:bg-red-50 rounded text-red-500"
+                type="button"
+                boo-button
+                variant="ghost"
+                size="sm"
+                [iconOnly]="true"
+                classname="!text-danger !h-8 !w-8"
+                aria-label="Delete permission"
                 title="Delete"
-              >trash
+                (click)="onDeleteClick(p)"
+                >
                 <physio-icon name="trash" class="w-3.5 h-3.5"></physio-icon>
               </button>
             </div>

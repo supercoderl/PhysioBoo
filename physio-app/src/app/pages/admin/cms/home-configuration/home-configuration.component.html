@@ -37,11 +37,7 @@
       <p class="m-0 mb-1.5 px-3 text-xs font-medium text-secondary">On this page</p>
       <ul class="m-0 p-0 list-none flex flex-col gap-0.5">
         <li *ngFor="let item of nav; trackBy: trackById">
-          <button
-            type="button"
-            class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-transparent border-0 text-left text-sm font-medium text-regular cursor-pointer hover:bg-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            (click)="goTo(item.id)"
-          >
+          <button type="button" boo-button variant="text" classname="w-full items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm font-medium !text-regular hover:bg-body" (click)="goTo(item.id)">
             <span class="truncate">{{ item.label }}</span>
             <span
               *ngIf="item.meta"
@@ -103,12 +99,12 @@
               </div>
               <div class="flex flex-col gap-4 min-w-0">
                 <div>
-                  <label for="hc-name" class="block mb-1 text-[13px] font-medium text-regular">Hospital name <span class="text-danger" aria-hidden="true">*</span></label>
+                  <label for="hc-name" class="block mb-1 text-sm font-medium text-regular">Hospital name <span class="text-danger" aria-hidden="true">*</span></label>
                   <boo-input id="hc-name" name="hc-name" formControlName="hospitalName" label="Hospital name" [maxlength]="max.hospitalName" />
                 </div>
                 <div>
                   <div class="flex items-baseline justify-between gap-3 mb-1">
-                    <label for="hc-tagline" class="text-[13px] font-medium text-regular">Tagline</label>
+                    <label for="hc-tagline" class="text-sm font-medium text-regular">Tagline</label>
                     <span class="text-xs text-secondary tabular-nums">{{ form.controls.tagLine.value.length }} / {{ max.tagLine }}</span>
                   </div>
                   <boo-input id="hc-tagline" name="hc-tagline" formControlName="tagLine" label="A short line under the name" [maxlength]="max.tagLine" />
@@ -124,7 +120,7 @@
               </div>
               <div class="min-w-0">
                 <div class="flex items-baseline justify-between gap-3 mb-1">
-                  <label for="hc-welcome" class="text-[13px] font-medium text-regular">Message</label>
+                  <label for="hc-welcome" class="text-sm font-medium text-regular">Message</label>
                   <span class="text-xs text-secondary tabular-nums">{{ form.controls.welcomeMessage.value.length }} / {{ max.welcomeMessage }}</span>
                 </div>
                 <boo-textarea id="hc-welcome" formControlName="welcomeMessage" label="Welcome visitors and say what you offer" [rows]="4" [maxlength]="max.welcomeMessage" />
@@ -140,17 +136,17 @@
               <div class="flex flex-col gap-4 min-w-0">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label for="hc-phone" class="block mb-1 text-[13px] font-medium text-regular">Phone</label>
+                    <label for="hc-phone" class="block mb-1 text-sm font-medium text-regular">Phone</label>
                     <boo-input id="hc-phone" name="hc-phone" type="tel" formControlName="contactPhone" label="Phone number" [maxlength]="max.contactPhone" />
                   </div>
                   <div>
-                    <label for="hc-email" class="block mb-1 text-[13px] font-medium text-regular">Email</label>
+                    <label for="hc-email" class="block mb-1 text-sm font-medium text-regular">Email</label>
                     <boo-input id="hc-email" name="hc-email" type="email" formControlName="contactEmail" label="Email address" [maxlength]="max.contactEmail" />
                   </div>
                 </div>
                 <div>
                   <div class="flex items-baseline justify-between gap-3 mb-1">
-                    <label for="hc-address" class="text-[13px] font-medium text-regular">Address</label>
+                    <label for="hc-address" class="text-sm font-medium text-regular">Address</label>
                     <span class="text-xs text-secondary tabular-nums">{{ form.controls.address.value.length }} / {{ max.address }}</span>
                   </div>
                   <boo-textarea id="hc-address" formControlName="address" label="Street, district, city" [rows]="2" [maxlength]="max.address" />
@@ -177,7 +173,7 @@
           >
             <p class="m-0 flex items-center gap-1.5 text-xs min-h-5" role="status" aria-live="polite">
               <ng-container *ngIf="saving">
-                <physio-icon name="loader-circle" [size]="14" class="animate-spin text-secondary" aria-hidden="true" />
+                <boo-spinner [inline]="true" tone="current" [size]="14" />
                 <span class="text-secondary">Saving…</span>
               </ng-container>
               <ng-container *ngIf="!saving && dirty && saveState === 'failed'">
@@ -239,15 +235,7 @@
             </div>
             <div class="flex-1 min-w-[150px]">
               <span class="sr-only">Position {{ i + 1 }}: </span>
-              <button
-                *ngIf="canUpdate; else bannerTitleTpl"
-                type="button"
-                class="block max-w-full p-0 bg-transparent border-0 text-left text-sm leading-5 font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
-                [attr.aria-label]="'Edit banner ' + b.title"
-                aria-haspopup="dialog"
-                [title]="b.title"
-                (click)="openBanner(b)"
-              >{{ b.title }}</button>
+              <button type="button" boo-button variant="text" classname="max-w-full text-sm leading-5 font-semibold !text-regular truncate rounded" *ngIf="canUpdate; else bannerTitleTpl" [attr.aria-label]="'Edit banner ' + b.title" aria-haspopup="dialog" [title]="b.title" (click)="openBanner(b)">{{ b.title }}</button>
               <ng-template #bannerTitleTpl><p class="m-0 text-sm leading-5 font-semibold text-regular truncate" [title]="b.title">{{ b.title }}</p></ng-template>
               <p *ngIf="b.subtitle" class="m-0 mt-0.5 text-xs leading-5 text-secondary truncate" [title]="b.subtitle">{{ b.subtitle }}</p>
               <p class="m-0 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-secondary">
@@ -345,15 +333,7 @@
             </span>
             <div class="flex-1 min-w-[150px]">
               <span class="sr-only">Position {{ i + 1 }}: </span>
-              <button
-                *ngIf="canUpdate; else featureTitleTpl"
-                type="button"
-                class="block max-w-full p-0 bg-transparent border-0 text-left text-sm leading-5 font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
-                [attr.aria-label]="'Edit feature ' + f.title"
-                aria-haspopup="dialog"
-                [title]="f.title"
-                (click)="openFeature(f)"
-              >{{ f.title }}</button>
+              <button type="button" boo-button variant="text" classname="max-w-full text-sm leading-5 font-semibold !text-regular truncate rounded" *ngIf="canUpdate; else featureTitleTpl" [attr.aria-label]="'Edit feature ' + f.title" aria-haspopup="dialog" [title]="f.title" (click)="openFeature(f)">{{ f.title }}</button>
               <ng-template #featureTitleTpl><p class="m-0 text-sm leading-5 font-semibold text-regular truncate" [title]="f.title">{{ f.title }}</p></ng-template>
               <p class="m-0 mt-0.5 text-xs leading-5 line-clamp-1 break-words" [class.text-secondary]="f.description" [class.text-placeholder]="!f.description">{{ f.description || 'No description' }}</p>
               <boo-status-badge class="sm:hidden mt-1" dotted [label]="f.active ? 'Active' : 'Inactive'" [tone]="f.active ? 'success' : 'neutral'" />
@@ -438,14 +418,7 @@
             <span class="flex-none w-10 h-10 rounded-full bg-primarySoft text-primaryDeep text-xs font-semibold flex items-center justify-center" [class.opacity-60]="!t.active" aria-hidden="true">{{ initials(t.patientName) }}</span>
             <div class="flex-1 min-w-[150px]">
               <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                <button
-                  *ngIf="canUpdate; else testimonialNameTpl"
-                  type="button"
-                  class="max-w-full p-0 bg-transparent border-0 text-left text-sm leading-5 font-semibold text-regular truncate cursor-pointer hover:text-primaryDeep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
-                  [attr.aria-label]="'Edit testimonial from ' + t.patientName"
-                  aria-haspopup="dialog"
-                  (click)="openTestimonial(t)"
-                >{{ t.patientName }}</button>
+                <button type="button" boo-button variant="text" classname="max-w-full text-sm leading-5 font-semibold !text-regular truncate rounded" *ngIf="canUpdate; else testimonialNameTpl" [attr.aria-label]="'Edit testimonial from ' + t.patientName" aria-haspopup="dialog" (click)="openTestimonial(t)">{{ t.patientName }}</button>
                 <ng-template #testimonialNameTpl><span class="text-sm leading-5 font-semibold text-regular truncate">{{ t.patientName }}</span></ng-template>
                 <span class="inline-flex items-center gap-0.5" role="img" [attr.aria-label]="t.rating + ' out of 5 stars'">
                   <physio-icon *ngFor="let s of stars" name="star" [size]="13" [class]="s <= t.rating ? 'text-amber-400' : 'text-rowDivider'" />

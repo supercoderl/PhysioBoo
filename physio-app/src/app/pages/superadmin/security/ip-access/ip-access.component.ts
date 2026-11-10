@@ -7,6 +7,8 @@ import { SecurityService } from "../../../../services/admin/security.service";
 import { DialogService } from "../../../../services/common/dialog.service";
 import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
+import { BooTextareaComponent } from "../../../../components/textarea/boo-textarea/boo-textarea.component";
+import { BooButtonComponent, BooFormFieldComponent, BooInputComponent } from "@physioboo/ui";
 
 const IPV4 = /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}$/;
 const IPV6 = /^[0-9a-fA-F:]{2,45}$/;
@@ -25,14 +27,13 @@ const DURATIONS = [
     { label: '30 days', minutes: 30 * 24 * 60 },
 ];
 
-const FIELD = 'w-full h-9 px-3 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular placeholder:text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 const CARD = 'bg-surface rounded-2 border border-borderGray/60';
 
 /** Block or unblock an IP address platform-wide. The API has no list of blocked addresses yet. */
 @Component({
     selector: 'superadmin-ip-access',
     standalone: true,
-    imports: [SharedModule, SuperadminPageHeaderComponent, BooSelectComponent],
+    imports: [SharedModule, SuperadminPageHeaderComponent, BooSelectComponent, BooTextareaComponent, BooButtonComponent, BooFormFieldComponent, BooInputComponent],
     template: `
         <div class="space-y-5">
             <superadmin-page-header
@@ -42,7 +43,7 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
 
             <div
                 role="note"
-                class="flex items-start gap-3 rounded-2 border border-primary/20 bg-primary/5 px-4 py-3 text-[13px] text-regular"
+                class="flex items-start gap-3 rounded-2 border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-regular"
             >
                 <physio-icon name="info" [class]="'text-primary shrink-0 mt-0.5'" />
                 <p class="m-0">
@@ -56,13 +57,11 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
                 <section [class]="card" aria-labelledby="block-title">
                     <h3 id="block-title" class="text-sm font-semibold text-regular m-0 px-4 py-3 border-b border-borderGray/60">Block an address</h3>
                     <form [formGroup]="blockForm" class="p-4 space-y-4" (ngSubmit)="confirmBlock()">
+                        <boo-form-field label="IP address" for="block-ip" required [error]="showError(blockForm, 'ipAddress') ? 'Enter a valid IPv4 or IPv6 address.' : null">
+                            <boo-input [id]="'block-ip'" class="font-mono" formControlName="ipAddress" label="203.0.113.7" size="small" />
+                        </boo-form-field>
                         <div class="space-y-1">
-                            <label for="block-ip" class="text-[13px] font-medium text-regular">IP address <span class="text-danger" aria-hidden="true">*</span></label>
-                            <input id="block-ip" type="text" formControlName="ipAddress" [class]="field + ' font-mono'" autocomplete="off" placeholder="203.0.113.7" />
-                            <p *ngIf="showError(blockForm, 'ipAddress')" class="text-[12px] text-danger m-0">Enter a valid IPv4 or IPv6 address.</p>
-                        </div>
-                        <div class="space-y-1">
-                            <span class="block text-[13px] font-medium text-regular">Block for</span>
+                            <span class="block text-sm font-medium text-regular">Block for</span>
                             <boo-select
                                 formControlName="durationMinutes"
                                 label="Choose a duration"
@@ -71,22 +70,10 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
                                 [options]="durationOptions"
                             ></boo-select>
                         </div>
-                        <div class="space-y-1">
-                            <label for="block-reason" class="text-[13px] font-medium text-regular">Reason <span class="text-danger" aria-hidden="true">*</span></label>
-                            <textarea
-                                id="block-reason"
-                                formControlName="reason"
-                                rows="3"
-                                maxlength="300"
-                                class="w-full px-3 py-2 rounded-1.5 border border-borderGray bg-surface text-[13px] text-regular focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                            ></textarea>
-                            <p *ngIf="showError(blockForm, 'reason')" class="text-[12px] text-danger m-0">Say why, so the audit trail makes sense later.</p>
-                        </div>
-                        <button
-                            type="submit"
-                            class="h-9 px-4 rounded-1.5 border border-danger/30 bg-surface text-[13px] font-semibold text-danger hover:bg-danger/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                            [disabled]="blocking()"
-                        >
+                        <boo-form-field label="Reason" for="block-reason" required [error]="showError(blockForm, 'reason') ? 'Say why, so the audit trail makes sense later.' : null">
+                            <boo-textarea [id]="'block-reason'" formControlName="reason" [rows]="3" [maxlength]="300" size="small" />
+                        </boo-form-field>
+                        <button type="submit" boo-button variant="secondary" size="sm" classname="!text-danger" [disabled]="blocking()">
                             {{ blocking() ? 'Blocking…' : 'Block address' }}
                         </button>
                     </form>
@@ -96,16 +83,10 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
                 <section [class]="card" aria-labelledby="unblock-title">
                     <h3 id="unblock-title" class="text-sm font-semibold text-regular m-0 px-4 py-3 border-b border-borderGray/60">Unblock an address</h3>
                     <form [formGroup]="unblockForm" class="p-4 space-y-4" (ngSubmit)="unblock()">
-                        <div class="space-y-1">
-                            <label for="unblock-ip" class="text-[13px] font-medium text-regular">IP address <span class="text-danger" aria-hidden="true">*</span></label>
-                            <input id="unblock-ip" type="text" formControlName="ipAddress" [class]="field + ' font-mono'" autocomplete="off" placeholder="203.0.113.7" />
-                            <p *ngIf="showError(unblockForm, 'ipAddress')" class="text-[12px] text-danger m-0">Enter a valid IPv4 or IPv6 address.</p>
-                        </div>
-                        <button
-                            type="submit"
-                            class="h-9 px-4 rounded-1.5 bg-primary text-white text-[13px] font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                            [disabled]="unblocking()"
-                        >
+                        <boo-form-field label="IP address" for="unblock-ip" required [error]="showError(unblockForm, 'ipAddress') ? 'Enter a valid IPv4 or IPv6 address.' : null">
+                            <boo-input [id]="'unblock-ip'" class="font-mono" formControlName="ipAddress" label="203.0.113.7" size="small" />
+                        </boo-form-field>
+                        <button type="submit" boo-button variant="primary" size="sm" [disabled]="unblocking()">
                             {{ unblocking() ? 'Unblocking…' : 'Unblock address' }}
                         </button>
                     </form>
@@ -124,7 +105,6 @@ export class SuperadminIpAccessComponent {
 
     // #region Inputs, Outputs, Properties
     readonly card = CARD;
-    readonly field = FIELD;
     readonly durationOptions = DURATIONS.map(d => ({ label: d.label, value: d.minutes }));
 
     blocking = signal(false);

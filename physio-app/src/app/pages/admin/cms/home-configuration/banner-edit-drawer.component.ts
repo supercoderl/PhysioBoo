@@ -54,12 +54,12 @@ import { LIMITS, POSITION_PATTERN } from './home-config.utils';
                         <legend class="mb-3 text-sm font-semibold text-regular">Message</legend>
                         <div class="flex flex-col gap-4">
                             <div>
-                                <label for="hb-title" class="block mb-1 text-[13px] font-medium text-regular">Headline <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="hb-title" class="block mb-1 text-sm font-medium text-regular">Headline <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input id="hb-title" name="hb-title" formControlName="title" label="Headline" [maxlength]="max.bannerTitle" />
                             </div>
                             <div>
                                 <div class="flex items-baseline justify-between gap-3 mb-1">
-                                    <label for="hb-subtitle" class="text-[13px] font-medium text-regular">Supporting text</label>
+                                    <label for="hb-subtitle" class="text-sm font-medium text-regular">Supporting text</label>
                                     <span class="text-xs text-secondary tabular-nums">{{ form.controls.subtitle.value.length }} / {{ max.bannerSubtitle }}</span>
                                 </div>
                                 <boo-input id="hb-subtitle" name="hb-subtitle" formControlName="subtitle" label="One line under the headline" [maxlength]="max.bannerSubtitle" />
@@ -87,11 +87,11 @@ import { LIMITS, POSITION_PATTERN } from './home-config.utils';
                         <p class="m-0 mb-3 text-xs text-secondary">Optional. Leave both empty for a banner without a button.</p>
                         <div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
                             <div class="sm:col-span-2">
-                                <label for="hb-btn-text" class="block mb-1 text-[13px] font-medium text-regular">Button text</label>
+                                <label for="hb-btn-text" class="block mb-1 text-sm font-medium text-regular">Button text</label>
                                 <boo-input id="hb-btn-text" name="hb-btn-text" formControlName="buttonText" label="e.g. Book a visit" [maxlength]="max.buttonText" />
                             </div>
                             <div class="sm:col-span-3">
-                                <label for="hb-btn-link" class="block mb-1 text-[13px] font-medium text-regular">Button link</label>
+                                <label for="hb-btn-link" class="block mb-1 text-sm font-medium text-regular">Button link</label>
                                 <boo-input id="hb-btn-link" name="hb-btn-link" formControlName="buttonLink" label="e.g. /booking" [maxlength]="max.url" />
                             </div>
                         </div>
@@ -102,7 +102,7 @@ import { LIMITS, POSITION_PATTERN } from './home-config.utils';
                         <legend class="mb-3 text-sm font-semibold text-regular">Display</legend>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
                             <div>
-                                <label for="hb-order" class="block mb-1 text-[13px] font-medium text-regular">Position <span class="text-danger" aria-hidden="true">*</span></label>
+                                <label for="hb-order" class="block mb-1 text-sm font-medium text-regular">Position <span class="text-danger" aria-hidden="true">*</span></label>
                                 <boo-input id="hb-order" name="hb-order" type="number" formControlName="order" label="Position" />
                                 <p class="m-0 mt-1 text-xs text-secondary">Whole number, 1 or more. Lower numbers come first.</p>
                             </div>

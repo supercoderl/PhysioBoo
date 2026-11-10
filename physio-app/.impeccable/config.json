@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "projects/physioboo-ui/src/lib/tabs/tabs.component.ts"
+        ],
+        "createdAt": "2026-11-10T15:47:54.350Z",
+        "reason": "assistant: the 2px accent is the bottom edge of a tab whose top corners are rounded only to shape the hover fill and focus ring; the accent edge itself is square, and the styling is carried over unchanged from the original list-page tab strips"
+      }
+    ]
+  }
+}

@@ -23,7 +23,7 @@
       <div class="mt-3 text-center">
         <a
           routerLink="/admin/system/scrumboard/list"
-          class="text-primary text-[13px] font-medium"
+          class="text-primary text-sm font-medium"
           >Back to boards</a
         >
       </div>
@@ -40,18 +40,13 @@
               >
                 {{ b.title }}
               </h1>
-              <button
-                type="button"
-                (click)="startEditBoard()"
-                aria-label="Edit board"
-                class="rounded p-1.5 text-gray-500 hover:bg-gray-100"
-              >
+              <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" (click)="startEditBoard()" aria-label="Edit board">
                 <physio-icon name="pencil" [size]="16"></physio-icon>
               </button>
             </div>
             <p
               *ngIf="b.description"
-              class="m-0 text-[13px] leading-[1.5] text-[#71606A]"
+              class="m-0 text-sm leading-[1.5] text-[#71606A]"
             >
               {{ b.description }}
             </p>
@@ -126,8 +121,10 @@
             <ng-template #listTitle>
               <button
                 type="button"
+                boo-button
+                variant="text"
                 (click)="startRename(list)"
-                class="min-w-0 flex-auto truncate bg-transparent p-0 text-left text-[14px] font-semibold"
+                classname="min-w-0 flex-auto truncate text-[14px] font-semibold !text-regular !no-underline"
                 [attr.aria-label]="'Rename list ' + list.title"
               >
                 {{ list.title }}
@@ -136,18 +133,7 @@
                 }}</span>
               </button>
             </ng-template>
-            <button
-              type="button"
-              (click)="deleteList(list)"
-              [disabled]="list.cards.length > 0"
-              [attr.aria-label]="'Delete list ' + list.title"
-              [title]="
-                list.cards.length
-                  ? 'Move or delete the cards first'
-                  : 'Delete list'
-              "
-              class="shrink-0 rounded p-1.5 text-gray-500 hover:bg-gray-200 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
-            >
+            <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8 !text-danger" (click)="deleteList(list)" [disabled]="list.cards.length> 0" [attr.aria-label]="'Delete list ' + list.title" [title]=" list.cards.length ? 'Move or delete the cards first' : 'Delete list' ">
               <physio-icon name="trash" [size]="14"></physio-icon>
             </button>
           </header>
@@ -170,12 +156,12 @@
               (keydown.enter)="openCard(card)"
               class="cursor-grab rounded-lg border border-[#EFE3E7] bg-surface px-3 py-2 shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              <p class="m-0 break-words text-[13px] leading-[1.5]">
+              <p class="m-0 break-words text-sm leading-[1.5]">
                 {{ card.title }}
               </p>
               <div
                 *ngIf="card.dueDate || card.description"
-                class="mt-1 flex items-center gap-2 text-[11px] text-[#71606A]"
+                class="mt-1 flex items-center gap-2 text-xs text-[#71606A]"
               >
                 <span
                   *ngIf="card.dueDate"
@@ -207,7 +193,7 @@
                 placeholder="Card title"
                 aria-label="New card title"
                 autofocus
-                class="w-full rounded-lg border border-[#EFE3E7] px-3 py-2 text-[13px] outline-none focus:border-primary"
+                class="w-full rounded-lg border border-[#EFE3E7] px-3 py-2 text-sm outline-none focus:border-primary"
               ></textarea>
               <div class="flex gap-2">
                 <boo-button-admin (click)="addCard(list)" [disabled]="!newCardTitle.trim()" textColor="white" [fontSize]="12" [radius]="8" fontWeight="500">
@@ -238,7 +224,7 @@
             maxlength="120"
             placeholder="Add a list"
             aria-label="New list title"
-            class="w-full rounded-lg border border-[#EFE3E7] bg-surface px-3 min-h-10 text-[13px] outline-none focus:border-primary"
+            class="w-full rounded-lg border border-[#EFE3E7] bg-surface px-3 min-h-10 text-sm outline-none focus:border-primary"
           />
           <boo-button-admin *ngIf="newListTitle.trim()" (click)="addList()" textColor="white" [fontSize]="12" [radius]="8" fontWeight="500" class="mt-2">
             Add list

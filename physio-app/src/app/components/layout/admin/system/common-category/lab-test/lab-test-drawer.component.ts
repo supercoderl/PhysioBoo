@@ -1,6 +1,6 @@
 import { Component, OnChanges, SimpleChanges, inject } from "@angular/core";
 import { FormBuilder, Validators } from "@angular/forms";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
+import { BooCheckboxComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { LabTestCategoryService } from "../../../../../../services/admin/lab-test-category.service";
 import { LabTestService } from "../../../../../../services/admin/lab-test.service";
 import { SharedModule } from "../../../../../../shared/shared-imports";
@@ -20,8 +20,7 @@ import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-sh
         BooInputComponent,
         BooTextareaComponent,
         BooCheckboxComponent,
-        BooSelectComponent
-    ],
+        BooSelectComponent, BooFieldErrorComponent],
     template: `
         <common-category-drawer-shell
             [form]="form"
@@ -48,7 +47,7 @@ import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-sh
                         <boo-input label="Methodology" formControlName="methodology" [maxlength]="150" placeholder="e.g. Spectrophotometry" />
                         <boo-input label="Unit of measurement" formControlName="unitOfMeasurement" [maxlength]="50" placeholder="e.g. mg/dL" />
                     </div>
-                    <p *ngIf="form.controls['categoryId'].touched && form.controls['categoryId'].invalid" class="m-0 mt-1 text-xs text-danger" role="alert">Choose a category.</p>
+                    <boo-field-error size="sm" announce class="mt-1" *ngIf="form.controls['categoryId'].touched && form.controls['categoryId'].invalid">Choose a category.</boo-field-error>
                     <div class="mt-4">
                         <boo-textarea label="Description" formControlName="description" />
                     </div>

@@ -2,7 +2,7 @@ import { NgIf } from '@angular/common';
 import { Component, DestroyRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { BooButtonComponent, BooIconComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooIconComponent, BooAlertComponent } from '@physioboo/ui';
 import { finalize } from 'rxjs/operators';
 import { DrawerComponent } from '../../../../components/drawer/drawer.component';
 import { BooSelectComponent } from '../../../../components/select/boo-select/boo-select.component';
@@ -18,7 +18,7 @@ import { STATUS, STATUS_OPTIONS, TIER_OPTIONS, memberName, serverMessage } from 
 @Component({
     selector: 'crm-member-edit-drawer',
     standalone: true,
-    imports: [NgIf, ReactiveFormsModule, DrawerComponent, BooButtonComponent, BooIconComponent, BooSelectComponent],
+    imports: [NgIf, ReactiveFormsModule, DrawerComponent, BooButtonComponent, BooIconComponent, BooSelectComponent, BooAlertComponent],
     template: `
         <drawer [isOpen]="!!member" [isShowDialog]="form.dirty && !submitting" (close)="discard()">
             <form
@@ -45,11 +45,11 @@ import { STATUS, STATUS_OPTIONS, TIER_OPTIONS, memberName, serverMessage } from 
                 <div class="flex-1 min-h-0 overflow-y-auto px-6 py-5 flex flex-col gap-5">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label for="me-tier" class="block mb-1 text-[13px] font-medium text-regular">Tier <span class="text-danger" aria-hidden="true">*</span></label>
+                            <label for="me-tier" class="block mb-1 text-sm font-medium text-regular">Tier <span class="text-danger" aria-hidden="true">*</span></label>
                             <boo-select id="me-tier" formControlName="tier" label="Tier" required [options]="tierOptions" />
                         </div>
                         <div>
-                            <label for="me-status" class="block mb-1 text-[13px] font-medium text-regular">Status <span class="text-danger" aria-hidden="true">*</span></label>
+                            <label for="me-status" class="block mb-1 text-sm font-medium text-regular">Status <span class="text-danger" aria-hidden="true">*</span></label>
                             <boo-select id="me-status" formControlName="status" label="Status" required [options]="statusOptions" />
                         </div>
                     </div>
@@ -58,10 +58,7 @@ import { STATUS, STATUS_OPTIONS, TIER_OPTIONS, memberName, serverMessage } from 
                         <physio-icon name="info" [size]="14" class="flex-none mt-px" aria-hidden="true" />{{ statusNote }}
                     </p>
 
-                    <p *ngIf="submitError" class="m-0 flex items-start gap-2 rounded-lg border border-dangerBorder bg-dangerSoft px-3 py-2.5 text-sm text-danger" role="alert">
-                        <physio-icon name="circle-alert" [size]="16" class="flex-none mt-0.5" aria-hidden="true" />
-                        <span>{{ submitError }}</span>
-                    </p>
+                    <boo-alert *ngIf="submitError" tone="error" role="alert">{{ submitError }}</boo-alert>
                 </div>
 
                 <footer class="flex-none px-6 py-4 border-t border-rowDivider flex items-center justify-end gap-2">

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { InsuranceProviderNode, SavedSearch, SmartFolder } from "../../../../shared/types/insurance-claims.types";
+import { BooButtonComponent } from '@physioboo/ui';
 
 interface SmartFolderDef {
   key: SmartFolder;
@@ -11,15 +12,15 @@ interface SmartFolderDef {
 @Component({
   selector: 'insurance-providers-tree',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BooButtonComponent],
   template: `
     <aside
       class="shrink-0 h-full bg-[var(--ic-ivory)] border-r border-[var(--ic-warm-gray-200)] flex flex-col transition-all duration-150"
       [ngClass]="collapsed ? 'w-11' : 'w-[240px]'"
     >
       <div class="flex items-center justify-between px-2 py-2 border-b border-[var(--ic-warm-gray-200)]">
-        <span *ngIf="!collapsed" class="text-[11px] font-bold tracking-wide uppercase text-[var(--ic-warm-gray-600)]">Workspace</span>
-        <button type="button" class="p-1 rounded hover:bg-[var(--ic-warm-gray-200)] ml-auto" (click)="collapsedChange.emit(!collapsed)" aria-label="Toggle panel">
+        <span *ngIf="!collapsed" class="text-xs font-bold tracking-wide uppercase text-[var(--ic-warm-gray-600)]">Workspace</span>
+        <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" (click)="collapsedChange.emit(!collapsed)" aria-label="Toggle panel">
           <physio-icon [name]="collapsed ? 'panel-left-open' : 'panel-left-close'" [size]="16" class="text-[var(--ic-warm-gray-600)]"></physio-icon>
         </button>
       </div>

@@ -4,8 +4,7 @@ import { Component, DestroyRef, OnInit, inject, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import {
-  BooBadgeTone, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooIconComponent, BooStatusBadgeComponent
-} from '@physioboo/ui';
+  BooBadgeTone, BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooIconComponent, BooStatusBadgeComponent, BooTab, BooTabsComponent, BooAlertComponent } from '@physioboo/ui';
 import { NursingService } from "../../../../services/admin/nursing.service";
 import { TreatmentSheetService } from "../../../../services/admin/treatment-sheet.service";
 import { AuthService } from "../../../../services/auth/auth.service";
@@ -31,8 +30,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     NgIf, NgFor, NgClass, NgSwitch, NgSwitchCase, DatePipe, RouterLink,
     BooButtonComponent, BooIconComponent, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent,
     NursingOverviewTabComponent, NursingVitalsTabComponent, NursingMarTabComponent,
-    NursingIoTabComponent, NursingTasksTabComponent, NursingNotesTabComponent,
-  ],
+    NursingIoTabComponent, NursingTasksTabComponent, NursingNotesTabComponent, BooTabsComponent, BooAlertComponent],
   template: `
     <div class="flex flex-1 min-h-0 flex-col gap-4 pb-5" [attr.aria-busy]="isLoading()">
       <!-- First load -->
@@ -108,23 +106,12 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
           </div>
 
           <!-- Allergies are shown in full whenever the treatment sheet makes them available -->
-          <div *ngIf="p.risk.hasAllergies" role="note" class="px-4 py-2 border-t border-dangerBorder bg-dangerSoft text-sm text-danger flex items-start gap-2">
-            <physio-icon name="triangle-alert" [size]="16" class="flex-none mt-0.5" aria-hidden="true" />
+          <boo-alert *ngIf="p.risk.hasAllergies" tone="error" role="note" icon="triangle-alert" class="!rounded-none !border-x-0 !border-b-0 !px-4 !py-2">
             <span *ngIf="summary()?.allergies?.length; else allergyFlagOnly"><strong>Allergies:</strong> {{ summary()!.allergies.join(', ') }}</span>
             <ng-template #allergyFlagOnly><span><strong>Allergy recorded.</strong> Check the allergy details before giving any medication.</span></ng-template>
-          </div>
+          </boo-alert>
 
-          <nav class="px-2 border-t border-borderGray flex items-center gap-1 overflow-x-auto" role="tablist" aria-label="Patient chart sections" (keydown)="onTabKeydown($event)">
-            <button *ngFor="let t of tabs" type="button" role="tab"
-              [id]="'nursing-tab-' + t.key" [attr.aria-controls]="'nursing-panel-' + t.key"
-              [attr.aria-selected]="activeTab() === t.key" [attr.tabindex]="activeTab() === t.key ? 0 : -1"
-              (click)="setTab(t.key)"
-              class="px-3.5 py-2.5 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 -mb-px whitespace-nowrap bg-transparent cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-t"
-              [ngClass]="activeTab() === t.key ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
-              <physio-icon [name]="t.icon" [size]="16" aria-hidden="true" />
-              {{ t.label }}
-            </button>
-          </nav>
+          <boo-tabs [tabs]="tabItems" [value]="activeTab()" (valueChange)="setTab($event)" label="Patient chart sections" idPrefix="nursing-tab" panelPrefix="nursing-panel" [bordered]="false" listClass="px-2 gap-1" class="border-t border-borderGray" />
         </header>
 
         <!-- Tabs keep their state (drafts, page) once opened, so switching never loses unsaved input -->
@@ -175,6 +162,7 @@ export class AdminNursingPatientComponent implements OnInit {
     { key: 'tasks', label: 'Tasks', icon: 'clipboard' },
     { key: 'notes', label: 'Notes', icon: 'file-text' },
   ];
+  readonly tabItems: BooTab<TabKey>[] = this.tabs.map(t => ({ value: t.key, label: t.label, icon: t.icon }));
   // #endregion
 
   ngOnInit(): void {
@@ -247,21 +235,6 @@ export class AdminNursingPatientComponent implements OnInit {
     if (!this.visited().has(key)) this.visited.set(new Set(this.visited()).add(key));
   }
 
-  onTabKeydown(event: KeyboardEvent): void {
-    const keys = this.tabs.map(t => t.key);
-    const current = keys.indexOf(this.activeTab());
-    let next = current;
-    switch (event.key) {
-      case 'ArrowRight': next = (current + 1) % keys.length; break;
-      case 'ArrowLeft': next = (current - 1 + keys.length) % keys.length; break;
-      case 'Home': next = 0; break;
-      case 'End': next = keys.length - 1; break;
-      default: return;
-    }
-    event.preventDefault();
-    this.setTab(keys[next]);
-    document.getElementById('nursing-tab-' + keys[next])?.focus();
-  }
   // #endregion
 
   // #region Helpers

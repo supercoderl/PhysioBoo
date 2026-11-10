@@ -27,7 +27,7 @@ import { canOpenNavLink, childRoutePermissions } from "../../../../shared/utils/
                 <ul class="m-0 p-0 list-none flex md:flex-col gap-1 px-1 md:px-3 pb-2 overflow-x-auto md:overflow-visible boo-scrollbar">
                     <li *ngFor="let setting of settings" class="shrink-0">
                         <a
-                            class="group flex items-center gap-2.5 p-2 rounded-md min-h-9 text-[13px] font-medium leading-none text-regular no-underline hover:bg-black/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors"
+                            class="group flex items-center gap-2.5 p-2 rounded-md min-h-9 text-sm font-medium leading-none text-regular no-underline hover:bg-black/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors"
                             [routerLink]="setting.route"
                             routerLinkActive="!bg-black/[0.06]"
                             ariaCurrentWhenActive="page"
@@ -35,8 +35,8 @@ import { canOpenNavLink, childRoutePermissions } from "../../../../shared/utils/
                         >
                             <physio-icon [name]="setting.icon" [size]="16" class="shrink-0" [class.text-primary]="rla.isActive" />
                             <span class="flex min-w-0 flex-auto flex-col items-start gap-1">
-                                <span class="leading-none truncate max-w-full text-[13px]" [class.font-semibold]="rla.isActive">{{ setting.name }}</span>
-                                <span class="hidden md:block leading-none text-[11px] truncate max-w-full text-secondary font-normal">{{ setting.description }}</span>
+                                <span class="leading-none truncate max-w-full text-sm" [class.font-semibold]="rla.isActive">{{ setting.name }}</span>
+                                <span class="hidden md:block leading-none text-xs truncate max-w-full text-secondary font-normal">{{ setting.description }}</span>
                             </span>
                         </a>
                     </li>

@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { catchError, forkJoin, map, of, throwError } from "rxjs";
 import { CommonCategoryHospitalGroupDrawerComponent } from "../../../../components/layout/admin/system/common-category/hospital-group/hospital-group-drawer.component";
 import { SuperadminTab, SuperadminTabsComponent } from "../../../../components/layout/superadmin/shared/superadmin-tabs.component";
-import { BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent, BooButtonComponent } from '@physioboo/ui';
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { BillingService } from "../../../../services/admin/billing.service";
 import { HospitalGroupService } from "../../../../services/admin/hospital-group.service";
@@ -25,7 +25,6 @@ interface DetailRow {
     href?: string;
 }
 
-const OUTLINE_BUTTON = 'inline-flex items-center gap-1.5 h-9 px-3.5 rounded-1.5 border border-borderGray bg-surface text-[13px] font-medium text-regular hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors cursor-pointer';
 const CARD = 'bg-surface rounded-2 border border-borderGray/60';
 
 @Component({
@@ -38,8 +37,7 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
         BooStatusBadgeComponent,
         BooEmptyStateComponent,
         BooErrorStateComponent,
-        CommonCategoryHospitalGroupDrawerComponent
-    ],
+        CommonCategoryHospitalGroupDrawerComponent, BooButtonComponent],
     host: { class: 'block h-full min-h-0' },
     template: `
         <div class="h-full overflow-y-auto space-y-5" custom-scrollbar [alwaysVisible]="true">
@@ -102,7 +100,7 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
                             <div class="min-w-0">
                                 <h2 class="text-xl font-bold text-regular leading-tight m-0 truncate">{{ g.name }}</h2>
                                 <div class="mt-1.5 flex items-center gap-2 flex-wrap">
-                                    <span *ngIf="g.code" class="text-[11px] font-mono bg-gray-100 text-secondary px-1.5 py-0.5 rounded">{{ g.code }}</span>
+                                    <span *ngIf="g.code" class="text-xs font-mono bg-gray-100 text-secondary px-1.5 py-0.5 rounded">{{ g.code }}</span>
                                     <boo-status-badge
                                         [label]="g.isActive ? 'Active' : 'Inactive'"
                                         [tone]="g.isActive ? 'success' : 'neutral'"
@@ -117,7 +115,7 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
                             </div>
                         </div>
                         <div class="flex items-center gap-2 flex-wrap">
-                            <button type="button" [class]="outlineButton" (click)="openDrawer()">
+                            <button type="button" boo-button variant="secondary" size="sm" (click)="openDrawer()">
                                 <physio-icon name="pencil" [size]="14" />
                                 Edit
                             </button>
@@ -152,7 +150,7 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
                     >
                         <section [class]="card" aria-labelledby="org-title">
                             <h3 id="org-title" class="text-sm font-semibold text-regular m-0 px-4 py-3 border-b border-borderGray/60">Organization</h3>
-                            <dl class="grid grid-cols-[110px_minmax(0,1fr)] gap-x-4 gap-y-3 text-[13px] m-0 p-4">
+                            <dl class="grid grid-cols-[110px_minmax(0,1fr)] gap-x-4 gap-y-3 text-sm m-0 p-4">
                                 <ng-container *ngFor="let row of organizationRows()">
                                     <dt class="text-secondary">{{ row.label }}</dt>
                                     <dd class="text-regular m-0 break-words">{{ row.value }}</dd>
@@ -162,7 +160,7 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
 
                         <section [class]="card" aria-labelledby="contact-title">
                             <h3 id="contact-title" class="text-sm font-semibold text-regular m-0 px-4 py-3 border-b border-borderGray/60">Contact &amp; location</h3>
-                            <dl class="grid grid-cols-[110px_minmax(0,1fr)] gap-x-4 gap-y-3 text-[13px] m-0 p-4">
+                            <dl class="grid grid-cols-[110px_minmax(0,1fr)] gap-x-4 gap-y-3 text-sm m-0 p-4">
                                 <ng-container *ngFor="let row of contactRows()">
                                     <dt class="text-secondary">{{ row.label }}</dt>
                                     <dd class="text-regular m-0 break-words">
@@ -202,7 +200,7 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
                             </p>
 
                             <div *ngIf="!hospitalsFailed() && hospitals().length" class="overflow-x-auto max-h-[50svh]" custom-scrollbar>
-                                <table class="w-full text-[13px] text-left">
+                                <table class="w-full text-sm text-left">
                                     <caption class="sr-only">Hospitals of {{ g.name }}</caption>
                                     <thead class="sticky top-0 z-[1] bg-surface">
                                         <tr class="border-b border-borderGray/60 text-secondary">
@@ -271,7 +269,7 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
                                         <h3 id="sub-title" class="text-sm font-semibold text-regular m-0">Subscription</h3>
                                         <a routerLink="/superadmin/billing" [queryParams]="{ tenant: tenantId }" class="text-xs font-semibold text-primary hover:underline">Manage in billing</a>
                                     </div>
-                                    <dl class="grid grid-cols-[130px_minmax(0,1fr)] gap-x-4 gap-y-3 text-[13px] m-0 p-4">
+                                    <dl class="grid grid-cols-[130px_minmax(0,1fr)] gap-x-4 gap-y-3 text-sm m-0 p-4">
                                         <dt class="text-secondary">Plan</dt>
                                         <dd class="text-regular m-0">{{ s.planName ?? '—' }}</dd>
                                         <dt class="text-secondary">Status</dt>
@@ -290,7 +288,7 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
                                 <section [class]="card" aria-labelledby="limits-title" *ngIf="branchUsage() as usage">
                                     <h3 id="limits-title" class="text-sm font-semibold text-regular m-0 px-4 py-3 border-b border-borderGray/60">Plan limits</h3>
                                     <div class="p-4">
-                                        <div class="flex items-baseline justify-between text-[13px]">
+                                        <div class="flex items-baseline justify-between text-sm">
                                             <span class="text-regular">Branches</span>
                                             <span class="text-regular tabular-nums">{{ usage.used }} / {{ usage.max ?? '∞' }}</span>
                                         </div>
@@ -317,9 +315,9 @@ const CARD = 'bg-surface rounded-2 border border-borderGray/60';
 
                             <section [class]="card" aria-labelledby="invoices-title">
                                 <h3 id="invoices-title" class="text-sm font-semibold text-regular m-0 px-4 py-3 border-b border-borderGray/60">Recent invoices</h3>
-                                <p *ngIf="!s.invoices.length" class="text-[13px] text-secondary m-0 p-4">No invoices yet.</p>
+                                <p *ngIf="!s.invoices.length" class="text-sm text-secondary m-0 p-4">No invoices yet.</p>
                                 <div *ngIf="s.invoices.length" class="overflow-x-auto">
-                                    <table class="w-full text-[13px] text-left">
+                                    <table class="w-full text-sm text-left">
                                         <caption class="sr-only">Recent invoices</caption>
                                         <thead>
                                             <tr class="border-b border-borderGray/60 text-secondary">
@@ -370,7 +368,6 @@ export class SuperadminTenantDetailComponent implements OnInit {
 
     // #region Inputs, Outputs, Properties
     readonly card = CARD;
-    readonly outlineButton = OUTLINE_BUTTON;
     readonly statusTone = billingStatusTone;
     readonly statusLabel = billingStatusLabel;
     readonly money = formatMoney;

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, signal } from "@angular/core";
-import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent, BooButtonComponent, BooInputComponent, BooTab, BooTabsComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../shared/shared-imports";
 import {
   ClaimActionMode,
@@ -20,7 +20,7 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BooBadgeTone> = {
 @Component({
   selector: 'insurance-claim-detail-panel',
   standalone: true,
-  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonAdminComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonAdminComponent, BooButtonComponent, BooInputComponent, BooTabsComponent],
   template: `
     <section class="h-full flex flex-col bg-[var(--ic-ivory)] border-l border-[var(--ic-warm-gray-200)] min-w-0">
       <!-- Idle -->
@@ -36,30 +36,23 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BooBadgeTone> = {
               <p class="text-sm font-bold text-[var(--ic-graphite)] truncate">{{ c.claimNumber }}</p>
               <p class="text-xs text-[var(--ic-warm-gray-600)] truncate">{{ c.patientName }} · {{ c.providerName }}</p>
             </div>
-            <button type="button" class="p-1 rounded hover:bg-[var(--ic-warm-gray-200)] shrink-0" (click)="closeRequested.emit()" aria-label="Close detail panel">
+            <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" (click)="closeRequested.emit()" aria-label="Close detail panel">
               <physio-icon name="panel-right-close" [size]="16" class="text-[var(--ic-warm-gray-600)]"></physio-icon>
             </button>
           </div>
 
           <div class="flex flex-wrap items-center gap-1.5 mt-2">
             <boo-button-admin [disabled]="!canSubmit" (click)="actionRequested.emit('submit')" background="var(--ic-forest)" textColor="var(--ic-ivory)" padding="4px 10px" [fontSize]="11" fontWeight="600">Submit</boo-button-admin>
-            <button type="button" class="px-2.5 py-1 rounded-1.5 text-[11px] font-semibold bg-[var(--ic-emerald)]/10 text-[var(--ic-emerald)] hover:bg-[var(--ic-emerald)]/20 disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="!canApprove" (click)="actionRequested.emit('approve')">Approve</button>
-            <button type="button" class="px-2.5 py-1 rounded-1.5 text-[11px] font-semibold bg-[var(--ic-rose)]/10 text-[var(--ic-rose)] hover:bg-[var(--ic-rose)]/20 disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="!canReject" (click)="actionRequested.emit('reject')">Reject</button>
-            <button type="button" class="px-2.5 py-1 rounded-1.5 text-[11px] font-semibold bg-[var(--ic-amber)]/10 text-[var(--ic-amber)] hover:bg-[var(--ic-amber)]/20 disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="!canAppeal" (click)="actionRequested.emit('appeal')">Appeal</button>
+            <button type="button" boo-button variant="soft" size="sm" [disabled]="!canApprove" (click)="actionRequested.emit('approve')">Approve</button>
+            <button type="button" boo-button variant="ghost" size="sm" classname="!text-danger" [disabled]="!canReject" (click)="actionRequested.emit('reject')">Reject</button>
+            <button type="button" boo-button variant="subtle" size="sm" [disabled]="!canAppeal" (click)="actionRequested.emit('appeal')">Appeal</button>
             <boo-button-admin [disabled]="!canSettle" (click)="actionRequested.emit('settle')" background="var(--ic-warm-gray-200)" textColor="var(--ic-warm-gray-700)" padding="4px 10px" [fontSize]="11" fontWeight="600">Settlement</boo-button-admin>
             <boo-button-admin (click)="print()" background="transparent" textColor="var(--ic-warm-gray-600)" padding="4px 10px" [fontSize]="11" fontWeight="600">Print</boo-button-admin>
           </div>
         </header>
 
         <!-- Tabs -->
-        <nav class="flex items-center gap-0.5 px-2 border-b border-[var(--ic-warm-gray-200)] overflow-x-auto" role="tablist">
-          <button *ngFor="let t of tabs" type="button" role="tab" [attr.aria-selected]="activeTab() === t.key"
-            class="px-2.5 py-2 text-[11px] font-semibold whitespace-nowrap border-b-2 -mb-px transition-colors"
-            [ngClass]="activeTab() === t.key ? 'border-[var(--ic-forest)] text-[var(--ic-forest)]' : 'border-transparent text-[var(--ic-warm-gray-500)] hover:text-[var(--ic-graphite)]'"
-            (click)="activeTab.set(t.key)">
-            {{ t.label }}
-          </button>
-        </nav>
+        <boo-tabs [tabs]="tabItems" [value]="activeTab()" (valueChange)="activeTab.set($event)" label="Claim sections" idPrefix="claim-tab" panelPrefix="" listClass="px-2" />
 
         <div class="flex-1 overflow-y-auto p-4 text-xs">
           <!-- Overview -->
@@ -72,7 +65,7 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BooBadgeTone> = {
             </div>
             <div>
               <p class="text-[10px] font-bold uppercase tracking-wide text-[var(--ic-warm-gray-500)] mb-1">Coverage</p>
-              <div class="flex justify-between text-[11px] mb-1">
+              <div class="flex justify-between text-xs mb-1">
                 <span class="text-[var(--ic-warm-gray-600)]">Used {{ formatAmount(c.coverage.usedAmount) }}</span>
                 <span class="text-[var(--ic-warm-gray-600)]">Available {{ formatAmount(c.coverage.availableAmount) }}</span>
               </div>
@@ -100,8 +93,8 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BooBadgeTone> = {
               (dragover)="onDragOver($event)" (dragleave)="dragOver = false" (drop)="onDrop($event)"
             >
               <physio-icon name="upload-cloud" [size]="20" [class]="'text-[var(--ic-warm-gray-400)] mx-auto mb-1'"></physio-icon>
-              <p class="text-[11px] text-[var(--ic-warm-gray-600)]">Drag and drop files, or</p>
-              <button type="button" class="text-[11px] font-semibold text-[var(--ic-forest)] hover:underline" (click)="actionRequested.emit('upload')">browse to upload</button>
+              <p class="text-xs text-[var(--ic-warm-gray-600)]">Drag and drop files, or</p>
+              <button type="button" boo-button variant="text" classname="text-xs font-semibold !text-[var(--ic-forest)]" (click)="actionRequested.emit('upload')">browse to upload</button>
             </div>
 
             <div *ngFor="let d of c.documents" class="flex items-center gap-2 p-2 rounded-1.5 border border-[var(--ic-warm-gray-200)]" [class.opacity-70]="selectedDoc === d">
@@ -113,10 +106,10 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BooBadgeTone> = {
             </div>
 
             <div *ngIf="selectedDoc as d" class="border border-[var(--ic-warm-gray-200)] rounded-1.5 p-3 bg-[var(--ic-warm-gray-50)]">
-              <p class="text-[11px] font-semibold mb-2">{{ d.name }} — preview</p>
+              <p class="text-xs font-semibold mb-2">{{ d.name }} — preview</p>
               <div class="h-40 flex items-center justify-center bg-[var(--ic-ivory)] border border-dashed border-[var(--ic-warm-gray-300)] rounded-1.5">
                 <ng-container *ngIf="d.status === 'Missing'; else previewAvailable">
-                  <span class="text-[11px] text-[var(--ic-amber)]">Not yet uploaded</span>
+                  <span class="text-xs text-[var(--ic-amber)]">Not yet uploaded</span>
                 </ng-container>
                 <ng-template #previewAvailable>
                   <div class="flex flex-col items-center gap-1 text-[var(--ic-warm-gray-500)]">
@@ -161,7 +154,7 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BooBadgeTone> = {
               <span class="absolute -left-4 top-0.5 w-2.5 h-2.5 rounded-full bg-[var(--ic-forest)] ring-2 ring-[var(--ic-ivory)]"></span>
               <p class="font-semibold text-[var(--ic-graphite)]">{{ ev.type }}</p>
               <p class="text-[10px] text-[var(--ic-warm-gray-500)]">{{ ev.actor }} · {{ ev.occurredAt | date:'dd/MM/yyyy HH:mm' }}</p>
-              <p *ngIf="ev.note" class="text-[11px] text-[var(--ic-warm-gray-600)] mt-0.5">{{ ev.note }}</p>
+              <p *ngIf="ev.note" class="text-xs text-[var(--ic-warm-gray-600)] mt-0.5">{{ ev.note }}</p>
             </div>
           </div>
 
@@ -172,7 +165,7 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BooBadgeTone> = {
               <p class="text-[var(--ic-graphite)]">{{ m.message }}</p>
             </div>
             <div class="flex gap-2 pt-1">
-              <input type="text" [(ngModel)]="draftMessage" placeholder="Message the provider…" class="flex-1 px-2 py-1.5 text-[11px] border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]" />
+              <boo-input class="flex-1 min-w-0" label="Message the provider…" ariaLabel="Message the provider" size="small" [(ngModel)]="draftMessage" />
               <boo-button-admin [disabled]="!draftMessage.trim()" (click)="sendMessage()" background="var(--ic-forest)" textColor="var(--ic-ivory)" padding="4px 10px" [fontSize]="11" fontWeight="600">Send</boo-button-admin>
             </div>
           </div>
@@ -184,7 +177,7 @@ const DOC_STATUS_TONE: Record<DocumentStatus, BooBadgeTone> = {
               <p class="text-[var(--ic-graphite)]">{{ n.message }}</p>
             </div>
             <div class="flex gap-2 pt-1">
-              <input type="text" [(ngModel)]="draftNote" placeholder="Add an internal note…" class="flex-1 px-2 py-1.5 text-[11px] border border-[var(--ic-warm-gray-300)] rounded-1.5 bg-[var(--ic-ivory)] focus:outline-none focus:ring-1 focus:ring-[var(--ic-forest)]" />
+              <boo-input class="flex-1 min-w-0" label="Add an internal note…" ariaLabel="Internal note" size="small" [(ngModel)]="draftNote" />
               <boo-button-admin [disabled]="!draftNote.trim()" (click)="addNote()" background="var(--ic-forest)" textColor="var(--ic-ivory)" padding="4px 10px" [fontSize]="11" fontWeight="600">Add</boo-button-admin>
             </div>
           </div>
@@ -228,6 +221,7 @@ export class InsuranceClaimDetailPanelComponent implements OnChanges {
     { key: 'notes', label: 'Notes' },
     { key: 'audit', label: 'Audit Logs' },
   ];
+  readonly tabItems: BooTab<InspectorTab>[] = this.tabs.map(t => ({ value: t.key, label: t.label }));
 
   ngOnChanges(): void {
     this.selectedDoc = null;

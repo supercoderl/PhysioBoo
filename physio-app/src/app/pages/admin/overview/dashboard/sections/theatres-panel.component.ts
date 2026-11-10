@@ -24,7 +24,7 @@ const STATUS: Record<OperationTheatreStatus, { label: string; tone: BooBadgeTone
                 <li *ngFor="let op of operations" class="py-2.5 min-w-0">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
-                            <p class="m-0 text-[13px] leading-5 font-medium text-regular truncate" [title]="op.procedure">{{ op.procedure }}</p>
+                            <p class="m-0 text-sm leading-5 font-medium text-regular truncate" [title]="op.procedure">{{ op.procedure }}</p>
                             <p class="m-0 text-xs leading-4 text-secondary truncate">
                                 <span class="font-semibold text-regular">{{ op.room }}</span> · {{ op.surgeon }}
                             </p>
@@ -40,7 +40,7 @@ const STATUS: Record<OperationTheatreStatus, { label: string; tone: BooBadgeTone
                         >
                             <div class="h-full rounded-full bg-primary" [style.width.%]="clampPct(op.progressPct)"></div>
                         </div>
-                        <p class="m-0 text-[11px] leading-4 text-placeholder tabular-nums whitespace-nowrap" [class.ml-auto]="op.status === 'scheduled'">
+                        <p class="m-0 text-xs leading-4 text-placeholder tabular-nums whitespace-nowrap" [class.ml-auto]="op.status === 'scheduled'">
                             {{ op.status === 'scheduled' ? 'Starts ' + op.startedAt : 'Started ' + op.startedAt + ' · ~' + op.etaMinutes + ' min left (est.)' }}
                         </p>
                     </div>

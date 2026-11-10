@@ -9,7 +9,7 @@ import { ToastService } from "../../../../services/common/toast.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { DrawerComponent } from "../../../drawer/drawer.component";
 import { BooButtonAdminComponent } from "../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
+import { BooCheckboxComponent, BooInputComponent, BooButtonComponent } from '@physioboo/ui';
 import { BooSelectComponent } from "../../../select/boo-select/boo-select.component";
 import { BooTextareaComponent } from "../../../textarea/boo-textarea/boo-textarea.component";
 
@@ -23,7 +23,7 @@ type Priority = 'Routine' | 'Urgent' | 'Stat';
 @Component({
     selector: 'clinical-action-drawer',
     standalone: true,
-    imports: [SharedModule, DrawerComponent, BooButtonAdminComponent, BooInputComponent, BooSelectComponent, BooTextareaComponent, BooCheckboxComponent],
+    imports: [SharedModule, DrawerComponent, BooButtonAdminComponent, BooInputComponent, BooSelectComponent, BooTextareaComponent, BooCheckboxComponent, BooButtonComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="close.emit()">
             <div class="flex flex-col h-full bg-surface">
@@ -32,7 +32,7 @@ type Priority = 'Routine' | 'Urgent' | 'Stat';
                         <h2 class="text-xl font-bold text-primary leading-none mb-1">{{ title() }}</h2>
                         <p class="text-sm text-secondary m-0">{{ patientName }}</p>
                     </div>
-                    <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100" aria-label="Close">
+                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="close.emit()" aria-label="Close">
                         <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>

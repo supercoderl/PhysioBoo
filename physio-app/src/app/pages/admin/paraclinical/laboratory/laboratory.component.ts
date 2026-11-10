@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { finalize, forkJoin } from "rxjs";
-import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent, BooTab, BooTabsComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { StatCardComponent } from "../../../../components/ui/stat-card.component";
 import { LaboratoryService } from "../../../../services/admin/laboratory.service";
 import { AuthService } from "../../../../services/auth/auth.service";
@@ -38,8 +38,7 @@ const LOADING_KEY = 'laboratory';
     LaboratoryCriticalAlertsTabComponent,
     LaboratoryPatientResultDrawerComponent,
     BooButtonComponent,
-    BooEmptyStateComponent
-  ],
+    BooEmptyStateComponent, BooTabsComponent, BooSpinnerComponent],
   template: `
     <!-- No access -->
     <div *ngIf="!canRead" class="pt-4">
@@ -49,7 +48,7 @@ const LOADING_KEY = 'laboratory';
 
     <!-- Loading -->
     <div *ngIf="canRead && loadingSrv.isLoading(LOADING_KEY) && !hasLoadedOnce" class="flex flex-col items-center justify-center py-24 gap-3" role="status">
-      <physio-icon name="loader" [size]="32" [class]="'animate-spin text-primary'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="32" />
       <span class="text-gray-500 text-sm">Loading laboratory workspace...</span>
     </div>
 
@@ -66,20 +65,13 @@ const LOADING_KEY = 'laboratory';
             <h1 class="text-lg font-semibold text-gray-800">Laboratory</h1>
             <p class="text-xs text-secondary">Laboratory Information System — orders, samples, results, and verification</p>
           </div>
-          <button boo-button variant="secondary" size="sm" type="button" [loading]="refreshing()" (click)="refresh()">
+          <button boo-button variant="secondary" size="sm" type="button" [disabled]="refreshing()" (click)="refresh()">
             <physio-icon name="refresh-cw" [size]="16"></physio-icon> Refresh
           </button>
         </div>
 
         <!-- Tab nav -->
-        <nav class="px-4 border-t border-gray-200 flex items-center gap-1 overflow-x-auto" role="tablist">
-          <button *ngFor="let t of tabs" type="button" (click)="setTab(t.key)" [attr.aria-selected]="activeTab() === t.key" role="tab"
-            class="px-4 py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b-2 -mb-px whitespace-nowrap"
-            [ngClass]="activeTab() === t.key ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-primary hover:border-gray-300'">
-            <physio-icon [name]="t.icon" class="w-4 h-4"></physio-icon>
-            {{ t.label }}
-          </button>
-        </nav>
+        <boo-tabs [tabs]="tabItems" [value]="activeTab()" (valueChange)="setTab($event)" label="Sections" [bordered]="false" listClass="px-4 gap-1" class="border-t border-gray-200" />
       </div>
 
       <main class="boo-scrollbar min-h-0 min-w-0 flex-1 overflow-auto pb-5">
@@ -92,8 +84,7 @@ const LOADING_KEY = 'laboratory';
               <boo-status-badge [label]="a.severity" [tone]="alertTone(a.severity)"></boo-status-badge>
               <p class="text-xs text-gray-700 mt-1">{{ a.description }}</p>
             </div>
-            <button *ngIf="canAcknowledge" type="button" (click)="acknowledgeAlert(a)" [disabled]="acknowledgingId() === a.id"
-              class="text-gray-400 hover:text-gray-600 disabled:opacity-40" [attr.aria-label]="'Acknowledge ' + a.severity + ' alert'">
+            <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" *ngIf="canAcknowledge" (click)="acknowledgeAlert(a)" [disabled]="acknowledgingId() === a.id" [attr.aria-label]="'Acknowledge ' + a.severity + ' alert'">
               <physio-icon name="x" [size]="16"></physio-icon>
             </button>
           </div>
@@ -152,6 +143,7 @@ export class AdminLaboratoryComponent implements OnInit {
     { key: 'result-verification', label: 'Result Entry & Verification', icon: 'clipboard-check' },
     { key: 'critical-alerts', label: 'Critical Alerts', icon: 'triangle-alert' },
   ];
+  readonly tabItems: BooTab<TabKey>[] = this.tabs.map(t => ({ value: t.key, label: t.label, icon: t.icon }));
 
   constructor(
     private route: ActivatedRoute,

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { BooBadgeTone, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooStatusBadgeComponent, BooButtonComponent } from '@physioboo/ui';
 import { SharedModule } from "../../../../shared/shared-imports";
 import { ClaimPriority, ClaimStatus, InsuranceClaimCard } from "../../../../shared/types/insurance-claims.types";
 
@@ -39,7 +39,7 @@ const PRIORITY_COLOR: Record<ClaimPriority, string> = {
 @Component({
   selector: 'insurance-claim-card',
   standalone: true,
-  imports: [SharedModule,BooStatusBadgeComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooButtonComponent],
   template: `
     <div
       class="group relative flex gap-0 bg-[var(--ic-ivory)] border rounded-1.5 cursor-pointer transition-all duration-150 overflow-hidden"
@@ -55,19 +55,19 @@ const PRIORITY_COLOR: Record<ClaimPriority, string> = {
         <div class="flex items-start justify-between gap-2 mb-1.5">
           <div class="min-w-0">
             <p class="text-sm font-semibold text-[var(--ic-graphite)] truncate">{{ claim.patientName }}</p>
-            <p class="text-[11px] text-[var(--ic-warm-gray-600)]">{{ claim.claimNumber }} · {{ claim.mrn }}</p>
+            <p class="text-xs text-[var(--ic-warm-gray-600)]">{{ claim.claimNumber }} · {{ claim.mrn }}</p>
           </div>
           <boo-status-badge [label]="statusLabel" [tone]="statusTone"></boo-status-badge>
         </div>
 
-        <div class="flex items-center gap-1.5 text-[11px] text-[var(--ic-warm-gray-700)] mb-1">
+        <div class="flex items-center gap-1.5 text-xs text-[var(--ic-warm-gray-700)] mb-1">
           <physio-icon name="shield" [size]="12" class="text-[var(--ic-olive)]"></physio-icon>
           <span class="truncate">{{ claim.providerName }}</span>
           <span class="mx-0.5">·</span>
           <span class="font-semibold text-[var(--ic-forest)]">{{ formatAmount(claim.claimAmount) }}</span>
         </div>
 
-        <p class="text-[11px] text-[var(--ic-warm-gray-600)] truncate mb-2">
+        <p class="text-xs text-[var(--ic-warm-gray-600)] truncate mb-2">
           {{ claim.department }} · {{ claim.doctorName }}
         </p>
 
@@ -91,10 +91,10 @@ const PRIORITY_COLOR: Record<ClaimPriority, string> = {
 
       <!-- Hover quick actions -->
       <div class="absolute top-2 right-2 hidden group-hover:flex items-center gap-1 bg-[var(--ic-ivory)]/95 rounded-1.5 shadow-sm p-0.5" *ngIf="mode !== 'kanban'">
-        <button type="button" class="p-1 rounded hover:bg-[var(--ic-warm-gray-200)]" (click)="approve.emit(claim.id); $event.stopPropagation()" aria-label="Approve claim" title="Approve">
+        <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" (click)="approve.emit(claim.id); $event.stopPropagation()" aria-label="Approve claim" title="Approve">
           <physio-icon name="check" [size]="14" class="text-[var(--ic-emerald)]"></physio-icon>
         </button>
-        <button type="button" class="p-1 rounded hover:bg-[var(--ic-warm-gray-200)]" (click)="reject.emit(claim.id); $event.stopPropagation()" aria-label="Reject claim" title="Reject">
+        <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" (click)="reject.emit(claim.id); $event.stopPropagation()" aria-label="Reject claim" title="Reject">
           <physio-icon name="x" [size]="14" class="text-[var(--ic-rose)]"></physio-icon>
         </button>
       </div>

@@ -55,23 +55,23 @@ import { LIMITS, RATING_OPTIONS } from './home-config.utils';
                         <div class="flex flex-col gap-4">
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div class="sm:col-span-2">
-                                    <label for="ht-name" class="block mb-1 text-[13px] font-medium text-regular">Patient name <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="ht-name" class="block mb-1 text-sm font-medium text-regular">Patient name <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-input id="ht-name" name="ht-name" formControlName="patientName" label="As it should appear" [maxlength]="max.patientName" />
                                 </div>
                                 <div>
-                                    <label for="ht-rating" class="block mb-1 text-[13px] font-medium text-regular">Rating <span class="text-danger" aria-hidden="true">*</span></label>
+                                    <label for="ht-rating" class="block mb-1 text-sm font-medium text-regular">Rating <span class="text-danger" aria-hidden="true">*</span></label>
                                     <boo-select id="ht-rating" formControlName="rating" label="Rating" required [options]="ratingOptions" />
                                 </div>
                             </div>
                             <div>
                                 <div class="flex items-baseline justify-between gap-3 mb-1">
-                                    <label for="ht-comment" class="text-[13px] font-medium text-regular">What they said</label>
+                                    <label for="ht-comment" class="text-sm font-medium text-regular">What they said</label>
                                     <span class="text-xs text-secondary tabular-nums">{{ form.controls.comment.value.length }} / {{ max.comment }}</span>
                                 </div>
                                 <boo-textarea id="ht-comment" formControlName="comment" label="The patient’s words" [rows]="5" [maxlength]="max.comment" />
                             </div>
                             <div class="sm:w-1/2 sm:pr-2">
-                                <label for="ht-date" class="block mb-1 text-[13px] font-medium text-regular">Date</label>
+                                <label for="ht-date" class="block mb-1 text-sm font-medium text-regular">Date</label>
                                 <boo-datepicker id="ht-date" name="ht-date" formControlName="date" label="Pick a date" />
                                 <p class="m-0 mt-1 text-xs text-secondary">Optional. The list is sorted by this date, newest first.</p>
                             </div>

@@ -68,3 +68,12 @@ One treatment, defined in `src/styles.scss`:
 
 * `insurance-claims-workspace` and `dispense-detail-panel` are self-contained workspaces with their own internal scrolling; only their outer size changed.
 * Tables on Dashboard widgets (`appointments-panel`, `patient-flow-panel`) rely on wrapper `overflow-x-auto` and were not restructured.
+
+## Update: sticky headers, loading, focus and typography
+
+* **Nursing dashboard and handover** are now fill pages: the root is `flex flex-1 min-h-0 flex-col`, the `<header>` is `shrink-0`, and everything below it sits in one `boo-scrollbar min-h-0 flex-1 overflow-auto` region. Only that region scrolls; the title, shift picker and Refresh stay in view.
+* **Refresh buttons** never show a spinner. The button keeps its size and label and is `disabled` while its request runs, which also blocks duplicate clicks. Progress is shown by the content that is loading (table skeletons, chart and card loading states), each section on its own flag.
+* **Floating labels** (`boo-input`, `boo-select`, `boo-textarea`) use the named group `group/field` and `group-focus-within/field:`. The unnamed `group-focus-within:` matched any `.group` ancestor, so on Registration (`#main-content.group`, `<details class="group">`) focusing one field hid the labels of all others. A page or card may now use `group` freely.
+* **Search field** `boo-search-field` defaults to `large` (56px, 16px text) for public intros; admin forms and toolbars pass `size="middle"` (44px) or `small`. Registration's patient search now uses `middle`.
+* **Booking form**: Enter in a single-line field no longer submits the form; only the submit button does.
+* **Typography tokens** (`src/styles.scss`): `--font-size-page-title` 20px, `--font-size-section-title` 16px, `--font-size-card-title`/`--font-size-body` 14px, `--font-size-caption` 12px; weights 400/500/600; `--line-height-body` 1.5. `#admin-layout` sets 14px/400/1.5 once; `th` is 600 and `h1` is 20px/600 through zero-specificity `:where()` rules so any `text-*` utility still wins. In admin areas `text-[13px]` became `text-sm` (14px) and `text-[11px]` became `text-xs` (12px); `boo-button-admin` defaults to 14px.

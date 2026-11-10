@@ -449,13 +449,7 @@
         class="border-b border-gray-200"
       >
         <h3 class="m-0">
-          <button
-            type="button"
-            (click)="toggleFaq(i)"
-            [attr.aria-expanded]="openFaq === i"
-            [attr.aria-controls]="'faq-' + i"
-            class="w-full min-h-14 py-4 lg:py-[22px] border-0 bg-transparent flex justify-between items-center gap-4 lg:gap-6 text-left text-base lg:text-[17px] font-semibold text-gray-900 hover:text-primaryDeep cursor-pointer"
-          >
+          <button type="button" boo-button variant="text" classname="w-full min-h-14 py-4 lg:py-[22px] justify-between items-center gap-4 lg:gap-6 text-base lg:text-[17px] font-semibold !text-gray-900" (click)="toggleFaq(i)" [attr.aria-expanded]="openFaq === i" [attr.aria-controls]="'faq-' + i">
             {{ f.q }}
             <physio-icon
               [name]="openFaq === i ? 'minus' : 'plus'"

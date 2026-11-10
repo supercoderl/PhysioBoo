@@ -64,17 +64,17 @@ function notInPast(control: AbstractControl<string>): ValidationErrors | null {
                     <p class="m-0 text-xs text-secondary">Fields marked <span class="text-danger">*</span> are required. The visit is closed when you save.</p>
 
                     <div>
-                        <label for="cc-diagnosis" class="block mb-1 text-[13px] font-medium text-regular">Diagnosis <span class="text-danger" aria-hidden="true">*</span></label>
+                        <label for="cc-diagnosis" class="block mb-1 text-sm font-medium text-regular">Diagnosis <span class="text-danger" aria-hidden="true">*</span></label>
                         <boo-textarea id="cc-diagnosis" name="cc-diagnosis" formControlName="diagnosis" label="Diagnosis" [rows]="4" [maxlength]="textMax" />
                     </div>
 
                     <div>
-                        <label for="cc-plan" class="block mb-1 text-[13px] font-medium text-regular">Treatment plan</label>
+                        <label for="cc-plan" class="block mb-1 text-sm font-medium text-regular">Treatment plan</label>
                         <boo-textarea id="cc-plan" name="cc-plan" formControlName="treatmentPlan" label="Treatment plan" [rows]="4" [maxlength]="textMax" />
                     </div>
 
                     <div class="max-w-xs">
-                        <label for="cc-follow-up" class="block mb-1 text-[13px] font-medium text-regular">Follow-up date</label>
+                        <label for="cc-follow-up" class="block mb-1 text-sm font-medium text-regular">Follow-up date</label>
                         <boo-datepicker id="cc-follow-up" name="cc-follow-up" formControlName="followUpDate" label="Optional" [min]="today" />
                     </div>
                 </div>

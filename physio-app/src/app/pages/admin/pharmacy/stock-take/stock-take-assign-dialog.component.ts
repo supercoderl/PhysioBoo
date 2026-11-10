@@ -1,3 +1,4 @@
+import { BooButtonComponent, BooDialogComponent } from '@physioboo/ui';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from "@angular/core";
 import { BooButtonAdminComponent } from "../../../../components/button/boo-button-admin/boo-button-admin.component";
 import { BooSelectComponent } from "../../../../components/select/boo-select/boo-select.component";
@@ -9,34 +10,17 @@ import { AssignCounterPayload } from "../../../../shared/types/stock-take.types"
 @Component({
     selector: 'stock-take-assign-dialog',
     standalone: true,
-    imports: [SharedModule, BooSelectComponent, BooButtonAdminComponent],
+    imports: [SharedModule, BooSelectComponent, BooButtonAdminComponent, BooButtonComponent, BooDialogComponent],
     template: `
-    <div *ngIf="isOpen" class="fixed inset-0 z-[10000] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="stock-take-assign-title" (keydown.escape)="close.emit()">
-      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="close.emit()"></div>
-
-      <div class="relative bg-surface rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100">
-        <div class="px-6 py-5 border-b border-gray-100 flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <physio-icon name="user-plus" [size]="20" class="text-primary"></physio-icon>
-          </div>
-          <div class="flex-1">
-            <h3 id="stock-take-assign-title" class="text-lg font-semibold text-gray-900">Assign counter</h3>
-            <p class="text-sm text-gray-500 mt-1 leading-relaxed">Choose who counts {{ code }}.</p>
-          </div>
-        </div>
-
-        <div class="px-6 py-4 space-y-3">
-          <boo-select label="Counter" [(ngModel)]="assignedTo" required
-            [options]="users" bindLabel="name" bindValue="id"></boo-select>
-          <p *ngIf="loaded && !users.length" class="m-0 text-xs text-secondary">No users could be listed. Counter candidates need permission to view users.</p>
-        </div>
-
-        <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3">
-          <boo-button-admin background="transparent" (click)="close.emit()">Cancel</boo-button-admin>
-          <boo-button-admin textColor="white" (click)="onConfirm()" [disabled]="!assignedTo || busy" [loading]="busy">Assign</boo-button-admin>
-        </div>
+    <boo-dialog *ngIf="isOpen" heading="Assign counter" [description]="'Choose who counts ' + code + '.'" icon="user-plus" [busy]="busy" (dismiss)="close.emit()">
+      <div class="space-y-3">
+        <boo-select label="Counter" [(ngModel)]="assignedTo" required
+          [options]="users" bindLabel="name" bindValue="id"></boo-select>
+        <p *ngIf="loaded && !users.length" class="m-0 text-xs text-secondary">No users could be listed. Counter candidates need permission to view users.</p>
       </div>
-    </div>
+      <button boo-dialog-footer type="button" boo-button variant="secondary" size="sm" [disabled]="busy" (click)="close.emit()">Cancel</button>
+      <button boo-dialog-footer type="button" boo-button variant="primary" size="sm" [disabled]="!assignedTo" [loading]="busy" (click)="onConfirm()">Assign</button>
+    </boo-dialog>
   `,
 })
 export class StockTakeAssignDialogComponent implements OnInit, OnChanges {

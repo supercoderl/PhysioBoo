@@ -1,3 +1,4 @@
+import { BooTab, BooTabsComponent } from '@physioboo/ui';
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AuthService } from "../../../../services/auth/auth.service";
@@ -17,7 +18,7 @@ type InsuranceView = 'insurers' | 'claims';
 @Component({
     selector: 'admin-insurance',
     standalone: true,
-    imports: [SharedModule, InsuranceCompaniesComponent, InsuranceClaimsWorkspaceComponent],
+    imports: [SharedModule, InsuranceCompaniesComponent, InsuranceClaimsWorkspaceComponent, BooTabsComponent],
     template: `
     <main class="flex flex-1 min-h-0 flex-col gap-5 pb-5">
       <header class="min-w-0 shrink-0">
@@ -28,16 +29,7 @@ type InsuranceView = 'insurers' | 'claims';
         </p>
       </header>
 
-      <div *ngIf="canReadClaims" role="tablist" aria-label="Insurance sections" class="inline-flex shrink-0 self-start gap-1 bg-gray-100 rounded-2 p-1" (keydown.arrowright)="move(1)" (keydown.arrowleft)="move(-1)">
-        <button type="button" role="tab" id="insurance-tab-insurers" aria-controls="insurance-panel-insurers"
-          [attr.aria-selected]="view() === 'insurers'" [attr.tabindex]="view() === 'insurers' ? 0 : -1" (click)="setView('insurers')"
-          class="px-4 h-9 rounded-1.5 text-sm font-semibold cursor-pointer transition-colors"
-          [ngClass]="view() === 'insurers' ? 'bg-surface text-regular shadow-sm' : 'text-secondary hover:text-regular'">Insurers</button>
-        <button type="button" role="tab" id="insurance-tab-claims" aria-controls="insurance-panel-claims"
-          [attr.aria-selected]="view() === 'claims'" [attr.tabindex]="view() === 'claims' ? 0 : -1" (click)="setView('claims')"
-          class="px-4 h-9 rounded-1.5 text-sm font-semibold cursor-pointer transition-colors"
-          [ngClass]="view() === 'claims' ? 'bg-surface text-regular shadow-sm' : 'text-secondary hover:text-regular'">Claims</button>
-      </div>
+      <boo-tabs *ngIf="canReadClaims" variant="segment" class="shrink-0 self-start" [tabs]="viewTabs" [value]="view()" (valueChange)="setView($event)" label="Insurance sections" idPrefix="insurance-tab" panelPrefix="insurance-panel" />
 
       <section *ngIf="view() === 'insurers'" id="insurance-panel-insurers" role="tabpanel" class="flex flex-1 min-h-[34rem] flex-col" aria-labelledby="insurance-tab-insurers">
         <insurance-companies class="flex-1 min-h-0" (viewClaims)="openClaims($event)"></insurance-companies>
@@ -57,6 +49,7 @@ export class AdminInsuranceComponent implements OnInit {
 
     readonly canReadClaims = this.authSrv.hasPermission(Permissions.Finance.InsuranceClaimRead);
 
+    readonly viewTabs: BooTab<InsuranceView>[] = [{ value: 'insurers', label: 'Insurers' }, { value: 'claims', label: 'Claims' }];
     view = signal<InsuranceView>('insurers');
     /** Insurer handed over from the Insurers view, to scope the claims queue. */
     claimsProviderId = signal<string | null>(null);
@@ -82,9 +75,4 @@ export class AdminInsuranceComponent implements OnInit {
         this.setView('claims');
     }
 
-    move(step: 1 | -1): void {
-        if (!this.canReadClaims) return;
-        this.setView(step === 1 ? 'claims' : 'insurers');
-        setTimeout(() => document.getElementById(`insurance-tab-${this.view()}`)?.focus());
-    }
 }

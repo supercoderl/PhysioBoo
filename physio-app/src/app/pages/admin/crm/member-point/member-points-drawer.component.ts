@@ -2,7 +2,7 @@ import { DecimalPipe, NgIf } from '@angular/common';
 import { Component, DestroyRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { BooButtonComponent, BooIconComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooIconComponent, BooInputComponent, BooFieldErrorComponent, BooAlertComponent } from '@physioboo/ui';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { DrawerComponent } from '../../../../components/drawer/drawer.component';
@@ -36,8 +36,7 @@ export type PointsMode = 'add' | 'redeem';
         BooInputComponent,
         BooSelectComponent,
         BooTextareaComponent,
-        CustomScrollbarDirective,
-    ],
+        CustomScrollbarDirective, BooFieldErrorComponent, BooAlertComponent],
     template: `
         <drawer [isOpen]="!!member" [isShowDialog]="dirty && !submitting" (close)="discard()">
             <form
@@ -81,14 +80,14 @@ export type PointsMode = 'add' | 'redeem';
                     <!-- Add points -->
                     <ng-container *ngIf="mode === 'add'">
                         <div>
-                            <label for="mp-points" class="block mb-1 text-[13px] font-medium text-regular">Points to add <span class="text-danger" aria-hidden="true">*</span></label>
+                            <label for="mp-points" class="block mb-1 text-sm font-medium text-regular">Points to add <span class="text-danger" aria-hidden="true">*</span></label>
                             <boo-input id="mp-points" name="mp-points" type="number" formControlName="points" [maxlength]="7" label="e.g. 100" />
                             <p class="m-0 mt-1 text-xs" [class.text-danger]="pointsInvalid" [class.text-secondary]="!pointsInvalid" [attr.role]="pointsInvalid ? 'alert' : null">
                                 A whole number from 1 to {{ maxPoints | number }}.
                             </p>
                         </div>
                         <div>
-                            <label for="mp-reason" class="block mb-1 text-[13px] font-medium text-regular">Reason <span class="text-danger" aria-hidden="true">*</span></label>
+                            <label for="mp-reason" class="block mb-1 text-sm font-medium text-regular">Reason <span class="text-danger" aria-hidden="true">*</span></label>
                             <boo-textarea id="mp-reason" name="mp-reason" formControlName="description" [rows]="3" [maxlength]="maxNote" label="e.g. Consultation visit on 12 Oct" />
                             <p class="m-0 mt-1 flex justify-between gap-3 text-xs">
                                 <span [class.text-danger]="reasonInvalid" [class.text-secondary]="!reasonInvalid" [attr.role]="reasonInvalid ? 'alert' : null">Shown in the member's point history.</span>
@@ -100,7 +99,7 @@ export type PointsMode = 'add' | 'redeem';
                     <!-- Redeem a reward -->
                     <ng-container *ngIf="mode === 'redeem'">
                         <div>
-                            <label for="mp-reward" class="block mb-1 text-[13px] font-medium text-regular">Reward <span class="text-danger" aria-hidden="true">*</span></label>
+                            <label for="mp-reward" class="block mb-1 text-sm font-medium text-regular">Reward <span class="text-danger" aria-hidden="true">*</span></label>
                             <ng-container *ngIf="rewardsState === 'ready'; else rewardsStateTpl">
                                 <boo-select id="mp-reward" formControlName="rewardId" label="Select a reward" required [options]="rewardOptions" />
                                 <p *ngIf="!rewardOptions.length" class="m-0 mt-1 text-xs text-secondary">No rewards are available to redeem right now.</p>
@@ -108,7 +107,7 @@ export type PointsMode = 'add' | 'redeem';
                             <ng-template #rewardsStateTpl>
                                 <div *ngIf="rewardsState === 'loading'" class="h-11 rounded-md bg-rowDivider animate-pulse" aria-hidden="true"></div>
                                 <p *ngIf="rewardsState === 'loading'" class="sr-only" role="status">Loading rewards…</p>
-                                <p *ngIf="rewardsState === 'forbidden'" class="m-0 text-xs text-danger" role="alert">You don't have access to the rewards catalog.</p>
+                                <boo-field-error size="sm" announce *ngIf="rewardsState === 'forbidden'">You don't have access to the rewards catalog.</boo-field-error>
                                 <p *ngIf="rewardsState === 'failed'" class="m-0 flex items-center gap-1.5 text-xs text-danger" role="alert">
                                     <physio-icon name="circle-alert" [size]="14" aria-hidden="true" />Couldn't load rewards.
                                     <button type="button" boo-button variant="link" size="sm" (click)="retryRewards.emit()">Try again</button>
@@ -131,15 +130,12 @@ export type PointsMode = 'add' | 'redeem';
                         </div>
 
                         <div>
-                            <label for="mp-note" class="block mb-1 text-[13px] font-medium text-regular">Note <span class="font-normal text-secondary">(optional)</span></label>
+                            <label for="mp-note" class="block mb-1 text-sm font-medium text-regular">Note <span class="font-normal text-secondary">(optional)</span></label>
                             <boo-textarea id="mp-note" name="mp-note" formControlName="description" [rows]="2" [maxlength]="maxNote" label="Defaults to “Redeemed: reward name”" />
                         </div>
                     </ng-container>
 
-                    <p *ngIf="submitError" class="m-0 flex items-start gap-2 rounded-lg border border-dangerBorder bg-dangerSoft px-3 py-2.5 text-sm text-danger" role="alert">
-                        <physio-icon name="circle-alert" [size]="16" class="flex-none mt-0.5" aria-hidden="true" />
-                        <span>{{ submitError }} Nothing was changed; your entries are kept.</span>
-                    </p>
+                    <boo-alert *ngIf="submitError" tone="error" role="alert">{{ submitError }} Nothing was changed; your entries are kept.</boo-alert>
                 </div>
 
                 <footer class="flex-none px-6 py-4 border-t border-rowDivider flex items-center justify-end gap-2">

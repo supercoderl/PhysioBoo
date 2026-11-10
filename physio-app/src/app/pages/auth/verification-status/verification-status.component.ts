@@ -1,18 +1,16 @@
+import { BooSpinnerComponent } from '@physioboo/ui';
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnimationItem } from 'lottie-web';
 import { AnimationOptions } from 'ngx-lottie';
 import { interval, Subscription } from 'rxjs';
-import { DotSpinnerComponent } from "../../../components/icon/boo-icon/dot-spinner.component";
 import { SharedModule } from '../../../shared/shared-imports';
 
 @Component({
   selector: 'app-verification-status',
   standalone: true,
   imports: [
-    SharedModule,
-    DotSpinnerComponent
-],
+    SharedModule, BooSpinnerComponent],
   templateUrl: './verification-status.component.html'
 })
 export class VerificationStatusComponent implements OnInit, OnDestroy, AfterViewInit {

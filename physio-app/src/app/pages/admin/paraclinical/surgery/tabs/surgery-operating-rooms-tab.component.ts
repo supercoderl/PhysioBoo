@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output, signal } from "@angular/core";
-import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooBadgeTone, BooEmptyStateComponent, BooStatusBadgeComponent, BooButtonComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { SurgeryService } from "../../../../../services/admin/surgery.service";
 import { SharedModule } from "../../../../../shared/shared-imports";
 import { OperatingRoom, OperatingRoomStatus } from "../../../../../shared/types/surgery.types";
@@ -7,10 +7,10 @@ import { OperatingRoom, OperatingRoomStatus } from "../../../../../shared/types/
 @Component({
   selector: 'surgery-operating-rooms-tab',
   standalone: true,
-  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent],
+  imports: [SharedModule,BooStatusBadgeComponent, BooEmptyStateComponent, BooButtonComponent, BooSpinnerComponent],
   template: `
     <div *ngIf="isLoading()" class="flex items-center justify-center py-16">
-      <physio-icon name="loader" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+      <boo-spinner [inline]="true" tone="primary" [size]="24" />
     </div>
 
     <div *ngIf="!isLoading() && !rooms().length"><boo-empty-state icon="hospital" title="No operating rooms configured"></boo-empty-state></div>
@@ -39,7 +39,7 @@ import { OperatingRoom, OperatingRoomStatus } from "../../../../../shared/types/
             <physio-icon [name]="r.equipmentReady ? 'circle-check' : 'triangle-alert'" [size]="14"></physio-icon>
             {{ r.equipmentReady ? 'Equipment Ready' : 'Equipment Not Ready' }}
           </span>
-          <button *ngIf="r.currentSurgeryId" (click)="viewCase.emit(r.currentSurgeryId!)" class="text-primary text-xs font-semibold hover:underline">View Case</button>
+          <button type="button" boo-button variant="text" classname="text-primary text-xs font-semibold" *ngIf="r.currentSurgeryId" (click)="viewCase.emit(r.currentSurgeryId!)">View Case</button>
         </div>
       </div>
     </div>

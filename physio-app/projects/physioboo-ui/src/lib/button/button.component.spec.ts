@@ -98,7 +98,7 @@ describe('BooButtonComponent', () => {
     it('applies each variant without the original gradient', () => {
         const { fixture, host, el } = render();
         const expected: Record<BooButtonVariant, string> = {
-            primary: 'bg-primary', secondary: 'border-gray-300', outline: 'border-primary', soft: 'bg-primarySoft', subtle: 'bg-gray-100', ghost: 'bg-transparent', link: 'underline',
+            primary: 'bg-primary', secondary: 'border-gray-300', outline: 'border-primary', soft: 'bg-primarySoft', subtle: 'bg-gray-100', ghost: 'bg-transparent', link: 'underline', text: 'hover:underline', danger: 'bg-danger',
         };
         for (const variant of Object.keys(expected) as BooButtonVariant[]) {
             host.variant = variant;
@@ -121,7 +121,7 @@ describe('BooButtonComponent', () => {
         fixture.detectChanges();
         expect(el('ds').hasAttribute('disabled')).toBeTrue();
         expect(el('ds').getAttribute('aria-busy')).toBe('true');
-        expect(el('ds').querySelector('physio-icon[name="loader-circle"]')).not.toBeNull();
+        expect(el('ds').querySelector('physio-icon[name="loader-circle"]')).toBeNull();
     });
 
     it('marks a disabled anchor with aria-disabled and takes it out of the tab order', () => {

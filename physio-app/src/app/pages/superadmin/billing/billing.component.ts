@@ -7,7 +7,7 @@ import { SuperadminSubscriptionTableCardComponent } from '../../../components/la
 import { SuperadminTenantSubscriptionDrawerComponent } from '../../../components/layout/superadmin/billing/tenant-subscription-drawer.component';
 import { SuperadminPageHeaderComponent } from '../../../components/layout/superadmin/shared/superadmin-page-header.component';
 import { SuperadminTab, SuperadminTabsComponent } from '../../../components/layout/superadmin/shared/superadmin-tabs.component';
-import { BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooErrorStateComponent, BooStatusBadgeComponent, BooButtonComponent } from '@physioboo/ui';
 import { StatCardComponent } from '../../../components/ui/stat-card.component';
 import { BillingService } from '../../../services/admin/billing.service';
 import { SharedModule } from '../../../shared/shared-imports';
@@ -38,8 +38,7 @@ const STATUS_OPTIONS: SubscriptionStatus[] = ['Trial', 'Active', 'PastDue', 'Can
     StatCardComponent,
     BooStatusBadgeComponent,
     BooEmptyStateComponent,
-    BooErrorStateComponent
-  ],
+    BooErrorStateComponent, BooButtonComponent],
   templateUrl: './billing.component.html',
   host: { class: 'block h-full min-h-0' }
 })

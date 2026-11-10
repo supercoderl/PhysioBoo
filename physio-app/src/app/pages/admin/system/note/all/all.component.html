@@ -9,7 +9,7 @@
           Notes
         </p>
         <p
-          class="tracking-tight font-medium m-0 text-[13px] leading-[1.5] text-[#71606A]"
+          class="tracking-tight font-medium m-0 text-sm leading-[1.5] text-[#71606A]"
         >
           Capture and organize your thoughts and ideas
         </p>
@@ -19,7 +19,7 @@
           type="button"
           (click)="toggleArchived()"
           [attr.aria-pressed]="showArchived"
-          class="flex items-center gap-1.5 rounded-lg border px-3 min-h-10 text-[13px] font-medium transition-colors"
+          class="flex items-center gap-1.5 rounded-lg border px-3 min-h-10 text-sm font-medium transition-colors"
           [ngClass]="
             showArchived
               ? 'bg-primary text-white border-primary'
@@ -58,8 +58,10 @@
       <div *ngIf="!showArchived" class="flex w-full justify-center pb-4">
         <button
           type="button"
+          boo-button
+          variant="secondary"
           (click)="openNew()"
-          class="border border-solid rounded-lg flex items-center gap-2 shrink-0 max-w-128 w-full min-h-10 bg-surface border-[#EFE3E7] px-3 text-left text-[14px] leading-[1.5] text-[#71606A] hover:border-gray-300"
+          classname="!justify-start !font-normal !text-secondary shrink-0 max-w-128 w-full"
         >
           <physio-icon name="plus" [size]="16"></physio-icon>
           Take a note...
@@ -163,7 +165,7 @@
 
             <div
               *ngIf="note.content"
-              class="px-4 my-3 text-[13px] leading-[1.5]"
+              class="px-4 my-3 text-sm leading-[1.5]"
             >
               <div class="w-full break-words whitespace-pre-line">
                 {{ note.content }}
@@ -206,7 +208,7 @@
                 class="max-w-full mt-1 mx-0.5 flex items-center text-[#71606A]"
               >
                 <physio-icon name="clock" [size]="14"></physio-icon>
-                <span class="text-[11px] leading-[1.4] truncate px-1">{{
+                <span class="text-xs leading-[1.4] truncate px-1">{{
                   note.reminderAt | date: "MMM d, y, h:mm a"
                 }}</span>
               </span>
@@ -220,25 +222,13 @@
             <div
               class="flex items-center justify-end gap-1 px-2 pb-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity"
             >
-              <button
-                type="button"
-                (click)="toggleArchive(note, $event)"
-                [attr.aria-label]="
-                  note.isArchived ? 'Restore note' : 'Archive note'
-                "
-                class="rounded p-1.5 text-gray-500 hover:bg-gray-200"
-              >
+              <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8" (click)="toggleArchive(note, $event)" [attr.aria-label]=" note.isArchived ? 'Restore note' : 'Archive note' ">
                 <physio-icon
                   [name]="note.isArchived ? 'archive-restore' : 'archive'"
                   [size]="16"
                 ></physio-icon>
               </button>
-              <button
-                type="button"
-                (click)="deleteNote(note, $event)"
-                aria-label="Delete note"
-                class="rounded p-1.5 text-gray-500 hover:bg-gray-200 hover:text-red-600"
-              >
+              <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8 !text-danger" (click)="deleteNote(note, $event)" aria-label="Delete note">
                 <physio-icon name="trash" [size]="16"></physio-icon>
               </button>
             </div>
@@ -320,15 +310,10 @@
               [(ngModel)]="item.text"
               maxlength="200"
               aria-label="Checklist item"
-              class="flex-1 rounded border border-transparent px-2 min-h-8 text-[13px] outline-none hover:border-[#EFE3E7] focus:border-primary"
+              class="flex-1 rounded border border-transparent px-2 min-h-8 text-sm outline-none hover:border-[#EFE3E7] focus:border-primary"
               [ngClass]="item.done ? 'line-through text-[#71606A]' : ''"
             />
-            <button
-              type="button"
-              (click)="removeItem(i)"
-              [attr.aria-label]="'Remove ' + item.text"
-              class="rounded p-1 text-gray-400 hover:text-red-600"
-            >
+            <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-8 !w-8 !text-danger" (click)="removeItem(i)" [attr.aria-label]="'Remove ' + item.text">
               <physio-icon name="x" [size]="14"></physio-icon>
             </button>
           </li>
@@ -340,7 +325,7 @@
           maxlength="200"
           placeholder="Add an item and press Enter"
           aria-label="New checklist item"
-          class="mt-1 w-full rounded-lg border border-[#EFE3E7] px-3 min-h-9 text-[13px] outline-none focus:border-primary"
+          class="mt-1 w-full rounded-lg border border-[#EFE3E7] px-3 min-h-9 text-sm outline-none focus:border-primary"
         />
       </div>
 
@@ -353,12 +338,7 @@
             class="flex items-center gap-1 rounded-full bg-gray-200 pl-2 pr-1 text-[12px]"
           >
             {{ label }}
-            <button
-              type="button"
-              (click)="removeLabel(i)"
-              [attr.aria-label]="'Remove label ' + label"
-              class="rounded-full p-0.5 hover:bg-gray-300"
-            >
+            <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="removeLabel(i)" [attr.aria-label]="'Remove label ' + label">
               <physio-icon name="x" [size]="12"></physio-icon>
             </button>
           </span>
@@ -370,7 +350,7 @@
           maxlength="30"
           placeholder="Add a label and press Enter"
           aria-label="New label"
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-9 text-[13px] outline-none focus:border-primary"
+          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-9 text-sm outline-none focus:border-primary"
         />
       </div>
 
@@ -382,7 +362,7 @@
         <input
           type="datetime-local"
           [(ngModel)]="d.reminderAt"
-          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-9 text-[13px] outline-none focus:border-primary"
+          class="w-full rounded-lg border border-[#EFE3E7] px-3 min-h-9 text-sm outline-none focus:border-primary"
         />
       </label>
     </div>

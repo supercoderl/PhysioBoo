@@ -28,8 +28,8 @@ interface StaffRow {
                 <li *ngFor="let row of rows" class="min-w-0">
                     <div class="flex items-baseline justify-between gap-3">
                         <span class="min-w-0">
-                            <span class="block text-[13px] font-medium text-regular truncate">{{ row.label }}</span>
-                            <span class="block text-[11px] leading-4 text-placeholder">{{ row.measure }}</span>
+                            <span class="block text-sm font-medium text-regular truncate">{{ row.label }}</span>
+                            <span class="block text-xs leading-4 text-placeholder">{{ row.measure }}</span>
                         </span>
                         <span class="flex-none text-sm font-semibold text-regular tabular-nums">
                             {{ row.group.onDuty }}<span class="text-xs font-normal text-secondary"> / {{ row.group.total }}</span>

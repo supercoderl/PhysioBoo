@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnDestroy, OnInit, signal } from "@angular/core";
-import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooEmptyStateComponent, BooErrorStateComponent, BooTab, BooTabsComponent } from '@physioboo/ui';
 import { catchError, finalize, Observable, of, Subject, switchMap, takeUntil } from "rxjs";
 import { DrawerComponent } from "../../../../components/drawer/drawer.component";
 import { CashierService } from "../../../../services/admin/cashier.service";
@@ -51,8 +51,7 @@ const WIDE_QUERY = '(min-width: 1280px)';
         CashierBillPanelComponent,
         CashierPaymentDialogComponent,
         CashierRefundDialogComponent,
-        CashierAdjustmentDialogComponent,
-    ],
+        CashierAdjustmentDialogComponent, BooTabsComponent],
     template: `
     <main class="flex flex-1 min-h-0 flex-col gap-5 pb-5">
       <header class="flex shrink-0 flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
@@ -62,7 +61,7 @@ const WIDE_QUERY = '(min-width: 1280px)';
             Find a bill, review its charges and take payment. Refunds, discounts, insurance and voids are available per bill.
           </p>
         </div>
-        <button boo-button variant="secondary" (click)="refreshAll()" [loading]="listState() === 'loading'">
+        <button boo-button variant="secondary" (click)="refreshAll()" [disabled]="listState() === 'loading'">
           <physio-icon name="refresh" [size]="16"></physio-icon>Refresh
         </button>
       </header>
@@ -84,14 +83,7 @@ const WIDE_QUERY = '(min-width: 1280px)';
             (reset)="onReset()"
           ></cashier-filter-bar>
 
-          <div *ngIf="canReadPayments" role="tablist" aria-label="Queue" class="inline-flex shrink-0 self-start gap-1 bg-gray-100 rounded-2 p-1">
-            <button type="button" role="tab" id="cashier-tab-bills" [attr.aria-selected]="tab() === 'bills'" (click)="tab.set('bills')"
-              class="px-4 h-9 rounded-1.5 text-sm font-semibold cursor-pointer transition-colors"
-              [ngClass]="tab() === 'bills' ? 'bg-surface text-regular shadow-sm' : 'text-secondary hover:text-regular'">Bills</button>
-            <button type="button" role="tab" id="cashier-tab-payments" [attr.aria-selected]="tab() === 'payments'" (click)="tab.set('payments')"
-              class="px-4 h-9 rounded-1.5 text-sm font-semibold cursor-pointer transition-colors"
-              [ngClass]="tab() === 'payments' ? 'bg-surface text-regular shadow-sm' : 'text-secondary hover:text-regular'">Recent payments</button>
-          </div>
+          <boo-tabs *ngIf="canReadPayments" variant="segment" class="shrink-0 self-start" [tabs]="queueTabs" [value]="tab()" (valueChange)="tab.set($event)" label="Queue" idPrefix="cashier-tab" panelPrefix="" />
 
           <section *ngIf="tab() === 'bills'" class="flex flex-1 min-h-0 flex-col" aria-label="Bills" [attr.aria-busy]="listState() === 'loading'">
             <boo-error-state
@@ -226,6 +218,7 @@ export class AdminCashierComponent implements OnInit, OnDestroy {
     historyState = signal<CashierPaymentsState>(this.canReadPayments ? 'loading' : 'unavailable');
 
     selected = signal<CashierInvoice | null>(null);
+    readonly queueTabs: BooTab<QueueTab>[] = [{ value: 'bills', label: 'Bills' }, { value: 'payments', label: 'Recent payments' }];
     tab = signal<QueueTab>('bills');
     drawerOpen = signal(false);
     isWide = signal(false);

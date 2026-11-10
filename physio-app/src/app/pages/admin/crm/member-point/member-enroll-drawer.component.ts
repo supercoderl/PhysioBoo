@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { BooButtonComponent, BooCheckboxComponent, BooIconComponent, BooSearchFieldComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooCheckboxComponent, BooIconComponent, BooSearchFieldComponent, BooAlertComponent } from '@physioboo/ui';
 import { Subject, of } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap } from 'rxjs/operators';
 import { DrawerComponent } from '../../../../components/drawer/drawer.component';
@@ -36,8 +36,7 @@ const LOOKUP_SIZE = 8;
         BooIconComponent,
         BooSearchFieldComponent,
         BooCheckboxComponent,
-        BooSelectComponent,
-    ],
+        BooSelectComponent, BooAlertComponent],
     template: `
         <drawer [isOpen]="open" [isShowDialog]="dirty && !submitting" (close)="discard()">
             <form
@@ -64,7 +63,7 @@ const LOOKUP_SIZE = 8;
                 <div class="flex-1 min-h-0 overflow-y-auto px-6 py-5 flex flex-col gap-5">
                     <!-- Patient -->
                     <div>
-                        <p class="m-0 mb-1 text-[13px] font-medium text-regular">Patient <span class="text-danger" aria-hidden="true">*</span></p>
+                        <p class="m-0 mb-1 text-sm font-medium text-regular">Patient <span class="text-danger" aria-hidden="true">*</span></p>
                         <div *ngIf="patient as p; else lookupTpl" class="flex items-center justify-between gap-3 rounded-lg border border-rowDivider px-4 py-3">
                             <div class="min-w-0">
                                 <p class="m-0 text-sm font-semibold text-regular truncate">{{ patientName(p) }}</p>
@@ -111,16 +110,13 @@ const LOOKUP_SIZE = 8;
                     </div>
 
                     <div class="sm:w-1/2">
-                        <label for="me-enroll-tier" class="block mb-1 text-[13px] font-medium text-regular">Tier <span class="text-danger" aria-hidden="true">*</span></label>
+                        <label for="me-enroll-tier" class="block mb-1 text-sm font-medium text-regular">Tier <span class="text-danger" aria-hidden="true">*</span></label>
                         <boo-select id="me-enroll-tier" name="me-enroll-tier" label="Select a tier" required [options]="tierOptions" [(ngModel)]="tier" (ngModelChange)="touched = true" />
                     </div>
 
                     <boo-checkbox name="me-terms" [(ngModel)]="agreed" (ngModelChange)="touched = true" label="The patient agrees to the loyalty programme terms and conditions" />
 
-                    <p *ngIf="submitError" class="m-0 flex items-start gap-2 rounded-lg border border-dangerBorder bg-dangerSoft px-3 py-2.5 text-sm text-danger" role="alert">
-                        <physio-icon name="circle-alert" [size]="16" class="flex-none mt-0.5" aria-hidden="true" />
-                        <span>{{ submitError }}</span>
-                    </p>
+                    <boo-alert *ngIf="submitError" tone="error" role="alert">{{ submitError }}</boo-alert>
                 </div>
 
                 <footer class="flex-none px-6 py-4 border-t border-rowDivider flex items-center justify-end gap-2">

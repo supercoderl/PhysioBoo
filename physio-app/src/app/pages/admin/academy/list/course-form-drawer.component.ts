@@ -2,7 +2,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { Component, DestroyRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { BooButtonComponent, BooCheckboxComponent, BooIconComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooCheckboxComponent, BooIconComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { DrawerComponent } from '../../../../components/drawer/drawer.component';
@@ -32,8 +32,7 @@ import { PagedResponse } from '../../../../shared/types/common';
     BooInputComponent,
     BooCheckboxComponent,
     BooTextareaComponent,
-    CustomScrollbarDirective,
-  ],
+    CustomScrollbarDirective, BooFieldErrorComponent],
   template: `
     <drawer [isOpen]="open" [isShowDialog]="form.dirty && !submitting" (close)="discard()">
       <form
@@ -59,12 +58,12 @@ import { PagedResponse } from '../../../../shared/types/common';
 
         <div class="flex-1 min-h-0 overflow-y-auto px-6 py-5 flex flex-col gap-4" custom-scrollbar>
           <div>
-            <label for="course-title" class="block mb-1 text-[13px] font-medium text-regular">Title <span class="text-danger" aria-hidden="true">*</span></label>
+            <label for="course-title" class="block mb-1 text-sm font-medium text-regular">Title <span class="text-danger" aria-hidden="true">*</span></label>
             <boo-input name="course-title" formControlName="title" label="Course title" required [maxlength]="200" />
           </div>
 
           <div>
-            <label for="course-category" class="block mb-1 text-[13px] font-medium text-regular">Category <span class="text-danger" aria-hidden="true">*</span></label>
+            <label for="course-category" class="block mb-1 text-sm font-medium text-regular">Category <span class="text-danger" aria-hidden="true">*</span></label>
             <boo-input name="course-category" formControlName="category" label="e.g. Clinical skills" required [maxlength]="60" />
             <div *ngIf="categories.length" class="mt-2 flex flex-wrap items-center gap-1.5" role="group" aria-label="Existing categories">
               <span class="text-xs text-secondary">Existing:</span>
@@ -80,9 +79,9 @@ import { PagedResponse } from '../../../../shared/types/common';
           </div>
 
           <div>
-            <label for="course-description" class="block mb-1 text-[13px] font-medium text-regular">Description</label>
+            <label for="course-description" class="block mb-1 text-sm font-medium text-regular">Description</label>
             <boo-textarea id="course-description" formControlName="description" label="What will learners get from this course?" [rows]="4" />
-            <p *ngIf="form.controls.description.hasError('maxlength')" class="m-0 mt-1 text-xs text-danger" role="alert">Keep the description within 2000 characters.</p>
+            <boo-field-error size="sm" announce class="mt-1" *ngIf="form.controls.description.hasError('maxlength')">Keep the description within 2000 characters.</boo-field-error>
           </div>
 
           <div>

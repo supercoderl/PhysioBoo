@@ -6,7 +6,7 @@ import { User } from "../../../../../shared/types/core.types";
 import { Role } from "../../../../../shared/types/role.types";
 import { ColorUtils } from "../../../../../shared/utils/color.utils";
 import { BooButtonAdminComponent } from "../../../../button/boo-button-admin/boo-button-admin.component";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
+import { BooCheckboxComponent, BooInputComponent, BooButtonComponent } from '@physioboo/ui';
 import { DrawerComponent } from "../../../../drawer/drawer.component";
 
 @Component({
@@ -18,8 +18,7 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
 
         BooButtonAdminComponent,
         BooInputComponent,
-        BooCheckboxComponent
-    ],
+        BooCheckboxComponent, BooButtonComponent],
     template: `
         <drawer [isOpen]="isOpen" [isShowDialog]="true" (close)="onClose()">
             <div class="flex flex-col h-full bg-surface" [formGroup]="form">
@@ -34,10 +33,7 @@ import { DrawerComponent } from "../../../../drawer/drawer.component";
                         Account credentials and role assignments
                     </p>
                     </div>
-                    <button
-                        (click)="onClose()"
-                        class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
-                    >
+                    <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" (click)="onClose()" aria-label="Close">
                         <physio-icon name="x" [size]="20"></physio-icon>
                     </button>
                 </div>

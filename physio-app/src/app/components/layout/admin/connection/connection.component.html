@@ -116,12 +116,7 @@
         <ng-container
           *ngIf="view() === 'thread' && thread() as t; else listHeader"
         >
-          <button
-            class="inline-flex items-center justify-center cursor-pointer w-9 h-9 rounded-2 hover:bg-surface/10 transition-colors"
-            type="button"
-            aria-label="Back to conversations"
-            (click)="backToList()"
-          >
+          <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" classname="!h-9 !w-9" aria-label="Back to conversations" (click)="backToList()">
             <physio-icon name="arrow-left" class="w-4 h-4 stroke-white" />
           </button>
           <div
@@ -137,7 +132,7 @@
               </p>
               <p
                 *ngIf="c.roleName"
-                class="m-0 text-[11px] text-white/70 truncate"
+                class="m-0 text-xs text-white/70 truncate"
               >
                 {{ c.roleName }}
               </p>
@@ -152,13 +147,7 @@
           </div>
         </ng-template>
         <div class="flex px-1">
-          <button
-            class="inline-flex items-center justify-center relative cursor-pointer text-[26px] w-9 h-9 p-3 rounded-2 hover:bg-surface/10 transition-colors"
-            tabindex="0"
-            type="button"
-            aria-label="Close team chat"
-            (click)="closePanel()"
-          >
+          <button type="button" boo-button variant="ghost" size="sm" [iconOnly]="true" aria-label="Close team chat" (click)="closePanel()">
             <physio-icon name="x" class="w-4 h-4 stroke-white" />
           </button>
         </div>
@@ -178,7 +167,7 @@
           ></physio-icon>
           <input
             type="text"
-            class="flex-1 min-w-0 bg-transparent outline-none text-[13px]"
+            class="flex-1 min-w-0 bg-transparent outline-none text-sm"
             placeholder="Search colleagues"
             aria-label="Search colleagues"
             [ngModel]="search()"
@@ -192,11 +181,7 @@
           *ngIf="contactsState() === 'loading' && !contacts().length"
           class="flex justify-center py-10"
         >
-          <physio-icon
-            name="loader-circle"
-            [size]="22"
-            class="text-primary animate-spin"
-          ></physio-icon>
+          <boo-spinner [inline]="true" tone="primary" [size]="22" />
         </div>
 
         <boo-error-state
@@ -235,7 +220,7 @@
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
               <p
-                class="m-0 flex-1 truncate text-[13px] text-regular"
+                class="m-0 flex-1 truncate text-sm text-regular"
                 [ngClass]="
                   contact.unreadCount ? 'font-semibold' : 'font-medium'
                 "
@@ -244,7 +229,7 @@
               </p>
               <span
                 *ngIf="contact.lastMessageAt"
-                class="shrink-0 text-[11px] text-secondary"
+                class="shrink-0 text-xs text-secondary"
               >
                 {{
                   contact.lastMessageAt
@@ -300,11 +285,7 @@
         aria-label="Messages"
       >
         <div *ngIf="t.state === 'loading'" class="flex justify-center py-10">
-          <physio-icon
-            name="loader-circle"
-            [size]="22"
-            class="text-primary animate-spin"
-          ></physio-icon>
+          <boo-spinner [inline]="true" tone="primary" [size]="22" />
         </div>
 
         <boo-error-state
@@ -322,12 +303,8 @@
               [disabled]="t.loadingOlder"
               (click)="loadOlder()"
             >
-              <physio-icon
-                [name]="t.loadingOlder ? 'loader-circle' : 'refresh'"
-                [size]="12"
-                [ngClass]="{ 'animate-spin': t.loadingOlder }"
-              ></physio-icon>
-              {{ t.loadingOlder ? "Loading…" : "Load earlier messages" }}
+              <physio-icon name="refresh" [size]="12"></physio-icon>
+              Load earlier messages
             </button>
           </div>
 
@@ -352,7 +329,7 @@
               [ngClass]="message.isMine ? 'items-end' : 'items-start'"
             >
               <div
-                class="px-3 py-2 rounded-2 text-[13px] leading-[1.45] whitespace-pre-wrap break-words"
+                class="px-3 py-2 rounded-2 text-sm leading-[1.45] whitespace-pre-wrap break-words"
                 [ngClass]="
                   message.isMine
                     ? 'bg-primary text-white rounded-br-sm'
@@ -400,7 +377,7 @@
         <div class="flex items-end gap-2">
           <textarea
             rows="2"
-            class="flex-1 min-w-0 max-h-32 resize-none px-3 py-2 rounded-2 bg-gray-50 border border-solid border-[#EFE3E7] focus:border-primary outline-none text-[13px] leading-[1.4]"
+            class="flex-1 min-w-0 max-h-32 resize-none px-3 py-2 rounded-2 bg-gray-50 border border-solid border-[#EFE3E7] focus:border-primary outline-none text-sm leading-[1.4]"
             placeholder="Write a message…"
             aria-label="Message"
             name="draft"

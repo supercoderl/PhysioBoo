@@ -2,7 +2,7 @@ import { NgIf } from '@angular/common';
 import { Component, DestroyRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { BooButtonComponent, BooIconComponent, BooInputComponent } from '@physioboo/ui';
+import { BooButtonComponent, BooIconComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { DrawerComponent } from '../../../../components/drawer/drawer.component';
@@ -32,8 +32,7 @@ const DEFAULT_DURATION_MINUTES = 10;
     BooIconComponent,
     BooInputComponent,
     BooTextareaComponent,
-    CustomScrollbarDirective,
-  ],
+    CustomScrollbarDirective, BooFieldErrorComponent],
   template: `
     <drawer [isOpen]="open" [isShowDialog]="form.dirty && !submitting" (close)="discard()">
       <form
@@ -59,19 +58,19 @@ const DEFAULT_DURATION_MINUTES = 10;
 
         <div class="flex-1 min-h-0 overflow-y-auto px-6 py-5 flex flex-col gap-4" custom-scrollbar>
           <div>
-            <label for="lesson-title" class="block mb-1 text-[13px] font-medium text-regular">Title <span class="text-danger" aria-hidden="true">*</span></label>
+            <label for="lesson-title" class="block mb-1 text-sm font-medium text-regular">Title <span class="text-danger" aria-hidden="true">*</span></label>
             <boo-input id="lesson-title" name="lesson-title" formControlName="title" label="Lesson title" required [maxlength]="200" />
           </div>
 
           <div>
-            <label for="lesson-duration" class="block mb-1 text-[13px] font-medium text-regular">Duration (minutes) <span class="text-danger" aria-hidden="true">*</span></label>
+            <label for="lesson-duration" class="block mb-1 text-sm font-medium text-regular">Duration (minutes) <span class="text-danger" aria-hidden="true">*</span></label>
             <boo-input class="sm:max-w-40" id="lesson-duration" name="lesson-duration" type="number" formControlName="durationMinutes" label="Minutes" required [maxlength]="3" />
             <p class="m-0 mt-1 text-xs text-secondary">Whole minutes, 1 to 600.</p>
-            <p *ngIf="form.controls.durationMinutes.touched && form.controls.durationMinutes.invalid" class="m-0 mt-1 text-xs text-danger" role="alert">Enter a whole number of minutes between 1 and 600.</p>
+            <boo-field-error size="sm" announce class="mt-1" *ngIf="form.controls.durationMinutes.touched && form.controls.durationMinutes.invalid">Enter a whole number of minutes between 1 and 600.</boo-field-error>
           </div>
 
           <div>
-            <label for="lesson-content" class="block mb-1 text-[13px] font-medium text-regular">Content <span class="text-danger" aria-hidden="true">*</span></label>
+            <label for="lesson-content" class="block mb-1 text-sm font-medium text-regular">Content <span class="text-danger" aria-hidden="true">*</span></label>
             <boo-textarea id="lesson-content" name="lesson-content" formControlName="content" label="Lesson text" required [rows]="14" [maxlength]="20000" />
             <p class="m-0 mt-1 text-xs text-secondary">Plain text, up to 20,000 characters. Line breaks are kept.</p>
           </div>

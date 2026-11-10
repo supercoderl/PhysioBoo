@@ -31,7 +31,7 @@ const MAX_IMAGE_BYTES = 300 * 1024;
       </div>
       <div class="min-w-0">
         <div class="text-sm font-semibold text-gray-900 truncate">{{ meta.label }}</div>
-        <div class="text-[11px] text-gray-500 truncate">{{ meta.description }}</div>
+        <div class="text-xs text-gray-500 truncate">{{ meta.description }}</div>
       </div>
     </div>
 
@@ -127,7 +127,7 @@ const MAX_IMAGE_BYTES = 300 * 1024;
               <ng-container *ngTemplateOutlet="alignSeg; context: { value: c.align, set: setColumnAlign(i) }"></ng-container>
               <input class="ptd-input !mt-0 w-20 ml-auto" type="number" min="1" max="100" placeholder="auto" title="Width (%)"
                 [ngModel]="c.width" (ngModelChange)="setColumn(i, 'width', $event === null || $event === '' ? null : n($event), 'col-w-' + i)" />
-              <span class="text-[11px] text-gray-500">%</span>
+              <span class="text-xs text-gray-500">%</span>
             </div>
           </div>
         </div>
@@ -226,7 +226,7 @@ const MAX_IMAGE_BYTES = 300 * 1024;
 
       <ng-container *ngIf="el.kind === 'html'">
         <label class="ptd-label">HTML</label>
-        <textarea #htmlRef class="ptd-input ptd-textarea font-mono text-[11px]" rows="12" spellcheck="false" [ngModel]="el.html"
+        <textarea #htmlRef class="ptd-input ptd-textarea font-mono text-xs" rows="12" spellcheck="false" [ngModel]="el.html"
           (ngModelChange)="set('html', $event, 'html')"></textarea>
         <ng-container *ngTemplateOutlet="insertField; context: { $implicit: htmlRef }"></ng-container>
         <p class="ptd-hint">Printed exactly as written. Placeholders use the <code ngNonBindable>{{ key }}</code> syntax of the print engine.</p>
@@ -338,7 +338,7 @@ const MAX_IMAGE_BYTES = 300 * 1024;
     <ng-template #colorInput let-value="value" let-set="set" let-clearable="clearable">
       <div class="flex items-center gap-1 mt-1">
         <input type="color" class="ptd-color" [ngModel]="value || '#ffffff'" (ngModelChange)="set($event)" />
-        <span class="text-[11px] font-mono text-gray-600 truncate flex-1">{{ value || 'none' }}</span>
+        <span class="text-xs font-mono text-gray-600 truncate flex-1">{{ value || 'none' }}</span>
         <button *ngIf="clearable && value" type="button" class="ptd-icon-btn" title="Clear" (click)="set('')">
           <physio-icon name="x" [size]="12" />
         </button>

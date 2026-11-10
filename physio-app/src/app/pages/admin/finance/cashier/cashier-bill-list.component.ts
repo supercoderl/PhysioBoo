@@ -32,21 +32,21 @@ import { PaginationData } from "../../../../shared/types/common";
             <button type="button" (click)="select.emit(item)" [attr.aria-current]="item.id === selectedId ? 'true' : null"
               class="block max-w-full truncate text-left text-sm font-semibold hover:underline"
               [ngClass]="item.id === selectedId ? 'text-primary underline' : 'text-regular'">{{ item.billNumber }}</button>
-            <div class="truncate text-[11px] text-secondary">{{ item.billDate | date:'mediumDate' }}</div>
+            <div class="truncate text-xs text-secondary">{{ item.billDate | date:'mediumDate' }}</div>
           </div>
         </ng-template>
 
         <ng-template appColumnDef="patient" headerLabel="Patient" headerClass="text-left" let-item>
           <div class="min-w-0 leading-tight">
             <div class="truncate text-sm text-regular">{{ item.patientName || '—' }}</div>
-            <div class="truncate text-[11px] text-secondary">{{ item.patientMrn || 'No MRN' }}</div>
+            <div class="truncate text-xs text-secondary">{{ item.patientMrn || 'No MRN' }}</div>
           </div>
         </ng-template>
 
         <ng-template appColumnDef="due" headerLabel="Outstanding" headerClass="text-right" cellClass="text-right" let-item>
           <div class="leading-tight">
             <div class="text-sm font-semibold tabular-nums" [ngClass]="item.remainingBalance > 0 ? 'text-rose-700' : 'text-secondary'">{{ item.remainingBalance | currency:'USD':'symbol':'1.2-2' }}</div>
-            <div class="text-[11px] text-secondary tabular-nums">of {{ item.totalAmount | currency:'USD':'symbol':'1.2-2' }}</div>
+            <div class="text-xs text-secondary tabular-nums">of {{ item.totalAmount | currency:'USD':'symbol':'1.2-2' }}</div>
           </div>
         </ng-template>
 

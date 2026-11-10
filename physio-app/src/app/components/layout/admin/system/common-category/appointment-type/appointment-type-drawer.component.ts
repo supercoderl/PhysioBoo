@@ -1,6 +1,6 @@
 import { Component, inject } from "@angular/core";
 import { FormBuilder, Validators } from "@angular/forms";
-import { BooCheckboxComponent, BooInputComponent } from '@physioboo/ui';
+import { BooCheckboxComponent, BooInputComponent, BooFieldErrorComponent } from '@physioboo/ui';
 import { AppointmentTypeService } from "../../../../../../services/admin/appointment-type.service";
 import { SharedModule } from "../../../../../../shared/shared-imports";
 import { AppointmentType } from "../../../../../../shared/types/operation.types";
@@ -17,8 +17,7 @@ import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-sh
         CommonCategoryDrawerShellComponent,
         BooInputComponent,
         BooTextareaComponent,
-        BooCheckboxComponent
-    ],
+        BooCheckboxComponent, BooFieldErrorComponent],
     template: `
         <common-category-drawer-shell
             [form]="form"
@@ -46,7 +45,7 @@ import { CommonCategoryDrawerShellComponent } from "../shared/category-drawer-sh
                             <boo-input class="flex-1 min-w-0" label="Calendar color" formControlName="colorCode" [maxlength]="9" placeholder="#FB7185" />
                         </div>
                     </div>
-                    <p *ngIf="form.controls['colorCode'].touched && form.controls['colorCode'].hasError('pattern')" class="m-0 mt-1 text-xs text-danger" role="alert">Use a hex color such as #FB7185.</p>
+                    <boo-field-error size="sm" announce class="mt-1" *ngIf="form.controls['colorCode'].touched && form.controls['colorCode'].hasError('pattern')">Use a hex color such as #FB7185.</boo-field-error>
                 </section>
 
                 <section class="px-6 py-5 border-b border-rowDivider">

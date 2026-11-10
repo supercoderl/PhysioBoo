@@ -159,6 +159,7 @@
           </p>
 
           <boo-search-field
+            size="middle"
             label="Search existing patients"
             placeholder="Name, patient no. or phone"
             [formControl]="searchQuery"
@@ -269,22 +270,9 @@
             </div>
           </div>
 
-          <fieldset
-            class="m-0 bg-surface border border-borderGray rounded-xl p-4 min-w-0"
-          >
-            <legend class="px-1 text-sm font-semibold text-regular">
-              Patient
-            </legend>
-            <div
-              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-1"
-            >
-              <div class="min-w-0">
-                <label
-                  for="reg-first-name"
-                  class="block mb-1 text-[13px] font-medium text-regular"
-                  >First name
-                  <span class="text-danger" aria-hidden="true">*</span></label
-                >
+          <fieldset boo-form-section heading="Patient">
+            <boo-form-row [columns]="3">
+              <boo-form-field label="First name" for="reg-first-name" required>
                 <boo-input
                   name="reg-first-name"
                   formControlName="firstName"
@@ -292,14 +280,8 @@
                   [maxlength]="100"
                   required
                 />
-              </div>
-              <div class="min-w-0">
-                <label
-                  for="reg-last-name"
-                  class="block mb-1 text-[13px] font-medium text-regular"
-                  >Last name
-                  <span class="text-danger" aria-hidden="true">*</span></label
-                >
+              </boo-form-field>
+              <boo-form-field label="Last name" for="reg-last-name" required>
                 <boo-input
                   name="reg-last-name"
                   formControlName="lastName"
@@ -307,14 +289,22 @@
                   [maxlength]="100"
                   required
                 />
-              </div>
-              <div class="min-w-0">
-                <label
-                  for="reg-dob"
-                  class="block mb-1 text-[13px] font-medium text-regular"
-                  >Date of birth
-                  <span class="text-danger" aria-hidden="true">*</span></label
-                >
+              </boo-form-field>
+              <boo-form-field
+                label="Date of birth"
+                for="reg-dob"
+                required
+                [error]="
+                  showError('dateOfBirth')
+                    ? form.controls.dateOfBirth.hasError('required')
+                      ? 'Date of birth is required.'
+                      : 'Date of birth must be between 1900 and today.'
+                    : null
+                "
+                [helper]="
+                  age() !== null ? age() + ' years old' : 'Between 1900 and today.'
+                "
+              >
                 <boo-datepicker
                   id="reg-dob"
                   formControlName="dateOfBirth"
@@ -323,33 +313,8 @@
                   disableFuture
                   [min]="minDob"
                 />
-                <p
-                  id="reg-dob-msg"
-                  class="m-0 mt-1 text-xs"
-                  [class.text-danger]="showError('dateOfBirth')"
-                  [class.text-secondary]="!showError('dateOfBirth')"
-                >
-                  <ng-container *ngIf="showError('dateOfBirth'); else ageTpl">{{
-                    form.controls.dateOfBirth.hasError("required")
-                      ? "Date of birth is required."
-                      : "Date of birth must be between 1900 and today."
-                  }}</ng-container>
-                  <ng-template #ageTpl
-                    ><ng-container *ngIf="age() !== null; else dobHint"
-                      >{{ age() }} years old</ng-container
-                    ><ng-template #dobHint
-                      >Between 1900 and today.</ng-template
-                    ></ng-template
-                  >
-                </p>
-              </div>
-              <div class="min-w-0">
-                <label
-                  for="reg-gender"
-                  class="block mb-1 text-[13px] font-medium text-regular"
-                  >Gender
-                  <span class="text-danger" aria-hidden="true">*</span></label
-                >
+              </boo-form-field>
+              <boo-form-field label="Gender" for="reg-gender" required>
                 <boo-select
                   id="reg-gender"
                   formControlName="gender"
@@ -357,14 +322,8 @@
                   required
                   [options]="genders"
                 />
-              </div>
-              <div class="min-w-0">
-                <label
-                  for="reg-blood"
-                  class="block mb-1 text-[13px] font-medium text-regular"
-                  >Blood group
-                  <span class="text-danger" aria-hidden="true">*</span></label
-                >
+              </boo-form-field>
+              <boo-form-field label="Blood group" for="reg-blood" required>
                 <boo-select
                   id="reg-blood"
                   formControlName="bloodGroup"
@@ -372,14 +331,8 @@
                   required
                   [options]="bloodGroups"
                 />
-              </div>
-              <div class="min-w-0">
-                <label
-                  for="reg-marital"
-                  class="block mb-1 text-[13px] font-medium text-regular"
-                  >Marital status
-                  <span class="text-danger" aria-hidden="true">*</span></label
-                >
+              </boo-form-field>
+              <boo-form-field label="Marital status" for="reg-marital" required>
                 <boo-select
                   id="reg-marital"
                   formControlName="maritalStatus"
@@ -387,24 +340,13 @@
                   required
                   [options]="maritalStatuses"
                 />
-              </div>
-            </div>
+              </boo-form-field>
+            </boo-form-row>
           </fieldset>
 
-          <fieldset
-            class="m-0 bg-surface border border-borderGray rounded-xl p-4 min-w-0"
-          >
-            <legend class="px-1 text-sm font-semibold text-regular">
-              Contact
-            </legend>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-1">
-              <div class="min-w-0">
-                <label
-                  for="reg-phone"
-                  class="block mb-1 text-[13px] font-medium text-regular"
-                  >Phone
-                  <span class="text-danger" aria-hidden="true">*</span></label
-                >
+          <fieldset boo-form-section heading="Contact">
+            <boo-form-row>
+              <boo-form-field label="Phone" for="reg-phone" required>
                 <boo-input
                   name="reg-phone"
                   formControlName="phone"
@@ -413,14 +355,8 @@
                   [maxlength]="20"
                   required
                 />
-              </div>
-              <div class="min-w-0">
-                <label
-                  for="reg-email"
-                  class="block mb-1 text-[13px] font-medium text-regular"
-                  >Email
-                  <span class="text-danger" aria-hidden="true">*</span></label
-                >
+              </boo-form-field>
+              <boo-form-field label="Email" for="reg-email" required>
                 <boo-input
                   name="reg-email"
                   formControlName="email"
@@ -429,26 +365,24 @@
                   [maxlength]="255"
                   required
                 />
-              </div>
-              <div class="min-w-0">
-                <label
-                  for="reg-ec-name"
-                  class="block mb-1 text-[13px] font-medium text-regular"
-                  >Emergency contact name</label
-                >
+              </boo-form-field>
+              <boo-form-field
+                label="Emergency contact name"
+                for="reg-ec-name"
+                optional
+              >
                 <boo-input
                   name="reg-ec-name"
                   formControlName="emergencyContactName"
                   label="Emergency contact name"
                   [maxlength]="255"
                 />
-              </div>
-              <div class="min-w-0">
-                <label
-                  for="reg-ec-phone"
-                  class="block mb-1 text-[13px] font-medium text-regular"
-                  >Emergency contact phone</label
-                >
+              </boo-form-field>
+              <boo-form-field
+                label="Emergency contact phone"
+                for="reg-ec-phone"
+                optional
+              >
                 <boo-input
                   name="reg-ec-phone"
                   formControlName="emergencyContactPhone"
@@ -456,24 +390,22 @@
                   type="tel"
                   [maxlength]="20"
                 />
-              </div>
-            </div>
+              </boo-form-field>
+            </boo-form-row>
           </fieldset>
 
-          <fieldset
-            class="m-0 bg-surface border border-borderGray rounded-xl p-4 min-w-0"
-          >
-            <legend class="px-1 text-sm font-semibold text-regular">
-              Care
-            </legend>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-1">
-              <div class="min-w-0">
-                <label
-                  for="reg-doctor"
-                  class="block mb-1 text-[13px] font-medium text-regular"
-                  >Primary doctor
-                  <span class="text-danger" aria-hidden="true">*</span></label
-                >
+          <fieldset boo-form-section heading="Care">
+            <boo-form-row>
+              <boo-form-field
+                label="Primary doctor"
+                for="reg-doctor"
+                required
+                [error]="
+                  noDoctors
+                    ? 'No doctors are set up yet, so a primary doctor can’t be chosen.'
+                    : null
+                "
+              >
                 <boo-select
                   id="reg-doctor"
                   formControlName="primaryDoctorId"
@@ -483,29 +415,16 @@
                   bindLabel="fullName"
                   bindValue="id"
                 />
-                <p
-                  id="reg-doctor-msg"
-                  *ngIf="noDoctors"
-                  class="m-0 mt-1 text-xs text-danger"
-                >
-                  No doctors are set up yet, so a primary doctor can’t be
-                  chosen.
-                </p>
-              </div>
-              <div class="min-w-0">
-                <label
-                  for="reg-occupation"
-                  class="block mb-1 text-[13px] font-medium text-regular"
-                  >Occupation</label
-                >
+              </boo-form-field>
+              <boo-form-field label="Occupation" for="reg-occupation" optional>
                 <boo-input
                   name="reg-occupation"
                   formControlName="occupation"
                   label="Occupation"
                   [maxlength]="255"
                 />
-              </div>
-            </div>
+              </boo-form-field>
+            </boo-form-row>
             <boo-inline-error
               *ngIf="doctorsError"
               class="block mt-3"
@@ -535,7 +454,7 @@
               <div class="min-w-0">
                 <label
                   for="reg-ins-provider"
-                  class="block mb-1 text-[13px] font-medium text-regular"
+                  class="block mb-1 text-sm font-medium text-regular"
                   >Provider</label
                 >
                 <boo-input
@@ -548,7 +467,7 @@
               <div class="min-w-0">
                 <label
                   for="reg-ins-policy"
-                  class="block mb-1 text-[13px] font-medium text-regular"
+                  class="block mb-1 text-sm font-medium text-regular"
                   >Policy number</label
                 >
                 <boo-input
@@ -561,7 +480,7 @@
               <div class="min-w-0">
                 <label
                   for="reg-ins-expiry"
-                  class="block mb-1 text-[13px] font-medium text-regular"
+                  class="block mb-1 text-sm font-medium text-regular"
                   >Expiry date</label
                 >
                 <boo-datepicker
@@ -573,7 +492,7 @@
               <div class="min-w-0">
                 <label
                   for="reg-ins-coverage"
-                  class="block mb-1 text-[13px] font-medium text-regular"
+                  class="block mb-1 text-sm font-medium text-regular"
                   >Coverage amount</label
                 >
                 <boo-input
@@ -605,7 +524,7 @@
               <div class="min-w-0 sm:col-span-2">
                 <label
                   for="reg-allergy"
-                  class="block mb-1 text-[13px] font-medium text-regular"
+                  class="block mb-1 text-sm font-medium text-regular"
                   >Known allergies</label
                 >
                 <boo-textarea
@@ -618,7 +537,7 @@
               <div class="min-w-0 sm:col-span-2">
                 <label
                   for="reg-history"
-                  class="block mb-1 text-[13px] font-medium text-regular"
+                  class="block mb-1 text-sm font-medium text-regular"
                   >Medical history</label
                 >
                 <boo-textarea
@@ -631,7 +550,7 @@
               <div class="min-w-0">
                 <label
                   for="reg-family"
-                  class="block mb-1 text-[13px] font-medium text-regular"
+                  class="block mb-1 text-sm font-medium text-regular"
                   >Family history</label
                 >
                 <boo-textarea
@@ -644,7 +563,7 @@
               <div class="min-w-0">
                 <label
                   for="reg-surgical"
-                  class="block mb-1 text-[13px] font-medium text-regular"
+                  class="block mb-1 text-sm font-medium text-regular"
                   >Surgical history</label
                 >
                 <boo-textarea
@@ -657,7 +576,7 @@
               <div class="min-w-0">
                 <label
                   for="reg-meds"
-                  class="block mb-1 text-[13px] font-medium text-regular"
+                  class="block mb-1 text-sm font-medium text-regular"
                   >Current medications</label
                 >
                 <boo-textarea
@@ -670,7 +589,7 @@
               <div class="min-w-0">
                 <label
                   for="reg-lifestyle"
-                  class="block mb-1 text-[13px] font-medium text-regular"
+                  class="block mb-1 text-sm font-medium text-regular"
                   >Lifestyle notes</label
                 >
                 <boo-textarea

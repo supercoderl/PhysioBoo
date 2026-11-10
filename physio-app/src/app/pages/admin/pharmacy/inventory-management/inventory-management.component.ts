@@ -38,7 +38,7 @@ const PAGE_SIZE = 20;
           </p>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-          <button boo-button variant="secondary" (click)="refresh()" [loading]="listState() === 'loading'">
+          <button boo-button variant="secondary" (click)="refresh()" [disabled]="listState() === 'loading'">
             <physio-icon name="refresh" [size]="16"></physio-icon>Refresh
           </button>
           <a boo-button variant="primary" routerLink="/admin/pharmacy/stock-take">

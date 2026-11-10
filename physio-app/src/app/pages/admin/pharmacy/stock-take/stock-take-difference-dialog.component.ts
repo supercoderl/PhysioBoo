@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
-import { BooEmptyStateComponent, BooErrorStateComponent } from '@physioboo/ui';
+import { BooEmptyStateComponent, BooErrorStateComponent, BooButtonComponent, BooDialogComponent, BooSpinnerComponent } from '@physioboo/ui';
 import { StockTakeService } from "../../../../services/admin/stock-take.service";
 import { SharedModule } from "../../../../shared/shared-imports";
 import { StockTake, StockTakeItem, stockTakeReasonLabel } from "../../../../shared/types/stock-take.types";
@@ -7,33 +7,15 @@ import { StockTake, StockTakeItem, stockTakeReasonLabel } from "../../../../shar
 @Component({
     selector: 'stock-take-difference-dialog',
     standalone: true,
-    imports: [SharedModule, BooEmptyStateComponent, BooErrorStateComponent],
+    imports: [SharedModule, BooEmptyStateComponent, BooErrorStateComponent, BooButtonComponent, BooDialogComponent, BooSpinnerComponent],
     template: `
-    <div *ngIf="isOpen" class="fixed inset-0 z-[10000] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="stock-take-diff-title" (keydown.escape)="close.emit()">
-      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="close.emit()"></div>
-
-      <div class="relative bg-surface rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden border border-gray-100 flex flex-col">
-        <div class="px-6 py-5 border-b border-gray-100 flex items-start justify-between gap-4">
-          <div class="flex items-start gap-4">
-            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <physio-icon name="scale" [size]="20" class="text-primary"></physio-icon>
-            </div>
-            <div>
-              <h3 id="stock-take-diff-title" class="text-lg font-semibold text-gray-900">Differences — {{ stockTake?.code }}</h3>
-              <p class="text-sm text-gray-500 mt-1">Counted batches whose quantity differs from the system quantity at the start of counting</p>
-            </div>
-          </div>
-          <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100" aria-label="Close differences">
-            <physio-icon name="x" [size]="18"></physio-icon>
-          </button>
-        </div>
-
-        <div class="flex-1 overflow-y-auto p-6" custom-scrollbar>
+    <boo-dialog *ngIf="isOpen" size="lg" [heading]="'Differences — ' + stockTake?.code" description="Counted batches whose quantity differs from the system quantity at the start of counting" icon="scale" (dismiss)="close.emit()">
+        <div>
           <boo-error-state *ngIf="!loading && failed" title="We couldn't load the items" (retry)="load(stockTake!.id)"></boo-error-state>
           <boo-empty-state *ngIf="!loading && !failed && !differences.length" icon="circle-check" title="No differences found" description="Every counted item matches the system quantity."></boo-empty-state>
 
           <div *ngIf="loading" class="flex items-center justify-center py-10">
-            <physio-icon name="loader-circle" [class]="'w-6 h-6 text-primary animate-spin'"></physio-icon>
+            <boo-spinner [inline]="true" tone="primary" [size]="24" />
           </div>
 
           <table class="w-full text-sm" *ngIf="!loading && !failed && differences.length">
@@ -62,8 +44,7 @@ import { StockTake, StockTakeItem, stockTakeReasonLabel } from "../../../../shar
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+    </boo-dialog>
   `,
 })
 export class StockTakeDifferenceDialogComponent implements OnChanges {
